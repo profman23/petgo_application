@@ -380,7 +380,7 @@ export default function Login() {
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
                 disabled={registerMutation.isPending}
               >
-                {registerMutation.isPending ? 'جاري إنشاء الحساب...' : 'إنشاء حساب جديد'}
+                {registerMutation.isPending ? t('loading') : t('createNewAccount')}
               </Button>
 
               <Button 
@@ -389,8 +389,8 @@ export default function Login() {
                 onClick={() => setIsRegistering(false)}
                 className="w-full"
               >
-                <ArrowLeft className="w-4 h-4 ml-2" />
-                العودة لتسجيل الدخول
+                <ArrowLeft className={`w-4 h-4 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                {t('backToLogin')}
               </Button>
             </form>
           )}
