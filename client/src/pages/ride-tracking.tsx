@@ -101,25 +101,7 @@ export default function RideTracking() {
           className="h-full"
         />
         
-        {/* Google Maps Navigation Button */}
-        {assignedDriver && customerLat && customerLng && (
-          <div className="absolute top-4 right-4 z-[1000]">
-            <Button
-              onClick={() => {
-                const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(assignedDriver.latitude)},${encodeURIComponent(assignedDriver.longitude)}/${encodeURIComponent(customerLat)},${encodeURIComponent(customerLng)}`;
-                console.log('Opening Google Maps:', googleMapsUrl);
-                const newWindow = window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
-                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
-                  window.location.href = googleMapsUrl;
-                }
-              }}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2"
-            >
-              <Navigation className="w-4 h-4 mr-1" />
-              التنقل عبر Google Maps
-            </Button>
-          </div>
-        )}
+
       </div>
 
       {/* Content */}
@@ -194,54 +176,18 @@ export default function RideTracking() {
           </CardContent>
         </Card>
 
-        {/* Trip Details */}
+        {/* معلومات الطلب المبسطة */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">تفاصيل الرحلة</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500 mb-1">المسافة المقدرة</p>
-                <p className="font-semibold">{activeRide.estimatedDistance} كم</p>
-              </div>
-              <div>
-                <p className="text-gray-500 mb-1">الوقت المقدر</p>
-                <p className="font-semibold">{activeRide.estimatedTime} دقيقة</p>
-              </div>
-              <div>
-                <p className="text-gray-500 mb-1">التكلفة المقدرة</p>
-                <p className="font-semibold text-green-600">{activeRide.estimatedCost} ريال</p>
-              </div>
-              <div>
-                <p className="text-gray-500 mb-1">طريقة الدفع</p>
-                <p className="font-semibold">نقدي</p>
-              </div>
+            <h3 className="font-semibold text-gray-900 mb-3 text-center">طلب العيادة البيطرية</h3>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-600">تم تقديم طلبك بنجاح</p>
+              <p className="text-sm text-gray-600">ننتظر رد العيادة البيطرية</p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Route Details */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">تفاصيل المسار</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-gray-500">من</p>
-                  <p className="font-medium">{activeRide.pickupLocation}</p>
-                </div>
-              </div>
-              <div className="border-r-2 border-gray-300 border-dashed h-4 mr-1" />
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-red-500 rounded-full flex-shrink-0" />
-                <div>
-                  <p className="text-sm text-gray-500">إلى</p>
-                  <p className="font-medium">{activeRide.destination}</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
 
         {/* Cancel Button */}
         {!['completed', 'cancelled'].includes(activeRide.status) && (
