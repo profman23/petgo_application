@@ -80,13 +80,14 @@ export default function DoctorDashboard() {
     onSuccess: () => {
       toast({
         title: 'تم قبول الطلب',
-        description: 'تم قبول طلب العيادة البيطرية بنجاح',
+        description: 'جاري توجيهك لصفحة المتابعة مع خرائط Google...',
       });
-      refetch();
-      // Redirect to ride tracking page with navigation
-      setTimeout(() => {
-        setLocation('/doctor-ride-tracking');
-      }, 1000);
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/active-ride'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/pending-rides'] });
+      
+      // Immediate redirect to ride tracking page
+      setLocation('/doctor-ride-tracking');
     },
     onError: (error) => {
       toast({

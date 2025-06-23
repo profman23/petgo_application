@@ -138,6 +138,11 @@ Changelog:
 - June 23, 2025. Enhanced map component to support displaying both doctor and customer locations simultaneously
 - June 23, 2025. Added automatic redirect to tracking page after doctor accepts request
 - June 23, 2025. Implemented call customer feature and direct navigation buttons in doctor interface
+- June 23, 2025. FIXED: Google Maps navigation issue - added multiple opening methods and fallback options
+- June 23, 2025. Added comprehensive navigation buttons: Google Maps (new window + direct), Apple Maps, Waze
+- June 23, 2025. Implemented proper URL encoding and popup blocking detection for reliable map opening
+- June 23, 2025. Enhanced doctor dashboard with immediate redirect to tracking page after accepting requests
+- June 23, 2025. Added toast notifications and debugging features for troubleshooting navigation issues
 ```
 
 ## User Preferences
