@@ -40,6 +40,8 @@ export class MemStorage implements IStorage {
     
     // Initialize with 6 mock drivers
     this.initializeDrivers();
+    // Initialize with test users
+    this.initializeTestUsers();
   }
 
   private initializeDrivers() {
@@ -130,6 +132,30 @@ export class MemStorage implements IStorage {
     });
   }
 
+  private initializeTestUsers() {
+    const testUsers = [
+      {
+        id: 1,
+        phone: '0501234567',
+        password: '123456',
+        name: 'أحمد محمد',
+        membershipType: 'bronze'
+      },
+      {
+        id: 2,
+        phone: '0507654321',
+        password: '123456',
+        name: 'فاطمة علي',
+        membershipType: 'silver'
+      }
+    ];
+
+    testUsers.forEach(user => {
+      this.users.set(user.id, user as User);
+      this.currentUserId = Math.max(this.currentUserId, user.id + 1);
+    });
+  }
+
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
   }
@@ -180,6 +206,13 @@ export class MemStorage implements IStorage {
     const ride: Ride = {
       ...rideData,
       id,
+      status: rideData.status || 'requested',
+      driverId: rideData.driverId || null,
+      destinationLatitude: rideData.destinationLatitude || null,
+      destinationLongitude: rideData.destinationLongitude || null,
+      estimatedDistance: rideData.estimatedDistance || null,
+      estimatedTime: rideData.estimatedTime || null,
+      estimatedCost: rideData.estimatedCost || null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

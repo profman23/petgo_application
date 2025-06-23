@@ -107,6 +107,13 @@ export default function Login() {
             <p className="text-gray-600">
               {isRegistering ? 'إنشاء حساب جديد' : 'سجل دخولك للبدء في طلب الرحلة'}
             </p>
+            {!isRegistering && (
+              <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg mt-4">
+                <p className="font-semibold mb-1">للتجربة استخدم:</p>
+                <p>الهاتف: 0501234567</p>
+                <p>كلمة المرور: 123456</p>
+              </div>
+            )}
           </div>
 
           <Form {...form}>

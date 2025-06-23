@@ -114,6 +114,7 @@ The application serves the built frontend statically in production while providi
 ```
 Changelog:
 - June 23, 2025. Initial setup
+- June 23, 2025. Added test user accounts for login testing (phone: 0501234567, password: 123456)
 ```
 
 ## User Preferences
