@@ -234,6 +234,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Doctor location update endpoint
+  app.put('/api/doctor/location', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const { latitude, longitude, accuracy, timestamp } = req.body;
+      
+      // Validate coordinates
+      if (!latitude || !longitude || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        return res.status(400).json({ message: 'Invalid coordinates' });
+      }
+
+      // Update doctor location in storage
+      await storage.updateDriverLocation(user.id, latitude, longitude);
+      
+      res.json({ 
+        message: 'Location updated successfully',
+        coordinates: { latitude, longitude },
+        accuracy,
+        timestamp 
+      });
+    } catch (error) {
+      console.error('Error updating doctor location:', error);
+      res.status(500).json({ message: 'Failed to update location' });
+    }
+  });
+
   // Doctor endpoints for ride management
   app.get('/api/doctor/pending-rides', requireAuth, async (req, res) => {
     try {
