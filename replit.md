@@ -120,6 +120,9 @@ Changelog:
 - June 23, 2025. Created separate login interfaces for customers and doctors
 - June 23, 2025. Fixed authentication token system for API calls
 - June 23, 2025. Implemented real-time request notifications between customer and doctor interfaces
+- June 23, 2025. Fixed location detection issues - added Saudi Arabia boundary check and Riyadh fallback
+- June 23, 2025. Added automatic token expiry detection and redirect to login when sessions expire
+- June 23, 2025. COMPLETED: Full end-to-end testing confirmed - system working perfectly with real-time notifications
 ```
 
 ## User Preferences
