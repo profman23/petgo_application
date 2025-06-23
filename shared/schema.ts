@@ -50,8 +50,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
 });
 
 export const loginSchema = z.object({
-  phone: z.string().min(10, "رقم الهاتف يجب أن يكون 10 أرقام على الأقل"),
-  password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+  phone: z.string().min(1, "رقم الهاتف أو اسم المستخدم مطلوب"),
+  password: z.string().min(1, "كلمة المرور مطلوبة"),
 });
 
 export const rideRequestSchema = createInsertSchema(rides).pick({
