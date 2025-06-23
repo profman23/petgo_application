@@ -12,6 +12,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
 import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart } from 'lucide-react';
 import { useLocation } from 'wouter';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 
 interface LoginFormData {
   phone: string;
@@ -160,8 +161,12 @@ export default function Login() {
       <Card className="w-full max-w-md">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-blue-600" />
+            <div className="mx-auto mb-6">
+              <img 
+                src={logoImage} 
+                alt="Vets Van - Mobile Veterinary Clinic" 
+                className="h-20 mx-auto object-contain"
+              />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {isRegistering ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}

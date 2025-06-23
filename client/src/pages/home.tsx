@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { Bell, Settings, User, Car, Star } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -84,8 +85,12 @@ export default function Home() {
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-gray-600" />
+            <div className="w-12 h-12 flex items-center justify-center">
+              <img 
+                src={logoImage} 
+                alt="Vets Van" 
+                className="h-8 object-contain"
+              />
             </div>
             <div>
               <p className="font-semibold text-gray-900">{user.name}</p>
