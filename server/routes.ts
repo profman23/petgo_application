@@ -319,7 +319,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const allRides = await storage.getAllRides();
-      const pendingRides = allRides.filter(ride => ride.status === 'جاري المعالجة');
+      const pendingRides = allRides.filter(ride => ride.status === 'requested');
       
       // Get customer details for each ride
       const ridesWithCustomers = await Promise.all(

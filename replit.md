@@ -155,6 +155,12 @@ Changelog:
 - June 23, 2025. FIXED: Login issues for both customers and doctors - proper data saving and navigation
 - June 23, 2025. Resolved doctor login JSON parsing error and corrected apiRequest usage
 - June 23, 2025. Both customer and doctor login systems now work reliably with correct session management
+- June 23, 2025. RESTORED: Real-time notification system for doctors when new requests arrive
+- June 23, 2025. ENHANCED: Real GPS location tracking with high accuracy positioning instead of default locations
+- June 23, 2025. Added browser notifications and toast alerts for doctors when new veterinary requests are submitted
+- June 23, 2025. Fixed API endpoints to properly display pending requests with status 'requested' instead of Arabic status
+- June 23, 2025. Implemented location detection with city names (Riyadh, Jeddah, Dammam) based on real GPS coordinates
+- June 23, 2025. COMPLETED: Full notification and GPS system working - doctors receive instant alerts for new customer requests
 ```
 
 ## User Preferences
