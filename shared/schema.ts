@@ -7,10 +7,10 @@ export const users = pgTable("users", {
   phone: text("phone").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  petName: text("pet_name").notNull(),
-  petType: text("pet_type").notNull(), // كلب، قطة، طير
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  petName: text("pet_name"),
+  petType: text("pet_type"), // كلب، قطة، طير
   membershipType: text("membership_type").notNull().default("bronze"),
 });
 

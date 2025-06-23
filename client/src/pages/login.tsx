@@ -121,122 +121,328 @@ export default function Login() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: LoginFormData & { name: string }) => {
-      const response = await apiRequest('POST', '/api/auth/register', data);
+    mutationFn: async (data: RegisterUser) => {
+      // Validate captcha on frontend first
+      if (parseInt(data.captcha) !== captcha.answer) {
+        throw new Error('رمز التحقق غير صحيح');
+      }
+      
+      const response = await apiRequest('POST', '/api/auth/register', {
+        phone: data.phone,
+        password: data.password,
+        name: `${data.firstName} ${data.lastName}`,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        petName: data.petName,
+        petType: data.petType
+      });
       return response.json() as Promise<AuthResponse>;
     },
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast({
-        title: 'تم إنشاء الحساب بنجاح',
-        description: `مرحباً ${data.user.name}`,
+        title: 'تم التسجيل بنجاح',
+        description: `مرحباً ${data.user.name}، تم إنشاء حسابك بنجاح`,
       });
       setLocation('/');
     },
     onError: (error) => {
       toast({
-        title: 'خطأ في إنشاء الحساب',
+        title: 'خطأ في التسجيل',
         description: error.message,
         variant: 'destructive',
       });
+      generateCaptcha(); // Generate new captcha on error
     },
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    if (isRegistering) {
-      const name = data.phone.replace(/\D/g, '').slice(-4);
-      registerMutation.mutate({ ...data, name: `مستخدم ${name}` });
-    } else {
-      loginMutation.mutate(data);
-    }
+  const onLoginSubmit = (data: LoginFormData) => {
+    loginMutation.mutate(data);
+  };
+
+  const onRegisterSubmit = (data: RegisterUser) => {
+    registerMutation.mutate(data);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md">
         <CardContent className="p-8">
-          <div className="text-center mb-8">
+          <div className="flex items-center justify-between mb-8">
             <Button
               variant="ghost"
-              onClick={() => setLocation('/login')}
-              className="mb-4 p-2"
+              size="sm"
+              onClick={() => setLocation('/')}
+              className="p-2"
             >
-              <ArrowLeft className="w-4 h-4 ml-2" />
-              العودة
+              <ArrowLeft className="w-4 h-4" />
             </Button>
-            
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">دخول العميل</h1>
-            <p className="text-gray-600">
-              {isRegistering ? 'إنشاء حساب جديد' : 'سجل دخولك لطلب العيادة البيطرية'}
-            </p>
-            {!isRegistering && (
-              <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg mt-4">
-                <p className="font-semibold mb-1">للتجربة استخدم:</p>
-                <p>رقم الهاتف: 0501234567</p>
-                <p>كلمة المرور: 123456</p>
+            <div className="text-center flex-1">
+              <div className="flex items-center justify-center mb-2">
+                {isRegistering ? (
+                  <UserPlus className="w-8 h-8 text-blue-600 ml-2" />
+                ) : (
+                  <User className="w-8 h-8 text-blue-600 ml-2" />
+                )}
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {isRegistering ? 'إنشاء حساب جديد' : 'تسجيل دخول العملاء'}
+                </h1>
               </div>
-            )}
+              <p className="text-gray-600 text-sm">
+                {isRegistering 
+                  ? 'املأ جميع البيانات المطلوبة لإنشاء حساب جديد'
+                  : 'ادخل بياناتك للوصول إلى خدمات العيادة البيطرية المتنقلة'
+                }
+              </p>
+            </div>
           </div>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>رقم الهاتف أو اسم المستخدم</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          {...field}
-                          type="text"
-                          placeholder="05xxxxxxxx أو vetsvan1"
-                          className="text-right pr-4 pl-12"
-                        />
-                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          {!isRegistering && (
+            <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg mb-4">
+              <p className="font-semibold mb-1">للتجربة استخدم:</p>
+              <p>رقم الهاتف: 0501234567</p>
+              <p>كلمة المرور: 123456</p>
+            </div>
+          )}
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>كلمة المرور</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          {...field}
-                          type="password"
-                          placeholder="••••••••"
-                          className="text-right pr-4 pl-12"
-                        />
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          {!isRegistering ? (
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
+                <FormField
+                  control={loginForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>رقم الهاتف أو اسم المستخدم</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="05xxxxxxxx أو vetsvan1"
+                            className="text-right pr-4 pl-12"
+                          />
+                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <Button
-                type="submit"
-                className="w-full bg-primary hover:bg-gray-800 text-white py-3"
-                disabled={loginMutation.isPending || registerMutation.isPending}
-              >
-                {isRegistering ? 'إنشاء حساب' : 'تسجيل الدخول'}
-              </Button>
-            </form>
-          </Form>
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>كلمة المرور</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type="password"
+                            placeholder="كلمة المرور"
+                            className="text-right pr-4 pl-12"
+                          />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={loginMutation.isPending}
+                >
+                  {loginMutation.isPending ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+                </Button>
+              </form>
+            </Form>
+          ) : (
+            <Form {...registerForm}>
+              <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={registerForm.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>الاسم الأول *</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="أحمد"
+                            className="text-right"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={registerForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>الاسم الثاني *</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="محمد"
+                            className="text-right"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={registerForm.control}
+                  name="petName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>اسم الأليف *</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type="text"
+                            placeholder="فيلو"
+                            className="text-right pr-4 pl-12"
+                          />
+                          <Heart className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={registerForm.control}
+                  name="petType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>نوع الأليف *</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="text-right">
+                            <SelectValue placeholder="اختر نوع الأليف" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="كلب">كلب 🐕</SelectItem>
+                          <SelectItem value="قطة">قطة 🐱</SelectItem>
+                          <SelectItem value="طير">طير 🐦</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={registerForm.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>رقم الهاتف *</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type="tel"
+                            placeholder="0501234567"
+                            className="text-right pr-4 pl-12"
+                          />
+                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={registerForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>كلمة المرور *</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            {...field}
+                            type="password"
+                            placeholder="كلمة المرور (6 أحرف على الأقل)"
+                            className="text-right pr-4 pl-12"
+                          />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Captcha Section */}
+                <div className="bg-blue-50 p-4 rounded-lg border">
+                  <div className="flex items-center justify-between mb-3">
+                    <FormLabel className="text-sm font-medium">رمز التحقق *</FormLabel>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={generateCaptcha}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      <RefreshCw className="w-4 h-4 ml-1" />
+                      تجديد
+                    </Button>
+                  </div>
+                  <div className="text-center mb-3">
+                    <div className="inline-block bg-white border-2 border-blue-200 px-4 py-2 rounded text-xl font-bold text-blue-800">
+                      {captcha.question}
+                    </div>
+                  </div>
+                  <FormField
+                    control={registerForm.control}
+                    name="captcha"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            placeholder="أدخل الإجابة"
+                            className="text-center text-lg"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={registerMutation.isPending}
+                >
+                  {registerMutation.isPending ? 'جاري إنشاء الحساب...' : 'إنشاء حساب جديد'}
+                </Button>
+              </form>
+            </Form>
+          )}
 
           <div className="mt-6 text-center">
             <button
@@ -244,6 +450,15 @@ export default function Login() {
               className="text-blue-600 hover:underline text-sm"
             >
               {isRegistering ? 'لديك حساب؟ سجل دخولك' : 'لا تملك حساب؟ سجل الآن'}
+            </button>
+          </div>
+
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => setLocation('/doctor-login')}
+              className="text-gray-600 hover:text-gray-800 text-sm underline"
+            >
+              دخول الأطباء
             </button>
           </div>
         </CardContent>
