@@ -7,6 +7,7 @@ import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { ArrowLeft, X, Satellite, MapPin, Navigation, Loader2 } from 'lucide-react';
 import { Map } from '@/components/map';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { DriverCard } from '@/components/driver-card';
 import { RideStatus } from '@/components/ride-status';
 import { DEFAULT_COORDINATES } from '@/lib/constants';
@@ -86,7 +87,14 @@ export default function RideTracking() {
             <ArrowLeft className="w-4 h-4" />
             العودة
           </Button>
-          <h1 className="text-lg font-semibold">متابعة الرحلة</h1>
+          <div className="flex items-center gap-3">
+            <img 
+              src={logoImage} 
+              alt="Vets Van" 
+              className="h-8 object-contain"
+            />
+            <h1 className="text-lg font-semibold">متابعة الرحلة</h1>
+          </div>
           <div className="w-10" />
         </div>
       </header>

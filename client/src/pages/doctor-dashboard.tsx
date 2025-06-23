@@ -8,6 +8,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { useDoctorLocation } from '@/hooks/useDoctorLocation';
 import { Map } from '@/components/map';
 import { ArrowLeft, Check, X, MapPin, Clock, Navigation, Loader2, Satellite } from 'lucide-react';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 
 export default function DoctorDashboard() {
   const [, setLocation] = useLocation();
@@ -210,7 +211,14 @@ export default function DoctorDashboard() {
             <ArrowLeft className="w-4 h-4" />
             العودة
           </Button>
-          <h1 className="text-lg font-semibold">لوحة تحكم الطبيب البيطري</h1>
+          <div className="flex items-center gap-3">
+            <img 
+              src={logoImage} 
+              alt="Vets Van" 
+              className="h-8 object-contain"
+            />
+            <h1 className="text-lg font-semibold">لوحة تحكم الطبيب البيطري</h1>
+          </div>
           <Button variant="ghost" onClick={handleLogout} className="text-red-600">
             خروج
           </Button>

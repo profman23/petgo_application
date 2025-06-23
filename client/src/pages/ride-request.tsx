@@ -11,6 +11,7 @@ import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2 } from 'lucide-react';
 import { rideRequestSchema } from '@shared/schema';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 
@@ -187,7 +188,14 @@ export default function RideRequest() {
             <ArrowLeft className="w-4 h-4" />
             العودة
           </Button>
-          <h1 className="text-lg font-semibold">طلب عيادة بيطرية متنقلة</h1>
+          <div className="flex items-center gap-3">
+            <img 
+              src={logoImage} 
+              alt="Vets Van" 
+              className="h-8 object-contain"
+            />
+            <h1 className="text-lg font-semibold">طلب عيادة بيطرية متنقلة</h1>
+          </div>
           <div className="w-10" />
         </div>
       </header>
