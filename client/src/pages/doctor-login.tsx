@@ -34,7 +34,7 @@ export default function DoctorLogin() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { language } = useLanguage();
-  const { t } = useTranslation();
+  const t = useTranslation();
 
   const doctorLoginSchema = z.object({
     username: z.string().min(1, language === 'ar' ? 'اسم المستخدم مطلوب' : 'Username is required'),
@@ -66,14 +66,14 @@ export default function DoctorLogin() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast({
-        title: 'تم تسجيل الدخول بنجاح',
-        description: `مرحباً د. ${data.user.name}`,
+        title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Login Successful',
+        description: language === 'ar' ? `مرحباً د. ${data.user.name}` : `Welcome Dr. ${data.user.name}`,
       });
       window.location.href = '/doctor-dashboard';
     },
     onError: (error) => {
       toast({
-        title: 'خطأ في تسجيل الدخول',
+        title: language === 'ar' ? 'خطأ في تسجيل الدخول' : 'Login Error',
         description: error.message,
         variant: 'destructive',
       });
@@ -102,7 +102,7 @@ export default function DoctorLogin() {
                 className="mb-4 p-2"
               >
                 <ArrowLeft className={`w-4 h-4 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-{t('back')}
+{language === 'ar' ? 'العودة' : 'Back'}
               </Button>
               
               <div className="mx-auto mb-6">
@@ -160,14 +160,16 @@ export default function DoctorLogin() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>كلمة المرور</FormLabel>
+                      <FormLabel>
+                        {language === 'ar' ? 'كلمة المرور' : 'Password'}
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             {...field}
                             type="password"
                             placeholder="••••••••"
-                            className="text-right pr-4 pl-12"
+                            className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                           />
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -182,13 +184,21 @@ export default function DoctorLogin() {
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-3"
                   disabled={loginMutation.isPending}
                 >
-                  {loginMutation.isPending ? 'جاري تسجيل الدخول...' : 'دخول'}
+                  {loginMutation.isPending 
+                    ? (language === 'ar' ? 'جاري تسجيل الدخول...' : 'Logging in...') 
+                    : (language === 'ar' ? 'دخول' : 'Login')
+                  }
                 </Button>
               </form>
             </Form>
 
             <div className="text-center text-xs text-gray-500 mt-6">
-              <p>مخصص للأطباء البيطريين المعتمدين فقط</p>
+              <p>
+                {language === 'ar' 
+                  ? 'مخصص للأطباء البيطريين المعتمدين فقط' 
+                  : 'For certified veterinary doctors only'
+                }
+              </p>
             </div>
           </CardContent>
         </Card>
