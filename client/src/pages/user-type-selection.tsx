@@ -2,6 +2,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Stethoscope, ArrowLeft } from 'lucide-react';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 
 export default function UserTypeSelection() {
   const [, setLocation] = useLocation();
@@ -11,8 +12,12 @@ export default function UserTypeSelection() {
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center">
-          <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Stethoscope className="w-10 h-10 text-white" />
+          <div className="w-20 h-20 flex items-center justify-center mx-auto mb-4">
+            <img 
+              src={logoImage} 
+              alt="Vets Van" 
+              className="w-full h-full object-contain rounded-full border-2 border-green-200"
+            />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">العيادة البيطرية المتنقلة</h1>
           <p className="text-gray-600">اختر نوع حسابك للمتابعة</p>

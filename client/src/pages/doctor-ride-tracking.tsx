@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Navigation, MapPin, Phone, Clock } from "lucide-react";
 import { Map } from "@/components/map";
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useLocation } from "wouter";
 import { useDoctorLocation } from "@/hooks/useDoctorLocation";
 import { useToast } from "@/hooks/use-toast";
@@ -118,7 +119,14 @@ export default function DoctorRideTracking() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-lg font-semibold">متابعة الرحلة</h1>
+          <div className="flex items-center gap-3">
+            <img 
+              src={logoImage} 
+              alt="Vets Van" 
+              className="h-8 object-contain"
+            />
+            <h1 className="text-lg font-semibold">متابعة الرحلة</h1>
+          </div>
           <div className="w-10" />
         </div>
       </header>
