@@ -188,6 +188,9 @@ Changelog:
 - June 23, 2025. ENHANCED: Main screen container design with elegant purple borders and white background
 - June 23, 2025. Added comprehensive border styling to entire user selection screen with matching shadow effects
 - June 23, 2025. Updated logo border color to match purple theme for complete visual consistency
+- June 23, 2025. IMPROVED: Language selector button design with purple theme integration
+- June 23, 2025. Enhanced language selector with clear text display, purple borders, hover effects, and dropdown indicators
+- June 23, 2025. Added visual checkmarks for selected language and improved dropdown menu styling
 ```
 
 ## User Preferences
