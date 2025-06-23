@@ -129,13 +129,13 @@ export default function Login() {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>رقم الهاتف</FormLabel>
+                    <FormLabel>رقم الهاتف أو اسم المستخدم</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
                           {...field}
-                          type="tel"
-                          placeholder="05xxxxxxxx"
+                          type="text"
+                          placeholder="05xxxxxxxx أو vetsvan1"
                           className="text-right pr-4 pl-12"
                         />
                         <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
