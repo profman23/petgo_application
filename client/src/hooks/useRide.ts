@@ -18,8 +18,7 @@ export function useRide() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/rides/active'] });
-      // Start simulation
-      simulateRideMutation.mutate(data.id);
+      // Note: Simulation disabled - doctors will manually approve/reject
     },
   });
 

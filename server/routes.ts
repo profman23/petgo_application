@@ -171,7 +171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         estimatedDistance: Math.round(distance * 10) / 10,
         estimatedTime,
         estimatedCost: Math.round(estimatedCost),
-        status: 'requested'
+        status: 'جاري المعالجة'
       });
       
       res.json(ride);
