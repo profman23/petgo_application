@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { loginSchema } from '@shared/schema';
-import { Car, Phone, Lock } from 'lucide-react';
+import { User, Phone, Lock, ArrowLeft } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 interface LoginFormData {
@@ -106,18 +106,27 @@ export default function Login() {
       <Card className="w-full max-w-md shadow-xl">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <div className="bg-primary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Car className="text-white w-8 h-8" />
+            <Button
+              variant="ghost"
+              onClick={() => setLocation('/login')}
+              className="mb-4 p-2"
+            >
+              <ArrowLeft className="w-4 h-4 ml-2" />
+              العودة
+            </Button>
+            
+            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">العيادة البيطرية المتنقلة</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">دخول العميل</h1>
             <p className="text-gray-600">
               {isRegistering ? 'إنشاء حساب جديد' : 'سجل دخولك لطلب العيادة البيطرية'}
             </p>
             {!isRegistering && (
               <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg mt-4">
                 <p className="font-semibold mb-1">للتجربة استخدم:</p>
-                <p><strong>عميل:</strong> الهاتف: 0501234567 - كلمة المرور: 123456</p>
-                <p><strong>طبيب بيطري:</strong> الهاتف: vetsvan1 - كلمة المرور: 123456</p>
+                <p>رقم الهاتف: 0501234567</p>
+                <p>كلمة المرور: 123456</p>
               </div>
             )}
           </div>

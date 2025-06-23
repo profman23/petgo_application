@@ -9,6 +9,8 @@ import Home from "@/pages/home";
 import RideRequest from "@/pages/ride-request";
 import RideTracking from "@/pages/ride-tracking";
 import DoctorDashboard from "@/pages/doctor-dashboard";
+import UserTypeSelection from "@/pages/user-type-selection";
+import DoctorLogin from "@/pages/doctor-login";
 import { useEffect, useState } from "react";
 
 // Configure default authorization header for API requests
@@ -56,7 +58,9 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
 function Router() {
   return (
     <Switch>
-      <Route path="/login" component={Login} />
+      <Route path="/login" component={UserTypeSelection} />
+      <Route path="/login/customer" component={Login} />
+      <Route path="/login/doctor" component={DoctorLogin} />
       <Route path="/doctor-dashboard" component={DoctorDashboard} />
       <Route path="/ride-request" component={RideRequest} />
       <Route path="/ride-tracking" component={RideTracking} />
