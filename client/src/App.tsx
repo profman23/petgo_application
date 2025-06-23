@@ -13,6 +13,29 @@ import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
 import { useEffect, useState } from "react";
 
+// Check for expired tokens on app start
+const checkAndClearExpiredTokens = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+  
+  try {
+    const response = await fetch('/api/rides/active', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+  } catch (error) {
+    // Network error, ignore
+  }
+};
+
+// Run check immediately
+checkAndClearExpiredTokens();
+
 // Configure default authorization header for API requests
 const token = localStorage.getItem('token');
 if (token) {
