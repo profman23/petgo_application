@@ -161,6 +161,9 @@ Changelog:
 - June 23, 2025. Fixed API endpoints to properly display pending requests with status 'requested' instead of Arabic status
 - June 23, 2025. Implemented location detection with city names (Riyadh, Jeddah, Dammam) based on real GPS coordinates
 - June 23, 2025. COMPLETED: Full notification and GPS system working - doctors receive instant alerts for new customer requests
+- June 23, 2025. FIXED: Doctor ride acceptance system - corrected status validation from "جاري المعالجة" to "requested"
+- June 23, 2025. ENHANCED: Google Maps integration now automatically opens when doctor accepts ride with customer location
+- June 23, 2025. RESOLVED: JSON parsing errors in doctor dashboard API calls using proper apiRequest method
 ```
 
 ## User Preferences

@@ -352,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'الطلب غير موجود' });
       }
       
-      if (ride.status !== 'جاري المعالجة') {
+      if (ride.status !== 'requested') {
         return res.status(400).json({ message: 'لا يمكن قبول هذا الطلب' });
       }
       
@@ -372,7 +372,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }, 10000);
       }, 5000);
       
-      res.json({ message: 'تم قبول الطلب بنجاح' });
+      // إرجاع تفاصيل الطلب مع الرد
+      const updatedRide = await storage.getRide(rideId);
+      res.json({ 
+        message: 'تم قبول الطلب بنجاح',
+        ride: updatedRide
+      });
     } catch (error) {
       console.error('Error accepting ride:', error);
       res.status(500).json({ message: 'خطأ في قبول الطلب' });
