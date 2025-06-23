@@ -138,24 +138,24 @@ export default function Home() {
 
         {/* Quick Actions */}
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">طلب عيادة بيطرية متنقلة</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">{t('requestMobileVet')}</h2>
           <Button
             onClick={handleRequestRide}
             disabled={!!activeRide}
             className="w-full bg-green-600 hover:bg-green-700 text-white p-8 h-auto flex-col"
           >
             <div className="text-4xl mb-3">🏥</div>
-            <span className="font-bold text-lg">طلب عيادة متنقلة</span>
-            <span className="text-sm opacity-90 mt-1">خدمة بيطرية في موقعك</span>
+            <span className="font-bold text-lg">{t('requestVetService')}</span>
+            <span className="text-sm opacity-90 mt-1">{t('veterinaryService')}</span>
           </Button>
         </div>
 
         {/* Recent Activity */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">الطلبات الأخيرة</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">{t('recentOrders')}</h3>
             <div className="text-center py-8">
-              <p className="text-gray-500">لا توجد طلبات سابقة</p>
+              <p className="text-gray-500">{t('noPreviousOrders')}</p>
             </div>
           </CardContent>
         </Card>
