@@ -164,6 +164,12 @@ Changelog:
 - June 23, 2025. FIXED: Doctor ride acceptance system - corrected status validation from "جاري المعالجة" to "requested"
 - June 23, 2025. ENHANCED: Google Maps integration now automatically opens when doctor accepts ride with customer location
 - June 23, 2025. RESOLVED: JSON parsing errors in doctor dashboard API calls using proper apiRequest method
+- June 23, 2025. CLEANED: Customer ride tracking interface - removed all doctor personal details, showing only status updates
+- June 23, 2025. Simplified customer view to show only: "جاري المعالجة", "قيد التنفيذ", "تم الوصول" status states
+- June 23, 2025. FIXED: Active ride detection issues - corrected database queries for getUserActiveRide and getDriverActiveRide
+- June 23, 2025. Changed ride status from Arabic "جاري المعالجة" to English "requested" for proper notification system
+- June 23, 2025. RESOLVED: Missing notifications issue - doctors now receive all new ride requests properly
+- June 23, 2025. ADDED: Second doctor account (vetsvan2/123456 - د. سارة علي) for multi-doctor testing scenarios
 ```
 
 ## User Preferences

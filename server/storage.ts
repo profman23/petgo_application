@@ -59,6 +59,19 @@ export class DatabaseStorage implements IStorage {
         });
       }
 
+      const existingDoctor2 = await this.getUserByPhone('vetsvan2');
+      if (!existingDoctor2) {
+        await this.createUser({
+          name: 'د. سارة علي',
+          phone: 'vetsvan2',
+          password: '123456',
+          petName: '',
+          petType: '',
+          address: 'الرياض',
+          membershipType: 'doctor'
+        });
+      }
+
       // Initialize drivers
       await this.initializeDrivers();
     } catch (error) {
