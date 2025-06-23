@@ -48,8 +48,11 @@ export default function DoctorLogin() {
         phone: data.username,
         password: data.password,
       };
-      const response = await apiRequest('POST', '/api/auth/login', loginData);
-      return response.json() as Promise<AuthResponse>;
+      const response = await apiRequest('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(loginData)
+      });
+      return response as AuthResponse;
     },
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
@@ -58,7 +61,7 @@ export default function DoctorLogin() {
         title: 'تم تسجيل الدخول بنجاح',
         description: `مرحباً د. ${data.user.name}`,
       });
-      setLocation('/doctor-dashboard');
+      window.location.href = '/doctor-dashboard';
     },
     onError: (error) => {
       toast({

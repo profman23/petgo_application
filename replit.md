@@ -152,6 +152,9 @@ Changelog:
 - June 23, 2025. ADDED: Welcome message system for new users with personalized popup notifications
 - June 23, 2025. Created multi-stage welcome experience: immediate registration success, beginner tips, and one-time homepage welcome
 - June 23, 2025. Welcome messages include user's name and pet name for personalized experience
+- June 23, 2025. FIXED: Login issues for both customers and doctors - proper data saving and navigation
+- June 23, 2025. Resolved doctor login JSON parsing error and corrected apiRequest usage
+- June 23, 2025. Both customer and doctor login systems now work reliably with correct session management
 ```
 
 ## User Preferences
