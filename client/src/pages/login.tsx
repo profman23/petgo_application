@@ -103,9 +103,9 @@ export default function Login() {
             <div className="bg-primary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Car className="text-white w-8 h-8" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">تطبيق النقل</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">العيادة البيطرية المتنقلة</h1>
             <p className="text-gray-600">
-              {isRegistering ? 'إنشاء حساب جديد' : 'سجل دخولك للبدء في طلب الرحلة'}
+              {isRegistering ? 'إنشاء حساب جديد' : 'سجل دخولك لطلب العيادة البيطرية'}
             </p>
             {!isRegistering && (
               <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg mt-4">

@@ -14,8 +14,7 @@ import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 
 const formSchema = rideRequestSchema.extend({
-  pickupLocation: z.string().min(1, 'موقع الانطلاق مطلوب'),
-  destination: z.string().min(1, 'الوجهة مطلوبة'),
+  pickupLocation: z.string().min(1, 'الموقع مطلوب'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -30,11 +29,11 @@ export default function RideRequest() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       pickupLocation: '',
-      destination: '',
+      destination: 'خدمة بيطرية في الموقع',
       pickupLatitude: DEFAULT_COORDINATES.latitude,
       pickupLongitude: DEFAULT_COORDINATES.longitude,
-      destinationLatitude: DEFAULT_COORDINATES.latitude + 0.01,
-      destinationLongitude: DEFAULT_COORDINATES.longitude + 0.01,
+      destinationLatitude: DEFAULT_COORDINATES.latitude,
+      destinationLongitude: DEFAULT_COORDINATES.longitude,
       vehicleType: 'standard',
     },
   });
@@ -105,33 +104,24 @@ export default function RideRequest() {
             <ArrowLeft className="w-4 h-4" />
             العودة
           </Button>
-          <h1 className="text-lg font-semibold">طلب رحلة جديدة</h1>
+          <h1 className="text-lg font-semibold">طلب عيادة بيطرية متنقلة</h1>
           <div className="w-10" />
         </div>
       </header>
 
       <div className="p-4">
-        {/* Vehicle Type Selection */}
+        {/* Service Type Selection */}
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">نوع المركبة</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">نوع الخدمة البيطرية</h2>
+          <div className="grid grid-cols-1 gap-3">
             <Button
               variant={form.watch('vehicleType') === 'standard' ? 'default' : 'outline'}
               onClick={() => form.setValue('vehicleType', 'standard')}
-              className="p-6 h-auto flex-col"
+              className="p-6 h-auto flex-col bg-green-50 border-green-200"
             >
-              <MapPin className="w-8 h-8 mb-2" />
-              <span className="font-semibold">سيارة عادية</span>
-              <span className="text-sm text-gray-500">توفير في التكلفة</span>
-            </Button>
-            <Button
-              variant={form.watch('vehicleType') === 'premium' ? 'default' : 'outline'}
-              onClick={() => form.setValue('vehicleType', 'premium')}
-              className="p-6 h-auto flex-col"
-            >
-              <Navigation className="w-8 h-8 mb-2" />
-              <span className="font-semibold">سيارة مميزة</span>
-              <span className="text-sm text-gray-500">راحة إضافية</span>
+              <div className="text-3xl mb-2">🏥</div>
+              <span className="font-semibold">عيادة بيطرية متنقلة</span>
+              <span className="text-sm text-gray-500">خدمة بيطرية شاملة في موقعك</span>
             </Button>
           </div>
         </div>
@@ -146,7 +136,7 @@ export default function RideRequest() {
                   name="pickupLocation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>موقع الانطلاق</FormLabel>
+                      <FormLabel>موقعك الحالي</FormLabel>
                       <FormControl>
                         <div className="flex items-center gap-3">
                           <Circle className="w-3 h-3 text-green-500 flex-shrink-0" />
@@ -154,6 +144,7 @@ export default function RideRequest() {
                             {...field}
                             placeholder="موقعك الحالي"
                             className="flex-1 text-right"
+                            readOnly
                           />
                           <Button
                             type="button"
@@ -166,39 +157,19 @@ export default function RideRequest() {
                         </div>
                       </FormControl>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="border-r-2 border-gray-300 border-dashed h-4 mr-1" />
-                
-                <FormField
-                  control={form.control}
-                  name="destination"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>الوجهة</FormLabel>
-                      <FormControl>
-                        <div className="flex items-center gap-3">
-                          <Circle className="w-3 h-3 text-red-500 flex-shrink-0" />
-                          <Input
-                            {...field}
-                            placeholder="إلى أين تريد الذهاب؟"
-                            className="flex-1 text-right"
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
+                      <p className="text-xs text-gray-500 mt-1">
+                        العيادة البيطرية ستأتي إلى موقعك الحالي
+                      </p>
                     </FormItem>
                   )}
                 />
 
                 <Button
                   type="submit"
-                  className="w-full bg-primary hover:bg-gray-800 text-white py-4 text-lg"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg"
                   disabled={isRequestingRide}
                 >
-                  {isRequestingRide ? 'جاري إرسال الطلب...' : 'طلب الرحلة الآن'}
+                  {isRequestingRide ? 'جاري إرسال الطلب...' : 'طلب العيادة البيطرية الآن'}
                 </Button>
               </form>
             </Form>
