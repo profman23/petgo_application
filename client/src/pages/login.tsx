@@ -239,12 +239,12 @@ export default function Login() {
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
                   disabled={loginMutation.isPending}
                 >
-                  {loginMutation.isPending ? 'جاري تسجيل الدخول...' : 'تسجيل الدخول'}
+                  {loginMutation.isPending ? t('loading') : t('login')}
                 </Button>
 
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-2">
-                    حساب تجريبي: 0501234567 / 123456
+                    {language === 'ar' ? 'حساب تجريبي: 0501234567 / 123456' : 'Test account: 0501234567 / 123456'}
                   </p>
                   <Button 
                     type="button" 
@@ -252,8 +252,8 @@ export default function Login() {
                     onClick={() => setIsRegistering(true)}
                     className="w-full"
                   >
-                    <UserPlus className="w-4 h-4 ml-2" />
-                    إنشاء حساب جديد
+                    <UserPlus className={`w-4 h-4 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                    {t('createNewAccount')}
                   </Button>
                 </div>
               </form>
@@ -262,11 +262,11 @@ export default function Login() {
             <form onSubmit={handleRegisterSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">الاسم الأول *</label>
+                  <label className="block text-sm font-medium mb-2">{t('firstName')} *</label>
                   <Input
                     type="text"
-                    placeholder="أحمد"
-                    className="text-right"
+                    placeholder={t('enterFirstName')}
+                    className={`${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.firstName}
                     onChange={(e) => updateFormData('firstName', e.target.value)}
                     required
@@ -274,11 +274,11 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">الاسم الثاني *</label>
+                  <label className="block text-sm font-medium mb-2">{t('lastName')} *</label>
                   <Input
                     type="text"
-                    placeholder="محمد"
-                    className="text-right"
+                    placeholder={t('enterLastName')}
+                    className={`${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.lastName}
                     onChange={(e) => updateFormData('lastName', e.target.value)}
                     required
@@ -287,12 +287,12 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">اسم الأليف *</label>
+                <label className="block text-sm font-medium mb-2">{t('petName')} *</label>
                 <div className="relative">
                   <Input
                     type="text"
-                    placeholder="فيلو"
-                    className="text-right pr-4 pl-12"
+                    placeholder={t('enterPetName')}
+                    className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.petName}
                     onChange={(e) => updateFormData('petName', e.target.value)}
                     required
@@ -302,26 +302,26 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">نوع الأليف *</label>
+                <label className="block text-sm font-medium mb-2">{t('petType')} *</label>
                 <Select value={formData.petType} onValueChange={(value) => updateFormData('petType', value)}>
-                  <SelectTrigger className="text-right">
-                    <SelectValue placeholder="اختر نوع الأليف" />
+                  <SelectTrigger className={`${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                    <SelectValue placeholder={language === 'ar' ? 'اختر نوع الأليف' : 'Select pet type'} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="كلب">كلب</SelectItem>
-                    <SelectItem value="قطة">قطة</SelectItem>
-                    <SelectItem value="طير">طير</SelectItem>
+                    <SelectItem value="كلب">{language === 'ar' ? 'كلب' : 'Dog'}</SelectItem>
+                    <SelectItem value="قطة">{language === 'ar' ? 'قطة' : 'Cat'}</SelectItem>
+                    <SelectItem value="طير">{language === 'ar' ? 'طير' : 'Bird'}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">رقم الهاتف *</label>
+                <label className="block text-sm font-medium mb-2">{t('phoneNumber')} *</label>
                 <div className="relative">
                   <Input
                     type="tel"
-                    placeholder="0501234567"
-                    className="text-right pr-4 pl-12"
+                    placeholder={t('enterPhone')}
+                    className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.phone}
                     onChange={(e) => updateFormData('phone', e.target.value)}
                     required
@@ -331,12 +331,12 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">كلمة المرور *</label>
+                <label className="block text-sm font-medium mb-2">{t('password')} *</label>
                 <div className="relative">
                   <Input
                     type="password"
-                    placeholder="كلمة المرور (6 أحرف على الأقل)"
-                    className="text-right pr-4 pl-12"
+                    placeholder={t('enterPassword')}
+                    className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.password}
                     onChange={(e) => updateFormData('password', e.target.value)}
                     required
@@ -347,7 +347,7 @@ export default function Login() {
               </div>
 
               <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <h3 className="text-center text-lg font-semibold text-yellow-800 mb-2">رمز التحقق *</h3>
+                <h3 className="text-center text-lg font-semibold text-yellow-800 mb-2">{t('mathCaptcha')} *</h3>
                 <div className="flex justify-center mb-3">
                   <div className="inline-block bg-white border-2 border-blue-200 px-4 py-2 rounded text-xl font-bold text-blue-800">
                     {captcha.question}
@@ -355,7 +355,7 @@ export default function Login() {
                 </div>
                 <Input
                   type="number"
-                  placeholder="أدخل الإجابة"
+                  placeholder={t('enterCaptchaAnswer')}
                   className="text-center text-lg mb-2"
                   value={formData.captcha}
                   onChange={(e) => updateFormData('captcha', e.target.value)}
@@ -370,7 +370,7 @@ export default function Login() {
                     className="flex items-center gap-2"
                   >
                     <RefreshCw className="w-4 h-4" />
-                    تجديد السؤال
+                    {language === 'ar' ? 'تجديد السؤال' : 'Refresh Question'}
                   </Button>
                 </div>
               </div>
