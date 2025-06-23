@@ -345,25 +345,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'لا يمكن قبول هذا الطلب' });
       }
       
-      // Find and assign nearest available doctor
-      const doctors = await storage.getAvailableDrivers();
-      if (doctors.length > 0) {
-        const nearestDoctor = doctors[0]; // Simplified: take first available
-        await storage.assignDriverToRide(rideId, nearestDoctor.id);
-        await storage.updateDriverAvailability(nearestDoctor.id, false);
-        await storage.updateRideStatus(rideId, 'confirmed');
-        
-        // Simulate progression
+      // Assign the current doctor (who accepted) to the ride
+      const doctorId = user.id;
+      console.log('Assigning doctor ID:', doctorId, 'to ride ID:', rideId);
+      await storage.assignDriverToRide(rideId, doctorId);
+      await storage.updateDriverAvailability(doctorId, false);
+      await storage.updateRideStatus(rideId, 'confirmed');
+      console.log('Ride assignment completed');
+      
+      // Simulate progression
+      setTimeout(async () => {
+        await storage.updateRideStatus(rideId, 'enroute');
         setTimeout(async () => {
-          await storage.updateRideStatus(rideId, 'enroute');
-          setTimeout(async () => {
-            await storage.updateRideStatus(rideId, 'arrived');
-          }, 10000);
-        }, 5000);
-      }
+          await storage.updateRideStatus(rideId, 'arrived');
+        }, 10000);
+      }, 5000);
       
       res.json({ message: 'تم قبول الطلب بنجاح' });
     } catch (error) {
+      console.error('Error accepting ride:', error);
       res.status(500).json({ message: 'خطأ في قبول الطلب' });
     }
   });
@@ -372,7 +372,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/doctor/active-ride', requireAuth, async (req: any, res) => {
     try {
       const doctorId = req.user.id;
+      console.log('Looking for active ride for doctor ID:', doctorId);
+      
+      // Debug: Get all rides to see what's in storage
+      const allRides = await storage.getAllRides();
+      console.log('All rides in storage:', allRides.map(r => ({ id: r.id, driverId: r.driverId, status: r.status })));
+      
       const activeRide = await storage.getDriverActiveRide(doctorId);
+      console.log('Found active ride for doctor:', activeRide);
       
       if (!activeRide) {
         return res.json({ ride: null });

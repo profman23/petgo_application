@@ -53,10 +53,24 @@ export default function DoctorDashboard() {
     });
   }, [setLocation, toast]);
 
+  // Check for active ride and redirect if found
+  const { data: activeRideData } = useQuery({
+    queryKey: ['/api/doctor/active-ride'],
+    refetchInterval: 2000,
+    retry: false,
+  });
+
   const { data: pendingRides = [], isLoading, refetch } = useQuery({
     queryKey: ['/api/doctor/pending-rides'],
     refetchInterval: 3000, // Poll every 3 seconds for new requests
   });
+
+  // Redirect to tracking page if there's an active ride
+  useEffect(() => {
+    if (activeRideData && activeRideData.ride) {
+      setLocation('/doctor-ride-tracking');
+    }
+  }, [activeRideData, setLocation]);
 
   const acceptMutation = useMutation({
     mutationFn: async (rideId: number) => {
