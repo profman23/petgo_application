@@ -115,20 +115,38 @@ export default function DoctorDashboard() {
 
   const acceptMutation = useMutation({
     mutationFn: async (rideId: number) => {
-      const response = await apiRequest('POST', `/api/doctor/rides/${rideId}/accept`);
-      return response.json();
+      const response = await apiRequest(`/api/doctor/rides/${rideId}/accept`, {
+        method: 'POST'
+      });
+      return response;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: 'تم قبول الطلب',
-        description: 'جاري توجيهك لصفحة المتابعة مع خرائط Google...',
+        description: 'جاري فتح خرائط Google للتوجه للعميل...',
       });
+      
+      // فتح Google Maps مباشرة مع موقع العميل
+      if (data && data.ride) {
+        const { pickupLatitude, pickupLongitude } = data.ride;
+        const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${pickupLatitude},${pickupLongitude}&travelmode=driving`;
+        
+        // فتح في نافذة جديدة مع تجربة عدة طرق
+        const newWindow = window.open(mapsUrl, '_blank');
+        if (!newWindow) {
+          // إذا تم حظر النافذة المنبثقة، حاول فتح في نفس النافذة
+          window.location.href = mapsUrl;
+        }
+      }
+      
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/doctor/active-ride'] });
       queryClient.invalidateQueries({ queryKey: ['/api/doctor/pending-rides'] });
       
-      // Immediate redirect to ride tracking page
-      setLocation('/doctor-ride-tracking');
+      // توجه لصفحة المتابعة بعد ثانية واحدة
+      setTimeout(() => {
+        setLocation('/doctor-ride-tracking');
+      }, 1000);
     },
     onError: (error) => {
       toast({
@@ -141,8 +159,10 @@ export default function DoctorDashboard() {
 
   const rejectMutation = useMutation({
     mutationFn: async (rideId: number) => {
-      const response = await apiRequest('POST', `/api/doctor/rides/${rideId}/reject`);
-      return response.json();
+      const response = await apiRequest(`/api/doctor/rides/${rideId}/reject`, {
+        method: 'POST'
+      });
+      return response;
     },
     onSuccess: () => {
       toast({
