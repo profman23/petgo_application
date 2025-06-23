@@ -143,6 +143,12 @@ Changelog:
 - June 23, 2025. Implemented proper URL encoding and popup blocking detection for reliable map opening
 - June 23, 2025. Enhanced doctor dashboard with immediate redirect to tracking page after accepting requests
 - June 23, 2025. Added toast notifications and debugging features for troubleshooting navigation issues
+- June 23, 2025. COMPLETED: Customer registration system with mandatory fields and math captcha security
+- June 23, 2025. Fixed input field issues in registration form - all fields now accept user input correctly
+- June 23, 2025. MIGRATED: Successfully moved from in-memory storage to PostgreSQL database
+- June 23, 2025. Created PostgreSQL database with users, drivers, and rides tables
+- June 23, 2025. Implemented DatabaseStorage class with full CRUD operations for all entities
+- June 23, 2025. All user registrations and data now persist in real database instead of memory
 ```
 
 ## User Preferences
