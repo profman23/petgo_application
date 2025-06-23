@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { ArrowLeft, X } from 'lucide-react';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { ArrowLeft, X, Satellite, MapPin, Navigation, Loader2 } from 'lucide-react';
 import { Map } from '@/components/map';
 import { DriverCard } from '@/components/driver-card';
 import { RideStatus } from '@/components/ride-status';
@@ -14,8 +15,26 @@ export default function RideTracking() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { activeRide, assignedDriver, cancelRide, isCancellingRide, fetchNearbyDrivers } = useRide();
-  const [customerLocation] = useState<[number, number]>([DEFAULT_COORDINATES.latitude, DEFAULT_COORDINATES.longitude]);
   const [nearbyDrivers, setNearbyDrivers] = useState([]);
+  
+  // Real GPS tracking for customer
+  const {
+    latitude: customerLat,
+    longitude: customerLng,
+    accuracy,
+    error: gpsError,
+    isLoading: isLoadingGPS,
+  } = useGeolocation({
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 30000,
+    watch: true, // Continuous tracking during ride
+  });
+
+  // Dynamic customer location with fallback
+  const customerLocation: [number, number] = customerLat && customerLng 
+    ? [customerLat, customerLng] 
+    : [DEFAULT_COORDINATES.latitude, DEFAULT_COORDINATES.longitude];
 
   useEffect(() => {
     if (!activeRide) {
@@ -84,6 +103,36 @@ export default function RideTracking() {
 
       {/* Content */}
       <div className="p-4 space-y-4">
+        {/* GPS Status Card */}
+        <Card className="mb-4 bg-blue-50 border-blue-200">
+          <CardContent className="p-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Satellite className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-900">حالة الموقع</span>
+              </div>
+              {isLoadingGPS && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
+            </div>
+            
+            {customerLat && customerLng ? (
+              <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+                <MapPin className="w-3 h-3" />
+                <span>تم تحديد موقعك بدقة {accuracy ? Math.round(accuracy) : '---'} متر</span>
+              </div>
+            ) : gpsError ? (
+              <div className="mt-2 text-xs text-red-600 flex items-center gap-1">
+                <X className="w-3 h-3" />
+                <span>خطأ في تحديد الموقع</span>
+              </div>
+            ) : (
+              <div className="mt-2 text-xs text-yellow-600 flex items-center gap-1">
+                <Navigation className="w-3 h-3" />
+                <span>جاري تحديد الموقع...</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Status Card */}
         <Card>
           <CardContent className="p-4">

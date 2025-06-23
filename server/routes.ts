@@ -264,6 +264,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Customer location update endpoint
+  app.put('/api/customer/location', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.membershipType !== 'customer') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+
+      const { latitude, longitude, accuracy, timestamp } = req.body;
+      
+      // Validate coordinates
+      if (!latitude || !longitude || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        return res.status(400).json({ message: 'Invalid coordinates' });
+      }
+
+      // Store customer location (could be extended to update active ride location)
+      const activeRide = await storage.getUserActiveRide(user.id);
+      if (activeRide) {
+        // Update ride pickup location with real GPS coordinates
+        activeRide.pickupLatitude = latitude;
+        activeRide.pickupLongitude = longitude;
+      }
+      
+      res.json({ 
+        message: 'Customer location updated successfully',
+        coordinates: { latitude, longitude },
+        accuracy,
+        timestamp 
+      });
+    } catch (error) {
+      console.error('Error updating customer location:', error);
+      res.status(500).json({ message: 'Failed to update location' });
+    }
+  });
+
   // Doctor endpoints for ride management
   app.get('/api/doctor/pending-rides', requireAuth, async (req, res) => {
     try {
