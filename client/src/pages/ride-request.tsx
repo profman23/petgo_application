@@ -8,7 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { ArrowLeft, MapPin, Navigation, Circle } from 'lucide-react';
+import { useGeolocation } from '@/hooks/useGeolocation';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2 } from 'lucide-react';
 import { rideRequestSchema } from '@shared/schema';
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
@@ -24,6 +25,20 @@ export default function RideRequest() {
   const { toast } = useToast();
   const { requestRide, isRequestingRide } = useRide();
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  
+  // استخدام نظام GPS الحقيقي
+  const {
+    latitude,
+    longitude,
+    accuracy,
+    error: gpsError,
+    isLoading: isLoadingGPS,
+    getCurrentPosition,
+  } = useGeolocation({
+    enableHighAccuracy: true,
+    timeout: 15000,
+    maximumAge: 60000, // تحديث كل دقيقة
+  });
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -66,53 +81,75 @@ export default function RideRequest() {
     setLocation('/ride-tracking');
   };
 
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          
-          // Check if location is in Saudi Arabia (rough boundaries)
-          const isInSaudiArabia = latitude >= 16 && latitude <= 32 && longitude >= 34 && longitude <= 56;
-          
-          if (isInSaudiArabia) {
-            setCurrentLocation({ latitude, longitude });
-            form.setValue('pickupLatitude', latitude);
-            form.setValue('pickupLongitude', longitude);
-            form.setValue('pickupLocation', 'موقعك الحالي');
-            toast({
-              title: 'تم تحديد الموقع',
-              description: 'تم الحصول على موقعك الحالي بنجاح',
-            });
-          } else {
-            // Use Riyadh coordinates if location is outside Saudi Arabia
-            const riyadhLat = 24.7136;
-            const riyadhLng = 46.6753;
-            setCurrentLocation({ latitude: riyadhLat, longitude: riyadhLng });
-            form.setValue('pickupLatitude', riyadhLat);
-            form.setValue('pickupLongitude', riyadhLng);
-            form.setValue('pickupLocation', 'الرياض - الموقع الافتراضي');
-            toast({
-              title: 'تم تصحيح الموقع',
-              description: 'تم تحديد موقع الرياض بدلاً من الموقع المكتشف خارج المملكة',
-            });
-          }
-        },
-        (error) => {
-          // Use Riyadh coordinates as fallback
-          const riyadhLat = 24.7136;
-          const riyadhLng = 46.6753;
-          setCurrentLocation({ latitude: riyadhLat, longitude: riyadhLng });
-          form.setValue('pickupLatitude', riyadhLat);
-          form.setValue('pickupLongitude', riyadhLng);
-          form.setValue('pickupLocation', 'الرياض - الموقع الافتراضي');
+  // تحديث الموقع تلقائياً عند تغيير GPS
+  useEffect(() => {
+    if (latitude && longitude) {
+      // فحص ما إذا كان الموقع داخل المملكة العربية السعودية
+      const isInSaudiArabia = latitude >= 16 && latitude <= 32 && longitude >= 34 && longitude <= 56;
+      
+      if (isInSaudiArabia) {
+        setCurrentLocation({ latitude, longitude });
+        form.setValue('pickupLatitude', latitude);
+        form.setValue('pickupLongitude', longitude);
+        
+        // تحديد اسم المنطقة حسب الإحداثيات
+        let locationName = 'موقعك الحالي';
+        if (latitude >= 24.5 && latitude <= 24.9 && longitude >= 46.4 && longitude <= 47.0) {
+          locationName = 'الرياض - موقعك الحالي';
+        } else if (latitude >= 21.3 && latitude <= 21.7 && longitude >= 39.1 && longitude <= 39.3) {
+          locationName = 'جدة - موقعك الحالي';
+        } else if (latitude >= 26.3 && latitude <= 26.5 && longitude >= 49.9 && longitude <= 50.3) {
+          locationName = 'الدمام - موقعك الحالي';
+        }
+        
+        form.setValue('pickupLocation', locationName);
+        
+        if (accuracy && accuracy < 100) {
           toast({
-            title: 'تم استخدام الموقع الافتراضي',
-            description: 'تم تحديد موقع الرياض كموقع افتراضي',
+            title: 'تم تحديد موقعك بدقة',
+            description: `الدقة: ${Math.round(accuracy)} متر`,
           });
         }
-      );
+      } else {
+        // استخدام إحداثيات الرياض إذا كان الموقع خارج المملكة
+        const riyadhLat = 24.7136;
+        const riyadhLng = 46.6753;
+        setCurrentLocation({ latitude: riyadhLat, longitude: riyadhLng });
+        form.setValue('pickupLatitude', riyadhLat);
+        form.setValue('pickupLongitude', riyadhLng);
+        form.setValue('pickupLocation', 'الرياض - الموقع الافتراضي');
+        toast({
+          title: 'تم تصحيح الموقع',
+          description: 'تم استخدام موقع الرياض (الموقع المكتشف خارج المملكة)',
+          variant: 'destructive',
+        });
+      }
     }
+  }, [latitude, longitude, accuracy, form, toast]);
+
+  // التعامل مع أخطاء GPS
+  useEffect(() => {
+    if (gpsError) {
+      const riyadhLat = 24.7136;
+      const riyadhLng = 46.6753;
+      setCurrentLocation({ latitude: riyadhLat, longitude: riyadhLng });
+      form.setValue('pickupLatitude', riyadhLat);
+      form.setValue('pickupLongitude', riyadhLng);
+      form.setValue('pickupLocation', 'الرياض - الموقع الافتراضي');
+      toast({
+        title: 'خطأ في تحديد الموقع',
+        description: `${gpsError}. تم استخدام موقع الرياض كبديل.`,
+        variant: 'destructive',
+      });
+    }
+  }, [gpsError, form, toast]);
+
+  const refreshLocation = () => {
+    getCurrentPosition();
+    toast({
+      title: 'يتم تحديث الموقع...',
+      description: 'الرجاء الانتظار',
+    });
   };
 
   return (
@@ -174,9 +211,15 @@ export default function RideRequest() {
                             type="button"
                             variant="outline"
                             size="icon"
-                            onClick={getCurrentLocation}
+                            onClick={refreshLocation}
+                            disabled={isLoadingGPS}
+                            title={isLoadingGPS ? "يتم تحديد الموقع..." : "تحديث الموقع"}
                           >
-                            <Navigation className="w-4 h-4" />
+                            {isLoadingGPS ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <RefreshCw className="w-4 h-4" />
+                            )}
                           </Button>
                         </div>
                       </FormControl>
