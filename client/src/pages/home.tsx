@@ -22,7 +22,20 @@ export default function Home() {
       return;
     }
     
-    setUser(JSON.parse(userData));
+    const parsedUser = JSON.parse(userData);
+    setUser(parsedUser);
+    
+    // رسالة ترحيب للمستخدمين الجدد (يتم عرضها مرة واحدة فقط)
+    const hasSeenWelcome = localStorage.getItem(`welcome_${parsedUser.id}`);
+    if (!hasSeenWelcome) {
+      setTimeout(() => {
+        toast({
+          title: `مرحباً ${parsedUser.firstName}! 👋`,
+          description: `نحن سعداء لانضمامك إلى عيادة الحيوانات المتنقلة. يمكنك الآن طلب طبيب بيطري لحيوانك الأليف ${parsedUser.petName || 'الأليف'}.`,
+        });
+        localStorage.setItem(`welcome_${parsedUser.id}`, 'true');
+      }, 1000);
+    }
     
     // Test token validity on page load
     fetch('/api/rides/active', {

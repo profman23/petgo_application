@@ -84,11 +84,12 @@ export default function Login() {
     },
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: `مرحباً ${data.user.name}`,
       });
-      setLocation('/');
+      window.location.href = '/';
     },
     onError: (error: Error) => {
       toast({
@@ -114,11 +115,23 @@ export default function Login() {
     },
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // رسالة ترحيب مفصلة
       toast({
-        title: "تم إنشاء الحساب بنجاح",
-        description: "مرحباً بك في عيادة الحيوانات المتنقلة",
+        title: "🎉 مرحباً بك في عيادة الحيوانات المتنقلة!",
+        description: `أهلاً وسهلاً ${formData.firstName}! تم إنشاء حسابك بنجاح. يمكنك الآن طلب الخدمات البيطرية لحيوانك الأليف ${formData.petName}.`,
       });
-      setLocation('/');
+      
+      // رسالة ترحيب إضافية بعد ثانيتين
+      setTimeout(() => {
+        toast({
+          title: "نصائح للبداية",
+          description: "يمكنك طلب طبيب بيطري متنقل الآن، وسيصل إليك في أسرع وقت ممكن!",
+        });
+      }, 2000);
+      
+      window.location.href = '/';
     },
     onError: (error: Error) => {
       toast({

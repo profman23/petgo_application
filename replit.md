@@ -149,6 +149,9 @@ Changelog:
 - June 23, 2025. Created PostgreSQL database with users, drivers, and rides tables
 - June 23, 2025. Implemented DatabaseStorage class with full CRUD operations for all entities
 - June 23, 2025. All user registrations and data now persist in real database instead of memory
+- June 23, 2025. ADDED: Welcome message system for new users with personalized popup notifications
+- June 23, 2025. Created multi-stage welcome experience: immediate registration success, beginner tips, and one-time homepage welcome
+- June 23, 2025. Welcome messages include user's name and pet name for personalized experience
 ```
 
 ## User Preferences
