@@ -191,6 +191,10 @@ Changelog:
 - June 23, 2025. IMPROVED: Language selector button design with purple theme integration
 - June 23, 2025. Enhanced language selector with clear text display, purple borders, hover effects, and dropdown indicators
 - June 23, 2025. Added visual checkmarks for selected language and improved dropdown menu styling
+- June 23, 2025. IMPLEMENTED: Comprehensive multi-language notification system across all screens
+- June 23, 2025. Added language-aware toast notifications for success messages, errors, and status updates
+- June 23, 2025. Enhanced customer and doctor login screens with localized success/error notifications
+- June 23, 2025. Created centralized translation keys for all notification messages in both Arabic and English
 ```
 
 ## User Preferences

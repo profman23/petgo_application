@@ -34,7 +34,7 @@ export default function DoctorLogin() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { language } = useLanguage();
-  const t = useTranslation();
+  const { t } = useTranslation();
 
   const doctorLoginSchema = z.object({
     username: z.string().min(1, language === 'ar' ? 'اسم المستخدم مطلوب' : 'Username is required'),
@@ -66,15 +66,15 @@ export default function DoctorLogin() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast({
-        title: t('loginSuccess'),
-        description: `${t('welcomeNewUser')} د. ${data.user.name}`,
+        title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Login Successful',
+        description: language === 'ar' ? `مرحباً بك في خدمتنا البيطرية د. ${data.user.name}` : `Welcome to our veterinary service Dr. ${data.user.name}`,
         variant: "default",
       });
       window.location.href = '/doctor-dashboard';
     },
     onError: (error) => {
       toast({
-        title: language === 'ar' ? 'خطأ في تسجيل الدخول' : 'Login Error',
+        title: language === 'ar' ? 'حدث خطأ' : 'An error occurred',
         description: error.message,
         variant: 'destructive',
       });
