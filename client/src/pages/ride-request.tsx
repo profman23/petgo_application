@@ -54,23 +54,45 @@ export default function RideRequest() {
   });
 
   useEffect(() => {
-    // Get user's current location
+    // Get user's current location with high accuracy
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          console.log('Real GPS Location:', latitude, longitude);
           setCurrentLocation({ latitude, longitude });
           form.setValue('pickupLatitude', latitude);
           form.setValue('pickupLongitude', longitude);
-          form.setValue('pickupLocation', 'موقعك الحالي');
+          
+          // تحديد اسم الموقع بناءً على الإحداثيات الحقيقية
+          let locationName = 'موقعك الحالي';
+          if (latitude >= 24.5 && latitude <= 24.9 && longitude >= 46.4 && longitude <= 47.0) {
+            locationName = 'الرياض - موقعك الحالي';
+          } else if (latitude >= 21.3 && latitude <= 21.7 && longitude >= 39.1 && longitude <= 39.3) {
+            locationName = 'جدة - موقعك الحالي';
+          } else if (latitude >= 26.3 && latitude <= 26.5 && longitude >= 50.0 && longitude <= 50.2) {
+            locationName = 'الدمام - موقعك الحالي';
+          }
+          
+          form.setValue('pickupLocation', locationName);
+          
+          toast({
+            title: 'تم تحديد موقعك',
+            description: `الموقع: ${locationName}`,
+          });
         },
         (error) => {
           console.error('Error getting location:', error);
           toast({
-            title: 'تعذر الحصول على الموقع',
-            description: 'سيتم استخدام موقع افتراضي',
+            title: 'تعذر الحصول على الموقع الحقيقي',
+            description: 'يرجى السماح بالوصول للموقع أو تفعيل GPS',
             variant: 'destructive',
           });
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
         }
       );
     }

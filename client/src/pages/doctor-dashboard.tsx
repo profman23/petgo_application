@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -51,6 +51,18 @@ export default function DoctorDashboard() {
     }).catch(() => {
       // Network error, ignore
     });
+
+    // طلب إذن الإشعارات
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          toast({
+            title: 'تم تفعيل الإشعارات',
+            description: 'ستصلك إشعارات عند وصول طلبات جديدة',
+          });
+        }
+      });
+    }
   }, [setLocation, toast]);
 
   // Check for active ride and redirect if found
@@ -64,6 +76,35 @@ export default function DoctorDashboard() {
     queryKey: ['/api/doctor/pending-rides'],
     refetchInterval: 3000, // Poll every 3 seconds for new requests
   });
+
+  // نظام الإشعارات للطلبات الجديدة
+  const [lastRideCount, setLastRideCount] = React.useState(0);
+  
+  useEffect(() => {
+    if (pendingRides && Array.isArray(pendingRides)) {
+      const currentCount = pendingRides.length;
+      
+      // إذا زاد عدد الطلبات، اعرض إشعار
+      if (currentCount > lastRideCount && lastRideCount > 0) {
+        const newRidesCount = currentCount - lastRideCount;
+        toast({
+          title: '🚨 طلب جديد!',
+          description: `لديك ${newRidesCount} طلب جديد للعيادة البيطرية`,
+          duration: 10000, // إشعار لمدة 10 ثوان
+        });
+        
+        // صوت تنبيه للطلب الجديد
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('طلب عيادة بيطرية جديد!', {
+            body: `لديك ${newRidesCount} طلب جديد في انتظار الموافقة`,
+            icon: '/icon.png'
+          });
+        }
+      }
+      
+      setLastRideCount(currentCount);
+    }
+  }, [pendingRides, lastRideCount, toast]);
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {
