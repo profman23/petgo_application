@@ -236,7 +236,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const allRides = await storage.getAllRides();
-      const pendingRides = allRides.filter(ride => ride.status === 'requested' || ride.status === 'processing');
+      const pendingRides = allRides.filter(ride => ride.status === 'جاري المعالجة');
       
       // Get customer details for each ride
       const ridesWithCustomers = await Promise.all(
@@ -269,7 +269,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'الطلب غير موجود' });
       }
       
-      if (ride.status !== 'requested' && ride.status !== 'processing') {
+      if (ride.status !== 'جاري المعالجة') {
         return res.status(400).json({ message: 'لا يمكن قبول هذا الطلب' });
       }
       
@@ -310,11 +310,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'الطلب غير موجود' });
       }
       
-      if (ride.status !== 'requested' && ride.status !== 'processing') {
+      if (ride.status !== 'جاري المعالجة') {
         return res.status(400).json({ message: 'لا يمكن رفض هذا الطلب' });
       }
       
-      await storage.updateRideStatus(rideId, 'cancelled');
+      await storage.updateRideStatus(rideId, 'مرفوض');
       res.json({ message: 'تم رفض الطلب' });
     } catch (error) {
       res.status(500).json({ message: 'خطأ في رفض الطلب' });
