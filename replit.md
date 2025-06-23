@@ -132,6 +132,12 @@ Changelog:
 - June 23, 2025. Enhanced map component with custom icons for customers (blue) and doctors (green)
 - June 23, 2025. Added GPS status indicators in both customer and doctor interfaces
 - June 23, 2025. Implemented real-time location synchronization with server endpoints
+- June 23, 2025. COMPLETED: Interactive map in doctor dashboard showing customer locations with pending requests
+- June 23, 2025. Added doctor ride tracking page with dual location display (doctor + customer)
+- June 23, 2025. Integrated Google Maps navigation - opens automatically after accepting ride request
+- June 23, 2025. Enhanced map component to support displaying both doctor and customer locations simultaneously
+- June 23, 2025. Added automatic redirect to tracking page after doctor accepts request
+- June 23, 2025. Implemented call customer feature and direct navigation buttons in doctor interface
 ```
 
 ## User Preferences

@@ -69,6 +69,10 @@ export default function DoctorDashboard() {
         description: 'تم قبول طلب العيادة البيطرية بنجاح',
       });
       refetch();
+      // Redirect to ride tracking page with navigation
+      setTimeout(() => {
+        setLocation('/doctor-ride-tracking');
+      }, 1000);
     },
     onError: (error) => {
       toast({
