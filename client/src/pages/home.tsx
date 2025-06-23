@@ -14,6 +14,7 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { activeRide, isLoadingActiveRide } = useRide();
+  const { t, language } = useTranslation();
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {

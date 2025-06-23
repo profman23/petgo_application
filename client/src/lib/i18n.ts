@@ -281,6 +281,13 @@ export const translations = {
     appleMaps: 'Apple Maps',
     waze: 'Waze',
     
+    // Home Page
+    veterinaryTransport: 'Veterinary Transport Company',
+    veterinaryService: 'Veterinary Transport Service',
+    
+    // General UI
+    notifications: 'Notifications',
+    
     // Status Messages
     statusRequested: 'Requested',
     statusAccepted: 'Accepted',
@@ -296,7 +303,6 @@ export const translations = {
     statusUpdated: 'Status updated',
     
     // Settings
-    settings: 'Settings',
     language: 'Language',
     arabic: 'العربية',
     english: 'English',
