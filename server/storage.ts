@@ -48,81 +48,81 @@ export class MemStorage implements IStorage {
     const mockDrivers = [
       {
         id: 1,
-        name: 'أحمد السعيد',
+        name: 'د. أحمد السعيد',
         phone: '0501234567',
         rating: 4.9,
-        carModel: 'تويوتا كامري',
+        carModel: 'عيادة بيطرية متنقلة',
         carColor: 'أبيض',
         plateNumber: 'أ ب ج 123',
         latitude: 24.7136 + (Math.random() - 0.5) * 0.1,
         longitude: 46.6753 + (Math.random() - 0.5) * 0.1,
         isAvailable: true,
-        profileImageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
+        profileImageUrl: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
       },
       {
         id: 2,
-        name: 'محمد عبدالله',
+        name: 'د. فاطمة عبدالله',
         phone: '0501234568',
         rating: 4.7,
-        carModel: 'هيونداي إلنترا',
-        carColor: 'رمادي',
+        carModel: 'عيادة بيطرية متنقلة',
+        carColor: 'أزرق',
         plateNumber: 'د ه و 456',
         latitude: 24.7136 + (Math.random() - 0.5) * 0.1,
         longitude: 46.6753 + (Math.random() - 0.5) * 0.1,
         isAvailable: true,
-        profileImageUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
+        profileImageUrl: 'https://images.unsplash.com/photo-1594824475317-774b21ec9626?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
       },
       {
         id: 3,
-        name: 'عبدالرحمن خالد',
+        name: 'د. عبدالرحمن خالد',
         phone: '0501234569',
         rating: 4.8,
-        carModel: 'نيسان التيما',
-        carColor: 'أسود',
+        carModel: 'عيادة بيطرية متنقلة',
+        carColor: 'أخضر',
         plateNumber: 'ز ح ط 789',
         latitude: 24.7136 + (Math.random() - 0.5) * 0.1,
         longitude: 46.6753 + (Math.random() - 0.5) * 0.1,
         isAvailable: true,
-        profileImageUrl: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
+        profileImageUrl: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
       },
       {
         id: 4,
-        name: 'سالم أحمد',
+        name: 'د. سارة أحمد',
         phone: '0501234570',
         rating: 4.6,
-        carModel: 'كيا أوبتيما',
-        carColor: 'أزرق',
+        carModel: 'عيادة بيطرية متنقلة',
+        carColor: 'رمادي',
         plateNumber: 'ي ك ل 012',
         latitude: 24.7136 + (Math.random() - 0.5) * 0.1,
         longitude: 46.6753 + (Math.random() - 0.5) * 0.1,
         isAvailable: true,
-        profileImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
+        profileImageUrl: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
       },
       {
         id: 5,
-        name: 'خالد محمود',
+        name: 'د. خالد محمود',
         phone: '0501234571',
         rating: 4.9,
-        carModel: 'هوندا أكورد',
-        carColor: 'فضي',
+        carModel: 'عيادة بيطرية متنقلة',
+        carColor: 'أبيض',
         plateNumber: 'م ن س 345',
         latitude: 24.7136 + (Math.random() - 0.5) * 0.1,
         longitude: 46.6753 + (Math.random() - 0.5) * 0.1,
         isAvailable: true,
-        profileImageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
+        profileImageUrl: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
       },
       {
         id: 6,
-        name: 'عبدالله سعد',
+        name: 'د. منى سعد',
         phone: '0501234572',
         rating: 4.5,
-        carModel: 'تويوتا كورولا',
+        carModel: 'عيادة بيطرية متنقلة',
         carColor: 'أبيض',
         plateNumber: 'ع ف ص 678',
         latitude: 24.7136 + (Math.random() - 0.5) * 0.1,
         longitude: 46.6753 + (Math.random() - 0.5) * 0.1,
         isAvailable: true,
-        profileImageUrl: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
+        profileImageUrl: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?ixlib=rb-4.0.3&w=150&h=150&fit=crop&crop=face'
       }
     ];
 

@@ -176,27 +176,32 @@ export default function RideRequest() {
           </CardContent>
         </Card>
 
-        {/* Ride Info */}
+        {/* Service Info */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">معلومات الرحلة</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">معلومات الخدمة</h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-gray-500 mb-1">المسافة المقدرة</p>
-                <p className="font-semibold">5.2 كم</p>
+                <p className="text-gray-500 mb-1">وقت الوصول المقدر</p>
+                <p className="font-semibold">15-30 دقيقة</p>
               </div>
               <div>
-                <p className="text-gray-500 mb-1">الوقت المقدر</p>
-                <p className="font-semibold">12 دقيقة</p>
+                <p className="text-gray-500 mb-1">مدة الخدمة</p>
+                <p className="font-semibold">45-60 دقيقة</p>
               </div>
               <div>
-                <p className="text-gray-500 mb-1">التكلفة المقدرة</p>
-                <p className="font-semibold text-green-600">25 ريال</p>
+                <p className="text-gray-500 mb-1">رسوم الخدمة</p>
+                <p className="font-semibold text-green-600">150 ريال</p>
               </div>
               <div>
                 <p className="text-gray-500 mb-1">طريقة الدفع</p>
                 <p className="font-semibold">نقدي</p>
               </div>
+            </div>
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-xs text-blue-800">
+                <strong>تشمل الخدمة:</strong> فحص شامل، تشخيص، علاج أساسي، استشارة طبية
+              </p>
             </div>
           </CardContent>
         </Card>
