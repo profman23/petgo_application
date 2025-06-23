@@ -34,7 +34,18 @@ export default function UserTypeSelection() {
         {/* User Type Cards */}
         <div className="space-y-4">
           {/* Customer Login */}
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-blue-300">
+          <Card 
+            className="hover:shadow-xl transition-all duration-300 cursor-pointer border-2" 
+            style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 8px 25px rgba(139, 47, 139, 0.1)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 12px 35px rgba(139, 47, 139, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(139, 47, 139, 0.1)';
+            }}
+          >
             <CardContent className="p-6">
               <Button
                 onClick={() => setLocation('/login/customer')}
@@ -42,8 +53,8 @@ export default function UserTypeSelection() {
                 variant="ghost"
               >
                 <div className="flex items-center space-x-4 rtl:space-x-reverse w-full">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <User className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(139, 47, 139, 0.1)' }}>
+                    <User className="w-6 h-6" style={{ color: 'var(--purple-primary)' }} />
                   </div>
                   <div className={`flex-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                     <h3 className="text-lg font-semibold text-gray-900">{t('customerLogin')}</h3>
@@ -56,7 +67,18 @@ export default function UserTypeSelection() {
           </Card>
 
           {/* Doctor Login */}
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-green-300">
+          <Card 
+            className="hover:shadow-xl transition-all duration-300 cursor-pointer border-2" 
+            style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 8px 25px rgba(139, 47, 139, 0.1)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 12px 35px rgba(139, 47, 139, 0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(139, 47, 139, 0.1)';
+            }}
+          >
             <CardContent className="p-6">
               <Button
                 onClick={() => setLocation('/login/doctor')}
@@ -64,8 +86,8 @@ export default function UserTypeSelection() {
                 variant="ghost"
               >
                 <div className="flex items-center space-x-4 rtl:space-x-reverse w-full">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <Stethoscope className="w-6 h-6 text-green-600" />
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: 'rgba(139, 47, 139, 0.1)' }}>
+                    <Stethoscope className="w-6 h-6" style={{ color: 'var(--purple-primary)' }} />
                   </div>
                   <div className={`flex-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                     <h3 className="text-lg font-semibold text-gray-900">{t('doctorLogin')}</h3>

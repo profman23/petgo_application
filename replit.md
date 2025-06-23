@@ -182,6 +182,9 @@ Changelog:
 - June 23, 2025. Applied purple color scheme (#8B2F8B) to login buttons and form field borders for both customer and doctor interfaces
 - June 23, 2025. Added elegant borders and shadow effects to login screens using CSS variables for consistent theming
 - June 23, 2025. Implemented hover effects on login buttons with darker purple shade for better user interaction feedback
+- June 23, 2025. EXTENDED: Purple theme consistency to user type selection screen (Customer/Doctor login buttons)
+- June 23, 2025. Applied matching purple borders, shadows, and icons to user selection cards for cohesive brand identity
+- June 23, 2025. Added interactive hover animations with lift effects and enhanced shadows for premium feel
 ```
 
 ## User Preferences
