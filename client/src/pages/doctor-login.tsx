@@ -113,15 +113,6 @@ export default function DoctorLogin() {
               <p className="text-gray-600">
                 {language === 'ar' ? 'سجل دخولك لإدارة الطلبات والمواعيد' : 'Log in to manage requests and appointments'}
               </p>
-              
-              {/* Test Account Info */}
-              <div className="text-xs text-green-600 bg-green-50 p-3 rounded-lg mt-4">
-                <p className="font-semibold mb-1">
-                  {language === 'ar' ? 'للتجربة استخدم:' : 'For testing use:'}
-                </p>
-                <p>{language === 'ar' ? 'اسم المستخدم: vetsvan1' : 'Username: vetsvan1'}</p>
-                <p>{language === 'ar' ? 'كلمة المرور: 123456' : 'Password: 123456'}</p>
-              </div>
             </div>
 
             <Form {...form}>

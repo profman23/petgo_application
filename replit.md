@@ -197,6 +197,8 @@ Changelog:
 - June 23, 2025. Created centralized translation keys for all notification messages in both Arabic and English
 - June 23, 2025. OPTIMIZED: Language selector button moved to home screen only
 - June 23, 2025. Removed language selector from login screens for cleaner interface - language choice now made only at initial screen
+- June 23, 2025. CLEANED: Removed test account information section from doctor login page for professional appearance
+- June 23, 2025. Hidden "For testing use: username/password" section from doctor login interface
 ```
 
 ## User Preferences
