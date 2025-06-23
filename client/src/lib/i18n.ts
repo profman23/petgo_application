@@ -58,6 +58,7 @@ export const translations = {
     enterPassword: 'أدخل كلمة المرور',
     noAccount: 'ليس لديك حساب؟',
     createAccount: 'إنشاء حساب',
+    joinMobileVetService: 'انضم إلى خدمة العيادة البيطرية المتنقلة',
     
     // Registration
     createNewAccount: 'إنشاء حساب جديد',
@@ -200,6 +201,7 @@ export const translations = {
     enterPassword: 'Enter your password',
     noAccount: "Don't have an account?",
     createAccount: 'Create Account',
+    joinMobileVetService: 'Join our mobile veterinary clinic service',
     
     // Registration
     createNewAccount: 'Create New Account',

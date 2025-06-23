@@ -13,6 +13,8 @@ import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
 import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import { useTranslation, getDirection } from '@/lib/i18n';
+import { LanguageSelector } from '@/components/language-selector';
 
 interface LoginFormData {
   phone: string;
@@ -43,6 +45,7 @@ export default function Login() {
   });
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { t, language } = useTranslation();
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -157,7 +160,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
+      {/* Language Selector */}
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
+      
       <Card className="w-full max-w-md">
         <CardContent className="p-8">
           <div className="text-center mb-8">
@@ -169,12 +177,12 @@ export default function Login() {
               />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              {isRegistering ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+              {isRegistering ? t('createNewAccount') : t('welcomeBack')}
             </h1>
             <p className="text-gray-600">
               {isRegistering 
-                ? 'انضم إلى خدمة العيادة البيطرية المتنقلة' 
-                : 'ادخل إلى حسابك للوصول إلى الخدمات البيطرية'
+                ? t('joinMobileVetService') 
+                : t('loginToAccount')
               }
             </p>
           </div>
@@ -187,14 +195,14 @@ export default function Login() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>رقم الهاتف</FormLabel>
+                      <FormLabel>{t('phoneNumber')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             {...field}
                             type="tel"
-                            placeholder="0501234567"
-                            className="text-right pr-4 pl-12"
+                            placeholder={t('enterPhone')}
+                            className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                           />
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -209,14 +217,14 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>كلمة المرور</FormLabel>
+                      <FormLabel>{t('password')}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             {...field}
                             type="password"
-                            placeholder="كلمة المرور"
-                            className="text-right pr-4 pl-12"
+                            placeholder={t('enterPassword')}
+                            className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                           />
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
