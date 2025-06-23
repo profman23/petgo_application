@@ -3,13 +3,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, Stethoscope, ArrowLeft } from 'lucide-react';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import { useTranslation, getDirection } from '@/lib/i18n';
+import { LanguageSelector } from '@/components/language-selector';
 
 export default function UserTypeSelection() {
   const [, setLocation] = useLocation();
+  const { t, language } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4" dir={getDirection(language)}>
       <div className="w-full max-w-md space-y-6">
+        {/* Language Selector */}
+        <div className="flex justify-end mb-4">
+          <LanguageSelector />
+        </div>
+        
         {/* Header */}
         <div className="text-center">
           <div className="w-20 h-20 flex items-center justify-center mx-auto mb-4">
@@ -19,8 +27,8 @@ export default function UserTypeSelection() {
               className="w-full h-full object-contain rounded-full border-2 border-green-200"
             />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">العيادة البيطرية المتنقلة</h1>
-          <p className="text-gray-600">اختر نوع حسابك للمتابعة</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('mobileVetClinic')}</h1>
+          <p className="text-gray-600">{t('selectAccountType')}</p>
         </div>
 
         {/* User Type Cards */}
