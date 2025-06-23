@@ -11,6 +11,7 @@ import RideTracking from "@/pages/ride-tracking";
 import DoctorDashboard from "@/pages/doctor-dashboard";
 import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
+import DoctorRideTracking from "@/pages/doctor-ride-tracking";
 import { useEffect, useState } from "react";
 
 // Check for expired tokens on app start

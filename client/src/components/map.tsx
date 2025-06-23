@@ -53,6 +53,7 @@ interface MapProps {
   drivers?: Driver[];
   assignedDriver?: Driver;
   pendingRides?: any[];
+  showBothLocations?: boolean;
   className?: string;
 }
 
@@ -66,7 +67,7 @@ function MapUpdater({ center }: { center: [number, number] }) {
   return null;
 }
 
-export function Map({ customerLocation, drivers = [], assignedDriver, pendingRides = [], className }: MapProps) {
+export function Map({ customerLocation, drivers = [], assignedDriver, pendingRides = [], showBothLocations = false, className }: MapProps) {
   const mapRef = useRef<L.Map | null>(null);
 
   return (

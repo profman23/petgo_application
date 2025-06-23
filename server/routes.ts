@@ -368,6 +368,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get active ride for doctor
+  app.get('/api/doctor/active-ride', requireAuth, async (req: any, res) => {
+    try {
+      const doctorId = req.user.id;
+      const activeRide = await storage.getDriverActiveRide(doctorId);
+      
+      if (!activeRide) {
+        return res.json({ ride: null });
+      }
+
+      // Get customer information
+      const customer = await storage.getUser(activeRide.userId);
+      
+      res.json({
+        ride: activeRide,
+        customer: customer ? {
+          id: customer.id,
+          name: customer.name,
+          phone: customer.phone
+        } : null
+      });
+    } catch (error) {
+      console.error("Error fetching active ride:", error);
+      res.status(500).json({ message: "Failed to fetch active ride" });
+    }
+  });
+
   app.post('/api/doctor/rides/:id/reject', requireAuth, async (req, res) => {
     try {
       const user = req.user as any;

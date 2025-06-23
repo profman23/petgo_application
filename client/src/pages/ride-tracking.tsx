@@ -97,8 +97,25 @@ export default function RideTracking() {
           customerLocation={customerLocation}
           drivers={nearbyDrivers}
           assignedDriver={assignedDriver}
+          showBothLocations={true}
           className="h-full"
         />
+        
+        {/* Google Maps Navigation Button */}
+        {assignedDriver && customerLat && customerLng && (
+          <div className="absolute top-4 right-4 z-[1000]">
+            <Button
+              onClick={() => {
+                const googleMapsUrl = `https://www.google.com/maps/dir/${assignedDriver.latitude},${assignedDriver.longitude}/${customerLat},${customerLng}`;
+                window.open(googleMapsUrl, '_blank');
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2"
+            >
+              <Navigation className="w-4 h-4 mr-1" />
+              التنقل عبر Google Maps
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
