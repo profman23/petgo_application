@@ -52,7 +52,13 @@ export default function Login() {
         title: 'تم تسجيل الدخول بنجاح',
         description: `مرحباً ${data.user.name}`,
       });
-      setLocation('/');
+      
+      // Redirect based on user type
+      if (data.user.membershipType === 'doctor') {
+        setLocation('/doctor-dashboard');
+      } else {
+        setLocation('/');
+      }
     },
     onError: (error) => {
       toast({
@@ -110,8 +116,8 @@ export default function Login() {
             {!isRegistering && (
               <div className="text-xs text-blue-600 bg-blue-50 p-3 rounded-lg mt-4">
                 <p className="font-semibold mb-1">للتجربة استخدم:</p>
-                <p>الهاتف: 0501234567</p>
-                <p>كلمة المرور: 123456</p>
+                <p><strong>عميل:</strong> الهاتف: 0501234567 - كلمة المرور: 123456</p>
+                <p><strong>طبيب بيطري:</strong> الهاتف: vetsvan1 - كلمة المرور: 123456</p>
               </div>
             )}
           </div>

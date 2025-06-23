@@ -227,6 +227,100 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Doctor endpoints for ride management
+  app.get('/api/doctor/pending-rides', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      const allRides = await storage.getAllRides();
+      const pendingRides = allRides.filter(ride => ride.status === 'requested' || ride.status === 'processing');
+      
+      // Get customer details for each ride
+      const ridesWithCustomers = await Promise.all(
+        pendingRides.map(async (ride) => {
+          const customer = await storage.getUser(ride.customerId);
+          return {
+            ...ride,
+            customer: customer ? { name: customer.name, phone: customer.phone } : null
+          };
+        })
+      );
+      
+      res.json(ridesWithCustomers);
+    } catch (error) {
+      res.status(500).json({ message: 'خطأ في جلب الطلبات المعلقة' });
+    }
+  });
+
+  app.post('/api/doctor/rides/:id/accept', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      const rideId = parseInt(req.params.id);
+      const ride = await storage.getRide(rideId);
+      
+      if (!ride) {
+        return res.status(404).json({ message: 'الطلب غير موجود' });
+      }
+      
+      if (ride.status !== 'requested' && ride.status !== 'processing') {
+        return res.status(400).json({ message: 'لا يمكن قبول هذا الطلب' });
+      }
+      
+      // Find and assign nearest available doctor
+      const doctors = await storage.getAvailableDrivers();
+      if (doctors.length > 0) {
+        const nearestDoctor = doctors[0]; // Simplified: take first available
+        await storage.assignDriverToRide(rideId, nearestDoctor.id);
+        await storage.updateDriverAvailability(nearestDoctor.id, false);
+        await storage.updateRideStatus(rideId, 'confirmed');
+        
+        // Simulate progression
+        setTimeout(async () => {
+          await storage.updateRideStatus(rideId, 'enroute');
+          setTimeout(async () => {
+            await storage.updateRideStatus(rideId, 'arrived');
+          }, 10000);
+        }, 5000);
+      }
+      
+      res.json({ message: 'تم قبول الطلب بنجاح' });
+    } catch (error) {
+      res.status(500).json({ message: 'خطأ في قبول الطلب' });
+    }
+  });
+
+  app.post('/api/doctor/rides/:id/reject', requireAuth, async (req, res) => {
+    try {
+      const user = req.user as any;
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      const rideId = parseInt(req.params.id);
+      const ride = await storage.getRide(rideId);
+      
+      if (!ride) {
+        return res.status(404).json({ message: 'الطلب غير موجود' });
+      }
+      
+      if (ride.status !== 'requested' && ride.status !== 'processing') {
+        return res.status(400).json({ message: 'لا يمكن رفض هذا الطلب' });
+      }
+      
+      await storage.updateRideStatus(rideId, 'cancelled');
+      res.json({ message: 'تم رفض الطلب' });
+    } catch (error) {
+      res.status(500).json({ message: 'خطأ في رفض الطلب' });
+    }
+  });
+
   // Simulate ride status updates
   app.post('/api/rides/:id/simulate', requireAuth, async (req, res) => {
     try {

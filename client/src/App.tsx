@@ -8,6 +8,7 @@ import Login from "@/pages/login";
 import Home from "@/pages/home";
 import RideRequest from "@/pages/ride-request";
 import RideTracking from "@/pages/ride-tracking";
+import DoctorDashboard from "@/pages/doctor-dashboard";
 import { useEffect, useState } from "react";
 
 // Configure default authorization header for API requests
@@ -56,6 +57,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
+      <Route path="/doctor-dashboard" component={DoctorDashboard} />
       <Route path="/ride-request" component={RideRequest} />
       <Route path="/ride-tracking" component={RideTracking} />
       <Route path="/" component={Home} />

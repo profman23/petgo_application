@@ -16,6 +16,7 @@ export interface IStorage {
   // Ride operations
   createRide(ride: RideRequest): Promise<Ride>;
   getRide(id: number): Promise<Ride | undefined>;
+  getAllRides(): Promise<Ride[]>;
   updateRideStatus(id: number, status: string): Promise<void>;
   assignDriverToRide(rideId: number, driverId: number): Promise<void>;
   getUserActiveRide(userId: number): Promise<Ride | undefined>;
@@ -147,6 +148,13 @@ export class MemStorage implements IStorage {
         password: '123456',
         name: 'فاطمة علي',
         membershipType: 'silver'
+      },
+      {
+        id: 3,
+        phone: 'vetsvan1',
+        password: '123456',
+        name: 'طبيب بيطري',
+        membershipType: 'doctor'
       }
     ];
 
@@ -222,6 +230,10 @@ export class MemStorage implements IStorage {
 
   async getRide(id: number): Promise<Ride | undefined> {
     return this.rides.get(id);
+  }
+
+  async getAllRides(): Promise<Ride[]> {
+    return Array.from(this.rides.values());
   }
 
   async updateRideStatus(id: number, status: string): Promise<void> {
