@@ -79,14 +79,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/auth/register', async (req, res) => {
     try {
-      const userData = insertUserSchema.parse(req.body);
+      const validatedData = registerSchema.parse(req.body);
       
-      const existingUser = await storage.getUserByPhone(userData.phone);
+      // Remove captcha from data before storing
+      const { captcha, ...userData } = validatedData;
+      
+      // Combine firstName and lastName into name
+      const fullUserData = {
+        ...userData,
+        name: `${userData.firstName} ${userData.lastName}`,
+        membershipType: 'standard'
+      };
+      
+      const existingUser = await storage.getUserByPhone(fullUserData.phone);
       if (existingUser) {
         return res.status(400).json({ message: 'رقم الهاتف مستخدم بالفعل' });
       }
       
-      const user = await storage.createUser(userData);
+      const user = await storage.createUser(fullUserData);
       const sessionId = generateSessionId();
       sessions.set(sessionId, { user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType } });
       
@@ -98,6 +108,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
+      console.error('Registration error:', error);
       res.status(500).json({ message: 'خطأ في الخادم' });
     }
   });

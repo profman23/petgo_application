@@ -15,14 +15,16 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
-  method: string,
   url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
+  options?: {
+    method?: string;
+    body?: string;
+  },
+): Promise<any> {
   const token = localStorage.getItem('token');
   const headers: Record<string, string> = {};
   
-  if (data) {
+  if (options?.body) {
     headers["Content-Type"] = "application/json";
   }
   
@@ -31,14 +33,14 @@ export async function apiRequest(
   }
 
   const res = await fetch(url, {
-    method,
+    method: options?.method || 'GET',
     headers,
-    body: data ? JSON.stringify(data) : undefined,
+    body: options?.body,
     credentials: "include",
   });
 
   await throwIfResNotOk(res);
-  return res;
+  return await res.json();
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
