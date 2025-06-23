@@ -185,6 +185,9 @@ Changelog:
 - June 23, 2025. EXTENDED: Purple theme consistency to user type selection screen (Customer/Doctor login buttons)
 - June 23, 2025. Applied matching purple borders, shadows, and icons to user selection cards for cohesive brand identity
 - June 23, 2025. Added interactive hover animations with lift effects and enhanced shadows for premium feel
+- June 23, 2025. ENHANCED: Main screen container design with elegant purple borders and white background
+- June 23, 2025. Added comprehensive border styling to entire user selection screen with matching shadow effects
+- June 23, 2025. Updated logo border color to match purple theme for complete visual consistency
 ```
 
 ## User Preferences

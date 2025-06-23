@@ -11,8 +11,15 @@ export default function UserTypeSelection() {
   const { t, language } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4" dir={getDirection(language)}>
-      <div className="w-full max-w-md space-y-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4" dir={getDirection(language)}>
+      <div 
+        className="w-full max-w-md space-y-6 p-8 rounded-lg border-2" 
+        style={{ 
+          borderColor: 'var(--purple-primary)', 
+          boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)',
+          backgroundColor: 'white'
+        }}
+      >
         {/* Language Selector */}
         <div className="flex justify-end mb-4">
           <LanguageSelector />
@@ -24,7 +31,8 @@ export default function UserTypeSelection() {
             <img 
               src={logoImage} 
               alt="Vets Van" 
-              className="w-full h-full object-contain rounded-full border-2 border-green-200"
+              className="w-full h-full object-contain rounded-full border-2" 
+              style={{ borderColor: 'var(--purple-primary)' }}
             />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('mobileVetClinic')}</h1>
