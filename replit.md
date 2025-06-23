@@ -117,6 +117,9 @@ Changelog:
 - June 23, 2025. Added test user accounts for login testing (phone: 0501234567, password: 123456)
 - June 23, 2025. Converted from ride-hailing to veterinary clinic service app
 - June 23, 2025. Added doctor interface with request approval/rejection system (doctor account: vetsvan1/123456)
+- June 23, 2025. Created separate login interfaces for customers and doctors
+- June 23, 2025. Fixed authentication token system for API calls
+- June 23, 2025. Implemented real-time request notifications between customer and doctor interfaces
 ```
 
 ## User Preferences
