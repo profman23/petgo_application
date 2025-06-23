@@ -51,6 +51,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   phone: true,
   password: true,
   name: true,
+  firstName: true,
+  lastName: true,
+  petName: true,
+  petType: true,
 });
 
 export const loginSchema = z.object({
