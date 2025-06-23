@@ -287,6 +287,17 @@ export const translations = {
     
     // General UI
     notifications: 'Notifications',
+    settings: 'Settings',
+    
+    // Home Page Content
+    myRides: 'My Rides',
+    trackCurrentRide: 'Track Current Ride',
+    noActiveRides: 'No Active Rides',
+    quickActions: 'Quick Actions',
+    activeRide: 'You have an active ride',
+    clickToContinue: 'Click to continue tracking',
+    recentOrders: 'Recent Orders',
+    noPreviousOrders: 'No previous orders',
     
     // Status Messages
     statusRequested: 'Requested',

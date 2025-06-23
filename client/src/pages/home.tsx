@@ -83,7 +83,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
@@ -98,12 +98,13 @@ export default function Home() {
             <div>
               <p className="font-semibold text-gray-900">{user.name}</p>
               <p className="text-sm text-gray-500">
-                العضوية: {MEMBERSHIP_TYPES[user.membershipType as keyof typeof MEMBERSHIP_TYPES]}
+                {t('membership')}: {MEMBERSHIP_TYPES[user.membershipType as keyof typeof MEMBERSHIP_TYPES]}
               </p>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
+            <LanguageSelector />
             <Button variant="ghost" size="icon">
               <Bell className="w-4 h-4" />
             </Button>
@@ -111,7 +112,7 @@ export default function Home() {
               <Settings className="w-4 h-4" />
             </Button>
             <Button variant="ghost" onClick={handleLogout} className="text-red-600">
-              خروج
+              {t('logout')}
             </Button>
           </div>
         </div>
@@ -124,11 +125,11 @@ export default function Home() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-blue-900">لديك رحلة نشطة</p>
-                  <p className="text-sm text-blue-700">اضغط لمتابعة الرحلة</p>
+                  <p className="font-semibold text-blue-900">{t('activeRide')}</p>
+                  <p className="text-sm text-blue-700">{t('clickToContinue')}</p>
                 </div>
                 <Button onClick={() => setLocation('/ride-tracking')} className="bg-blue-600 hover:bg-blue-700">
-                  متابعة الرحلة
+                  {t('continueTracking')}
                 </Button>
               </div>
             </CardContent>
