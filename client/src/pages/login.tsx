@@ -278,6 +278,8 @@ export default function Login() {
                             type="text"
                             placeholder="أحمد"
                             className="text-right"
+                            value={field.value || ''}
+                            onChange={field.onChange}
                           />
                         </FormControl>
                         <FormMessage />
@@ -297,6 +299,8 @@ export default function Login() {
                             type="text"
                             placeholder="محمد"
                             className="text-right"
+                            value={field.value || ''}
+                            onChange={field.onChange}
                           />
                         </FormControl>
                         <FormMessage />
@@ -318,6 +322,8 @@ export default function Login() {
                             type="text"
                             placeholder="فيلو"
                             className="text-right pr-4 pl-12"
+                            value={field.value || ''}
+                            onChange={field.onChange}
                           />
                           <Heart className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -363,6 +369,8 @@ export default function Login() {
                             type="tel"
                             placeholder="0501234567"
                             className="text-right pr-4 pl-12"
+                            value={field.value || ''}
+                            onChange={field.onChange}
                           />
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -385,6 +393,8 @@ export default function Login() {
                             type="password"
                             placeholder="كلمة المرور (6 أحرف على الأقل)"
                             className="text-right pr-4 pl-12"
+                            value={field.value || ''}
+                            onChange={field.onChange}
                           />
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -425,6 +435,8 @@ export default function Login() {
                             type="number"
                             placeholder="أدخل الإجابة"
                             className="text-center text-lg"
+                            value={field.value || ''}
+                            onChange={field.onChange}
                           />
                         </FormControl>
                         <FormMessage />
