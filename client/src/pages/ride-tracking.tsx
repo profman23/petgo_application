@@ -157,16 +157,40 @@ export default function RideTracking() {
         {/* Status Card */}
         <Card>
           <CardContent className="p-4">
-            <RideStatus status={activeRide.status} className="mb-4" />
-            
-            {/* Driver Card */}
-            {assignedDriver && (
-              <DriverCard
-                driver={assignedDriver}
-                onCall={handleCall}
-                onMessage={handleMessage}
-              />
-            )}
+            <div className="text-center">
+              <RideStatus status={activeRide.status} className="mb-4" />
+              
+              {/* حالات الطلب */}
+              <div className="mt-6 space-y-3">
+                {activeRide.status === 'requested' && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-yellow-800 mb-2">جاري المعالجة</h3>
+                    <p className="text-sm text-yellow-700">طلبك قيد المراجعة وننتظر موافقة الطبيب</p>
+                  </div>
+                )}
+                
+                {activeRide.status === 'confirmed' && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-blue-800 mb-2">تم القبول</h3>
+                    <p className="text-sm text-blue-700">تم قبول طلبك وسيتم التوجه إليك قريباً</p>
+                  </div>
+                )}
+                
+                {activeRide.status === 'enroute' && (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-orange-800 mb-2">قيد التنفيذ</h3>
+                    <p className="text-sm text-orange-700">العيادة البيطرية في الطريق إليك</p>
+                  </div>
+                )}
+                
+                {activeRide.status === 'arrived' && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h3 className="font-semibold text-green-800 mb-2">تم الوصول</h3>
+                    <p className="text-sm text-green-700">وصلت العيادة البيطرية إلى موقعك</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
