@@ -13,9 +13,16 @@ function generateSessionId() {
 
 function requireAuth(req: any, res: any, next: any) {
   const sessionId = req.headers.authorization?.replace('Bearer ', '');
+  
+  if (!sessionId) {
+    console.log('No token provided');
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  
   const session = sessions.get(sessionId);
   
   if (!session) {
+    console.log('Invalid token:', sessionId);
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
