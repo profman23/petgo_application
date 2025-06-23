@@ -71,20 +71,44 @@ export default function RideRequest() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setCurrentLocation({ latitude, longitude });
-          form.setValue('pickupLatitude', latitude);
-          form.setValue('pickupLongitude', longitude);
-          form.setValue('pickupLocation', 'موقعك الحالي');
-          toast({
-            title: 'تم تحديد الموقع',
-            description: 'تم الحصول على موقعك الحالي بنجاح',
-          });
+          
+          // Check if location is in Saudi Arabia (rough boundaries)
+          const isInSaudiArabia = latitude >= 16 && latitude <= 32 && longitude >= 34 && longitude <= 56;
+          
+          if (isInSaudiArabia) {
+            setCurrentLocation({ latitude, longitude });
+            form.setValue('pickupLatitude', latitude);
+            form.setValue('pickupLongitude', longitude);
+            form.setValue('pickupLocation', 'موقعك الحالي');
+            toast({
+              title: 'تم تحديد الموقع',
+              description: 'تم الحصول على موقعك الحالي بنجاح',
+            });
+          } else {
+            // Use Riyadh coordinates if location is outside Saudi Arabia
+            const riyadhLat = 24.7136;
+            const riyadhLng = 46.6753;
+            setCurrentLocation({ latitude: riyadhLat, longitude: riyadhLng });
+            form.setValue('pickupLatitude', riyadhLat);
+            form.setValue('pickupLongitude', riyadhLng);
+            form.setValue('pickupLocation', 'الرياض - الموقع الافتراضي');
+            toast({
+              title: 'تم تصحيح الموقع',
+              description: 'تم تحديد موقع الرياض بدلاً من الموقع المكتشف خارج المملكة',
+            });
+          }
         },
         (error) => {
+          // Use Riyadh coordinates as fallback
+          const riyadhLat = 24.7136;
+          const riyadhLng = 46.6753;
+          setCurrentLocation({ latitude: riyadhLat, longitude: riyadhLng });
+          form.setValue('pickupLatitude', riyadhLat);
+          form.setValue('pickupLongitude', riyadhLng);
+          form.setValue('pickupLocation', 'الرياض - الموقع الافتراضي');
           toast({
-            title: 'خطأ في تحديد الموقع',
-            description: 'تأكد من تفعيل خدمة الموقع',
-            variant: 'destructive',
+            title: 'تم استخدام الموقع الافتراضي',
+            description: 'تم تحديد موقع الرياض كموقع افتراضي',
           });
         }
       );
