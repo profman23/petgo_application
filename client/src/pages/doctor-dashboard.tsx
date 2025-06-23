@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useDoctorLocation } from '@/hooks/useDoctorLocation';
+import { Map } from '@/components/map';
 import { ArrowLeft, Check, X, MapPin, Clock, Navigation, Loader2, Satellite } from 'lucide-react';
 
 export default function DoctorDashboard() {
@@ -194,6 +195,29 @@ export default function DoctorDashboard() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Interactive Map showing customer locations */}
+        {!isLoading && pendingRides && pendingRides.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-4">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-blue-600" />
+                خريطة مواقع العملاء
+              </h3>
+              <div className="h-64 rounded-lg overflow-hidden">
+                <Map
+                  customerLocation={latitude && longitude ? [latitude, longitude] : [24.7136, 46.6753]}
+                  drivers={[]}
+                  pendingRides={pendingRides}
+                  className="h-full w-full"
+                />
+              </div>
+              <p className="text-xs text-gray-600 mt-2">
+                الدوائر الزرقاء تمثل مواقع العملاء، والدائرة الخضراء تمثل موقعك الحالي
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Pending Requests */}
         <div className="space-y-4">

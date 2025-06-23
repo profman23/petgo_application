@@ -52,6 +52,7 @@ interface MapProps {
   customerLocation: [number, number];
   drivers?: Driver[];
   assignedDriver?: Driver;
+  pendingRides?: any[];
   className?: string;
 }
 
@@ -65,7 +66,7 @@ function MapUpdater({ center }: { center: [number, number] }) {
   return null;
 }
 
-export function Map({ customerLocation, drivers = [], assignedDriver, className }: MapProps) {
+export function Map({ customerLocation, drivers = [], assignedDriver, pendingRides = [], className }: MapProps) {
   const mapRef = useRef<L.Map | null>(null);
 
   return (
@@ -103,6 +104,27 @@ export function Map({ customerLocation, drivers = [], assignedDriver, className 
               </div>
             </Popup>
           </Marker>
+        ))}
+
+        {/* Pending Rides - Customer Locations */}
+        {pendingRides.map((ride) => (
+          ride.pickupLatitude && ride.pickupLongitude && (
+            <Marker 
+              key={`customer-${ride.id}`} 
+              position={[ride.pickupLatitude, ride.pickupLongitude]} 
+              icon={customerIcon}
+            >
+              <Popup>
+                <div className="text-right">
+                  <strong>طلب رقم: {ride.id}</strong><br />
+                  <strong>العميل:</strong> {ride.customer?.name || 'غير محدد'}<br />
+                  <strong>الهاتف:</strong> {ride.customer?.phone || 'غير محدد'}<br />
+                  <strong>الموقع:</strong> {ride.pickupLocation}<br />
+                  <strong>الوقت:</strong> {new Date(ride.createdAt).toLocaleTimeString('ar-SA')}
+                </div>
+              </Popup>
+            </Marker>
+          )
         ))}
       </MapContainer>
     </div>
