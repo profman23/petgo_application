@@ -7,6 +7,8 @@ import { useRide } from '@/hooks/useRide';
 import { Bell, Settings, User, Car, Star } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import { useTranslation, getDirection } from '@/lib/i18n';
+import { LanguageSelector } from '@/components/language-selector';
 
 export default function Home() {
   const [, setLocation] = useLocation();

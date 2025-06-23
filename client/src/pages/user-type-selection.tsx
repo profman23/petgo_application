@@ -45,9 +45,9 @@ export default function UserTypeSelection() {
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                     <User className="w-6 h-6 text-blue-600" />
                   </div>
-                  <div className="flex-1 text-right">
-                    <h3 className="text-lg font-semibold text-gray-900">عميل</h3>
-                    <p className="text-sm text-gray-600">طلب عيادة بيطرية متنقلة</p>
+                  <div className={`flex-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('customerLogin')}</h3>
+                    <p className="text-sm text-gray-600">{t('customerLoginDesc')}</p>
                   </div>
                   <ArrowLeft className="w-5 h-5 text-gray-400" />
                 </div>
@@ -67,9 +67,9 @@ export default function UserTypeSelection() {
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <Stethoscope className="w-6 h-6 text-green-600" />
                   </div>
-                  <div className="flex-1 text-right">
-                    <h3 className="text-lg font-semibold text-gray-900">طبيب بيطري</h3>
-                    <p className="text-sm text-gray-600">إدارة الطلبات والمواعيد</p>
+                  <div className={`flex-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('doctorLogin')}</h3>
+                    <p className="text-sm text-gray-600">{t('doctorLoginDesc')}</p>
                   </div>
                   <ArrowLeft className="w-5 h-5 text-gray-400" />
                 </div>

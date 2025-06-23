@@ -269,7 +269,6 @@ export const translations = {
     connected: 'Connected',
     disconnected: 'Disconnected',
     customerInfo: 'Customer Information',
-    phone: 'Phone',
     rideDetails: 'Ride Details',
     currentStatus: 'Current Status',
     updateStatus: 'Update Status',
