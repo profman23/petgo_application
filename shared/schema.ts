@@ -7,6 +7,10 @@ export const users = pgTable("users", {
   phone: text("phone").notNull().unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  petName: text("pet_name").notNull(),
+  petType: text("pet_type").notNull(), // كلب، قطة، طير
   membershipType: text("membership_type").notNull().default("bronze"),
 });
 
@@ -54,6 +58,19 @@ export const loginSchema = z.object({
   password: z.string().min(1, "كلمة المرور مطلوبة"),
 });
 
+export const registerSchema = z.object({
+  firstName: z.string().min(2, "الاسم الأول مطلوب (حد أدنى حرفين)"),
+  lastName: z.string().min(2, "الاسم الثاني مطلوب (حد أدنى حرفين)"),
+  petName: z.string().min(2, "اسم الأليف مطلوب (حد أدنى حرفين)"),
+  petType: z.enum(["كلب", "قطة", "طير"], {
+    errorMap: () => ({ message: "يرجى اختيار نوع الأليف" })
+  }),
+  phone: z.string()
+    .regex(/^05\d{8}$/, "رقم الهاتف يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"),
+  password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
+  captcha: z.string().min(1, "يرجى إدخال رمز التحقق"),
+});
+
 export const rideRequestSchema = createInsertSchema(rides).pick({
   pickupLocation: true,
   destination: true,
@@ -65,6 +82,7 @@ export const rideRequestSchema = createInsertSchema(rides).pick({
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type RegisterUser = z.infer<typeof registerSchema>;
 export type User = typeof users.$inferSelect;
 export type Driver = typeof drivers.$inferSelect;
 export type Ride = typeof rides.$inferSelect;

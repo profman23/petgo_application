@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { loginSchema } from '@shared/schema';
-import { User, Phone, Lock, ArrowLeft } from 'lucide-react';
+import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
+import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 interface LoginFormData {
@@ -29,14 +30,64 @@ interface AuthResponse {
 
 export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
+  const [captcha, setCaptcha] = useState({ question: '', answer: 0 });
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const form = useForm<LoginFormData>({
+  // Generate simple math captcha
+  const generateCaptcha = () => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const operations = ['+', '-', '*'];
+    const operation = operations[Math.floor(Math.random() * operations.length)];
+    
+    let answer;
+    let question;
+    switch (operation) {
+      case '+':
+        answer = num1 + num2;
+        question = `${num1} + ${num2} = ؟`;
+        break;
+      case '-':
+        answer = Math.max(num1, num2) - Math.min(num1, num2);
+        question = `${Math.max(num1, num2)} - ${Math.min(num1, num2)} = ؟`;
+        break;
+      case '*':
+        answer = num1 * num2;
+        question = `${num1} × ${num2} = ؟`;
+        break;
+      default:
+        answer = num1 + num2;
+        question = `${num1} + ${num2} = ؟`;
+    }
+    
+    setCaptcha({ question, answer });
+  };
+
+  useEffect(() => {
+    if (isRegistering) {
+      generateCaptcha();
+    }
+  }, [isRegistering]);
+
+  const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       phone: '',
       password: '',
+    },
+  });
+
+  const registerForm = useForm<RegisterUser>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      petName: '',
+      petType: 'كلب',
+      phone: '',
+      password: '',
+      captcha: '',
     },
   });
 
