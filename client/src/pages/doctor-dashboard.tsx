@@ -13,12 +13,32 @@ export default function DoctorDashboard() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.membershipType !== 'doctor') {
+    
+    if (!token || user.membershipType !== 'doctor') {
       setLocation('/');
       return;
     }
-  }, [setLocation]);
+    
+    // Test token validity on page load
+    fetch('/api/doctor/pending-rides', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).then(res => {
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        toast({
+          title: 'انتهت جلسة العمل',
+          description: 'يرجى تسجيل الدخول مرة أخرى',
+          variant: 'destructive',
+        });
+        setLocation('/login');
+      }
+    }).catch(() => {
+      // Network error, ignore
+    });
+  }, [setLocation, toast]);
 
   const { data: pendingRides = [], isLoading, refetch } = useQuery({
     queryKey: ['/api/doctor/pending-rides'],

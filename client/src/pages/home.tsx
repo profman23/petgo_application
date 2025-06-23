@@ -23,7 +23,25 @@ export default function Home() {
     }
     
     setUser(JSON.parse(userData));
-  }, [setLocation]);
+    
+    // Test token validity on page load
+    fetch('/api/rides/active', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).then(res => {
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        toast({
+          title: 'انتهت جلسة العمل',
+          description: 'يرجى تسجيل الدخول مرة أخرى',
+          variant: 'destructive',
+        });
+        setLocation('/login');
+      }
+    }).catch(() => {
+      // Network error, ignore
+    });
+  }, [setLocation, toast]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
