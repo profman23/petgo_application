@@ -1,6 +1,6 @@
 import { users, drivers, rides, type User, type Driver, type Ride, type InsertUser, type RideRequest } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and, not, inArray, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -27,102 +27,100 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   constructor() {
-    // Initialize test data on first run
     this.initializeTestData();
   }
 
   private async initializeTestData() {
     try {
-      // Check if test user exists
+      // Check if test users exist
       const existingUser = await this.getUserByPhone('0501234567');
       if (!existingUser) {
         await this.createUser({
+          name: 'عميل تجريبي',
           phone: '0501234567',
           password: '123456',
-          name: 'مستخدم تجريبي',
-          firstName: 'مستخدم',
-          lastName: 'تجريبي',
-          petName: 'فيلو',
-          petType: 'كلب',
-          membershipType: 'standard'
+          petName: 'فلافي',
+          petType: 'قطة',
+          address: 'الرياض',
+          membershipType: 'premium'
         });
       }
 
-      // Check if test doctor exists
       const existingDoctor = await this.getUserByPhone('vetsvan1');
       if (!existingDoctor) {
         await this.createUser({
+          name: 'د. أحمد محمد',
           phone: 'vetsvan1',
           password: '123456',
-          name: 'د. أحمد البيطري',
-          firstName: 'د. أحمد',
-          lastName: 'البيطري',
           petName: '',
-          petType: 'كلب',
+          petType: '',
+          address: 'الرياض',
           membershipType: 'doctor'
         });
       }
 
-      // Initialize test drivers in database
+      // Initialize drivers
       await this.initializeDrivers();
     } catch (error) {
-      console.log('Test data initialization skipped:', error.message);
+      console.error('Error initializing test data:', error);
     }
   }
 
   private async initializeDrivers() {
     try {
-      const existingDrivers = await db.select().from(drivers);
+      const existingDrivers = await this.getAllDrivers();
       if (existingDrivers.length === 0) {
-        const testDrivers = [
+        const driversData = [
           {
+            id: 1,
             name: 'د. محمد العلي',
-            phone: '0501234568',
-            rating: 4.8,
-            carModel: 'تويوتا كامري 2023',
-            carColor: 'أبيض',
-            plateNumber: 'أ ب ج 1234',
+            phone: '0551234567',
             latitude: 24.7136,
             longitude: 46.6753,
+            rating: 4.8,
+            carModel: 'عيادة متنقلة',
+            carColor: 'أبيض',
+            plateNumber: 'VET-001',
             isAvailable: true,
-            profileImageUrl: null,
+            profileImageUrl: null
           },
           {
-            name: 'د. فاطمة الأحمد',
-            phone: '0501234569',
+            id: 2,
+            name: 'د. فاطمة أحمد',
+            phone: '0561234567',
+            latitude: 24.7180,
+            longitude: 46.6850,
             rating: 4.9,
-            carModel: 'هوندا أكورد 2022',
+            carModel: 'عيادة متنقلة',
             carColor: 'أزرق',
-            plateNumber: 'د هـ و 5678',
-            latitude: 24.7236,
-            longitude: 46.6853,
+            plateNumber: 'VET-002',
             isAvailable: true,
-            profileImageUrl: null,
+            profileImageUrl: null
           },
           {
+            id: 3,
             name: 'د. خالد المحمد',
-            phone: '0501234570',
+            phone: '0571234567',
+            latitude: 24.7050,
+            longitude: 46.6600,
             rating: 4.7,
-            carModel: 'نيسان التيما 2021',
-            carColor: 'أسود',
-            plateNumber: 'ز ح ط 9012',
-            latitude: 24.7036,
-            longitude: 46.6653,
+            carModel: 'عيادة متنقلة',
+            carColor: 'أخضر',
+            plateNumber: 'VET-003',
             isAvailable: true,
-            profileImageUrl: null,
+            profileImageUrl: null
           }
         ];
 
-        for (const driver of testDrivers) {
-          await db.insert(drivers).values(driver);
+        for (const driver of driversData) {
+          await db.insert(drivers).values(driver).onConflictDoNothing();
         }
       }
     } catch (error) {
-      console.log('Driver initialization skipped:', error.message);
+      console.error('Error initializing drivers:', error);
     }
   }
 
-  // User operations
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
@@ -141,7 +139,6 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  // Driver operations
   async getAllDrivers(): Promise<Driver[]> {
     return await db.select().from(drivers);
   }
@@ -169,17 +166,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(drivers.id, id));
   }
 
-  // Ride operations
   async createRide(rideData: RideRequest): Promise<Ride> {
     const [ride] = await db
       .insert(rides)
-      .values({
-        ...rideData,
-        status: 'requested',
-        vehicleType: rideData.vehicleType || 'standard',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
+      .values(rideData)
       .returning();
     return ride;
   }
@@ -196,7 +186,10 @@ export class DatabaseStorage implements IStorage {
   async updateRideStatus(id: number, status: string): Promise<void> {
     await db
       .update(rides)
-      .set({ status, updatedAt: new Date() })
+      .set({ 
+        status, 
+        updatedAt: new Date() 
+      })
       .where(eq(rides.id, id));
   }
 
@@ -215,24 +208,32 @@ export class DatabaseStorage implements IStorage {
     const [ride] = await db
       .select()
       .from(rides)
-      .where(eq(rides.customerId, userId));
+      .where(
+        and(
+          eq(rides.customerId, userId),
+          not(inArray(rides.status, ['completed', 'cancelled']))
+        )
+      )
+      .orderBy(desc(rides.createdAt))
+      .limit(1);
     
-    if (ride && !['completed', 'cancelled'].includes(ride.status)) {
-      return ride;
-    }
-    return undefined;
+    return ride || undefined;
   }
 
   async getDriverActiveRide(driverId: number): Promise<Ride | undefined> {
     const [ride] = await db
       .select()
       .from(rides)
-      .where(eq(rides.driverId, driverId));
+      .where(
+        and(
+          eq(rides.driverId, driverId),
+          not(inArray(rides.status, ['completed', 'cancelled']))
+        )
+      )
+      .orderBy(desc(rides.createdAt))
+      .limit(1);
     
-    if (ride && !['completed', 'cancelled'].includes(ride.status)) {
-      return ride;
-    }
-    return undefined;
+    return ride || undefined;
   }
 }
 
