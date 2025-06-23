@@ -1,0 +1,134 @@
+import { useEffect, useState } from 'react';
+import { useLocation } from 'wouter';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useToast } from '@/hooks/use-toast';
+import { useRide } from '@/hooks/useRide';
+import { Bell, Settings, User, Car, Star } from 'lucide-react';
+import { MEMBERSHIP_TYPES } from '@/lib/constants';
+
+export default function Home() {
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const { activeRide, isLoadingActiveRide } = useRide();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    
+    if (!token || !userData) {
+      setLocation('/login');
+      return;
+    }
+    
+    setUser(JSON.parse(userData));
+  }, [setLocation]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast({
+      title: 'تم تسجيل الخروج',
+      description: 'تم تسجيل خروجك بنجاح',
+    });
+    setLocation('/login');
+  };
+
+  const handleRequestRide = () => {
+    if (activeRide) {
+      setLocation('/ride-tracking');
+    } else {
+      setLocation('/ride-request');
+    }
+  };
+
+  if (!user) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+              <User className="w-5 h-5 text-gray-600" />
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900">{user.name}</p>
+              <p className="text-sm text-gray-500">
+                العضوية: {MEMBERSHIP_TYPES[user.membershipType as keyof typeof MEMBERSHIP_TYPES]}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon">
+              <Bell className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Settings className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" onClick={handleLogout} className="text-red-600">
+              خروج
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <div className="p-4">
+        {/* Active Ride Card */}
+        {activeRide && (
+          <Card className="mb-6 border-blue-200 bg-blue-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-blue-900">لديك رحلة نشطة</p>
+                  <p className="text-sm text-blue-700">اضغط لمتابعة الرحلة</p>
+                </div>
+                <Button onClick={() => setLocation('/ride-tracking')} className="bg-blue-600 hover:bg-blue-700">
+                  متابعة الرحلة
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Quick Actions */}
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">طلب رحلة جديدة</h2>
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              onClick={handleRequestRide}
+              disabled={!!activeRide}
+              className="bg-blue-600 hover:bg-blue-700 text-white p-6 h-auto flex-col"
+            >
+              <Car className="w-8 h-8 mb-2" />
+              <span className="font-semibold">سيارة عادية</span>
+            </Button>
+            <Button
+              onClick={handleRequestRide}
+              disabled={!!activeRide}
+              className="bg-green-600 hover:bg-green-700 text-white p-6 h-auto flex-col"
+            >
+              <Star className="w-8 h-8 mb-2" />
+              <span className="font-semibold">سيارة مميزة</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="font-semibold text-gray-900 mb-3">الرحلات الأخيرة</h3>
+            <div className="text-center py-8">
+              <p className="text-gray-500">لا توجد رحلات سابقة</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
