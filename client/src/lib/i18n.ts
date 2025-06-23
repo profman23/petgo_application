@@ -166,6 +166,13 @@ export const translations = {
     requestAccepted: 'تم قبول الطلب',
     requestRejected: 'تم رفض الطلب',
     statusUpdated: 'تم تحديث الحالة',
+    loginSuccess: 'تم تسجيل الدخول بنجاح',
+    logoutSuccess: 'تم تسجيل الخروج بنجاح',
+    languageChanged: 'تم تغيير اللغة بنجاح',
+    registrationSuccess: 'تم التسجيل بنجاح',
+    welcomeNewUser: 'مرحباً بك في خدمتنا البيطرية',
+    errorOccurred: 'حدث خطأ',
+    pleaseTryAgain: 'يرجى المحاولة مرة أخرى',
     
     // Settings
     settings: 'الإعدادات',
@@ -306,7 +313,7 @@ export const translations = {
     
     // Home Page
     veterinaryTransport: 'Veterinary Transport Company',
-    veterinaryService: 'Veterinary Transport Service',
+    veterinaryTransportService: 'Veterinary Transport Service',
     
     // General UI
     notifications: 'Notifications',
@@ -322,7 +329,7 @@ export const translations = {
     continueTracking: 'Continue Tracking',
     recentOrders: 'Recent Orders',
     noPreviousOrders: 'No previous orders',
-    veterinaryService: 'Veterinary service at your location',
+    veterinaryServiceLocation: 'Veterinary service at your location',
     
     // Status Messages
     statusRequested: 'Requested',
@@ -337,6 +344,13 @@ export const translations = {
     requestAccepted: 'Request accepted',
     requestRejected: 'Request rejected',
     statusUpdated: 'Status updated',
+    loginSuccess: 'Login successful',
+    logoutSuccess: 'Logout successful',
+    languageChanged: 'Language changed successfully',
+    registrationSuccess: 'Registration completed successfully',
+    welcomeNewUser: 'Welcome to our veterinary service',
+    errorOccurred: 'An error occurred',
+    pleaseTryAgain: 'Please try again',
     
     // Settings
     language: 'Language',

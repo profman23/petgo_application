@@ -7,10 +7,25 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Languages, ChevronDown } from 'lucide-react';
 import { useLanguage, useTranslation } from '@/lib/i18n';
+import { useToast } from '@/hooks/use-toast';
 
 export function LanguageSelector() {
   const { language, setLanguage } = useLanguage();
   const { t } = useTranslation();
+  const { toast } = useToast();
+
+  const handleLanguageChange = (newLanguage: 'ar' | 'en') => {
+    setLanguage(newLanguage);
+    
+    // Show success notification
+    setTimeout(() => {
+      toast({
+        title: newLanguage === 'ar' ? 'تم تغيير اللغة بنجاح' : 'Language changed successfully',
+        description: newLanguage === 'ar' ? 'تم تطبيق اللغة العربية' : 'English language applied',
+        variant: 'default',
+      });
+    }, 100);
+  };
 
   return (
     <DropdownMenu>
@@ -41,7 +56,7 @@ export function LanguageSelector() {
         }}
       >
         <DropdownMenuItem 
-          onClick={() => setLanguage('ar')}
+          onClick={() => handleLanguageChange('ar')}
           className={`cursor-pointer transition-colors ${
             language === 'ar' 
               ? 'bg-purple-100 text-purple-900 font-medium' 
@@ -54,7 +69,7 @@ export function LanguageSelector() {
           </span>
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={() => setLanguage('en')}
+          onClick={() => handleLanguageChange('en')}
           className={`cursor-pointer transition-colors ${
             language === 'en' 
               ? 'bg-purple-100 text-purple-900 font-medium' 
