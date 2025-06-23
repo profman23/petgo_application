@@ -166,7 +166,7 @@ export default function Login() {
         <LanguageSelector />
       </div>
       
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md border-2 shadow-xl" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
         <CardContent className="p-8">
           <div className="text-center mb-8">
             <div className="mx-auto mb-6">
@@ -202,7 +202,8 @@ export default function Login() {
                             {...field}
                             type="tel"
                             placeholder={t('enterPhone')}
-                            className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
                           />
                           <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -224,7 +225,8 @@ export default function Login() {
                             {...field}
                             type="password"
                             placeholder={t('enterPassword')}
-                            className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
                           />
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -236,8 +238,11 @@ export default function Login() {
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
+                  className="w-full text-white" 
                   disabled={loginMutation.isPending}
+                  style={{ backgroundColor: 'var(--purple-primary)', borderColor: 'var(--purple-primary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--purple-dark)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--purple-primary)'}
                 >
                   {loginMutation.isPending ? t('loading') : t('login')}
                 </Button>

@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom purple theme matching the logo */
+:root {
+  --purple-primary: #8B2F8B;
+  --purple-dark: #7A2A7A;
+  --purple-light: #9F439F;
+  --purple-accent: #B85CB8;
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(20, 14.3%, 4.1%);
