@@ -66,8 +66,9 @@ export default function DoctorLogin() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast({
-        title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Login Successful',
-        description: language === 'ar' ? `مرحباً د. ${data.user.name}` : `Welcome Dr. ${data.user.name}`,
+        title: t('loginSuccess'),
+        description: `${t('welcomeNewUser')} د. ${data.user.name}`,
+        variant: "default",
       });
       window.location.href = '/doctor-dashboard';
     },

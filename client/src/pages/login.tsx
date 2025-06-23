@@ -90,14 +90,15 @@ export default function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast({
-        title: "تم تسجيل الدخول بنجاح",
-        description: `مرحباً ${data.user.name}`,
+        title: t('loginSuccess'),
+        description: `${t('welcomeNewUser')} ${data.user.name}`,
+        variant: "default",
       });
       window.location.href = '/';
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ في تسجيل الدخول",
+        title: t('errorOccurred'),
         description: error.message,
         variant: "destructive",
       });
@@ -123,8 +124,9 @@ export default function Login() {
       
       // رسالة ترحيب مفصلة
       toast({
-        title: "🎉 مرحباً بك في عيادة الحيوانات المتنقلة!",
-        description: `أهلاً وسهلاً ${formData.firstName}! تم إنشاء حسابك بنجاح. يمكنك الآن طلب الخدمات البيطرية لحيوانك الأليف ${formData.petName}.`,
+        title: t('registrationSuccess'),
+        description: `${t('welcomeNewUser')} ${formData.firstName}! يمكنك الآن طلب الخدمات البيطرية لحيوانك الأليف ${formData.petName}.`,
+        variant: "default",
       });
       
       // رسالة ترحيب إضافية بعد ثانيتين
@@ -139,7 +141,7 @@ export default function Login() {
     },
     onError: (error: Error) => {
       toast({
-        title: "خطأ في إنشاء الحساب",
+        title: t('errorOccurred'),
         description: error.message,
         variant: "destructive",
       });
