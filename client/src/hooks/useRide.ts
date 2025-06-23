@@ -13,8 +13,11 @@ export function useRide() {
 
   const requestRideMutation = useMutation({
     mutationFn: async (rideData: any) => {
-      const response = await apiRequest('POST', '/api/rides/request', rideData);
-      return response.json();
+      const response = await apiRequest('/api/rides/request', {
+        method: 'POST',
+        body: JSON.stringify(rideData)
+      });
+      return response;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/rides/active'] });
@@ -24,15 +27,19 @@ export function useRide() {
 
   const simulateRideMutation = useMutation({
     mutationFn: async (rideId: number) => {
-      const response = await apiRequest('POST', `/api/rides/${rideId}/simulate`);
-      return response.json();
+      const response = await apiRequest(`/api/rides/${rideId}/simulate`, {
+        method: 'POST'
+      });
+      return response;
     },
   });
 
   const cancelRideMutation = useMutation({
     mutationFn: async (rideId: number) => {
-      const response = await apiRequest('PUT', `/api/rides/${rideId}/cancel`);
-      return response.json();
+      const response = await apiRequest(`/api/rides/${rideId}/cancel`, {
+        method: 'PUT'
+      });
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/rides/active'] });
@@ -45,8 +52,8 @@ export function useRide() {
   });
 
   const fetchNearbyDrivers = async (latitude: number, longitude: number) => {
-    const response = await apiRequest('GET', `/api/drivers/nearby?latitude=${latitude}&longitude=${longitude}`);
-    return response.json();
+    const response = await apiRequest(`/api/drivers/nearby?latitude=${latitude}&longitude=${longitude}`);
+    return response;
   };
 
   return {
