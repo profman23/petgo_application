@@ -80,8 +80,8 @@ export default function UserTypeSelection() {
 
         {/* Footer */}
         <div className="text-center text-xs text-gray-500 mt-8">
-          <p>خدمة العيادة البيطرية المتنقلة</p>
-          <p>رعاية حيواناتك في منزلك</p>
+          <p>{t('mobileVetService')}</p>
+          <p>{t('petCareAtHome')}</p>
         </div>
       </div>
     </div>

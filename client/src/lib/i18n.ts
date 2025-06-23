@@ -47,6 +47,8 @@ export const translations = {
     customerLoginDesc: 'لطلب خدمات بيطرية',
     doctorLogin: 'تسجيل دخول الطبيب',
     doctorLoginDesc: 'لتقديم الخدمات البيطرية',
+    mobileVetService: 'خدمة العيادة البيطرية المتنقلة',
+    petCareAtHome: 'رعاية حيواناتك في منزلك',
     
     // Login
     welcomeBack: 'مرحباً بعودتك',
@@ -187,6 +189,8 @@ export const translations = {
     customerLoginDesc: 'To request veterinary services',
     doctorLogin: 'Doctor Login',
     doctorLoginDesc: 'To provide veterinary services',
+    mobileVetService: 'Mobile Veterinary Clinic Service',
+    petCareAtHome: 'Pet care at your home',
     
     // Login
     welcomeBack: 'Welcome Back',
@@ -210,7 +214,6 @@ export const translations = {
     // Home
     membership: 'Membership',
     requestVetService: 'Request Vet Service',
-    continueTracking: 'Continue Tracking',
     noActiveRide: 'No active ride',
     welcomeUser: 'Welcome',
     
@@ -296,8 +299,10 @@ export const translations = {
     quickActions: 'Quick Actions',
     activeRide: 'You have an active ride',
     clickToContinue: 'Click to continue tracking',
+    continueTracking: 'Continue Tracking',
     recentOrders: 'Recent Orders',
     noPreviousOrders: 'No previous orders',
+    veterinaryService: 'Veterinary service at your location',
     
     // Status Messages
     statusRequested: 'Requested',
