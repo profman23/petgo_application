@@ -106,8 +106,12 @@ export default function RideTracking() {
           <div className="absolute top-4 right-4 z-[1000]">
             <Button
               onClick={() => {
-                const googleMapsUrl = `https://www.google.com/maps/dir/${assignedDriver.latitude},${assignedDriver.longitude}/${customerLat},${customerLng}`;
-                window.open(googleMapsUrl, '_blank');
+                const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(assignedDriver.latitude)},${encodeURIComponent(assignedDriver.longitude)}/${encodeURIComponent(customerLat)},${encodeURIComponent(customerLng)}`;
+                console.log('Opening Google Maps:', googleMapsUrl);
+                const newWindow = window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                  window.location.href = googleMapsUrl;
+                }
               }}
               className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2"
             >

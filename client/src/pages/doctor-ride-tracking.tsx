@@ -6,9 +6,11 @@ import { ArrowLeft, Navigation, MapPin, Phone, Clock } from "lucide-react";
 import { Map } from "@/components/map";
 import { useLocation } from "wouter";
 import { useDoctorLocation } from "@/hooks/useDoctorLocation";
+import { useToast } from "@/hooks/use-toast";
 
 export default function DoctorRideTracking() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const { latitude: doctorLat, longitude: doctorLng, accuracy, error } = useDoctorLocation();
 
   const { data: activeRide, isLoading } = useQuery({
@@ -48,8 +50,53 @@ export default function DoctorRideTracking() {
 
   const handleGoogleMapsNavigation = () => {
     if (doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude) {
-      const googleMapsUrl = `https://www.google.com/maps/dir/${doctorLat},${doctorLng}/${ride.pickupLatitude},${ride.pickupLongitude}`;
-      window.open(googleMapsUrl, '_blank');
+      // Create Google Maps URL with proper encoding
+      const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(doctorLat)},${encodeURIComponent(doctorLng)}/${encodeURIComponent(ride.pickupLatitude)},${encodeURIComponent(ride.pickupLongitude)}`;
+      
+      console.log('Opening Google Maps:', googleMapsUrl);
+      
+      // Show confirmation toast
+      toast({
+        title: "فتح Google Maps",
+        description: "جاري فتح التطبيق للتنقل...",
+      });
+      
+      // Try multiple methods to open the URL
+      try {
+        const newWindow = window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+        
+        // Check if popup was blocked after a short delay
+        setTimeout(() => {
+          if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+            toast({
+              title: "تعذر فتح نافذة جديدة",
+              description: "سيتم فتح Google Maps في نفس النافذة",
+              variant: "destructive",
+            });
+            setTimeout(() => {
+              window.location.href = googleMapsUrl;
+            }, 1500);
+          }
+        }, 1000);
+        
+      } catch (error) {
+        console.error('Error opening Google Maps:', error);
+        toast({
+          title: "خطأ في فتح Google Maps",
+          description: "سيتم المحاولة مرة أخرى...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = googleMapsUrl;
+        }, 1000);
+      }
+    } else {
+      console.log('Missing coordinates:', { doctorLat, doctorLng, pickupLat: ride.pickupLatitude, pickupLng: ride.pickupLongitude });
+      toast({
+        title: "خطأ في الموقع",
+        description: "لا يمكن تحديد إحداثيات الموقع",
+        variant: "destructive",
+      });
     }
   };
 
@@ -210,14 +257,62 @@ export default function DoctorRideTracking() {
 
         {/* Action Buttons */}
         <div className="space-y-3">
-          <Button
-            onClick={handleGoogleMapsNavigation}
-            disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
-          >
-            <Navigation className="w-5 h-5 mr-2" />
-            فتح التنقل في Google Maps
-          </Button>
+          <div className="grid grid-cols-1 gap-2">
+            <Button
+              onClick={handleGoogleMapsNavigation}
+              disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+            >
+              <Navigation className="w-5 h-5 mr-2" />
+              فتح التنقل في Google Maps (نافذة جديدة)
+            </Button>
+            
+            <Button
+              onClick={() => {
+                if (doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude) {
+                  const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(doctorLat)},${encodeURIComponent(doctorLng)}/${encodeURIComponent(ride.pickupLatitude)},${encodeURIComponent(ride.pickupLongitude)}`;
+                  window.location.href = googleMapsUrl;
+                }
+              }}
+              disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
+              variant="outline"
+              className="w-full py-3"
+            >
+              <Navigation className="w-5 h-5 mr-2" />
+              فتح Google Maps مباشرة
+            </Button>
+          </div>
+
+          {/* Alternative navigation options */}
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={() => {
+                if (doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude) {
+                  const appleUrl = `http://maps.apple.com/?saddr=${doctorLat},${doctorLng}&daddr=${ride.pickupLatitude},${ride.pickupLongitude}`;
+                  window.location.href = appleUrl;
+                }
+              }}
+              variant="outline"
+              className="py-2 text-sm"
+              disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
+            >
+              Apple Maps
+            </Button>
+            
+            <Button
+              onClick={() => {
+                if (doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude) {
+                  const wazeUrl = `https://waze.com/ul?ll=${ride.pickupLatitude},${ride.pickupLongitude}&navigate=yes`;
+                  window.open(wazeUrl, '_blank') || (window.location.href = wazeUrl);
+                }
+              }}
+              variant="outline"
+              className="py-2 text-sm"
+              disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
+            >
+              Waze
+            </Button>
+          </div>
           
           {customer?.phone && (
             <Button
@@ -228,6 +323,15 @@ export default function DoctorRideTracking() {
               <Phone className="w-5 h-5 mr-2" />
               اتصال بالعميل
             </Button>
+          )}
+
+          {/* Debug info for troubleshooting */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
+              <p>Debug Info:</p>
+              <p>Doctor: {doctorLat?.toFixed(6)}, {doctorLng?.toFixed(6)}</p>
+              <p>Customer: {ride.pickupLatitude?.toFixed(6)}, {ride.pickupLongitude?.toFixed(6)}</p>
+            </div>
           )}
         </div>
       </div>
