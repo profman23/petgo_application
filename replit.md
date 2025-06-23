@@ -195,6 +195,8 @@ Changelog:
 - June 23, 2025. Added language-aware toast notifications for success messages, errors, and status updates
 - June 23, 2025. Enhanced customer and doctor login screens with localized success/error notifications
 - June 23, 2025. Created centralized translation keys for all notification messages in both Arabic and English
+- June 23, 2025. OPTIMIZED: Language selector button moved to home screen only
+- June 23, 2025. Removed language selector from login screens for cleaner interface - language choice now made only at initial screen
 ```
 
 ## User Preferences

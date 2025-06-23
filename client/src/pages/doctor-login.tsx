@@ -13,7 +13,6 @@ import { apiRequest } from '@/lib/queryClient';
 import { ArrowLeft, Stethoscope, User, Lock } from 'lucide-react';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useLanguage, useTranslation, getDirection } from '@/lib/i18n';
-import { LanguageSelector } from '@/components/language-selector';
 
 type DoctorLoginData = {
   username: string;
@@ -90,11 +89,6 @@ export default function DoctorLogin() {
       <div className="w-full max-w-md">
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           <CardContent className="p-8">
-            {/* Language Selector */}
-            <div className="flex justify-end mb-4">
-              <LanguageSelector />
-            </div>
-            
             {/* Header */}
             <div className="text-center mb-8">
               <Button

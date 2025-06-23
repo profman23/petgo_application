@@ -14,7 +14,6 @@ import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart } from 'lucide
 import { useLocation } from 'wouter';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, getDirection } from '@/lib/i18n';
-import { LanguageSelector } from '@/components/language-selector';
 
 interface LoginFormData {
   phone: string;
@@ -163,11 +162,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
-      {/* Language Selector */}
-      <div className="absolute top-4 right-4">
-        <LanguageSelector />
-      </div>
-      
       <Card className="w-full max-w-md border-2 shadow-xl" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
         <CardContent className="p-8">
           <div className="text-center mb-8">
