@@ -87,7 +87,7 @@ export default function DoctorLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4" dir={getDirection(language)}>
       <div className="w-full max-w-md">
-        <Card className="shadow-xl border-0">
+        <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           <CardContent className="p-8">
             {/* Language Selector */}
             <div className="flex justify-end mb-4">
@@ -145,7 +145,8 @@ export default function DoctorLogin() {
                             {...field}
                             type="text"
                             placeholder="vetsvan1"
-                            className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
                           />
                           <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -169,7 +170,8 @@ export default function DoctorLogin() {
                             {...field}
                             type="password"
                             placeholder="••••••••"
-                            className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
                           />
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         </div>
@@ -181,8 +183,11 @@ export default function DoctorLogin() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3"
+                  className="w-full text-white py-3"
                   disabled={loginMutation.isPending}
+                  style={{ backgroundColor: 'var(--purple-primary)', borderColor: 'var(--purple-primary)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--purple-dark)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--purple-primary)'}
                 >
                   {loginMutation.isPending 
                     ? (language === 'ar' ? 'جاري تسجيل الدخول...' : 'Logging in...') 
