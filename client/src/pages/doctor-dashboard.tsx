@@ -8,9 +8,11 @@ import { apiRequest } from '@/lib/queryClient';
 import { useDoctorLocation } from '@/hooks/useDoctorLocation';
 import { Map } from '@/components/map';
 import { ArrowLeft, Check, X, MapPin, Clock, Navigation, Loader2, Satellite } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playNotificationSound, requestAudioPermission } from '@/utils/audio';
+import { useState, useRef } from 'react';
 
 export default function DoctorDashboard() {
   const [, setLocation] = useLocation();
@@ -20,6 +22,8 @@ export default function DoctorDashboard() {
   const { language } = useLanguage();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [selectedRideId, setSelectedRideId] = useState<number | null>(null);
   
   // نظام تتبع GPS للطبيب
   const {
@@ -518,7 +522,7 @@ export default function DoctorDashboard() {
                         {t.accept}
                       </Button>
                       <Button
-                        onClick={() => rejectMutation.mutate(ride.id)}
+                        onClick={() => handleRejectRequest(ride.id)}
                         disabled={acceptMutation.isPending || rejectMutation.isPending}
                         variant="destructive"
                         size="sm"
@@ -547,6 +551,43 @@ export default function DoctorDashboard() {
           )}
         </div>
       </div>
+
+      {/* Cancel/Reject Confirmation Dialog */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent className="max-w-md" dir={direction}>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center" style={{ textAlign }}>
+              {language === 'ar' ? 'تأكيد الرفض' : 'Confirm Rejection'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center" style={{ textAlign }}>
+              {language === 'ar' ? 'هل أنت متأكد من رفض هذا الطلب؟' : 'Are you sure you want to reject this request?'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex gap-2 justify-center">
+            <AlertDialogCancel 
+              className="bg-gray-100 hover:bg-gray-200 text-gray-800"
+              style={{ textAlign }}
+            >
+              {language === 'ar' ? 'لا، الرجوع' : 'No, Go Back'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (selectedRideId) {
+                  rejectMutation.mutate(selectedRideId);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+              disabled={rejectMutation.isPending}
+              style={{ textAlign }}
+            >
+              {rejectMutation.isPending ? 
+                (language === 'ar' ? 'جاري الرفض...' : 'Rejecting...') :
+                (language === 'ar' ? 'نعم، رفض الطلب' : 'Yes, Reject Request')
+              }
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
