@@ -259,7 +259,7 @@ export default function DoctorDashboard() {
             ) : (
               <div className="flex items-center gap-2 text-yellow-600">
                 <Navigation className="w-4 h-4" />
-                <span>جاري تحديد الموقع...</span>
+                <span style={{ textAlign }}>{t.loading}</span>
               </div>
             )}
           </CardContent>
@@ -270,9 +270,9 @@ export default function DoctorDashboard() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-green-900">الطلبات المعلقة</h2>
-                <p className="text-green-700">
-                  {isLoading ? 'جاري التحميل...' : `${pendingRides.length} طلب في الانتظار`}
+                <h2 className="text-xl font-bold text-green-900" style={{ textAlign }}>{t.pendingRequests}</h2>
+                <p className="text-green-700" style={{ textAlign }}>
+                  {isLoading ? t.loading : `${pendingRides.length} ${language === 'ar' ? 'طلب في الانتظار' : 'requests pending'}`}
                 </p>
               </div>
               <div className="text-3xl">🏥</div>
