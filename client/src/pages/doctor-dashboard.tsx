@@ -83,8 +83,8 @@ export default function DoctorDashboard() {
       Notification.requestPermission().then(permission => {
         if (permission === 'granted') {
           toast({
-            title: 'تم تفعيل الإشعارات',
-            description: 'ستصلك إشعارات عند وصول طلبات جديدة',
+            title: language === 'ar' ? 'تم تفعيل الإشعارات' : 'Notifications Enabled',
+            description: language === 'ar' ? 'ستصلك إشعارات عند وصول طلبات جديدة' : 'You will receive notifications when new requests arrive',
           });
         }
       });

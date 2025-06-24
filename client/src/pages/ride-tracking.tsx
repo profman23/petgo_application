@@ -69,15 +69,25 @@ export default function RideTracking() {
       
       // Show browser notification if permission granted
       if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(
-          language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
-          {
-            body: language === 'ar' ? 
-              'تم إلغاء طلب العيادة البيطرية. يمكنك طلب عيادة أخرى.' : 
-              'The veterinary clinic request has been cancelled. You can request another clinic.',
-            icon: '/favicon.ico'
-          }
-        );
+        try {
+          const notification = new Notification(
+            language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
+            {
+              body: language === 'ar' ? 
+                'تم إلغاء طلب العيادة البيطرية. يمكنك طلب عيادة أخرى.' : 
+                'The veterinary clinic request has been cancelled. You can request another clinic.',
+              icon: '/favicon.ico',
+              tag: 'ride-cancelled'
+            }
+          );
+          
+          // Auto-close notification after 5 seconds
+          setTimeout(() => {
+            notification.close();
+          }, 5000);
+        } catch (error) {
+          console.log('Notification not supported or blocked:', error);
+        }
       }
       
       // Store cancellation info for home page
