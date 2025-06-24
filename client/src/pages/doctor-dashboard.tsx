@@ -79,15 +79,16 @@ export default function DoctorDashboard() {
   });
 
   // نظام الإشعارات للطلبات الجديدة
-  const [lastKnownCount, setLastKnownCount] = React.useState(0);
+  const previousCountRef = React.useRef(0);
   
   React.useEffect(() => {
     if (pendingRides && Array.isArray(pendingRides)) {
       const currentCount = pendingRides.length;
+      const previousCount = previousCountRef.current;
       
       // عرض إشعار فقط إذا زاد العدد وليس في التحميل الأول
-      if (currentCount > lastKnownCount && lastKnownCount > 0) {
-        const newRidesCount = currentCount - lastKnownCount;
+      if (currentCount > previousCount && previousCount > 0) {
+        const newRidesCount = currentCount - previousCount;
         toast({
           title: 'طلب جديد!',
           description: `لديك ${newRidesCount} طلب جديد للعيادة البيطرية`,
@@ -102,12 +103,9 @@ export default function DoctorDashboard() {
         }
       }
       
-      // تحديث العدد المعروف فقط إذا تغير
-      if (currentCount !== lastKnownCount) {
-        setLastKnownCount(currentCount);
-      }
+      previousCountRef.current = currentCount;
     }
-  }, [pendingRides?.length]); // استخدام .length فقط لتجنب الحلقة اللا نهائية
+  }, [pendingRides, toast]);
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {

@@ -199,6 +199,9 @@ Changelog:
 - June 23, 2025. Removed language selector from login screens for cleaner interface - language choice now made only at initial screen
 - June 23, 2025. CLEANED: Removed test account information section from doctor login page for professional appearance
 - June 23, 2025. Hidden "For testing use: username/password" section from doctor login interface
+- June 24, 2025. FIXED: Doctor dashboard infinite loop issue causing excessive API calls and browser warnings
+- June 24, 2025. Corrected "Back" button navigation to redirect to user type selection screen instead of home
+- June 24, 2025. Optimized notification system to prevent React state update loops using useRef instead of useState
 ```
 
 ## User Preferences
