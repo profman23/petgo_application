@@ -202,6 +202,10 @@ Changelog:
 - June 24, 2025. FIXED: Doctor dashboard infinite loop issue causing excessive API calls and browser warnings
 - June 24, 2025. Corrected "Back" button navigation to redirect to user type selection screen instead of home
 - June 24, 2025. Optimized notification system to prevent React state update loops using useRef instead of useState
+- June 24, 2025. RESOLVED: Language persistence issue - changed default language to English and enhanced localStorage handling
+- June 24, 2025. Fixed language selection not being maintained across sessions after user login
+- June 24, 2025. Added missing /user-type-selection route to prevent 404 errors on back button navigation
+- June 24, 2025. Final fix for doctor dashboard infinite update loop using controlled state management
 ```
 
 ## User Preferences

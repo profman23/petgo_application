@@ -78,42 +78,47 @@ export default function DoctorDashboard() {
     refetchInterval: 3000, // Poll every 3 seconds for new requests
   });
 
-  // نظام الإشعارات للطلبات الجديدة
-  const previousCountRef = React.useRef(0);
-  const hasShownNotificationRef = React.useRef(false);
+  // نظام الإشعارات للطلبات الجديدة - إصلاح الحلقة اللا نهائية
+  const [notificationState, setNotificationState] = React.useState({
+    lastCount: 0,
+    initialized: false
+  });
   
   React.useEffect(() => {
     if (pendingRides && Array.isArray(pendingRides)) {
       const currentCount = pendingRides.length;
-      const previousCount = previousCountRef.current;
       
-      // تهيئة العدد في المرة الأولى فقط
-      if (!hasShownNotificationRef.current) {
-        previousCountRef.current = currentCount;
-        hasShownNotificationRef.current = true;
-        return;
-      }
-      
-      // عرض إشعار فقط إذا زاد العدد
-      if (currentCount > previousCount) {
-        const newRidesCount = currentCount - previousCount;
-        toast({
-          title: 'طلب جديد!',
-          description: `لديك ${newRidesCount} طلب جديد للعيادة البيطرية`,
-          duration: 10000,
-        });
-        
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('طلب عيادة بيطرية جديد!', {
-            body: `لديك ${newRidesCount} طلب جديد في انتظار الموافقة`,
-            icon: '/icon.png'
-          });
+      setNotificationState(prev => {
+        // تهيئة العدد في المرة الأولى
+        if (!prev.initialized) {
+          return { lastCount: currentCount, initialized: true };
         }
-      }
-      
-      previousCountRef.current = currentCount;
+        
+        // عرض إشعار فقط إذا زاد العدد
+        if (currentCount > prev.lastCount) {
+          const newRidesCount = currentCount - prev.lastCount;
+          
+          // استخدام setTimeout لتجنب المشاكل في التوقيت
+          setTimeout(() => {
+            toast({
+              title: 'طلب جديد!',
+              description: `لديك ${newRidesCount} طلب جديد للعيادة البيطرية`,
+              duration: 10000,
+            });
+            
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('طلب عيادة بيطرية جديد!', {
+                body: `لديك ${newRidesCount} طلب جديد في انتظار الموافقة`,
+                icon: '/icon.png'
+              });
+            }
+          }, 100);
+        }
+        
+        return { ...prev, lastCount: currentCount };
+      });
     }
-  }, [pendingRides]);
+  }, [pendingRides?.length]); // استخدام length فقط كتبعية
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {

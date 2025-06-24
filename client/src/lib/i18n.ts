@@ -11,11 +11,23 @@ interface LanguageStore {
 export const useLanguage = create<LanguageStore>()(
   persist(
     (set) => ({
-      language: 'ar',
+      language: 'en', // تعيين الإنجليزية كلغة افتراضية
       setLanguage: (lang: Language) => set({ language: lang }),
     }),
     {
       name: 'language-preference',
+      storage: {
+        getItem: (name) => {
+          const item = localStorage.getItem(name);
+          return item ? JSON.parse(item) : null;
+        },
+        setItem: (name, value) => {
+          localStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => {
+          localStorage.removeItem(name);
+        },
+      },
     }
   )
 );
