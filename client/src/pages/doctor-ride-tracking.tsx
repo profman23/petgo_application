@@ -1,27 +1,80 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Navigation, MapPin, Phone, Clock } from "lucide-react";
+import { ArrowLeft, Navigation, MapPin, Phone, Clock, CheckCircle, X } from "lucide-react";
 import { Map } from "@/components/map";
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useLocation } from "wouter";
 import { useDoctorLocation } from "@/hooks/useDoctorLocation";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
+import { apiRequest } from "@/lib/queryClient";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function DoctorRideTracking() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { latitude: doctorLat, longitude: doctorLng, accuracy, error } = useDoctorLocation();
   const t = useTranslation();
   const { language } = useLanguage();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
 
+  // Check for active ride
   const { data: activeRide, isLoading } = useQuery({
     queryKey: ['/api/doctor/active-ride'],
     refetchInterval: 2000,
+  });
+
+  // Update ride status mutation
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ rideId, status }: { rideId: number; status: string }) => {
+      return apiRequest(`/api/rides/${rideId}/status`, {
+        method: 'PUT',
+        body: { status },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/active-ride'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/pending-rides'] });
+    },
+  });
+
+  // Cancel ride mutation
+  const cancelRideMutation = useMutation({
+    mutationFn: async (rideId: number) => {
+      return apiRequest(`/api/rides/${rideId}/cancel`, {
+        method: 'PUT',
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: language === 'ar' ? "تم إلغاء الطلب" : "Request Cancelled",
+        description: language === 'ar' ? "تم إلغاء الطلب بنجاح. يمكنك الآن استقبال طلبات جديدة" : "Request cancelled successfully. You can now receive new requests",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/active-ride'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/pending-rides'] });
+      setLocation('/doctor-dashboard');
+    },
+    onError: (error) => {
+      toast({
+        title: language === 'ar' ? "خطأ في إلغاء الطلب" : "Cancel Error",
+        description: language === 'ar' ? "حدث خطأ أثناء إلغاء الطلب" : "Error occurred while cancelling request",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -29,7 +82,7 @@ export default function DoctorRideTracking() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={direction}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600" style={{ textAlign }}>{t.loading}</p>
+          <p className="mt-2 text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
         </div>
       </div>
     );
@@ -56,22 +109,16 @@ export default function DoctorRideTracking() {
 
   const handleGoogleMapsNavigation = () => {
     if (doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude) {
-      // Create Google Maps URL with proper encoding
       const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(doctorLat)},${encodeURIComponent(doctorLng)}/${encodeURIComponent(ride.pickupLatitude)},${encodeURIComponent(ride.pickupLongitude)}`;
       
-      console.log('Opening Google Maps:', googleMapsUrl);
-      
-      // Show confirmation toast
       toast({
         title: language === 'ar' ? "فتح Google Maps" : "Opening Google Maps",
         description: language === 'ar' ? "جاري فتح التطبيق للتنقل..." : "Opening navigation app...",
       });
       
-      // Try multiple methods to open the URL
       try {
         const newWindow = window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
         
-        // Check if popup was blocked after a short delay
         setTimeout(() => {
           if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
             toast({
@@ -97,7 +144,6 @@ export default function DoctorRideTracking() {
         }, 1000);
       }
     } else {
-      console.log('Missing coordinates:', { doctorLat, doctorLng, pickupLat: ride.pickupLatitude, pickupLng: ride.pickupLongitude });
       toast({
         title: language === 'ar' ? "خطأ في الموقع" : "Location Error",
         description: language === 'ar' ? "لا يمكن تحديد إحداثيات الموقع" : "Cannot determine location coordinates",
@@ -112,17 +158,30 @@ export default function DoctorRideTracking() {
     }
   };
 
+  const handleCancelRequest = () => {
+    if (ride?.id) {
+      cancelRideMutation.mutate(ride.id);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLocation('/user-type-selection');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={direction}>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => setLocation('/doctor-dashboard')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
+            {language === 'ar' ? 'العودة' : 'Back'}
           </Button>
           <div className="flex items-center gap-3">
             <img 
@@ -130,9 +189,13 @@ export default function DoctorRideTracking() {
               alt="Vets Van" 
               className="h-8 object-contain"
             />
-            <h1 className="text-lg font-semibold" style={{ textAlign }}>{language === 'ar' ? `متابعة الرحلة #${ride.id}` : `Ride Tracking #${ride.id}`}</h1>
+            <h1 className="text-lg font-semibold" style={{ textAlign }}>
+              {language === 'ar' ? `متابعة الرحلة #${ride?.id || ''}` : `Ride Tracking #${ride?.id || ''}`}
+            </h1>
           </div>
-          <div className="w-10" />
+          <Button variant="ghost" onClick={handleLogout} className="text-red-600">
+            {language === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+          </Button>
         </div>
       </header>
 
@@ -143,10 +206,12 @@ export default function DoctorRideTracking() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-green-600" />
-                <span className="font-medium" style={{ textAlign }}>{language === 'ar' ? 'حالة GPS' : 'GPS Status'}</span>
+                <span className="font-medium" style={{ textAlign }}>
+                  {language === 'ar' ? 'حالة GPS' : 'GPS Status'}
+                </span>
               </div>
               <Badge variant={doctorLat && doctorLng ? "default" : "destructive"}>
-{language === 'ar' ? (doctorLat && doctorLng ? "متصل" : "غير متصل") : (doctorLat && doctorLng ? "Connected" : "Disconnected")}
+                {language === 'ar' ? (doctorLat && doctorLng ? "متصل" : "غير متصل") : (doctorLat && doctorLng ? "Connected" : "Disconnected")}
               </Badge>
             </div>
             {accuracy && (
@@ -168,80 +233,62 @@ export default function DoctorRideTracking() {
                 <MapPin className="w-5 h-5 text-blue-600" />
                 {language === 'ar' ? 'خريطة التنقل' : 'Navigation Map'}
               </h3>
-              {doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude && (
-                <Button
-                  onClick={handleGoogleMapsNavigation}
-                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2"
-                >
-                  <Navigation className="w-4 h-4 mr-2" />
-                  Google Maps
-                </Button>
-              )}
             </div>
             
-            <div className="h-64 rounded-lg overflow-hidden">
-              <Map
-                customerLocation={ride.pickupLatitude && ride.pickupLongitude ? 
-                  [ride.pickupLatitude, ride.pickupLongitude] : 
-                  [24.7136, 46.6753]
-                }
-                drivers={doctorLat && doctorLng ? [{
-                  id: 999,
-                  name: language === 'ar' ? "موقعي الحالي" : "My Current Location",
-                  latitude: doctorLat,
-                  longitude: doctorLng,
-                  phone: "",
-                  vehicleType: "",
-                  isAvailable: true,
-                  rating: 0,
-                  carModel: "",
-                  carColor: "",
-                  membershipType: ""
-                }] : []}
-                assignedDriver={doctorLat && doctorLng ? {
-                  id: 999,
-                  name: language === 'ar' ? "موقعي الحالي" : "My Current Location",
-                  latitude: doctorLat,
-                  longitude: doctorLng,
-                  phone: "",
-                  vehicleType: "",
-                  isAvailable: true,
-                  rating: 0,
-                  carModel: "",
-                  carColor: "",
-                  membershipType: ""
-                } : undefined}
-                showBothLocations={true}
-                className="h-full w-full"
-              />
-            </div>
-            
-            <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                <span style={{ textAlign }}>{language === 'ar' ? 'موقعي (أخضر)' : 'My Location (Green)'}</span>
+            {doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude ? (
+              <div className="h-64 rounded-lg overflow-hidden">
+                <Map
+                  customerLocation={[ride.pickupLatitude, ride.pickupLongitude]}
+                  assignedDriver={{
+                    id: 1,
+                    name: "Doctor",
+                    latitude: doctorLat,
+                    longitude: doctorLng,
+                    isAvailable: true,
+                    phone: "",
+                    vehicleType: "car",
+                    rating: 5,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                  }}
+                  showBothLocations={true}
+                  className="w-full h-full"
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                <span style={{ textAlign }}>{language === 'ar' ? 'موقع العميل (أزرق)' : 'Customer Location (Blue)'}</span>
+            ) : (
+              <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                <p className="text-gray-500" style={{ textAlign }}>
+                  {language === 'ar' ? 'جاري تحميل الخريطة...' : 'Loading map...'}
+                </p>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Customer Info */}
+        {/* Customer Information */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold mb-3" style={{ textAlign }}>{language === 'ar' ? 'معلومات العميل' : 'Customer Information'}</h3>
+            <h3 className="font-semibold mb-4 flex items-center gap-2" style={{ textAlign }}>
+              <Phone className="w-5 h-5 text-blue-600" />
+              {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
+            </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'الاسم:' : 'Name:'}</span>
-                <span className="font-medium" style={{ textAlign }}>{customer?.name || (language === 'ar' ? 'غير محدد' : 'Not specified')}</span>
+                <span className="text-gray-600" style={{ textAlign }}>
+                  {language === 'ar' ? 'الاسم:' : 'Name:'}
+                </span>
+                <span className="font-medium" style={{ textAlign }}>
+                  {customer?.name || (language === 'ar' ? 'غير محدد' : 'Not specified')}
+                </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'}</span>
+                <span className="text-gray-600" style={{ textAlign }}>
+                  {language === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'}
+                </span>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium" style={{ textAlign }}>{customer?.phone || (language === 'ar' ? 'غير محدد' : 'Not specified')}</span>
+                  <span className="font-medium" style={{ textAlign }}>
+                    {customer?.phone || (language === 'ar' ? 'غير محدد' : 'Not specified')}
+                  </span>
                   {customer?.phone && (
                     <Button
                       size="sm"
@@ -255,11 +302,15 @@ export default function DoctorRideTracking() {
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'الموقع:' : 'Location:'}</span>
+                <span className="text-gray-600" style={{ textAlign }}>
+                  {language === 'ar' ? 'الموقع:' : 'Location:'}
+                </span>
                 <span className="font-medium" style={{ textAlign }}>{ride.pickupLocation}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'وقت الطلب:' : 'Request Time:'}</span>
+                <span className="text-gray-600" style={{ textAlign }}>
+                  {language === 'ar' ? 'وقت الطلب:' : 'Request Time:'}
+                </span>
                 <span className="font-medium" style={{ textAlign }}>
                   {new Date(ride.createdAt).toLocaleTimeString(language === 'ar' ? 'ar-SA' : 'en-US')}
                 </span>
@@ -269,84 +320,96 @@ export default function DoctorRideTracking() {
         </Card>
 
         {/* Action Buttons */}
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 gap-2">
-            <Button
-              onClick={handleGoogleMapsNavigation}
-              disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
-            >
-              <Navigation className="w-5 h-5 mr-2" />
-{language === 'ar' ? 'فتح التنقل في Google Maps (نافذة جديدة)' : 'Open Navigation in Google Maps (New Window)'}
-            </Button>
-            
-            <Button
-              onClick={() => {
-                if (doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude) {
-                  const googleMapsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(doctorLat)},${encodeURIComponent(doctorLng)}/${encodeURIComponent(ride.pickupLatitude)},${encodeURIComponent(ride.pickupLongitude)}`;
-                  window.location.href = googleMapsUrl;
-                }
-              }}
-              disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
-              variant="outline"
-              className="w-full py-3"
-            >
-              <Navigation className="w-5 h-5 mr-2" />
-{language === 'ar' ? 'فتح Google Maps مباشرة' : 'Open Google Maps Directly'}
-            </Button>
-          </div>
-
-          {/* Alternative navigation options */}
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              onClick={() => {
-                if (doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude) {
-                  const appleUrl = `http://maps.apple.com/?saddr=${doctorLat},${doctorLng}&daddr=${ride.pickupLatitude},${ride.pickupLongitude}`;
-                  window.location.href = appleUrl;
-                }
-              }}
-              variant="outline"
-              className="py-2 text-sm"
-              disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
-            >
-              Apple Maps
-            </Button>
-            
-            <Button
-              onClick={() => {
-                if (doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude) {
-                  const wazeUrl = `https://waze.com/ul?ll=${ride.pickupLatitude},${ride.pickupLongitude}&navigate=yes`;
-                  window.open(wazeUrl, '_blank') || (window.location.href = wazeUrl);
-                }
-              }}
-              variant="outline"
-              className="py-2 text-sm"
-              disabled={!doctorLat || !doctorLng || !ride.pickupLatitude || !ride.pickupLongitude}
-            >
-              Waze
-            </Button>
-          </div>
-          
-          {customer?.phone && (
-            <Button
-              onClick={handleCallCustomer}
-              variant="outline"
-              className="w-full py-3"
-            >
-              <Phone className="w-5 h-5 mr-2" />
-{language === 'ar' ? 'اتصال بالعميل' : 'Call Customer'}
-            </Button>
-          )}
-
-          {/* Debug info for troubleshooting */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-gray-600">
-              <p>Debug Info:</p>
-              <p>Doctor: {doctorLat?.toFixed(6)}, {doctorLng?.toFixed(6)}</p>
-              <p>Customer: {ride.pickupLatitude?.toFixed(6)}, {ride.pickupLongitude?.toFixed(6)}</p>
+        <Card>
+          <CardContent className="p-4">
+            <div className="space-y-3">
+              {/* Navigation buttons */}
+              <div className="grid grid-cols-1 gap-2">
+                <Button 
+                  onClick={handleGoogleMapsNavigation}
+                  className="w-full flex items-center gap-2"
+                >
+                  <Navigation className="w-4 h-4" />
+                  {language === 'ar' ? 'فتح خرائط جوجل' : 'Open Google Maps'}
+                </Button>
+                
+                <Button 
+                  onClick={handleCallCustomer}
+                  variant="outline" 
+                  className="w-full flex items-center gap-2"
+                >
+                  <Phone className="w-4 h-4" />
+                  {language === 'ar' ? 'اتصال بالعميل' : 'Call Customer'}
+                </Button>
+              </div>
+              
+              {/* Status buttons */}
+              <div className="border-t pt-3 space-y-2">
+                {ride?.status === 'in_progress' && (
+                  <Button 
+                    onClick={() => updateStatusMutation.mutate({ rideId: ride.id, status: 'arrived' })}
+                    className="w-full flex items-center gap-2"
+                    disabled={updateStatusMutation.isPending}
+                  >
+                    <Clock className="w-4 h-4" />
+                    {language === 'ar' ? 'تأكيد الوصول' : 'Mark as Arrived'}
+                  </Button>
+                )}
+                
+                {ride?.status === 'arrived' && (
+                  <Button 
+                    onClick={() => updateStatusMutation.mutate({ rideId: ride.id, status: 'completed' })}
+                    className="w-full flex items-center gap-2"
+                    disabled={updateStatusMutation.isPending}
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    {language === 'ar' ? 'تأكيد اكتمال الخدمة' : 'Mark as Completed'}
+                  </Button>
+                )}
+                
+                {/* Cancel Request Button */}
+                {(ride?.status === 'in_progress' || ride?.status === 'arrived') && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        className="w-full flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" />
+                        {language === 'ar' ? 'إلغاء الطلب' : 'Cancel Request'}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent dir={direction}>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle style={{ textAlign }}>
+                          {language === 'ar' ? 'إلغاء الطلب' : 'Cancel Request'}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription style={{ textAlign }}>
+                          {language === 'ar' ? 'هل أنت متأكد من إلغاء هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.' : 'Are you sure you want to cancel this request? This action cannot be undone.'}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter className={direction === 'rtl' ? 'flex-row-reverse' : ''}>
+                        <AlertDialogCancel>
+                          {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                        </AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleCancelRequest}
+                          className="bg-red-600 hover:bg-red-700"
+                          disabled={cancelRideMutation.isPending}
+                        >
+                          {cancelRideMutation.isPending ? 
+                            (language === 'ar' ? 'جاري الإلغاء...' : 'Cancelling...') : 
+                            (language === 'ar' ? 'تأكيد الإلغاء' : 'Confirm Cancel')
+                          }
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
             </div>
-          )}
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
