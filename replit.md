@@ -228,6 +228,11 @@ Changelog:
 - June 24, 2025. Implemented automatic doctor availability restoration after request cancellation
 - June 24, 2025. Added comprehensive warning dialog before cancellation to prevent accidental cancellations
 - June 24, 2025. SUCCESS: Cancel request feature tested and confirmed working - doctors can now cancel active requests and receive new ones
+- June 24, 2025. ENHANCED: Request button design with purple theme matching logo colors and truck icon
+- June 24, 2025. Updated button text to "Click Here to Request" with "Mobile Veterinary Clinic" subtitle
+- June 24, 2025. Added visual effects: shadows, smooth transitions, and hover animations for better user experience
+- June 24, 2025. FIXED: Infinite loop issues in polling system using useRef instead of dependencies in useEffect
+- June 24, 2025. Resolved "Maximum update depth exceeded" errors in doctor dashboard and ride tracking components
 ```
 
 ## User Preferences
