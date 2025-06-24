@@ -58,7 +58,7 @@ export default function RideTracking() {
 
   // Check if ride was cancelled by doctor and redirect to home immediately
   useEffect(() => {
-    if (activeRide && (activeRide.status === 'cancelled_by_doctor' || activeRide.status === 'rejected' || activeRide.status === 'cancelled')) {
+    if (activeRide && (activeRide.status === 'cancelled_by_doctor' || activeRide.status === 'rejected')) {
       // Store cancellation info and redirect to home immediately
       localStorage.setItem('cancelledRide', 'true');
       setLocation('/');

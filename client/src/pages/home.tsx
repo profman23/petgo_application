@@ -72,26 +72,28 @@ export default function Home() {
     setLocation('/login');
   };
 
-  // Check for cancelled ride and show notification
+  // Check for cancelled ride and show simple notification
   useEffect(() => {
     const cancelledRide = localStorage.getItem('cancelledRide');
     if (cancelledRide) {
       toast({
         title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
         description: language === 'ar' ? 
-          'تم إلغاء طلب العيادة البيطرية من قبل الطبيب. يمكنك طلب عيادة جديدة الآن.' : 
-          'The veterinary clinic request has been cancelled by the doctor. You can request a new clinic now.',
+          'يمكنك تقديم طلب جديد الآن' : 
+          'You can submit a new request now',
         variant: 'destructive',
-        duration: 5000,
+        duration: 3000,
       });
       localStorage.removeItem('cancelledRide');
     }
   }, [toast, language]);
 
   const handleRequestRide = () => {
-    if (activeRide) {
+    // If there's an active ride that's not cancelled, go to tracking
+    if (activeRide && !['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status)) {
       setLocation('/ride-tracking');
     } else {
+      // Otherwise, go to request a new ride
       setLocation('/ride-request');
     }
   };
@@ -137,8 +139,8 @@ export default function Home() {
       </header>
 
       <div className="p-4">
-        {/* Active Ride Card */}
-        {activeRide && (
+        {/* Active Ride Card - Only show if ride is active and not cancelled */}
+        {activeRide && !['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status) && (
           <Card className="mb-6 border-blue-200 bg-blue-50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -159,7 +161,7 @@ export default function Home() {
           <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ textAlign }}>{t('requestMobileVet')}</h2>
           <Button
             onClick={handleRequestRide}
-            disabled={!!activeRide}
+            disabled={activeRide && !['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status)}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white p-8 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <div className="flex items-center justify-center gap-3 mb-3">
