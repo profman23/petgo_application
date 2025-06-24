@@ -1,0 +1,34 @@
+/* Override Leaflet map z-index to ensure dialogs appear above */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
+.leaflet-control-container {
+  z-index: 1 !important;
+}
+
+.leaflet-popup-pane {
+  z-index: 2 !important;
+}
+
+.leaflet-marker-pane {
+  z-index: 3 !important;
+}
+
+/* Ensure dialog overlays are always on top */
+[data-radix-dialog-overlay] {
+  z-index: 9999 !important;
+}
+
+[data-radix-dialog-content] {
+  z-index: 10000 !important;
+}
+
+/* AlertDialog specific overrides */
+[data-radix-alert-dialog-overlay] {
+  z-index: 9999 !important;
+}
+
+[data-radix-alert-dialog-content] {
+  z-index: 10000 !important;
+}
