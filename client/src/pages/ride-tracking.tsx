@@ -58,9 +58,6 @@ export default function RideTracking() {
   // Check if ride was cancelled by doctor and redirect to home
   useEffect(() => {
     if (activeRide && (activeRide.status === 'cancelled_by_doctor' || activeRide.status === 'rejected')) {
-      const { t } = useTranslation();
-      const { language } = useLanguage();
-      
       toast({
         title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
         description: language === 'ar' ? 
@@ -91,7 +88,7 @@ export default function RideTracking() {
         setLocation('/');
       }, 3000);
     }
-  }, [activeRide, setLocation, toast]);
+  }, [activeRide, setLocation, toast, language]);
 
   const handleCancelRide = () => {
     if (activeRide && window.confirm('هل أنت متأكد من إلغاء الرحلة؟')) {
