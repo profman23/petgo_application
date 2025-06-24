@@ -71,12 +71,14 @@ export function Map({ customerLocation, drivers = [], assignedDriver, pendingRid
   const mapRef = useRef<L.Map | null>(null);
 
   return (
-    <div className={`h-64 w-full ${className}`}>
+    <div className={`h-64 w-full ${className} relative z-0`} style={{ zIndex: 0 }}>
       <MapContainer
         center={customerLocation}
         zoom={13}
-        className="h-full w-full rounded-lg"
+        className="h-full w-full rounded-lg relative z-0"
         ref={mapRef}
+        style={{ zIndex: 0 }}
+        zIndexOffset={-1000}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

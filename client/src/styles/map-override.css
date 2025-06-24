@@ -1,6 +1,7 @@
 /* Override Leaflet map z-index to ensure dialogs appear above */
 .leaflet-container {
   z-index: 0 !important;
+  position: relative !important;
 }
 
 .leaflet-control-container {
@@ -15,20 +16,51 @@
   z-index: 3 !important;
 }
 
+.leaflet-tile-pane {
+  z-index: -1 !important;
+}
+
+/* Force all map elements to stay low */
+.leaflet-map-pane {
+  z-index: 0 !important;
+}
+
+.leaflet-objects-pane {
+  z-index: 1 !important;
+}
+
 /* Ensure dialog overlays are always on top */
 [data-radix-dialog-overlay] {
-  z-index: 9999 !important;
+  z-index: 99999 !important;
+  position: fixed !important;
 }
 
 [data-radix-dialog-content] {
-  z-index: 10000 !important;
+  z-index: 100000 !important;
+  position: fixed !important;
 }
 
 /* AlertDialog specific overrides */
 [data-radix-alert-dialog-overlay] {
-  z-index: 9999 !important;
+  z-index: 99999 !important;
+  position: fixed !important;
 }
 
 [data-radix-alert-dialog-content] {
-  z-index: 10000 !important;
+  z-index: 100000 !important;
+  position: fixed !important;
+}
+
+/* Force all modal/dialog elements to top */
+.fixed {
+  z-index: 50000 !important;
+}
+
+/* Specific override for confirmation dialogs */
+div[role="dialog"] {
+  z-index: 100000 !important;
+}
+
+div[data-state="open"] {
+  z-index: 100000 !important;
 }

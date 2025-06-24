@@ -379,7 +379,11 @@ export default function DoctorRideTracking() {
                         {language === 'ar' ? 'إلغاء الطلب' : 'Cancel Request'}
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent dir={direction}>
+                    <AlertDialogContent 
+                      dir={direction}
+                      className="fixed z-[100000]"
+                      style={{ zIndex: 100000, position: 'fixed' }}
+                    >
                       <AlertDialogHeader>
                         <AlertDialogTitle style={{ textAlign }}>
                           {language === 'ar' ? 'إلغاء الطلب' : 'Cancel Request'}

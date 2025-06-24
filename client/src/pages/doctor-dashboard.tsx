@@ -564,7 +564,11 @@ export default function DoctorDashboard() {
 
       {/* Cancel/Reject Confirmation Dialog */}
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <AlertDialogContent className="max-w-md" dir={direction}>
+        <AlertDialogContent 
+          className="max-w-md fixed z-[100000]" 
+          dir={direction}
+          style={{ zIndex: 100000, position: 'fixed' }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="text-center" style={{ textAlign }}>
               {language === 'ar' ? 'تأكيد الرفض' : 'Confirm Rejection'}
