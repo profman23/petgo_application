@@ -8,11 +8,16 @@ import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useLocation } from "wouter";
 import { useDoctorLocation } from "@/hooks/useDoctorLocation";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 
 export default function DoctorRideTracking() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { latitude: doctorLat, longitude: doctorLng, accuracy, error } = useDoctorLocation();
+  const t = useTranslation();
+  const { language } = useLanguage();
+  const direction = getDirection(language);
+  const textAlign = getTextAlign(language);
 
   const { data: activeRide, isLoading } = useQuery({
     queryKey: ['/api/doctor/active-ride'],
@@ -21,10 +26,10 @@ export default function DoctorRideTracking() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={direction}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">جاري تحميل معلومات الرحلة...</p>
+          <p className="mt-2 text-gray-600" style={{ textAlign }}>{t.loading}</p>
         </div>
       </div>
     );
@@ -32,13 +37,13 @@ export default function DoctorRideTracking() {
 
   if (!activeRide?.ride) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={direction}>
         <Card className="w-full max-w-md mx-4">
           <CardContent className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-4">لا توجد رحلة نشطة</h2>
-            <p className="text-gray-600 mb-6">لا توجد رحلة مقبولة حالياً</p>
+            <h2 className="text-xl font-semibold mb-4" style={{ textAlign }}>{language === 'ar' ? 'لا توجد رحلة نشطة' : 'No Active Ride'}</h2>
+            <p className="text-gray-600 mb-6" style={{ textAlign }}>{language === 'ar' ? 'لا توجد رحلة مقبولة حالياً' : 'No accepted ride currently'}</p>
             <Button onClick={() => setLocation('/doctor-dashboard')} className="w-full">
-              العودة للوحة التحكم
+              {language === 'ar' ? 'العودة للوحة التحكم' : 'Back to Dashboard'}
             </Button>
           </CardContent>
         </Card>
@@ -159,9 +164,9 @@ export default function DoctorRideTracking() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold flex items-center gap-2">
+              <h3 className="font-semibold flex items-center gap-2" style={{ textAlign }}>
                 <MapPin className="w-5 h-5 text-blue-600" />
-                خريطة التنقل
+                {language === 'ar' ? 'خريطة التنقل' : 'Navigation Map'}
               </h3>
               {doctorLat && doctorLng && ride.pickupLatitude && ride.pickupLongitude && (
                 <Button
@@ -182,7 +187,7 @@ export default function DoctorRideTracking() {
                 }
                 drivers={doctorLat && doctorLng ? [{
                   id: 999,
-                  name: "موقعي الحالي",
+                  name: language === 'ar' ? "موقعي الحالي" : "My Current Location",
                   latitude: doctorLat,
                   longitude: doctorLng,
                   phone: "",
@@ -195,7 +200,7 @@ export default function DoctorRideTracking() {
                 }] : []}
                 assignedDriver={doctorLat && doctorLng ? {
                   id: 999,
-                  name: "موقعي الحالي",
+                  name: language === 'ar' ? "موقعي الحالي" : "My Current Location",
                   latitude: doctorLat,
                   longitude: doctorLng,
                   phone: "",
@@ -214,11 +219,11 @@ export default function DoctorRideTracking() {
             <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-green-600 rounded-full"></div>
-                <span>موقعي (أخضر)</span>
+                <span style={{ textAlign }}>{language === 'ar' ? 'موقعي (أخضر)' : 'My Location (Green)'}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-                <span>موقع العميل (أزرق)</span>
+                <span style={{ textAlign }}>{language === 'ar' ? 'موقع العميل (أزرق)' : 'Customer Location (Blue)'}</span>
               </div>
             </div>
           </CardContent>
@@ -227,16 +232,16 @@ export default function DoctorRideTracking() {
         {/* Customer Info */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold mb-3">معلومات العميل</h3>
+            <h3 className="font-semibold mb-3" style={{ textAlign }}>{language === 'ar' ? 'معلومات العميل' : 'Customer Information'}</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">الاسم:</span>
-                <span className="font-medium">{customer?.name || 'غير محدد'}</span>
+                <span className="text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'الاسم:' : 'Name:'}</span>
+                <span className="font-medium" style={{ textAlign }}>{customer?.name || (language === 'ar' ? 'غير محدد' : 'Not specified')}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">رقم الهاتف:</span>
+                <span className="text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'}</span>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">{customer?.phone || 'غير محدد'}</span>
+                  <span className="font-medium" style={{ textAlign }}>{customer?.phone || (language === 'ar' ? 'غير محدد' : 'Not specified')}</span>
                   {customer?.phone && (
                     <Button
                       size="sm"
@@ -250,13 +255,13 @@ export default function DoctorRideTracking() {
                 </div>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">الموقع:</span>
-                <span className="font-medium text-right">{ride.pickupLocation}</span>
+                <span className="text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'الموقع:' : 'Location:'}</span>
+                <span className="font-medium" style={{ textAlign }}>{ride.pickupLocation}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">وقت الطلب:</span>
-                <span className="font-medium">
-                  {new Date(ride.createdAt).toLocaleTimeString('ar-SA')}
+                <span className="text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'وقت الطلب:' : 'Request Time:'}</span>
+                <span className="font-medium" style={{ textAlign }}>
+                  {new Date(ride.createdAt).toLocaleTimeString(language === 'ar' ? 'ar-SA' : 'en-US')}
                 </span>
               </div>
             </div>
@@ -272,7 +277,7 @@ export default function DoctorRideTracking() {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
             >
               <Navigation className="w-5 h-5 mr-2" />
-              فتح التنقل في Google Maps (نافذة جديدة)
+{language === 'ar' ? 'فتح التنقل في Google Maps (نافذة جديدة)' : 'Open Navigation in Google Maps (New Window)'}
             </Button>
             
             <Button
@@ -287,7 +292,7 @@ export default function DoctorRideTracking() {
               className="w-full py-3"
             >
               <Navigation className="w-5 h-5 mr-2" />
-              فتح Google Maps مباشرة
+{language === 'ar' ? 'فتح Google Maps مباشرة' : 'Open Google Maps Directly'}
             </Button>
           </div>
 
@@ -329,7 +334,7 @@ export default function DoctorRideTracking() {
               className="w-full py-3"
             >
               <Phone className="w-5 h-5 mr-2" />
-              اتصال بالعميل
+{language === 'ar' ? 'اتصال بالعميل' : 'Call Customer'}
             </Button>
           )}
 
