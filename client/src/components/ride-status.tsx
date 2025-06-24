@@ -64,7 +64,9 @@ export function RideStatus({ status, className }: RideStatusProps) {
         'enroute': 'On the Way',
         'arrived': 'Arrived',
         'completed': 'Service Completed',
-        'cancelled': 'Request Cancelled'
+        'cancelled': 'Request Cancelled',
+        'rejected': 'Request Rejected',
+        'cancelled_by_doctor': 'Request Cancelled by Doctor'
       }
     };
     

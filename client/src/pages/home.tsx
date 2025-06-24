@@ -72,6 +72,22 @@ export default function Home() {
     setLocation('/login');
   };
 
+  // Check for cancelled ride and show notification
+  useEffect(() => {
+    const cancelledRide = localStorage.getItem('cancelledRide');
+    if (cancelledRide) {
+      toast({
+        title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
+        description: language === 'ar' ? 
+          'تم إلغاء طلب العيادة البيطرية من قبل الطبيب. يمكنك طلب عيادة جديدة الآن.' : 
+          'The veterinary clinic request has been cancelled by the doctor. You can request a new clinic now.',
+        variant: 'destructive',
+        duration: 5000,
+      });
+      localStorage.removeItem('cancelledRide');
+    }
+  }, [toast, language]);
+
   const handleRequestRide = () => {
     if (activeRide) {
       setLocation('/ride-tracking');

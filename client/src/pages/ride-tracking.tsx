@@ -55,6 +55,44 @@ export default function RideTracking() {
       .catch(console.error);
   }, [activeRide, setLocation, fetchNearbyDrivers, customerLocation]);
 
+  // Check if ride was cancelled by doctor and redirect to home
+  useEffect(() => {
+    if (activeRide && (activeRide.status === 'cancelled_by_doctor' || activeRide.status === 'rejected')) {
+      const { t } = useTranslation();
+      const { language } = useLanguage();
+      
+      toast({
+        title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
+        description: language === 'ar' ? 
+          'تم إلغاء طلب العيادة البيطرية من قبل الطبيب. يمكنك طلب عيادة أخرى.' : 
+          'The veterinary clinic request has been cancelled by the doctor. You can request another clinic.',
+        variant: 'destructive',
+        duration: 5000,
+      });
+      
+      // Show browser notification if permission granted
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(
+          language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
+          {
+            body: language === 'ar' ? 
+              'تم إلغاء طلب العيادة البيطرية. يمكنك طلب عيادة أخرى.' : 
+              'The veterinary clinic request has been cancelled. You can request another clinic.',
+            icon: '/favicon.ico'
+          }
+        );
+      }
+      
+      // Store cancellation info for home page
+      localStorage.setItem('cancelledRide', 'true');
+      
+      // Delay redirect to show the message
+      setTimeout(() => {
+        setLocation('/');
+      }, 3000);
+    }
+  }, [activeRide, setLocation, toast]);
+
   const handleCancelRide = () => {
     if (activeRide && window.confirm('هل أنت متأكد من إلغاء الرحلة؟')) {
       cancelRide(activeRide.id);
