@@ -18,7 +18,7 @@ export default function RideTracking() {
   const { toast } = useToast();
   const { activeRide, assignedDriver, cancelRide, isCancellingRide, fetchNearbyDrivers } = useRide();
   const [nearbyDrivers, setNearbyDrivers] = useState([]);
-  const [cancellationDialog, setCancellationDialog] = useState(false);
+
   
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -56,46 +56,14 @@ export default function RideTracking() {
       .catch(console.error);
   }, [activeRide, setLocation, fetchNearbyDrivers, customerLocation]);
 
-  // Check if ride was cancelled by doctor and show dialog
+  // Check if ride was cancelled by doctor and redirect to home immediately
   useEffect(() => {
-    if (activeRide && (activeRide.status === 'cancelled_by_doctor' || activeRide.status === 'rejected')) {
-      // Show immediate toast notification
-      toast({
-        title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
-        description: language === 'ar' ? 
-          'تم إلغاء طلب العيادة البيطرية من قبل الطبيب' : 
-          'The veterinary clinic request has been cancelled by the doctor',
-        variant: 'destructive',
-        duration: 5000,
-      });
-      
-      // Show browser notification if permission granted
-      if ('Notification' in window && Notification.permission === 'granted') {
-        try {
-          const notification = new Notification(
-            language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
-            {
-              body: language === 'ar' ? 
-                'تم إلغاء طلب العيادة البيطرية من قبل الطبيب' : 
-                'The veterinary clinic request has been cancelled by the doctor',
-              icon: '/favicon.ico',
-              tag: 'ride-cancelled'
-            }
-          );
-          
-          // Auto-close notification after 5 seconds
-          setTimeout(() => {
-            notification.close();
-          }, 5000);
-        } catch (error) {
-          console.log('Notification not supported or blocked:', error);
-        }
-      }
-      
-      // Set state to show cancellation dialog
-      setCancellationDialog(true);
+    if (activeRide && (activeRide.status === 'cancelled_by_doctor' || activeRide.status === 'rejected' || activeRide.status === 'cancelled')) {
+      // Store cancellation info and redirect to home immediately
+      localStorage.setItem('cancelledRide', 'true');
+      setLocation('/');
     }
-  }, [activeRide, toast, language]);
+  }, [activeRide, setLocation]);
 
   const handleCancelRide = () => {
     if (activeRide && window.confirm('هل أنت متأكد من إلغاء الرحلة؟')) {
@@ -296,33 +264,7 @@ export default function RideTracking() {
         )}
       </div>
 
-      {/* Cancellation Dialog */}
-      {cancellationDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100000]">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl relative z-[100001]" dir={direction}>
-            <h3 className="text-lg font-semibold mb-4 text-center" style={{ textAlign }}>
-              {language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled'}
-            </h3>
-            <p className="text-gray-600 mb-6 text-center" style={{ textAlign }}>
-              {language === 'ar' 
-                ? 'تم إلغاء طلب العيادة البيطرية المتنقلة من قبل الطبيب. يمكنك تقديم طلب جديد في أي وقت.'
-                : 'The mobile veterinary clinic request has been cancelled by the doctor. You can submit a new request at any time.'
-              }
-            </p>
-            <div className="flex justify-center">
-              <button
-                onClick={() => {
-                  setCancellationDialog(false);
-                  setLocation('/');
-                }}
-                className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                {language === 'ar' ? 'موافق' : 'OK'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

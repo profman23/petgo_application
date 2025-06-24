@@ -450,9 +450,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Unauthorized to cancel this ride' });
       }
       
-      // Update ride status to cancelled
-      await storage.updateRideStatus(rideId, 'cancelled');
-      console.log('Ride status updated to cancelled');
+      // Update ride status to cancelled by doctor if doctor is cancelling
+      const cancelStatus = user.membershipType === 'doctor' ? 'cancelled_by_doctor' : 'cancelled';
+      await storage.updateRideStatus(rideId, cancelStatus);
+      console.log(`Ride status updated to ${cancelStatus}`);
       
       // Make doctor available again if it was a doctor cancelling
       if (user.membershipType === 'doctor' && ride.driverId) {
