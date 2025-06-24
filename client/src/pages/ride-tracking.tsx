@@ -11,12 +11,18 @@ import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { DriverCard } from '@/components/driver-card';
 import { RideStatus } from '@/components/ride-status';
 import { DEFAULT_COORDINATES } from '@/lib/constants';
+import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 
 export default function RideTracking() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { activeRide, assignedDriver, cancelRide, isCancellingRide, fetchNearbyDrivers } = useRide();
   const [nearbyDrivers, setNearbyDrivers] = useState([]);
+  
+  const t = useTranslation();
+  const { language } = useLanguage();
+  const direction = getDirection(language);
+  const textAlign = getTextAlign(language);
   
   // Real GPS tracking for customer
   const {
@@ -85,7 +91,7 @@ export default function RideTracking() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            العودة
+            {t.back}
           </Button>
           <div className="flex items-center gap-3">
             <img 
@@ -93,7 +99,7 @@ export default function RideTracking() {
               alt="Vets Van" 
               className="h-8 object-contain"
             />
-            <h1 className="text-lg font-semibold">متابعة الرحلة</h1>
+            <h1 className="text-lg font-semibold" style={{ textAlign }}>{t.trackRequest}</h1>
           </div>
           <div className="w-10" />
         </div>
@@ -120,7 +126,9 @@ export default function RideTracking() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Satellite className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-900">حالة الموقع</span>
+                <span className="text-sm font-medium text-blue-900" style={{ textAlign }}>
+                  {language === 'ar' ? 'حالة الموقع' : 'Location Status'}
+                </span>
               </div>
               {isLoadingGPS && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
             </div>
@@ -128,17 +136,26 @@ export default function RideTracking() {
             {customerLat && customerLng ? (
               <div className="mt-2 text-xs text-green-600 flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
-                <span>تم تحديد موقعك بدقة {accuracy ? Math.round(accuracy) : '---'} متر</span>
+                <span style={{ textAlign }}>
+                  {language === 'ar' ? 
+                    `تم تحديد موقعك بدقة ${accuracy ? Math.round(accuracy) : '---'} متر` :
+                    `Location detected with ${accuracy ? Math.round(accuracy) : '---'} meters accuracy`
+                  }
+                </span>
               </div>
             ) : gpsError ? (
               <div className="mt-2 text-xs text-red-600 flex items-center gap-1">
                 <X className="w-3 h-3" />
-                <span>خطأ في تحديد الموقع</span>
+                <span style={{ textAlign }}>
+                  {language === 'ar' ? 'خطأ في تحديد الموقع' : 'Location detection error'}
+                </span>
               </div>
             ) : (
               <div className="mt-2 text-xs text-yellow-600 flex items-center gap-1">
                 <Navigation className="w-3 h-3" />
-                <span>جاري تحديد الموقع...</span>
+                <span style={{ textAlign }}>
+                  {language === 'ar' ? 'جاري تحديد الموقع...' : 'Detecting location...'}
+                </span>
               </div>
             )}
           </CardContent>
@@ -154,29 +171,45 @@ export default function RideTracking() {
               <div className="mt-6 space-y-3">
                 {activeRide.status === 'requested' && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-yellow-800 mb-2">جاري المعالجة</h3>
-                    <p className="text-sm text-yellow-700">طلبك قيد المراجعة وننتظر موافقة الطبيب</p>
+                    <h3 className="font-semibold text-yellow-800 mb-2" style={{ textAlign }}>
+                      {language === 'ar' ? 'جاري المعالجة' : 'Processing'}
+                    </h3>
+                    <p className="text-sm text-yellow-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'طلبك قيد المراجعة وننتظر موافقة الطبيب' : 'Your request is under review, waiting for doctor approval'}
+                    </p>
                   </div>
                 )}
                 
                 {activeRide.status === 'confirmed' && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-blue-800 mb-2">تم القبول</h3>
-                    <p className="text-sm text-blue-700">تم قبول طلبك وسيتم التوجه إليك قريباً</p>
+                    <h3 className="font-semibold text-blue-800 mb-2" style={{ textAlign }}>
+                      {language === 'ar' ? 'تم القبول' : 'Accepted'}
+                    </h3>
+                    <p className="text-sm text-blue-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'تم قبول طلبك وسيتم التوجه إليك قريباً' : 'Your request has been accepted and the doctor will head to you soon'}
+                    </p>
                   </div>
                 )}
                 
                 {activeRide.status === 'enroute' && (
                   <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-orange-800 mb-2">قيد التنفيذ</h3>
-                    <p className="text-sm text-orange-700">العيادة البيطرية في الطريق إليك</p>
+                    <h3 className="font-semibold text-orange-800 mb-2" style={{ textAlign }}>
+                      {language === 'ar' ? 'قيد التنفيذ' : 'In Progress'}
+                    </h3>
+                    <p className="text-sm text-orange-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'العيادة البيطرية في الطريق إليك' : 'The veterinary clinic is on the way to you'}
+                    </p>
                   </div>
                 )}
                 
                 {activeRide.status === 'arrived' && (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-green-800 mb-2">تم الوصول</h3>
-                    <p className="text-sm text-green-700">وصلت العيادة البيطرية إلى موقعك</p>
+                    <h3 className="font-semibold text-green-800 mb-2" style={{ textAlign }}>
+                      {language === 'ar' ? 'تم الوصول' : 'Arrived'}
+                    </h3>
+                    <p className="text-sm text-green-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'وصلت العيادة البيطرية إلى موقعك' : 'The veterinary clinic has arrived at your location'}
+                    </p>
                   </div>
                 )}
               </div>
@@ -187,10 +220,16 @@ export default function RideTracking() {
         {/* معلومات الطلب المبسطة */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3 text-center">طلب العيادة البيطرية</h3>
+            <h3 className="font-semibold text-gray-900 mb-3 text-center" style={{ textAlign }}>
+              {language === 'ar' ? 'طلب العيادة البيطرية' : 'Veterinary Clinic Request'}
+            </h3>
             <div className="text-center space-y-2">
-              <p className="text-sm text-gray-600">تم تقديم طلبك بنجاح</p>
-              <p className="text-sm text-gray-600">ننتظر رد العيادة البيطرية</p>
+              <p className="text-sm text-gray-600" style={{ textAlign }}>
+                {language === 'ar' ? 'تم تقديم طلبك بنجاح' : 'Your request has been submitted successfully'}
+              </p>
+              <p className="text-sm text-gray-600" style={{ textAlign }}>
+                {language === 'ar' ? 'ننتظر رد العيادة البيطرية' : 'Waiting for veterinary clinic response'}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -204,9 +243,13 @@ export default function RideTracking() {
             variant="destructive"
             className="w-full"
             disabled={isCancellingRide}
+            style={{ direction }}
           >
             <X className="w-4 h-4 ml-2" />
-            {isCancellingRide ? 'جاري الإلغاء...' : 'إلغاء الرحلة'}
+            {isCancellingRide ? 
+              (language === 'ar' ? 'جاري الإلغاء...' : 'Cancelling...') : 
+              (language === 'ar' ? 'إلغاء الرحلة' : 'Cancel Request')
+            }
           </Button>
         )}
       </div>

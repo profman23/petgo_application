@@ -357,10 +357,14 @@ export default function RideRequest() {
                   type="submit"
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg"
                   disabled={isRequestingRide || !currentLocation}
+                  style={{ direction }}
                 >
-                  {isRequestingRide ? 'جاري إرسال الطلب...' : 
-                   !currentLocation ? 'في انتظار تحديد الموقع...' : 
-                   'طلب العيادة البيطرية الآن'}
+                  {isRequestingRide ? 
+                    (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') : 
+                   !currentLocation ? 
+                    (language === 'ar' ? 'في انتظار تحديد الموقع...' : 'Waiting for location...') : 
+                    (language === 'ar' ? 'طلب العيادة البيطرية الآن' : 'Request Veterinary Clinic Now')
+                  }
                 </Button>
               </form>
             </Form>
