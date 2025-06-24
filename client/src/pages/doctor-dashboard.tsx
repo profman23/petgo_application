@@ -80,14 +80,22 @@ export default function DoctorDashboard() {
 
   // نظام الإشعارات للطلبات الجديدة
   const previousCountRef = React.useRef(0);
+  const hasShownNotificationRef = React.useRef(false);
   
   React.useEffect(() => {
     if (pendingRides && Array.isArray(pendingRides)) {
       const currentCount = pendingRides.length;
       const previousCount = previousCountRef.current;
       
-      // عرض إشعار فقط إذا زاد العدد وليس في التحميل الأول
-      if (currentCount > previousCount && previousCount > 0) {
+      // تهيئة العدد في المرة الأولى فقط
+      if (!hasShownNotificationRef.current) {
+        previousCountRef.current = currentCount;
+        hasShownNotificationRef.current = true;
+        return;
+      }
+      
+      // عرض إشعار فقط إذا زاد العدد
+      if (currentCount > previousCount) {
         const newRidesCount = currentCount - previousCount;
         toast({
           title: 'طلب جديد!',
@@ -105,7 +113,7 @@ export default function DoctorDashboard() {
       
       previousCountRef.current = currentCount;
     }
-  }, [pendingRides, toast]);
+  }, [pendingRides]);
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {

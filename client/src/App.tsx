@@ -82,6 +82,7 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
 function Router() {
   return (
     <Switch>
+      <Route path="/user-type-selection" component={UserTypeSelection} />
       <Route path="/login" component={UserTypeSelection} />
       <Route path="/login/customer" component={Login} />
       <Route path="/login/doctor" component={DoctorLogin} />
