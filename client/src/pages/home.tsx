@@ -14,6 +14,9 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { activeRide, isLoadingActiveRide } = useRide();
+  
+  // Force clear activeRide if it's cancelled
+  const actualActiveRide = activeRide && ['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status) ? null : activeRide;
   const { t } = useTranslation();
   const { language } = useLanguage();
   const textAlign = getTextAlign(language);
@@ -135,7 +138,7 @@ export default function Home() {
 
       <div className="p-4">
         {/* Active Ride Card - Only show if ride is active */}
-        {activeRide && (
+        {actualActiveRide && (
           <Card className="mb-6 border-blue-200 bg-blue-50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -156,7 +159,7 @@ export default function Home() {
           <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ textAlign }}>{t('requestMobileVet')}</h2>
           <Button
             onClick={handleRequestRide}
-            disabled={!!activeRide}
+            disabled={!!actualActiveRide}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white p-8 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <div className="flex items-center justify-center gap-3 mb-3">

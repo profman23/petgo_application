@@ -167,9 +167,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const rideData = rideRequestSchema.parse(req.body);
       
-      // Check if user has active ride
+      // Check if user has active ride (excluding cancelled/rejected)
       const activeRide = await storage.getUserActiveRide(req.user.id);
-      if (activeRide) {
+      if (activeRide && !['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status)) {
         return res.status(400).json({ message: 'لديك رحلة نشطة بالفعل' });
       }
       

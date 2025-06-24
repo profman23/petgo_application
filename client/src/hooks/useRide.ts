@@ -9,6 +9,7 @@ export function useRide() {
   const { data: activeRideData, isLoading: isLoadingActiveRide } = useQuery({
     queryKey: ['/api/rides/active'],
     refetchInterval: 2000, // Poll every 2 seconds for status updates
+    retry: false,
   });
 
   const requestRideMutation = useMutation({
