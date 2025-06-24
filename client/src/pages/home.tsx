@@ -4,17 +4,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { Bell, Settings, User, Car, Star } from 'lucide-react';
+import { Bell, Settings, User, Car, Star, Truck } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
-import { useTranslation, getDirection } from '@/lib/i18n';
+import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { activeRide, isLoadingActiveRide } = useRide();
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+  const textAlign = getTextAlign(language);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {

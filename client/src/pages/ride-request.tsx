@@ -369,16 +369,28 @@ export default function RideRequest() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                   disabled={isRequestingRide || !currentLocation}
                   style={{ direction }}
                 >
-                  {isRequestingRide ? 
-                    (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') : 
-                   !currentLocation ? 
-                    (language === 'ar' ? 'في انتظار تحديد الموقع...' : 'Waiting for location...') : 
-                    (language === 'ar' ? 'طلب العيادة البيطرية الآن' : 'Request Veterinary Clinic Now')
-                  }
+                  <div className="flex items-center justify-center gap-3">
+                    <Truck className="w-5 h-5" />
+                    <div className="text-center">
+                      <div>
+                        {isRequestingRide ? 
+                          (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') : 
+                         !currentLocation ? 
+                          (language === 'ar' ? 'في انتظار تحديد الموقع...' : 'Waiting for location...') : 
+                          (language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request')
+                        }
+                      </div>
+                      {!isRequestingRide && currentLocation && (
+                        <div className="text-sm opacity-90">
+                          {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Mobile Veterinary Clinic'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </Button>
               </form>
             </Form>
