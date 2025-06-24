@@ -1,5 +1,6 @@
 import { Clock, CheckCircle, Car, MapPin, Search } from 'lucide-react';
 import { RIDE_STATUS_MESSAGES, RIDE_STATUS_DESCRIPTIONS } from '@/lib/constants';
+import { useLanguage } from '@/lib/i18n';
 
 interface RideStatusProps {
   status: string;
@@ -7,6 +8,8 @@ interface RideStatusProps {
 }
 
 export function RideStatus({ status, className }: RideStatusProps) {
+  const { language } = useLanguage();
+  
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'requested':
@@ -40,17 +43,73 @@ export function RideStatus({ status, className }: RideStatusProps) {
     }
   };
 
+  // ترجمة رسائل الحالة
+  const getStatusMessage = (status: string) => {
+    const statusMessages = {
+      ar: {
+        'requested': 'تم استلام الطلب',
+        'processing': 'جاري المعالجة',
+        'confirmed': 'تم تأكيد الطلب',
+        'in_progress': 'قيد التنفيذ',
+        'enroute': 'في الطريق',
+        'arrived': 'تم الوصول',
+        'completed': 'تم اكتمال الخدمة',
+        'cancelled': 'تم إلغاء الطلب'
+      },
+      en: {
+        'requested': 'Request Received',
+        'processing': 'Processing',
+        'confirmed': 'Request Confirmed',
+        'in_progress': 'In Progress',
+        'enroute': 'On the Way',
+        'arrived': 'Arrived',
+        'completed': 'Service Completed',
+        'cancelled': 'Request Cancelled'
+      }
+    };
+    
+    return statusMessages[language][status as keyof typeof statusMessages[typeof language]] || status;
+  };
+
+  const getStatusDescription = (status: string) => {
+    const statusDescriptions = {
+      ar: {
+        'requested': 'تم استلام طلبك وجاري البحث عن طبيب بيطري',
+        'processing': 'يتم معالجة طلبك حالياً',
+        'confirmed': 'تم تأكيد طلبك وسيصل الطبيب قريباً',
+        'in_progress': 'الطبيب البيطري في طريقه إليك',
+        'enroute': 'الطبيب البيطري في الطريق إلى موقعك',
+        'arrived': 'وصل الطبيب البيطري إلى موقعك',
+        'completed': 'تم إكمال الخدمة البيطرية بنجاح',
+        'cancelled': 'تم إلغاء الطلب'
+      },
+      en: {
+        'requested': 'Your request has been received and we are finding a veterinarian',
+        'processing': 'Your request is currently being processed',
+        'confirmed': 'Your request has been confirmed and the doctor will arrive soon',
+        'in_progress': 'The veterinarian is on their way to you',
+        'enroute': 'The veterinarian is on the way to your location',
+        'arrived': 'The veterinarian has arrived at your location',
+        'completed': 'The veterinary service has been completed successfully',
+        'cancelled': 'The request has been cancelled'
+      }
+    };
+    
+    return statusDescriptions[language][status as keyof typeof statusDescriptions[typeof language]] || 
+           (language === 'ar' ? 'جاري التحديث...' : 'Updating...');
+  };
+
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getStatusColor(status)}`}>
         {getStatusIcon(status)}
       </div>
-      <div>
+      <div style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
         <p className="font-semibold text-gray-900">
-          {RIDE_STATUS_MESSAGES[status as keyof typeof RIDE_STATUS_MESSAGES] || status}
+          {getStatusMessage(status)}
         </p>
         <p className="text-sm text-gray-600">
-          {RIDE_STATUS_DESCRIPTIONS[status as keyof typeof RIDE_STATUS_DESCRIPTIONS] || 'جاري التحديث...'}
+          {getStatusDescription(status)}
         </p>
       </div>
     </div>
