@@ -83,16 +83,15 @@ export default function DoctorDashboard() {
     refetchInterval: 3000, // Poll every 3 seconds for new requests
   });
 
-  // Notification system with proper dependency control to prevent infinite loops
-  const lastCountRef = React.useRef(0);
+  // Simple notification system without dependency loops
+  const [lastRideCount, setLastRideCount] = React.useState(0);
   
-  const handleNotifications = React.useCallback(() => {
+  React.useEffect(() => {
     if (pendingRides && Array.isArray(pendingRides)) {
       const currentCount = pendingRides.length;
-      const lastCount = lastCountRef.current;
       
-      if (currentCount > lastCount && lastCount > 0) {
-        const newRidesCount = currentCount - lastCount;
+      if (currentCount > lastRideCount && lastRideCount > 0) {
+        const newRidesCount = currentCount - lastRideCount;
         toast({
           title: t.newRequest,
           description: `${t.newRequestDesc} (${newRidesCount})`,
@@ -107,13 +106,9 @@ export default function DoctorDashboard() {
         }
       }
       
-      lastCountRef.current = currentCount;
+      setLastRideCount(currentCount);
     }
-  }, [pendingRides, t.newRequest, t.newRequestDesc, t.newVetRequest, t.pendingApproval, toast]);
-  
-  React.useEffect(() => {
-    handleNotifications();
-  }, [handleNotifications]);
+  }, [pendingRides?.length]); // Only depend on length, not the whole array
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {
@@ -207,7 +202,7 @@ export default function DoctorDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={direction}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
@@ -296,9 +291,9 @@ export default function DoctorDashboard() {
         {!isLoading && pendingRides && pendingRides.length > 0 && (
           <Card className="mb-6">
             <CardContent className="p-4">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <h3 className="font-semibold mb-3 flex items-center gap-2" style={{ textAlign }}>
                 <MapPin className="w-5 h-5 text-blue-600" />
-                خريطة مواقع العملاء
+                {t.customerLocation}
               </h3>
               <div className="h-64 rounded-lg overflow-hidden">
                 <Map
@@ -308,8 +303,8 @@ export default function DoctorDashboard() {
                   className="h-full w-full"
                 />
               </div>
-              <p className="text-xs text-gray-600 mt-2">
-                الدوائر الزرقاء تمثل مواقع العملاء، والدائرة الخضراء تمثل موقعك الحالي
+              <p className="text-xs text-gray-600 mt-2" style={{ textAlign }}>
+                {language === 'ar' ? 'الدوائر الزرقاء تمثل مواقع العملاء، والدائرة الخضراء تمثل موقعك الحالي' : 'Blue circles represent customer locations, green circle represents your current location'}
               </p>
             </CardContent>
           </Card>
@@ -320,15 +315,17 @@ export default function DoctorDashboard() {
           {isLoading ? (
             <Card>
               <CardContent className="p-8 text-center">
-                <p className="text-gray-500">جاري تحميل الطلبات...</p>
+                <p className="text-gray-500" style={{ textAlign }}>{t.loading}</p>
               </CardContent>
             </Card>
           ) : pendingRides.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center">
                 <div className="text-4xl mb-4">😴</div>
-                <p className="text-gray-500">لا توجد طلبات معلقة حالياً</p>
-                <p className="text-sm text-gray-400 mt-2">سيتم تحديث القائمة تلقائياً عند وصول طلبات جديدة</p>
+                <p className="text-gray-500" style={{ textAlign }}>{t.noPendingRequests}</p>
+                <p className="text-sm text-gray-400 mt-2" style={{ textAlign }}>
+                  {language === 'ar' ? 'سيتم تحديث القائمة تلقائياً عند وصول طلبات جديدة' : 'The list will be updated automatically when new requests arrive'}
+                </p>
               </CardContent>
             </Card>
           ) : (
@@ -339,21 +336,21 @@ export default function DoctorDashboard() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <MapPin className="w-4 h-4 text-blue-600" />
-                        <span className="font-semibold text-blue-900">طلب جديد #{ride.id}</span>
+                        <span className="font-semibold text-blue-900" style={{ textAlign }}>{t.newRequest} #{ride.id}</span>
                       </div>
-                      <div className="space-y-1 text-sm">
+                      <div className="space-y-1 text-sm" style={{ textAlign }}>
                         <p className="text-gray-700">
-                          <strong>العميل:</strong> {ride.customer?.name || 'غير محدد'}
+                          <strong>{t.name}:</strong> {ride.customer?.name || t.error}
                         </p>
                         <p className="text-gray-700">
-                          <strong>الموقع:</strong> {ride.pickupLocation}
+                          <strong>{t.customerLocation}:</strong> {ride.pickupLocation}
                         </p>
                         <p className="text-gray-700">
-                          <strong>الهاتف:</strong> {ride.customer?.phone || 'غير محدد'}
+                          <strong>{t.phone}:</strong> {ride.customer?.phone || t.error}
                         </p>
                         <div className="flex items-center gap-2 text-gray-600">
                           <Clock className="w-3 h-3" />
-                          <span>تم الطلب في {formatTime(ride.createdAt)}</span>
+                          <span>{language === 'ar' ? 'تم الطلب في' : 'Requested at'} {formatTime(ride.createdAt)}</span>
                         </div>
                       </div>
                     </div>
@@ -365,7 +362,7 @@ export default function DoctorDashboard() {
                         size="sm"
                       >
                         <Check className="w-4 h-4 ml-1" />
-                        موافق
+                        {t.accept}
                       </Button>
                       <Button
                         onClick={() => rejectMutation.mutate(ride.id)}
@@ -374,7 +371,7 @@ export default function DoctorDashboard() {
                         size="sm"
                       >
                         <X className="w-4 h-4 ml-1" />
-                        رفض
+                        {t.reject}
                       </Button>
                     </div>
                   </div>
