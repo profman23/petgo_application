@@ -10,6 +10,7 @@ import { Map } from '@/components/map';
 import { ArrowLeft, Check, X, MapPin, Clock, Navigation, Loader2, Satellite } from 'lucide-react';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
+import { playNotificationSound, requestAudioPermission } from '@/utils/audio';
 
 export default function DoctorDashboard() {
   const [, setLocation] = useLocation();
