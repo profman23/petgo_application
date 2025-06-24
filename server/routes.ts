@@ -219,31 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put('/api/rides/:id/cancel', requireAuth, async (req, res) => {
-    try {
-      const rideId = parseInt(req.params.id);
-      const ride = await storage.getRide(rideId);
-      
-      if (!ride || ride.customerId !== req.user.id) {
-        return res.status(404).json({ message: 'الرحلة غير موجودة' });
-      }
-      
-      if (['completed', 'cancelled'].includes(ride.status)) {
-        return res.status(400).json({ message: 'لا يمكن إلغاء هذه الرحلة' });
-      }
-      
-      await storage.updateRideStatus(rideId, 'cancelled');
-      
-      // Make driver available again
-      if (ride.driverId) {
-        await storage.updateDriverAvailability(ride.driverId, true);
-      }
-      
-      res.json({ message: 'تم إلغاء الرحلة بنجاح' });
-    } catch (error) {
-      res.status(500).json({ message: 'خطأ في إلغاء الرحلة' });
-    }
-  });
+
 
   // Doctor location update endpoint
   app.put('/api/doctor/location', requireAuth, async (req, res) => {
@@ -440,6 +416,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: 'تم رفض الطلب' });
     } catch (error) {
       res.status(500).json({ message: 'خطأ في رفض الطلب' });
+    }
+  });
+
+  // Doctor cancel ride
+  app.put('/api/rides/:id/cancel', requireAuth, async (req: any, res) => {
+    try {
+      const rideId = parseInt(req.params.id);
+      const user = req.user;
+      
+      console.log('Cancel request for ride:', rideId, 'by user:', user.id, 'type:', user.membershipType);
+      
+      // Get ride details first
+      const ride = await storage.getRide(rideId);
+      if (!ride) {
+        console.log('Ride not found:', rideId);
+        return res.status(404).json({ message: 'Ride not found' });
+      }
+      
+      console.log('Found ride:', ride);
+      
+      // Check if user is the assigned doctor
+      if (user.membershipType === 'doctor' && ride.driverId !== user.id) {
+        console.log('Doctor not assigned to this ride. Driver ID:', ride.driverId, 'User ID:', user.id);
+        return res.status(403).json({ message: 'Unauthorized to cancel this ride' });
+      }
+      
+      // Check if user is the customer
+      if (user.membershipType === 'customer' && ride.customerId !== user.id) {
+        console.log('Customer not owner of this ride. Customer ID:', ride.customerId, 'User ID:', user.id);
+        return res.status(403).json({ message: 'Unauthorized to cancel this ride' });
+      }
+      
+      // Update ride status to cancelled
+      await storage.updateRideStatus(rideId, 'cancelled');
+      console.log('Ride status updated to cancelled');
+      
+      // Make doctor available again if it was a doctor cancelling
+      if (user.membershipType === 'doctor' && ride.driverId) {
+        await storage.updateDriverAvailability(ride.driverId, true);
+        console.log('Driver made available again');
+      }
+      
+      res.json({ success: true, message: 'Ride cancelled successfully' });
+    } catch (error) {
+      console.error('Error cancelling ride:', error);
+      res.status(500).json({ message: 'Failed to cancel ride' });
+    }
+  });
+
+  // Update ride status (for doctors)
+  app.put('/api/rides/:id/status', requireAuth, async (req: any, res) => {
+    try {
+      const rideId = parseInt(req.params.id);
+      const { status } = req.body;
+      const user = req.user;
+      
+      // Get ride details first
+      const ride = await storage.getRide(rideId);
+      if (!ride) {
+        return res.status(404).json({ message: 'Ride not found' });
+      }
+      
+      // Check if user is the assigned doctor
+      if (user.membershipType === 'doctor' && ride.driverId !== user.id) {
+        return res.status(403).json({ message: 'Unauthorized to update this ride' });
+      }
+      
+      await storage.updateRideStatus(rideId, status);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating ride status:', error);
+      res.status(500).json({ message: 'Failed to update ride status' });
     }
   });
 
