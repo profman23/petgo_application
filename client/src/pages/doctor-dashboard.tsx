@@ -83,33 +83,25 @@ export default function DoctorDashboard() {
     refetchInterval: 3000, // Poll every 3 seconds for new requests
   });
 
-  // Notification system without infinite loops
-  const lastRideCountRef = React.useRef(0);
+  // Simple notification tracking without loops
+  const lastNotificationCount = React.useRef(0);
   
   React.useEffect(() => {
-    if (pendingRides && Array.isArray(pendingRides)) {
+    if (pendingRides && Array.isArray(pendingRides) && lastNotificationCount.current > 0) {
       const currentCount = pendingRides.length;
-      const lastCount = lastRideCountRef.current;
-      
-      if (currentCount > lastCount && lastCount > 0) {
-        const newRidesCount = currentCount - lastCount;
+      if (currentCount > lastNotificationCount.current) {
+        const newRides = currentCount - lastNotificationCount.current;
         toast({
           title: t.newRequest,
-          description: `${t.newRequestDesc} (${newRidesCount})`,
+          description: `${t.newRequestDesc} (${newRides})`,
           duration: 10000,
         });
-        
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification(t.newVetRequest, {
-            body: `${t.pendingApproval} (${newRidesCount})`,
-            icon: '/icon.png'
-          });
-        }
       }
-      
-      lastRideCountRef.current = currentCount;
     }
-  }, [pendingRides?.length]); // Only track the length
+    if (pendingRides) {
+      lastNotificationCount.current = pendingRides.length;
+    }
+  }, [pendingRides?.length]);
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {
@@ -242,27 +234,27 @@ export default function DoctorDashboard() {
             </div>
             
             {latitude && longitude ? (
-              <div className="space-y-2 text-sm" style={{ textAlign }}>
+              <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-green-600" />
-                  <span className="text-green-600">{t.locationDetectedSuccessfully}</span>
+                  <span className="text-green-600" style={{ textAlign }}>{t.locationDetectedSuccessfully}</span>
                 </div>
-                <div className="text-gray-600">
+                <div className="text-gray-600" style={{ textAlign }}>
                   {t.latitude}: {latitude.toFixed(6)}
                 </div>
-                <div className="text-gray-600">
+                <div className="text-gray-600" style={{ textAlign }}>
                   {t.longitude}: {longitude.toFixed(6)}
                 </div>
                 {accuracy && (
-                  <div className="text-gray-600">
+                  <div className="text-gray-600" style={{ textAlign }}>
                     {t.accuracy}: {Math.round(accuracy)} {t.meters}
                   </div>
                 )}
               </div>
             ) : gpsError ? (
-              <div className="flex items-center gap-2 text-red-600" style={{ textAlign }}>
+              <div className="flex items-center gap-2 text-red-600">
                 <X className="w-4 h-4" />
-                <span>{t.error}: {gpsError}</span>
+                <span style={{ textAlign }}>{t.error}: {gpsError}</span>
               </div>
             ) : (
               <div className="flex items-center gap-2 text-yellow-600">
@@ -380,12 +372,12 @@ export default function DoctorDashboard() {
                   <div className="border-t border-blue-200 pt-3">
                     <div className="grid grid-cols-2 gap-4 text-xs">
                       <div>
-                        <p className="text-gray-500">نوع الخدمة</p>
-                        <p className="font-medium">عيادة بيطرية متنقلة</p>
+                        <p className="text-gray-500" style={{ textAlign }}>{t.serviceType}</p>
+                        <p className="font-medium" style={{ textAlign }}>{language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Mobile Veterinary Clinic'}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">الرسوم المتوقعة</p>
-                        <p className="font-medium text-green-600">150 ريال</p>
+                        <p className="text-gray-500" style={{ textAlign }}>{language === 'ar' ? 'الرسوم المتوقعة' : 'Expected Fee'}</p>
+                        <p className="font-medium text-green-600" style={{ textAlign }}>{language === 'ar' ? '150 ريال' : '150 SAR'}</p>
                       </div>
                     </div>
                   </div>
