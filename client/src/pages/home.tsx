@@ -89,13 +89,8 @@ export default function Home() {
   }, [toast, language]);
 
   const handleRequestRide = () => {
-    // If there's an active ride that's not cancelled, go to tracking
-    if (activeRide && !['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status)) {
-      setLocation('/ride-tracking');
-    } else {
-      // Otherwise, go to request a new ride
-      setLocation('/ride-request');
-    }
+    // Always go to request a new ride since cancelled rides are filtered out
+    setLocation('/ride-request');
   };
 
   if (!user) {
@@ -139,8 +134,8 @@ export default function Home() {
       </header>
 
       <div className="p-4">
-        {/* Active Ride Card - Only show if ride is active and not cancelled */}
-        {activeRide && !['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status) && (
+        {/* Active Ride Card - Only show if ride is active */}
+        {activeRide && (
           <Card className="mb-6 border-blue-200 bg-blue-50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -161,7 +156,7 @@ export default function Home() {
           <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ textAlign }}>{t('requestMobileVet')}</h2>
           <Button
             onClick={handleRequestRide}
-            disabled={activeRide && !['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status)}
+            disabled={!!activeRide}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white p-8 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <div className="flex items-center justify-center gap-3 mb-3">
