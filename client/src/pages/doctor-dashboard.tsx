@@ -59,6 +59,21 @@ export default function DoctorDashboard() {
       // Network error, ignore
     });
 
+    // طلب إذن الصوت عند بداية التحميل
+    const requestAudioPermission = async () => {
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        if (audioContext.state === 'suspended') {
+          await audioContext.resume();
+        }
+        console.log('Audio permission granted');
+      } catch (error) {
+        console.log('Audio permission denied:', error);
+      }
+    };
+
+    requestAudioPermission();
+
     // طلب إذن الإشعارات
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission().then(permission => {
@@ -87,11 +102,133 @@ export default function DoctorDashboard() {
   // Simple notification tracking without loops
   const lastNotificationCount = React.useRef(0);
   
+  // دالة تشغيل الصوت المحسنة
+  const playNewRequestSound = React.useCallback(() => {
+    try {
+      // الطريقة الأولى: استخدام Web Audio API
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // نغمة أولى
+      const oscillator1 = audioContext.createOscillator();
+      const gainNode1 = audioContext.createGain();
+      
+      oscillator1.connect(gainNode1);
+      gainNode1.connect(audioContext.destination);
+      
+      oscillator1.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator1.type = 'sine';
+      
+      gainNode1.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode1.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+      gainNode1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+      
+      oscillator1.start(audioContext.currentTime);
+      oscillator1.stop(audioContext.currentTime + 0.8);
+      
+      // نغمة ثانية
+      setTimeout(() => {
+        const oscillator2 = audioContext.createOscillator();
+        const gainNode2 = audioContext.createGain();
+        
+        oscillator2.connect(gainNode2);
+        gainNode2.connect(audioContext.destination);
+        
+        oscillator2.frequency.setValueAtTime(1000, audioContext.currentTime);
+        oscillator2.type = 'sine';
+        
+        gainNode2.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode2.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+        gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+        
+        oscillator2.start(audioContext.currentTime);
+        oscillator2.stop(audioContext.currentTime + 0.8);
+      }, 400);
+      
+    } catch (error) {
+      console.log('Web Audio API failed, trying alternative:', error);
+      try {
+        // الطريقة البديلة: استخدام HTML5 Audio مع Data URL
+        const beep = () => {
+          const audio = new Audio();
+          // تكوين موجة صوتية بسيطة
+          const frequency = 800;
+          const duration = 0.5;
+          const sampleRate = 8000;
+          const samples = duration * sampleRate;
+          
+          // إنشاء buffer صوتي
+          const buffer = new ArrayBuffer(44 + samples * 2);
+          const view = new DataView(buffer);
+          
+          // WAV header
+          view.setUint32(0, 0x46464952); // "RIFF"
+          view.setUint32(4, 36 + samples * 2, true);
+          view.setUint32(8, 0x45564157); // "WAVE"
+          view.setUint32(12, 0x20746d66); // "fmt "
+          view.setUint32(16, 16, true);
+          view.setUint16(20, 1, true);
+          view.setUint16(22, 1, true);
+          view.setUint32(24, sampleRate, true);
+          view.setUint32(28, sampleRate * 2, true);
+          view.setUint16(32, 2, true);
+          view.setUint16(34, 16, true);
+          view.setUint32(36, 0x61746164); // "data"
+          view.setUint32(40, samples * 2, true);
+          
+          // إنشاء الموجة الصوتية
+          for (let i = 0; i < samples; i++) {
+            const sample = Math.sin(2 * Math.PI * frequency * i / sampleRate) * 0.3;
+            view.setInt16(44 + i * 2, sample * 32767, true);
+          }
+          
+          const blob = new Blob([buffer], { type: 'audio/wav' });
+          audio.src = URL.createObjectURL(blob);
+          audio.volume = 0.5;
+          audio.play().catch(() => {
+            console.log('Audio play failed');
+          });
+        };
+        
+        beep();
+        setTimeout(beep, 400); // نغمة ثانية
+        
+      } catch (fallbackError) {
+        console.log('All audio methods failed:', fallbackError);
+        // محاولة أخيرة بأبسط طريقة
+        try {
+          const audio = new Audio('data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ4AAAC4hYOFZFJfdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+Xsr2AcBDuO2e/XeSEFLISA8d+ZQgoPXrTn8apZFQpBmediqGAXBjuR2O/XfCEFLYDO8t2QQgoPX7Pr769YFAlCn+Xtr2EcBDyM1+7WfiMHL4LN8d2OQQwOXLfnJpZGFAlEn+XtrGEdBDyM1+7XfiEHL4LN8t2QQwwPXLfnBpZGFAlEn+btr');
+          audio.volume = 0.3;
+          audio.play().catch(() => {});
+        } catch (finalError) {
+          console.log('Final audio attempt failed:', finalError);
+        }
+      }
+    }
+  }, []);
+  
   React.useEffect(() => {
     if (pendingRides && Array.isArray(pendingRides) && lastNotificationCount.current > 0) {
       const currentCount = pendingRides.length;
       if (currentCount > lastNotificationCount.current) {
         const newRides = currentCount - lastNotificationCount.current;
+        
+        // تشغيل الصوت عند وصول طلب جديد
+        playNewRequestSound();
+        
+        // إشعار browser notification
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification(
+            language === 'ar' ? 'طلب جديد!' : 'New Request!',
+            {
+              body: language === 'ar' ? 'وصل طلب عيادة بيطرية جديد' : 'New veterinary clinic request received',
+              icon: logoImage,
+              badge: logoImage,
+              tag: 'new-request',
+              requireInteraction: true
+            }
+          );
+        }
+        
         toast({
           title: t.newRequest,
           description: `${t.newRequestDesc} (${newRides})`,
@@ -102,7 +239,7 @@ export default function DoctorDashboard() {
     if (pendingRides) {
       lastNotificationCount.current = pendingRides.length;
     }
-  }, [pendingRides?.length]);
+  }, [pendingRides?.length, playNewRequestSound, t.newRequest, t.newRequestDesc, language]);
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {
@@ -163,6 +300,28 @@ export default function DoctorDashboard() {
       return response;
     },
     onSuccess: () => {
+      // تشغيل صوت الرفض
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(330, audioContext.currentTime); // نغمة منخفضة
+        oscillator.type = 'sine';
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.5);
+      } catch (error) {
+        console.log('Reject sound failed:', error);
+      }
+      
       toast({
         title: 'تم رفض الطلب',
         description: 'تم رفض طلب العيادة البيطرية',
