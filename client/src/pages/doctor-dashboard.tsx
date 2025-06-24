@@ -304,33 +304,12 @@ export default function DoctorDashboard() {
       return response;
     },
     onSuccess: () => {
-      // تشغيل صوت الرفض
-      try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(330, audioContext.currentTime); // نغمة منخفضة
-        oscillator.type = 'sine';
-        
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.1);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.5);
-      } catch (error) {
-        console.log('Reject sound failed:', error);
-      }
-      
       toast({
-        title: 'تم رفض الطلب',
-        description: 'تم رفض طلب العيادة البيطرية',
+        title: language === 'ar' ? "تم رفض الطلب" : "Request Rejected",
+        description: language === 'ar' ? "تم رفض طلب العيادة البيطرية" : "Veterinary clinic request has been rejected",
       });
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/pending-rides'] });
+      setShowCancelDialog(false);
     },
     onError: (error) => {
       toast({
