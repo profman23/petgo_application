@@ -19,7 +19,7 @@ export default function RideTracking() {
   const { activeRide, assignedDriver, cancelRide, isCancellingRide, fetchNearbyDrivers } = useRide();
   const [nearbyDrivers, setNearbyDrivers] = useState([]);
   
-  const t = useTranslation();
+  const { t } = useTranslation();
   const { language } = useLanguage();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);

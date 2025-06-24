@@ -28,7 +28,7 @@ export default function RideRequest() {
   const { requestRide, isRequestingRide } = useRide();
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   
-  const t = useTranslation();
+  const { t } = useTranslation();
   const { language } = useLanguage();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
