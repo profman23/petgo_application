@@ -63,8 +63,8 @@ export default function DoctorRideTracking() {
       
       // Show confirmation toast
       toast({
-        title: "فتح Google Maps",
-        description: "جاري فتح التطبيق للتنقل...",
+        title: language === 'ar' ? "فتح Google Maps" : "Opening Google Maps",
+        description: language === 'ar' ? "جاري فتح التطبيق للتنقل..." : "Opening navigation app...",
       });
       
       // Try multiple methods to open the URL
@@ -75,8 +75,8 @@ export default function DoctorRideTracking() {
         setTimeout(() => {
           if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
             toast({
-              title: "تعذر فتح نافذة جديدة",
-              description: "سيتم فتح Google Maps في نفس النافذة",
+              title: language === 'ar' ? "تعذر فتح نافذة جديدة" : "Cannot open new window",
+              description: language === 'ar' ? "سيتم فتح Google Maps في نفس النافذة" : "Google Maps will open in same window",
               variant: "destructive",
             });
             setTimeout(() => {
@@ -88,8 +88,8 @@ export default function DoctorRideTracking() {
       } catch (error) {
         console.error('Error opening Google Maps:', error);
         toast({
-          title: "خطأ في فتح Google Maps",
-          description: "سيتم المحاولة مرة أخرى...",
+          title: language === 'ar' ? "خطأ في فتح Google Maps" : "Error opening Google Maps",
+          description: language === 'ar' ? "سيتم المحاولة مرة أخرى..." : "Trying again...",
           variant: "destructive",
         });
         setTimeout(() => {
@@ -99,8 +99,8 @@ export default function DoctorRideTracking() {
     } else {
       console.log('Missing coordinates:', { doctorLat, doctorLng, pickupLat: ride.pickupLatitude, pickupLng: ride.pickupLongitude });
       toast({
-        title: "خطأ في الموقع",
-        description: "لا يمكن تحديد إحداثيات الموقع",
+        title: language === 'ar' ? "خطأ في الموقع" : "Location Error",
+        description: language === 'ar' ? "لا يمكن تحديد إحداثيات الموقع" : "Cannot determine location coordinates",
         variant: "destructive",
       });
     }
@@ -130,7 +130,7 @@ export default function DoctorRideTracking() {
               alt="Vets Van" 
               className="h-8 object-contain"
             />
-            <h1 className="text-lg font-semibold">متابعة الرحلة</h1>
+            <h1 className="text-lg font-semibold" style={{ textAlign }}>{language === 'ar' ? `متابعة الرحلة #${ride.id}` : `Ride Tracking #${ride.id}`}</h1>
           </div>
           <div className="w-10" />
         </div>
@@ -143,15 +143,15 @@ export default function DoctorRideTracking() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-green-600" />
-                <span className="font-medium">حالة GPS</span>
+                <span className="font-medium" style={{ textAlign }}>{language === 'ar' ? 'حالة GPS' : 'GPS Status'}</span>
               </div>
               <Badge variant={doctorLat && doctorLng ? "default" : "destructive"}>
-                {doctorLat && doctorLng ? "متصل" : "غير متصل"}
+{language === 'ar' ? (doctorLat && doctorLng ? "متصل" : "غير متصل") : (doctorLat && doctorLng ? "Connected" : "Disconnected")}
               </Badge>
             </div>
             {accuracy && (
-              <p className="text-sm text-gray-600 mt-2">
-                دقة الموقع: {Math.round(accuracy)} متر
+              <p className="text-sm text-gray-600 mt-2" style={{ textAlign }}>
+                {language === 'ar' ? `دقة الموقع: ${Math.round(accuracy)} متر` : `Location Accuracy: ${Math.round(accuracy)} meters`}
               </p>
             )}
             {error && (
