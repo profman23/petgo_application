@@ -91,7 +91,7 @@ export default function RideTracking() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {t.back}
+            {t('back')}
           </Button>
           <div className="flex items-center gap-3">
             <img 
@@ -99,7 +99,7 @@ export default function RideTracking() {
               alt="Vets Van" 
               className="h-8 object-contain"
             />
-            <h1 className="text-lg font-semibold" style={{ textAlign }}>{t.trackRequest}</h1>
+            <h1 className="text-lg font-semibold" style={{ textAlign }}>{t('trackRequest')}</h1>
           </div>
           <div className="w-10" />
         </div>

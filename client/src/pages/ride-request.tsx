@@ -14,6 +14,7 @@ import { rideRequestSchema } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
+import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 
 const formSchema = rideRequestSchema.extend({
   pickupLocation: z.string().min(1, 'الموقع مطلوب'),
@@ -26,6 +27,11 @@ export default function RideRequest() {
   const { toast } = useToast();
   const { requestRide, isRequestingRide } = useRide();
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  
+  const t = useTranslation();
+  const { language } = useLanguage();
+  const direction = getDirection(language);
+  const textAlign = getTextAlign(language);
   
   // استخدام نظام GPS الحقيقي
   const {
@@ -263,7 +269,7 @@ export default function RideRequest() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" style={{ direction }}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
@@ -273,7 +279,7 @@ export default function RideRequest() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            العودة
+            {t('back')}
           </Button>
           <div className="flex items-center gap-3">
             <img 
@@ -281,7 +287,7 @@ export default function RideRequest() {
               alt="Vets Van" 
               className="h-8 object-contain"
             />
-            <h1 className="text-lg font-semibold">طلب عيادة بيطرية متنقلة</h1>
+            <h1 className="text-lg font-semibold" style={{ textAlign }}>{t('requestVet')}</h1>
           </div>
           <div className="w-10" />
         </div>
@@ -290,7 +296,7 @@ export default function RideRequest() {
       <div className="p-4">
         {/* Service Type Selection */}
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">نوع الخدمة البيطرية</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ textAlign }}>{t('serviceType')}</h2>
           <div className="grid grid-cols-1 gap-3">
             <Button
               variant={form.watch('vehicleType') === 'standard' ? 'default' : 'outline'}
@@ -298,8 +304,12 @@ export default function RideRequest() {
               className="p-6 h-auto flex-col bg-green-50 border-green-200"
             >
               <div className="text-3xl mb-2">🏥</div>
-              <span className="font-semibold">عيادة بيطرية متنقلة</span>
-              <span className="text-sm text-gray-500">خدمة بيطرية شاملة في موقعك</span>
+              <span className="font-semibold" style={{ textAlign }}>
+                {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Mobile Veterinary Clinic'}
+              </span>
+              <span className="text-sm text-gray-500" style={{ textAlign }}>
+                {language === 'ar' ? 'خدمة بيطرية شاملة في موقعك' : 'Comprehensive veterinary service at your location'}
+              </span>
             </Button>
           </div>
         </div>
@@ -314,14 +324,15 @@ export default function RideRequest() {
                   name="pickupLocation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>موقعك الحالي</FormLabel>
+                      <FormLabel style={{ textAlign }}>{t('yourLocation')}</FormLabel>
                       <FormControl>
                         <div className="flex items-center gap-3">
                           <Circle className="w-3 h-3 text-green-500 flex-shrink-0" />
                           <Input
                             {...field}
-                            placeholder="موقعك الحالي"
-                            className="flex-1 text-right"
+                            placeholder={language === 'ar' ? 'موقعك الحالي' : 'Your current location'}
+                            className={`flex-1 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
+                            style={{ textAlign }}
                             readOnly
                           />
                           <Button
@@ -330,7 +341,10 @@ export default function RideRequest() {
                             size="icon"
                             onClick={refreshLocation}
                             disabled={isLoadingGPS}
-                            title={isLoadingGPS ? "يتم تحديد الموقع..." : "تحديث الموقع"}
+                            title={isLoadingGPS ? 
+                              (language === 'ar' ? "يتم تحديد الموقع..." : "Detecting location...") : 
+                              (language === 'ar' ? "تحديث الموقع" : "Update location")
+                            }
                           >
                             {isLoadingGPS ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -341,8 +355,8 @@ export default function RideRequest() {
                         </div>
                       </FormControl>
                       <FormMessage />
-                      <p className="text-xs text-gray-500 mt-1">
-                        العيادة البيطرية ستأتي إلى موقعك الحالي
+                      <p className="text-xs text-gray-500 mt-1" style={{ textAlign }}>
+                        {language === 'ar' ? 'العيادة البيطرية ستأتي إلى موقعك الحالي' : 'The veterinary clinic will come to your current location'}
                         {currentLocation && (
                           <span className="block text-blue-600 font-mono">
                             GPS: {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
@@ -374,28 +388,51 @@ export default function RideRequest() {
         {/* Service Info */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">معلومات الخدمة</h3>
+            <h3 className="font-semibold text-gray-900 mb-3" style={{ textAlign }}>
+              {language === 'ar' ? 'معلومات الخدمة' : 'Service Information'}
+            </h3>
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-gray-500 mb-1">وقت الوصول المقدر</p>
-                <p className="font-semibold">15-30 دقيقة</p>
+                <p className="text-gray-500 mb-1" style={{ textAlign }}>
+                  {language === 'ar' ? 'وقت الوصول المقدر' : 'Estimated arrival time'}
+                </p>
+                <p className="font-semibold" style={{ textAlign }}>
+                  {language === 'ar' ? '15-30 دقيقة' : '15-30 minutes'}
+                </p>
               </div>
               <div>
-                <p className="text-gray-500 mb-1">مدة الخدمة</p>
-                <p className="font-semibold">45-60 دقيقة</p>
+                <p className="text-gray-500 mb-1" style={{ textAlign }}>
+                  {language === 'ar' ? 'مدة الخدمة' : 'Service duration'}
+                </p>
+                <p className="font-semibold" style={{ textAlign }}>
+                  {language === 'ar' ? '45-60 دقيقة' : '45-60 minutes'}
+                </p>
               </div>
               <div>
-                <p className="text-gray-500 mb-1">رسوم الخدمة</p>
-                <p className="font-semibold text-green-600">150 ريال</p>
+                <p className="text-gray-500 mb-1" style={{ textAlign }}>
+                  {language === 'ar' ? 'رسوم الخدمة' : 'Service fee'}
+                </p>
+                <p className="font-semibold text-green-600" style={{ textAlign }}>
+                  150 {language === 'ar' ? 'ريال' : 'SAR'}
+                </p>
               </div>
               <div>
-                <p className="text-gray-500 mb-1">طريقة الدفع</p>
-                <p className="font-semibold">نقدي</p>
+                <p className="text-gray-500 mb-1" style={{ textAlign }}>
+                  {language === 'ar' ? 'طريقة الدفع' : 'Payment method'}
+                </p>
+                <p className="font-semibold" style={{ textAlign }}>
+                  {language === 'ar' ? 'نقدي' : 'Cash'}
+                </p>
               </div>
             </div>
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs text-blue-800">
-                <strong>تشمل الخدمة:</strong> فحص شامل، تشخيص، علاج أساسي، استشارة طبية
+              <p className="text-xs text-blue-800" style={{ textAlign }}>
+                <strong>
+                  {language === 'ar' ? 'تشمل الخدمة:' : 'Service includes:'}
+                </strong> {language === 'ar' ? 
+                  'فحص شامل، تشخيص، علاج أساسي، استشارة طبية' : 
+                  'Comprehensive examination, diagnosis, basic treatment, medical consultation'
+                }
               </p>
             </div>
           </CardContent>
