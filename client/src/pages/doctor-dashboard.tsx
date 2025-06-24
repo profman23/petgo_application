@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -79,22 +79,21 @@ export default function DoctorDashboard() {
   });
 
   // نظام الإشعارات للطلبات الجديدة
-  const [lastRideCount, setLastRideCount] = React.useState(0);
+  const [lastKnownCount, setLastKnownCount] = React.useState(0);
   
-  useEffect(() => {
+  React.useEffect(() => {
     if (pendingRides && Array.isArray(pendingRides)) {
       const currentCount = pendingRides.length;
       
-      // إذا زاد عدد الطلبات، اعرض إشعار
-      if (currentCount > lastRideCount && lastRideCount > 0) {
-        const newRidesCount = currentCount - lastRideCount;
+      // عرض إشعار فقط إذا زاد العدد وليس في التحميل الأول
+      if (currentCount > lastKnownCount && lastKnownCount > 0) {
+        const newRidesCount = currentCount - lastKnownCount;
         toast({
-          title: '🚨 طلب جديد!',
+          title: 'طلب جديد!',
           description: `لديك ${newRidesCount} طلب جديد للعيادة البيطرية`,
-          duration: 10000, // إشعار لمدة 10 ثوان
+          duration: 10000,
         });
         
-        // صوت تنبيه للطلب الجديد
         if ('Notification' in window && Notification.permission === 'granted') {
           new Notification('طلب عيادة بيطرية جديد!', {
             body: `لديك ${newRidesCount} طلب جديد في انتظار الموافقة`,
@@ -103,9 +102,12 @@ export default function DoctorDashboard() {
         }
       }
       
-      setLastRideCount(currentCount);
+      // تحديث العدد المعروف فقط إذا تغير
+      if (currentCount !== lastKnownCount) {
+        setLastKnownCount(currentCount);
+      }
     }
-  }, [pendingRides, lastRideCount, toast]);
+  }, [pendingRides?.length]); // استخدام .length فقط لتجنب الحلقة اللا نهائية
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {
@@ -205,7 +207,7 @@ export default function DoctorDashboard() {
         <div className="flex items-center justify-between p-4">
           <Button
             variant="ghost"
-            onClick={() => setLocation('/')}
+            onClick={() => setLocation('/user-type-selection')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
