@@ -84,6 +84,25 @@ export const translations = {
     alreadyHaveAccount: 'لديك حساب بالفعل؟',
     backToLogin: 'العودة لتسجيل الدخول',
     
+    // Doctor Dashboard
+    doctorDashboard: 'لوحة تحكم الطبيب',
+    sessionExpired: 'انتهت جلسة العمل',
+    loginAgain: 'يرجى تسجيل الدخول مرة أخرى',
+    gpsStatus: 'حالة GPS',
+    accuracy: 'دقة',
+    meters: 'متر',
+    enableGps: 'تفعيل GPS',
+    stopGps: 'إيقاف GPS',
+    pendingRequests: 'الطلبات المعلقة',
+    noPendingRequests: 'لا توجد طلبات معلقة حالياً',
+    customerLocation: 'موقع العميل',
+    acceptRequest: 'قبول الطلب',
+    rejectRequest: 'رفض الطلب',
+    newRequest: 'طلب جديد!',
+    newRequestDesc: 'لديك طلب جديد للعيادة البيطرية',
+    newVetRequest: 'طلب عيادة بيطرية جديد!',
+    pendingApproval: 'طلب جديد في انتظار الموافقة',
+    
     // Registration
     enterName: 'أدخل اسمك الكامل',
     enterAddress: 'أدخل عنوانك',
@@ -242,6 +261,25 @@ export const translations = {
     enterCaptchaAnswer: 'Enter the answer',
     alreadyHaveAccount: 'Already have an account?',
     backToLogin: 'Back to Login',
+    
+    // Doctor Dashboard
+    doctorDashboard: 'Doctor Dashboard',
+    sessionExpired: 'Session Expired',
+    loginAgain: 'Please login again',
+    gpsStatus: 'GPS Status',
+    accuracy: 'Accuracy',
+    meters: 'meters',
+    enableGps: 'Enable GPS',
+    stopGps: 'Stop GPS',
+    pendingRequests: 'Pending Requests',
+    noPendingRequests: 'No pending requests at the moment',
+    customerLocation: 'Customer Location',
+    acceptRequest: 'Accept Request',
+    rejectRequest: 'Reject Request',
+    newRequest: 'New Request!',
+    newRequestDesc: 'You have a new veterinary clinic request',
+    newVetRequest: 'New Veterinary Request!',
+    pendingApproval: 'New request pending approval',
     
     // Registration
     enterName: 'Enter your full name',

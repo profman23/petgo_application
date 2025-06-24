@@ -9,11 +9,16 @@ import { useDoctorLocation } from '@/hooks/useDoctorLocation';
 import { Map } from '@/components/map';
 import { ArrowLeft, Check, X, MapPin, Clock, Navigation, Loader2, Satellite } from 'lucide-react';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 
 export default function DoctorDashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const t = useTranslation();
+  const { language } = useLanguage();
+  const direction = getDirection(language);
+  const textAlign = getTextAlign(language);
   
   // نظام تتبع GPS للطبيب
   const {
@@ -43,8 +48,8 @@ export default function DoctorDashboard() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         toast({
-          title: 'انتهت جلسة العمل',
-          description: 'يرجى تسجيل الدخول مرة أخرى',
+          title: t.sessionExpired,
+          description: t.loginAgain,
           variant: 'destructive',
         });
         setLocation('/login');
@@ -78,47 +83,34 @@ export default function DoctorDashboard() {
     refetchInterval: 3000, // Poll every 3 seconds for new requests
   });
 
-  // نظام الإشعارات للطلبات الجديدة - إصلاح الحلقة اللا نهائية
-  const [notificationState, setNotificationState] = React.useState({
-    lastCount: 0,
-    initialized: false
-  });
+  // نظام الإشعارات للطلبات الجديدة - حل نهائي للحلقة اللا نهائية
+  const previousCountRef = React.useRef(0);
   
   React.useEffect(() => {
     if (pendingRides && Array.isArray(pendingRides)) {
       const currentCount = pendingRides.length;
+      const previousCount = previousCountRef.current;
       
-      setNotificationState(prev => {
-        // تهيئة العدد في المرة الأولى
-        if (!prev.initialized) {
-          return { lastCount: currentCount, initialized: true };
-        }
+      // عرض إشعار فقط إذا زاد العدد وليس في المرة الأولى
+      if (currentCount > previousCount && previousCount > 0) {
+        const newRidesCount = currentCount - previousCount;
+        toast({
+          title: t.newRequest,
+          description: `${t.newRequestDesc} (${newRidesCount})`,
+          duration: 10000,
+        });
         
-        // عرض إشعار فقط إذا زاد العدد
-        if (currentCount > prev.lastCount) {
-          const newRidesCount = currentCount - prev.lastCount;
-          
-          // استخدام setTimeout لتجنب المشاكل في التوقيت
-          setTimeout(() => {
-            toast({
-              title: 'طلب جديد!',
-              description: `لديك ${newRidesCount} طلب جديد للعيادة البيطرية`,
-              duration: 10000,
-            });
-            
-            if ('Notification' in window && Notification.permission === 'granted') {
-              new Notification('طلب عيادة بيطرية جديد!', {
-                body: `لديك ${newRidesCount} طلب جديد في انتظار الموافقة`,
-                icon: '/icon.png'
-              });
-            }
-          }, 100);
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification(t.newVetRequest, {
+            body: `${t.pendingApproval} (${newRidesCount})`,
+            icon: '/icon.png'
+          });
         }
-        
-        return { ...prev, lastCount: currentCount };
-      });
+      }
+      
+      previousCountRef.current = currentCount;
     }
-  }, [pendingRides?.length]); // استخدام length فقط كتبعية
+  }, [pendingRides]); // استخدام pendingRides كاملة
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {
