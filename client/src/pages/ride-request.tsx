@@ -55,124 +55,211 @@ export default function RideRequest() {
   });
 
   useEffect(() => {
-    // Get user's current location with high accuracy
+    // Get user's current location with high accuracy - force new location request
     if (navigator.geolocation) {
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0 // Force fresh location request
+      };
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const { latitude, longitude } = position.coords;
-          console.log('Real GPS Location:', latitude, longitude);
+          const { latitude, longitude, accuracy } = position.coords;
+          console.log('Fresh GPS Location:', latitude, longitude, 'Accuracy:', accuracy);
+          
           setCurrentLocation({ latitude, longitude });
           form.setValue('pickupLatitude', latitude);
           form.setValue('pickupLongitude', longitude);
           
-          // تحديد اسم الموقع بناءً على الإحداثيات الحقيقية
-          let locationName = 'موقعك الحالي';
-          if (latitude >= 24.5 && latitude <= 24.9 && longitude >= 46.4 && longitude <= 47.0) {
-            locationName = 'الرياض - موقعك الحالي';
-          } else if (latitude >= 21.3 && latitude <= 21.7 && longitude >= 39.1 && longitude <= 39.3) {
-            locationName = 'جدة - موقعك الحالي';
-          } else if (latitude >= 26.3 && latitude <= 26.5 && longitude >= 50.0 && longitude <= 50.2) {
-            locationName = 'الدمام - موقعك الحالي';
+          // تحديد اسم الموقع بناءً على الإحداثيات الحقيقية - نطاقات أوسع
+          let locationName = `موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          
+          if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
+            locationName = `الرياض - موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
+            locationName = `جدة - موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
+            locationName = `الدمام - موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
+            locationName = `المدينة المنورة - موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
           }
           
           form.setValue('pickupLocation', locationName);
           
           toast({
-            title: 'تم تحديد موقعك',
-            description: `الموقع: ${locationName}`,
+            title: 'تم تحديد موقعك الحقيقي بنجاح',
+            description: `الموقع: ${locationName}\nالدقة: ${Math.round(accuracy)} متر`,
+            duration: 5000,
           });
         },
         (error) => {
-          console.error('Error getting location:', error);
+          console.error('GPS Error:', error);
+          let errorMessage = 'خطأ غير معروف';
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'تم رفض إذن الوصول للموقع';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'الموقع غير متاح';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'انتهت مهلة تحديد الموقع';
+              break;
+          }
+          
           toast({
-            title: 'تعذر الحصول على الموقع الحقيقي',
-            description: 'يرجى السماح بالوصول للموقع أو تفعيل GPS',
+            title: 'فشل في تحديد الموقع الحقيقي',
+            description: `${errorMessage}. يرجى السماح بالوصول للموقع وإعادة المحاولة.`,
             variant: 'destructive',
+            duration: 8000,
           });
         },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000
-        }
+        options
       );
+    } else {
+      toast({
+        title: 'GPS غير مدعوم',
+        description: 'متصفحك لا يدعم خدمات الموقع',
+        variant: 'destructive',
+      });
     }
   }, [form, toast]);
 
   const onSubmit = (data: FormData) => {
-    requestRide(data);
+    // التحقق من وجود الموقع الحقيقي
+    if (!currentLocation || !currentLocation.latitude || !currentLocation.longitude) {
+      toast({
+        title: 'خطأ في الموقع',
+        description: 'لم يتم تحديد موقعك الحقيقي بعد. يرجى الانتظار أو الضغط على زر تحديث الموقع.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // التأكد من استخدام الموقع الحقيقي
+    const rideData = {
+      ...data,
+      pickupLatitude: currentLocation.latitude,
+      pickupLongitude: currentLocation.longitude,
+      destinationLatitude: currentLocation.latitude,
+      destinationLongitude: currentLocation.longitude,
+    };
+
+    console.log('Submitting ride with real GPS location:', rideData);
+    requestRide(rideData);
     setLocation('/ride-tracking');
   };
 
-  // تحديث الموقع تلقائياً عند تغيير GPS
+  // تحديث الموقع تلقائياً عند تغيير GPS من useGeolocation hook
   useEffect(() => {
-    if (latitude && longitude) {
+    if (latitude && longitude && accuracy) {
+      console.log('useGeolocation hook update:', latitude, longitude, accuracy);
+      
       // فحص ما إذا كان الموقع داخل المملكة العربية السعودية
-      const isInSaudiArabia = latitude >= 16 && latitude <= 32 && longitude >= 34 && longitude <= 56;
+      const isInSaudiArabia = latitude >= 15 && latitude <= 33 && longitude >= 34 && longitude <= 56;
       
       if (isInSaudiArabia) {
         setCurrentLocation({ latitude, longitude });
         form.setValue('pickupLatitude', latitude);
         form.setValue('pickupLongitude', longitude);
         
-        // تحديد اسم المنطقة حسب الإحداثيات
-        let locationName = 'موقعك الحالي';
-        if (latitude >= 24.5 && latitude <= 24.9 && longitude >= 46.4 && longitude <= 47.0) {
-          locationName = 'الرياض - موقعك الحالي';
-        } else if (latitude >= 21.3 && latitude <= 21.7 && longitude >= 39.1 && longitude <= 39.3) {
-          locationName = 'جدة - موقعك الحالي';
-        } else if (latitude >= 26.3 && latitude <= 26.5 && longitude >= 49.9 && longitude <= 50.3) {
-          locationName = 'الدمام - موقعك الحالي';
+        // تحديد اسم المنطقة حسب الإحداثيات الدقيقة
+        let locationName = `موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+        
+        if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
+          locationName = `الرياض - موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+        } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
+          locationName = `جدة - موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+        } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
+          locationName = `الدمام - موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+        } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
+          locationName = `المدينة المنورة - موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
         }
         
         form.setValue('pickupLocation', locationName);
         
-        if (accuracy && accuracy < 100) {
+        if (accuracy < 50) {
           toast({
-            title: 'تم تحديد موقعك بدقة',
+            title: 'تم تحديث موقعك بدقة عالية',
             description: `الدقة: ${Math.round(accuracy)} متر`,
+            duration: 3000,
           });
         }
       } else {
-        // استخدام إحداثيات الرياض إذا كان الموقع خارج المملكة
-        const riyadhLat = 24.7136;
-        const riyadhLng = 46.6753;
-        setCurrentLocation({ latitude: riyadhLat, longitude: riyadhLng });
-        form.setValue('pickupLatitude', riyadhLat);
-        form.setValue('pickupLongitude', riyadhLng);
-        form.setValue('pickupLocation', 'الرياض - الموقع الافتراضي');
         toast({
-          title: 'تم تصحيح الموقع',
-          description: 'تم استخدام موقع الرياض (الموقع المكتشف خارج المملكة)',
+          title: 'موقع خارج المملكة',
+          description: `تم اكتشاف موقع خارج المملكة العربية السعودية`,
           variant: 'destructive',
         });
       }
     }
   }, [latitude, longitude, accuracy, form, toast]);
 
-  // التعامل مع أخطاء GPS
+  // التعامل مع أخطاء GPS من useGeolocation hook
   useEffect(() => {
     if (gpsError) {
-      const riyadhLat = 24.7136;
-      const riyadhLng = 46.6753;
-      setCurrentLocation({ latitude: riyadhLat, longitude: riyadhLng });
-      form.setValue('pickupLatitude', riyadhLat);
-      form.setValue('pickupLongitude', riyadhLng);
-      form.setValue('pickupLocation', 'الرياض - الموقع الافتراضي');
+      console.log('GPS Error from hook:', gpsError);
       toast({
-        title: 'خطأ في تحديد الموقع',
-        description: `${gpsError}. تم استخدام موقع الرياض كبديل.`,
+        title: 'خطأ في GPS Hook',
+        description: `${gpsError}`,
         variant: 'destructive',
       });
     }
-  }, [gpsError, form, toast]);
+  }, [gpsError, toast]);
 
   const refreshLocation = () => {
-    getCurrentPosition();
-    toast({
-      title: 'يتم تحديث الموقع...',
-      description: 'الرجاء الانتظار',
-    });
+    // طلب موقع جديد بدقة عالية
+    if (navigator.geolocation) {
+      toast({
+        title: 'يتم تحديث الموقع...',
+        description: 'الرجاء الانتظار',
+      });
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude, accuracy } = position.coords;
+          console.log('Refreshed GPS Location:', latitude, longitude, 'Accuracy:', accuracy);
+          
+          setCurrentLocation({ latitude, longitude });
+          form.setValue('pickupLatitude', latitude);
+          form.setValue('pickupLongitude', longitude);
+          
+          // تحديد اسم الموقع الجديد
+          let locationName = `موقعك المحدث (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          
+          if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
+            locationName = `الرياض - موقعك المحدث (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
+            locationName = `جدة - موقعك المحدث (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
+            locationName = `الدمام - موقعك المحدث (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          }
+          
+          form.setValue('pickupLocation', locationName);
+          
+          toast({
+            title: 'تم تحديث موقعك بنجاح',
+            description: `الموقع الجديد: ${locationName}\nالدقة: ${Math.round(accuracy)} متر`,
+            duration: 5000,
+          });
+        },
+        (error) => {
+          console.error('Refresh GPS Error:', error);
+          toast({
+            title: 'فشل في تحديث الموقع',
+            description: 'يرجى التأكد من تفعيل GPS والسماح للمتصفح بالوصول للموقع',
+            variant: 'destructive',
+          });
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0 // Force fresh location
+        }
+      );
+    }
   };
 
   return (
@@ -256,6 +343,11 @@ export default function RideRequest() {
                       <FormMessage />
                       <p className="text-xs text-gray-500 mt-1">
                         العيادة البيطرية ستأتي إلى موقعك الحالي
+                        {currentLocation && (
+                          <span className="block text-blue-600 font-mono">
+                            GPS: {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
+                          </span>
+                        )}
                       </p>
                     </FormItem>
                   )}
@@ -264,9 +356,11 @@ export default function RideRequest() {
                 <Button
                   type="submit"
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-4 text-lg"
-                  disabled={isRequestingRide}
+                  disabled={isRequestingRide || !currentLocation}
                 >
-                  {isRequestingRide ? 'جاري إرسال الطلب...' : 'طلب العيادة البيطرية الآن'}
+                  {isRequestingRide ? 'جاري إرسال الطلب...' : 
+                   !currentLocation ? 'في انتظار تحديد الموقع...' : 
+                   'طلب العيادة البيطرية الآن'}
                 </Button>
               </form>
             </Form>
