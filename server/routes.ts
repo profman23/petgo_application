@@ -408,13 +408,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'الطلب غير موجود' });
       }
       
-      if (ride.status !== 'جاري المعالجة') {
+      // Allow rejection of requests with status 'requested' or 'جاري المعالجة'
+      if (ride.status !== 'requested' && ride.status !== 'جاري المعالجة') {
         return res.status(400).json({ message: 'لا يمكن رفض هذا الطلب' });
       }
       
-      await storage.updateRideStatus(rideId, 'مرفوض');
+      await storage.updateRideStatus(rideId, 'rejected');
       res.json({ message: 'تم رفض الطلب' });
     } catch (error) {
+      console.error('Error rejecting ride:', error);
       res.status(500).json({ message: 'خطأ في رفض الطلب' });
     }
   });
