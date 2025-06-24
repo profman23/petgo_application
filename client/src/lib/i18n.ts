@@ -105,6 +105,7 @@ export const translations = {
     serviceType: 'نوع الخدمة',
     accept: 'قبول',
     reject: 'رفض',
+    distance: 'المسافة التقديرية',
     
     // Registration
     enterName: 'أدخل اسمك الكامل',
@@ -286,6 +287,7 @@ export const translations = {
     serviceType: 'Service Type',
     accept: 'Accept',
     reject: 'Reject',
+    distance: 'Estimated Distance',
     
     // Registration
     enterName: 'Enter your full name',

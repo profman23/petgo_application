@@ -83,15 +83,16 @@ export default function DoctorDashboard() {
     refetchInterval: 3000, // Poll every 3 seconds for new requests
   });
 
-  // Simple notification system without dependency loops
-  const [lastRideCount, setLastRideCount] = React.useState(0);
+  // Notification system without infinite loops
+  const lastRideCountRef = React.useRef(0);
   
   React.useEffect(() => {
     if (pendingRides && Array.isArray(pendingRides)) {
       const currentCount = pendingRides.length;
+      const lastCount = lastRideCountRef.current;
       
-      if (currentCount > lastRideCount && lastRideCount > 0) {
-        const newRidesCount = currentCount - lastRideCount;
+      if (currentCount > lastCount && lastCount > 0) {
+        const newRidesCount = currentCount - lastCount;
         toast({
           title: t.newRequest,
           description: `${t.newRequestDesc} (${newRidesCount})`,
@@ -106,9 +107,9 @@ export default function DoctorDashboard() {
         }
       }
       
-      setLastRideCount(currentCount);
+      lastRideCountRef.current = currentCount;
     }
-  }, [pendingRides?.length]); // Only depend on length, not the whole array
+  }, [pendingRides?.length]); // Only track the length
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {
@@ -212,7 +213,7 @@ export default function DoctorDashboard() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            العودة
+            {t.back}
           </Button>
           <div className="flex items-center gap-3">
             <img 
@@ -220,10 +221,10 @@ export default function DoctorDashboard() {
               alt="Vets Van" 
               className="h-8 object-contain"
             />
-            <h1 className="text-lg font-semibold">لوحة تحكم الطبيب البيطري</h1>
+            <h1 className="text-lg font-semibold" style={{ textAlign }}>{t.doctorDashboard}</h1>
           </div>
           <Button variant="ghost" onClick={handleLogout} className="text-red-600">
-            خروج
+            {t.logout}
           </Button>
         </div>
       </header>
