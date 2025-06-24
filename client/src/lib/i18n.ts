@@ -85,11 +85,11 @@ export const translations = {
     backToLogin: 'العودة لتسجيل الدخول',
     
     // Doctor Dashboard
-    doctorDashboard: 'لوحة تحكم الطبيب',
+    doctorDashboard: 'لوحة تحكم الطبيب البيطري',
     sessionExpired: 'انتهت جلسة العمل',
     loginAgain: 'يرجى تسجيل الدخول مرة أخرى',
     gpsStatus: 'حالة GPS',
-    accuracy: 'دقة',
+    accuracy: 'دقة الموقع',
     meters: 'متر',
     enableGps: 'تفعيل GPS',
     stopGps: 'إيقاف GPS',
@@ -102,6 +102,9 @@ export const translations = {
     newRequestDesc: 'لديك طلب جديد للعيادة البيطرية',
     newVetRequest: 'طلب عيادة بيطرية جديد!',
     pendingApproval: 'طلب جديد في انتظار الموافقة',
+    serviceType: 'نوع الخدمة',
+    accept: 'قبول',
+    reject: 'رفض',
     
     // Registration
     enterName: 'أدخل اسمك الكامل',
@@ -263,11 +266,11 @@ export const translations = {
     backToLogin: 'Back to Login',
     
     // Doctor Dashboard
-    doctorDashboard: 'Doctor Dashboard',
+    doctorDashboard: 'Veterinary Doctor Dashboard',
     sessionExpired: 'Session Expired',
     loginAgain: 'Please login again',
     gpsStatus: 'GPS Status',
-    accuracy: 'Accuracy',
+    accuracy: 'Location Accuracy',
     meters: 'meters',
     enableGps: 'Enable GPS',
     stopGps: 'Stop GPS',
@@ -280,6 +283,9 @@ export const translations = {
     newRequestDesc: 'You have a new veterinary clinic request',
     newVetRequest: 'New Veterinary Request!',
     pendingApproval: 'New request pending approval',
+    serviceType: 'Service Type',
+    accept: 'Accept',
+    reject: 'Reject',
     
     // Registration
     enterName: 'Enter your full name',

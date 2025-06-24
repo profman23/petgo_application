@@ -83,17 +83,16 @@ export default function DoctorDashboard() {
     refetchInterval: 3000, // Poll every 3 seconds for new requests
   });
 
-  // نظام الإشعارات للطلبات الجديدة - حل نهائي للحلقة اللا نهائية
-  const previousCountRef = React.useRef(0);
+  // Notification system with proper dependency control to prevent infinite loops
+  const lastCountRef = React.useRef(0);
   
-  React.useEffect(() => {
+  const handleNotifications = React.useCallback(() => {
     if (pendingRides && Array.isArray(pendingRides)) {
       const currentCount = pendingRides.length;
-      const previousCount = previousCountRef.current;
+      const lastCount = lastCountRef.current;
       
-      // عرض إشعار فقط إذا زاد العدد وليس في المرة الأولى
-      if (currentCount > previousCount && previousCount > 0) {
-        const newRidesCount = currentCount - previousCount;
+      if (currentCount > lastCount && lastCount > 0) {
+        const newRidesCount = currentCount - lastCount;
         toast({
           title: t.newRequest,
           description: `${t.newRequestDesc} (${newRidesCount})`,
@@ -108,9 +107,13 @@ export default function DoctorDashboard() {
         }
       }
       
-      previousCountRef.current = currentCount;
+      lastCountRef.current = currentCount;
     }
-  }, [pendingRides]); // استخدام pendingRides كاملة
+  }, [pendingRides, t.newRequest, t.newRequestDesc, t.newVetRequest, t.pendingApproval, toast]);
+  
+  React.useEffect(() => {
+    handleNotifications();
+  }, [handleNotifications]);
 
   // Redirect to tracking page if there's an active ride
   useEffect(() => {
@@ -235,35 +238,35 @@ export default function DoctorDashboard() {
         <Card className="mb-6 bg-blue-50 border-blue-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold flex items-center gap-2 text-blue-900">
+              <h3 className="font-semibold flex items-center gap-2 text-blue-900" style={{ textAlign }}>
                 <Satellite className="w-5 h-5" />
-                حالة تتبع الموقع
+                {t.locationTracking}
               </h3>
               {isLoadingGPS && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
             </div>
             
             {latitude && longitude ? (
-              <div className="space-y-2 text-sm">
+              <div className="space-y-2 text-sm" style={{ textAlign }}>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-green-600" />
-                  <span className="text-green-600">الموقع محدد بنجاح</span>
+                  <span className="text-green-600">{t.locationDetectedSuccessfully}</span>
                 </div>
                 <div className="text-gray-600">
-                  خط العرض: {latitude.toFixed(6)}
+                  {t.latitude}: {latitude.toFixed(6)}
                 </div>
                 <div className="text-gray-600">
-                  خط الطول: {longitude.toFixed(6)}
+                  {t.longitude}: {longitude.toFixed(6)}
                 </div>
                 {accuracy && (
                   <div className="text-gray-600">
-                    دقة الموقع: {Math.round(accuracy)} متر
+                    {t.accuracy}: {Math.round(accuracy)} {t.meters}
                   </div>
                 )}
               </div>
             ) : gpsError ? (
-              <div className="flex items-center gap-2 text-red-600">
+              <div className="flex items-center gap-2 text-red-600" style={{ textAlign }}>
                 <X className="w-4 h-4" />
-                <span>خطأ في تحديد الموقع: {gpsError}</span>
+                <span>{t.error}: {gpsError}</span>
               </div>
             ) : (
               <div className="flex items-center gap-2 text-yellow-600">
