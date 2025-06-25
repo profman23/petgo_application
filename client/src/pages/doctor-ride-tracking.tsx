@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +37,7 @@ export default function DoctorRideTracking() {
   const { data: activeRide, isLoading } = useQuery({
     queryKey: ['/api/doctor/active-ride'],
     refetchInterval: 2000,
+    retry: false,
   });
 
   // Update ride status mutation
@@ -94,9 +96,14 @@ export default function DoctorRideTracking() {
     );
   }
 
+  // Check if we should redirect to dashboard
+  React.useEffect(() => {
+    if (!isLoading && !activeRide?.ride) {
+      setLocation('/doctor-dashboard');
+    }
+  }, [activeRide, isLoading, setLocation]);
+
   if (!activeRide?.ride) {
-    // Redirect to dashboard immediately if no active ride
-    setLocation('/doctor-dashboard');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={direction}>
         <div className="text-center">

@@ -224,7 +224,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(rides.customerId, userId),
-          not(inArray(rides.status, ['completed', 'cancelled']))
+          not(inArray(rides.status, ['completed', 'cancelled', 'cancelled_by_doctor', 'rejected']))
         )
       )
       .orderBy(desc(rides.createdAt))
@@ -240,7 +240,7 @@ export class DatabaseStorage implements IStorage {
       .where(
         and(
           eq(rides.driverId, driverId),
-          not(inArray(rides.status, ['completed', 'cancelled']))
+          not(inArray(rides.status, ['completed', 'cancelled', 'cancelled_by_doctor', 'rejected']))
         )
       )
       .orderBy(desc(rides.createdAt))
