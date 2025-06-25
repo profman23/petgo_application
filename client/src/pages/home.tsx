@@ -126,13 +126,6 @@ export default function Home() {
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setLocation('/user-type-selection')}
-              className="p-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100"
-              title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
-            >
-              <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
-            </button>
             <div className="w-12 h-12 flex items-center justify-center">
               <img 
                 src={logoImage} 
