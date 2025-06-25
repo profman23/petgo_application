@@ -13,7 +13,7 @@ import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
 import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
-import { useTranslation, getDirection } from '@/lib/i18n';
+import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 
 interface LoginFormData {
   phone: string;
