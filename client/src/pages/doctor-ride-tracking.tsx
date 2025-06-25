@@ -95,17 +95,14 @@ export default function DoctorRideTracking() {
   }
 
   if (!activeRide?.ride) {
+    // Redirect to dashboard immediately if no active ride
+    setLocation('/doctor-dashboard');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center" dir={direction}>
-        <Card className="w-full max-w-md mx-4">
-          <CardContent className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-4" style={{ textAlign }}>{language === 'ar' ? 'لا توجد رحلة نشطة' : 'No Active Ride'}</h2>
-            <p className="text-gray-600 mb-6" style={{ textAlign }}>{language === 'ar' ? 'لا توجد رحلة مقبولة حالياً' : 'No accepted ride currently'}</p>
-            <Button onClick={() => setLocation('/doctor-dashboard')} className="w-full">
-              {language === 'ar' ? 'العودة للوحة التحكم' : 'Back to Dashboard'}
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600" style={{ textAlign }}>{language === 'ar' ? 'جاري التحويل...' : 'Redirecting...'}</p>
+        </div>
       </div>
     );
   }
