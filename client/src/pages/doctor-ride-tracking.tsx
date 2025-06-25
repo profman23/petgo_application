@@ -60,13 +60,19 @@ export default function DoctorRideTracking() {
       });
     },
     onSuccess: () => {
+      // Invalidate queries first
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/active-ride'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/pending-rides'] });
+      
       toast({
         title: language === 'ar' ? "تم إلغاء الطلب" : "Request Cancelled",
         description: language === 'ar' ? "تم إلغاء الطلب بنجاح. يمكنك الآن استقبال طلبات جديدة" : "Request cancelled successfully. You can now receive new requests",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/doctor/active-ride'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/doctor/pending-rides'] });
-      setLocation('/doctor-dashboard');
+      
+      // Force navigation after short delay
+      setTimeout(() => {
+        setLocation('/doctor-dashboard');
+      }, 500);
     },
     onError: (error) => {
       toast({
