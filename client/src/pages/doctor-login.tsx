@@ -85,35 +85,36 @@ export default function DoctorLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4" dir={getDirection(language)}>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
       <div className="w-full max-w-md">
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
-          <CardContent className="p-8">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <Button
-                variant="ghost"
-                onClick={() => setLocation('/login')}
-                className="mb-4 p-2"
-              >
-                <ArrowLeft className={`w-4 h-4 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-{language === 'ar' ? 'العودة' : 'Back'}
-              </Button>
-              
-              <div className="mx-auto mb-6">
-                <img 
-                  src={logoImage} 
-                  alt="Vets Van - Mobile Veterinary Clinic" 
-                  className="h-20 mx-auto object-contain"
-                />
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {language === 'ar' ? 'دخول الطبيب البيطري' : 'Veterinary Doctor Login'}
-              </h1>
-              <p className="text-gray-600">
-                {language === 'ar' ? 'سجل دخولك لإدارة الطلبات والمواعيد' : 'Log in to manage requests and appointments'}
-              </p>
+          {/* Header with back button - matching customer login style */}
+          <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-center relative rounded-t-lg">
+            {/* Back button */}
+            <button
+              onClick={() => setLocation('/user-type-selection')}
+              className="absolute top-4 left-4 p-2 text-white hover:bg-purple-800 rounded-lg transition-colors"
+              title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
+            >
+              <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
+            </button>
+            
+            <div className="mb-4">
+              <img 
+                src={logoImage} 
+                alt="Vets Van" 
+                className="h-16 mx-auto object-contain rounded-lg border-2 border-purple-300"
+              />
             </div>
+            <h1 className="text-2xl font-bold text-white" style={{ textAlign: getTextAlign(language) }}>
+              {language === 'ar' ? 'دخول الطبيب البيطري' : 'Veterinary Doctor Login'}
+            </h1>
+            <p className="text-purple-100 mt-2" style={{ textAlign: getTextAlign(language) }}>
+              {language === 'ar' ? 'سجل دخولك لإدارة الطلبات والمواعيد' : 'Log in to manage requests and appointments'}
+            </p>
+          </div>
+
+          <CardContent className="p-8">
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
