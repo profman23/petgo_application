@@ -106,9 +106,9 @@ export default function Home() {
       case 'enroute':
         return 60; // On the way
       case 'arrived':
-        return 90; // Almost there
+        return 100; // Clinic has arrived
       case 'in_progress':
-        return 95; // Service in progress
+        return 100; // Service in progress
       case 'completed':
         return 100; // Completed
       default:
@@ -283,6 +283,29 @@ export default function Home() {
                     : `Journey Progress: ${getProgressPercentage(actualActiveRide.status)}%`
                   }
                 </div>
+
+                {/* Arrival Message when clinic arrives */}
+                {(actualActiveRide.status === 'arrived' || actualActiveRide.status === 'in_progress') && (
+                  <div className="mt-4 p-4 bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 rounded-xl shadow-lg animate-pulse">
+                    <div className="text-center">
+                      <div className="text-2xl mb-2">🚐✨</div>
+                      <div className="text-lg font-bold text-green-800 mb-2" style={{ textAlign }}>
+                        {language === 'ar' ? 'وصلت العيادة البيطرية!' : 'Veterinary Clinic Has Arrived!'}
+                      </div>
+                      <div className="text-sm text-green-700" style={{ textAlign }}>
+                        {language === 'ar' 
+                          ? 'العيادة البيطرية المتنقلة في الخارج في انتظارك 🏥' 
+                          : 'The mobile veterinary clinic is outside waiting for you 🏥'
+                        }
+                      </div>
+                      {actualActiveRide.status === 'in_progress' && (
+                        <div className="mt-2 text-xs text-green-600" style={{ textAlign }}>
+                          {language === 'ar' ? 'جاري فحص الحيوان الأليف...' : 'Pet examination in progress...'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
