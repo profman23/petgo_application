@@ -96,6 +96,26 @@ export default function Home() {
     setLocation('/ride-request');
   };
 
+  // Function to get progress percentage based on ride status
+  const getProgressPercentage = (status: string): number => {
+    switch (status) {
+      case 'requested':
+        return 10; // Just started
+      case 'confirmed':
+        return 25; // Doctor accepted, preparing
+      case 'enroute':
+        return 60; // On the way
+      case 'arrived':
+        return 90; // Almost there
+      case 'in_progress':
+        return 95; // Service in progress
+      case 'completed':
+        return 100; // Completed
+      default:
+        return 0;
+    }
+  };
+
   if (!user) {
     return null;
   }
