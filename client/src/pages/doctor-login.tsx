@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { ArrowLeft, Stethoscope, User, Lock } from 'lucide-react';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
-import { useLanguage, useTranslation, getDirection } from '@/lib/i18n';
+import { useLanguage, useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 
 type DoctorLoginData = {
   username: string;
