@@ -162,35 +162,34 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
-      <Card className="w-full max-w-md border-2 shadow-xl relative" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
-        {/* Back button */}
-        <button
-          onClick={() => setLocation('/user-type-selection')}
-          className="absolute top-4 left-4 p-2 text-purple-600 hover:bg-purple-100 rounded-lg transition-colors z-10"
-          title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
-        >
-          <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
-        </button>
+      <Card className="w-full max-w-md border-2 shadow-xl" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
+        {/* Header with back button - matching doctor login style */}
+        <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-center relative rounded-t-lg">
+          {/* Back button */}
+          <button
+            onClick={() => setLocation('/user-type-selection')}
+            className="absolute top-4 left-4 p-2 text-white hover:bg-purple-800 rounded-lg transition-colors"
+            title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
+          >
+            <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
+          </button>
+          
+          <div className="mb-4">
+            <img 
+              src={logoImage} 
+              alt="Vets Van" 
+              className="h-16 mx-auto object-contain rounded-lg border-2 border-purple-300"
+            />
+          </div>
+          <h1 className="text-2xl font-bold text-white" style={{ textAlign: getTextAlign(language) }}>
+            {isRegistering ? t('createNewAccount') : t('customerLogin')}
+          </h1>
+          <p className="text-purple-100 mt-2" style={{ textAlign: getTextAlign(language) }}>
+            {isRegistering ? t('joinMobileVetService') : t('welcomeBack')}
+          </p>
+        </div>
 
         <CardContent className="p-8">
-          <div className="text-center mb-8">
-            <div className="mx-auto mb-6">
-              <img 
-                src={logoImage} 
-                alt="Vets Van - Mobile Veterinary Clinic" 
-                className="h-20 mx-auto object-contain"
-              />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              {isRegistering ? t('createNewAccount') : t('welcomeBack')}
-            </h1>
-            <p className="text-gray-600">
-              {isRegistering 
-                ? t('joinMobileVetService') 
-                : t('loginToAccount')
-              }
-            </p>
-          </div>
 
           {!isRegistering ? (
             <Form {...loginForm}>
