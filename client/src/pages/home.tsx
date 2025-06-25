@@ -179,6 +179,91 @@ export default function Home() {
                   {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
                 </div>
               </div>
+
+              {/* Progress Animation for Active Ride */}
+              <div className="mt-4 p-4 bg-white rounded-lg border border-purple-200">
+                <div className="text-sm font-semibold text-purple-800 mb-3 text-center" style={{ textAlign }}>
+                  {language === 'ar' ? 'تتبع العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic Tracking'}
+                </div>
+                
+                {/* Progress Road */}
+                <div className="relative h-16 bg-gray-300 rounded-lg mb-2 overflow-hidden">
+                  {/* Progress line - completed portion */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 transition-all duration-1000 ease-in-out"
+                    style={{ 
+                      width: `${getProgressPercentage(actualActiveRide.status)}%`,
+                      zIndex: 1
+                    }}
+                  ></div>
+                  
+                  {/* Remaining road */}
+                  <div className="absolute inset-0 bg-gray-300"></div>
+                  
+                  {/* Road markings on completed section */}
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center overflow-hidden"
+                    style={{ width: `${getProgressPercentage(actualActiveRide.status)}%` }}
+                  >
+                    <div className="w-full h-1 bg-white opacity-80"></div>
+                  </div>
+                  
+                  {/* Road markings on remaining section */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-full h-1 bg-white opacity-40 animate-pulse"></div>
+                  </div>
+                  
+                  {/* Moving car positioned based on progress */}
+                  <div 
+                    className="absolute top-2 h-12 w-16 bg-purple-600 rounded-lg shadow-lg transition-all duration-2000 ease-in-out"
+                    style={{
+                      left: language === 'ar' 
+                        ? `${100 - getProgressPercentage(actualActiveRide.status)}%`
+                        : `${getProgressPercentage(actualActiveRide.status)}%`,
+                      transform: language === 'ar' 
+                        ? `translateX(50%) scaleX(-1)` 
+                        : 'translateX(-50%)',
+                      zIndex: 2
+                    }}
+                  >
+                    {/* Car body */}
+                    <div className="relative w-full h-full">
+                      {/* Car main body */}
+                      <div className="absolute inset-1 bg-purple-700 rounded-md"></div>
+                      {/* Car windows */}
+                      <div className="absolute top-2 left-2 right-2 h-3 bg-blue-200 rounded-sm opacity-80"></div>
+                      {/* Car wheels */}
+                      <div className="absolute -bottom-1 left-1 w-3 h-3 bg-gray-800 rounded-full"></div>
+                      <div className="absolute -bottom-1 right-1 w-3 h-3 bg-gray-800 rounded-full"></div>
+                      {/* Medical cross */}
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="w-2 h-2 bg-white relative">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-1 h-2 bg-red-500"></div>
+                            <div className="absolute w-2 h-1 bg-red-500"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Start and End markers */}
+                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-purple-700 z-10">
+                    🏥
+                  </div>
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-700 z-10">
+                    🏠
+                  </div>
+                </div>
+
+                {/* Progress percentage */}
+                <div className="text-center text-sm text-purple-700" style={{ textAlign }}>
+                  {language === 'ar' 
+                    ? `تقدم الرحلة: ${getProgressPercentage(actualActiveRide.status)}%`
+                    : `Journey Progress: ${getProgressPercentage(actualActiveRide.status)}%`
+                  }
+                </div>
+              </div>
             </div>
           )}
 
