@@ -181,6 +181,65 @@ export default function Home() {
               </div>
             </div>
           )}
+
+          {/* Animated Car Coming Soon - Only show when no active ride */}
+          {!actualActiveRide && (
+            <div className="mb-6 p-6 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 rounded-2xl border-2 border-purple-200 shadow-lg">
+              <div className="text-center">
+                <div className="text-lg font-semibold text-purple-800 mb-4" style={{ textAlign }}>
+                  {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
+                </div>
+                
+                {/* Road Animation */}
+                <div className="relative h-16 bg-gray-300 rounded-lg mb-4 overflow-hidden">
+                  {/* Road markings */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-full h-1 bg-white opacity-60 animate-pulse"></div>
+                  </div>
+                  
+                  {/* Moving car */}
+                  <div className={`absolute top-2 h-12 w-16 bg-purple-600 rounded-lg shadow-lg transform transition-all duration-4000 ease-in-out ${
+                    language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
+                  }`}>
+                    {/* Car body */}
+                    <div className="relative w-full h-full">
+                      {/* Car main body */}
+                      <div className="absolute inset-1 bg-purple-700 rounded-md"></div>
+                      {/* Car windows */}
+                      <div className="absolute top-2 left-2 right-2 h-3 bg-blue-200 rounded-sm opacity-80"></div>
+                      {/* Car wheels */}
+                      <div className="absolute -bottom-1 left-1 w-3 h-3 bg-gray-800 rounded-full"></div>
+                      <div className="absolute -bottom-1 right-1 w-3 h-3 bg-gray-800 rounded-full"></div>
+                      {/* Medical cross */}
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="w-2 h-2 bg-white relative">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-1 h-2 bg-red-500"></div>
+                            <div className="absolute w-2 h-1 bg-red-500"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Start and End markers */}
+                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-purple-700">
+                    🏥
+                  </div>
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-700">
+                    🏠
+                  </div>
+                </div>
+
+                <div className="text-sm text-purple-700 mb-2" style={{ textAlign }}>
+                  {language === 'ar' ? 'خدمة طبية بيطرية سريعة وموثوقة' : 'Fast & Reliable Veterinary Service'}
+                </div>
+                <div className="text-xs text-purple-600" style={{ textAlign }}>
+                  {language === 'ar' ? 'نصل إليك في أقل من 30 دقيقة' : 'We reach you in less than 30 minutes'}
+                </div>
+              </div>
+            </div>
+          )}
           
           <Button
             onClick={handleRequestRide}

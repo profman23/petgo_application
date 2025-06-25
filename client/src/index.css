@@ -2,6 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom animations for car movement */
+@keyframes bounce-left-to-right {
+  0% {
+    left: -4rem;
+    transform: translateY(0px);
+  }
+  25% {
+    transform: translateY(-4px);
+  }
+  50% {
+    left: 50%;
+    transform: translateX(-50%) translateY(0px);
+  }
+  75% {
+    transform: translateX(-50%) translateY(-4px);
+  }
+  100% {
+    left: calc(100% + 1rem);
+    transform: translateY(0px);
+  }
+}
+
+@keyframes bounce-right-to-left {
+  0% {
+    right: -4rem;
+    left: auto;
+    transform: translateY(0px) scaleX(-1);
+  }
+  25% {
+    transform: translateY(-4px) scaleX(-1);
+  }
+  50% {
+    right: 50%;
+    transform: translateX(50%) translateY(0px) scaleX(-1);
+  }
+  75% {
+    transform: translateX(50%) translateY(-4px) scaleX(-1);
+  }
+  100% {
+    right: calc(100% + 1rem);
+    left: auto;
+    transform: translateY(0px) scaleX(-1);
+  }
+}
+
+.animate-bounce-left-to-right {
+  animation: bounce-left-to-right 6s ease-in-out infinite;
+}
+
+.animate-bounce-right-to-left {
+  animation: bounce-right-to-left 6s ease-in-out infinite;
+}
+
 /* Custom purple theme matching the logo */
 :root {
   --purple-primary: #8B2F8B;
