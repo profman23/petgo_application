@@ -207,6 +207,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!ride) {
         return res.json(null);
       }
+
+      // If ride is cancelled/rejected, return null
+      if (['cancelled', 'cancelled_by_doctor', 'rejected'].includes(ride.status)) {
+        return res.json(null);
+      }
       
       let driver = null;
       if (ride.driverId) {

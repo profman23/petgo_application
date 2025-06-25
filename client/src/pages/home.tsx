@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { Bell, Settings, User, Car, Star, Truck } from 'lucide-react';
+import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
@@ -154,20 +154,48 @@ export default function Home() {
           </Card>
         )}
 
-        {/* Quick Actions */}
+        {/* Request Status and Actions */}
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ textAlign }}>{t('requestMobileVet')}</h2>
+          
+          {/* Show current ride status if exists */}
+          {actualActiveRide && (
+            <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg shadow-sm">
+              <div className="text-center">
+                <div className="flex items-center justify-center mb-2">
+                  {actualActiveRide.status === 'requested' && <Clock className="w-5 h-5 text-blue-600 mr-2" />}
+                  {actualActiveRide.status === 'confirmed' && <CheckCircle className="w-5 h-5 text-green-600 mr-2" />}
+                  {actualActiveRide.status === 'enroute' && <MapPin className="w-5 h-5 text-orange-600 mr-2" />}
+                  {actualActiveRide.status === 'arrived' && <MapPin className="w-5 h-5 text-purple-600 mr-2" />}
+                  {actualActiveRide.status === 'in_progress' && <Stethoscope className="w-5 h-5 text-red-600 mr-2" />}
+                  <div className="text-lg font-semibold text-gray-900" style={{ textAlign }}>
+                    {t(actualActiveRide.status)}
+                  </div>
+                </div>
+                <div className="text-sm text-gray-700 mb-2" style={{ textAlign }}>
+                  {t(`${actualActiveRide.status}Desc`)}
+                </div>
+                <div className="mt-2 text-xs text-blue-600" style={{ textAlign }}>
+                  {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
+                </div>
+              </div>
+            </div>
+          )}
+          
           <Button
             onClick={handleRequestRide}
             disabled={!!actualActiveRide}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white p-8 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white p-8 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center justify-center gap-3 mb-3">
               <Truck className="w-8 h-8" />
             </div>
             <div className="text-center">
               <div className="font-bold text-lg mb-1">
-                {language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request'}
+                {actualActiveRide 
+                  ? (language === 'ar' ? 'لديك طلب نشط' : 'You have an active request')
+                  : (language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request')
+                }
               </div>
               <div className="text-sm opacity-90">
                 {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Mobile Veterinary Clinic'}
