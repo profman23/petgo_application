@@ -269,7 +269,7 @@ export default function RideRequest() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ direction }}>
+    <div className="min-h-screen bg-gray-50 border-4 border-purple-600 m-2 rounded-lg" style={{ direction, borderColor: 'var(--purple-primary)' }}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
@@ -287,7 +287,7 @@ export default function RideRequest() {
               alt="Vets Van" 
               className="h-8 object-contain"
             />
-            <h1 className="text-lg font-semibold" style={{ textAlign }}>{t('requestVet')}</h1>
+            <h1 className="text-lg font-bold text-purple-700" style={{ textAlign }}>{t('requestVet')}</h1>
           </div>
           <div className="w-10" />
         </div>
