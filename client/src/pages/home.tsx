@@ -650,7 +650,7 @@ export default function Home() {
             <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-violet-500 to-purple-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
             
             {/* Main Button Container */}
-            <div className="relative h-20 bg-gradient-to-br from-white/25 to-white/10 backdrop-blur-md border border-white/30 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
+            <div className="relative h-20 bg-white border-2 border-white rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
               {/* Inner Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/40 to-violet-600/40 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
               
@@ -691,7 +691,7 @@ export default function Home() {
             <div className="absolute -inset-2 bg-gradient-to-r from-indigo-400 via-purple-500 to-violet-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
             
             {/* Main Button Container */}
-            <div className="relative h-20 bg-gradient-to-br from-white/25 to-white/10 backdrop-blur-md border border-white/30 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 group-active:scale-95">
+            <div className="relative h-20 bg-white border-2 border-white rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 group-active:scale-95">
               {/* Inner Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/40 to-purple-600/40 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
               
@@ -735,7 +735,7 @@ export default function Home() {
             <div className="absolute -inset-2 bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-500 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
             
             {/* Main Button Container */}
-            <div className="relative h-20 bg-gradient-to-br from-white/25 to-white/10 backdrop-blur-md border border-white/30 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
+            <div className="relative h-20 bg-white border-2 border-white rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
               {/* Inner Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-br from-violet-500/40 to-fuchsia-600/40 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
               
