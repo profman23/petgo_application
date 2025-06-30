@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Remove default body margins and padding */
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Ensure the main app container fills the entire viewport */
+#root {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
 /* Custom animations for car movement */
 @keyframes bounce-left-to-right {
   0% {
