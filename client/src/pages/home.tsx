@@ -244,9 +244,9 @@ export default function Home() {
                     <div className="w-full h-1 bg-white opacity-40 animate-pulse"></div>
                   </div>
                   
-                  {/* Moving car positioned based on progress */}
+                  {/* Modern Mercedes Veterinary Ambulance */}
                   <div 
-                    className="absolute top-2 h-12 w-16 bg-purple-600 rounded-lg shadow-lg transition-all duration-2000 ease-in-out"
+                    className="absolute top-1 h-14 w-20 transition-all duration-2000 ease-in-out"
                     style={{
                       left: language === 'ar' 
                         ? `${100 - getProgressPercentage(actualActiveRide.status)}%`
@@ -257,33 +257,116 @@ export default function Home() {
                       zIndex: 2
                     }}
                   >
-                    {/* Car body */}
-                    <div className="relative w-full h-full">
-                      {/* Car main body */}
-                      <div className="absolute inset-1 bg-purple-700 rounded-md"></div>
-                      {/* Car windows */}
-                      <div className="absolute top-2 left-2 right-2 h-3 bg-blue-200 rounded-sm opacity-80"></div>
-                      {/* Car wheels */}
-                      <div className="absolute -bottom-1 left-1 w-3 h-3 bg-gray-800 rounded-full"></div>
-                      <div className="absolute -bottom-1 right-1 w-3 h-3 bg-gray-800 rounded-full"></div>
-                      {/* Medical cross */}
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <div className="w-2 h-2 bg-white relative">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-1 h-2 bg-red-500"></div>
-                            <div className="absolute w-2 h-1 bg-red-500"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    {/* Mercedes Ambulance SVG */}
+                    <svg viewBox="0 0 80 56" className="w-full h-full drop-shadow-lg">
+                      {/* Main vehicle body - white Mercedes */}
+                      <rect x="8" y="20" width="52" height="24" rx="4" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      
+                      {/* Front cab */}
+                      <rect x="2" y="22" width="12" height="20" rx="3" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      
+                      {/* Rear doors */}
+                      <rect x="56" y="24" width="16" height="16" rx="2" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      
+                      {/* Windows */}
+                      <rect x="4" y="24" width="8" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      <rect x="16" y="22" width="36" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      <rect x="58" y="26" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      
+                      {/* Mercedes Grille */}
+                      <rect x="2" y="28" width="2" height="8" fill="#c0c0c0"/>
+                      <circle cx="3" cy="32" r="1" fill="#silver"/>
+                      
+                      {/* Veterinary Cross - Red */}
+                      <g transform="translate(36,30)">
+                        <rect x="-1" y="-4" width="2" height="8" fill="#ff4444"/>
+                        <rect x="-4" y="-1" width="8" height="2" fill="#ff4444"/>
+                        <rect x="-1" y="-4" width="2" height="8" fill="white" fillOpacity="0.3"/>
+                      </g>
+                      
+                      {/* Vets Van Text */}
+                      <text x="30" y="38" fontSize="4" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                      
+                      {/* Emergency Lights */}
+                      <rect x="20" y="20" width="3" height="2" rx="1" fill="#ff6b6b" opacity="0.9"/>
+                      <rect x="25" y="20" width="3" height="2" rx="1" fill="#4dabf7" opacity="0.9"/>
+                      <rect x="30" y="20" width="3" height="2" rx="1" fill="#ff6b6b" opacity="0.9"/>
+                      
+                      {/* Wheels */}
+                      <circle cx="15" cy="46" r="6" fill="#333"/>
+                      <circle cx="15" cy="46" r="4" fill="#666"/>
+                      <circle cx="15" cy="46" r="2" fill="#999"/>
+                      
+                      <circle cx="55" cy="46" r="6" fill="#333"/>
+                      <circle cx="55" cy="46" r="4" fill="#666"/>
+                      <circle cx="55" cy="46" r="2" fill="#999"/>
+                      
+                      {/* Headlights */}
+                      <circle cx="2" cy="30" r="2" fill="#fffacd" opacity="0.9"/>
+                      <circle cx="2" cy="36" r="2" fill="#fffacd" opacity="0.9"/>
+                      
+                      {/* Side medical stripe */}
+                      <rect x="16" y="34" width="36" height="2" fill="#ff4444"/>
+                    </svg>
                   </div>
                   
-                  {/* Start and End markers */}
-                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-purple-700 z-10">
-                    🏥
+                  {/* Modern Clinic Icon */}
+                  <div className="absolute left-1 top-1/2 transform -translate-y-1/2 z-10">
+                    <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-md">
+                      {/* Clinic Building */}
+                      <rect x="2" y="12" width="28" height="18" rx="2" fill="#4f46e5" stroke="#3730a3" strokeWidth="1"/>
+                      
+                      {/* Roof */}
+                      <polygon points="16,4 2,12 30,12" fill="#6366f1"/>
+                      
+                      {/* Windows */}
+                      <rect x="6" y="16" width="4" height="4" rx="1" fill="#93c5fd"/>
+                      <rect x="14" y="16" width="4" height="4" rx="1" fill="#93c5fd"/>
+                      <rect x="22" y="16" width="4" height="4" rx="1" fill="#93c5fd"/>
+                      
+                      {/* Main Door */}
+                      <rect x="13" y="22" width="6" height="8" rx="1" fill="#1e40af"/>
+                      <circle cx="17" cy="26" r="1" fill="#fbbf24"/>
+                      
+                      {/* Medical Cross */}
+                      <g transform="translate(16,10)">
+                        <rect x="-1" y="-3" width="2" height="6" fill="white"/>
+                        <rect x="-3" y="-1" width="6" height="2" fill="white"/>
+                      </g>
+                      
+                      {/* Clinic Sign */}
+                      <rect x="8" y="6" width="16" height="4" rx="1" fill="white" stroke="#e5e7eb"/>
+                      <text x="16" y="8.5" fontSize="3" fill="#374151" textAnchor="middle" fontFamily="Arial">VET CLINIC</text>
+                    </svg>
                   </div>
-                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-700 z-10">
-                    🏠
+                  
+                  {/* Modern House Icon */}
+                  <div className="absolute right-1 top-1/2 transform -translate-y-1/2 z-10">
+                    <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-md">
+                      {/* House Base */}
+                      <rect x="4" y="16" width="24" height="14" rx="2" fill="#10b981" stroke="#047857" strokeWidth="1"/>
+                      
+                      {/* Roof */}
+                      <polygon points="16,6 4,16 28,16" fill="#059669"/>
+                      
+                      {/* Chimney */}
+                      <rect x="22" y="8" width="3" height="8" fill="#7c2d12"/>
+                      
+                      {/* Windows */}
+                      <rect x="8" y="20" width="4" height="4" rx="1" fill="#fef3c7"/>
+                      <rect x="20" y="20" width="4" height="4" rx="1" fill="#fef3c7"/>
+                      
+                      {/* Door */}
+                      <rect x="13" y="22" width="6" height="8" rx="1" fill="#92400e"/>
+                      <circle cx="17" cy="26" r="1" fill="#fbbf24"/>
+                      
+                      {/* Roof Details */}
+                      <rect x="15" y="10" width="2" height="6" fill="#047857"/>
+                      
+                      {/* Garden */}
+                      <circle cx="6" cy="28" r="2" fill="#22c55e"/>
+                      <circle cx="26" cy="28" r="2" fill="#22c55e"/>
+                    </svg>
                   </div>
                 </div>
 
@@ -336,29 +419,61 @@ export default function Home() {
                     <div className="w-full h-1 bg-white opacity-60 animate-pulse"></div>
                   </div>
                   
-                  {/* Moving car */}
-                  <div className={`absolute top-2 h-12 w-16 bg-purple-600 rounded-lg shadow-lg transform transition-all duration-4000 ease-in-out ${
+                  {/* Moving Mercedes Ambulance */}
+                  <div className={`absolute top-1 h-14 w-20 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    {/* Car body */}
-                    <div className="relative w-full h-full">
-                      {/* Car main body */}
-                      <div className="absolute inset-1 bg-purple-700 rounded-md"></div>
-                      {/* Car windows */}
-                      <div className="absolute top-2 left-2 right-2 h-3 bg-blue-200 rounded-sm opacity-80"></div>
-                      {/* Car wheels */}
-                      <div className="absolute -bottom-1 left-1 w-3 h-3 bg-gray-800 rounded-full"></div>
-                      <div className="absolute -bottom-1 right-1 w-3 h-3 bg-gray-800 rounded-full"></div>
-                      {/* Medical cross */}
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <div className="w-2 h-2 bg-white relative">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-1 h-2 bg-red-500"></div>
-                            <div className="absolute w-2 h-1 bg-red-500"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    {/* Mercedes Ambulance SVG */}
+                    <svg viewBox="0 0 80 56" className="w-full h-full drop-shadow-lg">
+                      {/* Main vehicle body - white Mercedes */}
+                      <rect x="8" y="20" width="52" height="24" rx="4" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      
+                      {/* Front cab */}
+                      <rect x="2" y="22" width="12" height="20" rx="3" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      
+                      {/* Rear doors */}
+                      <rect x="56" y="24" width="16" height="16" rx="2" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      
+                      {/* Windows */}
+                      <rect x="4" y="24" width="8" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      <rect x="16" y="22" width="36" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      <rect x="58" y="26" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      
+                      {/* Mercedes Grille */}
+                      <rect x="2" y="28" width="2" height="8" fill="#c0c0c0"/>
+                      <circle cx="3" cy="32" r="1" fill="#silver"/>
+                      
+                      {/* Veterinary Cross - Red */}
+                      <g transform="translate(36,30)">
+                        <rect x="-1" y="-4" width="2" height="8" fill="#ff4444"/>
+                        <rect x="-4" y="-1" width="8" height="2" fill="#ff4444"/>
+                        <rect x="-1" y="-4" width="2" height="8" fill="white" fillOpacity="0.3"/>
+                      </g>
+                      
+                      {/* Vets Van Text */}
+                      <text x="30" y="38" fontSize="4" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                      
+                      {/* Emergency Lights */}
+                      <rect x="20" y="20" width="3" height="2" rx="1" fill="#ff6b6b" opacity="0.9"/>
+                      <rect x="25" y="20" width="3" height="2" rx="1" fill="#4dabf7" opacity="0.9"/>
+                      <rect x="30" y="20" width="3" height="2" rx="1" fill="#ff6b6b" opacity="0.9"/>
+                      
+                      {/* Wheels */}
+                      <circle cx="15" cy="46" r="6" fill="#333"/>
+                      <circle cx="15" cy="46" r="4" fill="#666"/>
+                      <circle cx="15" cy="46" r="2" fill="#999"/>
+                      
+                      <circle cx="55" cy="46" r="6" fill="#333"/>
+                      <circle cx="55" cy="46" r="4" fill="#666"/>
+                      <circle cx="55" cy="46" r="2" fill="#999"/>
+                      
+                      {/* Headlights */}
+                      <circle cx="2" cy="30" r="2" fill="#fffacd" opacity="0.9"/>
+                      <circle cx="2" cy="36" r="2" fill="#fffacd" opacity="0.9"/>
+                      
+                      {/* Side medical stripe */}
+                      <rect x="16" y="34" width="36" height="2" fill="#ff4444"/>
+                    </svg>
                   </div>
                   
                   {/* Start and End markers */}
@@ -380,26 +495,134 @@ export default function Home() {
             </div>
           )}
           
-          <Button
-            onClick={handleRequestRide}
-            disabled={!!actualActiveRide}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white p-8 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <Truck className="w-8 h-8" />
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-lg mb-1">
-                {actualActiveRide 
-                  ? (language === 'ar' ? 'لديك طلب نشط' : 'You have an active request')
-                  : (language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request')
-                }
+          {/* Enhanced Request Button with Modern Design */}
+          <div className="mb-6 p-6 bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-300">
+            {/* Top Section with Pets and Logo */}
+            <div className="flex items-center justify-center gap-6 mb-6">
+              {/* Dog Icon */}
+              <div className="flex-shrink-0">
+                <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-lg">
+                  <ellipse cx="24" cy="32" rx="14" ry="12" fill="#d2691e" stroke="#8b4513" strokeWidth="1"/>
+                  <circle cx="24" cy="20" r="12" fill="#daa520" stroke="#b8860b" strokeWidth="1"/>
+                  <ellipse cx="18" cy="14" rx="4" ry="6" fill="#daa520" stroke="#b8860b" strokeWidth="1"/>
+                  <ellipse cx="30" cy="14" rx="4" ry="6" fill="#daa520" stroke="#b8860b" strokeWidth="1"/>
+                  <circle cx="20" cy="18" r="2" fill="#000"/>
+                  <circle cx="28" cy="18" r="2" fill="#000"/>
+                  <ellipse cx="24" cy="22" rx="1.5" ry="1" fill="#000"/>
+                  <path d="M22 24 Q24 26 26 24" stroke="#000" strokeWidth="1.5" fill="none"/>
+                  <path d="M18 26 Q20 28 22 26" stroke="#ff69b4" strokeWidth="1" fill="none"/>
+                </svg>
               </div>
-              <div className="text-sm opacity-90">
-                {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Mobile Veterinary Clinic'}
+
+              {/* Company Logo */}
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 rounded-full bg-white border-4 border-purple-300 flex items-center justify-center shadow-lg">
+                  <img 
+                    src={logoImage} 
+                    alt="Vets Van" 
+                    className="h-12 w-12 object-contain rounded-full"
+                  />
+                </div>
+              </div>
+
+              {/* Cat Icon */}
+              <div className="flex-shrink-0">
+                <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-lg">
+                  <ellipse cx="24" cy="30" rx="12" ry="10" fill="#d3d3d3" stroke="#a9a9a9" strokeWidth="1"/>
+                  <circle cx="24" cy="20" r="10" fill="#f5f5f5" stroke="#dcdcdc" strokeWidth="1"/>
+                  <polygon points="16,12 20,8 22,14" fill="#f5f5f5" stroke="#dcdcdc" strokeWidth="1"/>
+                  <polygon points="32,12 28,8 26,14" fill="#f5f5f5" stroke="#dcdcdc" strokeWidth="1"/>
+                  <circle cx="20" cy="18" r="1.5" fill="#32cd32"/>
+                  <circle cx="28" cy="18" r="1.5" fill="#32cd32"/>
+                  <path d="M22 22 L24 23 L26 22" stroke="#ff69b4" strokeWidth="1" fill="none"/>
+                  <path d="M18 24 Q20 26 22 24" stroke="#000" strokeWidth="0.5" fill="none"/>
+                  <path d="M26 24 Q28 26 30 24" stroke="#000" strokeWidth="0.5" fill="none"/>
+                </svg>
               </div>
             </div>
-          </Button>
+
+            {/* Modern Mercedes Ambulance Display */}
+            <div className="flex justify-center mb-6">
+              <div className="w-32 h-24">
+                <svg viewBox="0 0 128 96" className="w-full h-full drop-shadow-xl">
+                  {/* Main vehicle body - white Mercedes */}
+                  <rect x="12" y="32" width="84" height="38" rx="6" fill="white" stroke="#e0e0e0" strokeWidth="2"/>
+                  
+                  {/* Front cab */}
+                  <rect x="3" y="35" width="19" height="32" rx="5" fill="white" stroke="#e0e0e0" strokeWidth="2"/>
+                  
+                  {/* Rear doors */}
+                  <rect x="90" y="38" width="26" height="26" rx="3" fill="white" stroke="#e0e0e0" strokeWidth="2"/>
+                  
+                  {/* Windows */}
+                  <rect x="6" y="38" width="13" height="10" rx="2" fill="#87CEEB" opacity="0.8"/>
+                  <rect x="26" y="35" width="58" height="10" rx="2" fill="#87CEEB" opacity="0.8"/>
+                  <rect x="93" y="42" width="19" height="10" rx="2" fill="#87CEEB" opacity="0.8"/>
+                  
+                  {/* Mercedes Grille */}
+                  <rect x="3" y="45" width="3" height="13" fill="#c0c0c0"/>
+                  <circle cx="4.5" cy="51" r="2" fill="#silver"/>
+                  
+                  {/* Large Veterinary Cross - Red */}
+                  <g transform="translate(58,48)">
+                    <rect x="-2" y="-6" width="4" height="12" fill="#ff4444"/>
+                    <rect x="-6" y="-2" width="12" height="4" fill="#ff4444"/>
+                    <rect x="-2" y="-6" width="4" height="12" fill="white" fillOpacity="0.3"/>
+                  </g>
+                  
+                  {/* Vets Van Text */}
+                  <text x="58" y="60" fontSize="6" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                  
+                  {/* Emergency Lights */}
+                  <rect x="32" y="32" width="5" height="3" rx="1.5" fill="#ff6b6b" opacity="0.9"/>
+                  <rect x="40" y="32" width="5" height="3" rx="1.5" fill="#4dabf7" opacity="0.9"/>
+                  <rect x="48" y="32" width="5" height="3" rx="1.5" fill="#ff6b6b" opacity="0.9"/>
+                  
+                  {/* Wheels */}
+                  <circle cx="24" cy="74" r="9" fill="#333"/>
+                  <circle cx="24" cy="74" r="6" fill="#666"/>
+                  <circle cx="24" cy="74" r="3" fill="#999"/>
+                  
+                  <circle cx="88" cy="74" r="9" fill="#333"/>
+                  <circle cx="88" cy="74" r="6" fill="#666"/>
+                  <circle cx="88" cy="74" r="3" fill="#999"/>
+                  
+                  {/* Headlights */}
+                  <circle cx="3" cy="48" r="3" fill="#fffacd" opacity="0.9"/>
+                  <circle cx="3" cy="58" r="3" fill="#fffacd" opacity="0.9"/>
+                  
+                  {/* Side medical stripe */}
+                  <rect x="26" y="54" width="58" height="3" fill="#ff4444"/>
+                  
+                  {/* Mercedes Badge */}
+                  <circle cx="58" cy="42" r="4" fill="#silver" stroke="#666" strokeWidth="1"/>
+                  <text x="58" y="44" fontSize="3" fill="#000" textAnchor="middle" fontFamily="serif">MB</text>
+                </svg>
+              </div>
+            </div>
+
+            {/* Request Button */}
+            <Button
+              onClick={handleRequestRide}
+              disabled={!!actualActiveRide}
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-6 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl"
+            >
+              <div className="text-center">
+                <div className="font-bold text-xl mb-2">
+                  {actualActiveRide 
+                    ? (language === 'ar' ? 'لديك طلب نشط' : 'You have an active request')
+                    : (language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request')
+                  }
+                </div>
+                <div className="text-base opacity-90 mb-2">
+                  {language === 'ar' ? 'عيادة بيطرية متنقلة - مرسيدس' : 'Mobile Veterinary Clinic - Mercedes'}
+                </div>
+                <div className="text-sm opacity-75">
+                  {language === 'ar' ? 'خدمة احترافية للكلاب والقطط' : 'Professional service for dogs and cats'}
+                </div>
+              </div>
+            </Button>
+          </div>
         </div>
 
         {/* Recent Activity */}
