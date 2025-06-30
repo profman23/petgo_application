@@ -8,6 +8,7 @@ import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Ste
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import vetsVanImage from "@assets/image_1751292329902.png";
+import truckIcon from "@assets/Screenshot 2025-06-30 172555_1751293572215.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 
@@ -422,54 +423,15 @@ export default function Home() {
                     <div className="w-full h-2 bg-white opacity-70 animate-pulse rounded-full"></div>
                   </div>
                   
-                  {/* Purple Veterinary Van - Based on attached image */}
-                  <div className={`absolute top-1 h-20 w-28 transform transition-all duration-4000 ease-in-out ${
+                  {/* Actual Truck Image from Attachment */}
+                  <div className={`absolute top-2 h-16 w-20 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    {/* Flat Design Truck - Exact match to attached image */}
-                    <svg viewBox="0 0 100 70" className="w-full h-full drop-shadow-xl">
-                      {/* Vehicle shadow */}
-                      <ellipse cx="50" cy="68" rx="40" ry="2" fill="black" opacity="0.2"/>
-                      
-                      {/* Main cargo box - light pink/beige background */}
-                      <rect x="15" y="15" width="50" height="35" rx="8" fill="#F5E6D8" stroke="#8B4590" strokeWidth="3"/>
-                      
-                      {/* Front cab - beige/pink */}
-                      <path d="M65 20 L85 20 L85 35 Q85 45 75 45 L65 45 Z" fill="#E8C5B5" stroke="#8B4590" strokeWidth="3"/>
-                      
-                      {/* Red light on top of cab */}
-                      <rect x="75" y="12" width="8" height="6" rx="2" fill="#E53E3E"/>
-                      
-                      {/* Blue windshield */}
-                      <path d="M70 22 L82 22 L82 32 L70 32 Z" fill="#63B3ED" opacity="0.8"/>
-                      
-                      {/* Door handle */}
-                      <circle cx="78" cy="38" r="1.5" fill="#8B4590"/>
-                      
-                      {/* Paw print in center of cargo area - EXACT MATCH */}
-                      <g transform="translate(40,32)">
-                        {/* Main pad */}
-                        <ellipse cx="0" cy="3" rx="5" ry="4" fill="#8B4590"/>
-                        {/* Four toe pads */}
-                        <ellipse cx="-4" cy="-3" rx="2.5" ry="2" fill="#8B4590"/>
-                        <ellipse cx="-1" cy="-4.5" rx="2.5" ry="2" fill="#8B4590"/>
-                        <ellipse cx="2" cy="-4.5" rx="2.5" ry="2" fill="#8B4590"/>
-                        <ellipse cx="5" cy="-3" rx="2.5" ry="2" fill="#8B4590"/>
-                      </g>
-                      
-                      {/* Wheels - dark with purple centers */}
-                      <circle cx="25" cy="52" r="8" fill="#4A5568"/>
-                      <circle cx="25" cy="52" r="5" fill="#8B4590"/>
-                      <circle cx="25" cy="52" r="2" fill="#2D3748"/>
-                      
-                      <circle cx="75" cy="52" r="8" fill="#4A5568"/>
-                      <circle cx="75" cy="52" r="5" fill="#8B4590"/>
-                      <circle cx="75" cy="52" r="2" fill="#2D3748"/>
-                      
-                      {/* Small details like in the original */}
-                      <circle cx="55" cy="42" r="1.5" fill="#8B4590"/>
-                      <rect x="57" y="41" width="4" height="2" rx="1" fill="#8B4590"/>
-                    </svg>
+                    <img 
+                      src={truckIcon} 
+                      alt="Veterinary Truck" 
+                      className="w-full h-full object-contain drop-shadow-xl"
+                    />
                   </div>
                   
                   {/* Enhanced Start and End markers */}
