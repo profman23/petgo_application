@@ -233,6 +233,11 @@ Changelog:
 - June 24, 2025. Added visual effects: shadows, smooth transitions, and hover animations for better user experience
 - June 24, 2025. FIXED: Infinite loop issues in polling system using useRef instead of dependencies in useEffect
 - June 24, 2025. Resolved "Maximum update depth exceeded" errors in doctor dashboard and ride tracking components
+- June 30, 2025. MODERNIZED: Complete home screen design overhaul with realistic Mercedes Sprinter van based on user's actual vehicle image
+- June 30, 2025. Replaced all ambulance designs with accurate Mercedes Sprinter VETS VAN featuring purple branding, dog/cat silhouettes, and professional styling
+- June 30, 2025. Enhanced request button area with gradient backgrounds, larger Mercedes van display, modern clinic/house icons, and animated pet illustrations
+- June 30, 2025. Added comprehensive vehicle details: Mercedes grille, proper windshield angles, purple stripe design matching brand colors, and realistic proportions
+- June 30, 2025. Implemented consistent van design across all animations: moving vehicle during active rides and preview animations
 ```
 
 ## User Preferences

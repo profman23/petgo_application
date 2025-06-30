@@ -244,7 +244,7 @@ export default function Home() {
                     <div className="w-full h-1 bg-white opacity-40 animate-pulse"></div>
                   </div>
                   
-                  {/* Modern Mercedes Veterinary Ambulance */}
+                  {/* Mercedes Sprinter VETS VAN - Moving */}
                   <div 
                     className="absolute top-1 h-14 w-20 transition-all duration-2000 ease-in-out"
                     style={{
@@ -257,56 +257,58 @@ export default function Home() {
                       zIndex: 2
                     }}
                   >
-                    {/* Mercedes Ambulance SVG */}
+                    {/* Mercedes Sprinter SVG */}
                     <svg viewBox="0 0 80 56" className="w-full h-full drop-shadow-lg">
-                      {/* Main vehicle body - white Mercedes */}
-                      <rect x="8" y="20" width="52" height="24" rx="4" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      {/* Main van body */}
+                      <rect x="12" y="18" width="55" height="22" rx="4" fill="white" stroke="#ddd" strokeWidth="1"/>
                       
                       {/* Front cab */}
-                      <rect x="2" y="22" width="12" height="20" rx="3" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      <path d="M2 22 L12 18 L12 40 L2 40 Z" fill="white" stroke="#ddd" strokeWidth="1"/>
                       
-                      {/* Rear doors */}
-                      <rect x="56" y="24" width="16" height="16" rx="2" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      {/* Mercedes grille */}
+                      <rect x="1" y="25" width="2" height="9" rx="1" fill="#333"/>
+                      <circle cx="2" cy="29" r="1.5" fill="#c0c0c0"/>
                       
-                      {/* Windows */}
-                      <rect x="4" y="24" width="8" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
-                      <rect x="16" y="22" width="36" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
-                      <rect x="58" y="26" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      {/* Windshield */}
+                      <path d="M3 22 L12 18 L12 25 L3 27 Z" fill="#87CEEB" opacity="0.7"/>
                       
-                      {/* Mercedes Grille */}
-                      <rect x="2" y="28" width="2" height="8" fill="#c0c0c0"/>
-                      <circle cx="3" cy="32" r="1" fill="#silver"/>
+                      {/* Side windows */}
+                      <rect x="15" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
+                      <rect x="25" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
+                      <rect x="35" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
                       
-                      {/* Veterinary Cross - Red */}
-                      <g transform="translate(36,30)">
-                        <rect x="-1" y="-4" width="2" height="8" fill="#ff4444"/>
-                        <rect x="-4" y="-1" width="8" height="2" fill="#ff4444"/>
-                        <rect x="-1" y="-4" width="2" height="8" fill="white" fillOpacity="0.3"/>
+                      {/* Purple stripe */}
+                      <path d="M12 30 Q20 28 30 29 Q40 30 50 29 Q60 28 67 30 L67 37 Q60 35 50 36 Q40 37 30 36 Q20 35 12 37 Z" fill="#8B5CF6" opacity="0.8"/>
+                      
+                      {/* VETS VAN text */}
+                      <text x="40" y="16" fontSize="4" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                      <text x="30" y="26" fontSize="3" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS</text>
+                      
+                      {/* Veterinary cross */}
+                      <g transform="translate(22,32)">
+                        <rect x="-1" y="-2" width="2" height="4" fill="#8B5CF6"/>
+                        <rect x="-2" y="-1" width="4" height="2" fill="#8B5CF6"/>
                       </g>
                       
-                      {/* Vets Van Text */}
-                      <text x="30" y="38" fontSize="4" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
-                      
-                      {/* Emergency Lights */}
-                      <rect x="20" y="20" width="3" height="2" rx="1" fill="#ff6b6b" opacity="0.9"/>
-                      <rect x="25" y="20" width="3" height="2" rx="1" fill="#4dabf7" opacity="0.9"/>
-                      <rect x="30" y="20" width="3" height="2" rx="1" fill="#ff6b6b" opacity="0.9"/>
-                      
-                      {/* Wheels */}
-                      <circle cx="15" cy="46" r="6" fill="#333"/>
-                      <circle cx="15" cy="46" r="4" fill="#666"/>
-                      <circle cx="15" cy="46" r="2" fill="#999"/>
-                      
-                      <circle cx="55" cy="46" r="6" fill="#333"/>
-                      <circle cx="55" cy="46" r="4" fill="#666"/>
-                      <circle cx="55" cy="46" r="2" fill="#999"/>
+                      {/* Mercedes logo */}
+                      <circle cx="7" cy="23" r="1.5" fill="#c0c0c0"/>
                       
                       {/* Headlights */}
-                      <circle cx="2" cy="30" r="2" fill="#fffacd" opacity="0.9"/>
-                      <circle cx="2" cy="36" r="2" fill="#fffacd" opacity="0.9"/>
+                      <ellipse cx="3" cy="24" rx="1" ry="1.5" fill="#fff3cd"/>
+                      <ellipse cx="3" cy="28" rx="1" ry="1.5" fill="#fff3cd"/>
                       
-                      {/* Side medical stripe */}
-                      <rect x="16" y="34" width="36" height="2" fill="#ff4444"/>
+                      {/* Wheels */}
+                      <circle cx="17" cy="41" r="4" fill="#333"/>
+                      <circle cx="17" cy="41" r="3" fill="#666"/>
+                      <circle cx="17" cy="41" r="1.5" fill="#999"/>
+                      
+                      <circle cx="55" cy="41" r="4" fill="#333"/>
+                      <circle cx="55" cy="41" r="3" fill="#666"/>
+                      <circle cx="55" cy="41" r="1.5" fill="#999"/>
+                      
+                      {/* Rear doors */}
+                      <rect x="62" y="22" width="7" height="15" rx="1" fill="white" stroke="#ddd"/>
+                      <line x1="65" y1="22" x2="65" y2="37" stroke="#ccc" strokeWidth="0.5"/>
                     </svg>
                   </div>
                   
@@ -419,60 +421,62 @@ export default function Home() {
                     <div className="w-full h-1 bg-white opacity-60 animate-pulse"></div>
                   </div>
                   
-                  {/* Moving Mercedes Ambulance */}
+                  {/* Moving Mercedes Sprinter VETS VAN */}
                   <div className={`absolute top-1 h-14 w-20 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    {/* Mercedes Ambulance SVG */}
+                    {/* Mercedes Sprinter SVG */}
                     <svg viewBox="0 0 80 56" className="w-full h-full drop-shadow-lg">
-                      {/* Main vehicle body - white Mercedes */}
-                      <rect x="8" y="20" width="52" height="24" rx="4" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      {/* Main van body */}
+                      <rect x="12" y="18" width="55" height="22" rx="4" fill="white" stroke="#ddd" strokeWidth="1"/>
                       
                       {/* Front cab */}
-                      <rect x="2" y="22" width="12" height="20" rx="3" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      <path d="M2 22 L12 18 L12 40 L2 40 Z" fill="white" stroke="#ddd" strokeWidth="1"/>
                       
-                      {/* Rear doors */}
-                      <rect x="56" y="24" width="16" height="16" rx="2" fill="white" stroke="#e0e0e0" strokeWidth="1"/>
+                      {/* Mercedes grille */}
+                      <rect x="1" y="25" width="2" height="9" rx="1" fill="#333"/>
+                      <circle cx="2" cy="29" r="1.5" fill="#c0c0c0"/>
                       
-                      {/* Windows */}
-                      <rect x="4" y="24" width="8" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
-                      <rect x="16" y="22" width="36" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
-                      <rect x="58" y="26" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      {/* Windshield */}
+                      <path d="M3 22 L12 18 L12 25 L3 27 Z" fill="#87CEEB" opacity="0.7"/>
                       
-                      {/* Mercedes Grille */}
-                      <rect x="2" y="28" width="2" height="8" fill="#c0c0c0"/>
-                      <circle cx="3" cy="32" r="1" fill="#silver"/>
+                      {/* Side windows */}
+                      <rect x="15" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
+                      <rect x="25" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
+                      <rect x="35" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
                       
-                      {/* Veterinary Cross - Red */}
-                      <g transform="translate(36,30)">
-                        <rect x="-1" y="-4" width="2" height="8" fill="#ff4444"/>
-                        <rect x="-4" y="-1" width="8" height="2" fill="#ff4444"/>
-                        <rect x="-1" y="-4" width="2" height="8" fill="white" fillOpacity="0.3"/>
+                      {/* Purple stripe */}
+                      <path d="M12 30 Q20 28 30 29 Q40 30 50 29 Q60 28 67 30 L67 37 Q60 35 50 36 Q40 37 30 36 Q20 35 12 37 Z" fill="#8B5CF6" opacity="0.8"/>
+                      
+                      {/* VETS VAN text */}
+                      <text x="40" y="16" fontSize="4" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                      <text x="30" y="26" fontSize="3" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS</text>
+                      
+                      {/* Veterinary cross */}
+                      <g transform="translate(22,32)">
+                        <rect x="-1" y="-2" width="2" height="4" fill="#8B5CF6"/>
+                        <rect x="-2" y="-1" width="4" height="2" fill="#8B5CF6"/>
                       </g>
                       
-                      {/* Vets Van Text */}
-                      <text x="30" y="38" fontSize="4" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
-                      
-                      {/* Emergency Lights */}
-                      <rect x="20" y="20" width="3" height="2" rx="1" fill="#ff6b6b" opacity="0.9"/>
-                      <rect x="25" y="20" width="3" height="2" rx="1" fill="#4dabf7" opacity="0.9"/>
-                      <rect x="30" y="20" width="3" height="2" rx="1" fill="#ff6b6b" opacity="0.9"/>
-                      
-                      {/* Wheels */}
-                      <circle cx="15" cy="46" r="6" fill="#333"/>
-                      <circle cx="15" cy="46" r="4" fill="#666"/>
-                      <circle cx="15" cy="46" r="2" fill="#999"/>
-                      
-                      <circle cx="55" cy="46" r="6" fill="#333"/>
-                      <circle cx="55" cy="46" r="4" fill="#666"/>
-                      <circle cx="55" cy="46" r="2" fill="#999"/>
+                      {/* Mercedes logo */}
+                      <circle cx="7" cy="23" r="1.5" fill="#c0c0c0"/>
                       
                       {/* Headlights */}
-                      <circle cx="2" cy="30" r="2" fill="#fffacd" opacity="0.9"/>
-                      <circle cx="2" cy="36" r="2" fill="#fffacd" opacity="0.9"/>
+                      <ellipse cx="3" cy="24" rx="1" ry="1.5" fill="#fff3cd"/>
+                      <ellipse cx="3" cy="28" rx="1" ry="1.5" fill="#fff3cd"/>
                       
-                      {/* Side medical stripe */}
-                      <rect x="16" y="34" width="36" height="2" fill="#ff4444"/>
+                      {/* Wheels */}
+                      <circle cx="17" cy="41" r="4" fill="#333"/>
+                      <circle cx="17" cy="41" r="3" fill="#666"/>
+                      <circle cx="17" cy="41" r="1.5" fill="#999"/>
+                      
+                      <circle cx="55" cy="41" r="4" fill="#333"/>
+                      <circle cx="55" cy="41" r="3" fill="#666"/>
+                      <circle cx="55" cy="41" r="1.5" fill="#999"/>
+                      
+                      {/* Rear doors */}
+                      <rect x="62" y="22" width="7" height="15" rx="1" fill="white" stroke="#ddd"/>
+                      <line x1="65" y1="22" x2="65" y2="37" stroke="#ccc" strokeWidth="0.5"/>
                     </svg>
                   </div>
                   
@@ -541,62 +545,88 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Modern Mercedes Ambulance Display */}
+            {/* Mercedes Sprinter VETS VAN Display */}
             <div className="flex justify-center mb-6">
-              <div className="w-32 h-24">
-                <svg viewBox="0 0 128 96" className="w-full h-full drop-shadow-xl">
-                  {/* Main vehicle body - white Mercedes */}
-                  <rect x="12" y="32" width="84" height="38" rx="6" fill="white" stroke="#e0e0e0" strokeWidth="2"/>
+              <div className="w-40 h-24">
+                <svg viewBox="0 0 160 96" className="w-full h-full drop-shadow-xl">
+                  {/* Main van body - Mercedes Sprinter */}
+                  <rect x="25" y="35" width="110" height="45" rx="8" fill="white" stroke="#ddd" strokeWidth="1"/>
                   
-                  {/* Front cab */}
-                  <rect x="3" y="35" width="19" height="32" rx="5" fill="white" stroke="#e0e0e0" strokeWidth="2"/>
+                  {/* Front cab - more angular Mercedes style */}
+                  <path d="M5 42 L25 35 L25 80 L5 80 Z" fill="white" stroke="#ddd" strokeWidth="1"/>
+                  
+                  {/* Mercedes front grille */}
+                  <rect x="2" y="50" width="5" height="18" rx="2" fill="#333"/>
+                  <circle cx="4.5" cy="59" r="3" fill="#c0c0c0" stroke="#666" strokeWidth="1"/>
+                  <path d="M2.5 56 L6.5 56 M2.5 59 L6.5 59 M2.5 62 L6.5 62" stroke="#999" strokeWidth="0.5"/>
+                  
+                  {/* Front windshield */}
+                  <path d="M7 42 L25 35 L25 50 L7 55 Z" fill="#87CEEB" opacity="0.7"/>
+                  
+                  {/* Side windows */}
+                  <rect x="30" y="37" width="15" height="8" rx="1" fill="#87CEEB" opacity="0.7"/>
+                  <rect x="50" y="37" width="15" height="8" rx="1" fill="#87CEEB" opacity="0.7"/>
+                  <rect x="70" y="37" width="15" height="8" rx="1" fill="#87CEEB" opacity="0.7"/>
                   
                   {/* Rear doors */}
-                  <rect x="90" y="38" width="26" height="26" rx="3" fill="white" stroke="#e0e0e0" strokeWidth="2"/>
+                  <rect x="125" y="45" width="15" height="30" rx="2" fill="white" stroke="#ddd" strokeWidth="1"/>
+                  <line x1="132" y1="45" x2="132" y2="75" stroke="#ccc" strokeWidth="1"/>
                   
-                  {/* Windows */}
-                  <rect x="6" y="38" width="13" height="10" rx="2" fill="#87CEEB" opacity="0.8"/>
-                  <rect x="26" y="35" width="58" height="10" rx="2" fill="#87CEEB" opacity="0.8"/>
-                  <rect x="93" y="42" width="19" height="10" rx="2" fill="#87CEEB" opacity="0.8"/>
+                  {/* Purple stripe design like in image */}
+                  <path d="M25 60 Q40 55 60 58 Q80 60 100 58 Q120 56 135 60 L135 75 Q120 72 100 74 Q80 76 60 74 Q40 72 25 75 Z" fill="#8B5CF6" opacity="0.8"/>
                   
-                  {/* Mercedes Grille */}
-                  <rect x="3" y="45" width="3" height="13" fill="#c0c0c0"/>
-                  <circle cx="4.5" cy="51" r="2" fill="#silver"/>
+                  {/* VETS VAN text on top */}
+                  <text x="80" y="32" fontSize="8" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                  <text x="80" y="40" fontSize="4" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif">MOBILE VETERINARY CLINIC</text>
                   
-                  {/* Large Veterinary Cross - Red */}
-                  <g transform="translate(58,48)">
-                    <rect x="-2" y="-6" width="4" height="12" fill="#ff4444"/>
-                    <rect x="-6" y="-2" width="12" height="4" fill="#ff4444"/>
-                    <rect x="-2" y="-6" width="4" height="12" fill="white" fillOpacity="0.3"/>
+                  {/* Side VETS VAN branding */}
+                  <text x="60" y="52" fontSize="6" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                  
+                  {/* Veterinary cross on side */}
+                  <g transform="translate(45,65)">
+                    <rect x="-2" y="-4" width="4" height="8" fill="#8B5CF6"/>
+                    <rect x="-4" y="-2" width="8" height="4" fill="#8B5CF6"/>
                   </g>
                   
-                  {/* Vets Van Text */}
-                  <text x="58" y="60" fontSize="6" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                  {/* Dog and cat silhouettes like in image */}
+                  <g transform="translate(90,65)">
+                    {/* Dog silhouette */}
+                    <ellipse cx="-8" cy="0" rx="4" ry="3" fill="white"/>
+                    <ellipse cx="-10" cy="-2" rx="2" ry="2" fill="white"/>
+                    <ellipse cx="-12" cy="-3" rx="1" ry="2" fill="white"/>
+                    <ellipse cx="-6" cy="-3" rx="1" ry="2" fill="white"/>
+                    
+                    {/* Cat silhouette */}
+                    <ellipse cx="8" cy="0" rx="3" ry="3" fill="white"/>
+                    <ellipse cx="8" cy="-2" rx="2" ry="2" fill="white"/>
+                    <polygon points="6,-4 8,-6 10,-4" fill="white"/>
+                  </g>
                   
-                  {/* Emergency Lights */}
-                  <rect x="32" y="32" width="5" height="3" rx="1.5" fill="#ff6b6b" opacity="0.9"/>
-                  <rect x="40" y="32" width="5" height="3" rx="1.5" fill="#4dabf7" opacity="0.9"/>
-                  <rect x="48" y="32" width="5" height="3" rx="1.5" fill="#ff6b6b" opacity="0.9"/>
-                  
-                  {/* Wheels */}
-                  <circle cx="24" cy="74" r="9" fill="#333"/>
-                  <circle cx="24" cy="74" r="6" fill="#666"/>
-                  <circle cx="24" cy="74" r="3" fill="#999"/>
-                  
-                  <circle cx="88" cy="74" r="9" fill="#333"/>
-                  <circle cx="88" cy="74" r="6" fill="#666"/>
-                  <circle cx="88" cy="74" r="3" fill="#999"/>
+                  {/* Mercedes logo on front */}
+                  <circle cx="15" cy="45" r="3" fill="#c0c0c0" stroke="#666" strokeWidth="1"/>
+                  <path d="M15 42 L15 48 M12 46.5 L18 46.5 M13 44 L17 47" stroke="#333" strokeWidth="0.8"/>
                   
                   {/* Headlights */}
-                  <circle cx="3" cy="48" r="3" fill="#fffacd" opacity="0.9"/>
-                  <circle cx="3" cy="58" r="3" fill="#fffacd" opacity="0.9"/>
+                  <ellipse cx="8" cy="48" rx="2" ry="3" fill="#fff3cd" opacity="0.9"/>
+                  <ellipse cx="8" cy="56" rx="2" ry="3" fill="#fff3cd" opacity="0.9"/>
                   
-                  {/* Side medical stripe */}
-                  <rect x="26" y="54" width="58" height="3" fill="#ff4444"/>
+                  {/* Wheels - Mercedes style */}
+                  <circle cx="35" cy="82" r="8" fill="#333"/>
+                  <circle cx="35" cy="82" r="6" fill="#666"/>
+                  <circle cx="35" cy="82" r="3" fill="#999"/>
+                  <circle cx="35" cy="82" r="1" fill="#ccc"/>
                   
-                  {/* Mercedes Badge */}
-                  <circle cx="58" cy="42" r="4" fill="#silver" stroke="#666" strokeWidth="1"/>
-                  <text x="58" y="44" fontSize="3" fill="#000" textAnchor="middle" fontFamily="serif">MB</text>
+                  <circle cx="110" cy="82" r="8" fill="#333"/>
+                  <circle cx="110" cy="82" r="6" fill="#666"/>
+                  <circle cx="110" cy="82" r="3" fill="#999"/>
+                  <circle cx="110" cy="82" r="1" fill="#ccc"/>
+                  
+                  {/* Contact info like in image */}
+                  <text x="80" y="72" fontSize="3" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">📞 CALL NOW</text>
+                  
+                  {/* Side mirrors */}
+                  <ellipse cx="25" cy="45" rx="2" ry="1" fill="#333"/>
+                  <ellipse cx="25" cy="55" rx="2" ry="1" fill="#333"/>
                 </svg>
               </div>
             </div>
