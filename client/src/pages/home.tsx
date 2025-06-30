@@ -662,15 +662,15 @@ export default function Home() {
                   <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
                   
                   {/* Icon Container */}
-                  <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-white drop-shadow-lg">
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-gray-700 drop-shadow-sm">
                       <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                     </svg>
                   </div>
                 </div>
                 
                 {/* Enhanced Label */}
-                <span className="text-xs font-bold text-white tracking-wider drop-shadow-md group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
+                <span className="text-xs font-bold text-gray-700 tracking-wider drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
                   {t('home')}
                 </span>
               </div>
@@ -703,15 +703,15 @@ export default function Home() {
                   <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
                   
                   {/* Icon Container */}
-                  <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-white drop-shadow-lg">
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-gray-700 drop-shadow-sm">
                       <path d="M9 11H7l5-9 5 9h-2l-3 8-3-8z"/>
                     </svg>
                   </div>
                 </div>
                 
                 {/* Enhanced Label */}
-                <span className="text-xs font-bold text-white tracking-wider drop-shadow-md group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
+                <span className="text-xs font-bold text-gray-700 tracking-wider drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
                   {t('activity')}
                 </span>
               </div>
@@ -747,15 +747,15 @@ export default function Home() {
                   <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
                   
                   {/* Icon Container */}
-                  <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-white drop-shadow-lg">
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-gray-700 drop-shadow-sm">
                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                     </svg>
                   </div>
                 </div>
                 
                 {/* Enhanced Label */}
-                <span className="text-xs font-bold text-white tracking-wider drop-shadow-md group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
+                <span className="text-xs font-bold text-gray-700 tracking-wider drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
                   {t('account')}
                 </span>
               </div>
