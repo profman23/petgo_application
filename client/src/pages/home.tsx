@@ -410,21 +410,21 @@ export default function Home() {
 
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
-            <div className="mb-6 p-6 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 rounded-2xl border-2 border-purple-200 shadow-lg">
+            <div className="mb-3 p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 rounded-2xl border-2 border-purple-200 shadow-lg">
               <div className="text-center">
-                <div className="text-lg font-semibold text-purple-800 mb-4" style={{ textAlign }}>
+                <div className="text-sm font-semibold text-purple-800 mb-2" style={{ textAlign }}>
                   {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
                 </div>
                 
                 {/* Enhanced Road Animation */}
-                <div className="relative h-24 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-4 overflow-hidden shadow-inner">
+                <div className="relative h-16 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2 overflow-hidden shadow-inner">
                   {/* Road markings */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-full h-2 bg-purple-300 opacity-50 animate-pulse rounded-full"></div>
                   </div>
                   
                   {/* Actual Truck Image from Attachment */}
-                  <div className={`absolute top-2 h-16 w-20 transform transition-all duration-4000 ease-in-out ${
+                  <div className={`absolute top-1 h-12 w-16 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
                     {/* Perfect isolated truck image with transparent background */}
@@ -435,10 +435,10 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Enhanced Start and End markers - LARGER AND CLEARER */}
-                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
-                    {/* Professional Veterinary Clinic - Much Larger */}
-                    <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-2xl">
+                  {/* Enhanced Start and End markers - Compact */}
+                  <div className="absolute left-1 top-1/2 transform -translate-y-1/2">
+                    {/* Professional Veterinary Clinic - Compact */}
+                    <svg width="32" height="32" viewBox="0 0 48 48" className="drop-shadow-lg">
                       {/* Main building foundation */}
                       <rect x="2" y="20" width="44" height="24" rx="3" fill="#8B4590" stroke="#6B21A8" strokeWidth="2"/>
                       
@@ -474,9 +474,9 @@ export default function Home() {
                     </svg>
                   </div>
                   
-                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                    {/* Beautiful Modern House - Much Larger */}
-                    <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-2xl">
+                  <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+                    {/* Beautiful Modern House - Compact */}
+                    <svg width="32" height="32" viewBox="0 0 48 48" className="drop-shadow-lg">
                       {/* House main structure */}
                       <rect x="6" y="22" width="36" height="22" rx="2" fill="#8B4590" stroke="#6B21A8" strokeWidth="2"/>
                       
@@ -556,12 +556,12 @@ export default function Home() {
           )}
           
           {/* Enhanced Request Button with Modern Design */}
-          <div className="mb-6 p-6 bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-300">
+          <div className="mb-3 p-3 bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-300">
             {/* Top Section with Pets and Logo */}
-            <div className="flex items-center justify-center gap-6 mb-6">
+            <div className="flex items-center justify-center gap-3 mb-3">
               {/* Dog Icon */}
               <div className="flex-shrink-0">
-                <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-lg">
+                <svg width="32" height="32" viewBox="0 0 48 48" className="drop-shadow-lg">
                   <ellipse cx="24" cy="32" rx="14" ry="12" fill="#d2691e" stroke="#8b4513" strokeWidth="1"/>
                   <circle cx="24" cy="20" r="12" fill="#daa520" stroke="#b8860b" strokeWidth="1"/>
                   <ellipse cx="18" cy="14" rx="4" ry="6" fill="#daa520" stroke="#b8860b" strokeWidth="1"/>
