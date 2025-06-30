@@ -269,31 +269,33 @@ export default function RideRequest() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 border-4 border-purple-600 m-2 rounded-lg" style={{ direction, borderColor: 'var(--purple-primary)' }}>
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="flex items-center justify-between p-4">
-          <Button
-            variant="ghost"
-            onClick={() => setLocation('/')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {t('back')}
-          </Button>
-          <div className="flex items-center gap-3">
-            <img 
-              src={logoImage} 
-              alt="Vets Van" 
-              className="h-8 object-contain"
-            />
-            <h1 className="text-lg font-bold text-purple-700" style={{ textAlign }}>{t('requestVet')}</h1>
+    <div className="min-h-screen bg-gray-50" style={{ direction }}>
+      {/* Outer container with purple border */}
+      <div className="min-h-screen border-4 border-purple-600 m-2 rounded-lg bg-white" style={{ borderColor: '#8B5CF6' }}>
+        {/* Header */}
+        <header className="bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg sticky top-0 z-50 rounded-t-lg">
+          <div className="flex items-center justify-between p-4">
+            <Button
+              variant="ghost"
+              onClick={() => setLocation('/')}
+              className="flex items-center gap-2 text-white hover:bg-purple-800"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {t('back')}
+            </Button>
+            <div className="flex items-center gap-3">
+              <img 
+                src={logoImage} 
+                alt="Vets Van" 
+                className="h-10 object-contain rounded-lg border-2 border-purple-300"
+              />
+              <h1 className="text-xl font-bold text-white" style={{ textAlign }}>{t('requestVet')}</h1>
+            </div>
+            <div className="w-10" />
           </div>
-          <div className="w-10" />
-        </div>
-      </header>
+        </header>
 
-      <div className="p-4">
+        <div className="p-4">
         {/* Service Type Selection */}
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ textAlign }}>{t('serviceType')}</h2>
@@ -543,6 +545,7 @@ export default function RideRequest() {
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
