@@ -8,7 +8,7 @@ import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Ste
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import vetsVanImage from "@assets/image_1751292329902.png";
-import truckIcon from "@assets/Screenshot 2025-06-30 174821_1751294926842.png";
+import truckIcon from "@assets/10773561_1751295833176.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 
@@ -432,11 +432,6 @@ export default function Home() {
                       src={truckIcon} 
                       alt="Veterinary Truck" 
                       className="w-full h-full object-contain drop-shadow-lg"
-                      style={{
-                        opacity: 0.8,
-                        filter: 'contrast(1.1) saturate(1.2)',
-                        mixBlendMode: 'multiply'
-                      }}
                     />
                   </div>
                   
