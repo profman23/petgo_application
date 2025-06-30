@@ -417,10 +417,10 @@ export default function Home() {
                 </div>
                 
                 {/* Enhanced Road Animation */}
-                <div className="relative h-24 bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 rounded-xl mb-4 overflow-hidden shadow-inner">
+                <div className="relative h-24 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-4 overflow-hidden shadow-inner">
                   {/* Road markings */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-2 bg-white opacity-70 animate-pulse rounded-full"></div>
+                    <div className="w-full h-2 bg-purple-300 opacity-50 animate-pulse rounded-full"></div>
                   </div>
                   
                   {/* Actual Truck Image from Attachment */}
