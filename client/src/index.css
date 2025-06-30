@@ -4,16 +4,23 @@
 
 /* Remove default body margins and padding */
 body, html {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   overflow-x: hidden;
+  background: white;
 }
 
 /* Ensure the main app container fills the entire viewport */
 #root {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   min-height: 100vh;
+}
+
+/* Remove any default margins from main container */
+.app-container {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 /* Custom animations for car movement */

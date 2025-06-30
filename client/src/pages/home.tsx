@@ -124,11 +124,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-purple-600 p-0 m-0" dir={getDirection(language)}>
-      {/* Enhanced Container with Full Screen Purple Border */}
-      <div className="min-h-screen border-4 border-purple-700 bg-white">
-        {/* Header */}
-        <header className="bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg sticky top-0 z-50">
+    <div className="min-h-screen bg-white border-4 border-purple-600 p-0 m-0" style={{ margin: 0, padding: 0 }} dir={getDirection(language)}>
+      {/* Header */}
+      <header className="bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 flex items-center justify-center">
@@ -585,7 +583,6 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
-        </div>
       </div>
     </div>
   );
