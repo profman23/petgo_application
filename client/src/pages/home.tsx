@@ -7,6 +7,7 @@ import { useRide } from '@/hooks/useRide';
 import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import vetsVanImage from "@assets/image_1751292329902.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 
@@ -545,89 +546,14 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Mercedes Sprinter VETS VAN Display */}
+            {/* Real VETS VAN Image Display */}
             <div className="flex justify-center mb-6">
-              <div className="w-40 h-24">
-                <svg viewBox="0 0 160 96" className="w-full h-full drop-shadow-xl">
-                  {/* Main van body - Mercedes Sprinter */}
-                  <rect x="25" y="35" width="110" height="45" rx="8" fill="white" stroke="#ddd" strokeWidth="1"/>
-                  
-                  {/* Front cab - more angular Mercedes style */}
-                  <path d="M5 42 L25 35 L25 80 L5 80 Z" fill="white" stroke="#ddd" strokeWidth="1"/>
-                  
-                  {/* Mercedes front grille */}
-                  <rect x="2" y="50" width="5" height="18" rx="2" fill="#333"/>
-                  <circle cx="4.5" cy="59" r="3" fill="#c0c0c0" stroke="#666" strokeWidth="1"/>
-                  <path d="M2.5 56 L6.5 56 M2.5 59 L6.5 59 M2.5 62 L6.5 62" stroke="#999" strokeWidth="0.5"/>
-                  
-                  {/* Front windshield */}
-                  <path d="M7 42 L25 35 L25 50 L7 55 Z" fill="#87CEEB" opacity="0.7"/>
-                  
-                  {/* Side windows */}
-                  <rect x="30" y="37" width="15" height="8" rx="1" fill="#87CEEB" opacity="0.7"/>
-                  <rect x="50" y="37" width="15" height="8" rx="1" fill="#87CEEB" opacity="0.7"/>
-                  <rect x="70" y="37" width="15" height="8" rx="1" fill="#87CEEB" opacity="0.7"/>
-                  
-                  {/* Rear doors */}
-                  <rect x="125" y="45" width="15" height="30" rx="2" fill="white" stroke="#ddd" strokeWidth="1"/>
-                  <line x1="132" y1="45" x2="132" y2="75" stroke="#ccc" strokeWidth="1"/>
-                  
-                  {/* Purple stripe design like in image */}
-                  <path d="M25 60 Q40 55 60 58 Q80 60 100 58 Q120 56 135 60 L135 75 Q120 72 100 74 Q80 76 60 74 Q40 72 25 75 Z" fill="#8B5CF6" opacity="0.8"/>
-                  
-                  {/* VETS VAN text on top */}
-                  <text x="80" y="32" fontSize="8" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
-                  <text x="80" y="40" fontSize="4" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif">MOBILE VETERINARY CLINIC</text>
-                  
-                  {/* Side VETS VAN branding */}
-                  <text x="60" y="52" fontSize="6" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
-                  
-                  {/* Veterinary cross on side */}
-                  <g transform="translate(45,65)">
-                    <rect x="-2" y="-4" width="4" height="8" fill="#8B5CF6"/>
-                    <rect x="-4" y="-2" width="8" height="4" fill="#8B5CF6"/>
-                  </g>
-                  
-                  {/* Dog and cat silhouettes like in image */}
-                  <g transform="translate(90,65)">
-                    {/* Dog silhouette */}
-                    <ellipse cx="-8" cy="0" rx="4" ry="3" fill="white"/>
-                    <ellipse cx="-10" cy="-2" rx="2" ry="2" fill="white"/>
-                    <ellipse cx="-12" cy="-3" rx="1" ry="2" fill="white"/>
-                    <ellipse cx="-6" cy="-3" rx="1" ry="2" fill="white"/>
-                    
-                    {/* Cat silhouette */}
-                    <ellipse cx="8" cy="0" rx="3" ry="3" fill="white"/>
-                    <ellipse cx="8" cy="-2" rx="2" ry="2" fill="white"/>
-                    <polygon points="6,-4 8,-6 10,-4" fill="white"/>
-                  </g>
-                  
-                  {/* Mercedes logo on front */}
-                  <circle cx="15" cy="45" r="3" fill="#c0c0c0" stroke="#666" strokeWidth="1"/>
-                  <path d="M15 42 L15 48 M12 46.5 L18 46.5 M13 44 L17 47" stroke="#333" strokeWidth="0.8"/>
-                  
-                  {/* Headlights */}
-                  <ellipse cx="8" cy="48" rx="2" ry="3" fill="#fff3cd" opacity="0.9"/>
-                  <ellipse cx="8" cy="56" rx="2" ry="3" fill="#fff3cd" opacity="0.9"/>
-                  
-                  {/* Wheels - Mercedes style */}
-                  <circle cx="35" cy="82" r="8" fill="#333"/>
-                  <circle cx="35" cy="82" r="6" fill="#666"/>
-                  <circle cx="35" cy="82" r="3" fill="#999"/>
-                  <circle cx="35" cy="82" r="1" fill="#ccc"/>
-                  
-                  <circle cx="110" cy="82" r="8" fill="#333"/>
-                  <circle cx="110" cy="82" r="6" fill="#666"/>
-                  <circle cx="110" cy="82" r="3" fill="#999"/>
-                  <circle cx="110" cy="82" r="1" fill="#ccc"/>
-                  
-                  {/* Contact info like in image */}
-                  <text x="80" y="72" fontSize="3" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">📞 CALL NOW</text>
-                  
-                  {/* Side mirrors */}
-                  <ellipse cx="25" cy="45" rx="2" ry="1" fill="#333"/>
-                  <ellipse cx="25" cy="55" rx="2" ry="1" fill="#333"/>
-                </svg>
+              <div className="w-48 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-purple-200">
+                <img 
+                  src={vetsVanImage} 
+                  alt="VETS VAN Mobile Veterinary Clinic" 
+                  className="w-full h-full object-cover object-center"
+                />
               </div>
             </div>
 
