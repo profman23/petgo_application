@@ -440,39 +440,87 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Enhanced Start and End markers */}
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                    {/* Modern Clinic Building */}
-                    <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-lg">
-                      <rect x="4" y="12" width="24" height="16" rx="2" fill="#8B5CF6" opacity="0.9"/>
-                      <rect x="6" y="8" width="20" height="8" rx="1" fill="#A855F7"/>
-                      <rect x="8" y="4" width="16" height="8" rx="1" fill="#C084FC"/>
-                      {/* Cross */}
-                      <rect x="14" y="18" width="4" height="8" fill="white"/>
-                      <rect x="12" y="20" width="8" height="4" fill="white"/>
-                      {/* Windows */}
-                      <rect x="7" y="10" width="2" height="2" fill="white" opacity="0.8"/>
-                      <rect x="10" y="10" width="2" height="2" fill="white" opacity="0.8"/>
-                      <rect x="20" y="10" width="2" height="2" fill="white" opacity="0.8"/>
-                      <rect x="23" y="10" width="2" height="2" fill="white" opacity="0.8"/>
+                  {/* Enhanced Start and End markers - LARGER AND CLEARER */}
+                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2">
+                    {/* Professional Veterinary Clinic - Much Larger */}
+                    <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-2xl">
+                      {/* Main building foundation */}
+                      <rect x="2" y="20" width="44" height="24" rx="3" fill="#8B4590" stroke="#6B21A8" strokeWidth="2"/>
+                      
+                      {/* Second floor */}
+                      <rect x="6" y="12" width="36" height="16" rx="2" fill="#A855F7" stroke="#7C3AED" strokeWidth="1.5"/>
+                      
+                      {/* Top floor/sign area */}
+                      <rect x="10" y="6" width="28" height="12" rx="2" fill="#C084FC" stroke="#9333EA" strokeWidth="1"/>
+                      
+                      {/* Large Medical Cross - Center focal point */}
+                      <rect x="20" y="28" width="8" height="12" fill="white" stroke="#8B4590" strokeWidth="1"/>
+                      <rect x="16" y="32" width="16" height="4" fill="white" stroke="#8B4590" strokeWidth="1"/>
+                      
+                      {/* Multiple Windows */}
+                      <rect x="8" y="15" width="4" height="4" rx="1" fill="white" opacity="0.9" stroke="#7C3AED" strokeWidth="0.5"/>
+                      <rect x="14" y="15" width="4" height="4" rx="1" fill="white" opacity="0.9" stroke="#7C3AED" strokeWidth="0.5"/>
+                      <rect x="30" y="15" width="4" height="4" rx="1" fill="white" opacity="0.9" stroke="#7C3AED" strokeWidth="0.5"/>
+                      <rect x="36" y="15" width="4" height="4" rx="1" fill="white" opacity="0.9" stroke="#7C3AED" strokeWidth="0.5"/>
+                      
+                      {/* Ground floor windows */}
+                      <rect x="6" y="25" width="3" height="4" rx="0.5" fill="white" opacity="0.8"/>
+                      <rect x="39" y="25" width="3" height="4" rx="0.5" fill="white" opacity="0.8"/>
+                      
+                      {/* Door */}
+                      <rect x="10" y="35" width="6" height="9" rx="1" fill="#4C1D95" stroke="white" strokeWidth="1"/>
+                      <circle cx="15" cy="39" r="0.8" fill="white"/>
+                      
+                      {/* Roof line */}
+                      <polygon points="0,20 24,4 48,20" fill="#6B21A8" opacity="0.7"/>
+                      
+                      {/* Veterinary Sign */}
+                      <text x="24" y="12" textAnchor="middle" fill="white" fontSize="4" fontWeight="bold">VET</text>
                     </svg>
                   </div>
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                    {/* Modern House */}
-                    <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-lg">
-                      {/* House base */}
-                      <rect x="6" y="16" width="20" height="12" rx="1" fill="#8B5CF6" opacity="0.9"/>
-                      {/* Roof */}
-                      <polygon points="4,16 16,6 28,16" fill="#A855F7"/>
-                      {/* Door */}
-                      <rect x="13" y="20" width="6" height="8" rx="1" fill="#7C3AED"/>
-                      {/* Windows */}
-                      <rect x="8" y="18" width="3" height="3" fill="white" opacity="0.9"/>
-                      <rect x="21" y="18" width="3" height="3" fill="white" opacity="0.9"/>
+                  
+                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                    {/* Beautiful Modern House - Much Larger */}
+                    <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-2xl">
+                      {/* House main structure */}
+                      <rect x="6" y="22" width="36" height="22" rx="2" fill="#8B4590" stroke="#6B21A8" strokeWidth="2"/>
+                      
+                      {/* Triangular roof with depth */}
+                      <polygon points="2,22 24,8 46,22" fill="#A855F7" stroke="#7C3AED" strokeWidth="1.5"/>
+                      <polygon points="4,20 24,10 44,20" fill="#C084FC" opacity="0.8"/>
+                      
+                      {/* Front door with frame */}
+                      <rect x="18" y="30" width="12" height="14" rx="2" fill="#4C1D95" stroke="white" strokeWidth="1.5"/>
+                      <rect x="19" y="31" width="10" height="12" rx="1" fill="#5B21B6"/>
+                      
+                      {/* Door panels */}
+                      <rect x="20" y="33" width="8" height="4" rx="0.5" fill="#6B21A8" opacity="0.7"/>
+                      <rect x="20" y="38" width="8" height="4" rx="0.5" fill="#6B21A8" opacity="0.7"/>
+                      
                       {/* Door handle */}
-                      <circle cx="17" cy="24" r="0.5" fill="white"/>
-                      {/* Chimney */}
-                      <rect x="22" y="8" width="3" height="6" fill="#6B21A8"/>
+                      <circle cx="27" cy="37" r="1" fill="gold" stroke="white" strokeWidth="0.5"/>
+                      
+                      {/* Large windows with frames */}
+                      <rect x="9" y="26" width="6" height="6" rx="1" fill="white" stroke="#7C3AED" strokeWidth="1"/>
+                      <rect x="33" y="26" width="6" height="6" rx="1" fill="white" stroke="#7C3AED" strokeWidth="1"/>
+                      
+                      {/* Window panes */}
+                      <line x1="12" y1="26" x2="12" y2="32" stroke="#7C3AED" strokeWidth="0.5"/>
+                      <line x1="9" y1="29" x2="15" y2="29" stroke="#7C3AED" strokeWidth="0.5"/>
+                      <line x1="36" y1="26" x2="36" y2="32" stroke="#7C3AED" strokeWidth="0.5"/>
+                      <line x1="33" y1="29" x2="39" y2="29" stroke="#7C3AED" strokeWidth="0.5"/>
+                      
+                      {/* Decorative chimney */}
+                      <rect x="34" y="12" width="6" height="12" rx="1" fill="#6B21A8" stroke="#4C1D95" strokeWidth="1"/>
+                      <rect x="35" y="10" width="4" height="3" rx="0.5" fill="#7C3AED"/>
+                      
+                      {/* Garden elements */}
+                      <circle cx="12" cy="42" r="2" fill="#22C55E" opacity="0.7"/>
+                      <circle cx="36" cy="42" r="2" fill="#22C55E" opacity="0.7"/>
+                      
+                      {/* House number */}
+                      <circle cx="42" cy="18" r="3" fill="white" stroke="#8B4590" strokeWidth="1"/>
+                      <text x="42" y="20" textAnchor="middle" fill="#8B4590" fontSize="3" fontWeight="bold">1</text>
                     </svg>
                   </div>
                   
