@@ -427,18 +427,47 @@ export default function Home() {
                   <div className={`absolute top-2 h-16 w-20 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    <div className="w-full h-full relative">
-                      <img 
-                        src={truckIcon} 
-                        alt="Veterinary Truck" 
-                        className="w-full h-full object-contain"
-                        style={{
-                          filter: 'contrast(1.1) saturate(1.1)',
-                          mixBlendMode: 'multiply',
-                          backgroundColor: 'transparent'
-                        }}
-                      />
-                    </div>
+                    {/* SVG Truck - Recreated to match attached image exactly but without background */}
+                    <svg viewBox="0 0 100 60" className="w-full h-full drop-shadow-lg">
+                      {/* Main cargo area - light pink/beige */}
+                      <rect x="10" y="15" width="50" height="30" rx="6" fill="#F5E6D8" stroke="#8B4590" strokeWidth="2.5"/>
+                      
+                      {/* Front cab */}
+                      <path d="M60 20 L80 20 Q85 20 85 25 L85 35 Q85 40 80 40 L60 40 Z" fill="#E8C5B5" stroke="#8B4590" strokeWidth="2.5"/>
+                      
+                      {/* Red emergency light on cab roof */}
+                      <rect x="72" y="12" width="6" height="4" rx="1" fill="#E53E3E"/>
+                      
+                      {/* Blue windshield */}
+                      <path d="M65 22 L78 22 L78 30 L65 30 Z" fill="#63B3ED" opacity="0.9"/>
+                      
+                      {/* Door handle */}
+                      <circle cx="75" cy="32" r="1" fill="#8B4590"/>
+                      
+                      {/* Large paw print in center - exact match to original */}
+                      <g transform="translate(35,30)">
+                        {/* Main paw pad */}
+                        <ellipse cx="0" cy="2" rx="4" ry="3" fill="#8B4590"/>
+                        {/* Four toe pads */}
+                        <ellipse cx="-3" cy="-2" rx="2" ry="1.5" fill="#8B4590"/>
+                        <ellipse cx="-1" cy="-3" rx="2" ry="1.5" fill="#8B4590"/>
+                        <ellipse cx="1" cy="-3" rx="2" ry="1.5" fill="#8B4590"/>
+                        <ellipse cx="3" cy="-2" rx="2" ry="1.5" fill="#8B4590"/>
+                      </g>
+                      
+                      {/* Wheels - dark with purple centers */}
+                      <circle cx="22" cy="48" r="6" fill="#4A5568"/>
+                      <circle cx="22" cy="48" r="4" fill="#8B4590"/>
+                      <circle cx="22" cy="48" r="2" fill="#2D3748"/>
+                      
+                      <circle cx="68" cy="48" r="6" fill="#4A5568"/>
+                      <circle cx="68" cy="48" r="4" fill="#8B4590"/>
+                      <circle cx="68" cy="48" r="2" fill="#2D3748"/>
+                      
+                      {/* Small details from original */}
+                      <circle cx="50" cy="35" r="1" fill="#8B4590"/>
+                      <rect x="52" y="34" width="3" height="2" rx="1" fill="#8B4590"/>
+                    </svg>
                   </div>
                   
                   {/* Enhanced Start and End markers */}
