@@ -637,69 +637,72 @@ export default function Home() {
         </div>
 
         {/* Recent Activity */}
-        {/* Navigation Buttons */}
-        <div className="grid grid-cols-3 gap-3">
-          {/* Home Button */}
-          <Button
-            variant="outline"
-            className="h-16 flex flex-col items-center justify-center space-y-2 border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 group"
+        {/* Enhanced Navigation Buttons */}
+        <div className="grid grid-cols-3 gap-4">
+          {/* Home Button - Elevated Design */}
+          <div 
+            className="relative h-20 cursor-pointer group"
             onClick={() => {
-              // Already on home page - maybe refresh or scroll to top
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
-            <div className="p-2 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-600">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                <polyline points="9,22 9,12 15,12 15,22"/>
-              </svg>
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105"></div>
+            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-2 group-hover:bg-gradient-to-br group-hover:from-purple-50 group-hover:to-pink-50 transition-all duration-300">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 group-hover:from-purple-200 group-hover:to-pink-200 transition-all duration-300 shadow-inner">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-purple-600 group-hover:text-purple-700">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9,22 9,12 15,12 15,22"/>
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-gray-700 group-hover:text-purple-700 tracking-wide" style={{ textAlign }}>
+                {t('home')}
+              </span>
             </div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700" style={{ textAlign }}>
-              {t('home')}
-            </span>
-          </Button>
+          </div>
 
-          {/* Activity Button */}
-          <Button
-            variant="outline"
-            className="h-16 flex flex-col items-center justify-center space-y-2 border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 group"
+          {/* Activity Button - Professional Design */}
+          <div 
+            className="relative h-20 cursor-pointer group"
             onClick={() => {
-              // Navigate to activity/tracking page
               setLocation('/ride-tracking');
             }}
           >
-            <div className="p-2 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-600">
-                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
-              </svg>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105"></div>
+            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-2 group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-cyan-50 transition-all duration-300">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-300 shadow-inner">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-blue-600 group-hover:text-blue-700">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-gray-700 group-hover:text-blue-700 tracking-wide" style={{ textAlign }}>
+                {t('activity')}
+              </span>
             </div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700" style={{ textAlign }}>
-              {t('activity')}
-            </span>
-          </Button>
+          </div>
 
-          {/* Account Button */}
-          <Button
-            variant="outline"
-            className="h-16 flex flex-col items-center justify-center space-y-2 border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 group"
+          {/* Account Button - Elegant Design */}
+          <div 
+            className="relative h-20 cursor-pointer group"
             onClick={() => {
-              // For now, show user info or settings
               toast({
                 title: language === 'ar' ? 'إعدادات الحساب' : 'Account Settings',
                 description: language === 'ar' ? 'ستتوفر هذه الميزة قريباً' : 'This feature will be available soon',
               });
             }}
           >
-            <div className="p-2 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-600">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105"></div>
+            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-2 group-hover:bg-gradient-to-br group-hover:from-emerald-50 group-hover:to-teal-50 transition-all duration-300">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-300 shadow-inner">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-emerald-600 group-hover:text-emerald-700">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <span className="text-xs font-bold text-gray-700 group-hover:text-emerald-700 tracking-wide" style={{ textAlign }}>
+                {t('account')}
+              </span>
             </div>
-            <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700" style={{ textAlign }}>
-              {t('account')}
-            </span>
-          </Button>
+          </div>
         </div>
         </div>
         </div>
