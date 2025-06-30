@@ -427,11 +427,18 @@ export default function Home() {
                   <div className={`absolute top-2 h-16 w-20 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    <img 
-                      src={truckIcon} 
-                      alt="Veterinary Truck" 
-                      className="w-full h-full object-contain drop-shadow-xl"
-                    />
+                    <div className="w-full h-full relative">
+                      <img 
+                        src={truckIcon} 
+                        alt="Veterinary Truck" 
+                        className="w-full h-full object-contain"
+                        style={{
+                          filter: 'contrast(1.1) saturate(1.1)',
+                          mixBlendMode: 'multiply',
+                          backgroundColor: 'transparent'
+                        }}
+                      />
+                    </div>
                   </div>
                   
                   {/* Enhanced Start and End markers */}
