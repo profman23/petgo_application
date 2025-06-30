@@ -161,39 +161,34 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4" dir={getDirection(language)}>
-      {/* Logo at top center */}
-      <div className="flex justify-center pt-8 pb-4">
-        <div className="bg-white rounded-full p-4 shadow-lg">
-          <img 
-            src={logoImage} 
-            alt="Vets Van" 
-            className="h-16 w-16 object-contain rounded-full"
-          />
-        </div>
-      </div>
-
-      {/* Main content centered */}
-      <div className="flex items-center justify-center min-h-full">
-          <Card className="w-full max-w-md border-2 shadow-xl bg-white/90 backdrop-blur-sm" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
-            {/* Header with back button */}
-            <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-center relative rounded-t-lg">
-              {/* Back button */}
-              <button
-                onClick={() => setLocation('/user-type-selection')}
-                className="absolute top-4 left-4 p-2 text-white hover:bg-purple-800 rounded-lg transition-colors"
-                title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
-              >
-                <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
-              </button>
-              
-              <h1 className="text-2xl font-bold text-white mt-4" style={{ textAlign: getTextAlign(language) }}>
-                {isRegistering ? t('createNewAccount') : t('customerLogin')}
-              </h1>
-              <p className="text-purple-100 mt-2" style={{ textAlign: getTextAlign(language) }}>
-                {isRegistering ? t('joinMobileVetService') : t('welcomeBack')}
-              </p>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
+      <div className="w-full max-w-md">
+        <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
+          {/* Header with back button - matching doctor login style */}
+          <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-center relative rounded-t-lg">
+            {/* Back button */}
+            <button
+              onClick={() => setLocation('/user-type-selection')}
+              className="absolute top-4 left-4 p-2 text-white hover:bg-purple-800 rounded-lg transition-colors"
+              title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
+            >
+              <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
+            </button>
+            
+            <div className="mb-4">
+              <img 
+                src={logoImage} 
+                alt="Vets Van" 
+                className="h-16 mx-auto object-contain rounded-lg border-2 border-purple-300"
+              />
             </div>
+            <h1 className="text-2xl font-bold text-white" style={{ textAlign: getTextAlign(language) }}>
+              {isRegistering ? t('createNewAccount') : t('customerLogin')}
+            </h1>
+            <p className="text-purple-100 mt-2" style={{ textAlign: getTextAlign(language) }}>
+              {isRegistering ? t('joinMobileVetService') : t('welcomeBack')}
+            </p>
+          </div>
 
         <CardContent className="p-8">
 
@@ -410,8 +405,8 @@ export default function Login() {
             </form>
           )}
         </CardContent>
-      </Card>
-    </div>
+        </Card>
+      </div>
     </div>
   );
 }
