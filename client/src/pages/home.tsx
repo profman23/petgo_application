@@ -637,69 +637,93 @@ export default function Home() {
         </div>
 
         {/* Recent Activity */}
-        {/* Enhanced Navigation Buttons - Fixed 3D Design */}
-        <div className="grid grid-cols-3 gap-4 p-2">
-          {/* Home Button - 3D Purple Design */}
+        {/* Premium Glass Morphism Navigation Buttons */}
+        <div className="grid grid-cols-3 gap-3 p-3">
+          {/* Home Button - Glassmorphism Design */}
           <div 
-            className="relative cursor-pointer group"
+            className="relative cursor-pointer group perspective-1000"
             onClick={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
-            {/* 3D Shadow Base */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-700 to-purple-900 rounded-2xl transform translate-y-1 translate-x-1 opacity-50"></div>
+            {/* Animated Glow Background */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500 animate-pulse"></div>
             
-            {/* Main Button Body */}
-            <div className="relative bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-4 shadow-lg transform transition-all duration-200 group-hover:scale-105 group-hover:-translate-y-1 group-active:translate-y-0">
-              {/* Inner Container */}
-              <div className="flex flex-col items-center justify-center space-y-2">
-                {/* Icon Container - Fixed Size */}
-                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
-                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                  </svg>
+            {/* Main Button Container */}
+            <div className="relative h-20 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
+              {/* Inner Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
+              
+              {/* Content Container */}
+              <div className="relative h-full flex flex-col items-center justify-center space-y-2 z-10">
+                {/* Floating Icon */}
+                <div className="relative">
+                  {/* Icon Glow */}
+                  <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
+                  
+                  {/* Icon Container */}
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-white drop-shadow-lg">
+                      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                  </div>
                 </div>
                 
-                {/* Label */}
-                <span className="text-xs font-bold text-white tracking-wide" style={{ textAlign }}>
+                {/* Enhanced Label */}
+                <span className="text-xs font-bold text-white tracking-wider drop-shadow-md group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
                   {t('home')}
                 </span>
               </div>
+              
+              {/* Corner Accent */}
+              <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-white/60 to-transparent rounded-full group-hover:scale-150 transition-transform duration-300"></div>
             </div>
           </div>
 
-          {/* Activity Button - 3D Blue Design */}
+          {/* Activity Button - Advanced Glass Design */}
           <div 
-            className="relative cursor-pointer group"
+            className="relative cursor-pointer group perspective-1000"
             onClick={() => {
               setLocation('/ride-tracking');
             }}
           >
-            {/* 3D Shadow Base */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-700 to-blue-900 rounded-2xl transform translate-y-1 translate-x-1 opacity-50"></div>
+            {/* Animated Glow Background */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500 animate-pulse"></div>
             
-            {/* Main Button Body */}
-            <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 shadow-lg transform transition-all duration-200 group-hover:scale-105 group-hover:-translate-y-1 group-active:translate-y-0">
-              {/* Inner Container */}
-              <div className="flex flex-col items-center justify-center space-y-2">
-                {/* Icon Container - Fixed Size */}
-                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
-                    <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
-                  </svg>
+            {/* Main Button Container */}
+            <div className="relative h-20 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 group-active:scale-95">
+              {/* Inner Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 to-cyan-500/30 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
+              
+              {/* Content Container */}
+              <div className="relative h-full flex flex-col items-center justify-center space-y-2 z-10">
+                {/* Floating Icon */}
+                <div className="relative">
+                  {/* Icon Glow */}
+                  <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
+                  
+                  {/* Icon Container */}
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-white drop-shadow-lg">
+                      <path d="M9 11H7l5-9 5 9h-2l-3 8-3-8z"/>
+                    </svg>
+                  </div>
                 </div>
                 
-                {/* Label */}
-                <span className="text-xs font-bold text-white tracking-wide" style={{ textAlign }}>
+                {/* Enhanced Label */}
+                <span className="text-xs font-bold text-white tracking-wider drop-shadow-md group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
                   {t('activity')}
                 </span>
               </div>
+              
+              {/* Corner Accent */}
+              <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-white/60 to-transparent rounded-full group-hover:scale-150 transition-transform duration-300"></div>
             </div>
           </div>
 
-          {/* Account Button - 3D Green Design */}
+          {/* Account Button - Luxury Glass Design */}
           <div 
-            className="relative cursor-pointer group"
+            className="relative cursor-pointer group perspective-1000"
             onClick={() => {
               toast({
                 title: language === 'ar' ? 'إعدادات الحساب' : 'Account Settings',
@@ -707,25 +731,37 @@ export default function Home() {
               });
             }}
           >
-            {/* 3D Shadow Base */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-700 to-emerald-900 rounded-2xl transform translate-y-1 translate-x-1 opacity-50"></div>
+            {/* Animated Glow Background */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500 animate-pulse"></div>
             
-            {/* Main Button Body */}
-            <div className="relative bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-4 shadow-lg transform transition-all duration-200 group-hover:scale-105 group-hover:-translate-y-1 group-active:translate-y-0">
-              {/* Inner Container */}
-              <div className="flex flex-col items-center justify-center space-y-2">
-                {/* Icon Container - Fixed Size */}
-                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
+            {/* Main Button Container */}
+            <div className="relative h-20 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
+              {/* Inner Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/30 to-teal-500/30 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
+              
+              {/* Content Container */}
+              <div className="relative h-full flex flex-col items-center justify-center space-y-2 z-10">
+                {/* Floating Icon */}
+                <div className="relative">
+                  {/* Icon Glow */}
+                  <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
+                  
+                  {/* Icon Container */}
+                  <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-white drop-shadow-lg">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                  </div>
                 </div>
                 
-                {/* Label */}
-                <span className="text-xs font-bold text-white tracking-wide" style={{ textAlign }}>
+                {/* Enhanced Label */}
+                <span className="text-xs font-bold text-white tracking-wider drop-shadow-md group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
                   {t('account')}
                 </span>
               </div>
+              
+              {/* Corner Accent */}
+              <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-white/60 to-transparent rounded-full group-hover:scale-150 transition-transform duration-300"></div>
             </div>
           </div>
         </div>
