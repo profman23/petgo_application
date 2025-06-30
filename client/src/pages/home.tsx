@@ -637,52 +637,69 @@ export default function Home() {
         </div>
 
         {/* Recent Activity */}
-        {/* Enhanced Navigation Buttons */}
-        <div className="grid grid-cols-3 gap-3">
-          {/* Home Button - Elevated Design */}
+        {/* Enhanced Navigation Buttons - Fixed 3D Design */}
+        <div className="grid grid-cols-3 gap-4 p-2">
+          {/* Home Button - 3D Purple Design */}
           <div 
-            className="relative h-16 cursor-pointer group"
+            className="relative cursor-pointer group"
             onClick={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105"></div>
-            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-2 group-hover:bg-gradient-to-br group-hover:from-purple-50 group-hover:to-pink-50 transition-all duration-300">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 group-hover:from-purple-200 group-hover:to-pink-200 transition-all duration-300 shadow-inner">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-purple-600 group-hover:text-purple-700">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                  <polyline points="9,22 9,12 15,12 15,22"/>
-                </svg>
+            {/* 3D Shadow Base */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-700 to-purple-900 rounded-2xl transform translate-y-1 translate-x-1 opacity-50"></div>
+            
+            {/* Main Button Body */}
+            <div className="relative bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-4 shadow-lg transform transition-all duration-200 group-hover:scale-105 group-hover:-translate-y-1 group-active:translate-y-0">
+              {/* Inner Container */}
+              <div className="flex flex-col items-center justify-center space-y-2">
+                {/* Icon Container - Fixed Size */}
+                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                  </svg>
+                </div>
+                
+                {/* Label */}
+                <span className="text-xs font-bold text-white tracking-wide" style={{ textAlign }}>
+                  {t('home')}
+                </span>
               </div>
-              <span className="text-xs font-bold text-gray-700 group-hover:text-purple-700 tracking-wide" style={{ textAlign }}>
-                {t('home')}
-              </span>
             </div>
           </div>
 
-          {/* Activity Button - Professional Design */}
+          {/* Activity Button - 3D Blue Design */}
           <div 
-            className="relative h-16 cursor-pointer group"
+            className="relative cursor-pointer group"
             onClick={() => {
               setLocation('/ride-tracking');
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105"></div>
-            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-1 group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-cyan-50 transition-all duration-300">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-300 shadow-inner">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-blue-600 group-hover:text-blue-700">
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                </svg>
+            {/* 3D Shadow Base */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-700 to-blue-900 rounded-2xl transform translate-y-1 translate-x-1 opacity-50"></div>
+            
+            {/* Main Button Body */}
+            <div className="relative bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 shadow-lg transform transition-all duration-200 group-hover:scale-105 group-hover:-translate-y-1 group-active:translate-y-0">
+              {/* Inner Container */}
+              <div className="flex flex-col items-center justify-center space-y-2">
+                {/* Icon Container - Fixed Size */}
+                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                    <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                  </svg>
+                </div>
+                
+                {/* Label */}
+                <span className="text-xs font-bold text-white tracking-wide" style={{ textAlign }}>
+                  {t('activity')}
+                </span>
               </div>
-              <span className="text-xs font-bold text-gray-700 group-hover:text-blue-700 tracking-wide" style={{ textAlign }}>
-                {t('activity')}
-              </span>
             </div>
           </div>
 
-          {/* Account Button - Elegant Design */}
+          {/* Account Button - 3D Green Design */}
           <div 
-            className="relative h-16 cursor-pointer group"
+            className="relative cursor-pointer group"
             onClick={() => {
               toast({
                 title: language === 'ar' ? 'إعدادات الحساب' : 'Account Settings',
@@ -690,17 +707,25 @@ export default function Home() {
               });
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105"></div>
-            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-1 group-hover:bg-gradient-to-br group-hover:from-emerald-50 group-hover:to-teal-50 transition-all duration-300">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-300 shadow-inner">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-emerald-600 group-hover:text-emerald-700">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
+            {/* 3D Shadow Base */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-700 to-emerald-900 rounded-2xl transform translate-y-1 translate-x-1 opacity-50"></div>
+            
+            {/* Main Button Body */}
+            <div className="relative bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-4 shadow-lg transform transition-all duration-200 group-hover:scale-105 group-hover:-translate-y-1 group-active:translate-y-0">
+              {/* Inner Container */}
+              <div className="flex flex-col items-center justify-center space-y-2">
+                {/* Icon Container - Fixed Size */}
+                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                
+                {/* Label */}
+                <span className="text-xs font-bold text-white tracking-wide" style={{ textAlign }}>
+                  {t('account')}
+                </span>
               </div>
-              <span className="text-xs font-bold text-gray-700 group-hover:text-emerald-700 tracking-wide" style={{ textAlign }}>
-                {t('account')}
-              </span>
             </div>
           </div>
         </div>
