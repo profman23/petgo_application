@@ -415,78 +415,163 @@ export default function Home() {
                   {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
                 </div>
                 
-                {/* Road Animation */}
-                <div className="relative h-16 bg-gray-300 rounded-lg mb-4 overflow-hidden">
+                {/* Enhanced Road Animation */}
+                <div className="relative h-24 bg-gradient-to-r from-gray-400 via-gray-300 to-gray-400 rounded-xl mb-4 overflow-hidden shadow-inner">
                   {/* Road markings */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-1 bg-white opacity-60 animate-pulse"></div>
+                    <div className="w-full h-2 bg-white opacity-70 animate-pulse rounded-full"></div>
                   </div>
                   
-                  {/* Moving Mercedes Sprinter VETS VAN */}
-                  <div className={`absolute top-1 h-14 w-20 transform transition-all duration-4000 ease-in-out ${
+                  {/* Enhanced Moving Mercedes Sprinter VETS VAN */}
+                  <div className={`absolute top-1 h-20 w-28 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    {/* Mercedes Sprinter SVG */}
-                    <svg viewBox="0 0 80 56" className="w-full h-full drop-shadow-lg">
-                      {/* Main van body */}
-                      <rect x="12" y="18" width="55" height="22" rx="4" fill="white" stroke="#ddd" strokeWidth="1"/>
+                    {/* Enhanced Mercedes Sprinter SVG */}
+                    <svg viewBox="0 0 112 80" className="w-full h-full drop-shadow-2xl">
+                      {/* Shadow */}
+                      <ellipse cx="56" cy="78" rx="45" ry="3" fill="black" opacity="0.2"/>
                       
-                      {/* Front cab */}
-                      <path d="M2 22 L12 18 L12 40 L2 40 Z" fill="white" stroke="#ddd" strokeWidth="1"/>
+                      {/* Main van body - larger and more detailed */}
+                      <rect x="18" y="25" width="76" height="32" rx="6" fill="white" stroke="#ddd" strokeWidth="1.5"/>
                       
-                      {/* Mercedes grille */}
-                      <rect x="1" y="25" width="2" height="9" rx="1" fill="#333"/>
-                      <circle cx="2" cy="29" r="1.5" fill="#c0c0c0"/>
+                      {/* Front cab - more angular Mercedes style */}
+                      <path d="M3 30 L18 25 L18 57 L3 57 Z" fill="white" stroke="#ddd" strokeWidth="1.5"/>
                       
-                      {/* Windshield */}
-                      <path d="M3 22 L12 18 L12 25 L3 27 Z" fill="#87CEEB" opacity="0.7"/>
+                      {/* Enhanced Mercedes front grille */}
+                      <rect x="1" y="35" width="4" height="15" rx="2" fill="#333"/>
+                      <circle cx="3" cy="42" r="2.5" fill="#c0c0c0" stroke="#666" strokeWidth="1"/>
+                      <path d="M1.5 38 L4.5 38 M1.5 42 L4.5 42 M1.5 46 L4.5 46" stroke="#999" strokeWidth="1"/>
                       
-                      {/* Side windows */}
-                      <rect x="15" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
-                      <rect x="25" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
-                      <rect x="35" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
+                      {/* Enhanced front windshield */}
+                      <path d="M5 30 L18 25 L18 35 L5 40 Z" fill="#87CEEB" opacity="0.8"/>
                       
-                      {/* Purple stripe */}
-                      <path d="M12 30 Q20 28 30 29 Q40 30 50 29 Q60 28 67 30 L67 37 Q60 35 50 36 Q40 37 30 36 Q20 35 12 37 Z" fill="#8B5CF6" opacity="0.8"/>
+                      {/* Side windows - larger */}
+                      <rect x="22" y="27" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      <rect x="36" y="27" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      <rect x="50" y="27" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
+                      <rect x="64" y="27" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
                       
-                      {/* VETS VAN text */}
-                      <text x="40" y="16" fontSize="4" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
-                      <text x="30" y="26" fontSize="3" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS</text>
+                      {/* Enhanced purple stripe design */}
+                      <path d="M18 42 Q28 40 42 41 Q56 42 70 41 Q84 40 94 42 L94 52 Q84 50 70 51 Q56 52 42 51 Q28 50 18 52 Z" fill="#8B5CF6" opacity="0.9"/>
                       
-                      {/* Veterinary cross */}
-                      <g transform="translate(22,32)">
-                        <rect x="-1" y="-2" width="2" height="4" fill="#8B5CF6"/>
-                        <rect x="-2" y="-1" width="4" height="2" fill="#8B5CF6"/>
+                      {/* VETS VAN branding - larger text */}
+                      <text x="56" y="22" fontSize="6" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                      <text x="56" y="28" fontSize="3" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif">MOBILE VETERINARY CLINIC</text>
+                      
+                      {/* Side VETS VAN text */}
+                      <text x="42" y="37" fontSize="4" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
+                      
+                      {/* Enhanced veterinary cross */}
+                      <g transform="translate(32,47)">
+                        <rect x="-2" y="-3" width="4" height="6" fill="#8B5CF6"/>
+                        <rect x="-3" y="-2" width="6" height="4" fill="#8B5CF6"/>
                       </g>
                       
-                      {/* Mercedes logo */}
-                      <circle cx="7" cy="23" r="1.5" fill="#c0c0c0"/>
+                      {/* Dog and cat silhouettes */}
+                      <g transform="translate(65,47)">
+                        {/* Dog silhouette */}
+                        <ellipse cx="-6" cy="0" rx="3" ry="2.5" fill="white"/>
+                        <ellipse cx="-8" cy="-1.5" rx="1.5" ry="1.5" fill="white"/>
+                        <ellipse cx="-9" cy="-2.5" rx="0.8" ry="1.5" fill="white"/>
+                        <ellipse cx="-5" cy="-2.5" rx="0.8" ry="1.5" fill="white"/>
+                        
+                        {/* Cat silhouette */}
+                        <ellipse cx="6" cy="0" rx="2.5" ry="2.5" fill="white"/>
+                        <ellipse cx="6" cy="-1.5" rx="1.5" ry="1.5" fill="white"/>
+                        <polygon points="4.5,-3 6,-4.5 7.5,-3" fill="white"/>
+                      </g>
                       
-                      {/* Headlights */}
-                      <ellipse cx="3" cy="24" rx="1" ry="1.5" fill="#fff3cd"/>
-                      <ellipse cx="3" cy="28" rx="1" ry="1.5" fill="#fff3cd"/>
+                      {/* Enhanced Mercedes logo */}
+                      <circle cx="12" cy="35" r="2.5" fill="#c0c0c0" stroke="#666" strokeWidth="1"/>
+                      <path d="M12 32 L12 38 M9 35.5 L15 35.5 M10 33 L14 37" stroke="#333" strokeWidth="1"/>
                       
-                      {/* Wheels */}
-                      <circle cx="17" cy="41" r="4" fill="#333"/>
-                      <circle cx="17" cy="41" r="3" fill="#666"/>
-                      <circle cx="17" cy="41" r="1.5" fill="#999"/>
+                      {/* Enhanced headlights */}
+                      <ellipse cx="5" cy="33" rx="1.5" ry="2" fill="#fff3cd" opacity="0.9"/>
+                      <ellipse cx="5" cy="39" rx="1.5" ry="2" fill="#fff3cd" opacity="0.9"/>
                       
-                      <circle cx="55" cy="41" r="4" fill="#333"/>
-                      <circle cx="55" cy="41" r="3" fill="#666"/>
-                      <circle cx="55" cy="41" r="1.5" fill="#999"/>
+                      {/* Enhanced wheels */}
+                      <circle cx="25" cy="60" r="6" fill="#333"/>
+                      <circle cx="25" cy="60" r="4.5" fill="#666"/>
+                      <circle cx="25" cy="60" r="2.5" fill="#999"/>
+                      <circle cx="25" cy="60" r="1" fill="#ccc"/>
                       
-                      {/* Rear doors */}
-                      <rect x="62" y="22" width="7" height="15" rx="1" fill="white" stroke="#ddd"/>
-                      <line x1="65" y1="22" x2="65" y2="37" stroke="#ccc" strokeWidth="0.5"/>
+                      <circle cx="77" cy="60" r="6" fill="#333"/>
+                      <circle cx="77" cy="60" r="4.5" fill="#666"/>
+                      <circle cx="77" cy="60" r="2.5" fill="#999"/>
+                      <circle cx="77" cy="60" r="1" fill="#ccc"/>
+                      
+                      {/* Enhanced rear doors */}
+                      <rect x="88" y="32" width="10" height="20" rx="2" fill="white" stroke="#ddd" strokeWidth="1"/>
+                      <line x1="93" y1="32" x2="93" y2="52" stroke="#ccc" strokeWidth="1"/>
+                      
+                      {/* Contact info */}
+                      <text x="56" y="50" fontSize="2.5" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">📞 920011626</text>
+                      
+                      {/* Side mirrors */}
+                      <ellipse cx="18" cy="32" rx="2" ry="1" fill="#333"/>
+                      <ellipse cx="18" cy="38" rx="2" ry="1" fill="#333"/>
                     </svg>
                   </div>
                   
-                  {/* Start and End markers */}
-                  <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-purple-700">
-                    🏥
+                  {/* Enhanced Start and End markers */}
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                    {/* Modern Clinic Building */}
+                    <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-lg">
+                      <rect x="4" y="12" width="24" height="16" rx="2" fill="#8B5CF6" opacity="0.9"/>
+                      <rect x="6" y="8" width="20" height="8" rx="1" fill="#A855F7"/>
+                      <rect x="8" y="4" width="16" height="8" rx="1" fill="#C084FC"/>
+                      {/* Cross */}
+                      <rect x="14" y="18" width="4" height="8" fill="white"/>
+                      <rect x="12" y="20" width="8" height="4" fill="white"/>
+                      {/* Windows */}
+                      <rect x="7" y="10" width="2" height="2" fill="white" opacity="0.8"/>
+                      <rect x="10" y="10" width="2" height="2" fill="white" opacity="0.8"/>
+                      <rect x="20" y="10" width="2" height="2" fill="white" opacity="0.8"/>
+                      <rect x="23" y="10" width="2" height="2" fill="white" opacity="0.8"/>
+                    </svg>
                   </div>
-                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-purple-700">
-                    🏠
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    {/* Modern House */}
+                    <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-lg">
+                      {/* House base */}
+                      <rect x="6" y="16" width="20" height="12" rx="1" fill="#8B5CF6" opacity="0.9"/>
+                      {/* Roof */}
+                      <polygon points="4,16 16,6 28,16" fill="#A855F7"/>
+                      {/* Door */}
+                      <rect x="13" y="20" width="6" height="8" rx="1" fill="#7C3AED"/>
+                      {/* Windows */}
+                      <rect x="8" y="18" width="3" height="3" fill="white" opacity="0.9"/>
+                      <rect x="21" y="18" width="3" height="3" fill="white" opacity="0.9"/>
+                      {/* Door handle */}
+                      <circle cx="17" cy="24" r="0.5" fill="white"/>
+                      {/* Chimney */}
+                      <rect x="22" y="8" width="3" height="6" fill="#6B21A8"/>
+                    </svg>
+                  </div>
+                  
+                  {/* Animated pets waiting */}
+                  <div className="absolute bottom-2 left-8 animate-bounce">
+                    <svg width="20" height="16" viewBox="0 0 20 16">
+                      {/* Dog */}
+                      <ellipse cx="5" cy="12" rx="3" ry="2" fill="#8B5CF6"/>
+                      <ellipse cx="5" cy="8" rx="2" ry="2" fill="#8B5CF6"/>
+                      <ellipse cx="3" cy="6" rx="1" ry="1.5" fill="#8B5CF6"/>
+                      <ellipse cx="7" cy="6" rx="1" ry="1.5" fill="#8B5CF6"/>
+                      <circle cx="4" cy="7" r="0.5" fill="white"/>
+                      <circle cx="6" cy="7" r="0.5" fill="white"/>
+                    </svg>
+                  </div>
+                  
+                  <div className="absolute bottom-2 right-8 animate-bounce delay-1000">
+                    <svg width="16" height="16" viewBox="0 0 16 16">
+                      {/* Cat */}
+                      <ellipse cx="8" cy="12" rx="2.5" ry="2" fill="#8B5CF6"/>
+                      <ellipse cx="8" cy="8" rx="2" ry="2" fill="#8B5CF6"/>
+                      <polygon points="6,5 8,3 10,5" fill="#8B5CF6"/>
+                      <circle cx="7" cy="7" r="0.5" fill="white"/>
+                      <circle cx="9" cy="7" r="0.5" fill="white"/>
+                      <path d="M8 8 Q7 9 6 8 M8 8 Q9 9 10 8" stroke="white" strokeWidth="0.5" fill="none"/>
+                    </svg>
                   </div>
                 </div>
 

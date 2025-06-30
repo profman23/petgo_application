@@ -238,6 +238,10 @@ Changelog:
 - June 30, 2025. Enhanced request button area with gradient backgrounds, larger Mercedes van display, modern clinic/house icons, and animated pet illustrations
 - June 30, 2025. Added comprehensive vehicle details: Mercedes grille, proper windshield angles, purple stripe design matching brand colors, and realistic proportions
 - June 30, 2025. Implemented consistent van design across all animations: moving vehicle during active rides and preview animations
+- June 30, 2025. ENHANCED: Animated elements significantly enlarged and improved - moving van now 40% larger with enhanced Mercedes details
+- June 30, 2025. UPGRADED: Clinic and house icons redesigned as professional SVG buildings with purple theme and architectural details
+- June 30, 2025. ADDED: Animated pet silhouettes (dog and cat) bouncing at road edges to create more engaging user experience
+- June 30, 2025. IMPROVED: Road animation with gradient background, enhanced shadows, and realistic van shadow effects
 ```
 
 ## User Preferences
