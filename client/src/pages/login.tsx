@@ -162,26 +162,19 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4" dir={getDirection(language)}>
-      {/* Full screen border with logo integration */}
-      <div className="min-h-screen border-4 rounded-2xl relative overflow-hidden" style={{ 
-        borderColor: 'var(--purple-primary)', 
-        boxShadow: 'inset 0 0 50px rgba(139, 47, 139, 0.1), 0 20px 40px rgba(139, 47, 139, 0.15)',
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%)'
-      }}>
-        
-        {/* Logo at top center of border */}
-        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
-          <div className="bg-white rounded-full p-4 border-4" style={{ borderColor: 'var(--purple-primary)' }}>
-            <img 
-              src={logoImage} 
-              alt="Vets Van" 
-              className="h-16 w-16 object-contain rounded-full"
-            />
-          </div>
+      {/* Logo at top center */}
+      <div className="flex justify-center pt-8 pb-4">
+        <div className="bg-white rounded-full p-4 shadow-lg">
+          <img 
+            src={logoImage} 
+            alt="Vets Van" 
+            className="h-16 w-16 object-contain rounded-full"
+          />
         </div>
+      </div>
 
-        {/* Main content centered */}
-        <div className="flex items-center justify-center min-h-full pt-16">
+      {/* Main content centered */}
+      <div className="flex items-center justify-center min-h-full">
           <Card className="w-full max-w-md border-2 shadow-xl bg-white/90 backdrop-blur-sm" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
             {/* Header with back button */}
             <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-center relative rounded-t-lg">
@@ -416,10 +409,9 @@ export default function Login() {
               </Button>
             </form>
           )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
+    </div>
     </div>
   );
 }
