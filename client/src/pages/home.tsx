@@ -422,94 +422,93 @@ export default function Home() {
                     <div className="w-full h-2 bg-white opacity-70 animate-pulse rounded-full"></div>
                   </div>
                   
-                  {/* Enhanced Moving Mercedes Sprinter VETS VAN */}
+                  {/* Purple Veterinary Van - Based on attached image */}
                   <div className={`absolute top-1 h-20 w-28 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    {/* Enhanced Mercedes Sprinter SVG */}
-                    <svg viewBox="0 0 112 80" className="w-full h-full drop-shadow-2xl">
-                      {/* Shadow */}
-                      <ellipse cx="56" cy="78" rx="45" ry="3" fill="black" opacity="0.2"/>
+                    {/* Purple Veterinary Van SVG - Styled after attached image */}
+                    <svg viewBox="0 0 120 80" className="w-full h-full drop-shadow-2xl">
+                      {/* Vehicle shadow */}
+                      <ellipse cx="60" cy="78" rx="50" ry="3" fill="black" opacity="0.2"/>
                       
-                      {/* Main van body - larger and more detailed */}
-                      <rect x="18" y="25" width="76" height="32" rx="6" fill="white" stroke="#ddd" strokeWidth="1.5"/>
+                      {/* Main van body - Purple theme */}
+                      <rect x="20" y="25" width="75" height="32" rx="8" fill="#F8E8F8" stroke="#8B5CF6" strokeWidth="2"/>
                       
-                      {/* Front cab - more angular Mercedes style */}
-                      <path d="M3 30 L18 25 L18 57 L3 57 Z" fill="white" stroke="#ddd" strokeWidth="1.5"/>
+                      {/* Front cab */}
+                      <path d="M5 30 L20 25 L20 57 L5 57 Z" fill="#F8E8F8" stroke="#8B5CF6" strokeWidth="2"/>
                       
-                      {/* Enhanced Mercedes front grille */}
-                      <rect x="1" y="35" width="4" height="15" rx="2" fill="#333"/>
-                      <circle cx="3" cy="42" r="2.5" fill="#c0c0c0" stroke="#666" strokeWidth="1"/>
-                      <path d="M1.5 38 L4.5 38 M1.5 42 L4.5 42 M1.5 46 L4.5 46" stroke="#999" strokeWidth="1"/>
+                      {/* Purple body panels */}
+                      <rect x="22" y="40" width="71" height="15" rx="3" fill="#8B5CF6"/>
                       
-                      {/* Enhanced front windshield */}
-                      <path d="M5 30 L18 25 L18 35 L5 40 Z" fill="#87CEEB" opacity="0.8"/>
+                      {/* Cargo area with paw print design */}
+                      <rect x="25" y="28" width="65" height="25" rx="4" fill="#F3E8FF" stroke="#8B5CF6" strokeWidth="1.5"/>
                       
-                      {/* Side windows - larger */}
-                      <rect x="22" y="27" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
-                      <rect x="36" y="27" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
-                      <rect x="50" y="27" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
-                      <rect x="64" y="27" width="12" height="6" rx="1" fill="#87CEEB" opacity="0.8"/>
-                      
-                      {/* Enhanced purple stripe design */}
-                      <path d="M18 42 Q28 40 42 41 Q56 42 70 41 Q84 40 94 42 L94 52 Q84 50 70 51 Q56 52 42 51 Q28 50 18 52 Z" fill="#8B5CF6" opacity="0.9"/>
-                      
-                      {/* VETS VAN branding - larger text */}
-                      <text x="56" y="22" fontSize="6" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
-                      <text x="56" y="28" fontSize="3" fill="#666" textAnchor="middle" fontFamily="Arial, sans-serif">MOBILE VETERINARY CLINIC</text>
-                      
-                      {/* Side VETS VAN text */}
-                      <text x="42" y="37" fontSize="4" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
-                      
-                      {/* Enhanced veterinary cross */}
-                      <g transform="translate(32,47)">
-                        <rect x="-2" y="-3" width="4" height="6" fill="#8B5CF6"/>
-                        <rect x="-3" y="-2" width="6" height="4" fill="#8B5CF6"/>
+                      {/* Large paw print in center */}
+                      <g transform="translate(57,40)">
+                        {/* Main paw pad */}
+                        <ellipse cx="0" cy="2" rx="6" ry="4" fill="#8B5CF6"/>
+                        {/* Toe pads */}
+                        <ellipse cx="-4" cy="-3" rx="2.5" ry="2" fill="#8B5CF6"/>
+                        <ellipse cx="-1" cy="-4" rx="2.5" ry="2" fill="#8B5CF6"/>
+                        <ellipse cx="2" cy="-4" rx="2.5" ry="2" fill="#8B5CF6"/>
+                        <ellipse cx="5" cy="-3" rx="2.5" ry="2" fill="#8B5CF6"/>
                       </g>
                       
-                      {/* Dog and cat silhouettes */}
-                      <g transform="translate(65,47)">
-                        {/* Dog silhouette */}
-                        <ellipse cx="-6" cy="0" rx="3" ry="2.5" fill="white"/>
-                        <ellipse cx="-8" cy="-1.5" rx="1.5" ry="1.5" fill="white"/>
-                        <ellipse cx="-9" cy="-2.5" rx="0.8" ry="1.5" fill="white"/>
-                        <ellipse cx="-5" cy="-2.5" rx="0.8" ry="1.5" fill="white"/>
-                        
-                        {/* Cat silhouette */}
-                        <ellipse cx="6" cy="0" rx="2.5" ry="2.5" fill="white"/>
-                        <ellipse cx="6" cy="-1.5" rx="1.5" ry="1.5" fill="white"/>
-                        <polygon points="4.5,-3 6,-4.5 7.5,-3" fill="white"/>
+                      {/* Front grille and bumper */}
+                      <rect x="2" y="35" width="5" height="15" rx="2" fill="#7C3AED"/>
+                      <rect x="3" y="37" width="3" height="11" rx="1" fill="#6B21A8"/>
+                      
+                      {/* Windshield */}
+                      <path d="M7 30 L20 25 L20 35 L7 40 Z" fill="#60A5FA" opacity="0.8"/>
+                      
+                      {/* Side windows */}
+                      <rect x="92" y="28" width="8" height="12" rx="2" fill="#60A5FA" opacity="0.8"/>
+                      
+                      {/* Purple door handles */}
+                      <circle cx="90" cy="40" r="1.5" fill="#8B5CF6"/>
+                      <circle cx="98" cy="40" r="1.5" fill="#8B5CF6"/>
+                      
+                      {/* Headlights */}
+                      <ellipse cx="6" cy="33" rx="2" ry="2.5" fill="#FEF3C7"/>
+                      <ellipse cx="6" cy="40" rx="2" ry="2.5" fill="#FEF3C7"/>
+                      
+                      {/* Wheels with purple rims */}
+                      <circle cx="28" cy="62" r="7" fill="#374151"/>
+                      <circle cx="28" cy="62" r="5" fill="#8B5CF6"/>
+                      <circle cx="28" cy="62" r="3" fill="#6B21A8"/>
+                      <circle cx="28" cy="62" r="1.5" fill="#C4B5FD"/>
+                      
+                      <circle cx="82" cy="62" r="7" fill="#374151"/>
+                      <circle cx="82" cy="62" r="5" fill="#8B5CF6"/>
+                      <circle cx="82" cy="62" r="3" fill="#6B21A8"/>
+                      <circle cx="82" cy="62" r="1.5" fill="#C4B5FD"/>
+                      
+                      {/* Rear doors */}
+                      <rect x="100" y="30" width="12" height="25" rx="3" fill="#F8E8F8" stroke="#8B5CF6" strokeWidth="2"/>
+                      <line x1="106" y1="30" x2="106" y2="55" stroke="#8B5CF6" strokeWidth="1.5"/>
+                      
+                      {/* Medical cross symbol */}
+                      <g transform="translate(35,45)">
+                        <rect x="-2" y="-4" width="4" height="8" fill="white"/>
+                        <rect x="-4" y="-2" width="8" height="4" fill="white"/>
                       </g>
                       
-                      {/* Enhanced Mercedes logo */}
-                      <circle cx="12" cy="35" r="2.5" fill="#c0c0c0" stroke="#666" strokeWidth="1"/>
-                      <path d="M12 32 L12 38 M9 35.5 L15 35.5 M10 33 L14 37" stroke="#333" strokeWidth="1"/>
+                      {/* Purple roof rack */}
+                      <rect x="25" y="22" width="65" height="3" rx="1.5" fill="#8B5CF6"/>
                       
-                      {/* Enhanced headlights */}
-                      <ellipse cx="5" cy="33" rx="1.5" ry="2" fill="#fff3cd" opacity="0.9"/>
-                      <ellipse cx="5" cy="39" rx="1.5" ry="2" fill="#fff3cd" opacity="0.9"/>
+                      {/* Side mirror */}
+                      <ellipse cx="20" cy="32" rx="2.5" ry="1.5" fill="#8B5CF6"/>
                       
-                      {/* Enhanced wheels */}
-                      <circle cx="25" cy="60" r="6" fill="#333"/>
-                      <circle cx="25" cy="60" r="4.5" fill="#666"/>
-                      <circle cx="25" cy="60" r="2.5" fill="#999"/>
-                      <circle cx="25" cy="60" r="1" fill="#ccc"/>
+                      {/* Veterinary text */}
+                      <text x="60" y="20" fontSize="5" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VET VAN</text>
                       
-                      <circle cx="77" cy="60" r="6" fill="#333"/>
-                      <circle cx="77" cy="60" r="4.5" fill="#666"/>
-                      <circle cx="77" cy="60" r="2.5" fill="#999"/>
-                      <circle cx="77" cy="60" r="1" fill="#ccc"/>
-                      
-                      {/* Enhanced rear doors */}
-                      <rect x="88" y="32" width="10" height="20" rx="2" fill="white" stroke="#ddd" strokeWidth="1"/>
-                      <line x1="93" y1="32" x2="93" y2="52" stroke="#ccc" strokeWidth="1"/>
-                      
-                      {/* Contact info */}
-                      <text x="56" y="50" fontSize="2.5" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif">📞 920011626</text>
-                      
-                      {/* Side mirrors */}
-                      <ellipse cx="18" cy="32" rx="2" ry="1" fill="#333"/>
-                      <ellipse cx="18" cy="38" rx="2" ry="1" fill="#333"/>
+                      {/* Small paw prints decoration */}
+                      <g transform="translate(75,35)">
+                        <ellipse cx="0" cy="0" rx="1.5" ry="1" fill="#8B5CF6"/>
+                        <ellipse cx="-1" cy="-1.5" rx="0.8" ry="0.6" fill="#8B5CF6"/>
+                        <ellipse cx="0" cy="-1.8" rx="0.8" ry="0.6" fill="#8B5CF6"/>
+                        <ellipse cx="1" cy="-1.5" rx="0.8" ry="0.6" fill="#8B5CF6"/>
+                      </g>
                     </svg>
                   </div>
                   
