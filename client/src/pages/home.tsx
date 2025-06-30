@@ -432,6 +432,11 @@ export default function Home() {
                       src={truckIcon} 
                       alt="Veterinary Truck" 
                       className="w-full h-full object-contain drop-shadow-lg"
+                      style={{
+                        opacity: 0.8,
+                        filter: 'contrast(1.1) saturate(1.2)',
+                        mixBlendMode: 'multiply'
+                      }}
                     />
                   </div>
                   
