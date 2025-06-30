@@ -122,7 +122,6 @@ export const translations = {
     welcomeUser: 'مرحباً',
     
     // Ride Request
-    requestVet: 'عيادات فيتس فان البيطرية المتنقلة',
     requestMobileVet: 'طلب عيادة بيطرية متنقلة',
     vetServiceType: 'نوع الخدمة البيطرية',
     generalExamination: 'فحص عام',
@@ -130,7 +129,6 @@ export const translations = {
     emergency: 'حالة طارئة',
     surgery: 'جراحة',
     pickupLocation: 'موقع الاستلام',
-    yourLocation: 'موقعك الحالي',
     currentLocation: 'موقعك الحالي',
     destination: 'الوجهة',
     enterDestination: 'أدخل الوجهة',
@@ -305,7 +303,6 @@ export const translations = {
     welcomeUser: 'Welcome',
     
     // Ride Request
-    requestVet: 'Vets Van Mobile Veterinary Clinic',
     requestMobileVet: 'Request Mobile Veterinary Clinic',
     vetServiceType: 'Veterinary Service Type',
     generalExamination: 'General Examination',
@@ -313,7 +310,6 @@ export const translations = {
     emergency: 'Emergency',
     surgery: 'Surgery',
     pickupLocation: 'Pickup Location',
-    yourLocation: 'Your Location',
     currentLocation: 'Your Current Location',
     destination: 'Destination',
     enterDestination: 'Enter destination',
