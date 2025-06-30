@@ -146,13 +146,6 @@ export default function Home() {
           <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-16 z-50 rounded-lg mx-4 mb-4">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img 
-                src={logoImage} 
-                alt="Vets Van" 
-                className="h-8 object-contain"
-              />
-            </div>
             <div>
               <p className="font-semibold text-gray-900">{user.name}</p>
               <p className="text-sm text-gray-500">
