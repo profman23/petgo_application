@@ -647,7 +647,7 @@ export default function Home() {
             }}
           >
             {/* Animated Glow Background */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500 animate-pulse"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
             
             {/* Main Button Container */}
             <div className="relative h-20 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
@@ -663,7 +663,7 @@ export default function Home() {
                   
                   {/* Icon Container */}
                   <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-white drop-shadow-lg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-white drop-shadow-lg">
                       <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
                     </svg>
                   </div>
@@ -688,7 +688,7 @@ export default function Home() {
             }}
           >
             {/* Animated Glow Background */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500 animate-pulse"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
             
             {/* Main Button Container */}
             <div className="relative h-20 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 group-active:scale-95">
@@ -704,7 +704,7 @@ export default function Home() {
                   
                   {/* Icon Container */}
                   <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-white drop-shadow-lg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-white drop-shadow-lg">
                       <path d="M9 11H7l5-9 5 9h-2l-3 8-3-8z"/>
                     </svg>
                   </div>
@@ -732,7 +732,7 @@ export default function Home() {
             }}
           >
             {/* Animated Glow Background */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500 animate-pulse"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
             
             {/* Main Button Container */}
             <div className="relative h-20 bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
@@ -748,7 +748,7 @@ export default function Home() {
                   
                   {/* Icon Container */}
                   <div className="relative w-10 h-10 bg-gradient-to-br from-white/40 to-white/20 rounded-full flex items-center justify-center border border-white/30 group-hover:border-white/50 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="text-white drop-shadow-lg">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-white drop-shadow-lg">
                       <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                     </svg>
                   </div>
