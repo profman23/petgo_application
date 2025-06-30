@@ -123,7 +123,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4" dir={getDirection(language)}>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-2" dir={getDirection(language)}>
       {/* Full screen border with logo integration */}
       <div className="min-h-screen border-4 rounded-2xl relative overflow-hidden" style={{ 
         borderColor: 'var(--purple-primary)', 
@@ -133,23 +133,23 @@ export default function Home() {
         
 
 
-        {/* Main content with padding for border */}
-        <div className="min-h-full pt-16">
-          {/* Header */}
-          <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-16 z-50 rounded-lg mx-4 mb-4">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 flex items-center justify-center">
+        {/* Main content with minimal padding */}
+        <div className="min-h-full pt-2">
+          {/* Header - Compact Design */}
+          <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-2 z-50 rounded-lg mx-2 mb-2">
+        <div className="flex items-center justify-between p-2">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 flex items-center justify-center">
               <img 
                 src={logoImage} 
                 alt="Vets Van" 
-                className="h-8 object-contain"
+                className="h-6 object-contain"
               />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">{user.name}</p>
-              <p className="text-sm text-gray-500">
-                {t('membership')}: {MEMBERSHIP_TYPES[user.membershipType as keyof typeof MEMBERSHIP_TYPES]}
+              <p className="font-semibold text-gray-900 text-sm">{user.name}</p>
+              <p className="text-xs text-gray-500">
+                {MEMBERSHIP_TYPES[user.membershipType as keyof typeof MEMBERSHIP_TYPES]}
               </p>
             </div>
           </div>
@@ -169,10 +169,10 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="p-4">
+      <div className="p-2">
         {/* Active Ride Card - Only show if ride is active */}
         {actualActiveRide && (
-          <Card className="mb-6 border-blue-200 bg-blue-50">
+          <Card className="mb-3 border-blue-200 bg-blue-50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -188,12 +188,12 @@ export default function Home() {
         )}
 
         {/* Request Status and Actions */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ textAlign }}>{t('requestMobileVet')}</h2>
+        <div className="mb-3">
+          <h2 className="text-lg font-bold text-gray-900 mb-2" style={{ textAlign }}>{t('requestMobileVet')}</h2>
           
           {/* Show current ride status if exists */}
           {actualActiveRide && (
-            <div className="mb-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg shadow-sm">
+            <div className="mb-2 p-3 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg shadow-sm">
               <div className="text-center">
                 <div className="flex items-center justify-center mb-2">
                   {actualActiveRide.status === 'requested' && <Clock className="w-5 h-5 text-blue-600 mr-2" />}
@@ -214,13 +214,13 @@ export default function Home() {
               </div>
 
               {/* Progress Animation for Active Ride */}
-              <div className="mt-4 p-4 bg-white rounded-lg border border-purple-200">
-                <div className="text-sm font-semibold text-purple-800 mb-3 text-center" style={{ textAlign }}>
+              <div className="mt-2 p-2 bg-white rounded-lg border border-purple-200">
+                <div className="text-xs font-semibold text-purple-800 mb-2 text-center" style={{ textAlign }}>
                   {language === 'ar' ? 'تتبع العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic Tracking'}
                 </div>
                 
                 {/* Progress Road */}
-                <div className="relative h-16 bg-gray-300 rounded-lg mb-2 overflow-hidden">
+                <div className="relative h-12 bg-gray-300 rounded-lg mb-1 overflow-hidden">
                   {/* Progress line - completed portion */}
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 transition-all duration-1000 ease-in-out"
