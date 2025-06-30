@@ -121,9 +121,29 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-4" dir={getDirection(language)}>
+      {/* Full screen border with logo integration */}
+      <div className="min-h-screen border-4 rounded-2xl relative overflow-hidden" style={{ 
+        borderColor: 'var(--purple-primary)', 
+        boxShadow: 'inset 0 0 50px rgba(139, 47, 139, 0.1), 0 20px 40px rgba(139, 47, 139, 0.15)',
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%)'
+      }}>
+        
+        {/* Logo at top center of border */}
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+          <div className="bg-white rounded-full p-4 border-4" style={{ borderColor: 'var(--purple-primary)' }}>
+            <img 
+              src={logoImage} 
+              alt="Vets Van" 
+              className="h-16 w-16 object-contain rounded-full"
+            />
+          </div>
+        </div>
+
+        {/* Main content with padding for border */}
+        <div className="min-h-full pt-16">
+          {/* Header */}
+          <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-16 z-50 rounded-lg mx-4 mb-4">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 flex items-center justify-center">
@@ -400,6 +420,8 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
+        </div>
+        </div>
       </div>
     </div>
   );
