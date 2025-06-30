@@ -426,89 +426,49 @@ export default function Home() {
                   <div className={`absolute top-1 h-20 w-28 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    {/* Purple Veterinary Van SVG - Styled after attached image */}
-                    <svg viewBox="0 0 120 80" className="w-full h-full drop-shadow-2xl">
+                    {/* Flat Design Truck - Exact match to attached image */}
+                    <svg viewBox="0 0 100 70" className="w-full h-full drop-shadow-xl">
                       {/* Vehicle shadow */}
-                      <ellipse cx="60" cy="78" rx="50" ry="3" fill="black" opacity="0.2"/>
+                      <ellipse cx="50" cy="68" rx="40" ry="2" fill="black" opacity="0.2"/>
                       
-                      {/* Main van body - Purple theme */}
-                      <rect x="20" y="25" width="75" height="32" rx="8" fill="#F8E8F8" stroke="#8B5CF6" strokeWidth="2"/>
+                      {/* Main cargo box - light pink/beige background */}
+                      <rect x="15" y="15" width="50" height="35" rx="8" fill="#F5E6D8" stroke="#8B4590" strokeWidth="3"/>
                       
-                      {/* Front cab */}
-                      <path d="M5 30 L20 25 L20 57 L5 57 Z" fill="#F8E8F8" stroke="#8B5CF6" strokeWidth="2"/>
+                      {/* Front cab - beige/pink */}
+                      <path d="M65 20 L85 20 L85 35 Q85 45 75 45 L65 45 Z" fill="#E8C5B5" stroke="#8B4590" strokeWidth="3"/>
                       
-                      {/* Purple body panels */}
-                      <rect x="22" y="40" width="71" height="15" rx="3" fill="#8B5CF6"/>
+                      {/* Red light on top of cab */}
+                      <rect x="75" y="12" width="8" height="6" rx="2" fill="#E53E3E"/>
                       
-                      {/* Cargo area with paw print design */}
-                      <rect x="25" y="28" width="65" height="25" rx="4" fill="#F3E8FF" stroke="#8B5CF6" strokeWidth="1.5"/>
+                      {/* Blue windshield */}
+                      <path d="M70 22 L82 22 L82 32 L70 32 Z" fill="#63B3ED" opacity="0.8"/>
                       
-                      {/* Large paw print in center */}
-                      <g transform="translate(57,40)">
-                        {/* Main paw pad */}
-                        <ellipse cx="0" cy="2" rx="6" ry="4" fill="#8B5CF6"/>
-                        {/* Toe pads */}
-                        <ellipse cx="-4" cy="-3" rx="2.5" ry="2" fill="#8B5CF6"/>
-                        <ellipse cx="-1" cy="-4" rx="2.5" ry="2" fill="#8B5CF6"/>
-                        <ellipse cx="2" cy="-4" rx="2.5" ry="2" fill="#8B5CF6"/>
-                        <ellipse cx="5" cy="-3" rx="2.5" ry="2" fill="#8B5CF6"/>
+                      {/* Door handle */}
+                      <circle cx="78" cy="38" r="1.5" fill="#8B4590"/>
+                      
+                      {/* Paw print in center of cargo area - EXACT MATCH */}
+                      <g transform="translate(40,32)">
+                        {/* Main pad */}
+                        <ellipse cx="0" cy="3" rx="5" ry="4" fill="#8B4590"/>
+                        {/* Four toe pads */}
+                        <ellipse cx="-4" cy="-3" rx="2.5" ry="2" fill="#8B4590"/>
+                        <ellipse cx="-1" cy="-4.5" rx="2.5" ry="2" fill="#8B4590"/>
+                        <ellipse cx="2" cy="-4.5" rx="2.5" ry="2" fill="#8B4590"/>
+                        <ellipse cx="5" cy="-3" rx="2.5" ry="2" fill="#8B4590"/>
                       </g>
                       
-                      {/* Front grille and bumper */}
-                      <rect x="2" y="35" width="5" height="15" rx="2" fill="#7C3AED"/>
-                      <rect x="3" y="37" width="3" height="11" rx="1" fill="#6B21A8"/>
+                      {/* Wheels - dark with purple centers */}
+                      <circle cx="25" cy="52" r="8" fill="#4A5568"/>
+                      <circle cx="25" cy="52" r="5" fill="#8B4590"/>
+                      <circle cx="25" cy="52" r="2" fill="#2D3748"/>
                       
-                      {/* Windshield */}
-                      <path d="M7 30 L20 25 L20 35 L7 40 Z" fill="#60A5FA" opacity="0.8"/>
+                      <circle cx="75" cy="52" r="8" fill="#4A5568"/>
+                      <circle cx="75" cy="52" r="5" fill="#8B4590"/>
+                      <circle cx="75" cy="52" r="2" fill="#2D3748"/>
                       
-                      {/* Side windows */}
-                      <rect x="92" y="28" width="8" height="12" rx="2" fill="#60A5FA" opacity="0.8"/>
-                      
-                      {/* Purple door handles */}
-                      <circle cx="90" cy="40" r="1.5" fill="#8B5CF6"/>
-                      <circle cx="98" cy="40" r="1.5" fill="#8B5CF6"/>
-                      
-                      {/* Headlights */}
-                      <ellipse cx="6" cy="33" rx="2" ry="2.5" fill="#FEF3C7"/>
-                      <ellipse cx="6" cy="40" rx="2" ry="2.5" fill="#FEF3C7"/>
-                      
-                      {/* Wheels with purple rims */}
-                      <circle cx="28" cy="62" r="7" fill="#374151"/>
-                      <circle cx="28" cy="62" r="5" fill="#8B5CF6"/>
-                      <circle cx="28" cy="62" r="3" fill="#6B21A8"/>
-                      <circle cx="28" cy="62" r="1.5" fill="#C4B5FD"/>
-                      
-                      <circle cx="82" cy="62" r="7" fill="#374151"/>
-                      <circle cx="82" cy="62" r="5" fill="#8B5CF6"/>
-                      <circle cx="82" cy="62" r="3" fill="#6B21A8"/>
-                      <circle cx="82" cy="62" r="1.5" fill="#C4B5FD"/>
-                      
-                      {/* Rear doors */}
-                      <rect x="100" y="30" width="12" height="25" rx="3" fill="#F8E8F8" stroke="#8B5CF6" strokeWidth="2"/>
-                      <line x1="106" y1="30" x2="106" y2="55" stroke="#8B5CF6" strokeWidth="1.5"/>
-                      
-                      {/* Medical cross symbol */}
-                      <g transform="translate(35,45)">
-                        <rect x="-2" y="-4" width="4" height="8" fill="white"/>
-                        <rect x="-4" y="-2" width="8" height="4" fill="white"/>
-                      </g>
-                      
-                      {/* Purple roof rack */}
-                      <rect x="25" y="22" width="65" height="3" rx="1.5" fill="#8B5CF6"/>
-                      
-                      {/* Side mirror */}
-                      <ellipse cx="20" cy="32" rx="2.5" ry="1.5" fill="#8B5CF6"/>
-                      
-                      {/* Veterinary text */}
-                      <text x="60" y="20" fontSize="5" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VET VAN</text>
-                      
-                      {/* Small paw prints decoration */}
-                      <g transform="translate(75,35)">
-                        <ellipse cx="0" cy="0" rx="1.5" ry="1" fill="#8B5CF6"/>
-                        <ellipse cx="-1" cy="-1.5" rx="0.8" ry="0.6" fill="#8B5CF6"/>
-                        <ellipse cx="0" cy="-1.8" rx="0.8" ry="0.6" fill="#8B5CF6"/>
-                        <ellipse cx="1" cy="-1.5" rx="0.8" ry="0.6" fill="#8B5CF6"/>
-                      </g>
+                      {/* Small details like in the original */}
+                      <circle cx="55" cy="42" r="1.5" fill="#8B4590"/>
+                      <rect x="57" y="41" width="4" height="2" rx="1" fill="#8B4590"/>
                     </svg>
                   </div>
                   
