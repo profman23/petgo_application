@@ -166,11 +166,15 @@ export default function Home() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-blue-900">{t('activeRide')}</p>
-                  <p className="text-sm text-blue-700">{t('clickToContinue')}</p>
+                  <p className="font-semibold text-blue-900">
+                    {language === 'ar' ? 'لديك طلب عيادة بيطرية نشط' : 'You have an active veterinary request'}
+                  </p>
+                  <p className="text-sm text-blue-700">
+                    {language === 'ar' ? 'اضغط للمتابعة' : 'Click to continue'}
+                  </p>
                 </div>
                 <Button onClick={() => setLocation('/ride-tracking')} className="bg-blue-600 hover:bg-blue-700">
-                  {t('continueTracking')}
+                  {language === 'ar' ? 'متابعة التتبع' : 'Continue Tracking'}
                 </Button>
               </div>
             </CardContent>
@@ -192,11 +196,19 @@ export default function Home() {
                   {actualActiveRide.status === 'arrived' && <MapPin className="w-5 h-5 text-purple-600 mr-2" />}
                   {actualActiveRide.status === 'in_progress' && <Stethoscope className="w-5 h-5 text-red-600 mr-2" />}
                   <div className="text-lg font-semibold text-gray-900" style={{ textAlign }}>
-                    {t(actualActiveRide.status)}
+                    {actualActiveRide.status === 'requested' && (language === 'ar' ? 'تم إرسال الطلب' : 'Request Sent')}
+                    {actualActiveRide.status === 'confirmed' && (language === 'ar' ? 'تم قبول الطلب' : 'Request Accepted')}
+                    {actualActiveRide.status === 'enroute' && (language === 'ar' ? 'في الطريق' : 'En Route')}
+                    {actualActiveRide.status === 'arrived' && (language === 'ar' ? 'وصل الطبيب' : 'Doctor Arrived')}
+                    {actualActiveRide.status === 'in_progress' && (language === 'ar' ? 'جاري الفحص' : 'Examination in Progress')}
                   </div>
                 </div>
                 <div className="text-sm text-gray-700 mb-2" style={{ textAlign }}>
-                  {t(`${actualActiveRide.status}Desc`)}
+                  {actualActiveRide.status === 'requested' && (language === 'ar' ? 'تم إرسال طلبك بنجاح وننتظر موافقة الطبيب البيطري' : 'Your request has been sent successfully and we are waiting for the veterinarian approval')}
+                  {actualActiveRide.status === 'confirmed' && (language === 'ar' ? 'تم قبول طلبك من قِبل الطبيب البيطري وهو في طريقه إليك' : 'Your request has been accepted by the veterinarian and they are on their way to you')}
+                  {actualActiveRide.status === 'enroute' && (language === 'ar' ? 'الطبيب البيطري في طريقه إليك الآن' : 'The veterinarian is on their way to you now')}
+                  {actualActiveRide.status === 'arrived' && (language === 'ar' ? 'وصل الطبيب البيطري إلى موقعك' : 'The veterinarian has arrived at your location')}
+                  {actualActiveRide.status === 'in_progress' && (language === 'ar' ? 'جاري فحص الحيوان الأليف' : 'Pet examination in progress')}
                 </div>
                 <div className="mt-2 text-xs text-blue-600" style={{ textAlign }}>
                   {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
@@ -529,6 +541,30 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Request Button - Enhanced */}
+              <div className="mb-6">
+                <Button 
+                  onClick={() => setLocation('/ride-request')}
+                  disabled={!!actualActiveRide}
+                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-6 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <Truck className="w-10 h-10 animate-bounce" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-xl mb-2">
+                      {actualActiveRide 
+                        ? (language === 'ar' ? 'لديك طلب نشط' : 'You have an active request')
+                        : (language === 'ar' ? 'اطلب العيادة البيطرية الآن' : 'Request Veterinary Clinic Now')
+                      }
+                    </div>
+                    <div className="text-sm opacity-90">
+                      {language === 'ar' ? 'عيادة بيطرية متنقلة إلى منزلك' : 'Mobile Veterinary Clinic to Your Home'}
+                    </div>
+                  </div>
+                </Button>
               </div>
             </CardContent>
           </Card>
