@@ -637,14 +637,70 @@ export default function Home() {
         </div>
 
         {/* Recent Activity */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">{t('recentOrders')}</h3>
-            <div className="text-center py-8">
-              <p className="text-gray-500">{t('noPreviousOrders')}</p>
+        {/* Navigation Buttons */}
+        <div className="grid grid-cols-3 gap-3">
+          {/* Home Button */}
+          <Button
+            variant="outline"
+            className="h-16 flex flex-col items-center justify-center space-y-2 border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 group"
+            onClick={() => {
+              // Already on home page - maybe refresh or scroll to top
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
+            <div className="p-2 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-600">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9,22 9,12 15,12 15,22"/>
+              </svg>
             </div>
-          </CardContent>
-        </Card>
+            <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700" style={{ textAlign }}>
+              {t('home')}
+            </span>
+          </Button>
+
+          {/* Activity Button */}
+          <Button
+            variant="outline"
+            className="h-16 flex flex-col items-center justify-center space-y-2 border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 group"
+            onClick={() => {
+              // Navigate to activity/tracking page
+              setLocation('/ride-tracking');
+            }}
+          >
+            <div className="p-2 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-600">
+                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+              </svg>
+            </div>
+            <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700" style={{ textAlign }}>
+              {t('activity')}
+            </span>
+          </Button>
+
+          {/* Account Button */}
+          <Button
+            variant="outline"
+            className="h-16 flex flex-col items-center justify-center space-y-2 border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all duration-300 group"
+            onClick={() => {
+              // For now, show user info or settings
+              toast({
+                title: language === 'ar' ? 'إعدادات الحساب' : 'Account Settings',
+                description: language === 'ar' ? 'ستتوفر هذه الميزة قريباً' : 'This feature will be available soon',
+              });
+            }}
+          >
+            <div className="p-2 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-colors">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple-600">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700" style={{ textAlign }}>
+              {t('account')}
+            </span>
+          </Button>
+        </div>
         </div>
         </div>
       </div>

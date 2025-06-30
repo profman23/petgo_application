@@ -242,6 +242,9 @@ Changelog:
 - June 30, 2025. UPGRADED: Clinic and house icons redesigned as professional SVG buildings with purple theme and architectural details
 - June 30, 2025. ADDED: Animated pet silhouettes (dog and cat) bouncing at road edges to create more engaging user experience
 - June 30, 2025. IMPROVED: Road animation with gradient background, enhanced shadows, and realistic van shadow effects
+- June 30, 2025. REPLACED: Recent Orders section with elegant navigation buttons (Account, Activity, Home) featuring bilingual support and purple theme
+- June 30, 2025. ENHANCED: Navigation buttons with SVG icons, hover effects, and proper Arabic/English text alignment
+- June 30, 2025. UPDATED: Translation system to include new navigation button labels in both Arabic and English
 ```
 
 ## User Preferences

@@ -120,6 +120,16 @@ export const translations = {
     continueTracking: 'متابعة الرحلة',
     noActiveRide: 'لا توجد رحلة نشطة',
     welcomeUser: 'مرحباً',
+    quickActions: 'إجراءات سريعة',
+    activeRide: 'لديك رحلة نشطة',
+    clickToContinue: 'اضغط لمتابعة التتبع',
+    recentOrders: 'الطلبات الأخيرة',
+    noPreviousOrders: 'لا توجد طلبات سابقة',
+    
+    // Navigation buttons
+    account: 'الحساب',
+    activity: 'النشاط',
+    home: 'الرئيسية',
     
     // Ride Request
     requestMobileVet: 'طلب عيادة بيطرية متنقلة',
@@ -387,6 +397,11 @@ export const translations = {
     continueTracking: 'Continue Tracking',
     recentOrders: 'Recent Orders',
     noPreviousOrders: 'No previous orders',
+    
+    // Navigation buttons
+    account: 'Account',
+    activity: 'Activity',
+    home: 'Home',
     veterinaryServiceLocation: 'Veterinary service at your location',
     
     // Status Messages
