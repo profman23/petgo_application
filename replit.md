@@ -233,6 +233,12 @@ Changelog:
 - June 24, 2025. Added visual effects: shadows, smooth transitions, and hover animations for better user experience
 - June 24, 2025. FIXED: Infinite loop issues in polling system using useRef instead of dependencies in useEffect
 - June 24, 2025. Resolved "Maximum update depth exceeded" errors in doctor dashboard and ride tracking components
+- June 30, 2025. MAJOR UX IMPROVEMENT: Unified single-screen experience for customers
+- June 30, 2025. Integrated ride request functionality directly into home screen eliminating separate navigation
+- June 30, 2025. Added comprehensive veterinary service information section with animated graphics
+- June 30, 2025. Enhanced visual journey animation showing clinic to home delivery with SVG illustrations
+- June 30, 2025. Applied full-screen purple border design with enhanced header and consistent branding
+- June 30, 2025. Removed all external padding and margins for clean edge-to-edge purple border experience
 ```
 
 ## User Preferences

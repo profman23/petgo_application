@@ -124,42 +124,46 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white border-4 border-purple-600 p-0 m-0" style={{ margin: 0, padding: 0 }} dir={getDirection(language)}>
+    <div className="min-h-screen bg-white border-4 border-purple-600" style={{ margin: 0, padding: 0 }} dir={getDirection(language)}>
       {/* Header */}
-      <header className="bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg sticky top-0 z-50">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 flex items-center justify-center">
+      <header className="bg-gradient-to-r from-purple-600 to-purple-700 shadow-lg">
+        <div className="container mx-auto p-4 max-w-md">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
               <img 
                 src={logoImage} 
                 alt="Vets Van" 
-                className="h-8 object-contain"
+                className="h-12 object-contain rounded-lg border-2 border-purple-300"
               />
+              <div>
+                <h1 className="text-xl font-bold text-white" style={{ textAlign }}>
+                  {language === 'ar' ? 'عيادات فيتس فان البيطرية' : 'Vets Van Veterinary Clinics'}
+                </h1>
+                <p className="text-sm text-purple-100" style={{ textAlign }}>
+                  {user?.firstName ? `${language === 'ar' ? 'أهلاً' : 'Welcome'} ${user.firstName}` : (language === 'ar' ? 'مرحباً' : 'Welcome')}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-gray-900">{user.name}</p>
-              <p className="text-sm text-gray-500">
-                {t('membership')}: {MEMBERSHIP_TYPES[user.membershipType as keyof typeof MEMBERSHIP_TYPES]}
-              </p>
+            <div className="flex items-center gap-2">
+              <LanguageSelector />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('user');
+                  setLocation('/login');
+                }}
+                className="text-purple-100 hover:text-white hover:bg-purple-800"
+              >
+                <Settings className="w-5 h-5" />
+              </Button>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <LanguageSelector />
-            <Button variant="ghost" size="icon">
-              <Bell className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" onClick={handleLogout} className="text-red-600">
-              {t('logout')}
-            </Button>
           </div>
         </div>
       </header>
 
-      <div className="p-4">
+      <div className="container mx-auto p-4 max-w-md">
         {/* Active Ride Card - Only show if ride is active */}
         {actualActiveRide && (
           <Card className="mb-6 border-blue-200 bg-blue-50">
