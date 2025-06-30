@@ -576,18 +576,18 @@ export default function Home() {
 
               {/* Company Logo */}
               <div className="flex-shrink-0">
-                <div className="w-16 h-16 rounded-full bg-white border-4 border-purple-300 flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 rounded-full bg-white border-2 border-purple-300 flex items-center justify-center shadow-lg">
                   <img 
                     src={logoImage} 
                     alt="Vets Van" 
-                    className="h-12 w-12 object-contain rounded-full"
+                    className="h-8 w-8 object-contain rounded-full"
                   />
                 </div>
               </div>
 
               {/* Cat Icon */}
               <div className="flex-shrink-0">
-                <svg width="48" height="48" viewBox="0 0 48 48" className="drop-shadow-lg">
+                <svg width="32" height="32" viewBox="0 0 48 48" className="drop-shadow-lg">
                   <ellipse cx="24" cy="30" rx="12" ry="10" fill="#d3d3d3" stroke="#a9a9a9" strokeWidth="1"/>
                   <circle cx="24" cy="20" r="10" fill="#f5f5f5" stroke="#dcdcdc" strokeWidth="1"/>
                   <polygon points="16,12 20,8 22,14" fill="#f5f5f5" stroke="#dcdcdc" strokeWidth="1"/>
@@ -602,8 +602,8 @@ export default function Home() {
             </div>
 
             {/* Real VETS VAN Image Display */}
-            <div className="flex justify-center mb-6">
-              <div className="w-48 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-purple-200">
+            <div className="flex justify-center mb-3">
+              <div className="w-32 h-20 rounded-xl overflow-hidden shadow-2xl border-2 border-purple-200">
                 <img 
                   src={vetsVanImage} 
                   alt="VETS VAN Mobile Veterinary Clinic" 
@@ -616,7 +616,7 @@ export default function Home() {
             <Button
               onClick={handleRequestRide}
               disabled={!!actualActiveRide}
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-6 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl"
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-4 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl"
             >
               <div className="text-center">
                 <div className="font-bold text-xl mb-2">
@@ -638,10 +638,10 @@ export default function Home() {
 
         {/* Recent Activity */}
         {/* Enhanced Navigation Buttons */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-3">
           {/* Home Button - Elevated Design */}
           <div 
-            className="relative h-20 cursor-pointer group"
+            className="relative h-16 cursor-pointer group"
             onClick={() => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
@@ -662,15 +662,15 @@ export default function Home() {
 
           {/* Activity Button - Professional Design */}
           <div 
-            className="relative h-20 cursor-pointer group"
+            className="relative h-16 cursor-pointer group"
             onClick={() => {
               setLocation('/ride-tracking');
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105"></div>
-            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-2 group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-cyan-50 transition-all duration-300">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-300 shadow-inner">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-blue-600 group-hover:text-blue-700">
+            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-1 group-hover:bg-gradient-to-br group-hover:from-blue-50 group-hover:to-cyan-50 transition-all duration-300">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100 group-hover:from-blue-200 group-hover:to-cyan-200 transition-all duration-300 shadow-inner">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-blue-600 group-hover:text-blue-700">
                   <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                 </svg>
               </div>
@@ -682,7 +682,7 @@ export default function Home() {
 
           {/* Account Button - Elegant Design */}
           <div 
-            className="relative h-20 cursor-pointer group"
+            className="relative h-16 cursor-pointer group"
             onClick={() => {
               toast({
                 title: language === 'ar' ? 'إعدادات الحساب' : 'Account Settings',
@@ -691,9 +691,9 @@ export default function Home() {
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-105"></div>
-            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-2 group-hover:bg-gradient-to-br group-hover:from-emerald-50 group-hover:to-teal-50 transition-all duration-300">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-300 shadow-inner">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-emerald-600 group-hover:text-emerald-700">
+            <div className="relative h-full bg-white rounded-2xl m-0.5 flex flex-col items-center justify-center space-y-1 group-hover:bg-gradient-to-br group-hover:from-emerald-50 group-hover:to-teal-50 transition-all duration-300">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 group-hover:from-emerald-200 group-hover:to-teal-200 transition-all duration-300 shadow-inner">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-emerald-600 group-hover:text-emerald-700">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
