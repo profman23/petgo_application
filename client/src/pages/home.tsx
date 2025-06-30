@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope } from 'lucide-react';
+import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Shield } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
@@ -92,8 +92,11 @@ export default function Home() {
   }, [toast, language]);
 
   const handleRequestRide = () => {
-    // Always go to request a new ride since cancelled rides are filtered out
-    setLocation('/ride-request');
+    // Instead of navigating, scroll to request section
+    const requestSection = document.getElementById('request-section');
+    if (requestSection) {
+      requestSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   // Function to get progress percentage based on ride status
@@ -391,12 +394,156 @@ export default function Home() {
           </Button>
         </div>
 
+        {/* Integrated Request Section */}
+        <div id="request-section" className="scroll-mt-20">
+          <Card className="border-4 border-purple-600 bg-white mb-6">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-bold text-purple-700 mb-4 text-center" style={{ textAlign }}>
+                {language === 'ar' ? 'عيادات فيتس فان البيطرية المتنقلة' : 'Vets Van Mobile Veterinary Clinic'}
+              </h2>
+              
+              {/* Enhanced Visual Journey Animation */}
+              <div className="mb-6">
+                <h3 className="font-bold text-lg text-purple-700 mb-4 text-center" style={{ textAlign }}>
+                  {language === 'ar' ? 'رحلة العيادة البيطرية إليك' : 'Veterinary Clinic Journey to You'}
+                </h3>
+                
+                {/* Enhanced Animation with SVG */}
+                <div className="relative h-32 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg overflow-hidden">
+                  {/* Hospital SVG Icon */}
+                  <div className={`absolute top-4 ${language === 'ar' ? 'right-4' : 'left-4'} flex flex-col items-center`}>
+                    <div className="w-16 h-16 bg-white rounded-lg shadow-lg flex items-center justify-center border-2 border-green-300">
+                      <svg viewBox="0 0 64 64" className="w-12 h-12">
+                        <rect x="10" y="20" width="44" height="35" fill="#4ade80" rx="4"/>
+                        <rect x="18" y="12" width="28" height="15" fill="#22c55e" rx="2"/>
+                        <rect x="28" y="30" width="8" height="3" fill="white"/>
+                        <rect x="30.5" y="27.5" width="3" height="8" fill="white"/>
+                        <circle cx="22" cy="38" r="2" fill="white"/>
+                        <circle cx="42" cy="38" r="2" fill="white"/>
+                        <rect x="26" y="45" width="12" height="2" fill="white"/>
+                      </svg>
+                    </div>
+                    <span className="text-xs font-medium text-green-700 mt-1">
+                      {language === 'ar' ? 'العيادة' : 'Clinic'}
+                    </span>
+                  </div>
+
+                  {/* Enhanced Veterinary Truck Animation */}
+                  <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+                    <div className="relative">
+                      <svg viewBox="0 0 120 60" className="w-24 h-12 animate-bounce">
+                        {/* Truck Body */}
+                        <rect x="20" y="25" width="50" height="20" fill="#8b5cf6" rx="3"/>
+                        <rect x="70" y="30" width="25" height="15" fill="#7c3aed" rx="2"/>
+                        
+                        {/* Medical Cross */}
+                        <rect x="40" y="30" width="10" height="3" fill="white"/>
+                        <rect x="43" y="27" width="4" height="9" fill="white"/>
+                        
+                        {/* Windows */}
+                        <rect x="72" y="32" width="8" height="6" fill="#e0e7ff"/>
+                        <rect x="82" y="32" width="8" height="6" fill="#e0e7ff"/>
+                        
+                        {/* Wheels */}
+                        <circle cx="30" cy="48" r="6" fill="#374151"/>
+                        <circle cx="30" cy="48" r="4" fill="#6b7280"/>
+                        <circle cx="80" cy="48" r="6" fill="#374151"/>
+                        <circle cx="80" cy="48" r="4" fill="#6b7280"/>
+                        
+                        {/* Lights */}
+                        <circle cx="95" cy="35" r="2" fill="#fbbf24"/>
+                        <rect x="18" y="33" width="3" height="4" fill="#ef4444"/>
+                      </svg>
+                      
+                      {/* Movement lines */}
+                      <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 opacity-60">
+                        <div className="w-4 h-0.5 bg-purple-400 animate-pulse"></div>
+                        <div className="w-3 h-0.5 bg-purple-300 mt-1 animate-pulse delay-100"></div>
+                        <div className="w-2 h-0.5 bg-purple-200 mt-1 animate-pulse delay-200"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Home SVG Icon */}
+                  <div className={`absolute top-4 ${language === 'ar' ? 'left-4' : 'right-4'} flex flex-col items-center`}>
+                    <div className="w-16 h-16 bg-white rounded-lg shadow-lg flex items-center justify-center border-2 border-blue-300">
+                      <svg viewBox="0 0 64 64" className="w-12 h-12">
+                        <polygon points="32,8 8,28 8,56 24,56 24,40 40,40 40,56 56,56 56,28" fill="#3b82f6"/>
+                        <polygon points="32,8 8,28 56,28" fill="#1d4ed8"/>
+                        <rect x="28" y="44" width="8" height="12" fill="#1e40af"/>
+                        <rect x="30" y="46" width="4" height="4" fill="#93c5fd"/>
+                        <circle cx="18" cy="34" r="2" fill="#60a5fa"/>
+                        <circle cx="46" cy="34" r="2" fill="#60a5fa"/>
+                      </svg>
+                    </div>
+                    <span className="text-xs font-medium text-blue-700 mt-1">
+                      {language === 'ar' ? 'منزلك' : 'Your Home'}
+                    </span>
+                  </div>
+
+                  {/* Direction Arrow */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-8">
+                    <svg className={`w-8 h-4 text-purple-500 animate-pulse ${language === 'ar' ? 'rotate-180' : ''}`} fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Service Information */}
+              <div className="mb-6">
+                <h3 className="font-bold text-lg text-purple-700 mb-4" style={{ textAlign }}>
+                  {language === 'ar' ? 'معلومات الخدمة' : 'Service Information'}
+                </h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <p className="text-green-600 font-medium mb-1" style={{ textAlign }}>
+                      {language === 'ar' ? 'وقت الوصول المقدر' : 'Estimated Arrival'}
+                    </p>
+                    <p className="font-bold text-green-800" style={{ textAlign }}>
+                      {language === 'ar' ? '15-30 دقيقة' : '15-30 minutes'}
+                    </p>
+                  </div>
+                  <div className="bg-blue-50 p-3 rounded-lg">
+                    <p className="text-blue-600 font-medium mb-1" style={{ textAlign }}>
+                      {language === 'ar' ? 'مدة الخدمة' : 'Service Duration'}
+                    </p>
+                    <p className="font-bold text-blue-800" style={{ textAlign }}>
+                      {language === 'ar' ? '45-60 دقيقة' : '45-60 minutes'}
+                    </p>
+                  </div>
+                  <div className="bg-purple-50 p-3 rounded-lg">
+                    <p className="text-purple-600 font-medium mb-1" style={{ textAlign }}>
+                      {language === 'ar' ? 'رسوم الخدمة' : 'Service Fee'}
+                    </p>
+                    <p className="font-bold text-purple-800" style={{ textAlign }}>
+                      150 {language === 'ar' ? 'ريال' : 'SAR'}
+                    </p>
+                  </div>
+                  <div className="bg-orange-50 p-3 rounded-lg">
+                    <p className="text-orange-600 font-medium mb-1" style={{ textAlign }}>
+                      {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
+                    </p>
+                    <p className="font-bold text-orange-800" style={{ textAlign }}>
+                      {language === 'ar' ? 'نقدي' : 'Cash'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Recent Activity */}
         <Card>
           <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">{t('recentOrders')}</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">
+              {language === 'ar' ? 'الطلبات السابقة' : 'Recent Orders'}
+            </h3>
             <div className="text-center py-8">
-              <p className="text-gray-500">{t('noPreviousOrders')}</p>
+              <p className="text-gray-500">
+                {language === 'ar' ? 'لا توجد طلبات سابقة' : 'No previous orders'}
+              </p>
             </div>
           </CardContent>
         </Card>
