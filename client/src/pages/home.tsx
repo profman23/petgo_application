@@ -143,26 +143,28 @@ export default function Home() {
         <div className="min-h-full pt-2">
           {/* Header - Compact Design */}
           <header className="bg-white/90 backdrop-blur-sm shadow-lg border-b border-gray-200 sticky top-2 z-50 rounded-lg mx-2 mb-2">
-        <div className="flex items-center justify-between p-3">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 flex items-center justify-center bg-purple-50 rounded-xl border-2 border-purple-100 shadow-sm">
+        <div className={`flex items-center justify-between p-2 h-10 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+          {/* Logo and User Name - Always on start side */}
+          <div className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+            <div className="w-7 h-7 flex items-center justify-center bg-purple-50 rounded-lg border border-purple-100 shadow-sm">
               <img 
                 src={logoImage} 
                 alt="Vets Van" 
-                className="h-10 object-contain"
+                className="h-5 object-contain"
               />
             </div>
             <div>
-              <p className="font-bold text-gray-900 text-base">{user?.name || user?.firstName}</p>
+              <p className="font-semibold text-gray-900 text-xs">{user?.name || user?.firstName}</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          {/* Controls - Always on end side (right for English, left for Arabic) */}
+          <div className={`flex items-center gap-1 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
             <LanguageSelector />
-            <Button variant="ghost" size="icon" className="hover:bg-purple-50">
-              <Bell className="w-4 h-4 text-purple-600" />
+            <Button variant="ghost" size="icon" className="hover:bg-purple-50 w-6 h-6">
+              <Bell className="w-3 h-3 text-purple-600" />
             </Button>
-            <Button variant="ghost" onClick={handleLogout} className="text-red-600 hover:bg-red-50">
+            <Button variant="ghost" onClick={handleLogout} className="text-red-600 hover:bg-red-50 text-xs px-2 py-1 h-6">
               {t('logout')}
             </Button>
           </div>
