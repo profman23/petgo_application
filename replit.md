@@ -344,6 +344,7 @@ Changelog:
 - July 1, 2025. IMPROVED: Button responds to system language selection with proper Arabic/English text alignment
 - July 1, 2025. UPDATED: Account button color changed from cyan/turquoise to gray gradient for better visual hierarchy
 - July 1, 2025. REDESIGNED: Footer button colors - Home and Account now use dark purple (matching request button), Activity uses lighter gray for contrast
+- July 1, 2025. ENHANCED: Activity button pet icon (🐾) color changed to dark purple for better visual consistency with overall design theme
 ```
 
 ## User Preferences

@@ -73,7 +73,9 @@ export function FixedFooter() {
                   shadow-inner transition-all duration-300
                   ${isActive ? 'bg-white/30 shadow-lg' : ''}
                 `}>
-                  <span className="text-2xl filter drop-shadow-sm">
+                  <span className={`text-2xl filter drop-shadow-sm ${
+                    item.id === 'activity' ? 'text-purple-800' : ''
+                  }`}>
                     {item.icon}
                   </span>
                 </div>
