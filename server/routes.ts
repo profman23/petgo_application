@@ -659,7 +659,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/patients', requireAuth, async (req, res) => {
     try {
       const userId = req.user.id;
-      const { name, type, ageYear, ageMonth, ageDay, photo, condition } = req.body;
+      const { name, type, ageYear, ageMonth, ageDay, photo } = req.body;
       
       if (!name || !type) {
         return res.status(400).json({ message: 'Patient name and type are required' });
@@ -669,11 +669,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId,
         name,
         type,
-        ageYear,
-        ageMonth,
-        ageDay,
-        photo,
-        condition
+        ageYear: ageYear || null,
+        ageMonth: ageMonth || null,
+        ageDay: ageDay || null,
+        photo: photo || null,
       });
       
       res.status(201).json(patient);

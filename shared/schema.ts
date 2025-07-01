@@ -106,7 +106,7 @@ export const insertPatientSchema = createInsertSchema(patients).pick({
   ageMonth: true,
   ageDay: true,
   photo: true,
-  condition: true,
+  userId: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

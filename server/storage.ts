@@ -280,7 +280,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPatient(insertPatient: InsertPatient): Promise<Patient> {
-    const [patient] = await db.insert(patients).values(insertPatient).returning();
+    const [patient] = await db
+      .insert(patients)
+      .values({
+        name: insertPatient.name,
+        type: insertPatient.type,
+        userId: insertPatient.userId,
+        ageYear: insertPatient.ageYear || null,
+        ageMonth: insertPatient.ageMonth || null,
+        ageDay: insertPatient.ageDay || null,
+        photo: insertPatient.photo || null,
+      })
+      .returning();
     return patient;
   }
 }
