@@ -301,29 +301,7 @@ export default function RideRequest() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 pt-16" style={{ direction }}>
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
-        <div className="flex items-center justify-between p-4">
-          <Button
-            variant="ghost"
-            onClick={() => setLocation('/')}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {t('back')}
-          </Button>
-          <div className="flex items-center gap-3">
-            <img 
-              src={logoImage} 
-              alt="Vets Van" 
-              className="h-8 object-contain"
-            />
-            <h1 className="text-lg font-semibold" style={{ textAlign }}>{t('requestVet')}</h1>
-          </div>
-          <div className="w-10" />
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-50 pb-20 pt-4" style={{ direction }}>
 
       <div className="p-4">
         {/* Pet Selection Section */}
