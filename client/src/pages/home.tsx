@@ -10,6 +10,7 @@ import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import vetsVanImage from "@assets/image_1751292329902.png";
 import truckIcon from "@assets/10773561_1751295833176.png";
 import petsImage from "@assets/freepik_assistant_1751361910420_1751361937178.png";
+import newVetVanImage from "@assets/freepik__background__70346_1751363211262.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { FixedFooter } from '@/components/fixed-footer';
@@ -248,7 +249,7 @@ export default function Home() {
                     <div className="w-full h-1 bg-white opacity-40 animate-pulse"></div>
                   </div>
                   
-                  {/* Mercedes Sprinter VETS VAN - Moving */}
+                  {/* New Veterinary Van - Moving */}
                   <div 
                     className="absolute top-1 h-14 w-20 transition-all duration-2000 ease-in-out"
                     style={{
@@ -261,59 +262,12 @@ export default function Home() {
                       zIndex: 2
                     }}
                   >
-                    {/* Mercedes Sprinter SVG */}
-                    <svg viewBox="0 0 80 56" className="w-full h-full drop-shadow-lg">
-                      {/* Main van body */}
-                      <rect x="12" y="18" width="55" height="22" rx="4" fill="white" stroke="#ddd" strokeWidth="1"/>
-                      
-                      {/* Front cab */}
-                      <path d="M2 22 L12 18 L12 40 L2 40 Z" fill="white" stroke="#ddd" strokeWidth="1"/>
-                      
-                      {/* Mercedes grille */}
-                      <rect x="1" y="25" width="2" height="9" rx="1" fill="#333"/>
-                      <circle cx="2" cy="29" r="1.5" fill="#c0c0c0"/>
-                      
-                      {/* Windshield */}
-                      <path d="M3 22 L12 18 L12 25 L3 27 Z" fill="#87CEEB" opacity="0.7"/>
-                      
-                      {/* Side windows */}
-                      <rect x="15" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
-                      <rect x="25" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
-                      <rect x="35" y="19" width="8" height="4" rx="0.5" fill="#87CEEB" opacity="0.7"/>
-                      
-                      {/* Purple stripe */}
-                      <path d="M12 30 Q20 28 30 29 Q40 30 50 29 Q60 28 67 30 L67 37 Q60 35 50 36 Q40 37 30 36 Q20 35 12 37 Z" fill="#8B5CF6" opacity="0.8"/>
-                      
-                      {/* VETS VAN text */}
-                      <text x="40" y="16" fontSize="4" fill="#8B5CF6" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS VAN</text>
-                      <text x="30" y="26" fontSize="3" fill="white" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="bold">VETS</text>
-                      
-                      {/* Veterinary cross */}
-                      <g transform="translate(22,32)">
-                        <rect x="-1" y="-2" width="2" height="4" fill="#8B5CF6"/>
-                        <rect x="-2" y="-1" width="4" height="2" fill="#8B5CF6"/>
-                      </g>
-                      
-                      {/* Mercedes logo */}
-                      <circle cx="7" cy="23" r="1.5" fill="#c0c0c0"/>
-                      
-                      {/* Headlights */}
-                      <ellipse cx="3" cy="24" rx="1" ry="1.5" fill="#fff3cd"/>
-                      <ellipse cx="3" cy="28" rx="1" ry="1.5" fill="#fff3cd"/>
-                      
-                      {/* Wheels */}
-                      <circle cx="17" cy="41" r="4" fill="#333"/>
-                      <circle cx="17" cy="41" r="3" fill="#666"/>
-                      <circle cx="17" cy="41" r="1.5" fill="#999"/>
-                      
-                      <circle cx="55" cy="41" r="4" fill="#333"/>
-                      <circle cx="55" cy="41" r="3" fill="#666"/>
-                      <circle cx="55" cy="41" r="1.5" fill="#999"/>
-                      
-                      {/* Rear doors */}
-                      <rect x="62" y="22" width="7" height="15" rx="1" fill="white" stroke="#ddd"/>
-                      <line x1="65" y1="22" x2="65" y2="37" stroke="#ccc" strokeWidth="0.5"/>
-                    </svg>
+                    {/* Beautiful VET van with pets inside */}
+                    <img 
+                      src={newVetVanImage} 
+                      alt="Veterinary Van with Pets" 
+                      className="w-full h-full object-contain drop-shadow-lg"
+                    />
                   </div>
                   
                   {/* Modern Clinic Icon */}
@@ -425,14 +379,14 @@ export default function Home() {
                     <div className="w-full h-2 bg-purple-300 opacity-50 animate-pulse rounded-full"></div>
                   </div>
                   
-                  {/* Actual Truck Image from Attachment */}
+                  {/* New Veterinary Van Image */}
                   <div className={`absolute top-1 h-12 w-16 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    {/* Perfect isolated truck image with transparent background */}
+                    {/* Beautiful VET van with pets inside */}
                     <img 
-                      src={truckIcon} 
-                      alt="Veterinary Truck" 
+                      src={newVetVanImage} 
+                      alt="Veterinary Van with Pets" 
                       className="w-full h-full object-contain drop-shadow-lg"
                     />
                   </div>
