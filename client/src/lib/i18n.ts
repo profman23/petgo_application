@@ -451,6 +451,7 @@ export const translations = {
     // Navigation buttons
     account: 'Account',
     activity: 'Activity',
+    activityDesc: 'History of your mobile veterinary clinic requests',
     home: 'Home',
     veterinaryServiceLocation: 'Veterinary service at your location',
     

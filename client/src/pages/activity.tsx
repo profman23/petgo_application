@@ -46,13 +46,15 @@ export default function Activity() {
     switch (status) {
       case 'completed':
         return <CheckCircle className="text-green-500" size={20} />;
+      case 'arrived':
+        return <CheckCircle className="text-green-500" size={20} />;
       case 'cancelled':
+      case 'cancelled_by_doctor':
       case 'rejected':
         return <XCircle className="text-red-500" size={20} />;
       case 'requested':
       case 'confirmed':
       case 'in_progress':
-      case 'arrived':
         return <AlertCircle className="text-orange-500" size={20} />;
       default:
         return <Clock className="text-gray-500" size={20} />;
@@ -67,6 +69,7 @@ export default function Activity() {
       'arrived': language === 'ar' ? 'تم الوصول' : 'Arrived',
       'completed': language === 'ar' ? 'تم الانتهاء' : 'Completed',
       'cancelled': language === 'ar' ? 'ملغي' : 'Cancelled',
+      'cancelled_by_doctor': language === 'ar' ? 'ملغي من الطبيب' : 'Cancelled by Doctor',
       'rejected': language === 'ar' ? 'مرفوض' : 'Rejected',
     };
     return statusMap[status as keyof typeof statusMap] || status;
@@ -76,13 +79,15 @@ export default function Activity() {
     switch (status) {
       case 'completed':
         return 'text-green-600 bg-green-50 border-green-200';
+      case 'arrived':
+        return 'text-green-600 bg-green-50 border-green-200';
       case 'cancelled':
+      case 'cancelled_by_doctor':
       case 'rejected':
         return 'text-red-600 bg-red-50 border-red-200';
       case 'requested':
       case 'confirmed':
       case 'in_progress':
-      case 'arrived':
         return 'text-orange-600 bg-orange-50 border-orange-200';
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200';
