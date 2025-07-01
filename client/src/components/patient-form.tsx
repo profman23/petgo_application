@@ -19,9 +19,9 @@ const patientFormSchema = z.object({
   type: z.enum(['Cat', 'Dog', 'Bird'], {
     errorMap: () => ({ message: 'Please select patient type' })
   }),
-  ageYear: z.coerce.number().min(0).max(50).optional().or(z.literal('')),
-  ageMonth: z.coerce.number().min(0).max(11).optional().or(z.literal('')),
-  ageDay: z.coerce.number().min(0).max(30).optional().or(z.literal('')),
+  ageYear: z.string().optional(),
+  ageMonth: z.string().optional(),
+  ageDay: z.string().optional(),
   photo: z.string().optional(),
 });
 
@@ -49,9 +49,9 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
     defaultValues: {
       name: '',
       type: undefined,
-      ageYear: undefined,
-      ageMonth: undefined,
-      ageDay: undefined,
+      ageYear: '',
+      ageMonth: '',
+      ageDay: '',
       photo: '',
     },
   });
@@ -94,13 +94,13 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
   };
 
   const onSubmit = (data: PatientFormData) => {
-    // Clean up data - convert empty strings to undefined for optional fields
+    // Clean up data - convert empty strings to numbers or undefined for optional fields
     const cleanData = {
       name: data.name,
       type: data.type,
-      ageYear: data.ageYear === '' ? undefined : Number(data.ageYear) || undefined,
-      ageMonth: data.ageMonth === '' ? undefined : Number(data.ageMonth) || undefined,
-      ageDay: data.ageDay === '' ? undefined : Number(data.ageDay) || undefined,
+      ageYear: data.ageYear && data.ageYear !== '' ? Number(data.ageYear) : undefined,
+      ageMonth: data.ageMonth && data.ageMonth !== '' ? Number(data.ageMonth) : undefined,
+      ageDay: data.ageDay && data.ageDay !== '' ? Number(data.ageDay) : undefined,
       photo: data.photo || undefined,
     };
     addPatientMutation.mutate(cleanData);
@@ -179,7 +179,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
               {/* Patient Age */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700">
-                  {t('patientAge')}
+                  {t('patientAge')} <span className="text-gray-400 text-xs">({t('optional')})</span>
                 </Label>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
@@ -230,7 +230,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
               {/* Patient Photo */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700">
-                  {t('patientPhoto')}
+                  {t('patientPhoto')} <span className="text-gray-400 text-xs">({t('optional')})</span>
                 </Label>
                 <div className="flex flex-col items-center gap-4">
                   {selectedPhoto ? (
