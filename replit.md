@@ -321,6 +321,10 @@ Changelog:
 - July 1, 2025. UPGRADED: Button animations with gradients, shadows, hover effects, and 3D depth matching user's design requirements
 - July 1, 2025. CLEANED: Removed footer borders and separator lines for cleaner, more appealing visual design
 - July 1, 2025. ENHANCED: Transparent footer background to create seamless integration with page content
+- July 1, 2025. CLEANED: Removed all purple borders (border-4 border-purple) from main containers and UI elements across all pages
+- July 1, 2025. UPDATED: Home, Account, Activity, and Patient forms now use clean shadows without purple borders for modern appearance
+- July 1, 2025. SIMPLIFIED: Form input fields converted from purple borders to standard gray borders for cleaner design
+- July 1, 2025. REFINED: Patient photo upload areas changed from purple to neutral gray borders for consistent styling
 ```
 
 ## User Preferences

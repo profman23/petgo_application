@@ -239,7 +239,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       <img
                         src={selectedPhoto}
                         alt="Patient"
-                        className="w-32 h-32 object-cover rounded-full border-4 border-purple-200"
+                        className="w-32 h-32 object-cover rounded-full border-2 border-gray-200"
                       />
                       <Button
                         type="button"
@@ -252,7 +252,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                     </div>
                   ) : (
                     <div
-                      className="w-32 h-32 border-4 border-dashed border-purple-300 rounded-full flex items-center justify-center cursor-pointer hover:border-purple-500 transition-colors"
+                      className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:border-gray-500 transition-colors"
                       onClick={() => document.getElementById('photo-upload')?.click()}
                     >
                       <div className="text-center">
