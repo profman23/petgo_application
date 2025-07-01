@@ -402,20 +402,17 @@ export default function Home() {
             <Button
               onClick={handleRequestRide}
               disabled={!!actualActiveRide}
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-4 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl"
+              className="w-full bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white p-4 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl"
             >
               <div className="text-center">
-                <div className="font-bold text-xl mb-2">
+                <div className="font-bold text-xl mb-1">
                   {actualActiveRide 
                     ? (language === 'ar' ? 'لديك طلب نشط' : 'You have an active request')
                     : (language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request')
                   }
                 </div>
-                <div className="text-base opacity-90 mb-2">
-                  {language === 'ar' ? 'عيادة بيطرية متنقلة - مرسيدس' : 'Mobile Veterinary Clinic - Mercedes'}
-                </div>
-                <div className="text-sm opacity-75">
-                  {language === 'ar' ? 'خدمة احترافية للكلاب والقطط' : 'Professional service for dogs and cats'}
+                <div className="text-base opacity-90">
+                  {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Vetsvan Mobile Clinic'}
                 </div>
               </div>
             </Button>
