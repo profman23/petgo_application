@@ -41,7 +41,7 @@ export default function RideRequest() {
   const textAlign = getTextAlign(language);
   
   // جلب الحيوانات الأليفة المسجلة
-  const { data: patients = [], isLoading: isLoadingPatients } = useQuery({
+  const { data: patients = [], isLoading: isLoadingPatients } = useQuery<Patient[]>({
     queryKey: ['/api/patients'],
   });
   
@@ -521,7 +521,7 @@ export default function RideRequest() {
                 <Button
                   type="submit"
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                  disabled={isRequestingRide || !currentLocation}
+                  disabled={isRequestingRide || !currentLocation || selectedPatients.length === 0 || !serviceType}
                   style={{ direction }}
                 >
                   <div className="flex items-center justify-center gap-3">
