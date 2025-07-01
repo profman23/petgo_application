@@ -363,8 +363,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
-                    {/* Beautiful Newest House Image - Extra Large */}
+                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+                    {/* Beautiful Newest House Image - Far Right Position */}
                     <img 
                       src={newestHouseImage} 
                       alt="Beautiful House" 
