@@ -268,6 +268,7 @@ export const translations = {
     bird: 'طائر',
     selectPatientType: 'اختر نوع المريض',
     addFirstPatient: 'أضف أول مريض لك',
+    noAge: 'العمر غير محدد',
   },
   en: {
     // Common
