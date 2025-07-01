@@ -73,14 +73,14 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
       queryClient.invalidateQueries({ queryKey: ['/api/patients'] });
       toast({
         title: t('success'),
-        description: language === 'ar' ? 'تم تحديث بيانات المريض بنجاح' : 'Patient updated successfully',
+        description: language === 'ar' ? 'تم تحديث بيانات الأليف بنجاح' : 'Patient updated successfully',
       });
       onSuccess();
     },
     onError: (error: Error) => {
       toast({
         title: t('error'),
-        description: error.message || (language === 'ar' ? 'فشل في تحديث المريض' : 'Failed to update patient'),
+        description: error.message || (language === 'ar' ? 'فشل في تحديث الأليف' : 'Failed to update patient'),
         variant: 'destructive',
       });
     },
@@ -140,7 +140,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                 <ArrowLeft className="h-5 w-5" style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} />
               </Button>
               <CardTitle className="text-xl">
-                {language === 'ar' ? 'تعديل بيانات المريض' : 'Edit Patient'}
+                {language === 'ar' ? 'تعديل بيانات الأليف' : 'Edit Patient'}
               </CardTitle>
             </div>
           </CardHeader>
