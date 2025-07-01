@@ -111,11 +111,7 @@ export default function RideRequest() {
           
           form.setValue('pickupLocation', locationName);
           
-          toast({
-            title: 'تم تحديد موقعك بنجاح',
-            description: locationName,
-            duration: 3000,
-          });
+          // Location set successfully without notification
         },
         (error) => {
           console.error('GPS Error:', error);
@@ -232,13 +228,7 @@ export default function RideRequest() {
         
         form.setValue('pickupLocation', locationName);
         
-        if (accuracy < 50) {
-          toast({
-            title: 'تم تحديث موقعك بدقة عالية',
-            description: locationName,
-            duration: 3000,
-          });
-        }
+        // Location updated with high accuracy - no notification needed
       } else {
         toast({
           title: 'موقع خارج المملكة',
@@ -291,11 +281,7 @@ export default function RideRequest() {
           
           form.setValue('pickupLocation', locationName);
           
-          toast({
-            title: 'تم تحديث موقعك بنجاح',
-            description: locationName,
-            duration: 3000,
-          });
+          // Location refreshed successfully without notification
         },
         (error) => {
           console.error('Refresh GPS Error:', error);
