@@ -521,16 +521,7 @@ export default function Home() {
                     </svg>
                   </div>
                   
-                  {/* Cute pets image */}
-                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
-                    <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm border-2 border-purple-200">
-                      <img 
-                        src={petsImage} 
-                        alt="Cute Dog and Cat" 
-                        className="w-28 h-20 object-contain animate-pulse hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  </div>
+
                 </div>
 
                 <div className="text-sm text-purple-700 mb-2" style={{ textAlign }}>
@@ -589,13 +580,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Real VETS VAN Image Display */}
+            {/* Cute Pets Image Display */}
             <div className="flex justify-center mb-3">
-              <div className="w-32 h-20 rounded-xl overflow-hidden shadow-2xl border-2 border-purple-200">
+              <div className="w-32 h-20 rounded-xl overflow-hidden shadow-2xl border-2 border-purple-200 bg-white/10 backdrop-blur-sm">
                 <img 
-                  src={vetsVanImage} 
-                  alt="VETS VAN Mobile Veterinary Clinic" 
-                  className="w-full h-full object-cover object-center"
+                  src={petsImage} 
+                  alt="Cute Dog and Cat" 
+                  className="w-full h-full object-contain p-1 hover:scale-105 transition-transform duration-300"
                 />
               </div>
             </div>
