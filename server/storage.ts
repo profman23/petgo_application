@@ -1,4 +1,4 @@
-import { users, drivers, rides, type User, type Driver, type Ride, type InsertUser, type RideRequest } from "@shared/schema";
+import { users, drivers, rides, patients, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 
@@ -25,6 +25,10 @@ export interface IStorage {
   assignDriverToRide(rideId: number, driverId: number): Promise<void>;
   getUserActiveRide(userId: number): Promise<Ride | undefined>;
   getDriverActiveRide(driverId: number): Promise<Ride | undefined>;
+
+  // Patient operations
+  getUserPatients(userId: number): Promise<Patient[]>;
+  createPatient(patient: InsertPatient): Promise<Patient>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -267,6 +271,17 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     
     return ride || undefined;
+  }
+
+  // Patient operations
+  async getUserPatients(userId: number): Promise<Patient[]> {
+    const userPatients = await db.select().from(patients).where(eq(patients.userId, userId));
+    return userPatients;
+  }
+
+  async createPatient(insertPatient: InsertPatient): Promise<Patient> {
+    const [patient] = await db.insert(patients).values(insertPatient).returning();
+    return patient;
   }
 }
 

@@ -643,6 +643,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's patients
+  app.get('/api/patients', requireAuth, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const patients = await storage.getUserPatients(userId);
+      res.json(patients);
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+      res.status(500).json({ message: "Failed to fetch patients" });
+    }
+  });
+
+  // Add new patient
+  app.post('/api/patients', requireAuth, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { name, type, age, condition } = req.body;
+      
+      if (!name || !type) {
+        return res.status(400).json({ message: 'Patient name and type are required' });
+      }
+      
+      const patient = await storage.createPatient({
+        userId,
+        name,
+        type,
+        age,
+        condition
+      });
+      
+      res.status(201).json(patient);
+    } catch (error) {
+      console.error("Error creating patient:", error);
+      res.status(500).json({ message: "Failed to create patient" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
