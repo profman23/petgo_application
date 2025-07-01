@@ -22,6 +22,7 @@ export function useRide() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/rides/active'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/rides'] }); // Update Activity page
       // Note: Simulation disabled - doctors will manually approve/reject
     },
   });

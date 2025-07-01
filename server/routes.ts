@@ -201,6 +201,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all rides for current user (for Activity page)
+  app.get('/api/rides', requireAuth, async (req, res) => {
+    try {
+      const allRides = await storage.getAllRides();
+      const userRides = allRides
+        .filter(ride => ride.customerId === req.user.id)
+        .sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA; // Sort by newest first
+        });
+      
+      res.json(userRides);
+    } catch (error) {
+      console.error('Error fetching user rides:', error);
+      res.status(500).json({ message: 'خطأ في جلب الطلبات' });
+    }
+  });
+
   app.get('/api/rides/active', requireAuth, async (req, res) => {
     try {
       const ride = await storage.getUserActiveRide(req.user.id);

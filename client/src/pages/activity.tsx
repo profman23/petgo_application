@@ -32,9 +32,10 @@ export default function Activity() {
   }, [setLocation]);
 
   // Fetch ride history
-  const { data: rideHistory = [], isLoading } = useQuery({
+  const { data: rideHistory = [], isLoading } = useQuery<Ride[]>({
     queryKey: ['/api/rides'],
     retry: false,
+    refetchInterval: 5000, // Refresh every 5 seconds to show new requests
   });
 
   const handleBack = () => {
