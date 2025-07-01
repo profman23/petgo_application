@@ -16,6 +16,7 @@ import Account from "@/pages/account";
 import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
 import { FixedFooter } from "@/components/fixed-footer";
+import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -116,6 +117,22 @@ function Router() {
 }
 
 function App() {
+  const [isAppReady, setIsAppReady] = useState(false);
+
+  const handleLoadingComplete = () => {
+    setIsAppReady(true);
+  };
+
+  if (!isAppReady) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <LoadingScreen onLoadingComplete={handleLoadingComplete} />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
