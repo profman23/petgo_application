@@ -304,6 +304,11 @@ Changelog:
 - July 1, 2025. ENHANCED: Custom pet image with glass morphism frame, backdrop blur, and hover scaling effects
 - July 1, 2025. ENLARGED: Pet image to 48x32 pixels and removed border frame for cleaner display with drop shadow effects
 - July 1, 2025. CLEANED: Removed logo and animated pet icons section above custom pet image for simplified, cleaner design
+- July 1, 2025. UPDATED: Successfully replaced animated VETS VAN car with user's custom veterinary van image (freepik__background__70346_1751363211262.png)
+- July 1, 2025. REPLACED: Both static preview and moving animation car graphics with new custom van image in all road animations
+- July 1, 2025. REPLACED: Both house icons (static and active ride tracking) with user's custom beautiful house image (freepik_assistant_1751363501296_1751363531753.jpeg)
+- July 1, 2025. MAINTAINED: All original animations, effects, and responsive design while using custom user images
+- July 1, 2025. PRESERVED: Complete bilingual support and proper scaling/positioning for all replaced graphics
 ```
 
 ## User Preferences

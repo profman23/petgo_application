@@ -11,6 +11,7 @@ import vetsVanImage from "@assets/image_1751292329902.png";
 import truckIcon from "@assets/10773561_1751295833176.png";
 import petsImage from "@assets/freepik_assistant_1751361910420_1751361937178.png";
 import newVetVanImage from "@assets/freepik__background__70346_1751363211262.png";
+import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753.jpeg";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { FixedFooter } from '@/components/fixed-footer';
@@ -300,33 +301,13 @@ export default function Home() {
                     </svg>
                   </div>
                   
-                  {/* Modern House Icon */}
+                  {/* Beautiful New House Image */}
                   <div className="absolute right-1 top-1/2 transform -translate-y-1/2 z-10">
-                    <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-md">
-                      {/* House Base */}
-                      <rect x="4" y="16" width="24" height="14" rx="2" fill="#10b981" stroke="#047857" strokeWidth="1"/>
-                      
-                      {/* Roof */}
-                      <polygon points="16,6 4,16 28,16" fill="#059669"/>
-                      
-                      {/* Chimney */}
-                      <rect x="22" y="8" width="3" height="8" fill="#7c2d12"/>
-                      
-                      {/* Windows */}
-                      <rect x="8" y="20" width="4" height="4" rx="1" fill="#fef3c7"/>
-                      <rect x="20" y="20" width="4" height="4" rx="1" fill="#fef3c7"/>
-                      
-                      {/* Door */}
-                      <rect x="13" y="22" width="6" height="8" rx="1" fill="#92400e"/>
-                      <circle cx="17" cy="26" r="1" fill="#fbbf24"/>
-                      
-                      {/* Roof Details */}
-                      <rect x="15" y="10" width="2" height="6" fill="#047857"/>
-                      
-                      {/* Garden */}
-                      <circle cx="6" cy="28" r="2" fill="#22c55e"/>
-                      <circle cx="26" cy="28" r="2" fill="#22c55e"/>
-                    </svg>
+                    <img 
+                      src={newHouseImage} 
+                      alt="Beautiful House" 
+                      className="w-8 h-8 object-contain drop-shadow-lg"
+                    />
                   </div>
                 </div>
 
@@ -431,48 +412,12 @@ export default function Home() {
                   </div>
                   
                   <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
-                    {/* Beautiful Modern House - Compact */}
-                    <svg width="32" height="32" viewBox="0 0 48 48" className="drop-shadow-lg">
-                      {/* House main structure */}
-                      <rect x="6" y="22" width="36" height="22" rx="2" fill="#8B4590" stroke="#6B21A8" strokeWidth="2"/>
-                      
-                      {/* Triangular roof with depth */}
-                      <polygon points="2,22 24,8 46,22" fill="#A855F7" stroke="#7C3AED" strokeWidth="1.5"/>
-                      <polygon points="4,20 24,10 44,20" fill="#C084FC" opacity="0.8"/>
-                      
-                      {/* Front door with frame */}
-                      <rect x="18" y="30" width="12" height="14" rx="2" fill="#4C1D95" stroke="white" strokeWidth="1.5"/>
-                      <rect x="19" y="31" width="10" height="12" rx="1" fill="#5B21B6"/>
-                      
-                      {/* Door panels */}
-                      <rect x="20" y="33" width="8" height="4" rx="0.5" fill="#6B21A8" opacity="0.7"/>
-                      <rect x="20" y="38" width="8" height="4" rx="0.5" fill="#6B21A8" opacity="0.7"/>
-                      
-                      {/* Door handle */}
-                      <circle cx="27" cy="37" r="1" fill="gold" stroke="white" strokeWidth="0.5"/>
-                      
-                      {/* Large windows with frames */}
-                      <rect x="9" y="26" width="6" height="6" rx="1" fill="white" stroke="#7C3AED" strokeWidth="1"/>
-                      <rect x="33" y="26" width="6" height="6" rx="1" fill="white" stroke="#7C3AED" strokeWidth="1"/>
-                      
-                      {/* Window panes */}
-                      <line x1="12" y1="26" x2="12" y2="32" stroke="#7C3AED" strokeWidth="0.5"/>
-                      <line x1="9" y1="29" x2="15" y2="29" stroke="#7C3AED" strokeWidth="0.5"/>
-                      <line x1="36" y1="26" x2="36" y2="32" stroke="#7C3AED" strokeWidth="0.5"/>
-                      <line x1="33" y1="29" x2="39" y2="29" stroke="#7C3AED" strokeWidth="0.5"/>
-                      
-                      {/* Decorative chimney */}
-                      <rect x="34" y="12" width="6" height="12" rx="1" fill="#6B21A8" stroke="#4C1D95" strokeWidth="1"/>
-                      <rect x="35" y="10" width="4" height="3" rx="0.5" fill="#7C3AED"/>
-                      
-                      {/* Garden elements */}
-                      <circle cx="12" cy="42" r="2" fill="#22C55E" opacity="0.7"/>
-                      <circle cx="36" cy="42" r="2" fill="#22C55E" opacity="0.7"/>
-                      
-                      {/* House number */}
-                      <circle cx="42" cy="18" r="3" fill="white" stroke="#8B4590" strokeWidth="1"/>
-                      <text x="42" y="20" textAnchor="middle" fill="#8B4590" fontSize="3" fontWeight="bold">1</text>
-                    </svg>
+                    {/* Beautiful New House Image */}
+                    <img 
+                      src={newHouseImage} 
+                      alt="Beautiful House" 
+                      className="w-8 h-8 object-contain drop-shadow-lg"
+                    />
                   </div>
                   
 
