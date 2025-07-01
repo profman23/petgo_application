@@ -170,4 +170,21 @@
     box-sizing: border-box;
     border-radius: 8px;
   }
+
+  /* Custom negative positioning classes for extreme placement */
+  .-left-8 {
+    left: -2rem !important;
+  }
+
+  .-right-8 {
+    right: -2rem !important;
+  }
+
+  .-left-12 {
+    left: -3rem !important;
+  }
+
+  .-right-12 {
+    right: -3rem !important;
+  }
 }
