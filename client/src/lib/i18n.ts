@@ -527,6 +527,7 @@ export const translations = {
     bird: 'Bird',
     selectPatientType: 'Select Patient Type',
     addFirstPatient: 'Add your first patient',
+    noAge: 'Age not specified',
   }
 };
 
