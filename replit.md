@@ -310,6 +310,8 @@ Changelog:
 - July 1, 2025. REPLACED: All veterinary clinic icons (both in static view and active ride tracking) with user's custom clinic image (freepik_assistant_1751363666289_1751363695395.png)
 - July 1, 2025. ENHANCED: Clinic image size increased to 40x40 pixels for better visibility as requested
 - July 1, 2025. COMPLETED: All SVG clinic icons completely replaced with user's custom images throughout the application
+- July 1, 2025. REPLACED: House image with newest custom house image (freepik_assistant_1751364682430_1751364706224.png)
+- July 1, 2025. ENHANCED: House image size increased from 32px to 48px (w-12 h-12) for better detail visibility
 - July 1, 2025. MAINTAINED: All original animations, effects, and responsive design while using custom user images
 - July 1, 2025. PRESERVED: Complete bilingual support and proper scaling/positioning for all replaced graphics
 ```
