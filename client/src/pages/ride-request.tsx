@@ -96,25 +96,25 @@ export default function RideRequest() {
           form.setValue('pickupLatitude', latitude);
           form.setValue('pickupLongitude', longitude);
           
-          // تحديد اسم الموقع بناءً على الإحداثيات الحقيقية - نطاقات أوسع
-          let locationName = `موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          // تحديد اسم الموقع بناءً على الإحداثيات الحقيقية - عرض مبسط
+          let locationName = 'موقعك الحالي';
           
           if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
-            locationName = `الرياض - موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+            locationName = 'الرياض - موقعك الحالي';
           } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
-            locationName = `جدة - موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+            locationName = 'جدة - موقعك الحالي';
           } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
-            locationName = `الدمام - موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+            locationName = 'الدمام - موقعك الحالي';
           } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
-            locationName = `المدينة المنورة - موقعك الحالي (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+            locationName = 'المدينة المنورة - موقعك الحالي';
           }
           
           form.setValue('pickupLocation', locationName);
           
           toast({
-            title: 'تم تحديد موقعك الحقيقي بنجاح',
-            description: `الموقع: ${locationName}\nالدقة: ${Math.round(accuracy)} متر`,
-            duration: 5000,
+            title: 'تم تحديد موقعك بنجاح',
+            description: locationName,
+            duration: 3000,
           });
         },
         (error) => {
@@ -512,11 +512,6 @@ export default function RideRequest() {
                       <FormMessage />
                       <p className="text-xs text-gray-500 mt-1" style={{ textAlign }}>
                         {language === 'ar' ? 'العيادة البيطرية ستأتي إلى موقعك الحالي' : 'The veterinary clinic will come to your current location'}
-                        {currentLocation && (
-                          <span className="block text-blue-600 font-mono">
-                            GPS: {currentLocation.latitude.toFixed(6)}, {currentLocation.longitude.toFixed(6)}
-                          </span>
-                        )}
                       </p>
                     </FormItem>
                   )}

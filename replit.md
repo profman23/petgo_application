@@ -358,6 +358,8 @@ Changelog:
 - July 1, 2025. ENHANCED: Fixed Header and Footer in ride request page - Header is fixed at top (fixed top-0 left-0 right-0 z-50), Footer is fixed at bottom
 - July 1, 2025. REMOVED: Service Information section completely removed from ride request page as requested
 - July 1, 2025. IMPROVED: Added bottom padding (pb-20) to main container to prevent content overlap with fixed footer
+- July 1, 2025. CLEANED: Simplified location display in ride request page - removed long GPS coordinates and technical details from location input field
+- July 1, 2025. STREAMLINED: Location names now show simple format like "الرياض - موقعك الحالي" instead of detailed coordinates for cleaner UI appearance
 ```
 
 ## User Preferences
