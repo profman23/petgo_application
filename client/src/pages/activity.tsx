@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import logoPath from '@assets/10773561_1751295833176.png';
 import { FixedFooter } from '@/components/fixed-footer';
+import { LanguageSelector } from '@/components/language-selector';
 
 interface Ride {
   id: number;
