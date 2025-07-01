@@ -29,8 +29,8 @@ export function FixedFooter() {
       id: 'account',
       path: '/account',
       label: language === 'ar' ? 'الحساب' : 'Account',
-      bgColor: 'bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600',
-      hoverColor: 'hover:from-cyan-500 hover:via-cyan-600 hover:to-cyan-700',
+      bgColor: 'bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600',
+      hoverColor: 'hover:from-gray-500 hover:via-gray-600 hover:to-gray-700',
       icon: '🐱'
     }
   ];
