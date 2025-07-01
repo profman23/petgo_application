@@ -29,6 +29,7 @@ export interface IStorage {
   // Patient operations
   getUserPatients(userId: number): Promise<Patient[]>;
   createPatient(patient: InsertPatient): Promise<Patient>;
+  updatePatient(patientId: number, userId: number, updateData: Partial<Patient>): Promise<Patient | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -293,6 +294,15 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return patient;
+  }
+
+  async updatePatient(patientId: number, userId: number, updateData: Partial<Patient>): Promise<Patient | undefined> {
+    const [updatedPatient] = await db
+      .update(patients)
+      .set(updateData)
+      .where(and(eq(patients.id, patientId), eq(patients.userId, userId)))
+      .returning();
+    return updatedPatient;
   }
 }
 

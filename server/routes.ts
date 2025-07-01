@@ -682,6 +682,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update patient
+  app.put('/api/patients/:id', requireAuth, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const patientId = parseInt(req.params.id);
+      const { name, type, ageYear, ageMonth, ageDay, photo } = req.body;
+      
+      if (!name || !type) {
+        return res.status(400).json({ message: 'Patient name and type are required' });
+      }
+      
+      const updatedPatient = await storage.updatePatient(patientId, userId, {
+        name,
+        type,
+        ageYear: ageYear || null,
+        ageMonth: ageMonth || null,
+        ageDay: ageDay || null,
+        photo: photo || null,
+      });
+      
+      if (!updatedPatient) {
+        return res.status(404).json({ message: "Patient not found or unauthorized" });
+      }
+      
+      res.json(updatedPatient);
+    } catch (error) {
+      console.error("Error updating patient:", error);
+      res.status(500).json({ message: "Failed to update patient" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
