@@ -11,7 +11,7 @@ export function FixedFooter() {
   const navigationItems = [
     {
       id: 'home',
-      path: '/home',
+      path: '/',
       icon: Home,
       label: t('home'),
       gradient: 'from-purple-500 to-violet-600'
