@@ -225,6 +225,18 @@ export const translations = {
     arabic: 'العربية',
     english: 'English',
     selectLanguage: 'اختر اللغة',
+    
+    // Account Page
+    accountTitle: 'حسابي الشخصي',
+    accountSubtitle: 'إدارة ملفك الشخصي',
+    accountDetails: 'تفاصيل الحساب',
+    firstName: 'الاسم الأول',
+    lastName: 'الاسم الأخير',
+    firstNamePlaceholder: 'أدخل اسمك الأول',
+    lastNamePlaceholder: 'أدخل اسمك الأخير',
+    phonePlaceholder: 'أدخل رقم هاتفك',
+    resetPassword: 'إعادة تعيين كلمة المرور',
+    saveProfile: 'حفظ الملف الشخصي',
   },
   en: {
     // Common
@@ -430,6 +442,18 @@ export const translations = {
     arabic: 'العربية',
     english: 'English',
     selectLanguage: 'Select Language',
+    
+    // Account Page
+    accountTitle: 'My Account',
+    accountSubtitle: 'Manage your profile',
+    accountDetails: 'Account Details',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    firstNamePlaceholder: 'Enter your first name',
+    lastNamePlaceholder: 'Enter your last name', 
+    phonePlaceholder: 'Enter your phone number',
+    resetPassword: 'Reset Password',
+    saveProfile: 'Save Profile',
   }
 };
 
