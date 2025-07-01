@@ -40,9 +40,12 @@ export default function RideRequest() {
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
   
-  // جلب الحيوانات الأليفة المسجلة
+  // جلب الحيوانات الأليفة المسجلة بتحسين الأداء
   const { data: patients = [], isLoading: isLoadingPatients } = useQuery<Patient[]>({
     queryKey: ['/api/patients'],
+    staleTime: 5 * 60 * 1000, // 5 دقائق
+    gcTime: 10 * 60 * 1000, // 10 دقائق
+    refetchOnWindowFocus: false,
   });
   
   // استخدام نظام GPS الحقيقي
@@ -353,7 +356,7 @@ export default function RideRequest() {
                   {language === 'ar' ? 'جاري تحميل الحيوانات الأليفة...' : 'Loading pets...'}
                 </span>
               </div>
-            ) : patients.length === 0 ? (
+            ) : !patients || patients.length === 0 ? (
               <div className="text-center p-8 bg-gray-50 rounded-lg">
                 <PawPrint className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                 <h3 className="font-medium text-gray-900 mb-2" style={{ textAlign }}>
@@ -532,7 +535,7 @@ export default function RideRequest() {
                           (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') : 
                          !currentLocation ? 
                           (language === 'ar' ? 'في انتظار تحديد الموقع...' : 'Waiting for location...') : 
-                          (language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request')
+                          (language === 'ar' ? 'اضغط هنا للطلب البيطري' : 'Click Here to Vet Request')
                         }
                       </div>
                       {!isRequestingRide && currentLocation && (

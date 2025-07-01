@@ -293,6 +293,12 @@ Changelog:
 - July 1, 2025. UPDATED: Arabic translations to replace "مريض" (patient) with "أليف" (pet) throughout the application
 - July 1, 2025. CLEANED: Removed Patient Name and Patient Type fields from Account Details page per user request
 - July 1, 2025. SIMPLIFIED: Account Details now contains only essential user information (First Name, Last Name, Phone Number, Password Reset)
+- July 1, 2025. ENHANCED: Ride request form with pet selection and service type features
+- July 1, 2025. ADDED: Multi-pet selection capability - users can choose one or multiple registered pets for veterinary service
+- July 1, 2025. IMPLEMENTED: Service type dropdown with "General Check Up" and "Grooming" options (no pricing display as requested)
+- July 1, 2025. OPTIMIZED: Pet loading performance with query caching (5-minute stale time, 10-minute cache time)
+- July 1, 2025. UPDATED: Button text to "Click Here to Vet Request" for concise messaging in both Arabic and English
+- July 1, 2025. ENHANCED: Form validation to ensure pets and service type are selected before submission
 ```
 
 ## User Preferences
