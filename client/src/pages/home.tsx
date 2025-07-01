@@ -354,41 +354,12 @@ export default function Home() {
                   
                   {/* Enhanced Start and End markers - Compact */}
                   <div className="absolute left-1 top-1/2 transform -translate-y-1/2">
-                    {/* Professional Veterinary Clinic - Compact */}
-                    <svg width="32" height="32" viewBox="0 0 48 48" className="drop-shadow-lg">
-                      {/* Main building foundation */}
-                      <rect x="2" y="20" width="44" height="24" rx="3" fill="#8B4590" stroke="#6B21A8" strokeWidth="2"/>
-                      
-                      {/* Second floor */}
-                      <rect x="6" y="12" width="36" height="16" rx="2" fill="#A855F7" stroke="#7C3AED" strokeWidth="1.5"/>
-                      
-                      {/* Top floor/sign area */}
-                      <rect x="10" y="6" width="28" height="12" rx="2" fill="#C084FC" stroke="#9333EA" strokeWidth="1"/>
-                      
-                      {/* Large Medical Cross - Center focal point */}
-                      <rect x="20" y="28" width="8" height="12" fill="white" stroke="#8B4590" strokeWidth="1"/>
-                      <rect x="16" y="32" width="16" height="4" fill="white" stroke="#8B4590" strokeWidth="1"/>
-                      
-                      {/* Multiple Windows */}
-                      <rect x="8" y="15" width="4" height="4" rx="1" fill="white" opacity="0.9" stroke="#7C3AED" strokeWidth="0.5"/>
-                      <rect x="14" y="15" width="4" height="4" rx="1" fill="white" opacity="0.9" stroke="#7C3AED" strokeWidth="0.5"/>
-                      <rect x="30" y="15" width="4" height="4" rx="1" fill="white" opacity="0.9" stroke="#7C3AED" strokeWidth="0.5"/>
-                      <rect x="36" y="15" width="4" height="4" rx="1" fill="white" opacity="0.9" stroke="#7C3AED" strokeWidth="0.5"/>
-                      
-                      {/* Ground floor windows */}
-                      <rect x="6" y="25" width="3" height="4" rx="0.5" fill="white" opacity="0.8"/>
-                      <rect x="39" y="25" width="3" height="4" rx="0.5" fill="white" opacity="0.8"/>
-                      
-                      {/* Door */}
-                      <rect x="10" y="35" width="6" height="9" rx="1" fill="#4C1D95" stroke="white" strokeWidth="1"/>
-                      <circle cx="15" cy="39" r="0.8" fill="white"/>
-                      
-                      {/* Roof line */}
-                      <polygon points="0,20 24,4 48,20" fill="#6B21A8" opacity="0.7"/>
-                      
-                      {/* Veterinary Sign */}
-                      <text x="24" y="12" textAnchor="middle" fill="white" fontSize="4" fontWeight="bold">VET</text>
-                    </svg>
+                    {/* Beautiful New Veterinary Clinic */}
+                    <img 
+                      src={newClinicImage} 
+                      alt="Veterinary Clinic" 
+                      className="w-10 h-10 object-contain drop-shadow-lg"
+                    />
                   </div>
                   
                   <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
