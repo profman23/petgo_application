@@ -13,15 +13,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Camera, Cat, Dog, Bird, ArrowLeft } from 'lucide-react';
 
-// Patient form schema
+// Patient form schema - only name and type are required
 const patientFormSchema = z.object({
   name: z.string().min(2, 'Patient name is required'),
   type: z.enum(['Cat', 'Dog', 'Bird'], {
     errorMap: () => ({ message: 'Please select patient type' })
   }),
-  ageYear: z.number().min(0).max(50).optional(),
-  ageMonth: z.number().min(0).max(11).optional(),
-  ageDay: z.number().min(0).max(30).optional(),
+  ageYear: z.coerce.number().min(0).max(50).optional().or(z.literal('')),
+  ageMonth: z.coerce.number().min(0).max(11).optional().or(z.literal('')),
+  ageDay: z.coerce.number().min(0).max(30).optional().or(z.literal('')),
   photo: z.string().optional(),
 });
 
@@ -94,7 +94,16 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
   };
 
   const onSubmit = (data: PatientFormData) => {
-    addPatientMutation.mutate(data);
+    // Clean up data - convert empty strings to undefined for optional fields
+    const cleanData = {
+      name: data.name,
+      type: data.type,
+      ageYear: data.ageYear === '' ? undefined : Number(data.ageYear) || undefined,
+      ageMonth: data.ageMonth === '' ? undefined : Number(data.ageMonth) || undefined,
+      ageDay: data.ageDay === '' ? undefined : Number(data.ageDay) || undefined,
+      photo: data.photo || undefined,
+    };
+    addPatientMutation.mutate(cleanData);
   };
 
   const isRTL = getDirection(language) === 'rtl';
