@@ -536,49 +536,7 @@ export default function Home() {
           
           {/* Enhanced Request Button with Modern Design */}
           <div className="mb-3 p-3 bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-300">
-            {/* Top Section with Pets and Logo */}
-            <div className="flex items-center justify-center gap-3 mb-3">
-              {/* Dog Icon */}
-              <div className="flex-shrink-0">
-                <svg width="32" height="32" viewBox="0 0 48 48" className="drop-shadow-lg">
-                  <ellipse cx="24" cy="32" rx="14" ry="12" fill="#d2691e" stroke="#8b4513" strokeWidth="1"/>
-                  <circle cx="24" cy="20" r="12" fill="#daa520" stroke="#b8860b" strokeWidth="1"/>
-                  <ellipse cx="18" cy="14" rx="4" ry="6" fill="#daa520" stroke="#b8860b" strokeWidth="1"/>
-                  <ellipse cx="30" cy="14" rx="4" ry="6" fill="#daa520" stroke="#b8860b" strokeWidth="1"/>
-                  <circle cx="20" cy="18" r="2" fill="#000"/>
-                  <circle cx="28" cy="18" r="2" fill="#000"/>
-                  <ellipse cx="24" cy="22" rx="1.5" ry="1" fill="#000"/>
-                  <path d="M22 24 Q24 26 26 24" stroke="#000" strokeWidth="1.5" fill="none"/>
-                  <path d="M18 26 Q20 28 22 26" stroke="#ff69b4" strokeWidth="1" fill="none"/>
-                </svg>
-              </div>
 
-              {/* Company Logo */}
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 rounded-full bg-white border-2 border-purple-300 flex items-center justify-center shadow-lg">
-                  <img 
-                    src={logoImage} 
-                    alt="Vets Van" 
-                    className="h-8 w-8 object-contain rounded-full"
-                  />
-                </div>
-              </div>
-
-              {/* Cat Icon */}
-              <div className="flex-shrink-0">
-                <svg width="32" height="32" viewBox="0 0 48 48" className="drop-shadow-lg">
-                  <ellipse cx="24" cy="30" rx="12" ry="10" fill="#d3d3d3" stroke="#a9a9a9" strokeWidth="1"/>
-                  <circle cx="24" cy="20" r="10" fill="#f5f5f5" stroke="#dcdcdc" strokeWidth="1"/>
-                  <polygon points="16,12 20,8 22,14" fill="#f5f5f5" stroke="#dcdcdc" strokeWidth="1"/>
-                  <polygon points="32,12 28,8 26,14" fill="#f5f5f5" stroke="#dcdcdc" strokeWidth="1"/>
-                  <circle cx="20" cy="18" r="1.5" fill="#32cd32"/>
-                  <circle cx="28" cy="18" r="1.5" fill="#32cd32"/>
-                  <path d="M22 22 L24 23 L26 22" stroke="#ff69b4" strokeWidth="1" fill="none"/>
-                  <path d="M18 24 Q20 26 22 24" stroke="#000" strokeWidth="0.5" fill="none"/>
-                  <path d="M26 24 Q28 26 30 24" stroke="#000" strokeWidth="0.5" fill="none"/>
-                </svg>
-              </div>
-            </div>
 
             {/* Cute Pets Image Display */}
             <div className="flex justify-center mb-3">

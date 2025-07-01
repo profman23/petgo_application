@@ -303,6 +303,7 @@ Changelog:
 - July 1, 2025. REPOSITIONED: Custom pet image moved to replace vehicle image in optimal location above "Click Here to Request" button
 - July 1, 2025. ENHANCED: Custom pet image with glass morphism frame, backdrop blur, and hover scaling effects
 - July 1, 2025. ENLARGED: Pet image to 48x32 pixels and removed border frame for cleaner display with drop shadow effects
+- July 1, 2025. CLEANED: Removed logo and animated pet icons section above custom pet image for simplified, cleaner design
 ```
 
 ## User Preferences
