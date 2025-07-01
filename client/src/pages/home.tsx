@@ -9,6 +9,7 @@ import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import vetsVanImage from "@assets/image_1751292329902.png";
 import truckIcon from "@assets/10773561_1751295833176.png";
+import petsImage from "@assets/freepik_assistant_1751361910420_1751361937178.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { FixedFooter } from '@/components/fixed-footer';
@@ -520,29 +521,15 @@ export default function Home() {
                     </svg>
                   </div>
                   
-                  {/* Animated pets waiting */}
-                  <div className="absolute bottom-2 left-8 animate-bounce">
-                    <svg width="20" height="16" viewBox="0 0 20 16">
-                      {/* Dog */}
-                      <ellipse cx="5" cy="12" rx="3" ry="2" fill="#8B5CF6"/>
-                      <ellipse cx="5" cy="8" rx="2" ry="2" fill="#8B5CF6"/>
-                      <ellipse cx="3" cy="6" rx="1" ry="1.5" fill="#8B5CF6"/>
-                      <ellipse cx="7" cy="6" rx="1" ry="1.5" fill="#8B5CF6"/>
-                      <circle cx="4" cy="7" r="0.5" fill="white"/>
-                      <circle cx="6" cy="7" r="0.5" fill="white"/>
-                    </svg>
-                  </div>
-                  
-                  <div className="absolute bottom-2 right-8 animate-bounce delay-1000">
-                    <svg width="16" height="16" viewBox="0 0 16 16">
-                      {/* Cat */}
-                      <ellipse cx="8" cy="12" rx="2.5" ry="2" fill="#8B5CF6"/>
-                      <ellipse cx="8" cy="8" rx="2" ry="2" fill="#8B5CF6"/>
-                      <polygon points="6,5 8,3 10,5" fill="#8B5CF6"/>
-                      <circle cx="7" cy="7" r="0.5" fill="white"/>
-                      <circle cx="9" cy="7" r="0.5" fill="white"/>
-                      <path d="M8 8 Q7 9 6 8 M8 8 Q9 9 10 8" stroke="white" strokeWidth="0.5" fill="none"/>
-                    </svg>
+                  {/* Cute pets image */}
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2">
+                    <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm border-2 border-purple-200">
+                      <img 
+                        src={petsImage} 
+                        alt="Cute Dog and Cat" 
+                        className="w-28 h-20 object-contain animate-pulse hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
                   </div>
                 </div>
 

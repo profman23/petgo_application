@@ -299,6 +299,8 @@ Changelog:
 - July 1, 2025. OPTIMIZED: Pet loading performance with query caching (5-minute stale time, 10-minute cache time)
 - July 1, 2025. UPDATED: Button text to "Click Here to Vet Request" for concise messaging in both Arabic and English
 - July 1, 2025. ENHANCED: Form validation to ensure pets and service type are selected before submission
+- July 1, 2025. REPLACED: Home screen pet animations with user's custom image of cute dog and cat sitting together
+- July 1, 2025. ENHANCED: Custom pet image positioned centrally above request button with glass morphism frame and hover effects
 ```
 
 ## User Preferences
