@@ -48,6 +48,16 @@ export const rides = pgTable("rides", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const patients = pgTable("patients", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // كلب، قطة، طير، أرنب، سمك
+  age: text("age"),
+  condition: text("condition"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   phone: true,
   password: true,
@@ -86,6 +96,13 @@ export const rideRequestSchema = createInsertSchema(rides).pick({
   vehicleType: true,
 });
 
+export const insertPatientSchema = createInsertSchema(patients).pick({
+  name: true,
+  type: true,
+  age: true,
+  condition: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type RegisterUser = z.infer<typeof registerSchema>;
 export type User = typeof users.$inferSelect;
@@ -93,3 +110,5 @@ export type Driver = typeof drivers.$inferSelect;
 export type Ride = typeof rides.$inferSelect;
 export type InsertRide = z.infer<typeof rideRequestSchema>;
 export type RideRequest = typeof rides.$inferInsert;
+export type Patient = typeof patients.$inferSelect;
+export type InsertPatient = z.infer<typeof insertPatientSchema>;

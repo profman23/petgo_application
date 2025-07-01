@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, PawPrint } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, PawPrint, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -24,6 +24,10 @@ export default function Account() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // UI states
+  const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch user profile
   const { data: userProfile, isLoading } = useQuery({
@@ -111,7 +115,7 @@ export default function Account() {
 
   const handleResetPassword = () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
-      showToast(t('allFieldsRequired') || 'جميع الحقول مطلوبة', 'error');
+      showToast('جميع الحقول مطلوبة', 'error');
       return;
     }
 
@@ -129,6 +133,19 @@ export default function Account() {
       currentPassword,
       newPassword,
     });
+  };
+
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // For now, just show a success message
+      // In a real app, you would upload to a file storage service
+      showToast(t('uploadPhoto') + ' - قريباً', 'success');
+    }
+  };
+
+  const handlePatientsClick = () => {
+    setLocation('/patients');
   };
 
   const ArrowIcon = direction === 'rtl' ? ArrowRight : ArrowLeft;

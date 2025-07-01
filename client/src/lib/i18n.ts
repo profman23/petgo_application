@@ -248,6 +248,16 @@ export const translations = {
     currentPasswordIncorrect: 'كلمة المرور الحالية غير صحيحة',
     newPasswordTooShort: 'كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل',
     passwordsDontMatch: 'كلمات المرور غير متطابقة',
+    patients: 'المرضى',
+    myPatients: 'مرضاي',
+    addPatient: 'إضافة مريض',
+    patientName: 'اسم المريض',
+    patientType: 'نوع المريض',
+    patientAge: 'عمر المريض',
+    patientCondition: 'حالة المريض',
+    noPatients: 'لا توجد مرضى حتى الآن',
+    uploadPhoto: 'رفع صورة',
+    profilePicture: 'صورة الملف الشخصي',
   },
   en: {
     // Common
@@ -481,6 +491,16 @@ export const translations = {
     currentPasswordIncorrect: 'Current password is incorrect',
     newPasswordTooShort: 'New password must be at least 6 characters',
     passwordsDontMatch: 'Passwords do not match',
+    patients: 'Patients',
+    myPatients: 'My Patients',
+    addPatient: 'Add Patient',
+    patientName: 'Patient Name',
+    patientType: 'Patient Type',
+    patientAge: 'Patient Age',
+    patientCondition: 'Patient Condition',
+    noPatients: 'No patients yet',
+    uploadPhoto: 'Upload Photo',
+    profilePicture: 'Profile Picture',
   }
 };
 
