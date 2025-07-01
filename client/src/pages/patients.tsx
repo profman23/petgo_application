@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Plus, Heart, Calendar, PawPrint, Cat, Dog, Bird } from 'lucide-react';
 import { PatientForm } from '@/components/patient-form';
+import { EditPatientForm } from '@/components/edit-patient-form';
 import { useLocation } from 'wouter';
 
 interface Patient {
@@ -28,6 +29,7 @@ export default function Patients() {
   const { t, language } = useTranslation();
   const [, setLocation] = useLocation();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   
   const { data: patients = [], isLoading } = useQuery<Patient[]>({
     queryKey: ['/api/patients'],
@@ -36,6 +38,8 @@ export default function Patients() {
   const handleBack = () => {
     if (showAddForm) {
       setShowAddForm(false);
+    } else if (selectedPatient) {
+      setSelectedPatient(null);
     } else {
       setLocation('/account');
     }
@@ -47,6 +51,14 @@ export default function Patients() {
 
   const handlePatientAdded = () => {
     setShowAddForm(false);
+  };
+
+  const handlePatientEdit = (patient: Patient) => {
+    setSelectedPatient(patient);
+  };
+
+  const handlePatientUpdated = () => {
+    setSelectedPatient(null);
   };
 
   const formatAge = (patient: Patient) => {
@@ -64,6 +76,16 @@ export default function Patients() {
       <PatientForm
         onBack={handleBack}
         onSuccess={handlePatientAdded}
+      />
+    );
+  }
+
+  if (selectedPatient) {
+    return (
+      <EditPatientForm
+        patient={selectedPatient}
+        onBack={handleBack}
+        onSuccess={handlePatientUpdated}
       />
     );
   }
@@ -149,7 +171,8 @@ export default function Patients() {
                 return (
                   <Card 
                     key={patient.id} 
-                    className="border-2 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-200 hover:border-purple-300"
+                    className="border-2 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-200 hover:border-purple-300 cursor-pointer"
+                    onClick={() => handlePatientEdit(patient)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
