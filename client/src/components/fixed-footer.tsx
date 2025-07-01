@@ -13,24 +13,24 @@ export function FixedFooter() {
       id: 'home',
       path: '/',
       label: language === 'ar' ? 'الرئيسية' : 'Home',
-      bgColor: 'bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600',
-      hoverColor: 'hover:from-orange-500 hover:via-orange-600 hover:to-orange-700',
+      bgColor: 'bg-gradient-to-br from-purple-700 via-purple-800 to-purple-900',
+      hoverColor: 'hover:from-purple-800 hover:via-purple-900 hover:to-purple-950',
       icon: '🏠'
     },
     {
       id: 'activity',
       path: '/activity',
       label: language === 'ar' ? 'النشاط' : 'Activity',
-      bgColor: 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600',
-      hoverColor: 'hover:from-purple-500 hover:via-purple-600 hover:to-purple-700',
+      bgColor: 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500',
+      hoverColor: 'hover:from-gray-400 hover:via-gray-500 hover:to-gray-600',
       icon: '🐾'
     },
     {
       id: 'account',
       path: '/account',
       label: language === 'ar' ? 'الحساب' : 'Account',
-      bgColor: 'bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600',
-      hoverColor: 'hover:from-gray-500 hover:via-gray-600 hover:to-gray-700',
+      bgColor: 'bg-gradient-to-br from-purple-700 via-purple-800 to-purple-900',
+      hoverColor: 'hover:from-purple-800 hover:via-purple-900 hover:to-purple-950',
       icon: '🐱'
     }
   ];
