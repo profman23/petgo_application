@@ -348,6 +348,7 @@ Changelog:
 - July 1, 2025. REMOVED: Settings/gear icons from all header sections (Home, Activity, Account) for cleaner interface design
 - July 1, 2025. ENHANCED: Logo visibility and prominence across all screens with enlarged frames, purple backgrounds, and enhanced shadows
 - July 1, 2025. UPGRADED: Header design consistency - all pages now use enhanced logo display with 12x12 purple-framed containers and improved shadow effects
+- July 1, 2025. CLEANED: Removed "VETS VAN - Premium" text from home page header for simpler, cleaner user display
 ```
 
 ## User Preferences

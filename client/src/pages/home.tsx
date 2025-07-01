@@ -154,9 +154,6 @@ export default function Home() {
             </div>
             <div>
               <p className="font-bold text-gray-900 text-base">{user?.name || user?.firstName}</p>
-              <p className="text-sm text-purple-600 font-medium">
-                VETS VAN - {MEMBERSHIP_TYPES[user?.membershipType as keyof typeof MEMBERSHIP_TYPES] || 'Premium'}
-              </p>
             </div>
           </div>
           
