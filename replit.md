@@ -302,6 +302,7 @@ Changelog:
 - July 1, 2025. REPLACED: VETS VAN image with user's custom cute dog and cat image positioned directly above request button
 - July 1, 2025. REPOSITIONED: Custom pet image moved to replace vehicle image in optimal location above "Click Here to Request" button
 - July 1, 2025. ENHANCED: Custom pet image with glass morphism frame, backdrop blur, and hover scaling effects
+- July 1, 2025. ENLARGED: Pet image to 48x32 pixels and removed border frame for cleaner display with drop shadow effects
 ```
 
 ## User Preferences

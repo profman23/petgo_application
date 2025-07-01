@@ -582,13 +582,11 @@ export default function Home() {
 
             {/* Cute Pets Image Display */}
             <div className="flex justify-center mb-3">
-              <div className="w-32 h-20 rounded-xl overflow-hidden shadow-2xl border-2 border-purple-200 bg-white/10 backdrop-blur-sm">
-                <img 
-                  src={petsImage} 
-                  alt="Cute Dog and Cat" 
-                  className="w-full h-full object-contain p-1 hover:scale-105 transition-transform duration-300"
-                />
-              </div>
+              <img 
+                src={petsImage} 
+                alt="Cute Dog and Cat" 
+                className="w-48 h-32 object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg"
+              />
             </div>
 
             {/* Request Button */}
