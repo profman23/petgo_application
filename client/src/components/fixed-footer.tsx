@@ -1,6 +1,6 @@
-import { Home, Activity, User } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
+import newButtonsImage from '@assets/freepik__background__89215_1751365610576.png';
 
 export function FixedFooter() {
   const [location, setLocation] = useLocation();
@@ -12,23 +12,26 @@ export function FixedFooter() {
     {
       id: 'home',
       path: '/',
-      icon: Home,
-      label: t('home'),
-      gradient: 'from-purple-500 to-violet-600'
+      label: language === 'ar' ? 'الرئيسية' : 'Home',
+      bgColor: 'bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600',
+      hoverColor: 'hover:from-orange-500 hover:via-orange-600 hover:to-orange-700',
+      icon: '🏠'
     },
     {
       id: 'activity',
       path: '/activity',
-      icon: Activity,
-      label: t('activity'),
-      gradient: 'from-indigo-500 to-purple-600'
+      label: language === 'ar' ? 'النشاط' : 'Activity',
+      bgColor: 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600',
+      hoverColor: 'hover:from-purple-500 hover:via-purple-600 hover:to-purple-700',
+      icon: '🐾'
     },
     {
       id: 'account',
       path: '/account',
-      icon: User,
-      label: t('account'),
-      gradient: 'from-violet-500 to-fuchsia-600'
+      label: language === 'ar' ? 'الحساب' : 'Account',
+      bgColor: 'bg-gradient-to-br from-cyan-400 via-cyan-500 to-cyan-600',
+      hoverColor: 'hover:from-cyan-500 hover:via-cyan-600 hover:to-cyan-700',
+      icon: '🐱'
     }
   ];
 
@@ -37,11 +40,10 @@ export function FixedFooter() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-2 border-purple-200 shadow-2xl">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl">
       <div className="max-w-md mx-auto">
-        <div className="flex items-center justify-around py-2 px-4">
+        <div className="flex items-center justify-around py-3 px-6">
           {navigationItems.map((item) => {
-            const IconComponent = item.icon;
             const isActive = location === item.path;
             
             return (
@@ -50,46 +52,48 @@ export function FixedFooter() {
                 onClick={() => handleNavigation(item.path)}
                 className={`
                   flex flex-col items-center justify-center 
-                  p-3 rounded-xl min-w-[80px] relative
+                  px-6 py-4 rounded-2xl min-w-[90px] relative
                   transition-all duration-300 ease-in-out
+                  transform hover:scale-105 active:scale-95
+                  ${item.bgColor} ${item.hoverColor}
+                  shadow-lg hover:shadow-xl
                   ${isActive 
-                    ? `bg-gradient-to-r ${item.gradient} text-white shadow-lg transform scale-105` 
-                    : 'text-gray-600 hover:text-purple-600 hover:bg-purple-50'
+                    ? 'ring-4 ring-white ring-opacity-50 scale-105' 
+                    : 'hover:ring-2 hover:ring-white hover:ring-opacity-30'
                   }
                 `}
                 style={{ 
                   textAlign: 'center'
                 }}
               >
-                {/* Icon Container */}
+                {/* 3D Icon Container */}
                 <div className={`
-                  w-8 h-8 rounded-lg flex items-center justify-center mb-1
-                  ${isActive 
-                    ? 'bg-white/20 backdrop-blur-sm' 
-                    : 'bg-gray-100'
-                  }
-                  transition-all duration-300
+                  w-12 h-12 rounded-xl flex items-center justify-center mb-2
+                  bg-white/20 backdrop-blur-sm border border-white/30
+                  shadow-inner transition-all duration-300
+                  ${isActive ? 'bg-white/30 shadow-lg' : ''}
                 `}>
-                  <IconComponent 
-                    size={18} 
-                    className={isActive ? 'text-white' : 'text-gray-700'}
-                  />
+                  <span className="text-2xl filter drop-shadow-sm">
+                    {item.icon}
+                  </span>
                 </div>
 
-                {/* Label */}
+                {/* Label with 3D Effect */}
                 <span className={`
-                  text-xs font-medium
-                  ${isActive ? 'text-white' : 'text-gray-700'}
-                  transition-colors duration-300
+                  text-sm font-bold text-white
+                  filter drop-shadow-md
+                  transition-all duration-300
+                  ${isActive ? 'text-shadow-lg' : ''}
                 `}>
                   {item.label}
                 </span>
 
-                {/* Active Indicator */}
+                {/* Shine Effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                
+                {/* Active Glow */}
                 {isActive && (
-                  <div className="absolute -top-1 left-1/2 transform -translate-x-1/2">
-                    <div className="w-2 h-2 bg-white rounded-full shadow-md"></div>
-                  </div>
+                  <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-sm"></div>
                 )}
               </button>
             );

@@ -16,7 +16,7 @@ import newClinicImage from "@assets/freepik_assistant_1751363666289_175136369539
 import newestHouseImage from "@assets/freepik_assistant_1751364682430_1751364706224.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
-import { FixedFooter } from '@/components/fixed-footer';
+
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -422,14 +422,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Add padding for fixed footer */}
-        <div className="pb-20"></div>
         </div>
         </div>
       </div>
-      
-      {/* Fixed Footer */}
-      <FixedFooter />
     </div>
   );
 }
