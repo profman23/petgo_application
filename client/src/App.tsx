@@ -92,7 +92,7 @@ function Router() {
   const shouldShowFooter = pagesWithFooter.includes(location);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col screen-border">
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
           <Route path="/user-type-selection" component={UserTypeSelection} />

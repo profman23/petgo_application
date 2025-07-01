@@ -332,6 +332,8 @@ Changelog:
 - July 1, 2025. IMPROVED: Better visual balance with larger building images for enhanced detail visibility
 - July 1, 2025. ADJUSTED: Reduced veterinary clinic image size from w-20 h-20 to w-16 h-16 for better proportions
 - July 1, 2025. CONFIRMED: Clinic positioned at far left (left-0) with optimal size for clean display
+- July 1, 2025. ADDED: Light gray border around entire screen with thin line (1px solid #e5e7eb)
+- July 1, 2025. IMPLEMENTED: Screen border class applied to main app container for consistent framing
 ```
 
 ## User Preferences

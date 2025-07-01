@@ -161,4 +161,12 @@
     transform: translate(-50%, -50%);
     z-index: 15;
   }
+  
+  /* Light gray border around entire screen */
+  .screen-border {
+    border: 1px solid #e5e7eb;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
 }
