@@ -11,6 +11,7 @@ export const users = pgTable("users", {
   lastName: text("last_name"),
   petName: text("pet_name"),
   petType: text("pet_type"), // كلب، قطة، طير
+  address: text("address"),
   membershipType: text("membership_type").notNull().default("bronze"),
 });
 

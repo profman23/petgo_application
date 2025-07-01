@@ -554,6 +554,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user profile
+  app.get('/api/user/profile', requireAuth, async (req, res) => {
+    try {
+      const user = await storage.getUser(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      // Remove password from response
+      const { password, ...userProfile } = user;
+      res.json(userProfile);
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      res.status(500).json({ message: 'Error fetching profile' });
+    }
+  });
+
+  // Update user profile
+  app.put('/api/user/profile', requireAuth, async (req, res) => {
+    try {
+      const { firstName, lastName, name, petName, petType } = req.body;
+      
+      // Validate required fields
+      if (!firstName || !lastName || !name) {
+        return res.status(400).json({ message: 'First name, last name, and name are required' });
+      }
+
+      const userId = req.user.id;
+      const updatedUser = await storage.updateUser(userId, {
+        firstName,
+        lastName,
+        name,
+        petName,
+        petType
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Remove password from response
+      const { password, ...userProfile } = updatedUser;
+      res.json(userProfile);
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      res.status(500).json({ message: 'Error updating profile' });
+    }
+  });
+
+  // Reset password
+  app.put('/api/user/reset-password', requireAuth, async (req, res) => {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      
+      // Validate inputs
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({ message: 'Current password and new password are required' });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'New password must be at least 6 characters long' });
+      }
+
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Verify current password
+      if (user.password !== currentPassword) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+
+      // Update password
+      const updatedUser = await storage.updateUserPassword(userId, newPassword);
+      
+      if (!updatedUser) {
+        return res.status(500).json({ message: 'Failed to update password' });
+      }
+
+      res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      res.status(500).json({ message: 'Error resetting password' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

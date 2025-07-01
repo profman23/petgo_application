@@ -237,6 +237,17 @@ export const translations = {
     phonePlaceholder: 'أدخل رقم هاتفك',
     resetPassword: 'إعادة تعيين كلمة المرور',
     saveProfile: 'حفظ الملف الشخصي',
+    petType: 'نوع الحيوان الأليف',
+    petTypeDesc: 'نوع حيوانك الأليف',
+    currentPassword: 'كلمة المرور الحالية',
+    newPassword: 'كلمة المرور الجديدة',
+    confirmNewPassword: 'تأكيد كلمة المرور الجديدة',
+    changePassword: 'تغيير كلمة المرور',
+    passwordChanged: 'تم تغيير كلمة المرور بنجاح',
+    profileUpdated: 'تم تحديث الملف الشخصي بنجاح',
+    currentPasswordIncorrect: 'كلمة المرور الحالية غير صحيحة',
+    newPasswordTooShort: 'كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل',
+    passwordsDontMatch: 'كلمات المرور غير متطابقة',
   },
   en: {
     // Common
@@ -459,6 +470,17 @@ export const translations = {
     phonePlaceholder: 'Enter your phone number',
     resetPassword: 'Reset Password',
     saveProfile: 'Save Profile',
+    petType: 'Pet Type',
+    petTypeDesc: 'Type of your pet',
+    currentPassword: 'Current Password',
+    newPassword: 'New Password',
+    confirmNewPassword: 'Confirm New Password',
+    changePassword: 'Change Password',
+    passwordChanged: 'Password changed successfully',
+    profileUpdated: 'Profile updated successfully',
+    currentPasswordIncorrect: 'Current password is incorrect',
+    newPasswordTooShort: 'New password must be at least 6 characters',
+    passwordsDontMatch: 'Passwords do not match',
   }
 };
 
