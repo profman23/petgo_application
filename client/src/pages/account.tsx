@@ -190,32 +190,64 @@ export default function Account() {
               </div>
               
               {/* Camera Button */}
-              <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white border-2 border-white flex items-center justify-center transition-colors">
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white border-2 border-white flex items-center justify-center transition-colors"
+              >
                 <Camera size={14} />
               </button>
+              
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
             </div>
 
             {/* User Name */}
             <div className="flex-1" style={{ textAlign }}>
               <h1 className="text-2xl font-bold text-gray-800 mb-1">
-                {t('accountTitle')}
+                {userProfile?.name || t('accountTitle')}
               </h1>
               <p className="text-sm text-gray-600">{t('accountSubtitle')}</p>
             </div>
           </div>
         </div>
 
-        {/* Divider Line */}
-        <div className="border-t border-purple-200 mb-6"></div>
-
-        {/* Account Details Form */}
-        <div className="bg-white rounded-xl border-2 border-purple-200 shadow-lg p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
+        {/* Account Details Toggle Button */}
+        <button
+          onClick={() => setIsAccountDetailsOpen(!isAccountDetailsOpen)}
+          className="w-full bg-white rounded-xl border-2 border-purple-200 shadow-lg p-4 mb-4 flex items-center justify-between hover:bg-purple-50 transition-colors"
+        >
+          <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
             {t('accountDetails')}
-          </h2>
+          </span>
+          {isAccountDetailsOpen ? (
+            <ChevronUp className="text-purple-600" size={20} />
+          ) : (
+            <ChevronDown className="text-purple-600" size={20} />
+          )}
+        </button>
 
-          {/* First Name */}
-          <div className="space-y-2">
+        {/* Patients Button */}
+        <button
+          onClick={handlePatientsClick}
+          className="w-full bg-white rounded-xl border-2 border-purple-200 shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-purple-50 transition-colors"
+        >
+          <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
+            {t('patients')}
+          </span>
+          <ArrowIcon className="text-purple-600" size={20} />
+        </button>
+
+        {/* Collapsible Account Details Form */}
+        {isAccountDetailsOpen && (
+          <div className="bg-white rounded-xl border-2 border-purple-200 shadow-lg p-6 space-y-6 mb-6">
+            {/* First Name */}
+            <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
               {t('firstName')}
             </label>
@@ -321,7 +353,9 @@ export default function Account() {
           >
             {updateProfileMutation.isPending ? t('loading') : t('saveProfile')}
           </button>
-        </div>
+          </div>
+        )}
+
       </div>
 
       {/* Password Reset Dialog */}
