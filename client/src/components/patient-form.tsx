@@ -193,7 +193,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       min="0"
                       max="50"
                       {...form.register('ageYear')}
-                      className="border-2 border-purple-200 focus:border-purple-500 rounded-lg"
+                      className="border rounded-lg"
                       placeholder="0"
                     />
                   </div>
@@ -207,7 +207,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       min="0"
                       max="11"
                       {...form.register('ageMonth')}
-                      className="border-2 border-purple-200 focus:border-purple-500 rounded-lg"
+                      className="border rounded-lg"
                       placeholder="0"
                     />
                   </div>
@@ -221,7 +221,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       min="0"
                       max="30"
                       {...form.register('ageDay')}
-                      className="border-2 border-purple-200 focus:border-purple-500 rounded-lg"
+                      className="border rounded-lg"
                       placeholder="0"
                     />
                   </div>

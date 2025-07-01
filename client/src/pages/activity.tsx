@@ -149,7 +149,7 @@ export default function Activity() {
 
         {/* Activity List */}
         {rideHistory.length === 0 ? (
-          <div className="bg-white rounded-xl border-2 border-purple-200 shadow-lg p-8 text-center">
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
             <Calendar className="mx-auto mb-4 text-purple-400" size={48} />
             <h3 className="text-lg font-semibold text-gray-800 mb-2" style={{ textAlign }}>
               {language === 'ar' ? 'لا توجد طلبات سابقة' : 'No Previous Requests'}
@@ -165,7 +165,7 @@ export default function Activity() {
             {rideHistory.map((ride: Ride) => (
               <div 
                 key={ride.id}
-                className="bg-white rounded-xl border-2 border-purple-200 shadow-lg p-6 hover:shadow-xl transition-shadow"
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
               >
                 {/* Status and Date */}
                 <div className="flex items-center justify-between mb-4">

@@ -131,8 +131,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-2" dir={getDirection(language)}>
       {/* Full screen border with logo integration */}
-      <div className="min-h-screen border-4 rounded-2xl relative overflow-hidden" style={{ 
-        borderColor: 'var(--purple-primary)', 
+      <div className="min-h-screen rounded-2xl relative overflow-hidden" style={{ 
         boxShadow: 'inset 0 0 50px rgba(139, 47, 139, 0.1), 0 20px 40px rgba(139, 47, 139, 0.15)',
         background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%)'
       }}>
