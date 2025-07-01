@@ -132,13 +132,14 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
               {/* Patient Name */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-                  {t('patientName')}
+                  {t('patientName')} <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="name"
                   {...form.register('name')}
                   className="border-2 border-purple-200 focus:border-purple-500 rounded-lg"
                   placeholder={t('patientName')}
+                  autoFocus
                 />
                 {form.formState.errors.name && (
                   <p className="text-red-500 text-sm">{form.formState.errors.name.message}</p>
@@ -148,7 +149,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
               {/* Patient Type */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700">
-                  {t('patientType')}
+                  {t('patientType')} <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   onValueChange={(value) => form.setValue('type', value as 'Cat' | 'Dog' | 'Bird')}
@@ -191,7 +192,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       type="number"
                       min="0"
                       max="50"
-                      {...form.register('ageYear', { valueAsNumber: true })}
+                      {...form.register('ageYear')}
                       className="border-2 border-purple-200 focus:border-purple-500 rounded-lg"
                       placeholder="0"
                     />
@@ -205,7 +206,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       type="number"
                       min="0"
                       max="11"
-                      {...form.register('ageMonth', { valueAsNumber: true })}
+                      {...form.register('ageMonth')}
                       className="border-2 border-purple-200 focus:border-purple-500 rounded-lg"
                       placeholder="0"
                     />
@@ -219,7 +220,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       type="number"
                       min="0"
                       max="30"
-                      {...form.register('ageDay', { valueAsNumber: true })}
+                      {...form.register('ageDay')}
                       className="border-2 border-purple-200 focus:border-purple-500 rounded-lg"
                       placeholder="0"
                     />
