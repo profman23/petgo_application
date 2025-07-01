@@ -359,7 +359,7 @@ export default function Home() {
                     <img 
                       src={newVetClinicImage} 
                       alt="3D Veterinary Clinic Building" 
-                      className="w-14 h-14 object-contain drop-shadow-xl"
+                      className="w-20 h-20 object-contain drop-shadow-xl"
                     />
                   </div>
                   
@@ -368,7 +368,7 @@ export default function Home() {
                     <img 
                       src={newestHouseImage} 
                       alt="Beautiful House" 
-                      className="w-20 h-20 object-contain drop-shadow-lg"
+                      className="w-24 h-24 object-contain drop-shadow-lg"
                     />
                   </div>
                   

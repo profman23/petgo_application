@@ -328,6 +328,8 @@ Changelog:
 - July 1, 2025. REPLACED: Veterinary clinic image with new 3D cartoon-style building (freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png)
 - July 1, 2025. REPOSITIONED: 3D clinic building positioned at far left (left-0) of animation screen with enhanced size (w-14 h-14)
 - July 1, 2025. ENHANCED: 3D clinic image with drop-shadow-xl effect for better visual prominence
+- July 1, 2025. ENLARGED: Both veterinary clinic and house images - clinic from w-14 h-14 to w-20 h-20, house from w-20 h-20 to w-24 h-24
+- July 1, 2025. IMPROVED: Better visual balance with larger building images for enhanced detail visibility
 ```
 
 ## User Preferences
