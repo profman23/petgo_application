@@ -394,6 +394,12 @@ export default function Account() {
           </div>
         </div>
       )}
+      
+      {/* Add padding for fixed footer */}
+      <div className="pb-20"></div>
+      
+      {/* Fixed Footer */}
+      <FixedFooter />
     </div>
   );
 }
