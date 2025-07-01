@@ -330,6 +330,8 @@ Changelog:
 - July 1, 2025. ENHANCED: 3D clinic image with drop-shadow-xl effect for better visual prominence
 - July 1, 2025. ENLARGED: Both veterinary clinic and house images - clinic from w-14 h-14 to w-20 h-20, house from w-20 h-20 to w-24 h-24
 - July 1, 2025. IMPROVED: Better visual balance with larger building images for enhanced detail visibility
+- July 1, 2025. ADJUSTED: Reduced veterinary clinic image size from w-20 h-20 to w-16 h-16 for better proportions
+- July 1, 2025. CONFIRMED: Clinic positioned at far left (left-0) with optimal size for clean display
 ```
 
 ## User Preferences

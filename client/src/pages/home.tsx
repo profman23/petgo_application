@@ -359,7 +359,7 @@ export default function Home() {
                     <img 
                       src={newVetClinicImage} 
                       alt="3D Veterinary Clinic Building" 
-                      className="w-20 h-20 object-contain drop-shadow-xl"
+                      className="w-16 h-16 object-contain drop-shadow-xl"
                     />
                   </div>
                   
