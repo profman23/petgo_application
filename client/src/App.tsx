@@ -15,7 +15,9 @@ import DoctorRideTracking from "@/pages/doctor-ride-tracking";
 import Account from "@/pages/account";
 import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
+import { FixedFooter } from "@/components/fixed-footer";
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 
 // Check for expired tokens on app start
 const checkAndClearExpiredTokens = async () => {
@@ -83,22 +85,33 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
 }
 
 function Router() {
+  const [location] = useLocation();
+  
+  // Pages that should show the footer
+  const pagesWithFooter = ['/', '/account', '/activity', '/patients'];
+  const shouldShowFooter = pagesWithFooter.includes(location);
+
   return (
-    <Switch>
-      <Route path="/user-type-selection" component={UserTypeSelection} />
-      <Route path="/login" component={UserTypeSelection} />
-      <Route path="/login/customer" component={Login} />
-      <Route path="/login/doctor" component={DoctorLogin} />
-      <Route path="/doctor-dashboard" component={DoctorDashboard} />
-      <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
-      <Route path="/ride-request" component={RideRequest} />
-      <Route path="/ride-tracking" component={RideTracking} />
-      <Route path="/account" component={Account} />
-      <Route path="/patients" component={Patients} />
-      <Route path="/activity" component={Activity} />
-      <Route path="/" component={Home} />
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen flex flex-col">
+      <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
+        <Switch>
+          <Route path="/user-type-selection" component={UserTypeSelection} />
+          <Route path="/login" component={UserTypeSelection} />
+          <Route path="/login/customer" component={Login} />
+          <Route path="/login/doctor" component={DoctorLogin} />
+          <Route path="/doctor-dashboard" component={DoctorDashboard} />
+          <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
+          <Route path="/ride-request" component={RideRequest} />
+          <Route path="/ride-tracking" component={RideTracking} />
+          <Route path="/account" component={Account} />
+          <Route path="/patients" component={Patients} />
+          <Route path="/activity" component={Activity} />
+          <Route path="/" component={Home} />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
+      {shouldShowFooter && <FixedFooter />}
+    </div>
   );
 }
 
