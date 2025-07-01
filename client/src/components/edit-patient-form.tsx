@@ -67,7 +67,6 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
       await apiRequest(`/api/patients/${patient.id}`, {
         method: 'PUT',
         body: JSON.stringify(cleanData),
-        headers: { 'Content-Type': 'application/json' },
       });
     },
     onSuccess: () => {
