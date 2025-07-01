@@ -364,11 +364,11 @@ export default function Home() {
                   </div>
                   
                   <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
-                    {/* Beautiful Newest House Image */}
+                    {/* Beautiful Newest House Image - Enlarged */}
                     <img 
                       src={newestHouseImage} 
                       alt="Beautiful House" 
-                      className="w-12 h-12 object-contain drop-shadow-lg"
+                      className="w-16 h-16 object-contain drop-shadow-lg"
                     />
                   </div>
                   
