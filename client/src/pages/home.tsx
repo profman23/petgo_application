@@ -724,12 +724,7 @@ export default function Home() {
           {/* Account Button - Luxury Glass Design */}
           <div 
             className="relative cursor-pointer group perspective-1000"
-            onClick={() => {
-              toast({
-                title: language === 'ar' ? 'إعدادات الحساب' : 'Account Settings',
-                description: language === 'ar' ? 'ستتوفر هذه الميزة قريباً' : 'This feature will be available soon',
-              });
-            }}
+            onClick={() => setLocation('/account')}
           >
             {/* Animated Glow Background */}
             <div className="absolute -inset-2 bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-500 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>

@@ -324,6 +324,11 @@ export const translations = {
     noActiveRide: 'No active ride',
     welcomeUser: 'Welcome',
     
+    // Navigation buttons
+    account: 'Account',
+    activity: 'Activity', 
+    home: 'Home',
+    
     // Ride Request
     requestMobileVet: 'Request Mobile Veterinary Clinic',
     vetServiceType: 'Veterinary Service Type',
