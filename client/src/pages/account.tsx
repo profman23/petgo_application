@@ -1,7 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, PawPrint } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import logoPath from '@assets/10773561_1751295833176.png';
 
 export default function Account() {
@@ -9,12 +11,135 @@ export default function Account() {
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+  
+  // Form states
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [petName, setPetName] = useState('');
+  const [petType, setPetType] = useState('');
+  
+  // Password reset modal state
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Fetch user profile
+  const { data: userProfile, isLoading } = useQuery({
+    queryKey: ['/api/user/profile'],
+    retry: false,
+  });
+
+  // Initialize form with user data
+  useEffect(() => {
+    if (userProfile) {
+      setFirstName(userProfile.firstName || '');
+      setLastName(userProfile.lastName || '');
+      setPetName(userProfile.petName || '');
+      setPetType(userProfile.petType || '');
+    }
+  }, [userProfile]);
+
+  // Update profile mutation
+  const updateProfileMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await apiRequest('/api/user/profile', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/profile'] });
+      showToast(t('profileUpdated'), 'success');
+    },
+    onError: (error: any) => {
+      showToast(error.message || 'حدث خطأ', 'error');
+    },
+  });
+
+  // Reset password mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (data: any) => {
+      await apiRequest('/api/user/reset-password', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      setShowPasswordDialog(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      showToast(t('passwordChanged'), 'success');
+    },
+    onError: (error: any) => {
+      showToast(error.message || 'حدث خطأ', 'error');
+    },
+  });
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    // Simple toast implementation
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white ${
+      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    }`;
+    document.body.appendChild(toast);
+    setTimeout(() => document.body.removeChild(toast), 3000);
+  };
 
   const handleBack = () => {
     setLocation('/');
   };
 
+  const handleSaveProfile = () => {
+    if (!firstName || !lastName) {
+      showToast('الاسم الأول والأخير مطلوبان', 'error');
+      return;
+    }
+
+    const fullName = `${firstName} ${lastName}`;
+    updateProfileMutation.mutate({
+      firstName,
+      lastName,
+      name: fullName,
+      petName,
+      petType,
+    });
+  };
+
+  const handleResetPassword = () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showToast(t('allFieldsRequired') || 'جميع الحقول مطلوبة', 'error');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      showToast(t('newPasswordTooShort'), 'error');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showToast(t('passwordsDontMatch'), 'error');
+      return;
+    }
+
+    resetPasswordMutation.mutate({
+      currentPassword,
+      newPassword,
+    });
+  };
+
   const ArrowIcon = direction === 'rtl' ? ArrowRight : ArrowLeft;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
+        <div className="text-purple-600">{t('loading')}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white" dir={direction}>
@@ -81,6 +206,8 @@ export default function Account() {
               <User className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
               <input
                 type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('firstNamePlaceholder')}
               />
@@ -96,13 +223,54 @@ export default function Account() {
               <User className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
               <input
                 type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
                 className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('lastNamePlaceholder')}
               />
             </div>
           </div>
 
-          {/* Phone Number */}
+          {/* Pet Name */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
+              {t('petName')}
+            </label>
+            <div className="relative">
+              <PawPrint className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
+              <input
+                type="text"
+                value={petName}
+                onChange={(e) => setPetName(e.target.value)}
+                className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                placeholder={t('petName')}
+              />
+            </div>
+          </div>
+
+          {/* Pet Type */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
+              {t('petType')}
+            </label>
+            <div className="relative">
+              <PawPrint className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
+              <select
+                value={petType}
+                onChange={(e) => setPetType(e.target.value)}
+                className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+              >
+                <option value="">{t('petType')}</option>
+                <option value="كلب">{language === 'ar' ? 'كلب' : 'Dog'}</option>
+                <option value="قطة">{language === 'ar' ? 'قطة' : 'Cat'}</option>
+                <option value="طير">{language === 'ar' ? 'طير' : 'Bird'}</option>
+                <option value="أرنب">{language === 'ar' ? 'أرنب' : 'Rabbit'}</option>
+                <option value="سمك">{language === 'ar' ? 'سمك' : 'Fish'}</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Phone Number (Read Only) */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
               {t('phone')}
@@ -111,24 +279,112 @@ export default function Account() {
               <Phone className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
               <input
                 type="tel"
-                className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                value={userProfile?.phone || ''}
+                readOnly
+                className={`w-full h-10 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('phonePlaceholder')}
               />
             </div>
           </div>
 
           {/* Reset Password Button */}
-          <button className="w-full border border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 flex items-center justify-center gap-2 py-3 rounded-md transition-colors">
+          <button 
+            onClick={() => setShowPasswordDialog(true)}
+            className="w-full border border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 flex items-center justify-center gap-2 py-3 rounded-md transition-colors"
+          >
             <Lock size={16} />
             {t('resetPassword')}
           </button>
 
           {/* Save Button */}
-          <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 rounded-md transition-colors">
-            {t('saveProfile')}
+          <button 
+            onClick={handleSaveProfile}
+            disabled={updateProfileMutation.isPending}
+            className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium py-3 rounded-md transition-colors"
+          >
+            {updateProfileMutation.isPending ? t('loading') : t('saveProfile')}
           </button>
         </div>
       </div>
+
+      {/* Password Reset Dialog */}
+      {showPasswordDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" dir={direction}>
+          <div className="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
+              {t('changePassword')}
+            </h3>
+
+            {/* Current Password */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
+                {t('currentPassword')}
+              </label>
+              <div className="relative">
+                <Lock className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  placeholder={t('currentPassword')}
+                />
+              </div>
+            </div>
+
+            {/* New Password */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
+                {t('newPassword')}
+              </label>
+              <div className="relative">
+                <Lock className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  placeholder={t('newPassword')}
+                />
+              </div>
+            </div>
+
+            {/* Confirm New Password */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
+                {t('confirmNewPassword')}
+              </label>
+              <div className="relative">
+                <Lock className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  placeholder={t('confirmNewPassword')}
+                />
+              </div>
+            </div>
+
+            {/* Dialog Buttons */}
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => setShowPasswordDialog(false)}
+                className="flex-1 border border-gray-200 text-gray-600 hover:bg-gray-50 py-2 rounded-md transition-colors"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleResetPassword}
+                disabled={resetPasswordMutation.isPending}
+                className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white py-2 rounded-md transition-colors"
+              >
+                {resetPasswordMutation.isPending ? t('loading') : t('changePassword')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
