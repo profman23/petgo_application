@@ -12,6 +12,7 @@ import truckIcon from "@assets/10773561_1751295833176.png";
 import petsImage from "@assets/freepik_assistant_1751361910420_1751361937178.png";
 import newVetVanImage from "@assets/freepik__background__70346_1751363211262.png";
 import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753.jpeg";
+import newClinicImage from "@assets/freepik_assistant_1751363666289_1751363695395.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { FixedFooter } from '@/components/fixed-footer';
@@ -271,34 +272,13 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Modern Clinic Icon */}
+                  {/* Beautiful New Veterinary Clinic */}
                   <div className="absolute left-1 top-1/2 transform -translate-y-1/2 z-10">
-                    <svg width="32" height="32" viewBox="0 0 32 32" className="drop-shadow-md">
-                      {/* Clinic Building */}
-                      <rect x="2" y="12" width="28" height="18" rx="2" fill="#4f46e5" stroke="#3730a3" strokeWidth="1"/>
-                      
-                      {/* Roof */}
-                      <polygon points="16,4 2,12 30,12" fill="#6366f1"/>
-                      
-                      {/* Windows */}
-                      <rect x="6" y="16" width="4" height="4" rx="1" fill="#93c5fd"/>
-                      <rect x="14" y="16" width="4" height="4" rx="1" fill="#93c5fd"/>
-                      <rect x="22" y="16" width="4" height="4" rx="1" fill="#93c5fd"/>
-                      
-                      {/* Main Door */}
-                      <rect x="13" y="22" width="6" height="8" rx="1" fill="#1e40af"/>
-                      <circle cx="17" cy="26" r="1" fill="#fbbf24"/>
-                      
-                      {/* Medical Cross */}
-                      <g transform="translate(16,10)">
-                        <rect x="-1" y="-3" width="2" height="6" fill="white"/>
-                        <rect x="-3" y="-1" width="6" height="2" fill="white"/>
-                      </g>
-                      
-                      {/* Clinic Sign */}
-                      <rect x="8" y="6" width="16" height="4" rx="1" fill="white" stroke="#e5e7eb"/>
-                      <text x="16" y="8.5" fontSize="3" fill="#374151" textAnchor="middle" fontFamily="Arial">VET CLINIC</text>
-                    </svg>
+                    <img 
+                      src={newClinicImage} 
+                      alt="Veterinary Clinic" 
+                      className="w-10 h-10 object-contain drop-shadow-lg"
+                    />
                   </div>
                   
                   {/* Beautiful New House Image */}
