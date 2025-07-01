@@ -217,17 +217,17 @@ export default function RideRequest() {
         form.setValue('pickupLatitude', latitude);
         form.setValue('pickupLongitude', longitude);
         
-        // تحديد اسم المنطقة حسب الإحداثيات الدقيقة
-        let locationName = `موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+        // تحديد اسم المنطقة حسب الإحداثيات - عرض مبسط
+        let locationName = 'موقعك الحالي';
         
         if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
-          locationName = `الرياض - موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          locationName = 'الرياض - موقعك الحالي';
         } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
-          locationName = `جدة - موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          locationName = 'جدة - موقعك الحالي';
         } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
-          locationName = `الدمام - موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          locationName = 'الدمام - موقعك الحالي';
         } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
-          locationName = `المدينة المنورة - موقعك الحالي GPS (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          locationName = 'المدينة المنورة - موقعك الحالي';
         }
         
         form.setValue('pickupLocation', locationName);
@@ -235,7 +235,7 @@ export default function RideRequest() {
         if (accuracy < 50) {
           toast({
             title: 'تم تحديث موقعك بدقة عالية',
-            description: `الدقة: ${Math.round(accuracy)} متر`,
+            description: locationName,
             duration: 3000,
           });
         }
@@ -278,23 +278,23 @@ export default function RideRequest() {
           form.setValue('pickupLatitude', latitude);
           form.setValue('pickupLongitude', longitude);
           
-          // تحديد اسم الموقع الجديد
-          let locationName = `موقعك المحدث (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+          // تحديد اسم الموقع الجديد - عرض مبسط
+          let locationName = 'موقعك المحدث';
           
           if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
-            locationName = `الرياض - موقعك المحدث (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+            locationName = 'الرياض - موقعك المحدث';
           } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
-            locationName = `جدة - موقعك المحدث (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+            locationName = 'جدة - موقعك المحدث';
           } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
-            locationName = `الدمام - موقعك المحدث (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+            locationName = 'الدمام - موقعك المحدث';
           }
           
           form.setValue('pickupLocation', locationName);
           
           toast({
             title: 'تم تحديث موقعك بنجاح',
-            description: `الموقع الجديد: ${locationName}\nالدقة: ${Math.round(accuracy)} متر`,
-            duration: 5000,
+            description: locationName,
+            duration: 3000,
           });
         },
         (error) => {
