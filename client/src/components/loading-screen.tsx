@@ -80,62 +80,12 @@ export function LoadingScreen({ onLoadingComplete }: LoadingScreenProps) {
   }, [language, onLoadingComplete, t.loading]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white screen-border">
-      {/* Logo and Title */}
-      <div className="mb-8 text-center">
-        <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
-          <span className="text-white text-2xl font-bold">VV</span>
-        </div>
-        <h1 className="text-2xl font-bold text-purple-700 mb-2">
-          {language === 'ar' ? 'عيادة الحيوانات المتنقلة' : 'Mobile Veterinary Clinic'}
-        </h1>
-        <p className="text-gray-600">
-          {language === 'ar' ? 'خدمة بيطرية متميزة في منزلك' : 'Premium veterinary service at your home'}
-        </p>
-      </div>
-
-      {/* Loading Animation */}
-      <div className="mb-6">
-        <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
-      </div>
-
-      {/* Loading Progress Bar */}
-      <div className="w-64 mb-4">
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-gradient-to-r from-purple-500 to-purple-700 h-2 rounded-full transition-all duration-300 ease-out"
-            style={{ width: `${loadingProgress}%` }}
-          ></div>
-        </div>
-        <div className="text-center mt-2 text-sm text-gray-600">
-          {Math.round(loadingProgress)}%
-        </div>
-      </div>
-
-      {/* Loading Text */}
+    <div className="min-h-screen flex items-center justify-center bg-white screen-border">
+      {/* Simple Loading Text */}
       <div className="text-center">
-        <p className="text-lg font-medium text-purple-700 animate-pulse">
-          {loadingText}
+        <p className="text-2xl font-bold text-purple-700">
+          {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
         </p>
-      </div>
-
-      {/* Animated Pets */}
-      <div className="mt-8 flex space-x-8">
-        <div className="animate-bounce">
-          <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xl">🐱</span>
-          </div>
-        </div>
-        <div className="animate-bounce" style={{ animationDelay: '0.2s' }}>
-          <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xl">🐶</span>
-          </div>
-        </div>
-        <div className="animate-bounce" style={{ animationDelay: '0.4s' }}>
-          <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xl">🐦</span>
-          </div>
-        </div>
       </div>
     </div>
   );

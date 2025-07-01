@@ -351,6 +351,8 @@ Changelog:
 - July 1, 2025. CLEANED: Removed "VETS VAN - Premium" text from home page header for simpler, cleaner user display
 - July 1, 2025. REORGANIZED: Header layout for optimal screen space usage - compact height (40px) with proper LTR/RTL responsive design
 - July 1, 2025. OPTIMIZED: Element positioning - logo and username on start side, language selector, notifications, and logout on end side with language-aware ordering
+- July 1, 2025. REPOSITIONED: House and clinic images with language-aware positioning - clinic moves to far left for English (right for Arabic), house moves to far right for English (left for Arabic)  
+- July 1, 2025. SIMPLIFIED: Loading screen now shows simple "Loading..." text in selected language instead of complex animation
 ```
 
 ## User Preferences

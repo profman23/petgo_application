@@ -269,8 +269,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Beautiful New Veterinary Clinic */}
-                  <div className="absolute left-1 top-1/2 transform -translate-y-1/2 z-10">
+                  {/* Beautiful New Veterinary Clinic - Language aware positioning */}
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 z-10 ${language === 'ar' ? 'right-1' : 'left-1'}`}>
                     <img 
                       src={newClinicImage} 
                       alt="Veterinary Clinic" 
@@ -278,8 +278,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Beautiful New House Image */}
-                  <div className="absolute right-1 top-1/2 transform -translate-y-1/2 z-10">
+                  {/* Beautiful New House Image - Language aware positioning */}
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 z-10 ${language === 'ar' ? 'left-1' : 'right-1'}`}>
                     <img 
                       src={newHouseImage} 
                       alt="Beautiful House" 
@@ -349,8 +349,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Enhanced Start and End markers - Compact */}
-                  <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
+                  {/* Enhanced Start and End markers - Language aware positioning */}
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 ${language === 'ar' ? 'right-0' : 'left-0'}`}>
                     {/* Beautiful 3D Veterinary Clinic Building */}
                     <img 
                       src={newVetClinicImage} 
@@ -359,8 +359,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
-                    {/* Beautiful Newest House Image - Far Right Position */}
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 ${language === 'ar' ? 'left-0' : 'right-0'}`}>
+                    {/* Beautiful Newest House Image - Language aware positioning */}
                     <img 
                       src={newestHouseImage} 
                       alt="Beautiful House" 
