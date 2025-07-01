@@ -129,6 +129,7 @@ export const translations = {
     // Navigation buttons
     account: 'الحساب',
     activity: 'النشاط',
+    activityDesc: 'تاريخ طلباتك للعيادة البيطرية المتنقلة',
     home: 'الرئيسية',
     
     // Ride Request
@@ -359,7 +360,8 @@ export const translations = {
     
     // Navigation buttons
     account: 'Account',
-    activity: 'Activity', 
+    activity: 'Activity',
+    activityDesc: 'History of your mobile veterinary clinic requests',
     home: 'Home',
     
     // Ride Request

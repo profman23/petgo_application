@@ -143,7 +143,7 @@ export default function Activity() {
             {t('activity')}
           </h1>
           <p className="text-gray-600" style={{ textAlign }}>
-            {language === 'ar' ? 'تاريخ طلباتك للعيادة البيطرية المتنقلة' : 'History of your mobile veterinary clinic requests'}
+            {t('activityDesc')}
           </p>
         </div>
 
