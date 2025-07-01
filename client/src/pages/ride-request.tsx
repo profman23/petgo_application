@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star } from 'lucide-react';
-import { rideRequestSchema } from '@shared/schema';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint } from 'lucide-react';
+import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
@@ -18,6 +21,8 @@ import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i
 
 const formSchema = rideRequestSchema.extend({
   pickupLocation: z.string().min(1, 'الموقع مطلوب'),
+  serviceType: z.string().min(1, 'نوع الخدمة مطلوب'),
+  selectedPatients: z.array(z.number()).min(1, 'يرجى اختيار حيوان أليف واحد على الأقل'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -27,11 +32,18 @@ export default function RideRequest() {
   const { toast } = useToast();
   const { requestRide, isRequestingRide } = useRide();
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [selectedPatients, setSelectedPatients] = useState<number[]>([]);
+  const [serviceType, setServiceType] = useState<string>('');
   
   const { t } = useTranslation();
   const { language } = useLanguage();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
+  
+  // جلب الحيوانات الأليفة المسجلة
+  const { data: patients = [], isLoading: isLoadingPatients } = useQuery({
+    queryKey: ['/api/patients'],
+  });
   
   // استخدام نظام GPS الحقيقي
   const {
@@ -57,6 +69,8 @@ export default function RideRequest() {
       destinationLatitude: DEFAULT_COORDINATES.latitude,
       destinationLongitude: DEFAULT_COORDINATES.longitude,
       vehicleType: 'standard',
+      serviceType: '',
+      selectedPatients: [],
     },
   });
 
@@ -137,8 +151,34 @@ export default function RideRequest() {
     // التحقق من وجود الموقع الحقيقي
     if (!currentLocation || !currentLocation.latitude || !currentLocation.longitude) {
       toast({
-        title: 'خطأ في الموقع',
-        description: 'لم يتم تحديد موقعك الحقيقي بعد. يرجى الانتظار أو الضغط على زر تحديث الموقع.',
+        title: language === 'ar' ? 'خطأ في الموقع' : 'Location Error',
+        description: language === 'ar' ? 
+          'لم يتم تحديد موقعك الحقيقي بعد. يرجى الانتظار أو الضغط على زر تحديث الموقع.' : 
+          'Your real location has not been determined yet. Please wait or press the refresh location button.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // التحقق من اختيار الحيوانات الأليفة
+    if (selectedPatients.length === 0) {
+      toast({
+        title: language === 'ar' ? 'يرجى اختيار الحيوانات الأليفة' : 'Please select pets',
+        description: language === 'ar' ? 
+          'يرجى اختيار حيوان أليف واحد على الأقل للخدمة البيطرية.' : 
+          'Please select at least one pet for veterinary service.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // التحقق من اختيار نوع الخدمة
+    if (!serviceType) {
+      toast({
+        title: language === 'ar' ? 'يرجى اختيار نوع الخدمة' : 'Please select service type',
+        description: language === 'ar' ? 
+          'يرجى اختيار نوع الخدمة المطلوبة.' : 
+          'Please select the required service type.',
         variant: 'destructive',
       });
       return;
@@ -151,9 +191,11 @@ export default function RideRequest() {
       pickupLongitude: currentLocation.longitude,
       destinationLatitude: currentLocation.latitude,
       destinationLongitude: currentLocation.longitude,
+      serviceType: serviceType,
+      selectedPatients: selectedPatients,
     };
 
-    console.log('Submitting ride with real GPS location:', rideData);
+    console.log('Submitting ride with real GPS location and selected pets:', rideData);
     requestRide(rideData);
     setLocation('/ride-tracking');
   };
@@ -294,25 +336,134 @@ export default function RideRequest() {
       </header>
 
       <div className="p-4">
+        {/* Pet Selection Section */}
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3" style={{ textAlign }}>
+              {t('selectPatients')}
+            </h2>
+            <p className="text-sm text-gray-600 mb-4" style={{ textAlign }}>
+              {t('selectPatientsDesc')}
+            </p>
+            
+            {isLoadingPatients ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <span className="ml-2" style={{ textAlign }}>
+                  {language === 'ar' ? 'جاري تحميل الحيوانات الأليفة...' : 'Loading pets...'}
+                </span>
+              </div>
+            ) : patients.length === 0 ? (
+              <div className="text-center p-8 bg-gray-50 rounded-lg">
+                <PawPrint className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                <h3 className="font-medium text-gray-900 mb-2" style={{ textAlign }}>
+                  {t('noRegisteredPatients')}
+                </h3>
+                <p className="text-gray-600 mb-4" style={{ textAlign }}>
+                  {t('registerPetsFirst')}
+                </p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setLocation('/account')}
+                >
+                  {t('goToPatients')}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {patients.map((patient: Patient) => (
+                  <div
+                    key={patient.id}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                      selectedPatients.includes(patient.id)
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => {
+                      const isSelected = selectedPatients.includes(patient.id);
+                      if (isSelected) {
+                        setSelectedPatients(prev => prev.filter(id => id !== patient.id));
+                      } else {
+                        setSelectedPatients(prev => [...prev, patient.id]);
+                      }
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        checked={selectedPatients.includes(patient.id)}
+                        onChange={() => {}}
+                        className="pointer-events-none"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">
+                            {patient.type === 'Cat' ? '🐱' : patient.type === 'Dog' ? '🐶' : '🐦'}
+                          </span>
+                          <h3 className="font-medium text-gray-900" style={{ textAlign }}>
+                            {patient.name}
+                          </h3>
+                        </div>
+                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                          <span style={{ textAlign }}>
+                            {language === 'ar' ? 'النوع:' : 'Type:'} {
+                              patient.type === 'Cat' ? (language === 'ar' ? 'قطة' : 'Cat') :
+                              patient.type === 'Dog' ? (language === 'ar' ? 'كلب' : 'Dog') :
+                              (language === 'ar' ? 'طائر' : 'Bird')
+                            }
+                          </span>
+                          {patient.ageYear && (
+                            <span style={{ textAlign }}>
+                              {language === 'ar' ? 'العمر:' : 'Age:'} {patient.ageYear} {language === 'ar' ? 'سنة' : 'years'}
+                              {patient.ageMonth && patient.ageMonth > 0 && (
+                                <span> {patient.ageMonth} {language === 'ar' ? 'شهر' : 'months'}</span>
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Service Type Selection */}
-        <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4" style={{ textAlign }}>{t('serviceType')}</h2>
-          <div className="grid grid-cols-1 gap-3">
-            <Button
-              variant={form.watch('vehicleType') === 'standard' ? 'default' : 'outline'}
-              onClick={() => form.setValue('vehicleType', 'standard')}
-              className="p-6 h-auto flex-col bg-green-50 border-green-200"
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <h2 className="text-lg font-semibold text-gray-900 mb-3" style={{ textAlign }}>
+              {t('selectServiceType')}
+            </h2>
+            <Select
+              value={serviceType}
+              onValueChange={(value) => {
+                setServiceType(value);
+                form.setValue('serviceType', value);
+              }}
             >
-              <div className="text-3xl mb-2">🏥</div>
-              <span className="font-semibold" style={{ textAlign }}>
-                {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Mobile Veterinary Clinic'}
-              </span>
-              <span className="text-sm text-gray-500" style={{ textAlign }}>
-                {language === 'ar' ? 'خدمة بيطرية شاملة في موقعك' : 'Comprehensive veterinary service at your location'}
-              </span>
-            </Button>
-          </div>
-        </div>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={
+                  language === 'ar' ? 'اختر نوع الخدمة...' : 'Select service type...'
+                } />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="general-checkup">
+                  <div className="flex items-center gap-2">
+                    <span>🩺</span>
+                    <span>{t('generalCheckUp')}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="grooming">
+                  <div className="flex items-center gap-2">
+                    <span>✂️</span>
+                    <span>{t('grooming')}</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
 
         {/* Location Input */}
         <Card className="mb-6">
