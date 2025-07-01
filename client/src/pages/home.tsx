@@ -142,33 +142,30 @@ export default function Home() {
         {/* Main content with minimal padding */}
         <div className="min-h-full pt-2">
           {/* Header - Compact Design */}
-          <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-2 z-50 rounded-lg mx-2 mb-2">
-        <div className="flex items-center justify-between p-2">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 flex items-center justify-center">
+          <header className="bg-white/90 backdrop-blur-sm shadow-lg border-b border-gray-200 sticky top-2 z-50 rounded-lg mx-2 mb-2">
+        <div className="flex items-center justify-between p-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 flex items-center justify-center bg-purple-50 rounded-xl border-2 border-purple-100 shadow-sm">
               <img 
                 src={logoImage} 
                 alt="Vets Van" 
-                className="h-6 object-contain"
+                className="h-10 object-contain"
               />
             </div>
             <div>
-              <p className="font-semibold text-gray-900 text-sm">{user.name}</p>
-              <p className="text-xs text-gray-500">
-                {MEMBERSHIP_TYPES[user.membershipType as keyof typeof MEMBERSHIP_TYPES]}
+              <p className="font-bold text-gray-900 text-base">{user?.name || user?.firstName}</p>
+              <p className="text-sm text-purple-600 font-medium">
+                VETS VAN - {MEMBERSHIP_TYPES[user?.membershipType as keyof typeof MEMBERSHIP_TYPES] || 'Premium'}
               </p>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
             <LanguageSelector />
-            <Button variant="ghost" size="icon">
-              <Bell className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="hover:bg-purple-50">
+              <Bell className="w-4 h-4 text-purple-600" />
             </Button>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-4 h-4" />
-            </Button>
-            <Button variant="ghost" onClick={handleLogout} className="text-red-600">
+            <Button variant="ghost" onClick={handleLogout} className="text-red-600 hover:bg-red-50">
               {t('logout')}
             </Button>
           </div>

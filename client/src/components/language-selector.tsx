@@ -33,17 +33,15 @@ export function LanguageSelector() {
         <Button 
           variant="outline" 
           size="sm" 
-          className="relative px-4 py-2 border-2 bg-white hover:bg-purple-50 transition-all duration-200 rounded-lg shadow-sm"
+          className="relative px-2 py-1 text-xs border bg-white hover:bg-gray-50 transition-all duration-200 rounded-md shadow-sm"
           style={{ 
-            borderColor: 'var(--purple-primary)',
-            color: 'var(--purple-primary)'
+            borderColor: '#d1d5db',
+            color: '#6b7280'
           }}
         >
-          <Languages className="w-4 h-4 mr-2" />
-          <span className="text-sm font-medium">
-            {language === 'ar' ? 'العربية' : 'English'}
+          <span className="text-xs font-medium">
+            {language === 'ar' ? 'ع' : 'EN'}
           </span>
-          <ChevronDown className="w-3 h-3 ml-2 opacity-70" />
           <span className="sr-only">{t('selectLanguage')}</span>
         </Button>
       </DropdownMenuTrigger>

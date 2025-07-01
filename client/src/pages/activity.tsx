@@ -117,8 +117,8 @@ export default function Activity() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white" dir={direction}>
-      {/* Header with Logo and Back Button */}
-      <div className="bg-white shadow-sm border-b border-purple-100 p-4">
+      {/* Header with Enhanced Logo and Back Button */}
+      <div className="bg-white shadow-lg border-b border-purple-100 p-4">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <button
             onClick={handleBack}
@@ -128,11 +128,16 @@ export default function Activity() {
             <span className="text-sm font-medium">{t('back')}</span>
           </button>
           
-          <img 
-            src={logoPath} 
-            alt="VETS VAN Logo" 
-            className="h-8 w-auto"
-          />
+          <div className="flex items-center gap-2">
+            <LanguageSelector />
+            <div className="w-12 h-12 flex items-center justify-center bg-purple-50 rounded-xl border-2 border-purple-100 shadow-sm">
+              <img 
+                src={logoPath} 
+                alt="VETS VAN Logo" 
+                className="h-10 w-auto object-contain"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
