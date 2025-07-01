@@ -5,6 +5,7 @@ import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import logoPath from '@assets/10773561_1751295833176.png';
+import { FixedFooter } from '@/components/fixed-footer';
 
 export default function Account() {
   const { t, language } = useTranslation();

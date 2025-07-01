@@ -11,6 +11,7 @@ import vetsVanImage from "@assets/image_1751292329902.png";
 import truckIcon from "@assets/10773561_1751295833176.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
+import { FixedFooter } from '@/components/fixed-footer';
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -636,136 +637,14 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Recent Activity */}
-        {/* Premium Glass Morphism Navigation Buttons */}
-        <div className="grid grid-cols-3 gap-3 p-3">
-          {/* Home Button - Glassmorphism Design */}
-          <div 
-            className="relative cursor-pointer group perspective-1000"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          >
-            {/* Animated Glow Background */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-purple-400 via-violet-500 to-purple-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
-            
-            {/* Main Button Container */}
-            <div className="relative h-20 bg-white border-2 border-white rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
-              {/* Inner Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/40 to-violet-600/40 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-              
-              {/* Content Container */}
-              <div className="relative h-full flex flex-col items-center justify-center space-y-2 z-10">
-                {/* Floating Icon */}
-                <div className="relative">
-                  {/* Icon Glow */}
-                  <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
-                  
-                  {/* Icon Container */}
-                  <div className="relative w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-gray-700 drop-shadow-sm">
-                      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                    </svg>
-                  </div>
-                </div>
-                
-                {/* Enhanced Label */}
-                <span className="text-xs font-bold text-gray-700 tracking-wider drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
-                  {t('home')}
-                </span>
-              </div>
-              
-              {/* Corner Accent */}
-              <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-white/60 to-transparent rounded-full group-hover:scale-150 transition-transform duration-300"></div>
-            </div>
-          </div>
-
-          {/* Activity Button - Advanced Glass Design */}
-          <div 
-            className="relative cursor-pointer group perspective-1000"
-            onClick={() => {
-              setLocation('/ride-tracking');
-            }}
-          >
-            {/* Animated Glow Background */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-indigo-400 via-purple-500 to-violet-600 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
-            
-            {/* Main Button Container */}
-            <div className="relative h-20 bg-white border-2 border-white rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3 group-active:scale-95">
-              {/* Inner Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/40 to-purple-600/40 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-              
-              {/* Content Container */}
-              <div className="relative h-full flex flex-col items-center justify-center space-y-2 z-10">
-                {/* Floating Icon */}
-                <div className="relative">
-                  {/* Icon Glow */}
-                  <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
-                  
-                  {/* Icon Container */}
-                  <div className="relative w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-gray-700 drop-shadow-sm">
-                      <path d="M9 11H7l5-9 5 9h-2l-3 8-3-8z"/>
-                    </svg>
-                  </div>
-                </div>
-                
-                {/* Enhanced Label */}
-                <span className="text-xs font-bold text-gray-700 tracking-wider drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
-                  {t('activity')}
-                </span>
-              </div>
-              
-              {/* Corner Accent */}
-              <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-white/60 to-transparent rounded-full group-hover:scale-150 transition-transform duration-300"></div>
-            </div>
-          </div>
-
-          {/* Account Button - Luxury Glass Design */}
-          <div 
-            className="relative cursor-pointer group perspective-1000"
-            onClick={() => {
-              console.log('Account button clicked');
-              setLocation('/account');
-            }}
-          >
-            {/* Animated Glow Background */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-500 rounded-3xl opacity-20 group-hover:opacity-40 blur-md transition-all duration-500" style={{ animation: 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}></div>
-            
-            {/* Main Button Container */}
-            <div className="relative h-20 bg-white border-2 border-white rounded-2xl shadow-2xl transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-active:scale-95">
-              {/* Inner Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/40 to-fuchsia-600/40 rounded-2xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-              
-              {/* Content Container */}
-              <div className="relative h-full flex flex-col items-center justify-center space-y-2 z-10">
-                {/* Floating Icon */}
-                <div className="relative">
-                  {/* Icon Glow */}
-                  <div className="absolute inset-0 bg-white/30 rounded-full blur-sm scale-150 group-hover:scale-200 transition-transform duration-300"></div>
-                  
-                  {/* Icon Container */}
-                  <div className="relative w-10 h-10 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center border border-gray-200 group-hover:border-gray-300 transition-all duration-300">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="0.5" className="text-gray-700 drop-shadow-sm">
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                    </svg>
-                  </div>
-                </div>
-                
-                {/* Enhanced Label */}
-                <span className="text-xs font-bold text-gray-700 tracking-wider drop-shadow-sm group-hover:scale-110 transition-transform duration-300" style={{ textAlign }}>
-                  {t('account')}
-                </span>
-              </div>
-              
-              {/* Corner Accent */}
-              <div className="absolute top-2 right-2 w-2 h-2 bg-gradient-to-br from-white/60 to-transparent rounded-full group-hover:scale-150 transition-transform duration-300"></div>
-            </div>
-          </div>
-        </div>
+        {/* Add padding for fixed footer */}
+        <div className="pb-20"></div>
         </div>
         </div>
       </div>
+      
+      {/* Fixed Footer */}
+      <FixedFooter />
     </div>
   );
 }
