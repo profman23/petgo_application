@@ -325,6 +325,9 @@ Changelog:
 - July 1, 2025. UPDATED: Home, Account, Activity, and Patient forms now use clean shadows without purple borders for modern appearance
 - July 1, 2025. SIMPLIFIED: Form input fields converted from purple borders to standard gray borders for cleaner design
 - July 1, 2025. REFINED: Patient photo upload areas changed from purple to neutral gray borders for consistent styling
+- July 1, 2025. REPLACED: Veterinary clinic image with new 3D cartoon-style building (freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png)
+- July 1, 2025. REPOSITIONED: 3D clinic building positioned at far left (left-0) of animation screen with enhanced size (w-14 h-14)
+- July 1, 2025. ENHANCED: 3D clinic image with drop-shadow-xl effect for better visual prominence
 ```
 
 ## User Preferences

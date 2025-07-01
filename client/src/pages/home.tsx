@@ -14,6 +14,7 @@ import newVetVanImage from "@assets/freepik__background__70346_1751363211262.png
 import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753.jpeg";
 import newClinicImage from "@assets/freepik_assistant_1751363666289_1751363695395.png";
 import newestHouseImage from "@assets/freepik_assistant_1751364682430_1751364706224.png";
+import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 
@@ -353,12 +354,12 @@ export default function Home() {
                   </div>
                   
                   {/* Enhanced Start and End markers - Compact */}
-                  <div className="absolute left-1 top-1/2 transform -translate-y-1/2">
-                    {/* Beautiful New Veterinary Clinic */}
+                  <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
+                    {/* Beautiful 3D Veterinary Clinic Building */}
                     <img 
-                      src={newClinicImage} 
-                      alt="Veterinary Clinic" 
-                      className="w-10 h-10 object-contain drop-shadow-lg"
+                      src={newVetClinicImage} 
+                      alt="3D Veterinary Clinic Building" 
+                      className="w-14 h-14 object-contain drop-shadow-xl"
                     />
                   </div>
                   
