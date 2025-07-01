@@ -258,6 +258,16 @@ export const translations = {
     noPatients: 'لا توجد مرضى حتى الآن',
     uploadPhoto: 'رفع صورة',
     profilePicture: 'صورة الملف الشخصي',
+    patientForm: 'نموذج المريض',
+    patientPhoto: 'صورة المريض',
+    year: 'السنة',
+    month: 'الشهر',
+    day: 'اليوم',
+    cat: 'قطة',
+    dog: 'كلب',
+    bird: 'طائر',
+    selectPatientType: 'اختر نوع المريض',
+    addFirstPatient: 'أضف أول مريض لك',
   },
   en: {
     // Common
@@ -503,6 +513,19 @@ export const translations = {
     profilePicture: 'Profile Picture',
     patients: 'Patients',
     addPatient: 'Add Patient',
+    patientForm: 'Patient Form',
+    patientName: 'Patient Name',
+    patientType: 'Patient Type',
+    patientAge: 'Patient Age',
+    patientPhoto: 'Patient Photo',
+    year: 'Year',
+    month: 'Month',
+    day: 'Day',
+    cat: 'Cat',
+    dog: 'Dog',
+    bird: 'Bird',
+    selectPatientType: 'Select Patient Type',
+    addFirstPatient: 'Add your first patient',
   }
 };
 

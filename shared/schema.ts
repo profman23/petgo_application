@@ -52,8 +52,11 @@ export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
   name: text("name").notNull(),
-  type: text("type").notNull(), // كلب، قطة، طير، أرنب، سمك
-  age: text("age"),
+  type: text("type").notNull(), // Cat, Dog, Bird
+  ageYear: integer("age_year"),
+  ageMonth: integer("age_month"),
+  ageDay: integer("age_day"),
+  photo: text("photo"),
   condition: text("condition"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -99,7 +102,10 @@ export const rideRequestSchema = createInsertSchema(rides).pick({
 export const insertPatientSchema = createInsertSchema(patients).pick({
   name: true,
   type: true,
-  age: true,
+  ageYear: true,
+  ageMonth: true,
+  ageDay: true,
+  photo: true,
   condition: true,
 });
 
