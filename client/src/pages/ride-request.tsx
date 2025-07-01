@@ -18,6 +18,7 @@ import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
+import { FixedFooter } from '@/components/fixed-footer';
 
 const formSchema = rideRequestSchema.extend({
   pickupLocation: z.string().min(1, 'الموقع مطلوب'),
@@ -314,7 +315,7 @@ export default function RideRequest() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ direction }}>
+    <div className="min-h-screen bg-gray-50 pb-20" style={{ direction }}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
@@ -550,60 +551,10 @@ export default function RideRequest() {
             </Form>
           </CardContent>
         </Card>
-
-        {/* Service Info */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3" style={{ textAlign }}>
-              {language === 'ar' ? 'معلومات الخدمة' : 'Service Information'}
-            </h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500 mb-1" style={{ textAlign }}>
-                  {language === 'ar' ? 'وقت الوصول المقدر' : 'Estimated arrival time'}
-                </p>
-                <p className="font-semibold" style={{ textAlign }}>
-                  {language === 'ar' ? '15-30 دقيقة' : '15-30 minutes'}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-500 mb-1" style={{ textAlign }}>
-                  {language === 'ar' ? 'مدة الخدمة' : 'Service duration'}
-                </p>
-                <p className="font-semibold" style={{ textAlign }}>
-                  {language === 'ar' ? '45-60 دقيقة' : '45-60 minutes'}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-500 mb-1" style={{ textAlign }}>
-                  {language === 'ar' ? 'رسوم الخدمة' : 'Service fee'}
-                </p>
-                <p className="font-semibold text-green-600" style={{ textAlign }}>
-                  150 {language === 'ar' ? 'ريال' : 'SAR'}
-                </p>
-              </div>
-              <div>
-                <p className="text-gray-500 mb-1" style={{ textAlign }}>
-                  {language === 'ar' ? 'طريقة الدفع' : 'Payment method'}
-                </p>
-                <p className="font-semibold" style={{ textAlign }}>
-                  {language === 'ar' ? 'نقدي' : 'Cash'}
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-xs text-blue-800" style={{ textAlign }}>
-                <strong>
-                  {language === 'ar' ? 'تشمل الخدمة:' : 'Service includes:'}
-                </strong> {language === 'ar' ? 
-                  'فحص شامل، تشخيص، علاج أساسي، استشارة طبية' : 
-                  'Comprehensive examination, diagnosis, basic treatment, medical consultation'
-                }
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
+
+      {/* Fixed Footer */}
+      <FixedFooter />
     </div>
   );
 }
