@@ -176,11 +176,11 @@ export default function Account() {
 
       <div className="max-w-md mx-auto p-6">
         {/* User Header Section */}
-        <div className="bg-white rounded-xl border-2 border-purple-200 shadow-lg p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center gap-4" style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row' }}>
             {/* Profile Picture */}
             <div className="relative">
-              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center border-4 border-purple-200">
+              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center">
                 <User size={32} className="text-purple-600" />
               </div>
               
@@ -215,7 +215,7 @@ export default function Account() {
         {/* Account Details Toggle Button */}
         <button
           onClick={() => setIsAccountDetailsOpen(!isAccountDetailsOpen)}
-          className="w-full bg-white rounded-xl border-2 border-purple-200 shadow-lg p-4 mb-4 flex items-center justify-between hover:bg-purple-50 transition-colors"
+          className="w-full bg-white rounded-xl shadow-lg p-4 mb-4 flex items-center justify-between hover:bg-purple-50 transition-colors"
         >
           <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
             {t('accountDetails')}
@@ -230,7 +230,7 @@ export default function Account() {
         {/* Patients Button */}
         <button
           onClick={handlePatientsClick}
-          className="w-full bg-white rounded-xl border-2 border-purple-200 shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-purple-50 transition-colors"
+          className="w-full bg-white rounded-xl shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-purple-50 transition-colors"
         >
           <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
             {t('patients')}
@@ -240,7 +240,7 @@ export default function Account() {
 
         {/* Collapsible Account Details Form */}
         {isAccountDetailsOpen && (
-          <div className="bg-white rounded-xl border-2 border-purple-200 shadow-lg p-6 space-y-6 mb-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 space-y-6 mb-6">
             {/* First Name */}
             <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
