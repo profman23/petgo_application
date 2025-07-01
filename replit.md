@@ -334,6 +334,8 @@ Changelog:
 - July 1, 2025. CONFIRMED: Clinic positioned at far left (left-0) with optimal size for clean display
 - July 1, 2025. ADDED: Light gray border around entire screen with thin line (1px solid #e5e7eb)
 - July 1, 2025. IMPLEMENTED: Screen border class applied to main app container for consistent framing
+- July 1, 2025. ENHANCED: Border made more visible - increased to 3px thickness with darker gray color (#9ca3af)
+- July 1, 2025. REFINED: Added 8px margin and border-radius for rounded corners and better frame visibility
 ```
 
 ## User Preferences
