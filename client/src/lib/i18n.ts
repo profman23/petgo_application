@@ -501,6 +501,8 @@ export const translations = {
     noPatients: 'No patients yet',
     uploadPhoto: 'Upload Photo',
     profilePicture: 'Profile Picture',
+    patients: 'Patients',
+    addPatient: 'Add Patient',
   }
 };
 

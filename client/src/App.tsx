@@ -13,6 +13,7 @@ import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
 import DoctorRideTracking from "@/pages/doctor-ride-tracking";
 import Account from "@/pages/account";
+import Patients from "@/pages/patients";
 import { useEffect, useState } from "react";
 
 // Check for expired tokens on app start
@@ -92,6 +93,7 @@ function Router() {
       <Route path="/ride-request" component={RideRequest} />
       <Route path="/ride-tracking" component={RideTracking} />
       <Route path="/account" component={Account} />
+      <Route path="/patients" component={Patients} />
       <Route path="/" component={Home} />
       <Route component={NotFound} />
     </Switch>
