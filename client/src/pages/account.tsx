@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, PawPrint, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -16,8 +16,6 @@ export default function Account() {
   // Form states
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [petName, setPetName] = useState('');
-  const [petType, setPetType] = useState('');
   
   // Password reset modal state
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -40,8 +38,6 @@ export default function Account() {
     if (userProfile) {
       setFirstName(userProfile.firstName || '');
       setLastName(userProfile.lastName || '');
-      setPetName(userProfile.petName || '');
-      setPetType(userProfile.petType || '');
     }
   }, [userProfile]);
 
@@ -108,8 +104,6 @@ export default function Account() {
       firstName,
       lastName,
       name: fullName,
-      petName,
-      petType,
     });
   };
 
@@ -280,44 +274,7 @@ export default function Account() {
             </div>
           </div>
 
-          {/* Pet Name */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
-              {t('petName')}
-            </label>
-            <div className="relative">
-              <PawPrint className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
-              <input
-                type="text"
-                value={petName}
-                onChange={(e) => setPetName(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
-                placeholder={t('petName')}
-              />
-            </div>
-          </div>
 
-          {/* Pet Type */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
-              {t('petType')}
-            </label>
-            <div className="relative">
-              <PawPrint className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
-              <select
-                value={petType}
-                onChange={(e) => setPetType(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
-              >
-                <option value="">{t('petType')}</option>
-                <option value="كلب">{language === 'ar' ? 'كلب' : 'Dog'}</option>
-                <option value="قطة">{language === 'ar' ? 'قطة' : 'Cat'}</option>
-                <option value="طير">{language === 'ar' ? 'طير' : 'Bird'}</option>
-                <option value="أرنب">{language === 'ar' ? 'أرنب' : 'Rabbit'}</option>
-                <option value="سمك">{language === 'ar' ? 'سمك' : 'Fish'}</option>
-              </select>
-            </div>
-          </div>
 
           {/* Phone Number (Read Only) */}
           <div className="space-y-2">

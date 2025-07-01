@@ -291,6 +291,8 @@ Changelog:
 - July 1, 2025. ADDED: EditPatientForm component with full update capabilities and backend API endpoints
 - July 1, 2025. ENHANCED: Patient cards now clickable for instant editing with proper navigation flow
 - July 1, 2025. UPDATED: Arabic translations to replace "مريض" (patient) with "أليف" (pet) throughout the application
+- July 1, 2025. CLEANED: Removed Patient Name and Patient Type fields from Account Details page per user request
+- July 1, 2025. SIMPLIFIED: Account Details now contains only essential user information (First Name, Last Name, Phone Number, Password Reset)
 ```
 
 ## User Preferences
