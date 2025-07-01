@@ -354,6 +354,7 @@ Changelog:
 - July 1, 2025. REPOSITIONED: House and clinic images with language-aware positioning - clinic moves to far left for English (right for Arabic), house moves to far right for English (left for Arabic)  
 - July 1, 2025. SIMPLIFIED: Loading screen now shows simple "Loading..." text in selected language instead of complex animation
 - July 1, 2025. EXTENDED: House and clinic positioning moved to extreme edges using negative margins (-left-8, -right-8, -left-12, -right-12) to push elements outside container boundaries
+- July 1, 2025. BALANCED: Adjusted house and clinic positioning to more moderate extremes (-left-4, -right-4, -left-6, -right-6) for better text visibility while maintaining edge placement
 ```
 
 ## User Preferences

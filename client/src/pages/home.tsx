@@ -349,9 +349,9 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Enhanced Start and End markers - Extreme positioning */}
-                  <div className={`absolute top-1/2 transform -translate-y-1/2 ${language === 'ar' ? '-right-8' : '-left-8'}`}>
-                    {/* Beautiful 3D Veterinary Clinic Building - Far extreme position */}
+                  {/* Enhanced Start and End markers - Balanced extreme positioning */}
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 ${language === 'ar' ? '-right-4' : '-left-4'}`}>
+                    {/* Beautiful 3D Veterinary Clinic Building - Balanced position */}
                     <img 
                       src={newVetClinicImage} 
                       alt="3D Veterinary Clinic Building" 
@@ -359,8 +359,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  <div className={`absolute top-1/2 transform -translate-y-1/2 ${language === 'ar' ? '-left-12' : '-right-12'}`}>
-                    {/* Beautiful Newest House Image - Far extreme position */}
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 ${language === 'ar' ? '-left-6' : '-right-6'}`}>
+                    {/* Beautiful Newest House Image - Balanced position */}
                     <img 
                       src={newestHouseImage} 
                       alt="Beautiful House" 

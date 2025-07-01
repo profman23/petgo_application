@@ -187,4 +187,21 @@
   .-right-12 {
     right: -3rem !important;
   }
+
+  /* Additional balanced positioning classes */
+  .-left-4 {
+    left: -1rem !important;
+  }
+
+  .-right-4 {
+    right: -1rem !important;
+  }
+
+  .-left-6 {
+    left: -1.5rem !important;
+  }
+
+  .-right-6 {
+    right: -1.5rem !important;
+  }
 }
