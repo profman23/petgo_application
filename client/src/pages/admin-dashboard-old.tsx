@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Truck, Clock, Car, Users } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 
@@ -100,36 +100,17 @@ export default function AdminDashboard() {
     },
   });
 
-  // Toggle availability mutation
-  const toggleAvailabilityMutation = useMutation({
-    mutationFn: async ({ driverId, isAvailable }: { driverId: number; isAvailable: boolean }) => {
-      await apiRequest(`/api/admin/drivers/${driverId}/availability`, {
-        method: "PATCH",
-        body: JSON.stringify({ isAvailable }),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
-      toast({
-        title: t('statusUpdated'),
-        description: t('driverStatusChanged'),
-      });
-    },
-    onError: () => {
-      toast({
-        title: t('error'),
-        description: t('failedToUpdateStatus'),
-        variant: "destructive",
-      });
-    },
-  });
-
   // Delete driver mutation
   const deleteDriverMutation = useMutation({
     mutationFn: async (driverId: number) => {
-      await apiRequest(`/api/admin/drivers/${driverId}`, {
+      const response = await fetch(`/api/admin/drivers/${driverId}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
       });
+      if (!response.ok) throw new Error("Failed to delete driver");
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
@@ -144,6 +125,25 @@ export default function AdminDashboard() {
         description: t('failedToDeleteVetsVan'),
         variant: "destructive",
       });
+    },
+  });
+
+  // Toggle availability mutation
+  const toggleAvailabilityMutation = useMutation({
+    mutationFn: async ({ driverId, isAvailable }: { driverId: number; isAvailable: boolean }) => {
+      const response = await fetch(`/api/admin/drivers/${driverId}/availability`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({ isAvailable }),
+      });
+      if (!response.ok) throw new Error("Failed to update availability");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
     },
   });
 
@@ -202,9 +202,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Main Content with Sidebar */}
-      <div className="flex">
+      <div className="flex h-screen">
         {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg min-h-screen">
+        <div className="w-64 bg-white shadow-lg">
           <nav className="mt-5 px-2">
             <button
               onClick={() => setActiveTab('management')}
@@ -251,137 +251,140 @@ export default function AdminDashboard() {
                         </button>
                       </div>
 
-                      {showAddForm && (
-                        <form onSubmit={handleAddDriver} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">VetsVan Code</label>
-                            <input
-                              type="text"
-                              value={newDriver.vetsvanCode}
-                              onChange={(e) => setNewDriver({ ...newDriver, vetsvanCode: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                              placeholder="V001"
-                              style={{ textAlign: getTextAlign(language) }}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">VetsVan Name</label>
-                            <input
-                              type="text"
-                              value={newDriver.vetsvanName}
-                              onChange={(e) => setNewDriver({ ...newDriver, vetsvanName: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                              placeholder="VETS VAN 1"
-                              style={{ textAlign: getTextAlign(language) }}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">{t('phoneNumber')}</label>
-                            <input
-                              type="tel"
-                              value={newDriver.phone}
-                              onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                              placeholder="05xxxxxxxx"
-                              style={{ textAlign: getTextAlign(language) }}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">{t('username')}</label>
-                            <input
-                              type="text"
-                              value={newDriver.username}
-                              onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                              placeholder={t('username')}
-                              style={{ textAlign: getTextAlign(language) }}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700">{t('password')}</label>
-                            <input
-                              type="password"
-                              value={newDriver.password}
-                              onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                              placeholder={t('password')}
-                              style={{ textAlign: getTextAlign(language) }}
-                            />
-                          </div>
-                          <div className="sm:col-span-2 lg:col-span-5">
-                            <button
-                              type="submit"
-                              disabled={addDriverMutation.isPending}
-                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
-                            >
-                              {addDriverMutation.isPending ? (
-                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                              ) : (
-                                t('addVetsVan')
-                              )}
-                            </button>
-                          </div>
-                        </form>
+              {showAddForm && (
+                <form onSubmit={handleAddDriver} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">VetsVan Code</label>
+                    <input
+                      type="text"
+                      value={newDriver.vetsvanCode}
+                      onChange={(e) => setNewDriver({ ...newDriver, vetsvanCode: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder="V001"
+                      style={{ textAlign: getTextAlign(language) }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">VetsVan Name</label>
+                    <input
+                      type="text"
+                      value={newDriver.vetsvanName}
+                      onChange={(e) => setNewDriver({ ...newDriver, vetsvanName: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder="VETS VAN 1"
+                      style={{ textAlign: getTextAlign(language) }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">{t('phoneNumber')}</label>
+                    <input
+                      type="tel"
+                      value={newDriver.phone}
+                      onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder="05xxxxxxxx"
+                      style={{ textAlign: getTextAlign(language) }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">{t('username')}</label>
+                    <input
+                      type="text"
+                      value={newDriver.username}
+                      onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder={t('username')}
+                      style={{ textAlign: getTextAlign(language) }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">{t('password')}</label>
+                    <input
+                      type="password"
+                      value={newDriver.password}
+                      onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder={t('password')}
+                      style={{ textAlign: getTextAlign(language) }}
+                    />
+                  </div>
+                  <div className="sm:col-span-2 lg:col-span-5">
+                    <button
+                      type="submit"
+                      disabled={addDriverMutation.isPending}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                    >
+                      {addDriverMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                      ) : (
+                        t('addVetsVan')
                       )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+
+          {/* Drivers List */}
+          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <div className="px-4 py-5 sm:px-6">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVansList')}</h3>
+              <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                {t('totalVetsVans')}: {drivers?.length || 0}
+              </p>
+            </div>
+            <ul className="divide-y divide-gray-200">
+              {drivers?.map((driver) => (
+                <li key={driver.id} className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                          <span className="text-purple-800 font-medium text-sm">
+                            {driver.name.slice(0, 2)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{driver.name}</div>
+                        <div className="text-sm text-gray-500">{driver.phone}</div>
+                        <div className="text-sm text-gray-500">@{driver.username}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          driver.isAvailable
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {driver.isAvailable ? t('available') : t('notAvailable')}
+                      </span>
+                      <button
+                        onClick={() =>
+                          toggleAvailabilityMutation.mutate({
+                            driverId: driver.id,
+                            isAvailable: !driver.isAvailable,
+                          })
+                        }
+                        className="text-sm text-purple-600 hover:text-purple-900"
+                      >
+                        {t('changeStatus')}
+                      </button>
+                      <button
+                        onClick={() => deleteDriverMutation.mutate(driver.id)}
+                        className="text-sm text-red-600 hover:text-red-900"
+                      >
+                        {t('delete')}
+                      </button>
                     </div>
                   </div>
-
-                  {/* Drivers List */}
-                  <div className="bg-white shadow overflow-hidden sm:rounded-md">
-                    <div className="px-4 py-5 sm:px-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">{t('currentVetsVans')}</h3>
-                      <p className="mt-1 max-w-2xl text-sm text-gray-500">{t('totalVetsVans')}: {drivers?.length || 0}</p>
+                </li>
+              ))}
+            </ul>
                     </div>
-                    <ul className="divide-y divide-gray-200">
-                      {drivers?.map((driver) => (
-                        <li key={driver.id} className="px-4 py-4 sm:px-6">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <div className="flex-shrink-0">
-                                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                                  <span className="text-sm font-medium text-purple-600">
-                                    {driver.name?.charAt(0) || 'V'}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{driver.name}</div>
-                                <div className="text-sm text-gray-500">{driver.phone}</div>
-                                <div className="text-sm text-gray-500">@{driver.username}</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  driver.isAvailable
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
-                                }`}
-                              >
-                                {driver.isAvailable ? t('available') : t('notAvailable')}
-                              </span>
-                              <button
-                                onClick={() =>
-                                  toggleAvailabilityMutation.mutate({
-                                    driverId: driver.id,
-                                    isAvailable: !driver.isAvailable,
-                                  })
-                                }
-                                className="text-sm text-purple-600 hover:text-purple-900"
-                              >
-                                {t('changeStatus')}
-                              </button>
-                              <button
-                                onClick={() => deleteDriverMutation.mutate(driver.id)}
-                                className="text-sm text-red-600 hover:text-red-900"
-                              >
-                                {t('delete')}
-                              </button>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
               )}
