@@ -212,7 +212,7 @@ export default function Home() {
               </div>
               
               {/* Veterinary Clinic Building - Start Position */}
-              <div className={`absolute top-2 ${language === 'ar' ? '-right-6' : '-left-6'} z-10`}>
+              <div className={`absolute -top-2 ${language === 'ar' ? '-right-6' : '-left-6'} z-10`}>
                 <img 
                   src={newVetClinicImage}
                   alt="Veterinary Clinic" 
@@ -221,7 +221,7 @@ export default function Home() {
               </div>
               
               {/* House Building - End Position */}
-              <div className={`absolute top-1 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
+              <div className={`absolute -top-3 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
                 <img 
                   src={newestHouseImage}
                   alt="House" 
@@ -486,7 +486,13 @@ export default function Home() {
 
           {/* Request Button */}
           <Button
-            className="w-full bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="w-full !bg-gradient-to-r !from-purple-700 !to-purple-800 hover:!from-purple-800 hover:!to-purple-900 !text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 !border-0"
+            style={{ 
+              background: 'linear-gradient(to right, #7c3aed, #6b21a8)',
+              color: 'white',
+              border: 'none',
+              outline: 'none'
+            }}
             onClick={() => setLocation('/ride-request')}
             disabled={!!actualActiveRide}
           >
