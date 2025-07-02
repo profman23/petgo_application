@@ -67,6 +67,15 @@ export default function VetsVanShifts() {
   // جلب قائمة السيارات
   const { data: vetsVans = [], isLoading: loadingVans } = useQuery<VetsVan[]>({
     queryKey: ['/api/admin/drivers'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/drivers', {
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch drivers');
+      return await response.json();
+    },
     retry: false,
     enabled: !!adminToken,
   });
@@ -74,6 +83,15 @@ export default function VetsVanShifts() {
   // جلب النوبات
   const { data: shifts = [], isLoading: loadingShifts } = useQuery<Shift[]>({
     queryKey: ['/api/admin/shifts'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/shifts', {
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch shifts');
+      return await response.json();
+    },
     retry: false,
     enabled: !!adminToken,
   });
@@ -81,10 +99,16 @@ export default function VetsVanShifts() {
   // إضافة نوبة جديدة
   const addShiftMutation = useMutation({
     mutationFn: async (shiftData: any) => {
-      return await apiRequest('/api/admin/shifts', {
+      const response = await fetch('/api/admin/shifts', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`,
+        },
         body: JSON.stringify(shiftData)
       });
+      if (!response.ok) throw new Error('Failed to add shift');
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/shifts'] });
@@ -107,9 +131,14 @@ export default function VetsVanShifts() {
   // حذف نوبة
   const deleteShiftMutation = useMutation({
     mutationFn: async (shiftId: number) => {
-      return await apiRequest(`/api/admin/shifts/${shiftId}`, {
-        method: 'DELETE'
+      const response = await fetch(`/api/admin/shifts/${shiftId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+        },
       });
+      if (!response.ok) throw new Error('Failed to delete shift');
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/shifts'] });
