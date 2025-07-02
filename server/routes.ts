@@ -859,6 +859,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Shifts management endpoints
+  app.get('/api/admin/shifts', requireAdminAuth, async (req, res) => {
+    try {
+      const shifts = await storage.getAllShifts();
+      res.json(shifts);
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
+      res.status(500).json({ message: 'Failed to fetch shifts' });
+    }
+  });
+
+  app.post('/api/admin/shifts', requireAdminAuth, async (req, res) => {
+    try {
+      const shiftData = req.body;
+      const shift = await storage.createShift(shiftData);
+      res.json(shift);
+    } catch (error) {
+      console.error('Error creating shift:', error);
+      res.status(500).json({ message: 'Failed to create shift' });
+    }
+  });
+
+  app.delete('/api/admin/shifts/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteShift(id);
+      res.json({ message: 'Shift deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting shift:', error);
+      res.status(500).json({ message: 'Failed to delete shift' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

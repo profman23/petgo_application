@@ -35,6 +35,11 @@ export interface IStorage {
   getAdminByUsername(username: string): Promise<Admin | undefined>;
   createDriver(driver: InsertDriver): Promise<Driver>;
   deleteDriver(id: number): Promise<void>;
+
+  // Shifts operations
+  getAllShifts(): Promise<Shift[]>;
+  createShift(shift: InsertShift): Promise<Shift>;
+  deleteShift(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -317,6 +322,25 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDriver(id: number): Promise<void> {
     await db.delete(drivers).where(eq(drivers.id, id));
+  }
+
+  // Shifts operations
+  async getAllShifts(): Promise<Shift[]> {
+    return await db.select().from(shifts);
+  }
+
+  async createShift(shiftData: InsertShift): Promise<Shift> {
+    const [shift] = await db
+      .insert(shifts)
+      .values(shiftData)
+      .returning();
+    return shift;
+  }
+
+  async deleteShift(id: number): Promise<void> {
+    await db
+      .delete(shifts)
+      .where(eq(shifts.id, id));
   }
 }
 

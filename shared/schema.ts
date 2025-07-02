@@ -158,3 +158,28 @@ export type InsertRide = z.infer<typeof rideRequestSchema>;
 export type RideRequest = typeof rides.$inferInsert;
 export type Patient = typeof patients.$inferSelect;
 export type InsertPatient = z.infer<typeof insertPatientSchema>;
+
+// Shifts table
+export const shifts = pgTable("shifts", {
+  id: serial("id").primaryKey(),
+  vetsVanId: integer("vets_van_id").notNull().references(() => drivers.id),
+  date: text("date").notNull(), // YYYY-MM-DD format
+  startTime: text("start_time").notNull(), // HH:MM format
+  endTime: text("end_time").notNull(), // HH:MM format
+  duration: text("duration").notNull(), // 'day', 'week', 'month'
+  status: text("status").default("scheduled").notNull(), // 'scheduled', 'active', 'completed', 'cancelled'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertShiftSchema = createInsertSchema(shifts).pick({
+  vetsVanId: true,
+  date: true,
+  startTime: true,
+  endTime: true,
+  duration: true,
+  status: true,
+});
+
+export type Shift = typeof shifts.$inferSelect;
+export type InsertShift = z.infer<typeof insertShiftSchema>;
