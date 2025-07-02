@@ -5,6 +5,8 @@ import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserPlus, Shield, LogOut } from "lucide-react";
+import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/language-selector";
 
 interface Driver {
   id: number;
@@ -27,6 +29,7 @@ interface NewDriverData {
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     name: "",
