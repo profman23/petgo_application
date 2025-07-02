@@ -116,6 +116,10 @@ export const translations = {
     failedToDeleteShift: 'فشل في حذف المناوبة',
     noVetsVansFound: 'لا توجد سيارات فيتس فان',
     driverStatusChanged: 'تم تغيير حالة السائق',
+    confirmDelete: 'تأكيد الحذف',
+    deleteVetsVanConfirm: 'هل أنت متأكد من حذف سيارة فيتس فان',
+    deleteWarning: 'لا يمكن التراجع عن هذا الإجراء.',
+    deleteConfirm: 'حذف',
     
     // Language
     language: 'اللغة',
@@ -218,6 +222,10 @@ export const translations = {
     failedToDeleteShift: 'Failed to delete shift',
     noVetsVansFound: 'No VETS VANs found',
     driverStatusChanged: 'Driver status changed',
+    confirmDelete: 'Confirm Delete',
+    deleteVetsVanConfirm: 'Are you sure you want to delete VETS VAN',
+    deleteWarning: 'This action cannot be undone.',
+    deleteConfirm: 'Delete',
     
     // Language
     language: 'Language',

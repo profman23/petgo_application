@@ -4,9 +4,20 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2 } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Driver {
   id: number;
@@ -104,7 +115,7 @@ export default function AdminDashboard() {
   const toggleAvailabilityMutation = useMutation({
     mutationFn: async ({ driverId, isAvailable }: { driverId: number; isAvailable: boolean }) => {
       await apiRequest(`/api/admin/drivers/${driverId}/availability`, {
-        method: "PATCH",
+        method: "PUT",
         body: JSON.stringify({ isAvailable }),
       });
     },
@@ -367,12 +378,33 @@ export default function AdminDashboard() {
                               >
                                 {t('changeStatus')}
                               </button>
-                              <button
-                                onClick={() => deleteDriverMutation.mutate(driver.id)}
-                                className="text-sm text-red-600 hover:text-red-900"
-                              >
-                                {t('delete')}
-                              </button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <button className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1">
+                                    <Trash2 className="w-3 h-3" />
+                                    {t('delete')}
+                                  </button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>{t('confirmDelete')}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      {t('deleteVetsVanConfirm')} {driver.vetsvanCode} - {driver.vetsvanName}?
+                                      <br />
+                                      {t('deleteWarning')}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deleteDriverMutation.mutate(driver.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      {t('deleteConfirm')}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </div>
                         </li>
