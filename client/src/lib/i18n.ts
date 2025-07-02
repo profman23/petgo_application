@@ -115,6 +115,7 @@ export const translations = {
     shiftDeletedSuccess: 'تم حذف المناوبة بنجاح',
     failedToDeleteShift: 'فشل في حذف المناوبة',
     noVetsVansFound: 'لا توجد سيارات فيتس فان',
+    driverStatusChanged: 'تم تغيير حالة السائق',
     
     // Language
     language: 'اللغة',
@@ -216,6 +217,7 @@ export const translations = {
     shiftDeletedSuccess: 'Shift deleted successfully',
     failedToDeleteShift: 'Failed to delete shift',
     noVetsVansFound: 'No VETS VANs found',
+    driverStatusChanged: 'Driver status changed',
     
     // Language
     language: 'Language',
