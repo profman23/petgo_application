@@ -84,8 +84,8 @@ export default function AdminDashboard() {
       setNewDriver({ name: "", phone: "", username: "", password: "" });
       setShowAddForm(false);
       toast({
-        title: "تم إضافة السائق بنجاح",
-        description: "تم إضافة السائق الجديد إلى النظام",
+        title: t('vetsVanAddedSuccess'),
+        description: t('vetsVanAddedDesc'),
       });
     },
     onError: () => {
@@ -154,8 +154,8 @@ export default function AdminDashboard() {
     e.preventDefault();
     if (!newDriver.name || !newDriver.phone || !newDriver.username || !newDriver.password) {
       toast({
-        title: "خطأ",
-        description: "يرجى ملء جميع الحقول",
+        title: t('error'),
+        description: t('fillAllFields'),
         variant: "destructive",
       });
       return;
@@ -172,25 +172,28 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
+            <div className={`flex items-center ${language === 'ar' ? 'ml-auto' : 'mr-auto'}`}>
               <Shield className="h-8 w-8 text-purple-600 ml-3" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">لوحة تحكم الإدارة</h1>
-                <p className="text-sm text-gray-500">مرحباً {admin.name}</p>
+                <h1 className="text-2xl font-bold text-gray-900">{t('adminDashboard')}</h1>
+                <p className="text-sm text-gray-500">{t('welcome')} {admin.name}</p>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-            >
-              <LogOut className="h-4 w-4 ml-2" />
-              خروج
-            </button>
+            <div className="flex items-center gap-4">
+              <LanguageSelector />
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+              >
+                <LogOut className="h-4 w-4 ml-2" />
+                {t('logout')}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -202,56 +205,60 @@ export default function AdminDashboard() {
           <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
             <div className="px-4 py-5 sm:p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">إدارة السائقين</h3>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVanManagement')}</h3>
                 <button
                   onClick={() => setShowAddForm(!showAddForm)}
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
                 >
                   <UserPlus className="h-4 w-4 ml-2" />
-                  إضافة سائق جديد
+                  {t('addNewVetsVan')}
                 </button>
               </div>
 
               {showAddForm && (
                 <form onSubmit={handleAddDriver} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">اسم السائق</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('driverName')}</label>
                     <input
                       type="text"
                       value={newDriver.name}
                       onChange={(e) => setNewDriver({ ...newDriver, name: e.target.value })}
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                      placeholder="اسم السائق"
+                      placeholder={t('driverName')}
+                      style={{ textAlign: getTextAlign(language) }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">رقم الهاتف</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('phoneNumber')}</label>
                     <input
                       type="tel"
                       value={newDriver.phone}
                       onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                       placeholder="05xxxxxxxx"
+                      style={{ textAlign: getTextAlign(language) }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">اسم المستخدم</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('username')}</label>
                     <input
                       type="text"
                       value={newDriver.username}
                       onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                      placeholder="username"
+                      placeholder={t('username')}
+                      style={{ textAlign: getTextAlign(language) }}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">كلمة المرور</label>
+                    <label className="block text-sm font-medium text-gray-700">{t('password')}</label>
                     <input
                       type="password"
                       value={newDriver.password}
                       onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                      placeholder="كلمة المرور"
+                      placeholder={t('password')}
+                      style={{ textAlign: getTextAlign(language) }}
                     />
                   </div>
                   <div className="sm:col-span-2 lg:col-span-4">
@@ -263,7 +270,7 @@ export default function AdminDashboard() {
                       {addDriverMutation.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin ml-2" />
                       ) : (
-                        "إضافة السائق"
+                        t('addVetsVan')
                       )}
                     </button>
                   </div>
@@ -275,9 +282,9 @@ export default function AdminDashboard() {
           {/* Drivers List */}
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">قائمة السائقين</h3>
+              <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVansList')}</h3>
               <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                إجمالي السائقين: {drivers?.length || 0}
+                {t('totalVetsVans')}: {drivers?.length || 0}
               </p>
             </div>
             <ul className="divide-y divide-gray-200">
@@ -306,7 +313,7 @@ export default function AdminDashboard() {
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {driver.isAvailable ? "متاح" : "غير متاح"}
+                        {driver.isAvailable ? t('available') : t('notAvailable')}
                       </span>
                       <button
                         onClick={() =>
@@ -317,13 +324,13 @@ export default function AdminDashboard() {
                         }
                         className="text-sm text-purple-600 hover:text-purple-900"
                       >
-                        تغيير الحالة
+                        {t('changeStatus')}
                       </button>
                       <button
                         onClick={() => deleteDriverMutation.mutate(driver.id)}
                         className="text-sm text-red-600 hover:text-red-900"
                       >
-                        حذف
+                        {t('delete')}
                       </button>
                     </div>
                   </div>
