@@ -212,7 +212,7 @@ export default function Home() {
               </div>
               
               {/* Veterinary Clinic Building - Start Position */}
-              <div className={`absolute -top-2 ${language === 'ar' ? '-right-6' : '-left-6'} z-10`}>
+              <div className={`absolute -top-6 ${language === 'ar' ? '-right-6' : '-left-6'} z-10`}>
                 <img 
                   src={newVetClinicImage}
                   alt="Veterinary Clinic" 
@@ -221,7 +221,7 @@ export default function Home() {
               </div>
               
               {/* House Building - End Position */}
-              <div className={`absolute -top-3 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
+              <div className={`absolute -top-8 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
                 <img 
                   src={newestHouseImage}
                   alt="House" 
@@ -497,11 +497,11 @@ export default function Home() {
             disabled={!!actualActiveRide}
           >
             <div className="flex flex-col items-center">
-              <Truck className="w-6 h-6 mb-1" />
-              <span className="text-lg" style={{ textAlign }}>
+              <Truck className="w-6 h-6 mb-1 !text-white" style={{ color: 'white' }} />
+              <span className="text-lg !text-white" style={{ textAlign, color: 'white' }}>
                 {language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request'}
               </span>
-              <span className="text-sm opacity-90" style={{ textAlign }}>
+              <span className="text-sm opacity-90 !text-white" style={{ textAlign, color: 'white' }}>
                 {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Vetsvan Mobile Clinic'}
               </span>
             </div>
