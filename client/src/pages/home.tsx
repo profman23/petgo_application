@@ -243,86 +243,85 @@ export default function Home() {
                   </h3>
                 </div>
 
-                {/* Customer Information */}
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-semibold text-gray-800 mb-2" style={{ textAlign }}>
-                    {language === 'ar' ? 'معلومات الطلب' : 'Request Information'}
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
+                {/* Compact Request Information */}
+                <div className="mb-3 p-2 bg-gray-50 rounded-lg">
+                  <div className="flex justify-between items-center text-sm">
+                    <div className="flex-1">
                       <span className="font-medium text-gray-600">
                         {language === 'ar' ? 'الموقع:' : 'Location:'}
                       </span>
-                      <div className="text-gray-800">
+                      <div className="text-gray-800 truncate">
                         {actualActiveRide.pickupLocation || (language === 'ar' ? 'موقعك الحالي' : 'Your current location')}
                       </div>
                     </div>
-                    <div>
+                    <div className="text-right">
                       <span className="font-medium text-gray-600">
-                        {language === 'ar' ? 'التكلفة المقدرة:' : 'Estimated Cost:'}
+                        {language === 'ar' ? 'التكلفة:' : 'Cost:'}
                       </span>
                       <div className="text-gray-800">
-                        {actualActiveRide.estimatedCost ? `${actualActiveRide.estimatedCost} ${language === 'ar' ? 'ريال' : 'SAR'}` : (language === 'ar' ? 'سيتم تحديدها' : 'To be determined')}
+                        {actualActiveRide.estimatedCost ? `${actualActiveRide.estimatedCost} ${language === 'ar' ? 'ريال' : 'SAR'}` : (language === 'ar' ? 'محدد' : 'TBD')}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Status Progress */}
-                <div className="mb-4">
-                  <h4 className="font-semibold text-gray-800 mb-3" style={{ textAlign }}>
+                {/* Compact Status Progress */}
+                <div className="mb-3">
+                  <h4 className="font-semibold text-gray-800 mb-2 text-sm" style={{ textAlign }}>
                     {language === 'ar' ? 'حالة الطلب' : 'Request Status'}
                   </h4>
                   
-                  {/* Status Steps */}
-                  <div className="space-y-3">
-                    {[
-                      { status: 'requested', icon: Clock, color: 'blue' },
-                      { status: 'confirmed', icon: CheckCircle, color: 'green' },
-                      { status: 'enroute', icon: Car, color: 'orange' },
-                      { status: 'arrived', icon: MapPin, color: 'purple' },
-                      { status: 'in_progress', icon: Stethoscope, color: 'red' },
-                      { status: 'completed', icon: CheckCircle, color: 'emerald' }
-                    ].map(({ status, icon: Icon, color }) => {
-                      const isActive = actualActiveRide.status === status;
-                      const isCompleted = getStatusOrder(actualActiveRide.status) > getStatusOrder(status);
+                  {/* Horizontal Progress Bar */}
+                  <div className="relative mb-2">
+                    {/* Progress Line */}
+                    <div className="flex items-center justify-between relative">
+                      <div className="absolute top-4 left-0 right-0 h-1 bg-gray-200 rounded-full"></div>
+                      <div 
+                        className="absolute top-4 left-0 h-1 bg-purple-500 rounded-full transition-all duration-1000"
+                        style={{ width: `${(getStatusOrder(actualActiveRide.status) - 1) * 20}%` }}
+                      ></div>
                       
-                      return (
-                        <div key={status} className={`flex items-center p-2 rounded-lg ${
-                          isActive ? `bg-${color}-100 border-2 border-${color}-300` : 
-                          isCompleted ? `bg-${color}-50 border border-${color}-200` : 
-                          'bg-gray-50 border border-gray-200'
-                        }`}>
-                          <Icon className={`w-5 h-5 mr-3 ${
-                            isActive ? `text-${color}-600` : 
-                            isCompleted ? `text-${color}-500` : 
-                            'text-gray-400'
-                          }`} />
-                          <div className="flex-1">
-                            <div className={`font-medium ${
-                              isActive ? `text-${color}-800` : 
-                              isCompleted ? `text-${color}-700` : 
-                              'text-gray-500'
+                      {[
+                        { status: 'requested', icon: Clock },
+                        { status: 'confirmed', icon: CheckCircle },
+                        { status: 'enroute', icon: Car },
+                        { status: 'arrived', icon: MapPin },
+                        { status: 'in_progress', icon: Stethoscope },
+                        { status: 'completed', icon: CheckCircle }
+                      ].map(({ status, icon: Icon }, index) => {
+                        const isActive = actualActiveRide.status === status;
+                        const isCompleted = getStatusOrder(actualActiveRide.status) > getStatusOrder(status);
+                        
+                        return (
+                          <div key={status} className="flex flex-col items-center relative z-10">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                              isActive ? 'bg-purple-600 border-purple-600 text-white animate-pulse' : 
+                              isCompleted ? 'bg-green-500 border-green-500 text-white' : 
+                              'bg-white border-gray-300 text-gray-400'
+                            }`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className={`text-xs font-medium text-center mt-2 max-w-16 ${
+                              isActive ? 'text-purple-700' : 
+                              isCompleted ? 'text-green-600' : 
+                              'text-gray-400'
                             }`} style={{ textAlign }}>
                               {getStatusText(status, language)}
                             </div>
-                            <div className={`text-xs ${
-                              isActive ? `text-${color}-600` : 
-                              isCompleted ? `text-${color}-500` : 
-                              'text-gray-400'
-                            }`} style={{ textAlign }}>
-                              {getStatusDescription(status, language)}
-                            </div>
                           </div>
-                          {isActive && (
-                            <div className={`w-3 h-3 rounded-full bg-${color}-500 animate-pulse`}></div>
-                          )}
-                          {isCompleted && (
-                            <CheckCircle className={`w-4 h-4 text-${color}-500`} />
-                          )}
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  {/* Current Status Description - Compact */}
+                  <div className="text-center p-2 bg-purple-50 rounded-lg border border-purple-200">
+                    <div className="text-sm font-bold text-purple-800" style={{ textAlign }}>
+                      {getStatusText(actualActiveRide.status, language)}
+                    </div>
+                    <div className="text-xs text-purple-600" style={{ textAlign }}>
+                      {getStatusDescription(actualActiveRide.status, language)}
+                    </div>
                   </div>
                 </div>
 
