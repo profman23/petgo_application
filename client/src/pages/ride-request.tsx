@@ -267,11 +267,12 @@ export default function RideRequest() {
       clientX = e.clientX;
     }
     
-    const newPosition = Math.max(0, Math.min(containerRect.width - 80, clientX - containerRect.left - 40));
+    const maxPosition = containerRect.width - 64; // 64px = w-16
+    const newPosition = Math.max(0, Math.min(maxPosition, clientX - containerRect.left - 32));
     setSlidePosition(newPosition);
     
-    // تحقق من اكتمال السحب (85% من العرض)
-    if (newPosition > containerRect.width * 0.85) {
+    // تحقق من اكتمال السحب (75% من العرض للسرعة)
+    if (newPosition > containerRect.width * 0.75) {
       setIsSlideComplete(true);
       setIsSliding(false);
       handleSlideComplete();
@@ -279,10 +280,11 @@ export default function RideRequest() {
   };
 
   const handleSlideEnd = () => {
-    if (!isSlideComplete) {
-      setSlidePosition(0);
-    }
     setIsSliding(false);
+    if (!isSlideComplete) {
+      // إعادة السيارة بسلاسة للموقع الأصلي
+      setTimeout(() => setSlidePosition(0), 50);
+    }
   };
 
   const handleSlideComplete = () => {
@@ -673,11 +675,14 @@ export default function RideRequest() {
                 {/* Slide to Confirm Button */}
                 <div className="relative w-full">
                   <div
-                    className="relative w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full overflow-hidden shadow-lg cursor-pointer"
+                    className="relative w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full overflow-hidden shadow-lg cursor-pointer select-none"
                     onMouseMove={handleSlideMove}
                     onMouseUp={handleSlideEnd}
+                    onMouseLeave={handleSlideEnd}
                     onTouchMove={handleSlideMove}
                     onTouchEnd={handleSlideEnd}
+                    onTouchCancel={handleSlideEnd}
+                    style={{ touchAction: 'none' }}
                   >
                     {/* Background Track */}
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -695,17 +700,22 @@ export default function RideRequest() {
 
                     {/* Progress Fill */}
                     <div 
-                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-purple-400 to-purple-600 transition-all duration-200"
-                      style={{ width: `${(slidePosition / (window.innerWidth - 80)) * 100}%` }}
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-purple-400 to-purple-600"
+                      style={{ 
+                        width: `${Math.min(100, (slidePosition / (window.innerWidth - 100)) * 100)}%`,
+                        transition: isSliding ? 'none' : 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                      }}
                     />
 
                     {/* Sliding Van */}
                     <div
-                      className="absolute top-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 cursor-grab active:cursor-grabbing"
+                      className="absolute top-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full shadow-xl flex items-center justify-center cursor-grab active:cursor-grabbing active:scale-105"
                       style={{ 
                         left: `${slidePosition}px`,
                         opacity: (!currentLocation || selectedPatients.length === 0 || !serviceType) ? 0.5 : 1,
-                        pointerEvents: (!currentLocation || selectedPatients.length === 0 || !serviceType) ? 'none' : 'auto'
+                        pointerEvents: (!currentLocation || selectedPatients.length === 0 || !serviceType) ? 'none' : 'auto',
+                        transform: `translateY(-50%) ${isSliding ? 'scale(1.05)' : 'scale(1)'}`,
+                        transition: isSliding ? 'transform 0.1s ease-out' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                       }}
                       onMouseDown={handleSlideStart}
                       onTouchStart={handleSlideStart}
