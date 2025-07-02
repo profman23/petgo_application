@@ -350,18 +350,24 @@ export default function Home() {
                           ? 'هل أنت متأكد من إلغاء الطلب؟' 
                           : 'Are you sure you want to cancel the request?')) {
                           try {
-                            await fetch(`/api/rides/${actualActiveRide.id}/cancel`, {
-                              method: 'POST',
+                            const response = await fetch(`/api/rides/${actualActiveRide.id}/status`, {
+                              method: 'PATCH',
                               headers: {
                                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                                 'Content-Type': 'application/json'
-                              }
+                              },
+                              body: JSON.stringify({ status: 'cancelled' })
                             });
-                            toast({
-                              title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
-                              description: language === 'ar' ? 'تم إلغاء طلبك بنجاح' : 'Your request has been cancelled successfully'
-                            });
-                            window.location.reload();
+                            
+                            if (response.ok) {
+                              toast({
+                                title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
+                                description: language === 'ar' ? 'تم إلغاء طلبك بنجاح' : 'Your request has been cancelled successfully'
+                              });
+                              window.location.reload();
+                            } else {
+                              throw new Error('Failed to cancel');
+                            }
                           } catch (error) {
                             toast({
                               title: language === 'ar' ? 'خطأ' : 'Error',
@@ -464,42 +470,7 @@ export default function Home() {
           </Button>
         </div>
 
-        {/* Enhanced 3D Footer Navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-transparent">
-          <div className="max-w-md mx-auto px-4 pb-2">
-            <div className="flex justify-center space-x-4">
-              {/* Home Button */}
-              <Button
-                onClick={() => setLocation('/home')}
-                className="relative flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-white"
-              >
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <span className="text-2xl">🏠</span>
-                </div>
-              </Button>
 
-              {/* Activity Button */}
-              <Button
-                onClick={() => setLocation('/activity')}
-                className="relative flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-white"
-              >
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <span className="text-2xl text-purple-800">🐾</span>
-                </div>
-              </Button>
-
-              {/* Account Button */}
-              <Button
-                onClick={() => setLocation('/account')}
-                className="relative flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-white"
-              >
-                <div className="w-8 h-8 flex items-center justify-center">
-                  <span className="text-2xl">🐱</span>
-                </div>
-              </Button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

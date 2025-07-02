@@ -19,65 +19,15 @@ export function LoadingScreen({ onLoadingComplete }: LoadingScreenProps) {
   const [loadingText, setLoadingText] = useState('');
 
   useEffect(() => {
-    const imagesToPreload = [
-      customPetImage,
-      customVanImage,
-      customHouseImage,
-      newVetClinicImage,
-      buttonImage
-    ];
-
-    const loadingMessages = [
-      t.loading,
-      language === 'ar' ? 'تحميل الصور...' : 'Loading images...',
-      language === 'ar' ? 'تحضير التطبيق...' : 'Preparing app...',
-      language === 'ar' ? 'اكتمل التحميل!' : 'Loading complete!'
-    ];
-
-    let loadedCount = 0;
-    let messageIndex = 0;
-
-    // Update loading message every 800ms
-    const messageInterval = setInterval(() => {
-      if (messageIndex < loadingMessages.length - 1) {
-        setLoadingText(loadingMessages[messageIndex]);
-        messageIndex++;
-      }
-    }, 800);
-
-    // Preload all images
-    const preloadImage = (src: string): Promise<void> => {
-      return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          loadedCount++;
-          setLoadingProgress((loadedCount / imagesToPreload.length) * 100);
-          resolve();
-        };
-        img.onerror = () => {
-          loadedCount++;
-          setLoadingProgress((loadedCount / imagesToPreload.length) * 100);
-          resolve();
-        };
-        img.src = src;
-      });
-    };
-
-    // Load all images
-    Promise.all(imagesToPreload.map(preloadImage)).then(() => {
-      setLoadingText(loadingMessages[loadingMessages.length - 1]);
-      
-      // Wait a bit more to show completion message
-      setTimeout(() => {
-        clearInterval(messageInterval);
-        onLoadingComplete();
-      }, 1000);
-    });
+    // Simple timeout-based loading instead of complex image preloading
+    const timer = setTimeout(() => {
+      onLoadingComplete();
+    }, 1500); // 1.5 seconds
 
     return () => {
-      clearInterval(messageInterval);
+      clearTimeout(timer);
     };
-  }, [language, onLoadingComplete, t.loading]);
+  }, [onLoadingComplete]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white screen-border">
