@@ -8,11 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -350,61 +352,79 @@ export default function RideRequest() {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-3">
-                {patients.map((patient: Patient) => (
-                  <div
-                    key={patient.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                      selectedPatients.includes(patient.id)
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => {
-                      const isSelected = selectedPatients.includes(patient.id);
-                      if (isSelected) {
-                        setSelectedPatients(prev => prev.filter(id => id !== patient.id));
-                      } else {
-                        setSelectedPatients(prev => [...prev, patient.id]);
-                      }
-                    }}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={`w-full justify-between ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
+                    style={{ textAlign }}
                   >
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        checked={selectedPatients.includes(patient.id)}
-                        onChange={() => {}}
-                        className="pointer-events-none"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl">
-                            {patient.type === 'Cat' ? '🐱' : patient.type === 'Dog' ? '🐶' : '🐦'}
-                          </span>
-                          <h3 className="font-medium text-gray-900" style={{ textAlign }}>
-                            {patient.name}
-                          </h3>
-                        </div>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
-                          <span style={{ textAlign }}>
-                            {language === 'ar' ? 'النوع:' : 'Type:'} {
-                              patient.type === 'Cat' ? (language === 'ar' ? 'قطة' : 'Cat') :
-                              patient.type === 'Dog' ? (language === 'ar' ? 'كلب' : 'Dog') :
-                              (language === 'ar' ? 'طائر' : 'Bird')
+                    {selectedPatients.length === 0
+                      ? (language === 'ar' ? 'اختر الحيوانات الأليفة...' : 'Select pets...')
+                      : selectedPatients.length === 1
+                      ? patients.find(p => p.id === selectedPatients[0])?.name
+                      : `${selectedPatients.length} ${language === 'ar' ? 'حيوانات مختارة' : 'pets selected'}`
+                    }
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0">
+                  <Command>
+                    <CommandInput 
+                      placeholder={language === 'ar' ? 'ابحث عن حيوان أليف...' : 'Search pets...'} 
+                      className={textAlign === 'right' ? 'text-right' : 'text-left'}
+                      style={{ textAlign }}
+                    />
+                    <CommandEmpty>
+                      {language === 'ar' ? 'لم يتم العثور على حيوانات أليفة.' : 'No pets found.'}
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {patients.map((patient: Patient) => (
+                        <CommandItem
+                          key={patient.id}
+                          value={patient.name}
+                          onSelect={() => {
+                            const isSelected = selectedPatients.includes(patient.id);
+                            if (isSelected) {
+                              setSelectedPatients(prev => prev.filter(id => id !== patient.id));
+                            } else {
+                              setSelectedPatients(prev => [...prev, patient.id]);
                             }
-                          </span>
-                          {patient.ageYear && (
-                            <span style={{ textAlign }}>
-                              {language === 'ar' ? 'العمر:' : 'Age:'} {patient.ageYear} {language === 'ar' ? 'سنة' : 'years'}
-                              {patient.ageMonth && patient.ageMonth > 0 && (
-                                <span> {patient.ageMonth} {language === 'ar' ? 'شهر' : 'months'}</span>
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg">
+                                {patient.type === 'Cat' ? '🐱' : patient.type === 'Dog' ? '🐶' : '🐦'}
+                              </span>
+                              <div>
+                                <div className="font-medium" style={{ textAlign }}>
+                                  {patient.name}
+                                </div>
+                                <div className="text-sm text-gray-500" style={{ textAlign }}>
+                                  {patient.type === 'Cat' ? (language === 'ar' ? 'قطة' : 'Cat') :
+                                   patient.type === 'Dog' ? (language === 'ar' ? 'كلب' : 'Dog') :
+                                   (language === 'ar' ? 'طائر' : 'Bird')}
+                                  {patient.ageYear && (
+                                    <span> • {patient.ageYear} {language === 'ar' ? 'سنة' : 'years'}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <Check
+                              className={`ml-auto h-4 w-4 ${
+                                selectedPatients.includes(patient.id) ? 'opacity-100' : 'opacity-0'
+                              }`}
+                            />
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             )}
           </CardContent>
         </Card>
