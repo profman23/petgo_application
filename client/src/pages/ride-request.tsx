@@ -729,8 +729,87 @@ export default function RideRequest() {
                   )}
                 />
 
-                {/* Slide to Confirm Button */}
-                <div className="relative w-full">
+                {/* زر طلب بسيط للاختبار */}
+                <Button
+                  type="button"
+                  onClick={async () => {
+                    console.log('Simple button clicked');
+                    console.log('Current data check:');
+                    console.log('- Location:', currentLocation);
+                    console.log('- Selected patients:', selectedPatients);
+                    console.log('- Service type:', serviceType);
+                    
+                    if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
+                      console.log('Missing required data for ride request');
+                      
+                      if (!currentLocation) {
+                        toast({
+                          title: language === 'ar' ? 'خطأ في الموقع' : 'Location Error',
+                          description: language === 'ar' ? 'لم يتم تحديد موقعك بعد' : 'Location not determined yet',
+                          variant: 'destructive',
+                        });
+                      } else if (selectedPatients.length === 0) {
+                        toast({
+                          title: language === 'ar' ? 'يرجى اختيار الحيوانات الأليفة' : 'Please select pets',
+                          description: language === 'ar' ? 'يرجى اختيار حيوان أليف واحد على الأقل' : 'Please select at least one pet',
+                          variant: 'destructive',
+                        });
+                      } else if (!serviceType) {
+                        toast({
+                          title: language === 'ar' ? 'يرجى اختيار نوع الخدمة' : 'Please select service type',
+                          description: language === 'ar' ? 'يرجى اختيار نوع الخدمة المطلوبة' : 'Please select the required service type',
+                          variant: 'destructive',
+                        });
+                      }
+                      return;
+                    }
+                    
+                    console.log('All data available - executing ride request');
+                    
+                    // تنفيذ الطلب
+                    const formData = form.getValues();
+                    const rideData = {
+                      ...formData,
+                      pickupLatitude: currentLocation.latitude,
+                      pickupLongitude: currentLocation.longitude,
+                      destinationLatitude: currentLocation.latitude,
+                      destinationLongitude: currentLocation.longitude,
+                      selectedPatients,
+                      serviceType,
+                    };
+                    
+                    console.log('Sending ride request with data:', rideData);
+                    
+                    try {
+                      const result = await requestRide(rideData);
+                      console.log('Ride request successful:', result);
+                      
+                      toast({
+                        title: language === 'ar' ? 'تم إرسال الطلب' : 'Request Sent',
+                        description: language === 'ar' ? 'تم إرسال طلبك بنجاح' : 'Your request has been sent successfully',
+                      });
+                      
+                      setLocation('/ride-tracking');
+                    } catch (error) {
+                      console.error('Ride request failed:', error);
+                      toast({
+                        title: language === 'ar' ? 'خطأ في إرسال الطلب' : 'Request Failed',
+                        description: language === 'ar' ? 'حدث خطأ في إرسال الطلب' : 'An error occurred while sending the request',
+                        variant: 'destructive',
+                      });
+                    }
+                  }}
+                  disabled={isRequestingRide}
+                  className="w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 text-white text-lg font-semibold rounded-full shadow-lg hover:from-purple-600 hover:to-purple-800 disabled:opacity-50"
+                >
+                  {isRequestingRide ? 
+                    (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') :
+                    (language === 'ar' ? 'إرسال طلب بيطري' : 'Send Veterinary Request')
+                  }
+                </Button>
+
+                {/* زر السحب المعقد (مخفي مؤقتاً) */}
+                <div className="hidden relative w-full">
                   <div
                     className="relative w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full overflow-hidden shadow-lg cursor-pointer select-none"
                     onMouseDown={handleSlideStart}
