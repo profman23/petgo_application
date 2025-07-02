@@ -90,8 +90,8 @@ export default function AdminDashboard() {
     },
     onError: () => {
       toast({
-        title: "خطأ",
-        description: "فشل في إضافة السائق",
+        title: t('error'),
+        description: t('failedToAddVetsVan'),
         variant: "destructive",
       });
     },
@@ -112,14 +112,14 @@ export default function AdminDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
       toast({
-        title: "تم حذف السائق",
-        description: "تم حذف السائق من النظام",
+        title: t('vetsVanDeleted'),
+        description: t('vetsVanDeletedDesc'),
       });
     },
     onError: () => {
       toast({
-        title: "خطأ",
-        description: "فشل في حذف السائق",
+        title: t('error'),
+        description: t('failedToDeleteVetsVan'),
         variant: "destructive",
       });
     },
