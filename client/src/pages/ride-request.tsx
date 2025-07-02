@@ -284,8 +284,8 @@ export default function RideRequest() {
     setSlidePosition(newPosition);
     console.log('New position:', newPosition, 'Container width:', containerRect.width);
     
-    // تحقق من اكتمال السحب (30% فقط للسهولة القصوى)
-    const threshold = containerRect.width * 0.3;
+    // تحقق من اكتمال السحب (75% لإعطاء المستخدم فرصة أكبر للتأكيد)
+    const threshold = containerRect.width * 0.75;
     console.log('Threshold:', threshold, 'Position:', newPosition);
     if (newPosition > threshold) {
       console.log('Threshold reached! Completing slide...');
