@@ -36,7 +36,7 @@ const getStatusText = (status: string, language: string): string => {
   const statusTexts: Record<string, { ar: string; en: string }> = {
     'requested': { ar: 'جاري المراجعة', en: 'Under Review' },
     'confirmed': { ar: 'تم القبول', en: 'Confirmed' },
-    'enroute': { ar: 'في الطريق', en: 'En Route' },
+    'enroute': { ar: 'في الطريق', en: 'On The Way' },
     'arrived': { ar: 'وصل', en: 'Arrived' },
     'in_progress': { ar: 'جاري الفحص', en: 'In Progress' },
     'completed': { ar: 'مكتمل', en: 'Completed' }
@@ -369,28 +369,9 @@ export default function Home() {
         <div className="mb-3">
           <h2 className="text-lg font-bold text-gray-900 mb-2" style={{ textAlign }}>{t('requestMobileVet')}</h2>
           
-          {/* Show current ride status if exists */}
+          {/* Enhanced Animation Section for Active Ride */}
           {actualActiveRide && (
-            <div className="mb-2 p-3 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg shadow-sm">
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-2">
-                  {actualActiveRide.status === 'requested' && <Clock className="w-5 h-5 text-blue-600 mr-2" />}
-                  {actualActiveRide.status === 'confirmed' && <CheckCircle className="w-5 h-5 text-green-600 mr-2" />}
-                  {actualActiveRide.status === 'enroute' && <MapPin className="w-5 h-5 text-orange-600 mr-2" />}
-                  {actualActiveRide.status === 'arrived' && <MapPin className="w-5 h-5 text-purple-600 mr-2" />}
-                  {actualActiveRide.status === 'in_progress' && <Stethoscope className="w-5 h-5 text-red-600 mr-2" />}
-                  <div className="text-lg font-semibold text-gray-900" style={{ textAlign }}>
-                    {getStatusText(actualActiveRide.status, language)}
-                  </div>
-                </div>
-                <div className="text-sm text-gray-700 mb-2" style={{ textAlign }}>
-                  {getStatusDescription(actualActiveRide.status, language)}
-                </div>
-                <div className="mt-2 text-xs text-blue-600" style={{ textAlign }}>
-                  {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
-                </div>
-              </div>
-
+            <div className="mb-3">
               {/* Enhanced Progress Animation for Active Ride */}
               <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 shadow-lg">
                 <div className="text-sm font-bold text-purple-800 mb-3 text-center" style={{ textAlign }}>
