@@ -159,9 +159,80 @@ export default function VetsVanShifts() {
   const handleAddShift = () => {
     if (!selectedVetsVan) return;
     
-    addShiftMutation.mutate({
-      vetsVanId: selectedVetsVan,
-      ...newShift
+    const shifts = [];
+    const startDate = new Date(newShift.date);
+    
+    if (newShift.duration === 'day') {
+      // يوم واحد فقط
+      shifts.push({
+        vetsVanId: selectedVetsVan,
+        date: newShift.date,
+        startTime: newShift.startTime,
+        endTime: newShift.endTime,
+        duration: newShift.duration
+      });
+    } else if (newShift.duration === 'week') {
+      // أسبوع كامل (7 أيام)
+      for (let i = 0; i < 7; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        shifts.push({
+          vetsVanId: selectedVetsVan,
+          date: currentDate.toISOString().split('T')[0],
+          startTime: newShift.startTime,
+          endTime: newShift.endTime,
+          duration: newShift.duration
+        });
+      }
+    } else if (newShift.duration === 'month') {
+      // شهر كامل (30 يوم)
+      for (let i = 0; i < 30; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        shifts.push({
+          vetsVanId: selectedVetsVan,
+          date: currentDate.toISOString().split('T')[0],
+          startTime: newShift.startTime,
+          endTime: newShift.endTime,
+          duration: newShift.duration
+        });
+      }
+    }
+    
+    // إضافة جميع النوبات
+    Promise.all(shifts.map(shift => 
+      fetch('/api/admin/shifts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify(shift)
+      }).then(res => {
+        if (!res.ok) throw new Error('Failed to add shift');
+        return res.json();
+      })
+    )).then(() => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/shifts'] });
+      setIsAddShiftOpen(false);
+      setSelectedVetsVan(null);
+      
+      const successMessage = newShift.duration === 'day' 
+        ? t('shiftAddedSuccess')
+        : newShift.duration === 'week'
+        ? (language === 'ar' ? 'تم إضافة نوبة الأسبوع بنجاح' : 'Week shifts added successfully')
+        : (language === 'ar' ? 'تم إضافة نوبة الشهر بنجاح' : 'Month shifts added successfully');
+        
+      toast({
+        title: t('success'),
+        description: successMessage,
+      });
+    }).catch(() => {
+      toast({
+        title: t('error'),
+        description: t('failedToAddShift'),
+        variant: "destructive",
+      });
     });
   };
 
