@@ -291,7 +291,8 @@ export default function RideRequest() {
       console.log('Threshold reached! Completing slide...');
       setIsSlideComplete(true);
       setIsSliding(false);
-      setTimeout(() => handleSlideComplete(), 100);
+      // استدعاء مباشر بدلاً من setTimeout لتجنب مشكلة state timing
+      executeRideRequest();
     }
   };
 
@@ -300,6 +301,81 @@ export default function RideRequest() {
     if (!isSlideComplete) {
       // إعادة السيارة بسلاسة للموقع الأصلي
       setTimeout(() => setSlidePosition(0), 50);
+    }
+  };
+
+  // دالة منفصلة لتنفيذ الطلب
+  const executeRideRequest = async () => {
+    console.log('executeRideRequest called');
+    console.log('Current location:', currentLocation);
+    console.log('Selected patients:', selectedPatients);
+    console.log('Service type:', serviceType);
+    
+    // التأكد من صحة البيانات قبل الإرسال
+    if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
+      console.log('Missing required data for ride request');
+      
+      if (!currentLocation) {
+        toast({
+          title: language === 'ar' ? 'خطأ في الموقع' : 'Location Error',
+          description: language === 'ar' ? 'لم يتم تحديد موقعك بعد' : 'Location not determined yet',
+          variant: 'destructive',
+        });
+      } else if (selectedPatients.length === 0) {
+        toast({
+          title: language === 'ar' ? 'يرجى اختيار الحيوانات الأليفة' : 'Please select pets',
+          description: language === 'ar' ? 'يرجى اختيار حيوان أليف واحد على الأقل' : 'Please select at least one pet',
+          variant: 'destructive',
+        });
+      } else if (!serviceType) {
+        toast({
+          title: language === 'ar' ? 'يرجى اختيار نوع الخدمة' : 'Please select service type',
+          description: language === 'ar' ? 'يرجى اختيار نوع الخدمة المطلوبة' : 'Please select the required service type',
+          variant: 'destructive',
+        });
+      }
+      
+      // إعادة تعيين السحب عند الفشل
+      setIsSlideComplete(false);
+      setSlidePosition(0);
+      return;
+    }
+    
+    // تنفيذ الطلب
+    const formData = form.getValues();
+    const rideData = {
+      ...formData,
+      pickupLatitude: currentLocation.latitude,
+      pickupLongitude: currentLocation.longitude,
+      destinationLatitude: currentLocation.latitude,
+      destinationLongitude: currentLocation.longitude,
+      selectedPatients,
+      serviceType,
+    };
+    
+    console.log('Sending ride request with data:', rideData);
+    
+    try {
+      const result = await requestRide(rideData);
+      console.log('Ride request successful:', result);
+      
+      toast({
+        title: language === 'ar' ? 'تم إرسال الطلب' : 'Request Sent',
+        description: language === 'ar' ? 'تم إرسال طلبك بنجاح' : 'Your request has been sent successfully',
+      });
+      
+      setLocation('/ride-tracking');
+    } catch (error) {
+      console.error('Ride request failed:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ في إرسال الطلب' : 'Request Failed',
+        description: language === 'ar' ? 'حدث خطأ في إرسال الطلب' : 'An error occurred while sending the request',
+        variant: 'destructive',
+      });
+      
+      // إعادة تعيين السحب عند الفشل
+      setIsSlideComplete(false);
+      setSlidePosition(0);
     }
   };
 
