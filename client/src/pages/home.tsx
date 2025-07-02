@@ -215,76 +215,92 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Progress Animation for Active Ride */}
-              <div className="mt-2 p-2 bg-white rounded-lg border border-purple-200">
-                <div className="text-xs font-semibold text-purple-800 mb-2 text-center" style={{ textAlign }}>
+              {/* Enhanced Progress Animation for Active Ride */}
+              <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 shadow-lg">
+                <div className="text-sm font-bold text-purple-800 mb-3 text-center" style={{ textAlign }}>
                   {language === 'ar' ? 'تتبع العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic Tracking'}
                 </div>
                 
-                {/* Progress Road */}
-                <div className="relative h-12 bg-gray-300 rounded-lg mb-1 overflow-hidden">
-                  {/* Progress line - completed portion */}
+                {/* Enhanced Progress Road with buildings */}
+                <div className="relative h-20 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-xl mb-2 overflow-hidden shadow-inner">
+                  {/* Progress road surface */}
                   <div 
-                    className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 transition-all duration-1000 ease-in-out"
+                    className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 transition-all duration-2000 ease-in-out"
                     style={{ 
                       width: `${getProgressPercentage(actualActiveRide.status)}%`,
                       zIndex: 1
                     }}
                   ></div>
                   
-                  {/* Remaining road */}
-                  <div className="absolute inset-0 bg-gray-300"></div>
-                  
-                  {/* Road markings on completed section */}
+                  {/* Road markings - completed section */}
                   <div 
                     className="absolute inset-0 flex items-center justify-center overflow-hidden"
                     style={{ width: `${getProgressPercentage(actualActiveRide.status)}%` }}
                   >
-                    <div className="w-full h-1 bg-white opacity-80"></div>
+                    <div className="w-full h-1 bg-white opacity-90 shadow-sm"></div>
                   </div>
                   
-                  {/* Road markings on remaining section */}
+                  {/* Road markings - remaining section */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-1 bg-white opacity-40 animate-pulse"></div>
+                    <div className="w-full h-1 bg-white opacity-50 animate-pulse"></div>
                   </div>
                   
-                  {/* New Veterinary Van - Moving */}
+                  {/* Veterinary Van - Moving with enhanced size */}
                   <div 
-                    className="absolute top-1 h-14 w-20 transition-all duration-2000 ease-in-out"
+                    className="absolute top-0 h-16 w-24 transition-all duration-2000 ease-in-out z-20"
                     style={{
                       left: language === 'ar' 
-                        ? `${100 - getProgressPercentage(actualActiveRide.status)}%`
-                        : `${getProgressPercentage(actualActiveRide.status)}%`,
+                        ? `${Math.max(5, 100 - getProgressPercentage(actualActiveRide.status))}%`
+                        : `${Math.min(95, getProgressPercentage(actualActiveRide.status))}%`,
                       transform: language === 'ar' 
                         ? `translateX(50%) scaleX(-1)` 
                         : 'translateX(-50%)',
-                      zIndex: 2
                     }}
                   >
-                    {/* Beautiful VET van with pets inside */}
                     <img 
                       src={newVetVanImage} 
-                      alt="Veterinary Van with Pets" 
-                      className="w-full h-full object-contain drop-shadow-lg"
+                      alt="Veterinary Van" 
+                      className="w-full h-full object-contain drop-shadow-xl animate-bounce"
+                      style={{ animationDuration: '3s' }}
                     />
                   </div>
                   
-                  {/* Beautiful New Veterinary Clinic - Language aware positioning */}
-                  <div className={`absolute top-1/2 transform -translate-y-1/2 z-10 ${language === 'ar' ? 'right-1' : 'left-1'}`}>
+                  {/* Veterinary Clinic - Enhanced with 3D effect */}
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 z-10 ${language === 'ar' ? '-right-2' : '-left-2'}`}>
                     <img 
-                      src={newClinicImage} 
-                      alt="Veterinary Clinic" 
-                      className="w-10 h-10 object-contain drop-shadow-lg"
+                      src={newVetClinicImage} 
+                      alt="3D Veterinary Clinic" 
+                      className="w-16 h-16 object-contain drop-shadow-xl hover:scale-110 transition-transform duration-300"
                     />
+                    <div className={`text-xs font-semibold text-green-700 mt-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                      {language === 'ar' ? 'العيادة' : 'Clinic'}
+                    </div>
                   </div>
                   
-                  {/* Beautiful New House Image - Language aware positioning */}
-                  <div className={`absolute top-1/2 transform -translate-y-1/2 z-10 ${language === 'ar' ? 'left-1' : 'right-1'}`}>
+                  {/* Beautiful House - Enhanced positioning */}
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 z-10 ${language === 'ar' ? '-left-2' : '-right-2'}`}>
                     <img 
-                      src={newHouseImage} 
+                      src={newestHouseImage} 
                       alt="Beautiful House" 
-                      className="w-8 h-8 object-contain drop-shadow-lg"
+                      className="w-20 h-20 object-contain drop-shadow-xl hover:scale-110 transition-transform duration-300"
                     />
+                    <div className={`text-xs font-semibold text-blue-700 mt-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                      {language === 'ar' ? 'منزلك' : 'Your Home'}
+                    </div>
+                  </div>
+                  
+                  {/* Progress status dots */}
+                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
+                    {['requested', 'confirmed', 'enroute', 'arrived', 'completed'].map((status, index) => (
+                      <div
+                        key={status}
+                        className={`w-3 h-3 rounded-full transition-all duration-500 ${
+                          getProgressPercentage(actualActiveRide.status) > (index * 25) 
+                            ? 'bg-green-500 shadow-lg scale-110' 
+                            : 'bg-gray-300'
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
 
