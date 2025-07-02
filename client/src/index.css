@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom button override to remove shadcn/ui styling */
+.custom-purple-button {
+  background: linear-gradient(to right, #7c3aed, #6b21a8) !important;
+  background-color: #7c3aed !important;
+  color: white !important;
+  border: none !important;
+  outline: none !important;
+}
+
+.custom-purple-button:hover {
+  background: linear-gradient(to right, #6b21a8, #581c87) !important;
+  background-color: #6b21a8 !important;
+  color: white !important;
+}
+
+.custom-purple-button:focus {
+  background: linear-gradient(to right, #7c3aed, #6b21a8) !important;
+  background-color: #7c3aed !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+.custom-purple-button * {
+  color: white !important;
+}
+
 /* Custom animations for car movement */
 @keyframes bounce-left-to-right {
   0% {

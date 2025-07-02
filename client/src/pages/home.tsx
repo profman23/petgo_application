@@ -485,8 +485,8 @@ export default function Home() {
           </div>
 
           {/* Request Button */}
-          <Button
-            className="w-full !bg-gradient-to-r !from-purple-700 !to-purple-800 hover:!from-purple-800 hover:!to-purple-900 !text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 !border-0"
+          <button
+            className="w-full font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer"
             style={{ 
               background: 'linear-gradient(to right, #7c3aed, #6b21a8)',
               color: 'white',
@@ -505,7 +505,7 @@ export default function Home() {
                 {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Vetsvan Mobile Clinic'}
               </span>
             </div>
-          </Button>
+          </button>
         </div>
 
 
