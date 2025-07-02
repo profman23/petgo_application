@@ -97,6 +97,8 @@ export class DatabaseStorage implements IStorage {
       if (existingDrivers.length === 0) {
         const driversData = [
           {
+            vetsvanCode: 'V001',
+            vetsvanName: 'VETS VAN 1',
             name: 'د. محمد العلي',
             phone: '0551234567',
             username: 'vetsvan1',
@@ -110,6 +112,8 @@ export class DatabaseStorage implements IStorage {
             isAvailable: true
           },
           {
+            vetsvanCode: 'V002',
+            vetsvanName: 'VETS VAN 2',
             name: 'د. فاطمة أحمد',
             phone: '0561234567',
             username: 'vetsvan2',

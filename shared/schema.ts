@@ -17,6 +17,8 @@ export const users = pgTable("users", {
 
 export const drivers = pgTable("drivers", {
   id: serial("id").primaryKey(),
+  vetsvanCode: text("vetsvan_code").notNull(),
+  vetsvanName: text("vetsvan_name").notNull(),
   name: text("name").notNull(),
   phone: text("phone").notNull().unique(),
   username: text("username").notNull().unique(),
@@ -122,6 +124,8 @@ export const insertPatientSchema = createInsertSchema(patients).pick({
 });
 
 export const insertDriverSchema = createInsertSchema(drivers).pick({
+  vetsvanCode: true,
+  vetsvanName: true,
   name: true,
   phone: true,
   username: true,
