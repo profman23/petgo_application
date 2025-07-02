@@ -17,6 +17,7 @@ import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
 import serviceTypeIcon from "@assets/freepik_assistant_1751437667818_1751437676533.png";
+import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -461,7 +462,14 @@ export default function RideRequest() {
                   name="pickupLocation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel style={{ textAlign }}>{t('yourLocation')}</FormLabel>
+                      <div className="flex items-center gap-2">
+                        <img 
+                          src={locationIcon} 
+                          alt="Location" 
+                          className="w-5 h-5 object-contain"
+                        />
+                        <FormLabel style={{ textAlign }}>{t('yourLocation')}</FormLabel>
+                      </div>
                       <FormControl>
                         <div className="flex items-center gap-3">
                           <Circle className="w-3 h-3 text-green-500 flex-shrink-0" />
