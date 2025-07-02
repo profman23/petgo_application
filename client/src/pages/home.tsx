@@ -350,13 +350,12 @@ export default function Home() {
                           ? 'هل أنت متأكد من إلغاء الطلب؟' 
                           : 'Are you sure you want to cancel the request?')) {
                           try {
-                            const response = await fetch(`/api/rides/${actualActiveRide.id}/status`, {
-                              method: 'PATCH',
+                            const response = await fetch(`/api/rides/${actualActiveRide.id}/cancel`, {
+                              method: 'PUT',
                               headers: {
                                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                                 'Content-Type': 'application/json'
-                              },
-                              body: JSON.stringify({ status: 'cancelled' })
+                              }
                             });
                             
                             if (response.ok) {

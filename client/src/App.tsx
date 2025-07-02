@@ -89,7 +89,7 @@ function Router() {
   const [location] = useLocation();
   
   // Pages that should show the footer
-  const pagesWithFooter = ['/', '/account', '/activity', '/patients'];
+  const pagesWithFooter = ['/', '/home', '/account', '/activity', '/patients'];
   const shouldShowFooter = pagesWithFooter.includes(location);
 
   return (
@@ -107,7 +107,16 @@ function Router() {
           <Route path="/account" component={Account} />
           <Route path="/patients" component={Patients} />
           <Route path="/activity" component={Activity} />
-          <Route path="/" component={Home} />
+          <Route path="/home" component={Home} />
+          <Route path="/" component={() => {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            if (token && user) {
+              return <Home />;
+            } else {
+              return <UserTypeSelection />;
+            }
+          }} />
           <Route component={NotFound} />
         </Switch>
       </div>
