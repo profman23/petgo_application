@@ -17,6 +17,7 @@ import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
+import VetsVanShifts from "@/pages/vets-van-shifts";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -112,6 +113,7 @@ function Router() {
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
+          <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/home" component={Home} />
           <Route path="/" component={() => {
             const token = localStorage.getItem('token');
