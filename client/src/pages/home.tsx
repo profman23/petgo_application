@@ -19,6 +19,43 @@ import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i
 import { LanguageSelector } from '@/components/language-selector';
 
 
+// Helper functions for status handling
+const getStatusOrder = (status: string): number => {
+  const statusOrder: Record<string, number> = {
+    'requested': 1,
+    'confirmed': 2,
+    'enroute': 3,
+    'arrived': 4,
+    'in_progress': 5,
+    'completed': 6
+  };
+  return statusOrder[status] || 0;
+};
+
+const getStatusText = (status: string, language: string): string => {
+  const statusTexts: Record<string, { ar: string; en: string }> = {
+    'requested': { ar: 'جاري المراجعة', en: 'Under Review' },
+    'confirmed': { ar: 'تم القبول', en: 'Confirmed' },
+    'enroute': { ar: 'في الطريق', en: 'En Route' },
+    'arrived': { ar: 'وصل', en: 'Arrived' },
+    'in_progress': { ar: 'جاري الفحص', en: 'In Progress' },
+    'completed': { ar: 'مكتمل', en: 'Completed' }
+  };
+  return statusTexts[status]?.[language as 'ar' | 'en'] || status;
+};
+
+const getStatusDescription = (status: string, language: string): string => {
+  const descriptions: Record<string, { ar: string; en: string }> = {
+    'requested': { ar: 'طلبك قيد المراجعة، في انتظار موافقة الطبيب', en: 'Your request is under review, waiting for doctor approval' },
+    'confirmed': { ar: 'تم قبول طلبك، الطبيب في الطريق إليك', en: 'Your request has been accepted, doctor will head to you soon' },
+    'enroute': { ar: 'الطبيب في الطريق إليك', en: 'Doctor is on the way to you' },
+    'arrived': { ar: 'وصل الطبيب إلى موقعك', en: 'Doctor has arrived at your location' },
+    'in_progress': { ar: 'جاري فحص الحيوان الأليف', en: 'Pet examination in progress' },
+    'completed': { ar: 'تم إنجاز الخدمة بنجاح', en: 'Service completed successfully' }
+  };
+  return descriptions[status]?.[language as 'ar' | 'en'] || '';
+};
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -172,21 +209,161 @@ export default function Home() {
       </header>
 
       <div className="p-2">
-        {/* Active Ride Card - Only show if ride is active */}
+        {/* Active Ride Details - Integrated in main page */}
         {actualActiveRide && (
-          <Card className="mb-3 border-blue-200 bg-blue-50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-semibold text-blue-900">{t('activeRide')}</p>
-                  <p className="text-sm text-blue-700">{t('clickToContinue')}</p>
+          <div className="mb-4">
+            {/* Ride Status Header */}
+            <Card className="mb-3 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-blue-900 text-lg">{t('activeRide')}</p>
+                    <p className="text-sm text-blue-700">
+                      {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-purple-700">
+                      {language === 'ar' ? t(actualActiveRide.status) : t(actualActiveRide.status)}
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      {new Date(actualActiveRide.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                    </div>
+                  </div>
                 </div>
-                <Button onClick={() => setLocation('/ride-tracking')} className="bg-blue-600 hover:bg-blue-700">
-                  {t('continueTracking')}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Detailed Tracking Information */}
+            <Card className="border-purple-200 bg-white shadow-lg">
+              <CardContent className="p-4">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-bold text-purple-800" style={{ textAlign }}>
+                    {language === 'ar' ? 'تفاصيل تتبع الطلب' : 'Request Tracking Details'}
+                  </h3>
+                </div>
+
+                {/* Customer Information */}
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-800 mb-2" style={{ textAlign }}>
+                    {language === 'ar' ? 'معلومات الطلب' : 'Request Information'}
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <span className="font-medium text-gray-600">
+                        {language === 'ar' ? 'الموقع:' : 'Location:'}
+                      </span>
+                      <div className="text-gray-800">
+                        {actualActiveRide.pickupLocation || (language === 'ar' ? 'موقعك الحالي' : 'Your current location')}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-600">
+                        {language === 'ar' ? 'التكلفة المقدرة:' : 'Estimated Cost:'}
+                      </span>
+                      <div className="text-gray-800">
+                        {actualActiveRide.estimatedCost ? `${actualActiveRide.estimatedCost} ${language === 'ar' ? 'ريال' : 'SAR'}` : (language === 'ar' ? 'سيتم تحديدها' : 'To be determined')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Progress */}
+                <div className="mb-4">
+                  <h4 className="font-semibold text-gray-800 mb-3" style={{ textAlign }}>
+                    {language === 'ar' ? 'حالة الطلب' : 'Request Status'}
+                  </h4>
+                  
+                  {/* Status Steps */}
+                  <div className="space-y-3">
+                    {[
+                      { status: 'requested', icon: Clock, color: 'blue' },
+                      { status: 'confirmed', icon: CheckCircle, color: 'green' },
+                      { status: 'enroute', icon: Car, color: 'orange' },
+                      { status: 'arrived', icon: MapPin, color: 'purple' },
+                      { status: 'in_progress', icon: Stethoscope, color: 'red' },
+                      { status: 'completed', icon: CheckCircle, color: 'emerald' }
+                    ].map(({ status, icon: Icon, color }) => {
+                      const isActive = actualActiveRide.status === status;
+                      const isCompleted = getStatusOrder(actualActiveRide.status) > getStatusOrder(status);
+                      
+                      return (
+                        <div key={status} className={`flex items-center p-2 rounded-lg ${
+                          isActive ? `bg-${color}-100 border-2 border-${color}-300` : 
+                          isCompleted ? `bg-${color}-50 border border-${color}-200` : 
+                          'bg-gray-50 border border-gray-200'
+                        }`}>
+                          <Icon className={`w-5 h-5 mr-3 ${
+                            isActive ? `text-${color}-600` : 
+                            isCompleted ? `text-${color}-500` : 
+                            'text-gray-400'
+                          }`} />
+                          <div className="flex-1">
+                            <div className={`font-medium ${
+                              isActive ? `text-${color}-800` : 
+                              isCompleted ? `text-${color}-700` : 
+                              'text-gray-500'
+                            }`} style={{ textAlign }}>
+                              {getStatusText(status, language)}
+                            </div>
+                            <div className={`text-xs ${
+                              isActive ? `text-${color}-600` : 
+                              isCompleted ? `text-${color}-500` : 
+                              'text-gray-400'
+                            }`} style={{ textAlign }}>
+                              {getStatusDescription(status, language)}
+                            </div>
+                          </div>
+                          {isActive && (
+                            <div className={`w-3 h-3 rounded-full bg-${color}-500 animate-pulse`}></div>
+                          )}
+                          {isCompleted && (
+                            <CheckCircle className={`w-4 h-4 text-${color}-500`} />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Cancel Request Button */}
+                {actualActiveRide && actualActiveRide.status !== 'completed' && actualActiveRide.status !== 'cancelled' && (
+                  <div className="mt-4 flex justify-center">
+                    <Button
+                      variant="outline"
+                      className="border-red-300 text-red-600 hover:bg-red-50"
+                      onClick={async () => {
+                        if (confirm(language === 'ar' ? 'هل أنت متأكد من إلغاء هذا الطلب؟' : 'Are you sure you want to cancel this request?')) {
+                          try {
+                            await fetch(`/api/rides/${actualActiveRide.id}/cancel`, { 
+                              method: 'PUT',
+                              headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                                'Content-Type': 'application/json'
+                              }
+                            });
+                            toast({
+                              title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
+                              description: language === 'ar' ? 'تم إلغاء طلبك بنجاح' : 'Your request has been cancelled successfully'
+                            });
+                            window.location.reload();
+                          } catch (error) {
+                            toast({
+                              title: language === 'ar' ? 'خطأ' : 'Error',
+                              description: language === 'ar' ? 'فشل في إلغاء الطلب' : 'Failed to cancel request',
+                              variant: 'destructive'
+                            });
+                          }
+                        }
+                      }}
+                    >
+                      {language === 'ar' ? 'إلغاء الطلب' : 'Cancel Request'}
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {/* Request Status and Actions */}
@@ -204,11 +381,11 @@ export default function Home() {
                   {actualActiveRide.status === 'arrived' && <MapPin className="w-5 h-5 text-purple-600 mr-2" />}
                   {actualActiveRide.status === 'in_progress' && <Stethoscope className="w-5 h-5 text-red-600 mr-2" />}
                   <div className="text-lg font-semibold text-gray-900" style={{ textAlign }}>
-                    {t(actualActiveRide.status)}
+                    {getStatusText(actualActiveRide.status, language)}
                   </div>
                 </div>
                 <div className="text-sm text-gray-700 mb-2" style={{ textAlign }}>
-                  {t(`${actualActiveRide.status}Desc`)}
+                  {getStatusDescription(actualActiveRide.status, language)}
                 </div>
                 <div className="mt-2 text-xs text-blue-600" style={{ textAlign }}>
                   {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
