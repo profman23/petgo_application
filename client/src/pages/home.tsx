@@ -18,7 +18,6 @@ import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-vet
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 
-
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
   const statusOrder: Record<string, number> = {
@@ -48,294 +47,233 @@ const getStatusDescription = (status: string, language: string): string => {
   const descriptions: Record<string, { ar: string; en: string }> = {
     'requested': { ar: 'طلبك قيد المراجعة، في انتظار موافقة الطبيب', en: 'Your request is under review, waiting for doctor approval' },
     'confirmed': { ar: 'تم قبول طلبك، الطبيب في الطريق إليك', en: 'Your request has been accepted, doctor will head to you soon' },
-    'enroute': { ar: 'الطبيب في الطريق إليك', en: 'Doctor is on the way to you' },
-    'arrived': { ar: 'وصل الطبيب إلى موقعك', en: 'Doctor has arrived at your location' },
-    'in_progress': { ar: 'جاري فحص الحيوان الأليف', en: 'Pet examination in progress' },
-    'completed': { ar: 'تم إنجاز الخدمة بنجاح', en: 'Service completed successfully' }
+    'enroute': { ar: 'الطبيب البيطري في الطريق إليك', en: 'Veterinarian is on the way to you' },
+    'arrived': { ar: 'وصل الطبيب البيطري إلى موقعك', en: 'Veterinarian has arrived at your location' },
+    'in_progress': { ar: 'جاري فحص حيوانك الأليف', en: 'Your pet is being examined' },
+    'completed': { ar: 'تم إكمال الفحص البيطري بنجاح', en: 'Veterinary examination completed successfully' }
   };
-  return descriptions[status]?.[language as 'ar' | 'en'] || '';
+  return descriptions[status]?.[language as 'ar' | 'en'] || status;
+};
+
+const getProgressPercentage = (status: string): number => {
+  const progressMap: Record<string, number> = {
+    'requested': 10,
+    'confirmed': 30,
+    'enroute': 60,
+    'arrived': 80,
+    'in_progress': 90,
+    'completed': 100
+  };
+  return progressMap[status] || 0;
 };
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const { toast } = useToast();
-  const { activeRide, isLoadingActiveRide } = useRide();
-  
-  // Force clear activeRide if it's cancelled
-  const actualActiveRide = activeRide && ['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status) ? null : activeRide;
-  const { t } = useTranslation();
-  const { language } = useLanguage();
-  const textAlign = getTextAlign(language);
   const [user, setUser] = useState<any>(null);
+  const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = useTranslation();
+  const textAlign = getTextAlign(language);
+  const direction = getDirection(language);
+
+  // Get active ride info
+  const { data: rideData, isLoading: rideLoading } = useRide();
+  const actualActiveRide = rideData?.ride || null;
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (!token || !userData) {
-      setLocation('/login');
+    if (!token) {
+      setLocation('/');
       return;
     }
-    
-    const parsedUser = JSON.parse(userData);
-    setUser(parsedUser);
-    
-    // رسالة ترحيب للمستخدمين الجدد (يتم عرضها مرة واحدة فقط)
-    const hasSeenWelcome = localStorage.getItem(`welcome_${parsedUser.id}`);
-    if (!hasSeenWelcome) {
-      setTimeout(() => {
-        toast({
-          title: `مرحباً ${parsedUser.firstName}! 👋`,
-          description: `نحن سعداء لانضمامك إلى عيادة الحيوانات المتنقلة. يمكنك الآن طلب طبيب بيطري لحيوانك الأليف ${parsedUser.petName || 'الأليف'}.`,
-        });
-        localStorage.setItem(`welcome_${parsedUser.id}`, 'true');
-      }, 1000);
-    }
-    
-    // Test token validity on page load
-    fetch('/api/rides/active', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    }).then(res => {
-      if (res.status === 401) {
-        localStorage.removeItem('token');
+
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
         localStorage.removeItem('user');
-        toast({
-          title: 'انتهت جلسة العمل',
-          description: 'يرجى تسجيل الدخول مرة أخرى',
-          variant: 'destructive',
-        });
-        setLocation('/login');
+        localStorage.removeItem('token');
+        setLocation('/');
       }
-    }).catch(() => {
-      // Network error, ignore
-    });
-  }, [setLocation, toast]);
+    }
+  }, [setLocation]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    toast({
-      title: 'تم تسجيل الخروج',
-      description: 'تم تسجيل خروجك بنجاح',
-    });
-    setLocation('/login');
-  };
-
-  // Check for cancelled ride and show simple notification
-  useEffect(() => {
-    const cancelledRide = localStorage.getItem('cancelledRide');
-    if (cancelledRide) {
-      toast({
-        title: language === 'ar' ? 'تم إلغاء الطلب' : 'Request Cancelled',
-        description: language === 'ar' ? 
-          'يمكنك تقديم طلب جديد الآن' : 
-          'You can submit a new request now',
-        variant: 'destructive',
-        duration: 3000,
-      });
-      localStorage.removeItem('cancelledRide');
-    }
-  }, [toast, language]);
-
-  const handleRequestRide = () => {
-    // Always go to request a new ride since cancelled rides are filtered out
-    setLocation('/ride-request');
-  };
-
-  // Function to get progress percentage based on ride status
-  const getProgressPercentage = (status: string): number => {
-    switch (status) {
-      case 'requested':
-        return 10; // Just started
-      case 'confirmed':
-        return 25; // Doctor accepted, preparing
-      case 'enroute':
-        return 60; // On the way
-      case 'arrived':
-        return 100; // Clinic has arrived
-      case 'in_progress':
-        return 100; // Service in progress
-      case 'completed':
-        return 100; // Completed
-      default:
-        return 0;
-    }
+    setLocation('/');
   };
 
   if (!user) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-2" dir={getDirection(language)}>
-      {/* Full screen border with logo integration */}
-      <div className="min-h-screen rounded-2xl relative overflow-hidden" style={{ 
-        boxShadow: 'inset 0 0 50px rgba(139, 47, 139, 0.1), 0 20px 40px rgba(139, 47, 139, 0.15)',
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%)'
-      }}>
-        
-
-
-        {/* Main content with minimal padding */}
-        <div className="min-h-full pt-2">
-          {/* Header - Compact Design */}
-          <header className="bg-white/90 backdrop-blur-sm shadow-lg border-b border-gray-200 sticky top-2 z-50 rounded-lg mx-2 mb-2">
-        <div className={`flex items-center justify-between p-2 h-10 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-          {/* Logo and User Name - Always on start side */}
-          <div className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-            <div className="w-7 h-7 flex items-center justify-center bg-purple-50 rounded-lg border border-purple-100 shadow-sm">
-              <img 
-                src={logoImage} 
-                alt="Vets Van" 
-                className="h-5 object-contain"
-              />
+    <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={direction}>
+      <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-white px-3 py-2 h-10">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2">
+              <div className="w-12 h-12 bg-purple-800 rounded-full border-4 border-purple-400 p-1 shadow-lg">
+                <img 
+                  src={logoImage} 
+                  alt="VETS VAN Logo" 
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
+              <div className="text-lg font-bold text-white">
+                {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
+              </div>
             </div>
-            <div>
-              <p className="font-semibold text-gray-900 text-xs">{user?.name || user?.firstName}</p>
+            <div className="flex items-center space-x-2">
+              <LanguageSelector />
+              <Bell className="w-5 h-5 cursor-pointer hover:text-purple-200" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-white hover:bg-purple-700 px-2 py-1 h-8"
+              >
+                {language === 'ar' ? 'خروج' : 'Logout'}
+              </Button>
             </div>
-          </div>
-          
-          {/* Controls - Always on end side (right for English, left for Arabic) */}
-          <div className={`flex items-center gap-1 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-            <LanguageSelector />
-            <Button variant="ghost" size="icon" className="hover:bg-purple-50 w-6 h-6">
-              <Bell className="w-3 h-3 text-purple-600" />
-            </Button>
-            <Button variant="ghost" onClick={handleLogout} className="text-red-600 hover:bg-red-50 text-xs px-2 py-1 h-6">
-              {t('logout')}
-            </Button>
           </div>
         </div>
-      </header>
 
-      <div className="p-2">
-        {/* Active Ride Details - Integrated in main page */}
+        {/* Current Location */}
+        <div className="p-3 bg-blue-50 border-b">
+          <h3 className="font-semibold text-gray-800 mb-1 text-sm" style={{ textAlign }}>
+            {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
+          </h3>
+          <div className="flex items-center">
+            <MapPin className="w-4 h-4 text-blue-600 mr-2" />
+            <span className="text-gray-700 text-sm">
+              {language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Current Location'}
+            </span>
+          </div>
+        </div>
+
+        {/* Enhanced Progress Animation for Active Ride */}
         {actualActiveRide && (
-          <div className="mb-4">
-            {/* Ride Status Header */}
-            <Card className="mb-3 border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
+          <div className="p-3 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border-b">
+            <div className="text-sm font-bold text-purple-800 mb-3 text-center" style={{ textAlign }}>
+              {language === 'ar' ? 'تتبع العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic Tracking'}
+            </div>
+            
+            {/* Enhanced Progress Road with buildings */}
+            <div className="relative h-20 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-xl mb-2 overflow-hidden shadow-inner">
+              {/* Progress road surface */}
+              <div 
+                className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 transition-all duration-2000 ease-in-out"
+                style={{ 
+                  width: `${getProgressPercentage(actualActiveRide.status)}%`,
+                  zIndex: 1
+                }}
+              ></div>
+              
+              {/* Road markings - completed section */}
+              <div 
+                className="absolute inset-0 flex items-center justify-center overflow-hidden"
+                style={{ width: `${getProgressPercentage(actualActiveRide.status)}%` }}
+              >
+                <div className="w-full h-1 bg-white opacity-90 shadow-sm"></div>
+              </div>
+              
+              {/* Road markings - remaining section */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-full h-1 bg-gray-300 opacity-70"></div>
+              </div>
+              
+              {/* Veterinary Clinic Building - Start Position */}
+              <div className={`absolute top-2 ${language === 'ar' ? '-right-6' : '-left-6'} z-10`}>
+                <img 
+                  src={newVetClinicImage}
+                  alt="Veterinary Clinic" 
+                  className="w-16 h-16 drop-shadow-xl"
+                />
+              </div>
+              
+              {/* House Building - End Position */}
+              <div className={`absolute top-1 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
+                <img 
+                  src={newestHouseImage}
+                  alt="House" 
+                  className="w-24 h-24 drop-shadow-xl"
+                />
+              </div>
+              
+              {/* Moving Van */}
+              <div 
+                className="absolute top-6 z-20 transition-all duration-3000 ease-in-out"
+                style={{ 
+                  left: `${Math.max(5, Math.min(85, getProgressPercentage(actualActiveRide.status) - 5))}%`,
+                  transform: language === 'ar' ? 'scaleX(-1)' : 'scaleX(1)'
+                }}
+              >
+                <img 
+                  src={newVetVanImage}
+                  alt="Veterinary Van" 
+                  className="w-8 h-8 drop-shadow-lg animate-bounce"
+                />
+              </div>
+              
+              {/* Status Progress Indicators */}
+              {getProgressPercentage(actualActiveRide.status) > 80 && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-full shadow-lg animate-pulse">
+                    {getStatusText(actualActiveRide.status, language)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Request Tracking Details - Only show when there's an active ride */}
+        {actualActiveRide && (
+          <div className="p-3">
+            <Card className="shadow-sm">
+              <CardContent className="p-3">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                      <Truck className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900" style={{ textAlign }}>
+                        {language === 'ar' ? 'طلبك النشط' : 'Your Active Request'}
+                      </div>
+                      <div className="text-sm text-gray-500" style={{ textAlign }}>
+                        {language === 'ar' ? 'خدمة بيطرية' : 'Veterinary Service'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
-                    <p className="font-bold text-blue-900 text-lg">{t('activeRide')}</p>
-                    <p className="text-sm text-blue-700">
-                      {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
-                    </p>
+                    <span className="font-medium text-gray-600">
+                      {language === 'ar' ? 'الموقع:' : 'Location:'}
+                    </span>
+                    <div className="text-gray-800 truncate">
+                      {actualActiveRide.pickupLocation || (language === 'ar' ? 'موقعك الحالي' : 'Your current location')}
+                    </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-sm font-semibold text-purple-700">
-                      {language === 'ar' ? t(actualActiveRide.status) : t(actualActiveRide.status)}
+                    <span className="font-medium text-gray-600">
+                      {language === 'ar' ? 'التكلفة:' : 'Cost:'}
+                    </span>
+                    <div className="text-gray-800">
+                      {actualActiveRide.estimatedCost ? `${actualActiveRide.estimatedCost} ${language === 'ar' ? 'ريال' : 'SAR'}` : (language === 'ar' ? 'محدد' : 'TBD')}
                     </div>
-                    <div className="text-xs text-gray-600">
-                      {new Date(actualActiveRide.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Detailed Tracking Information */}
-            <Card className="border-purple-200 bg-white shadow-lg">
-              <CardContent className="p-4">
-                <div className="text-center mb-4">
-                  <h3 className="text-lg font-bold text-purple-800" style={{ textAlign }}>
-                    {language === 'ar' ? 'تفاصيل تتبع الطلب' : 'Request Tracking Details'}
-                  </h3>
-                </div>
-
-                {/* Compact Request Information */}
-                <div className="mb-3 p-2 bg-gray-50 rounded-lg">
-                  <div className="flex justify-between items-center text-sm">
-                    <div className="flex-1">
-                      <span className="font-medium text-gray-600">
-                        {language === 'ar' ? 'الموقع:' : 'Location:'}
-                      </span>
-                      <div className="text-gray-800 truncate">
-                        {actualActiveRide.pickupLocation || (language === 'ar' ? 'موقعك الحالي' : 'Your current location')}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-medium text-gray-600">
-                        {language === 'ar' ? 'التكلفة:' : 'Cost:'}
-                      </span>
-                      <div className="text-gray-800">
-                        {actualActiveRide.estimatedCost ? `${actualActiveRide.estimatedCost} ${language === 'ar' ? 'ريال' : 'SAR'}` : (language === 'ar' ? 'محدد' : 'TBD')}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Enhanced Progress Animation for Active Ride */}
-                <div className="mb-3 p-3 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 shadow-lg">
-                  <div className="text-sm font-bold text-purple-800 mb-3 text-center" style={{ textAlign }}>
-                    {language === 'ar' ? 'تتبع العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic Tracking'}
-                  </div>
-                  
-                  {/* Enhanced Progress Road with buildings */}
-                  <div className="relative h-20 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-xl mb-2 overflow-hidden shadow-inner">
-                    {/* Progress road surface */}
-                    <div 
-                      className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 transition-all duration-2000 ease-in-out"
-                      style={{ 
-                        width: `${getProgressPercentage(actualActiveRide.status)}%`,
-                        zIndex: 1
-                      }}
-                    ></div>
-                    
-                    {/* Road markings - completed section */}
-                    <div 
-                      className="absolute inset-0 flex items-center justify-center overflow-hidden"
-                      style={{ width: `${getProgressPercentage(actualActiveRide.status)}%` }}
-                    >
-                      <div className="w-full h-1 bg-white opacity-90 shadow-sm"></div>
-                    </div>
-                    
-                    {/* Road markings - remaining section */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-full h-1 bg-gray-300 opacity-70"></div>
-                    </div>
-                    
-                    {/* Veterinary Clinic Building - Start Position */}
-                    <div className={`absolute top-2 ${language === 'ar' ? '-right-6' : '-left-6'} z-10`}>
-                      <img 
-                        src="/attached_assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png" 
-                        alt="Veterinary Clinic" 
-                        className="w-16 h-16 drop-shadow-xl"
-                      />
-                    </div>
-                    
-                    {/* House Building - End Position */}
-                    <div className={`absolute top-1 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
-                      <img 
-                        src="/attached_assets/freepik_assistant_1751364682430_1751364706224.png" 
-                        alt="House" 
-                        className="w-24 h-24 drop-shadow-xl"
-                      />
-                    </div>
-                    
-                    {/* Moving Van */}
-                    <div 
-                      className="absolute top-6 z-20 transition-all duration-3000 ease-in-out"
-                      style={{ 
-                        left: `${Math.max(5, Math.min(85, getProgressPercentage(actualActiveRide.status) - 5))}%`,
-                        transform: language === 'ar' ? 'scaleX(-1)' : 'scaleX(1)'
-                      }}
-                    >
-                      <img 
-                        src="/attached_assets/freepik__background__70346_1751363211262.png" 
-                        alt="Veterinary Van" 
-                        className="w-8 h-8 drop-shadow-lg animate-bounce"
-                      />
-                    </div>
-                    
-                    {/* Status Progress Indicators */}
-                    {getProgressPercentage(actualActiveRide.status) > 80 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-xs font-bold text-white bg-green-600 px-2 py-1 rounded-full shadow-lg animate-pulse">
-                          {getStatusText(actualActiveRide.status, language)}
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -362,54 +300,58 @@ export default function Home() {
                         { status: 'arrived', icon: MapPin },
                         { status: 'in_progress', icon: Stethoscope },
                         { status: 'completed', icon: CheckCircle }
-                      ].map(({ status, icon: Icon }, index) => {
-                        const isActive = actualActiveRide.status === status;
-                        const isCompleted = getStatusOrder(actualActiveRide.status) > getStatusOrder(status);
+                      ].map((step, index) => {
+                        const IconComponent = step.icon;
+                        const isActive = getStatusOrder(actualActiveRide.status) > index;
+                        const isCurrent = getStatusOrder(actualActiveRide.status) === index + 1;
                         
                         return (
-                          <div key={status} className="flex flex-col items-center relative z-10">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                              isActive ? 'bg-purple-600 border-purple-600 text-white animate-pulse' : 
-                              isCompleted ? 'bg-green-500 border-green-500 text-white' : 
-                              'bg-white border-gray-300 text-gray-400'
+                          <div key={step.status} className="relative flex flex-col items-center">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 z-10 ${
+                              isActive 
+                                ? 'bg-purple-500 border-purple-500 text-white' 
+                                : isCurrent
+                                ? 'bg-white border-purple-500 text-purple-500 ring-2 ring-purple-200'
+                                : 'bg-white border-gray-300 text-gray-300'
                             }`}>
-                              <Icon className="w-4 h-4" />
+                              <IconComponent className="w-4 h-4" />
                             </div>
-                            <div className={`text-xs font-medium text-center mt-2 max-w-16 ${
-                              isActive ? 'text-purple-700' : 
-                              isCompleted ? 'text-green-600' : 
-                              'text-gray-400'
+                            <div className={`mt-1 text-xs font-medium ${
+                              isActive || isCurrent ? 'text-purple-700' : 'text-gray-400'
                             }`} style={{ textAlign }}>
-                              {getStatusText(status, language)}
+                              {getStatusText(step.status, language)}
                             </div>
                           </div>
                         );
                       })}
                     </div>
                   </div>
-                  
-                  {/* Current Status Description - Compact */}
-                  <div className="text-center p-2 bg-purple-50 rounded-lg border border-purple-200">
-                    <div className="text-sm font-bold text-purple-800" style={{ textAlign }}>
-                      {getStatusText(actualActiveRide.status, language)}
-                    </div>
-                    <div className="text-xs text-purple-600" style={{ textAlign }}>
-                      {getStatusDescription(actualActiveRide.status, language)}
-                    </div>
+                </div>
+
+                {/* Status Description */}
+                <div className="text-center p-2 bg-gray-50 rounded-lg">
+                  <div className="text-sm text-gray-700" style={{ textAlign }}>
+                    {getStatusDescription(actualActiveRide.status, language)}
+                  </div>
+                  <div className="text-xs text-blue-600 mt-1" style={{ textAlign }}>
+                    {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
                   </div>
                 </div>
 
-                {/* Cancel Request Button */}
-                {actualActiveRide && actualActiveRide.status !== 'completed' && actualActiveRide.status !== 'cancelled' && (
-                  <div className="mt-4 flex justify-center">
+                {/* Cancel Button for active rides */}
+                {actualActiveRide && actualActiveRide.status !== 'completed' && (
+                  <div className="mt-3 text-center">
                     <Button
                       variant="outline"
-                      className="border-red-300 text-red-600 hover:bg-red-50"
+                      size="sm"
+                      className="text-red-600 border-red-300 hover:bg-red-50"
                       onClick={async () => {
-                        if (confirm(language === 'ar' ? 'هل أنت متأكد من إلغاء هذا الطلب؟' : 'Are you sure you want to cancel this request?')) {
+                        if (confirm(language === 'ar' 
+                          ? 'هل أنت متأكد من إلغاء الطلب؟' 
+                          : 'Are you sure you want to cancel the request?')) {
                           try {
-                            await fetch(`/api/rides/${actualActiveRide.id}/cancel`, { 
-                              method: 'PUT',
+                            await fetch(`/api/rides/${actualActiveRide.id}/cancel`, {
+                              method: 'POST',
                               headers: {
                                 'Authorization': `Bearer ${localStorage.getItem('token')}`,
                                 'Content-Type': 'application/json'
@@ -440,126 +382,9 @@ export default function Home() {
         )}
 
         {/* Request Status and Actions */}
-        <div className="mb-3">
+        <div className="p-3">
           <h2 className="text-lg font-bold text-gray-900 mb-2" style={{ textAlign }}>{t('requestMobileVet')}</h2>
-                
-                {/* Enhanced Progress Road with buildings */}
-                <div className="relative h-20 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-xl mb-2 overflow-hidden shadow-inner">
-                  {/* Progress road surface */}
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 transition-all duration-2000 ease-in-out"
-                    style={{ 
-                      width: `${getProgressPercentage(actualActiveRide.status)}%`,
-                      zIndex: 1
-                    }}
-                  ></div>
-                  
-                  {/* Road markings - completed section */}
-                  <div 
-                    className="absolute inset-0 flex items-center justify-center overflow-hidden"
-                    style={{ width: `${getProgressPercentage(actualActiveRide.status)}%` }}
-                  >
-                    <div className="w-full h-1 bg-white opacity-90 shadow-sm"></div>
-                  </div>
-                  
-                  {/* Road markings - remaining section */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-1 bg-white opacity-50 animate-pulse"></div>
-                  </div>
-                  
-                  {/* Veterinary Van - Moving with enhanced size */}
-                  <div 
-                    className="absolute top-0 h-16 w-24 transition-all duration-2000 ease-in-out z-20"
-                    style={{
-                      left: language === 'ar' 
-                        ? `${Math.max(5, 100 - getProgressPercentage(actualActiveRide.status))}%`
-                        : `${Math.min(95, getProgressPercentage(actualActiveRide.status))}%`,
-                      transform: language === 'ar' 
-                        ? `translateX(50%) scaleX(-1)` 
-                        : 'translateX(-50%)',
-                    }}
-                  >
-                    <img 
-                      src={newVetVanImage} 
-                      alt="Veterinary Van" 
-                      className="w-full h-full object-contain drop-shadow-xl animate-bounce"
-                      style={{ animationDuration: '3s' }}
-                    />
-                  </div>
-                  
-                  {/* Veterinary Clinic - Enhanced with 3D effect */}
-                  <div className={`absolute top-1/2 transform -translate-y-1/2 z-10 ${language === 'ar' ? '-right-2' : '-left-2'}`}>
-                    <img 
-                      src={newVetClinicImage} 
-                      alt="3D Veterinary Clinic" 
-                      className="w-16 h-16 object-contain drop-shadow-xl hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className={`text-xs font-semibold text-green-700 mt-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                      {language === 'ar' ? 'العيادة' : 'Clinic'}
-                    </div>
-                  </div>
-                  
-                  {/* Beautiful House - Enhanced positioning */}
-                  <div className={`absolute top-1/2 transform -translate-y-1/2 z-10 ${language === 'ar' ? '-left-2' : '-right-2'}`}>
-                    <img 
-                      src={newestHouseImage} 
-                      alt="Beautiful House" 
-                      className="w-20 h-20 object-contain drop-shadow-xl hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className={`text-xs font-semibold text-blue-700 mt-1 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                      {language === 'ar' ? 'منزلك' : 'Your Home'}
-                    </div>
-                  </div>
-                  
-                  {/* Progress status dots */}
-                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
-                    {['requested', 'confirmed', 'enroute', 'arrived', 'completed'].map((status, index) => (
-                      <div
-                        key={status}
-                        className={`w-3 h-3 rounded-full transition-all duration-500 ${
-                          getProgressPercentage(actualActiveRide.status) > (index * 25) 
-                            ? 'bg-green-500 shadow-lg scale-110' 
-                            : 'bg-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Progress percentage */}
-                <div className="text-center text-sm text-purple-700" style={{ textAlign }}>
-                  {language === 'ar' 
-                    ? `تقدم الرحلة: ${getProgressPercentage(actualActiveRide.status)}%`
-                    : `Journey Progress: ${getProgressPercentage(actualActiveRide.status)}%`
-                  }
-                </div>
-
-                {/* Arrival Message when clinic arrives */}
-                {(actualActiveRide.status === 'arrived' || actualActiveRide.status === 'in_progress') && (
-                  <div className="mt-4 p-4 bg-gradient-to-r from-green-100 to-emerald-100 border-2 border-green-300 rounded-xl shadow-lg animate-pulse">
-                    <div className="text-center">
-                      <div className="text-2xl mb-2">🚐✨</div>
-                      <div className="text-lg font-bold text-green-800 mb-2" style={{ textAlign }}>
-                        {language === 'ar' ? 'وصلت العيادة البيطرية!' : 'Veterinary Clinic Has Arrived!'}
-                      </div>
-                      <div className="text-sm text-green-700" style={{ textAlign }}>
-                        {language === 'ar' 
-                          ? 'العيادة البيطرية المتنقلة في الخارج في انتظارك 🏥' 
-                          : 'The mobile veterinary clinic is outside waiting for you 🏥'
-                        }
-                      </div>
-                      {actualActiveRide.status === 'in_progress' && (
-                        <div className="mt-2 text-xs text-green-600" style={{ textAlign }}>
-                          {language === 'ar' ? 'جاري فحص الحيوان الأليف...' : 'Pet examination in progress...'}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
+          
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
             <div className="mb-3 p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 rounded-2xl border-2 border-purple-200 shadow-lg">
@@ -579,80 +404,99 @@ export default function Home() {
                   <div className={`absolute top-1 h-12 w-16 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
-                    {/* Beautiful VET van with pets inside */}
                     <img 
-                      src={newVetVanImage} 
-                      alt="Veterinary Van with Pets" 
+                      src={newVetVanImage}
+                      alt="Veterinary Van" 
                       className="w-full h-full object-contain drop-shadow-lg"
                     />
                   </div>
                   
-                  {/* Enhanced Start and End markers - Balanced extreme positioning */}
-                  <div className={`absolute top-1/2 transform -translate-y-1/2 ${language === 'ar' ? '-right-4' : '-left-4'}`}>
-                    {/* Beautiful 3D Veterinary Clinic Building - Balanced position */}
+                  {/* 3D Veterinary Clinic - Start Position */}
+                  <div className={`absolute top-2 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
                     <img 
-                      src={newVetClinicImage} 
-                      alt="3D Veterinary Clinic Building" 
-                      className="w-16 h-16 object-contain drop-shadow-xl"
+                      src={newVetClinicImage}
+                      alt="Veterinary Clinic" 
+                      className="w-16 h-16 drop-shadow-xl"
                     />
                   </div>
                   
-                  <div className={`absolute top-1/2 transform -translate-y-1/2 ${language === 'ar' ? '-left-6' : '-right-6'}`}>
-                    {/* Beautiful Newest House Image - Balanced position */}
+                  {/* Custom House - End Position */}
+                  <div className={`absolute top-1 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
                     <img 
-                      src={newestHouseImage} 
-                      alt="Beautiful House" 
-                      className="w-24 h-24 object-contain drop-shadow-lg"
+                      src={newestHouseImage}
+                      alt="House" 
+                      className="w-24 h-24 drop-shadow-xl"
                     />
                   </div>
-                  
-
-                </div>
-
-                <div className="text-sm text-purple-700 mb-2" style={{ textAlign }}>
-                  {language === 'ar' ? 'خدمة طبية بيطرية سريعة وموثوقة' : 'Fast & Reliable Veterinary Service'}
-                </div>
-                <div className="text-xs text-purple-600" style={{ textAlign }}>
-                  {language === 'ar' ? 'نصل إليك في أقل من 30 دقيقة' : 'We reach you in less than 30 minutes'}
                 </div>
               </div>
             </div>
           )}
-          
-          {/* Enhanced Request Button with Modern Design */}
-          <div className="mb-3 p-3 bg-gradient-to-br from-purple-50 via-white to-blue-50 rounded-3xl border-2 border-purple-200 shadow-xl hover:shadow-2xl transition-all duration-300">
 
-
-            {/* Cute Pets Image Display */}
-            <div className="flex justify-center mb-3">
+          {/* Custom Dog and Cat Image */}
+          <div className="flex justify-center mb-3">
+            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm border border-purple-200">
               <img 
-                src={petsImage} 
-                alt="Cute Dog and Cat" 
-                className="w-48 h-32 object-contain hover:scale-105 transition-transform duration-300 drop-shadow-lg"
+                src={petsImage}
+                alt="Dogs and Cats" 
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 drop-shadow-lg"
               />
             </div>
-
-            {/* Request Button */}
-            <Button
-              onClick={handleRequestRide}
-              disabled={!!actualActiveRide}
-              className="w-full bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white p-4 h-auto flex-col shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed rounded-2xl"
-            >
-              <div className="text-center">
-                <div className="font-bold text-xl mb-1">
-                  {actualActiveRide 
-                    ? (language === 'ar' ? 'لديك طلب نشط' : 'You have an active request')
-                    : (language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request')
-                  }
-                </div>
-                <div className="text-base opacity-90">
-                  {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Vetsvan Mobile Clinic'}
-                </div>
-              </div>
-            </Button>
           </div>
+
+          {/* Request Button */}
+          <Button
+            className="w-full bg-gradient-to-r from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200"
+            onClick={() => setLocation('/ride-request')}
+            disabled={!!actualActiveRide}
+          >
+            <div className="flex flex-col items-center">
+              <Truck className="w-6 h-6 mb-1" />
+              <span className="text-lg" style={{ textAlign }}>
+                {language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request'}
+              </span>
+              <span className="text-sm opacity-90" style={{ textAlign }}>
+                {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Vetsvan Mobile Clinic'}
+              </span>
+            </div>
+          </Button>
         </div>
 
+        {/* Enhanced 3D Footer Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-transparent">
+          <div className="max-w-md mx-auto px-4 pb-2">
+            <div className="flex justify-center space-x-4">
+              {/* Home Button */}
+              <Button
+                onClick={() => setLocation('/home')}
+                className="relative flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-white"
+              >
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <span className="text-2xl">🏠</span>
+                </div>
+              </Button>
+
+              {/* Activity Button */}
+              <Button
+                onClick={() => setLocation('/activity')}
+                className="relative flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-white"
+              >
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <span className="text-2xl text-purple-800">🐾</span>
+                </div>
+              </Button>
+
+              {/* Account Button */}
+              <Button
+                onClick={() => setLocation('/account')}
+                className="relative flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-700 to-purple-800 hover:from-purple-800 hover:to-purple-900 text-white rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300 border-2 border-white"
+              >
+                <div className="w-8 h-8 flex items-center justify-center">
+                  <span className="text-2xl">🐱</span>
+                </div>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
