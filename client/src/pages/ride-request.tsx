@@ -722,9 +722,11 @@ export default function RideRequest() {
                 <div className="relative w-full">
                   <div
                     className="relative w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full overflow-hidden shadow-lg cursor-pointer select-none"
+                    onMouseDown={handleSlideStart}
                     onMouseMove={handleSlideMove}
                     onMouseUp={handleSlideEnd}
                     onMouseLeave={handleSlideEnd}
+                    onTouchStart={handleSlideStart}
                     onTouchMove={handleSlideMove}
                     onTouchEnd={handleSlideEnd}
                     onTouchCancel={handleSlideEnd}
