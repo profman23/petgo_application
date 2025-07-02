@@ -15,6 +15,7 @@ import { useGeolocation } from '@/hooks/useGeolocation';
 import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -313,6 +314,15 @@ export default function RideRequest() {
             <p className="text-sm text-gray-600 mb-4" style={{ textAlign }}>
               {t('selectPatientsDesc')}
             </p>
+            
+            {/* Pets Image */}
+            <div className="flex justify-center mb-6">
+              <img 
+                src={petsImage} 
+                alt="Pets" 
+                className="w-40 h-40 object-contain rounded-lg shadow-lg"
+              />
+            </div>
             
             {isLoadingPatients ? (
               <div className="flex items-center justify-center p-8">
