@@ -16,6 +16,7 @@ import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
+import serviceTypeIcon from "@assets/freepik_assistant_1751437667818_1751437676533.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -410,9 +411,16 @@ export default function RideRequest() {
         {/* Service Type Selection */}
         <Card className="mb-6">
           <CardContent className="p-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3" style={{ textAlign }}>
-              {t('selectServiceType')}
-            </h2>
+            <div className="flex items-center gap-2 mb-3">
+              <h2 className="text-lg font-semibold text-gray-900" style={{ textAlign }}>
+                {t('selectServiceType')}
+              </h2>
+              <img 
+                src={serviceTypeIcon} 
+                alt="Service Type" 
+                className="w-6 h-6 object-contain"
+              />
+            </div>
             <Select
               value={serviceType}
               onValueChange={(value) => {
