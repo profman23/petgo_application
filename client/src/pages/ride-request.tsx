@@ -412,14 +412,14 @@ export default function RideRequest() {
         <Card className="mb-6">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-3">
-              <h2 className="text-lg font-semibold text-gray-900" style={{ textAlign }}>
-                {t('selectServiceType')}
-              </h2>
               <img 
                 src={serviceTypeIcon} 
                 alt="Service Type" 
                 className="w-6 h-6 object-contain"
               />
+              <h2 className="text-lg font-semibold text-gray-900" style={{ textAlign }}>
+                {t('selectServiceType')}
+              </h2>
             </div>
             <Select
               value={serviceType}
