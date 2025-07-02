@@ -89,11 +89,11 @@ export default function DoctorLogin() {
       <div className="w-full max-w-md">
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button - matching customer login style */}
-          <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-center relative rounded-t-lg">
+          <div className="bg-white p-6 text-center relative rounded-t-lg border-b shadow-sm">
             {/* Back button */}
             <button
               onClick={() => setLocation('/user-type-selection')}
-              className="absolute top-4 left-4 p-2 text-white hover:bg-purple-800 rounded-lg transition-colors"
+              className="absolute top-4 left-4 p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
             >
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
@@ -106,10 +106,10 @@ export default function DoctorLogin() {
                 className="h-16 mx-auto object-contain rounded-lg border-2 border-purple-300"
               />
             </div>
-            <h1 className="text-2xl font-bold text-white" style={{ textAlign: getTextAlign(language) }}>
+            <h1 className="text-2xl font-bold text-gray-800" style={{ textAlign: getTextAlign(language) }}>
               {language === 'ar' ? 'دخول الطبيب البيطري' : 'Veterinary Doctor Login'}
             </h1>
-            <p className="text-purple-100 mt-2" style={{ textAlign: getTextAlign(language) }}>
+            <p className="text-gray-600 mt-2" style={{ textAlign: getTextAlign(language) }}>
               {language === 'ar' ? 'سجل دخولك لإدارة الطلبات والمواعيد' : 'Log in to manage requests and appointments'}
             </p>
           </div>
