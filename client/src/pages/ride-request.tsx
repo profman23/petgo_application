@@ -250,15 +250,7 @@ export default function RideRequest() {
 
   // دوال التحكم في زر السحب
   const handleSlideStart = (e: React.TouchEvent | React.MouseEvent) => {
-    console.log('Slide started');
-    console.log('Current data check:');
-    console.log('- Location:', currentLocation);
-    console.log('- Selected patients:', selectedPatients);
-    console.log('- Service type:', serviceType);
-    console.log('- Can start sliding?', currentLocation && selectedPatients.length > 0 && serviceType);
-    
     if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
-      console.log('Cannot start sliding - missing required data');
       return;
     }
     
@@ -267,10 +259,7 @@ export default function RideRequest() {
   };
 
   const handleSlideMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isSliding) {
-      console.log('Not sliding, returning');
-      return;
-    }
+    if (!isSliding) return;
     
     const container = e.currentTarget as HTMLElement;
     const containerRect = container.getBoundingClientRect();
@@ -278,25 +267,20 @@ export default function RideRequest() {
     
     if ('touches' in e) {
       clientX = e.touches[0].clientX;
-      console.log('Touch move at:', clientX);
     } else {
       clientX = e.clientX;
-      console.log('Mouse move at:', clientX);
     }
     
     const maxPosition = containerRect.width - 64; // 64px = w-16
     const newPosition = Math.max(0, Math.min(maxPosition, clientX - containerRect.left - 32));
     setSlidePosition(newPosition);
-    console.log('New position set to:', newPosition);
     
-    // تحقق من اكتمال السحب (50% من العرض للسهولة أكثر)
-    const threshold = containerRect.width * 0.5;
-    console.log('Slide position:', newPosition, 'of', containerRect.width, 'threshold:', threshold);
+    // تحقق من اكتمال السحب (30% فقط للسهولة القصوى)
+    const threshold = containerRect.width * 0.3;
     if (newPosition > threshold) {
-      console.log('Slide threshold reached - completing slide');
       setIsSlideComplete(true);
       setIsSliding(false);
-      setTimeout(() => handleSlideComplete(), 100); // تأخير صغير للتأكد من تحديث الحالة
+      setTimeout(() => handleSlideComplete(), 100);
     }
   };
 
@@ -729,87 +713,8 @@ export default function RideRequest() {
                   )}
                 />
 
-                {/* زر طلب بسيط للاختبار */}
-                <Button
-                  type="button"
-                  onClick={async () => {
-                    console.log('Simple button clicked');
-                    console.log('Current data check:');
-                    console.log('- Location:', currentLocation);
-                    console.log('- Selected patients:', selectedPatients);
-                    console.log('- Service type:', serviceType);
-                    
-                    if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
-                      console.log('Missing required data for ride request');
-                      
-                      if (!currentLocation) {
-                        toast({
-                          title: language === 'ar' ? 'خطأ في الموقع' : 'Location Error',
-                          description: language === 'ar' ? 'لم يتم تحديد موقعك بعد' : 'Location not determined yet',
-                          variant: 'destructive',
-                        });
-                      } else if (selectedPatients.length === 0) {
-                        toast({
-                          title: language === 'ar' ? 'يرجى اختيار الحيوانات الأليفة' : 'Please select pets',
-                          description: language === 'ar' ? 'يرجى اختيار حيوان أليف واحد على الأقل' : 'Please select at least one pet',
-                          variant: 'destructive',
-                        });
-                      } else if (!serviceType) {
-                        toast({
-                          title: language === 'ar' ? 'يرجى اختيار نوع الخدمة' : 'Please select service type',
-                          description: language === 'ar' ? 'يرجى اختيار نوع الخدمة المطلوبة' : 'Please select the required service type',
-                          variant: 'destructive',
-                        });
-                      }
-                      return;
-                    }
-                    
-                    console.log('All data available - executing ride request');
-                    
-                    // تنفيذ الطلب
-                    const formData = form.getValues();
-                    const rideData = {
-                      ...formData,
-                      pickupLatitude: currentLocation.latitude,
-                      pickupLongitude: currentLocation.longitude,
-                      destinationLatitude: currentLocation.latitude,
-                      destinationLongitude: currentLocation.longitude,
-                      selectedPatients,
-                      serviceType,
-                    };
-                    
-                    console.log('Sending ride request with data:', rideData);
-                    
-                    try {
-                      const result = await requestRide(rideData);
-                      console.log('Ride request successful:', result);
-                      
-                      toast({
-                        title: language === 'ar' ? 'تم إرسال الطلب' : 'Request Sent',
-                        description: language === 'ar' ? 'تم إرسال طلبك بنجاح' : 'Your request has been sent successfully',
-                      });
-                      
-                      setLocation('/ride-tracking');
-                    } catch (error) {
-                      console.error('Ride request failed:', error);
-                      toast({
-                        title: language === 'ar' ? 'خطأ في إرسال الطلب' : 'Request Failed',
-                        description: language === 'ar' ? 'حدث خطأ في إرسال الطلب' : 'An error occurred while sending the request',
-                        variant: 'destructive',
-                      });
-                    }
-                  }}
-                  disabled={isRequestingRide}
-                  className="w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 text-white text-lg font-semibold rounded-full shadow-lg hover:from-purple-600 hover:to-purple-800 disabled:opacity-50"
-                >
-                  {isRequestingRide ? 
-                    (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') :
-                    (language === 'ar' ? 'إرسال طلب بيطري' : 'Send Veterinary Request')
-                  }
-                </Button>
-
-                {/* زر السحب المعقد (مخفي مؤقتاً) */}
-                <div className="hidden relative w-full">
+                {/* Slide to Confirm Button */}
+                <div className="relative w-full">
                   <div
                     className="relative w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full overflow-hidden shadow-lg cursor-pointer select-none"
                     onMouseDown={handleSlideStart}
