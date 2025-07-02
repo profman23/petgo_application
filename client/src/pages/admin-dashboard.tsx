@@ -1,13 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
-import { Plus, Trash2, Edit, UserCheck, UserX, LogOut } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useLocation } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, UserPlus, Shield, LogOut } from "lucide-react";
 
 interface Driver {
   id: number;
@@ -30,106 +27,125 @@ interface NewDriverData {
 export default function AdminDashboard() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [newDriver, setNewDriver] = useState<NewDriverData>({
-    name: '',
-    phone: '',
-    username: '',
-    password: ''
+    name: "",
+    phone: "",
+    username: "",
+    password: "",
   });
 
-  // التحقق من صحة دخول الإدارة
+  // Check admin authentication
   useEffect(() => {
-    const adminToken = localStorage.getItem('adminToken');
+    const adminToken = localStorage.getItem("adminToken");
     if (!adminToken) {
-      setLocation('/admin-login');
+      setLocation("/admin-login");
+      return;
     }
   }, [setLocation]);
 
-  // جلب قائمة السائقين
+  const adminToken = localStorage.getItem("adminToken");
+  const admin = JSON.parse(localStorage.getItem("admin") || "{}");
+
+  // Fetch drivers
   const { data: drivers, isLoading } = useQuery({
-    queryKey: ['admin/drivers'],
+    queryKey: ["/api/admin/drivers"],
     queryFn: async () => {
-      const response = await apiRequest('/api/admin/drivers', {
+      const response = await fetch("/api/admin/drivers", {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        }
+          Authorization: `Bearer ${adminToken}`,
+        },
       });
-      return response as Driver[];
+      if (!response.ok) throw new Error("Failed to fetch drivers");
+      return await response.json() as Driver[];
     },
-    refetchInterval: 5000 // تحديث كل 5 ثوان
+    enabled: !!adminToken,
   });
 
-  // إضافة سائق جديد
+  // Add driver mutation
   const addDriverMutation = useMutation({
     mutationFn: async (data: NewDriverData) => {
-      return await apiRequest('/api/admin/drivers', {
-        method: 'POST',
+      const response = await fetch("/api/admin/drivers", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error("Failed to add driver");
+      return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
+      setNewDriver({ name: "", phone: "", username: "", password: "" });
+      setShowAddForm(false);
       toast({
         title: "تم إضافة السائق بنجاح",
-        variant: "default",
+        description: "تم إضافة السائق الجديد إلى النظام",
       });
-      setNewDriver({ name: '', phone: '', username: '', password: '' });
-      setShowAddForm(false);
-      queryClient.invalidateQueries({ queryKey: ['admin/drivers'] });
     },
     onError: () => {
       toast({
-        title: "خطأ في إضافة السائق",
+        title: "خطأ",
+        description: "فشل في إضافة السائق",
         variant: "destructive",
       });
-    }
+    },
   });
 
-  // حذف سائق
+  // Delete driver mutation
   const deleteDriverMutation = useMutation({
     mutationFn: async (driverId: number) => {
-      return await apiRequest(`/api/admin/drivers/${driverId}`, {
-        method: 'DELETE',
+      const response = await fetch(`/api/admin/drivers/${driverId}`, {
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        }
+          Authorization: `Bearer ${adminToken}`,
+        },
       });
+      if (!response.ok) throw new Error("Failed to delete driver");
+      return response.json();
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
       toast({
-        title: "تم حذف السائق بنجاح",
-        variant: "default",
+        title: "تم حذف السائق",
+        description: "تم حذف السائق من النظام",
       });
-      queryClient.invalidateQueries({ queryKey: ['admin/drivers'] });
     },
     onError: () => {
       toast({
-        title: "خطأ في حذف السائق",
+        title: "خطأ",
+        description: "فشل في حذف السائق",
         variant: "destructive",
       });
-    }
+    },
   });
 
-  // تغيير حالة توفر السائق
+  // Toggle availability mutation
   const toggleAvailabilityMutation = useMutation({
     mutationFn: async ({ driverId, isAvailable }: { driverId: number; isAvailable: boolean }) => {
-      return await apiRequest(`/api/admin/drivers/${driverId}/availability`, {
-        method: 'PUT',
+      const response = await fetch(`/api/admin/drivers/${driverId}/availability`, {
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
         },
-        body: JSON.stringify({ isAvailable })
+        body: JSON.stringify({ isAvailable }),
       });
+      if (!response.ok) throw new Error("Failed to update availability");
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin/drivers'] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
+    },
   });
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
+    setLocation("/admin-login");
+  };
 
   const handleAddDriver = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,231 +160,175 @@ export default function AdminDashboard() {
     addDriverMutation.mutate(newDriver);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    setLocation('/admin-login');
-  };
-
-  const adminUser = localStorage.getItem('adminUser') ? JSON.parse(localStorage.getItem('adminUser')!) : null;
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-700 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري تحميل لوحة التحكم...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-purple-700">لوحة تحكم الإدارة</h1>
-              <p className="text-gray-600">إدارة السائقين والطلبات - العيادة البيطرية المتنقلة</p>
-              {adminUser && (
-                <p className="text-sm text-gray-500 mt-1">مرحباً {adminUser.name}</p>
-              )}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <Shield className="h-8 w-8 text-purple-600 ml-3" />
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">لوحة تحكم الإدارة</h1>
+                <p className="text-sm text-gray-500">مرحباً {admin.name}</p>
+              </div>
             </div>
-            <Button
+            <button
               onClick={handleLogout}
-              variant="outline"
-              className="flex items-center gap-2"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
             >
-              <LogOut className="w-4 h-4" />
-              تسجيل الخروج
-            </Button>
+              <LogOut className="h-4 w-4 ml-2" />
+              خروج
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* إحصائيات سريعة */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">إجمالي السائقين</p>
-                  <p className="text-2xl font-bold text-purple-700">{drivers?.length || 0}</p>
-                </div>
-                <UserCheck className="w-8 h-8 text-purple-700" />
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          {/* Add Driver Section */}
+          <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
+            <div className="px-4 py-5 sm:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg leading-6 font-medium text-gray-900">إدارة السائقين</h3>
+                <button
+                  onClick={() => setShowAddForm(!showAddForm)}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                >
+                  <UserPlus className="h-4 w-4 ml-2" />
+                  إضافة سائق جديد
+                </button>
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">السائقين المتاحين</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {drivers?.filter(d => d.isAvailable).length || 0}
-                  </p>
-                </div>
-                <UserCheck className="w-8 h-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">السائقين غير المتاحين</p>
-                  <p className="text-2xl font-bold text-red-600">
-                    {drivers?.filter(d => !d.isAvailable).length || 0}
-                  </p>
-                </div>
-                <UserX className="w-8 h-8 text-red-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
 
-        {/* إضافة سائق جديد */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>إدارة السائقين</CardTitle>
-              <Button
-                onClick={() => setShowAddForm(!showAddForm)}
-                className="bg-purple-700 hover:bg-purple-800"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                إضافة سائق جديد
-              </Button>
+              {showAddForm && (
+                <form onSubmit={handleAddDriver} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">اسم السائق</label>
+                    <input
+                      type="text"
+                      value={newDriver.name}
+                      onChange={(e) => setNewDriver({ ...newDriver, name: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder="اسم السائق"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">رقم الهاتف</label>
+                    <input
+                      type="tel"
+                      value={newDriver.phone}
+                      onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder="05xxxxxxxx"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">اسم المستخدم</label>
+                    <input
+                      type="text"
+                      value={newDriver.username}
+                      onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder="username"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">كلمة المرور</label>
+                    <input
+                      type="password"
+                      value={newDriver.password}
+                      onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder="كلمة المرور"
+                    />
+                  </div>
+                  <div className="sm:col-span-2 lg:col-span-4">
+                    <button
+                      type="submit"
+                      disabled={addDriverMutation.isPending}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                    >
+                      {addDriverMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                      ) : (
+                        "إضافة السائق"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
-          </CardHeader>
-          <CardContent>
-            {showAddForm && (
-              <form onSubmit={handleAddDriver} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <Label htmlFor="name">اسم السائق</Label>
-                  <Input
-                    id="name"
-                    value={newDriver.name}
-                    onChange={(e) => setNewDriver(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="أدخل اسم السائق"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">رقم الهاتف</Label>
-                  <Input
-                    id="phone"
-                    value={newDriver.phone}
-                    onChange={(e) => setNewDriver(prev => ({ ...prev, phone: e.target.value }))}
-                    placeholder="أدخل رقم الهاتف"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="username">اسم المستخدم</Label>
-                  <Input
-                    id="username"
-                    value={newDriver.username}
-                    onChange={(e) => setNewDriver(prev => ({ ...prev, username: e.target.value }))}
-                    placeholder="أدخل اسم المستخدم"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="password">كلمة المرور</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={newDriver.password}
-                    onChange={(e) => setNewDriver(prev => ({ ...prev, password: e.target.value }))}
-                    placeholder="أدخل كلمة المرور"
-                  />
-                </div>
-                <div className="md:col-span-2 flex gap-2">
-                  <Button
-                    type="submit"
-                    disabled={addDriverMutation.isPending}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    {addDriverMutation.isPending ? 'جاري الإضافة...' : 'إضافة السائق'}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowAddForm(false)}
-                  >
-                    إلغاء
-                  </Button>
-                </div>
-              </form>
-            )}
+          </div>
 
-            {/* قائمة السائقين */}
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-gray-200">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="border border-gray-200 p-3 text-right">الاسم</th>
-                    <th className="border border-gray-200 p-3 text-right">رقم الهاتف</th>
-                    <th className="border border-gray-200 p-3 text-right">اسم المستخدم</th>
-                    <th className="border border-gray-200 p-3 text-right">الحالة</th>
-                    <th className="border border-gray-200 p-3 text-right">الموقع</th>
-                    <th className="border border-gray-200 p-3 text-right">الإجراءات</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {drivers?.map((driver) => (
-                    <tr key={driver.id} className="hover:bg-gray-50">
-                      <td className="border border-gray-200 p-3">{driver.name}</td>
-                      <td className="border border-gray-200 p-3">{driver.phone}</td>
-                      <td className="border border-gray-200 p-3">{driver.username}</td>
-                      <td className="border border-gray-200 p-3">
-                        <Button
-                          onClick={() => toggleAvailabilityMutation.mutate({
-                            driverId: driver.id,
-                            isAvailable: !driver.isAvailable
-                          })}
-                          size="sm"
-                          variant={driver.isAvailable ? "default" : "secondary"}
-                          className={driver.isAvailable ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}
-                        >
-                          {driver.isAvailable ? 'متاح' : 'غير متاح'}
-                        </Button>
-                      </td>
-                      <td className="border border-gray-200 p-3 text-sm">
-                        {driver.latitude ? (
-                          <span>
-                            {driver.latitude.toFixed(4)}, {driver.longitude.toFixed(4)}
+          {/* Drivers List */}
+          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <div className="px-4 py-5 sm:px-6">
+              <h3 className="text-lg leading-6 font-medium text-gray-900">قائمة السائقين</h3>
+              <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                إجمالي السائقين: {drivers?.length || 0}
+              </p>
+            </div>
+            <ul className="divide-y divide-gray-200">
+              {drivers?.map((driver) => (
+                <li key={driver.id} className="px-4 py-4 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                          <span className="text-purple-800 font-medium text-sm">
+                            {driver.name.slice(0, 2)}
                           </span>
-                        ) : (
-                          <span className="text-gray-500">غير محدد</span>
-                        )}
-                      </td>
-                      <td className="border border-gray-200 p-3">
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={() => deleteDriverMutation.mutate(driver.id)}
-                            size="sm"
-                            variant="destructive"
-                            disabled={deleteDriverMutation.isPending}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
                         </div>
-                      </td>
-                    </tr>
-                  )) || (
-                    <tr>
-                      <td colSpan={6} className="border border-gray-200 p-6 text-center text-gray-500">
-                        لا يوجد سائقين مضافين
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{driver.name}</div>
+                        <div className="text-sm text-gray-500">{driver.phone}</div>
+                        <div className="text-sm text-gray-500">@{driver.username}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          driver.isAvailable
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {driver.isAvailable ? "متاح" : "غير متاح"}
+                      </span>
+                      <button
+                        onClick={() =>
+                          toggleAvailabilityMutation.mutate({
+                            driverId: driver.id,
+                            isAvailable: !driver.isAvailable,
+                          })
+                        }
+                        className="text-sm text-purple-600 hover:text-purple-900"
+                      >
+                        تغيير الحالة
+                      </button>
+                      <button
+                        onClick={() => deleteDriverMutation.mutate(driver.id)}
+                        className="text-sm text-red-600 hover:text-red-900"
+                      >
+                        حذف
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

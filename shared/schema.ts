@@ -126,6 +126,13 @@ export const insertDriverSchema = createInsertSchema(drivers).pick({
   phone: true,
   username: true,
   password: true,
+  rating: true,
+  carModel: true,
+  carColor: true,
+  plateNumber: true,
+  latitude: true,
+  longitude: true,
+  isAvailable: true,
 });
 
 export const insertAdminSchema = createInsertSchema(admins).pick({
