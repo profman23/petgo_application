@@ -110,6 +110,7 @@ function Router() {
           <Route path="/patients" component={Patients} />
           <Route path="/activity" component={Activity} />
           <Route path="/admin-login" component={AdminLogin} />
+          <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/home" component={Home} />
           <Route path="/" component={() => {

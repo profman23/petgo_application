@@ -16,7 +16,6 @@ export const useLanguage = create<LanguageStore>()(
     }),
     {
       name: 'language-storage',
-      getStorage: () => localStorage,
     }
   )
 );
@@ -81,8 +80,19 @@ export const translations = {
     loginError: 'خطأ في تسجيل الدخول',
     enterUsernamePassword: 'يرجى إدخال اسم المستخدم وكلمة المرور',
     currentVetsVans: 'سيارات فيتس فان الحالية',
-    driverStatusChanged: 'تم تغيير حالة السائق',
+    statusUpdated: 'تم تحديث الحالة',
     failedToUpdateStatus: 'فشل في تحديث الحالة',
+    
+    // Patients & Services
+    selectPatients: 'اختر الحيوانات الأليفة',
+    selectPatientsDesc: 'اختر الحيوانات التي تحتاج خدمة بيطرية',
+    noRegisteredPatients: 'لا توجد حيوانات مسجلة',
+    registerPetsFirst: 'يرجى تسجيل حيواناتك الأليفة أولاً',
+    goToPatients: 'انتقل لتسجيل الحيوانات',
+    selectServiceType: 'اختر نوع الخدمة',
+    generalCheckUp: 'فحص عام',
+    grooming: 'تنظيف وتجميل',
+    yourLocation: 'موقعك الحالي',
     
     // Language
     language: 'اللغة',
@@ -149,8 +159,19 @@ export const translations = {
     loginError: 'Login error',
     enterUsernamePassword: 'Please enter username and password',
     currentVetsVans: 'Current VETS VANs',
-    driverStatusChanged: 'Driver status changed',
+    statusUpdated: 'Status updated',
     failedToUpdateStatus: 'Failed to update status',
+    
+    // Patients & Services
+    selectPatients: 'Select Pets',
+    selectPatientsDesc: 'Choose pets that need veterinary service',
+    noRegisteredPatients: 'No registered pets',
+    registerPetsFirst: 'Please register your pets first',
+    goToPatients: 'Go to register pets',
+    selectServiceType: 'Select Service Type',
+    generalCheckUp: 'General Check Up',
+    grooming: 'Grooming',
+    yourLocation: 'Your Location',
     
     // Language
     language: 'Language',
