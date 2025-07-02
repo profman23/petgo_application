@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient } from "@shared/schema";
+import { users, drivers, rides, patients, admins, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 
@@ -30,6 +30,11 @@ export interface IStorage {
   getUserPatients(userId: number): Promise<Patient[]>;
   createPatient(patient: InsertPatient): Promise<Patient>;
   updatePatient(patientId: number, userId: number, updateData: Partial<Patient>): Promise<Patient | undefined>;
+
+  // Admin operations
+  getAdminByUsername(username: string): Promise<Admin | undefined>;
+  createDriver(driver: InsertDriver): Promise<Driver>;
+  deleteDriver(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -92,43 +97,30 @@ export class DatabaseStorage implements IStorage {
       if (existingDrivers.length === 0) {
         const driversData = [
           {
-            id: 1,
             name: 'د. محمد العلي',
             phone: '0551234567',
+            username: 'vetsvan1',
+            password: '123456',
             latitude: 24.7136,
             longitude: 46.6753,
             rating: 4.8,
             carModel: 'عيادة متنقلة',
             carColor: 'أبيض',
             plateNumber: 'VET-001',
-            isAvailable: true,
-            profileImageUrl: null
+            isAvailable: true
           },
           {
-            id: 2,
             name: 'د. فاطمة أحمد',
             phone: '0561234567',
+            username: 'vetsvan2',
+            password: '123456',
             latitude: 24.7180,
             longitude: 46.6850,
             rating: 4.9,
             carModel: 'عيادة متنقلة',
             carColor: 'أزرق',
             plateNumber: 'VET-002',
-            isAvailable: true,
-            profileImageUrl: null
-          },
-          {
-            id: 3,
-            name: 'د. خالد المحمد',
-            phone: '0571234567',
-            latitude: 24.7050,
-            longitude: 46.6600,
-            rating: 4.7,
-            carModel: 'عيادة متنقلة',
-            carColor: 'أخضر',
-            plateNumber: 'VET-003',
-            isAvailable: true,
-            profileImageUrl: null
+            isAvailable: true
           }
         ];
 
@@ -303,6 +295,24 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(patients.id, patientId), eq(patients.userId, userId)))
       .returning();
     return updatedPatient;
+  }
+
+  // Admin operations
+  async getAdminByUsername(username: string): Promise<Admin | undefined> {
+    const [admin] = await db.select().from(admins).where(eq(admins.username, username));
+    return admin;
+  }
+
+  async createDriver(driverData: InsertDriver): Promise<Driver> {
+    const [driver] = await db
+      .insert(drivers)
+      .values(driverData)
+      .returning();
+    return driver;
+  }
+
+  async deleteDriver(id: number): Promise<void> {
+    await db.delete(drivers).where(eq(drivers.id, id));
   }
 }
 

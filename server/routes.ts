@@ -732,6 +732,131 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Authentication
+  const adminSessions = new Map();
+
+  function requireAdminAuth(req: any, res: any, next: any) {
+    const sessionId = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!sessionId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    const session = adminSessions.get(sessionId);
+    
+    if (!session || session.role !== 'admin') {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    req.admin = session;
+    next();
+  }
+
+  // Admin login
+  app.post('/api/admin/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+      }
+
+      const admin = await storage.getAdminByUsername(username);
+      
+      if (!admin || admin.password !== password) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const sessionId = generateSessionId();
+      adminSessions.set(sessionId, {
+        id: admin.id,
+        username: admin.username,
+        name: admin.name,
+        role: admin.role
+      });
+
+      res.json({
+        token: sessionId,
+        admin: {
+          id: admin.id,
+          username: admin.username,
+          name: admin.name,
+          role: admin.role
+        }
+      });
+    } catch (error) {
+      console.error('Admin login error:', error);
+      res.status(500).json({ message: 'Login failed' });
+    }
+  });
+
+  // Get all drivers for admin
+  app.get('/api/admin/drivers', requireAdminAuth, async (req, res) => {
+    try {
+      const drivers = await storage.getAllDrivers();
+      res.json(drivers);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      res.status(500).json({ message: 'Failed to fetch drivers' });
+    }
+  });
+
+  // Add new driver
+  app.post('/api/admin/drivers', requireAdminAuth, async (req, res) => {
+    try {
+      const { name, phone, username, password } = req.body;
+      
+      if (!name || !phone || !username || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
+
+      const driver = await storage.createDriver({
+        name,
+        phone,
+        username,
+        password,
+        rating: 4.5,
+        carModel: "Mercedes Sprinter",
+        carColor: "أبيض",
+        plateNumber: "VET-" + Math.floor(Math.random() * 1000),
+        latitude: 24.7136,
+        longitude: 46.6753,
+        isAvailable: true
+      });
+
+      res.json(driver);
+    } catch (error) {
+      console.error('Error creating driver:', error);
+      res.status(500).json({ message: 'Failed to create driver' });
+    }
+  });
+
+  // Delete driver
+  app.delete('/api/admin/drivers/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const driverId = parseInt(req.params.id);
+      await storage.deleteDriver(driverId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting driver:', error);
+      res.status(500).json({ message: 'Failed to delete driver' });
+    }
+  });
+
+  // Update driver availability
+  app.put('/api/admin/drivers/:id/availability', requireAdminAuth, async (req, res) => {
+    try {
+      const driverId = parseInt(req.params.id);
+      const { isAvailable } = req.body;
+      
+      await storage.updateDriverAvailability(driverId, isAvailable);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating driver availability:', error);
+      res.status(500).json({ message: 'Failed to update driver availability' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
