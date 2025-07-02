@@ -352,79 +352,163 @@ export default function RideRequest() {
                 </Button>
               </div>
             ) : (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={`w-full justify-between ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
-                    style={{ textAlign }}
-                  >
-                    {selectedPatients.length === 0
-                      ? (language === 'ar' ? 'اختر الحيوانات الأليفة...' : 'Select pets...')
-                      : selectedPatients.length === 1
-                      ? patients.find(p => p.id === selectedPatients[0])?.name
-                      : `${selectedPatients.length} ${language === 'ar' ? 'حيوانات مختارة' : 'pets selected'}`
-                    }
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[400px] p-0">
-                  <Command>
-                    <CommandInput 
-                      placeholder={language === 'ar' ? 'ابحث عن حيوان أليف...' : 'Search pets...'} 
-                      className={textAlign === 'right' ? 'text-right' : 'text-left'}
+              <div className="space-y-4">
+                {/* Multi-Select Button */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={`w-full justify-between ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
                       style={{ textAlign }}
-                    />
-                    <CommandEmpty>
-                      {language === 'ar' ? 'لم يتم العثور على حيوانات أليفة.' : 'No pets found.'}
-                    </CommandEmpty>
-                    <CommandGroup>
-                      {patients.map((patient: Patient) => (
+                    >
+                      {selectedPatients.length === 0
+                        ? (language === 'ar' ? 'اختر الحيوانات الأليفة...' : 'Select pets...')
+                        : selectedPatients.length === 1
+                        ? patients.find(p => p.id === selectedPatients[0])?.name
+                        : `${selectedPatients.length} ${language === 'ar' ? 'حيوانات مختارة' : 'pets selected'}`
+                      }
+                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0">
+                    <Command>
+                      <CommandInput 
+                        placeholder={language === 'ar' ? 'ابحث عن حيوان أليف...' : 'Search pets...'} 
+                        className={textAlign === 'right' ? 'text-right' : 'text-left'}
+                        style={{ textAlign }}
+                      />
+                      <CommandEmpty>
+                        {language === 'ar' ? 'لم يتم العثور على حيوانات أليفة.' : 'No pets found.'}
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {/* Select All Option */}
                         <CommandItem
-                          key={patient.id}
-                          value={patient.name}
                           onSelect={() => {
-                            const isSelected = selectedPatients.includes(patient.id);
-                            if (isSelected) {
-                              setSelectedPatients(prev => prev.filter(id => id !== patient.id));
+                            if (selectedPatients.length === patients.length) {
+                              setSelectedPatients([]);
                             } else {
-                              setSelectedPatients(prev => [...prev, patient.id]);
+                              setSelectedPatients(patients.map(p => p.id));
                             }
                           }}
-                          className="cursor-pointer"
+                          className="cursor-pointer border-b border-gray-200 font-medium"
                         >
                           <div className="flex items-center justify-between w-full">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">
-                                {patient.type === 'Cat' ? '🐱' : patient.type === 'Dog' ? '🐶' : '🐦'}
+                            <div className="flex items-center gap-3">
+                              <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                                selectedPatients.length === patients.length
+                                  ? 'bg-purple-500 border-purple-500'
+                                  : selectedPatients.length > 0
+                                  ? 'bg-purple-200 border-purple-300'
+                                  : 'border-gray-300'
+                              }`}>
+                                {selectedPatients.length === patients.length && (
+                                  <Check className="h-3 w-3 text-white" />
+                                )}
+                                {selectedPatients.length > 0 && selectedPatients.length < patients.length && (
+                                  <div className="w-2 h-2 bg-purple-500 rounded"></div>
+                                )}
+                              </div>
+                              <span style={{ textAlign }}>
+                                {language === 'ar' ? 'اختيار الكل' : 'Select All'}
                               </span>
-                              <div>
-                                <div className="font-medium" style={{ textAlign }}>
-                                  {patient.name}
-                                </div>
-                                <div className="text-sm text-gray-500" style={{ textAlign }}>
-                                  {patient.type === 'Cat' ? (language === 'ar' ? 'قطة' : 'Cat') :
-                                   patient.type === 'Dog' ? (language === 'ar' ? 'كلب' : 'Dog') :
-                                   (language === 'ar' ? 'طائر' : 'Bird')}
-                                  {patient.ageYear && (
-                                    <span> • {patient.ageYear} {language === 'ar' ? 'سنة' : 'years'}</span>
+                            </div>
+                          </div>
+                        </CommandItem>
+                        
+                        {/* Individual Pets */}
+                        {patients.map((patient: Patient) => (
+                          <CommandItem
+                            key={patient.id}
+                            value={patient.name}
+                            onSelect={() => {
+                              const isSelected = selectedPatients.includes(patient.id);
+                              if (isSelected) {
+                                setSelectedPatients(prev => prev.filter(id => id !== patient.id));
+                              } else {
+                                setSelectedPatients(prev => [...prev, patient.id]);
+                              }
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
+                                  selectedPatients.includes(patient.id)
+                                    ? 'bg-purple-500 border-purple-500'
+                                    : 'border-gray-300 hover:border-purple-300'
+                                }`}>
+                                  {selectedPatients.includes(patient.id) && (
+                                    <Check className="h-3 w-3 text-white" />
                                   )}
+                                </div>
+                                <span className="text-lg">
+                                  {patient.type === 'Cat' ? '🐱' : patient.type === 'Dog' ? '🐶' : '🐦'}
+                                </span>
+                                <div>
+                                  <div className="font-medium" style={{ textAlign }}>
+                                    {patient.name}
+                                  </div>
+                                  <div className="text-sm text-gray-500" style={{ textAlign }}>
+                                    {patient.type === 'Cat' ? (language === 'ar' ? 'قطة' : 'Cat') :
+                                     patient.type === 'Dog' ? (language === 'ar' ? 'كلب' : 'Dog') :
+                                     (language === 'ar' ? 'طائر' : 'Bird')}
+                                    {patient.ageYear && (
+                                      <span> • {patient.ageYear} {language === 'ar' ? 'سنة' : 'years'}</span>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                            <Check
-                              className={`ml-auto h-4 w-4 ${
-                                selectedPatients.includes(patient.id) ? 'opacity-100' : 'opacity-0'
-                              }`}
-                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Selected Pets Display */}
+                {selectedPatients.length > 0 && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-medium text-purple-800" style={{ textAlign }}>
+                        {language === 'ar' ? 'الحيوانات المختارة:' : 'Selected Pets:'}
+                      </h4>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedPatients([])}
+                        className="text-purple-600 hover:text-purple-800"
+                      >
+                        {language === 'ar' ? 'إلغاء الكل' : 'Clear All'}
+                      </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedPatients.map(petId => {
+                        const pet = patients.find(p => p.id === petId);
+                        if (!pet) return null;
+                        return (
+                          <div
+                            key={petId}
+                            className="flex items-center gap-2 bg-white border border-purple-300 rounded-full px-3 py-1 text-sm"
+                          >
+                            <span>
+                              {pet.type === 'Cat' ? '🐱' : pet.type === 'Dog' ? '🐶' : '🐦'}
+                            </span>
+                            <span className="font-medium">{pet.name}</span>
+                            <button
+                              onClick={() => setSelectedPatients(prev => prev.filter(id => id !== petId))}
+                              className="text-purple-500 hover:text-purple-700"
+                            >
+                              ×
+                            </button>
                           </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </CardContent>
         </Card>
