@@ -218,12 +218,8 @@ export default function AdminDashboard() {
               {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
             </button>
             <button
-              onClick={() => setActiveTab('shifts')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                activeTab === 'shifts'
-                  ? 'bg-purple-100 text-purple-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+              onClick={() => setLocation('/vets-van-shifts')}
+              className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Clock className="ml-3 h-6 w-6" />
               {language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}
@@ -386,27 +382,7 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {activeTab === 'shifts' && (
-                <div>
-                  {/* Shifts Section */}
-                  <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        {language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}
-                      </h3>
-                      <div className="text-center py-12">
-                        <Clock className="mx-auto h-12 w-12 text-gray-400" />
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">
-                          {language === 'ar' ? 'لا توجد مناوبات' : 'No shifts available'}
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {language === 'ar' ? 'سيتم إضافة نظام المناوبات قريباً' : 'Shift management system coming soon'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+
             </div>
           </div>
         </div>
