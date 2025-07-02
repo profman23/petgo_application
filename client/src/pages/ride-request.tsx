@@ -304,7 +304,11 @@ export default function RideRequest() {
   };
 
   const handleSlideComplete = async () => {
-    if (!isSlideComplete) return;
+    console.log('handleSlideComplete called, isSlideComplete:', isSlideComplete);
+    if (!isSlideComplete) {
+      console.log('Not slide complete, returning');
+      return;
+    }
     
     console.log('Slide completed - executing ride request');
     console.log('Current location:', currentLocation);
