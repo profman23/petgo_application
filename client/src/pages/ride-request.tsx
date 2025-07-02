@@ -266,6 +266,7 @@ export default function RideRequest() {
   };
 
   const handleSlideMove = (e: React.TouchEvent | React.MouseEvent) => {
+    console.log('handleSlideMove called, isSliding:', isSliding);
     if (!isSliding) return;
     
     const container = e.currentTarget as HTMLElement;
@@ -281,10 +282,13 @@ export default function RideRequest() {
     const maxPosition = containerRect.width - 64; // 64px = w-16
     const newPosition = Math.max(0, Math.min(maxPosition, clientX - containerRect.left - 32));
     setSlidePosition(newPosition);
+    console.log('New position:', newPosition, 'Container width:', containerRect.width);
     
     // تحقق من اكتمال السحب (30% فقط للسهولة القصوى)
     const threshold = containerRect.width * 0.3;
+    console.log('Threshold:', threshold, 'Position:', newPosition);
     if (newPosition > threshold) {
+      console.log('Threshold reached! Completing slide...');
       setIsSlideComplete(true);
       setIsSliding(false);
       setTimeout(() => handleSlideComplete(), 100);
