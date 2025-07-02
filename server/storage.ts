@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 

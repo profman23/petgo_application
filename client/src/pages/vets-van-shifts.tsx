@@ -13,21 +13,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { apiRequest } from "@/lib/queryClient";
 
-interface VetsVan {
-  id: number;
+import type { Driver, Shift as ShiftType } from "@shared/schema";
+
+interface VetsVan extends Driver {
   vetsvanCode: string;
   vetsvanName: string;
-  name: string;
-  phone: string;
-  isAvailable: boolean;
 }
 
-interface Shift {
-  id: number;
-  vetsVanId: number;
-  date: string;
-  startTime: string;
-  endTime: string;
+interface Shift extends ShiftType {
   duration: 'day' | 'week' | 'month';
   status: 'scheduled' | 'active' | 'completed' | 'cancelled';
 }
@@ -62,13 +55,13 @@ export default function VetsVanShifts() {
   const dateRange = getDateRange();
 
   // جلب قائمة السيارات
-  const { data: vetsVans = [], isLoading: loadingVans } = useQuery({
+  const { data: vetsVans = [], isLoading: loadingVans } = useQuery<VetsVan[]>({
     queryKey: ['/api/admin/drivers'],
     retry: false,
   });
 
   // جلب النوبات
-  const { data: shifts = [], isLoading: loadingShifts } = useQuery({
+  const { data: shifts = [], isLoading: loadingShifts } = useQuery<Shift[]>({
     queryKey: ['/api/admin/shifts'],
     retry: false,
   });
@@ -132,7 +125,7 @@ export default function VetsVanShifts() {
   };
 
   const getShiftForVanAndDate = (vetsVanId: number, date: string) => {
-    return shifts.find((shift: Shift) => 
+    return shifts?.find((shift) => 
       shift.vetsVanId === vetsVanId && shift.date === date
     );
   };
