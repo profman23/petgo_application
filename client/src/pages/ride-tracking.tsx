@@ -8,6 +8,9 @@ import { useGeolocation } from '@/hooks/useGeolocation';
 import { ArrowLeft, X, Satellite, MapPin, Navigation, Loader2 } from 'lucide-react';
 import { Map } from '@/components/map';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import vanImage from "@assets/freepik__background__70346_1751363211262.png";
+import houseImage from "@assets/freepik_assistant_1751364682430_1751364706224.png";
+import clinicImage from "@assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png";
 import { DriverCard } from '@/components/driver-card';
 import { RideStatus } from '@/components/ride-status';
 import { DEFAULT_COORDINATES } from '@/lib/constants';
@@ -109,7 +112,9 @@ export default function RideTracking() {
               alt="Vets Van" 
               className="h-8 object-contain"
             />
-            <h1 className="text-lg font-semibold" style={{ textAlign }}>{t('trackRequest')}</h1>
+            <h1 className="text-lg font-semibold" style={{ textAlign }}>
+              {language === 'ar' ? 'تتبع الطلب' : 'Track Request'}
+            </h1>
           </div>
           <div className="w-10" />
         </div>
@@ -126,6 +131,89 @@ export default function RideTracking() {
         />
         
 
+      </div>
+
+      {/* Animation Section */}
+      <div className="bg-gradient-to-b from-blue-50 to-white p-4 mx-4 mt-4 rounded-lg border">
+        <div className="relative h-32 overflow-hidden">
+          {/* Road Background */}
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-r from-gray-300 via-gray-400 to-gray-300 rounded-lg shadow-inner">
+            {/* Road stripes */}
+            <div className="absolute inset-x-0 top-1/2 transform -translate-y-1/2 h-1 bg-white border-dashed border-t-2 border-white opacity-60"></div>
+          </div>
+
+          {/* Clinic Building - Far Left */}
+          <div 
+            className={`absolute ${language === 'ar' ? 'right-0' : 'left-0'} bottom-0 w-16 h-16 flex items-end justify-center`}
+            style={{ transform: 'translateX(0)' }}
+          >
+            <img
+              src={clinicImage}
+              alt={language === 'ar' ? 'العيادة البيطرية' : 'Veterinary Clinic'}
+              className="w-12 h-12 object-contain drop-shadow-lg"
+            />
+          </div>
+
+          {/* House - Far Right */}
+          <div 
+            className={`absolute ${language === 'ar' ? 'left-0' : 'right-0'} bottom-0 w-16 h-16 flex items-end justify-center`}
+            style={{ transform: 'translateX(0)' }}
+          >
+            <img
+              src={houseImage}
+              alt={language === 'ar' ? 'المنزل' : 'House'}
+              className="w-14 h-14 object-contain drop-shadow-lg"
+            />
+          </div>
+
+          {/* Moving Van Animation */}
+          <div 
+            className="absolute bottom-0 w-12 h-12 flex items-end justify-center transition-all duration-1000 ease-in-out"
+            style={{
+              left: activeRide?.status === 'requested' ? '25%' :
+                    activeRide?.status === 'confirmed' ? '50%' :
+                    activeRide?.status === 'in_progress' ? '75%' :
+                    activeRide?.status === 'arrived' ? '85%' : '25%',
+              transform: 'translateX(-50%)'
+            }}
+          >
+            <img
+              src={vanImage}
+              alt={language === 'ar' ? 'شاحنة العيادة البيطرية' : 'Veterinary Van'}
+              className="w-10 h-8 object-contain drop-shadow-lg"
+            />
+          </div>
+
+          {/* Status Journey Dots */}
+          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-8">
+            {['requested', 'confirmed', 'in_progress', 'arrived'].map((status, index) => (
+              <div
+                key={status}
+                className={`w-3 h-3 rounded-full border-2 transition-all duration-300 ${
+                  activeRide?.status === status
+                    ? 'bg-purple-600 border-purple-600 scale-125 shadow-lg'
+                    : 'bg-gray-200 border-gray-300'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Journey Labels */}
+          <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex space-x-6 text-xs">
+            <span className={`${activeRide?.status === 'requested' ? 'text-purple-600 font-semibold' : 'text-gray-500'}`}>
+              {language === 'ar' ? 'طلب' : 'Request'}
+            </span>
+            <span className={`${activeRide?.status === 'confirmed' ? 'text-purple-600 font-semibold' : 'text-gray-500'}`}>
+              {language === 'ar' ? 'قبول' : 'Accept'}
+            </span>
+            <span className={`${activeRide?.status === 'in_progress' ? 'text-purple-600 font-semibold' : 'text-gray-500'}`}>
+              {language === 'ar' ? 'قادم' : 'Coming'}
+            </span>
+            <span className={`${activeRide?.status === 'arrived' ? 'text-purple-600 font-semibold' : 'text-gray-500'}`}>
+              {language === 'ar' ? 'وصل' : 'Arrived'}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Content */}
