@@ -250,12 +250,16 @@ export default function RideRequest() {
 
   // دوال التحكم في زر السحب
   const handleSlideStart = (e: React.TouchEvent | React.MouseEvent) => {
+    console.log('Slide started');
     setIsSliding(true);
     e.preventDefault();
   };
 
   const handleSlideMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isSliding) return;
+    if (!isSliding) {
+      console.log('Not sliding, returning');
+      return;
+    }
     
     const container = e.currentTarget as HTMLElement;
     const containerRect = container.getBoundingClientRect();
@@ -263,16 +267,21 @@ export default function RideRequest() {
     
     if ('touches' in e) {
       clientX = e.touches[0].clientX;
+      console.log('Touch move at:', clientX);
     } else {
       clientX = e.clientX;
+      console.log('Mouse move at:', clientX);
     }
     
     const maxPosition = containerRect.width - 64; // 64px = w-16
     const newPosition = Math.max(0, Math.min(maxPosition, clientX - containerRect.left - 32));
     setSlidePosition(newPosition);
+    console.log('New position set to:', newPosition);
     
-    // تحقق من اكتمال السحب (75% من العرض للسرعة)
-    if (newPosition > containerRect.width * 0.75) {
+    // تحقق من اكتمال السحب (50% من العرض للسهولة أكثر)
+    const threshold = containerRect.width * 0.5;
+    console.log('Slide position:', newPosition, 'of', containerRect.width, 'threshold:', threshold);
+    if (newPosition > threshold) {
       console.log('Slide threshold reached - completing slide');
       setIsSlideComplete(true);
       setIsSliding(false);
