@@ -359,7 +359,7 @@ export default function RideRequest() {
                     <Button
                       variant="outline"
                       role="combobox"
-                      className={`w-full justify-between ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
+                      className={`w-full h-12 justify-between px-4 text-sm font-medium ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
                       style={{ textAlign }}
                     >
                       {selectedPatients.length === 0
@@ -371,17 +371,17 @@ export default function RideRequest() {
                       <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0">
-                    <Command>
+                  <PopoverContent className="w-full max-w-md p-0 max-h-80" align="start">
+                    <Command className="rounded-lg border shadow-md">
                       <CommandInput 
                         placeholder={language === 'ar' ? 'ابحث عن حيوان أليف...' : 'Search pets...'} 
-                        className={textAlign === 'right' ? 'text-right' : 'text-left'}
+                        className={`h-12 px-4 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
                         style={{ textAlign }}
                       />
-                      <CommandEmpty>
+                      <CommandEmpty className="p-4 text-center text-gray-500">
                         {language === 'ar' ? 'لم يتم العثور على حيوانات أليفة.' : 'No pets found.'}
                       </CommandEmpty>
-                      <CommandGroup>
+                      <CommandGroup className="max-h-60 overflow-y-auto">
                         {/* Select All Option */}
                         <CommandItem
                           onSelect={() => {
@@ -391,7 +391,7 @@ export default function RideRequest() {
                               setSelectedPatients(patients.map(p => p.id));
                             }
                           }}
-                          className="cursor-pointer border-b border-gray-200 font-medium"
+                          className="cursor-pointer border-b border-gray-200 font-medium p-3 hover:bg-gray-50"
                         >
                           <div className="flex items-center justify-between w-full">
                             <div className="flex items-center gap-3">
@@ -429,7 +429,7 @@ export default function RideRequest() {
                                 setSelectedPatients(prev => [...prev, patient.id]);
                               }
                             }}
-                            className="cursor-pointer"
+                            className="cursor-pointer p-3 hover:bg-purple-50"
                           >
                             <div className="flex items-center justify-between w-full">
                               <div className="flex items-center gap-3">
