@@ -251,6 +251,17 @@ export default function RideRequest() {
   // دوال التحكم في زر السحب
   const handleSlideStart = (e: React.TouchEvent | React.MouseEvent) => {
     console.log('Slide started');
+    console.log('Current data check:');
+    console.log('- Location:', currentLocation);
+    console.log('- Selected patients:', selectedPatients);
+    console.log('- Service type:', serviceType);
+    console.log('- Can start sliding?', currentLocation && selectedPatients.length > 0 && serviceType);
+    
+    if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
+      console.log('Cannot start sliding - missing required data');
+      return;
+    }
+    
     setIsSliding(true);
     e.preventDefault();
   };
