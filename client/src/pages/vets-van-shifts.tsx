@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +40,13 @@ export default function VetsVanShifts() {
     return <div>Redirecting...</div>;
   }
   
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - dayOfWeek + 1);
+    return monday;
+  });
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [isAddShiftOpen, setIsAddShiftOpen] = useState(false);
   const [selectedVetsVan, setSelectedVetsVan] = useState<number | null>(null);
@@ -50,19 +57,44 @@ export default function VetsVanShifts() {
     duration: 'day' as 'day' | 'week' | 'month'
   });
 
-  // تحديد نطاق التواريخ للعرض (7 أيام)
+  // تحديد نطاق التواريخ للعرض (7 أيام من بداية الأسبوع)
   const getDateRange = () => {
     const dates = [];
-    const today = new Date();
     for (let i = 0; i < 7; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
+      const date = new Date(currentWeekStart);
+      date.setDate(currentWeekStart.getDate() + i);
       dates.push(date.toISOString().split('T')[0]);
     }
     return dates;
   };
 
   const dateRange = getDateRange();
+
+  // التنقل بين الأسابيع
+  const goToPreviousWeek = () => {
+    const newWeekStart = new Date(currentWeekStart);
+    newWeekStart.setDate(currentWeekStart.getDate() - 7);
+    setCurrentWeekStart(newWeekStart);
+  };
+
+  const goToNextWeek = () => {
+    const newWeekStart = new Date(currentWeekStart);
+    newWeekStart.setDate(currentWeekStart.getDate() + 7);
+    setCurrentWeekStart(newWeekStart);
+  };
+
+  // تنسيق نطاق الأسبوع
+  const getWeekRange = () => {
+    const startDate = new Date(currentWeekStart);
+    const endDate = new Date(currentWeekStart);
+    endDate.setDate(currentWeekStart.getDate() + 6);
+    
+    const formatDateForRange = (date: Date) => {
+      return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+    };
+    
+    return `${formatDateForRange(startDate)} - ${formatDateForRange(endDate)}`;
+  };
 
   // جلب قائمة السيارات
   const { data: vetsVans = [], isLoading: loadingVans } = useQuery<VetsVan[]>({
@@ -301,10 +333,34 @@ export default function VetsVanShifts() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>{t('shiftsSchedule')}</span>
-              <Badge variant="outline" className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                {dateRange.length} {t('days')}
-              </Badge>
+              <div className="flex items-center gap-4">
+                {/* أسهم التنقل بين الأسابيع */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPreviousWeek}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <div className="text-sm font-medium text-gray-700 min-w-[140px] text-center">
+                    {getWeekRange()}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextWeek}
+                    className="h-8 w-8 p-0"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  {dateRange.length} {t('days')}
+                </Badge>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent>
