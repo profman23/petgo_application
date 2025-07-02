@@ -20,7 +20,8 @@ interface Driver {
 }
 
 interface NewDriverData {
-  name: string;
+  vetsvanCode: string;
+  vetsvanName: string;
   phone: string;
   username: string;
   password: string;
@@ -31,8 +32,10 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [activeTab, setActiveTab] = useState('management'); // 'management' or 'shifts'
   const [newDriver, setNewDriver] = useState<NewDriverData>({
-    name: "",
+    vetsvanCode: "",
+    vetsvanName: "",
     phone: "",
     username: "",
     password: "",
@@ -81,7 +84,7 @@ export default function AdminDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
-      setNewDriver({ name: "", phone: "", username: "", password: "" });
+      setNewDriver({ vetsvanCode: "", vetsvanName: "", phone: "", username: "", password: "" });
       setShowAddForm(false);
       toast({
         title: t('vetsVanAddedSuccess'),
@@ -152,7 +155,7 @@ export default function AdminDashboard() {
 
   const handleAddDriver = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newDriver.name || !newDriver.phone || !newDriver.username || !newDriver.password) {
+    if (!newDriver.vetsvanCode || !newDriver.vetsvanName || !newDriver.phone || !newDriver.username || !newDriver.password) {
       toast({
         title: t('error'),
         description: t('fillAllFields'),
@@ -216,15 +219,26 @@ export default function AdminDashboard() {
               </div>
 
               {showAddForm && (
-                <form onSubmit={handleAddDriver} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <form onSubmit={handleAddDriver} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">{t('driverName')}</label>
+                    <label className="block text-sm font-medium text-gray-700">VetsVan Code</label>
                     <input
                       type="text"
-                      value={newDriver.name}
-                      onChange={(e) => setNewDriver({ ...newDriver, name: e.target.value })}
+                      value={newDriver.vetsvanCode}
+                      onChange={(e) => setNewDriver({ ...newDriver, vetsvanCode: e.target.value })}
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                      placeholder={t('driverName')}
+                      placeholder="V001"
+                      style={{ textAlign: getTextAlign(language) }}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">VetsVan Name</label>
+                    <input
+                      type="text"
+                      value={newDriver.vetsvanName}
+                      onChange={(e) => setNewDriver({ ...newDriver, vetsvanName: e.target.value })}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      placeholder="VETS VAN 1"
                       style={{ textAlign: getTextAlign(language) }}
                     />
                   </div>
@@ -261,7 +275,7 @@ export default function AdminDashboard() {
                       style={{ textAlign: getTextAlign(language) }}
                     />
                   </div>
-                  <div className="sm:col-span-2 lg:col-span-4">
+                  <div className="sm:col-span-2 lg:col-span-5">
                     <button
                       type="submit"
                       disabled={addDriverMutation.isPending}
