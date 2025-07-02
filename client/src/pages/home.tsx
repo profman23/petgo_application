@@ -67,6 +67,25 @@ const getProgressPercentage = (status: string): number => {
   return progressMap[status] || 0;
 };
 
+const getSimplifiedProgressPercentage = (status: string): number => {
+  // Map old statuses to new simplified ones
+  let mappedStatus = status;
+  if (['requested', 'confirmed'].includes(status)) {
+    mappedStatus = 'processing';
+  }
+  if (status === 'in_progress') {
+    mappedStatus = 'arrived';
+  }
+  
+  const progressMap: Record<string, number> = {
+    'processing': 25,
+    'enroute': 50,
+    'arrived': 75,
+    'completed': 100
+  };
+  return progressMap[mappedStatus] || 0;
+};
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<any>(null);
@@ -119,7 +138,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-white px-3 py-2 h-10">
+        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
               <div className="w-12 h-12 bg-purple-800 rounded-full border-4 border-purple-400 p-1 shadow-lg">
@@ -129,13 +148,13 @@ export default function Home() {
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
-              <div className="text-lg font-bold text-white">
+              <div className="text-lg font-bold text-gray-800">
                 {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <LanguageSelector />
-              <Bell className="w-5 h-5 cursor-pointer hover:text-purple-200" />
+              <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"
                 size="sm"
@@ -290,20 +309,31 @@ export default function Home() {
                       <div className="absolute top-4 left-0 right-0 h-1 bg-gray-200 rounded-full"></div>
                       <div 
                         className="absolute top-4 left-0 h-1 bg-purple-500 rounded-full transition-all duration-1000"
-                        style={{ width: `${(getStatusOrder(actualActiveRide.status) - 1) * 20}%` }}
+                        style={{ width: `${getSimplifiedProgressPercentage(actualActiveRide.status)}%` }}
                       ></div>
                       
                       {[
-                        { status: 'requested', icon: Clock },
-                        { status: 'confirmed', icon: CheckCircle },
+                        { status: 'processing', icon: Clock },
                         { status: 'enroute', icon: Car },
                         { status: 'arrived', icon: MapPin },
-                        { status: 'in_progress', icon: Stethoscope },
                         { status: 'completed', icon: CheckCircle }
                       ].map((step, index) => {
                         const IconComponent = step.icon;
-                        const isActive = getStatusOrder(actualActiveRide.status) > index;
-                        const isCurrent = getStatusOrder(actualActiveRide.status) === index + 1;
+                        
+                        // Map current status to simplified steps
+                        let mappedStatus = actualActiveRide.status;
+                        if (['requested', 'confirmed'].includes(actualActiveRide.status)) {
+                          mappedStatus = 'processing';
+                        }
+                        if (actualActiveRide.status === 'in_progress') {
+                          mappedStatus = 'arrived';
+                        }
+                        
+                        const statusOrder = ['processing', 'enroute', 'arrived', 'completed'];
+                        const currentIndex = statusOrder.indexOf(mappedStatus);
+                        
+                        const isActive = currentIndex > index;
+                        const isCurrent = currentIndex === index;
                         
                         return (
                           <div key={step.status} className="relative flex flex-col items-center">
@@ -319,7 +349,10 @@ export default function Home() {
                             <div className={`mt-1 text-xs font-medium ${
                               isActive || isCurrent ? 'text-purple-700' : 'text-gray-400'
                             }`} style={{ textAlign }}>
-                              {getStatusText(step.status, language)}
+                              {step.status === 'processing' && (language === 'ar' ? 'معالجة' : 'Processing')}
+                              {step.status === 'enroute' && (language === 'ar' ? 'في الطريق' : 'On the Way')}
+                              {step.status === 'arrived' && (language === 'ar' ? 'وصل' : 'Arrived')}
+                              {step.status === 'completed' && (language === 'ar' ? 'مكتمل' : 'Completed')}
                             </div>
                           </div>
                         );
