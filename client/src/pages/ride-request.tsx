@@ -20,6 +20,7 @@ import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
 import serviceTypeIcon from "@assets/freepik_assistant_1751437667818_1751437676533.png";
 import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.png";
+import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -40,6 +41,9 @@ export default function RideRequest() {
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedPatients, setSelectedPatients] = useState<number[]>([]);
   const [serviceType, setServiceType] = useState<string>('');
+  const [slidePosition, setSlidePosition] = useState(0);
+  const [isSliding, setIsSliding] = useState(false);
+  const [isSlideComplete, setIsSlideComplete] = useState(false);
   
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -243,6 +247,61 @@ export default function RideRequest() {
       }
     }
   }, [latitude, longitude, accuracy, form, toast]);
+
+  // دوال التحكم في زر السحب
+  const handleSlideStart = (e: React.TouchEvent | React.MouseEvent) => {
+    setIsSliding(true);
+    e.preventDefault();
+  };
+
+  const handleSlideMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (!isSliding) return;
+    
+    const container = e.currentTarget as HTMLElement;
+    const containerRect = container.getBoundingClientRect();
+    let clientX: number;
+    
+    if ('touches' in e) {
+      clientX = e.touches[0].clientX;
+    } else {
+      clientX = e.clientX;
+    }
+    
+    const newPosition = Math.max(0, Math.min(containerRect.width - 80, clientX - containerRect.left - 40));
+    setSlidePosition(newPosition);
+    
+    // تحقق من اكتمال السحب (85% من العرض)
+    if (newPosition > containerRect.width * 0.85) {
+      setIsSlideComplete(true);
+      setIsSliding(false);
+      handleSlideComplete();
+    }
+  };
+
+  const handleSlideEnd = () => {
+    if (!isSlideComplete) {
+      setSlidePosition(0);
+    }
+    setIsSliding(false);
+  };
+
+  const handleSlideComplete = () => {
+    if (!isSlideComplete) return;
+    
+    // تنفيذ الطلب
+    const formData = form.getValues();
+    onSubmit(formData);
+  };
+
+  // إعادة تعيين السحب بعد الإرسال
+  useEffect(() => {
+    if (!isRequestingRide && isSlideComplete) {
+      setTimeout(() => {
+        setIsSlideComplete(false);
+        setSlidePosition(0);
+      }, 1000);
+    }
+  }, [isRequestingRide, isSlideComplete]);
 
   // التعامل مع أخطاء GPS من useGeolocation hook
   useEffect(() => {
@@ -611,31 +670,67 @@ export default function RideRequest() {
                   )}
                 />
 
-                <Button
-                  type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                  disabled={isRequestingRide || !currentLocation || selectedPatients.length === 0 || !serviceType}
-                  style={{ direction }}
-                >
-                  <div className="flex items-center justify-center gap-3">
-                    <Truck className="w-5 h-5" />
-                    <div className="text-center">
-                      <div>
+                {/* Slide to Confirm Button */}
+                <div className="relative w-full">
+                  <div
+                    className="relative w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full overflow-hidden shadow-lg cursor-pointer"
+                    onMouseMove={handleSlideMove}
+                    onMouseUp={handleSlideEnd}
+                    onTouchMove={handleSlideMove}
+                    onTouchEnd={handleSlideEnd}
+                  >
+                    {/* Background Track */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-white font-medium text-lg">
                         {isRequestingRide ? 
-                          (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') : 
-                         !currentLocation ? 
-                          (language === 'ar' ? 'في انتظار تحديد الموقع...' : 'Waiting for location...') : 
-                          (language === 'ar' ? 'اضغط هنا للطلب البيطري' : 'Click Here to Vet Request')
+                          (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') :
+                          !currentLocation ? 
+                          (language === 'ar' ? 'في انتظار تحديد الموقع...' : 'Waiting for location...') :
+                          isSlideComplete ?
+                          (language === 'ar' ? 'تم التأكيد!' : 'Confirmed!') :
+                          (language === 'ar' ? 'اسحب للتأكيد' : 'Slide to Confirm')
                         }
-                      </div>
-                      {!isRequestingRide && currentLocation && (
-                        <div className="text-sm opacity-90">
-                          {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Mobile Veterinary Clinic'}
-                        </div>
+                      </span>
+                    </div>
+
+                    {/* Progress Fill */}
+                    <div 
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-purple-400 to-purple-600 transition-all duration-200"
+                      style={{ width: `${(slidePosition / (window.innerWidth - 80)) * 100}%` }}
+                    />
+
+                    {/* Sliding Van */}
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 cursor-grab active:cursor-grabbing"
+                      style={{ 
+                        left: `${slidePosition}px`,
+                        opacity: (!currentLocation || selectedPatients.length === 0 || !serviceType) ? 0.5 : 1,
+                        pointerEvents: (!currentLocation || selectedPatients.length === 0 || !serviceType) ? 'none' : 'auto'
+                      }}
+                      onMouseDown={handleSlideStart}
+                      onTouchStart={handleSlideStart}
+                    >
+                      {isRequestingRide ? (
+                        <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+                      ) : isSlideComplete ? (
+                        <Check className="w-8 h-8 text-green-600" />
+                      ) : (
+                        <img 
+                          src={vetVanImage} 
+                          alt="Vet Van" 
+                          className="w-12 h-12 object-contain"
+                        />
                       )}
                     </div>
                   </div>
-                </Button>
+
+                  {/* Subtitle */}
+                  {!isRequestingRide && currentLocation && (
+                    <div className="text-center mt-2 text-sm text-gray-600">
+                      {language === 'ar' ? 'عيادة بيطرية متنقلة' : 'Mobile Veterinary Clinic'}
+                    </div>
+                  )}
+                </div>
               </form>
             </Form>
           </CardContent>
