@@ -30,6 +30,16 @@ export default function VetsVanShifts() {
   const { t, language } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // التحقق من وجود admin token
+  const adminToken = localStorage.getItem('adminToken');
+  
+  // إعادة التوجيه إذا لم يكن مسجل دخول
+  if (!adminToken) {
+    setLocation('/admin-login');
+    return <div>Redirecting...</div>;
+  }
+  
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [isAddShiftOpen, setIsAddShiftOpen] = useState(false);
   const [selectedVetsVan, setSelectedVetsVan] = useState<number | null>(null);
@@ -58,12 +68,14 @@ export default function VetsVanShifts() {
   const { data: vetsVans = [], isLoading: loadingVans } = useQuery<VetsVan[]>({
     queryKey: ['/api/admin/drivers'],
     retry: false,
+    enabled: !!adminToken,
   });
 
   // جلب النوبات
   const { data: shifts = [], isLoading: loadingShifts } = useQuery<Shift[]>({
     queryKey: ['/api/admin/shifts'],
     retry: false,
+    enabled: !!adminToken,
   });
 
   // إضافة نوبة جديدة
