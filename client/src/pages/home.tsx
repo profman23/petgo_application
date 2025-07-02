@@ -77,8 +77,8 @@ export default function Home() {
   const direction = getDirection(language);
 
   // Get active ride info
-  const { data: rideData, isLoading: rideLoading } = useRide();
-  const actualActiveRide = rideData?.ride || null;
+  const { activeRide, isLoadingActiveRide } = useRide();
+  const actualActiveRide = activeRide || null;
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -383,7 +383,9 @@ export default function Home() {
 
         {/* Request Status and Actions */}
         <div className="p-3">
-          <h2 className="text-lg font-bold text-gray-900 mb-2" style={{ textAlign }}>{t('requestMobileVet')}</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-2" style={{ textAlign }}>
+            {language === 'ar' ? 'طلب العيادة البيطرية المتنقلة' : 'Request Mobile Veterinary Clinic'}
+          </h2>
           
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
