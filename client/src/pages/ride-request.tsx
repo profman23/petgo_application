@@ -250,10 +250,17 @@ export default function RideRequest() {
 
   // دوال التحكم في زر السحب
   const handleSlideStart = (e: React.TouchEvent | React.MouseEvent) => {
+    console.log('handleSlideStart called');
+    console.log('Location:', currentLocation);
+    console.log('Patients:', selectedPatients);
+    console.log('Service:', serviceType);
+    
     if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
+      console.log('Cannot slide - missing data');
       return;
     }
     
+    console.log('Starting slide...');
     setIsSliding(true);
     e.preventDefault();
   };
