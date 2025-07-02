@@ -273,9 +273,10 @@ export default function RideRequest() {
     
     // تحقق من اكتمال السحب (75% من العرض للسرعة)
     if (newPosition > containerRect.width * 0.75) {
+      console.log('Slide threshold reached - completing slide');
       setIsSlideComplete(true);
       setIsSliding(false);
-      handleSlideComplete();
+      setTimeout(() => handleSlideComplete(), 100); // تأخير صغير للتأكد من تحديث الحالة
     }
   };
 
@@ -287,11 +288,47 @@ export default function RideRequest() {
     }
   };
 
-  const handleSlideComplete = () => {
+  const handleSlideComplete = async () => {
     if (!isSlideComplete) return;
+    
+    console.log('Slide completed - executing ride request');
+    console.log('Current location:', currentLocation);
+    console.log('Selected patients:', selectedPatients);
+    console.log('Service type:', serviceType);
+    
+    // التأكد من صحة البيانات قبل الإرسال
+    if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
+      console.log('Missing required data for ride request');
+      
+      if (!currentLocation) {
+        toast({
+          title: language === 'ar' ? 'خطأ في الموقع' : 'Location Error',
+          description: language === 'ar' ? 'لم يتم تحديد موقعك بعد' : 'Location not determined yet',
+          variant: 'destructive',
+        });
+      } else if (selectedPatients.length === 0) {
+        toast({
+          title: language === 'ar' ? 'يرجى اختيار الحيوانات الأليفة' : 'Please select pets',
+          description: language === 'ar' ? 'يرجى اختيار حيوان أليف واحد على الأقل' : 'Please select at least one pet',
+          variant: 'destructive',
+        });
+      } else if (!serviceType) {
+        toast({
+          title: language === 'ar' ? 'يرجى اختيار نوع الخدمة' : 'Please select service type',
+          description: language === 'ar' ? 'يرجى اختيار نوع الخدمة المطلوبة' : 'Please select the required service type',
+          variant: 'destructive',
+        });
+      }
+      
+      // إعادة تعيين السحب عند الفشل
+      setIsSlideComplete(false);
+      setSlidePosition(0);
+      return;
+    }
     
     // تنفيذ الطلب
     const formData = form.getValues();
+    console.log('Form data before submit:', formData);
     onSubmit(formData);
   };
 
