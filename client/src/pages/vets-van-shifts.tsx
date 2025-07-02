@@ -191,6 +191,21 @@ export default function VetsVanShifts() {
   const handleAddShift = () => {
     if (!selectedVetsVan) return;
     
+    // التحقق من أن التاريخ ليس في الماضي
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(newShift.date);
+    selectedDate.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'لا يمكن إضافة نوبة لتاريخ سابق' : 'Cannot add shift for past date',
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const shifts = [];
     const startDate = new Date(newShift.date);
     
@@ -367,12 +382,14 @@ export default function VetsVanShifts() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-3 font-medium text-gray-700 min-w-[200px]">
+                  <tr className="border-b-2 border-gray-300">
+                    <th className="text-left p-3 font-medium text-gray-700 min-w-[200px] border-r-2 border-gray-300 bg-gray-50">
                       {t('vetsVanName')}
                     </th>
-                    {dateRange.map(date => (
-                      <th key={date} className="text-center p-3 font-medium text-gray-700 min-w-[120px]">
+                    {dateRange.map((date, index) => (
+                      <th key={date} className={`text-center p-3 font-medium text-gray-700 min-w-[120px] bg-gray-50 ${
+                        index < dateRange.length - 1 ? 'border-r border-gray-200' : ''
+                      }`}>
                         <div className="flex flex-col items-center">
                           <span className="text-sm">{formatDate(date)}</span>
                           <span className="text-xs text-gray-500">{date}</span>
@@ -397,7 +414,7 @@ export default function VetsVanShifts() {
                   ) : (
                     vetsVans.map((van: VetsVan) => (
                       <tr key={van.id} className="border-b hover:bg-gray-50">
-                        <td className="p-3">
+                        <td className="p-3 border-r-2 border-gray-300 bg-gray-25">
                           <div className="flex flex-col">
                             <span className="font-medium text-gray-900">
                               {van.vetsvanCode} - {van.vetsvanName}
@@ -411,10 +428,12 @@ export default function VetsVanShifts() {
                             </Badge>
                           </div>
                         </td>
-                        {dateRange.map(date => {
+                        {dateRange.map((date, index) => {
                           const shift = getShiftForVanAndDate(van.id, date);
                           return (
-                            <td key={date} className="p-3 text-center">
+                            <td key={date} className={`p-3 text-center ${
+                              index < dateRange.length - 1 ? 'border-r border-gray-200' : ''
+                            }`}>
                               {shift ? (
                                 <div className="relative">
                                   <Badge className={`${getStatusColor(shift.status)} text-xs`}>
@@ -467,6 +486,7 @@ export default function VetsVanShifts() {
                                         <Input 
                                           type="date" 
                                           value={newShift.date}
+                                          min={new Date().toISOString().split('T')[0]}
                                           onChange={(e) => setNewShift(prev => ({ ...prev, date: e.target.value }))}
                                         />
                                       </div>
