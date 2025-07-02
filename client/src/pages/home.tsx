@@ -212,7 +212,7 @@ export default function Home() {
               </div>
               
               {/* Veterinary Clinic Building - Start Position */}
-              <div className={`absolute -top-6 ${language === 'ar' ? '-right-6' : '-left-6'} z-10`}>
+              <div className={`absolute -top-10 ${language === 'ar' ? '-right-6' : '-left-6'} z-10`}>
                 <img 
                   src={newVetClinicImage}
                   alt="Veterinary Clinic" 
@@ -221,7 +221,7 @@ export default function Home() {
               </div>
               
               {/* House Building - End Position */}
-              <div className={`absolute -top-8 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
+              <div className={`absolute -top-12 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
                 <img 
                   src={newestHouseImage}
                   alt="House" 
