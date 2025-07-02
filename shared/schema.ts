@@ -19,14 +19,26 @@ export const drivers = pgTable("drivers", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   phone: text("phone").notNull().unique(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
   rating: real("rating").notNull().default(4.5),
-  carModel: text("car_model").notNull(),
-  carColor: text("car_color").notNull(),
-  plateNumber: text("plate_number").notNull(),
-  latitude: real("latitude").notNull(),
-  longitude: real("longitude").notNull(),
+  carModel: text("car_model").notNull().default("Mercedes Sprinter"),
+  carColor: text("car_color").notNull().default("أبيض"),
+  plateNumber: text("plate_number").notNull().default("ABC-123"),
+  latitude: real("latitude").default(24.7136),
+  longitude: real("longitude").default(46.6753),
   isAvailable: boolean("is_available").notNull().default(true),
   profileImageUrl: text("profile_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const admins = pgTable("admins", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  name: text("name").notNull(),
+  role: text("role").notNull().default("admin"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const rides = pgTable("rides", {
@@ -109,10 +121,27 @@ export const insertPatientSchema = createInsertSchema(patients).pick({
   userId: true,
 });
 
+export const insertDriverSchema = createInsertSchema(drivers).pick({
+  name: true,
+  phone: true,
+  username: true,
+  password: true,
+});
+
+export const insertAdminSchema = createInsertSchema(admins).pick({
+  username: true,
+  password: true,
+  name: true,
+  role: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type RegisterUser = z.infer<typeof registerSchema>;
 export type User = typeof users.$inferSelect;
 export type Driver = typeof drivers.$inferSelect;
+export type InsertDriver = z.infer<typeof insertDriverSchema>;
+export type Admin = typeof admins.$inferSelect;
+export type InsertAdmin = z.infer<typeof insertAdminSchema>;
 export type Ride = typeof rides.$inferSelect;
 export type InsertRide = z.infer<typeof rideRequestSchema>;
 export type RideRequest = typeof rides.$inferInsert;

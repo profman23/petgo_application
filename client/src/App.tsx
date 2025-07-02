@@ -15,6 +15,8 @@ import DoctorRideTracking from "@/pages/doctor-ride-tracking";
 import Account from "@/pages/account";
 import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
+import AdminLogin from "@/pages/admin-login";
+import AdminDashboard from "@/pages/admin-dashboard";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -107,6 +109,8 @@ function Router() {
           <Route path="/account" component={Account} />
           <Route path="/patients" component={Patients} />
           <Route path="/activity" component={Activity} />
+          <Route path="/admin-login" component={AdminLogin} />
+          <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/home" component={Home} />
           <Route path="/" component={() => {
             const token = localStorage.getItem('token');
