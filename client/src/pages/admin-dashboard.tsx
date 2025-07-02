@@ -28,6 +28,8 @@ interface Driver {
   longitude: number;
   isAvailable: boolean;
   createdAt: string;
+  vetsvanCode: string;
+  vetsvanName: string;
 }
 
 interface NewDriverData {
@@ -389,7 +391,7 @@ export default function AdminDashboard() {
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>{t('confirmDelete')}</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                      {t('deleteVetsVanConfirm')} {driver.vetsvanCode} - {driver.vetsvanName}?
+                                      {t('deleteVetsVanConfirm')} {(driver as any).vetsvanCode} - {(driver as any).vetsvanName}?
                                       <br />
                                       {t('deleteWarning')}
                                     </AlertDialogDescription>
