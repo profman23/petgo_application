@@ -1,12 +1,20 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-async function throwIfResNotOk(res: Response) {
+async function throwIfResNotOk(res: Response, url: string) {
   if (!res.ok) {
-    // If unauthorized, clear local storage and redirect to login
+    // If unauthorized, clear local storage and redirect to appropriate login
     if (res.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      if (url.includes('/api/admin/')) {
+        // Admin endpoint - clear admin tokens and redirect to admin login
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('admin');
+        window.location.href = '/admin-login';
+      } else {
+        // Regular endpoint - clear user tokens and redirect to regular login
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
       return;
     }
     const text = (await res.text()) || res.statusText;
@@ -21,6 +29,8 @@ export async function apiRequest(
     body?: string;
   },
 ): Promise<any> {
+  // Check for admin token first (for admin endpoints), then regular token
+  const adminToken = localStorage.getItem('adminToken');
   const token = localStorage.getItem('token');
   const headers: Record<string, string> = {};
   
@@ -28,7 +38,10 @@ export async function apiRequest(
     headers["Content-Type"] = "application/json";
   }
   
-  if (token) {
+  // Use admin token for admin endpoints, regular token for others
+  if (url.includes('/api/admin/') && adminToken) {
+    headers["Authorization"] = `Bearer ${adminToken}`;
+  } else if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
 
@@ -39,7 +52,7 @@ export async function apiRequest(
     credentials: "include",
   });
 
-  await throwIfResNotOk(res);
+  await throwIfResNotOk(res, url);
   return await res.json();
 }
 
@@ -65,14 +78,7 @@ export const getQueryFn: <T>(options: {
       return null;
     }
 
-    if (res.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-      return null;
-    }
-
-    await throwIfResNotOk(res);
+    await throwIfResNotOk(res, queryKey[0] as string);
     return await res.json();
   };
 
