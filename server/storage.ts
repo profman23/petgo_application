@@ -348,16 +348,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteDriver(id: number): Promise<void> {
-    // First get driver details to find associated doctor account
-    const driver = await db.select().from(drivers).where(eq(drivers.id, id)).limit(1);
-    
-    if (driver.length > 0) {
-      const driverData = driver[0];
-      // Delete associated doctor user account using vetsvanCode as username
-      await db.delete(users).where(eq(users.username, driverData.vetsvanCode));
-    }
-    
-    // Delete the driver record
+    // Simply delete the driver record (which includes doctor account)
     await db.delete(drivers).where(eq(drivers.id, id));
   }
 
