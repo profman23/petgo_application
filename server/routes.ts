@@ -119,6 +119,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: 'تم تسجيل الخروج بنجاح' });
   });
 
+  // Doctor login endpoint  
+  app.post('/api/doctor/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+      }
+
+      // Find driver by username
+      const driver = await storage.getDriverByUsername(username);
+      
+      if (!driver || driver.password !== password) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const sessionId = generateSessionId();
+      sessions.set(sessionId, { 
+        user: { 
+          id: driver.id, 
+          phone: driver.phone, 
+          name: driver.name, 
+          membershipType: 'doctor',
+          vetsVanId: driver.id, // Using driver.id as VetsVan ID
+          vetsVanName: driver.vetsvanName
+        } 
+      });
+      
+      res.json({ 
+        token: sessionId, 
+        user: { 
+          id: driver.id, 
+          phone: driver.phone, 
+          name: driver.name, 
+          membershipType: 'doctor',
+          vetsVanId: driver.id,
+          vetsVanName: driver.vetsvanName
+        }
+      });
+    } catch (error) {
+      console.error('Doctor login error:', error);
+      res.status(500).json({ message: 'خطأ في الخادم' });
+    }
+  });
+
   // Driver routes
   app.get('/api/drivers/available', requireAuth, async (req, res) => {
     try {

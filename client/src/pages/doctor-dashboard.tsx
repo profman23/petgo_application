@@ -478,6 +478,19 @@ export default function DoctorDashboard() {
           </Card>
         )}
 
+        {/* VetsVan Bookings Section */}
+        {(() => {
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          return user.vetsVanId && user.vetsVanName ? (
+            <div className="mb-6">
+              <DoctorBookingsTable 
+                vetsVanId={user.vetsVanId} 
+                vetsVanName={user.vetsVanName} 
+              />
+            </div>
+          ) : null;
+        })()}
+
         {/* Pending Requests */}
         <div className="space-y-4">
           {isLoading ? (

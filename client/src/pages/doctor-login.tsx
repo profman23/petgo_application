@@ -50,14 +50,9 @@ export default function DoctorLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: DoctorLoginData) => {
-      // Convert username to phone format for API compatibility
-      const loginData = {
-        phone: data.username,
-        password: data.password,
-      };
-      const response = await apiRequest('/api/auth/login', {
+      const response = await apiRequest('/api/doctor/login', {
         method: 'POST',
-        body: JSON.stringify(loginData)
+        body: JSON.stringify(data)
       });
       return response as AuthResponse;
     },
