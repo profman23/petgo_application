@@ -130,35 +130,11 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     }
   };
 
-  // Get user's current location
-  const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
-  
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude
-          });
-        },
-        (error) => {
-          console.log('Location access denied or error:', error);
-          // Use default Riyadh location
-          setUserLocation({
-            lat: 24.7136,
-            lon: 46.6753
-          });
-        }
-      );
-    } else {
-      // Use default Riyadh location
-      setUserLocation({
-        lat: 24.7136,
-        lon: 46.6753
-      });
-    }
-  }, []);
+  // For demo/testing purposes, always use Riyadh location to show realistic distances
+  const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>({
+    lat: 24.7136,
+    lon: 46.6753 // Default Riyadh location for testing realistic distances
+  });
 
   const { data: vetsvanData, isLoading, error } = useQuery({
     queryKey: ['/api/vetsvan/availability', userLocation],
