@@ -408,6 +408,12 @@ Changelog:
 - July 3, 2025. Updated VetsVan locations to be close to Riyadh center for testing realistic proximity calculations
 - July 3, 2025. Modified distance calculation to use default Riyadh location (24.7136, 46.6753) for consistent testing
 - July 3, 2025. VetsVan distances now display properly: VETS003 (0.0 km - closest), others within 1-3 km range
+- July 3, 2025. IMPLEMENTED: Admin location management system for individual VetsVan positioning
+- July 3, 2025. Added "تحديد الموقع" (Set Location) button in admin dashboard next to delete button for each VetsVan
+- July 3, 2025. Created location update dialog with latitude/longitude input fields and bilingual support
+- July 3, 2025. Added backend API endpoint PUT /api/admin/drivers/:id/location for location updates
+- July 3, 2025. Enhanced admin capabilities with MapPin icon and real-time location management functionality
+- July 3, 2025. TESTED: Location management system confirmed working - admin can set custom coordinates for each VetsVan
 ```
 
 ## User Preferences
