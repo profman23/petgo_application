@@ -91,6 +91,9 @@ export class DatabaseStorage implements IStorage {
 
       // Initialize drivers
       await this.initializeDrivers();
+      
+      // Initialize test shifts
+      await this.initializeTestShifts();
     } catch (error) {
       console.error('Error initializing test data:', error);
     }
@@ -139,6 +142,59 @@ export class DatabaseStorage implements IStorage {
       }
     } catch (error) {
       console.error('Error initializing drivers:', error);
+    }
+  }
+
+  private async initializeTestShifts() {
+    try {
+      const existingShifts = await this.getAllShifts();
+      if (existingShifts.length === 0) {
+        // Get all VetsVan to create shifts for them
+        const allVetsVan = await this.getAllDrivers();
+        
+        for (const vetsvan of allVetsVan) {
+          // Create shifts for next 7 days
+          for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+            const date = new Date();
+            date.setDate(date.getDate() + dayOffset);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            // Create morning shift (8 AM - 12 PM)
+            await db.insert(shifts).values({
+              vetsVanId: vetsvan.id,
+              date: dateStr,
+              startTime: '08:00',
+              endTime: '12:00',
+              duration: 4,
+              status: 'scheduled'
+            }).onConflictDoNothing();
+            
+            // Create afternoon shift (1 PM - 5 PM)
+            await db.insert(shifts).values({
+              vetsVanId: vetsvan.id,
+              date: dateStr,
+              startTime: '13:00',
+              endTime: '17:00',
+              duration: 4,
+              status: 'scheduled'
+            }).onConflictDoNothing();
+            
+            // Create evening shift (6 PM - 10 PM)
+            await db.insert(shifts).values({
+              vetsVanId: vetsvan.id,
+              date: dateStr,
+              startTime: '18:00',
+              endTime: '22:00',
+              duration: 4,
+              status: 'scheduled'
+            }).onConflictDoNothing();
+          }
+        }
+        
+        console.log('Test shifts initialized successfully');
+      }
+    } catch (error) {
+      console.error('Error initializing test shifts:', error);
     }
   }
 
