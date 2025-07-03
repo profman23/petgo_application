@@ -391,6 +391,9 @@ Changelog:
 - July 3, 2025. RESOLVED: Each doctor now receives notifications only for bookings on their assigned VetsVan
 - July 3, 2025. CORRECTED: Doctor login credentials - v001/123456 for VetsVan001, v003/123456 for VETS003
 - July 3, 2025. COMPLETED: VetsVan-specific notification targeting system working correctly
+- July 3, 2025. FIXED: Frontend DoctorBookingsTable component to use correct vetsVanId parameter
+- July 3, 2025. RESOLVED: Eliminated duplicate endpoints causing cross-notifications between doctors
+- July 3, 2025. CONFIRMED: Each doctor now receives bookings for their specific VetsVan only
 ```
 
 ## User Preferences

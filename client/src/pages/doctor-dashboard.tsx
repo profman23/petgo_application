@@ -578,8 +578,8 @@ export default function DoctorDashboard() {
         {/* Bookings Table for Current VetsVan */}
         {(() => {
           const user = JSON.parse(localStorage.getItem('user') || '{}');
-          const vetsVanId = user.id; // Assuming the user ID is the VetsVan ID for doctors
-          const vetsVanName = user.vetsvanName || user.name || 'VetsVan';
+          const vetsVanId = user.vetsVanId; // Use the actual VetsVan ID from user session
+          const vetsVanName = user.vetsVanName || user.name || 'VetsVan';
           
           return vetsVanId ? (
             <div className="mt-6">
