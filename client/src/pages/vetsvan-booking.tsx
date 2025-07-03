@@ -116,12 +116,24 @@ export default function VetsVanBooking() {
   };
 
   // mutation لإنشاء الحجز
-  const bookingMutation = useMutation({
-    mutationFn: async () => {
-      if (!selectedVetsVan || !selectedShift || !selectedTime || !selectedDate) {
-        throw new Error('Missing booking data');
-      }
+  // State for slide-to-confirm
+  const [isSlideComplete, setIsSlideComplete] = useState(false);
+  const [slidePosition, setSlidePosition] = useState(0);
+  const [isCreatingBooking, setIsCreatingBooking] = useState(false);
 
+  const createBooking = async () => {
+    if (!selectedVetsVan || !selectedShift || !selectedTime || !selectedDate) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'يرجى اختيار VetsVan والوقت' : 'Please select VetsVan and time',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsCreatingBooking(true);
+
+    try {
       const bookingData = {
         shiftId: selectedShift,
         vetsVanId: selectedVetsVan,
@@ -130,12 +142,11 @@ export default function VetsVanBooking() {
       };
 
       console.log('Creating booking with data:', bookingData);
-      return await apiRequest('/api/bookings', {
+      const result = await apiRequest('/api/bookings', {
         method: 'POST',
         body: JSON.stringify(bookingData),
       });
-    },
-    onSuccess: (result) => {
+
       console.log('Booking successful:', result);
       
       toast({
@@ -153,8 +164,7 @@ export default function VetsVanBooking() {
       
       // التوجه لصفحة تتبع الحجز أو الصفحة الرئيسية
       setLocation('/home');
-    },
-    onError: (error: Error) => {
+    } catch (error: any) {
       console.error('Booking failed:', error);
       toast({
         title: language === 'ar' ? '❌ فشل في الحجز' : '❌ Booking Failed',
@@ -163,8 +173,12 @@ export default function VetsVanBooking() {
           'An error occurred while booking the appointment. Please try again.',
         variant: 'destructive',
       });
-    },
-  });
+    } finally {
+      setIsCreatingBooking(false);
+      setIsSlideComplete(false);
+      setSlidePosition(0);
+    }
+  };
 
   const handleBack = () => {
     setLocation('/ride-request');
@@ -181,8 +195,10 @@ export default function VetsVanBooking() {
     setSelectedShift(shiftId);
   };
 
-  const handleConfirmBooking = () => {
-    bookingMutation.mutate();
+  // Handle slide-to-confirm
+  const handleSlideComplete = () => {
+    console.log('Slide completed, creating booking...');
+    createBooking();
   };
 
   if (!requestData) {
@@ -356,22 +372,124 @@ export default function VetsVanBooking() {
           </Card>
         )}
 
-        {/* زر التأكيد */}
+        {/* Slide to Confirm */}
         {selectedVetsVan && selectedTime && (
-          <Button
-            onClick={handleConfirmBooking}
-            disabled={bookingMutation.isPending}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3"
-          >
-            {bookingMutation.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                {language === 'ar' ? 'جاري الحجز...' : 'Booking...'}
-              </>
-            ) : (
-              language === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking'
-            )}
-          </Button>
+          <Card className="border-2 border-purple-200">
+            <CardContent className="p-4">
+              <div className="mb-4 text-center">
+                <h3 className="text-lg font-semibold text-purple-800 mb-2" style={{ textAlign }}>
+                  {language === 'ar' ? 'مراجعة الحجز' : 'Review Booking'}
+                </h3>
+                <div className="space-y-1 text-sm text-gray-600">
+                  <p>{language === 'ar' ? `VetsVan: ${selectedVetsVan}` : `VetsVan: ${selectedVetsVan}`}</p>
+                  <p>{language === 'ar' ? `الوقت: ${selectedTime}` : `Time: ${selectedTime}`}</p>
+                  <p>{language === 'ar' ? `التاريخ: ${selectedDate}` : `Date: ${selectedDate}`}</p>
+                </div>
+              </div>
+
+              {/* Slide to confirm button */}
+              <div className="relative">
+                <div className="w-full h-14 bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg relative overflow-hidden">
+                  <div 
+                    className="absolute left-0 top-0 h-full bg-green-500 transition-all duration-300 ease-out rounded-lg"
+                    style={{ width: `${(slidePosition / 100) * 70 + 30}%` }}
+                  />
+                  
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-white font-medium">
+                      {isSlideComplete ? (
+                        language === 'ar' ? '✓ تم التأكيد' : '✓ Confirmed'
+                      ) : (
+                        language === 'ar' ? 'اسحب لتأكيد الحجز' : 'Slide to Confirm Booking'
+                      )}
+                    </span>
+                  </div>
+                  
+                  <div 
+                    className="absolute top-1 bottom-1 left-1 w-12 bg-white rounded-md shadow-lg cursor-pointer flex items-center justify-center transition-transform duration-300"
+                    style={{ 
+                      transform: `translateX(${slidePosition * 2.5}px)`,
+                      opacity: isCreatingBooking ? 0.5 : 1 
+                    }}
+                    onMouseDown={(e) => {
+                      if (isCreatingBooking) return;
+                      const startX = e.clientX;
+                      const maxSlide = 100;
+                      
+                      const handleMouseMove = (e: MouseEvent) => {
+                        const currentX = e.clientX;
+                        const diff = currentX - startX;
+                        const newPosition = Math.max(0, Math.min(maxSlide, (diff / 250) * 100));
+                        setSlidePosition(newPosition);
+                        
+                        if (newPosition >= 30 && !isSlideComplete) {
+                          setIsSlideComplete(true);
+                          handleSlideComplete();
+                          document.removeEventListener('mousemove', handleMouseMove);
+                          document.removeEventListener('mouseup', handleMouseUp);
+                        }
+                      };
+                      
+                      const handleMouseUp = () => {
+                        if (!isSlideComplete) {
+                          setSlidePosition(0);
+                        }
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                      };
+                      
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                    }}
+                    onTouchStart={(e) => {
+                      if (isCreatingBooking) return;
+                      const startX = e.touches[0].clientX;
+                      const maxSlide = 100;
+                      
+                      const handleTouchMove = (e: TouchEvent) => {
+                        const currentX = e.touches[0].clientX;
+                        const diff = currentX - startX;
+                        const newPosition = Math.max(0, Math.min(maxSlide, (diff / 250) * 100));
+                        setSlidePosition(newPosition);
+                        
+                        if (newPosition >= 30 && !isSlideComplete) {
+                          setIsSlideComplete(true);
+                          handleSlideComplete();
+                          document.removeEventListener('touchmove', handleTouchMove);
+                          document.removeEventListener('touchend', handleTouchEnd);
+                        }
+                      };
+                      
+                      const handleTouchEnd = () => {
+                        if (!isSlideComplete) {
+                          setSlidePosition(0);
+                        }
+                        document.removeEventListener('touchmove', handleTouchMove);
+                        document.removeEventListener('touchend', handleTouchEnd);
+                      };
+                      
+                      document.addEventListener('touchmove', handleTouchMove);
+                      document.addEventListener('touchend', handleTouchEnd);
+                    }}
+                  >
+                    {isCreatingBooking ? (
+                      <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
+                    ) : (
+                      <span className="text-purple-600 text-xl">→</span>
+                    )}
+                  </div>
+                </div>
+                
+                {isCreatingBooking && (
+                  <div className="mt-2 text-center">
+                    <p className="text-sm text-purple-600">
+                      {language === 'ar' ? 'جاري إنشاء الحجز...' : 'Creating booking...'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>
