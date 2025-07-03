@@ -54,14 +54,28 @@ export default function AdminDashboard() {
     password: "",
   });
 
-  // Check admin authentication
+  // Check admin authentication and prevent doctors access
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
+    const regularToken = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    
+    // إذا كان المستخدم طبيب، منعه من دخول admin dashboard
+    if (user.membershipType === "doctor" || regularToken) {
+      toast({
+        title: language === 'ar' ? 'غير مسموح' : 'Access Denied',
+        description: language === 'ar' ? 'لا يمكن للأطباء الوصول إلى لوحة إدارة النظام' : 'Doctors cannot access admin dashboard',
+        variant: 'destructive',
+      });
+      setLocation("/doctor-dashboard");
+      return;
+    }
+    
     if (!adminToken) {
       setLocation("/admin-login");
       return;
     }
-  }, [setLocation]);
+  }, [setLocation, toast, language]);
 
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");

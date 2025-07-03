@@ -389,18 +389,9 @@ export default function DoctorDashboard() {
             />
             <h1 className="text-lg font-semibold" style={{ textAlign }}>{t.doctorDashboard}</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setLocation('/admin-dashboard')}
-              className="text-purple-600 border-purple-600 hover:bg-purple-50"
-            >
-              {language === 'ar' ? 'إدارة السيارات' : 'VetsVan Management'}
-            </Button>
-            <Button variant="ghost" onClick={handleLogout} className="text-red-600">
-              {t.logout}
-            </Button>
-          </div>
+          <Button variant="ghost" onClick={handleLogout} className="text-red-600">
+            {t.logout}
+          </Button>
         </div>
       </header>
 
