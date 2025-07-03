@@ -99,7 +99,9 @@ export default function Home() {
   const [locationInfo, setLocationInfo] = useState({
     isLoading: true,
     address: language === 'ar' ? 'جاري تحديد موقعك...' : 'Detecting your location...',
-    error: null as string | null
+    error: null as string | null,
+    coordinates: null as { lat: number, lon: number } | null,
+    accuracy: null as number | null
   });
 
   // Saudi cities for location detection
@@ -149,14 +151,16 @@ export default function Home() {
       setLocationInfo({
         isLoading: false,
         address: language === 'ar' ? 'الرياض - موقع افتراضي' : 'Riyadh - Default Location',
-        error: language === 'ar' ? 'المتصفح لا يدعم تحديد الموقع' : 'Browser does not support geolocation'
+        error: language === 'ar' ? 'المتصفح لا يدعم تحديد الموقع' : 'Browser does not support geolocation',
+        coordinates: null,
+        accuracy: null
       });
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
-        const { latitude, longitude } = position.coords;
+        const { latitude, longitude, accuracy } = position.coords;
         const { city, distance } = findClosestCity(latitude, longitude);
         
         try {
@@ -195,7 +199,9 @@ export default function Home() {
               setLocationInfo({
                 isLoading: false,
                 address: address,
-                error: null
+                error: null,
+                coordinates: { lat: latitude, lon: longitude },
+                accuracy: accuracy
               });
               return;
             }
@@ -219,7 +225,9 @@ export default function Home() {
         setLocationInfo({
           isLoading: false,
           address: fallbackAddress,
-          error: null
+          error: null,
+          coordinates: { lat: latitude, lon: longitude },
+          accuracy: accuracy
         });
       },
       (error) => {
@@ -241,7 +249,9 @@ export default function Home() {
         setLocationInfo({
           isLoading: false,
           address: fallbackAddress,
-          error: errorMessage
+          error: errorMessage,
+          coordinates: null,
+          accuracy: null
         });
       },
       {
@@ -351,6 +361,31 @@ export default function Home() {
               >
                 {language === 'ar' ? 'إعادة تحديد' : 'Refresh'}
               </Button>
+            )}
+          </div>
+          {/* Debug location info */}
+          <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+            <div className="text-gray-600">
+              <strong>{language === 'ar' ? 'معلومات النظام:' : 'System Info:'}</strong>
+            </div>
+            <div className="text-gray-700 mt-1">
+              {language === 'ar' ? 'نظام تحديد الموقع الدقيق مفعل' : 'Precise location system active'}
+            </div>
+            <div className="text-gray-700">
+              {language === 'ar' ? 'يعرض الشوارع والأحياء التفصيلية' : 'Shows detailed streets and neighborhoods'}
+            </div>
+            <div className="text-gray-700">
+              {language === 'ar' ? 'يدعم المدن السعودية مع نظام احتياطي' : 'Supports Saudi cities with fallback system'}
+            </div>
+            {locationInfo.coordinates && (
+              <div className="text-gray-600 mt-1 text-xs">
+                <strong>{language === 'ar' ? 'الإحداثيات:' : 'Coordinates:'}</strong> {locationInfo.coordinates.lat.toFixed(6)}, {locationInfo.coordinates.lon.toFixed(6)}
+                {locationInfo.accuracy && (
+                  <span className="ml-2">
+                    {language === 'ar' ? 'الدقة:' : 'Accuracy:'} {locationInfo.accuracy.toFixed(0)}m
+                  </span>
+                )}
+              </div>
             )}
           </div>
         </div>

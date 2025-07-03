@@ -794,6 +794,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's current location info for debugging
+  app.get('/api/user/location-info', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      res.json({
+        userId: user.id,
+        username: user.username,
+        phone: user.phone,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        message: 'نظام تحديد الموقع الدقيق مفعل - يمكنك رؤية موقعك التفصيلي في الصفحة الرئيسية',
+        locationSystemStatus: 'active',
+        features: [
+          'تحديد الموقع بدقة عالية باستخدام GPS',
+          'ترجمة الإحداثيات إلى عناوين تفصيلية',
+          'دعم المدن السعودية مع نظام احتياطي ذكي',
+          'عرض أسماء الشوارع والأحياء',
+          'دعم اللغتين العربية والإنجليزية'
+        ]
+      });
+    } catch (error) {
+      console.error('Error fetching user location info:', error);
+      res.status(500).json({ message: 'Failed to fetch user location info' });
+    }
+  });
+
   // Get all VetsVan with their available shifts for booking
   app.get('/api/vetsvan/availability', requireAuth, async (req: any, res) => {
     try {
