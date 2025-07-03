@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
-import { Loader2, Clock, CheckCircle, ChevronLeft, ChevronRight, Calendar, X } from "lucide-react";
-import { useState } from "react";
+import { Loader2, Clock, CheckCircle, ChevronLeft, ChevronRight, Calendar, X, Navigation } from "lucide-react";
+import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,6 +34,8 @@ interface VetsVanWithShifts {
   vetsvanName: string;
   isAvailable: boolean;
   shifts: Shift[];
+  distanceFromCustomer?: string;
+  isClosest?: boolean;
 }
 
 interface VetsVanAvailabilityTableProps {
@@ -128,8 +130,52 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     }
   };
 
+  // Get user's current location
+  const [userLocation, setUserLocation] = useState<{lat: number, lon: number} | null>(null);
+  
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log('Location access denied or error:', error);
+          // Use default Riyadh location
+          setUserLocation({
+            lat: 24.7136,
+            lon: 46.6753
+          });
+        }
+      );
+    } else {
+      // Use default Riyadh location
+      setUserLocation({
+        lat: 24.7136,
+        lon: 46.6753
+      });
+    }
+  }, []);
+
   const { data: vetsvanData, isLoading, error } = useQuery({
-    queryKey: ['/api/vetsvan/availability'],
+    queryKey: ['/api/vetsvan/availability', userLocation],
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (userLocation) {
+        params.append('lat', userLocation.lat.toString());
+        params.append('lon', userLocation.lon.toString());
+      }
+      const url = `/api/vetsvan/availability${params.toString() ? '?' + params.toString() : ''}`;
+      return fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      }).then(res => res.json());
+    },
+    enabled: !!userLocation,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
@@ -306,6 +352,24 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                   <div className="flex flex-col items-center">
                     <span className="font-semibold">{vetsvan.vetsvanName}</span>
                     <span className="text-xs text-gray-500">({vetsvan.vetsvanCode})</span>
+                    
+                    {/* Distance and closest indicator */}
+                    {vetsvan.distanceFromCustomer && (
+                      <div className="mt-1 text-center">
+                        <span className="text-xs text-blue-600 font-medium">
+                          {vetsvan.distanceFromCustomer} {language === 'ar' ? 'كم' : 'km'}
+                        </span>
+                        {vetsvan.isClosest && (
+                          <div className="flex items-center justify-center mt-1">
+                            <Navigation className="h-3 w-3 text-green-600 mr-1" />
+                            <span className="text-xs text-green-600 font-bold">
+                              {language === 'ar' ? 'الأقرب إليك' : 'Closest to you'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
                     {vetsvan.isAvailable ? (
                       <CheckCircle className="h-4 w-4 text-green-500 mt-1" />
                     ) : (

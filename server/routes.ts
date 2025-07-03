@@ -801,6 +801,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const shifts = await storage.getAllShifts();
       const bookings = await storage.getAllBookings();
       
+      // Get customer location from query parameters
+      const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
+      const customerLon = req.query.lon ? parseFloat(req.query.lon) : null;
+      
+      // Function to calculate distance between two points using Haversine formula
+      const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+        const R = 6371; // Radius of the Earth in kilometers
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+          Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+          Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c; // Distance in kilometers
+        return Math.round(distance * 10) / 10; // Round to 1 decimal place
+      };
+      
       // Group shifts by VetsVan ID and check for bookings
       const vetsvanWithShifts = drivers.map(driver => {
         const driverShifts = shifts.filter(shift => shift.vetsVanId === driver.id);
@@ -819,16 +837,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         });
         
+        // Calculate distance from customer if location is provided
+        let distanceFromCustomer = null;
+        if (customerLat && customerLon && driver.latitude && driver.longitude) {
+          distanceFromCustomer = calculateDistance(
+            customerLat, 
+            customerLon, 
+            driver.latitude, 
+            driver.longitude
+          );
+        }
+        
         return {
           id: driver.id,
           vetsvanCode: driver.vetsvanCode,
           vetsvanName: driver.vetsvanName,
           isAvailable: driver.isAvailable,
-          shifts: shiftsWithBookingStatus
+          latitude: driver.latitude,
+          longitude: driver.longitude,
+          shifts: shiftsWithBookingStatus,
+          distanceFromCustomer: distanceFromCustomer ? `${distanceFromCustomer}` : undefined
         };
       });
+      
+      // Find the closest VetsVan if customer location is available
+      let closestVetsVanId = null;
+      if (customerLat && customerLon) {
+        let minDistance = Infinity;
+        vetsvanWithShifts.forEach(vetsvan => {
+          if (vetsvan.distanceFromCustomer && vetsvan.distanceFromCustomer < minDistance) {
+            minDistance = vetsvan.distanceFromCustomer;
+            closestVetsVanId = vetsvan.id;
+          }
+        });
+      }
+      
+      // Add isClosest flag to each VetsVan
+      const vetsvanWithClosestFlag = vetsvanWithShifts.map(vetsvan => ({
+        ...vetsvan,
+        isClosest: vetsvan.id === closestVetsVanId
+      }));
 
-      res.json(vetsvanWithShifts);
+      res.json(vetsvanWithClosestFlag);
     } catch (error) {
       console.error('Error fetching VetsVan availability:', error);
       res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
