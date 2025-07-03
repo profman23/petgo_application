@@ -25,6 +25,7 @@ import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { FixedFooter } from '@/components/fixed-footer';
+import { VetsVanAvailabilityTable } from '@/components/vetsvan-availability-table';
 
 const formSchema = rideRequestSchema.extend({
   pickupLocation: z.string().min(1, 'الموقع مطلوب'),
@@ -748,6 +749,14 @@ export default function RideRequest() {
             </Select>
           </CardContent>
         </Card>
+
+        {/* VetsVan Availability Table */}
+        <VetsVanAvailabilityTable 
+          onSelectTimeSlot={(vetsvanId, date, time) => {
+            console.log('Selected VetsVan:', vetsvanId, 'Date:', date, 'Time:', time);
+            // يمكن إضافة logic هنا لحفظ الموعد المختار
+          }}
+        />
 
         {/* Location Input */}
         <Card className="mb-6">

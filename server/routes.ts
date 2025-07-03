@@ -732,6 +732,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all VetsVan with their available shifts for booking
+  app.get('/api/vetsvan/availability', requireAuth, async (req: any, res) => {
+    try {
+      const drivers = await storage.getAllDrivers();
+      const shifts = await storage.getAllShifts();
+      
+      // Group shifts by VetsVan ID
+      const vetsvanWithShifts = drivers.map(driver => {
+        const driverShifts = shifts.filter(shift => shift.vetsVanId === driver.id);
+        return {
+          id: driver.id,
+          vetsvanCode: driver.vetsvanCode,
+          vetsvanName: driver.vetsvanName,
+          isAvailable: driver.isAvailable,
+          shifts: driverShifts
+        };
+      });
+
+      res.json(vetsvanWithShifts);
+    } catch (error) {
+      console.error('Error fetching VetsVan availability:', error);
+      res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
+    }
+  });
+
   // Admin Authentication
   const adminSessions = new Map();
 
