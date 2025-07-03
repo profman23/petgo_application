@@ -801,10 +801,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: 'booked'
       });
 
-      res.json({ success: true, booking });
+      // Get user details for the notification
+      const user = await storage.getUser(userId);
+      const customerName = user?.name || 'عميل جديد';
+      
+      // Store notification for real-time updates
+      // This could be enhanced with WebSocket or Server-Sent Events for real-time notifications
+      console.log(`🔔 New booking notification for VetsVan ${vetsVanId}: ${customerName} booked ${appointmentTime} on ${appointmentDate}`);
+
+      res.json({ 
+        success: true, 
+        booking,
+        notification: {
+          message: `New booking from ${customerName}`,
+          vetsVanId,
+          appointmentDate,
+          appointmentTime
+        }
+      });
     } catch (error) {
       console.error('Error creating booking:', error);
       res.status(500).json({ message: 'Failed to book appointment' });
+    }
+  });
+
+  // Get bookings for a specific VetsVan (Doctor)
+  app.get('/api/doctor/bookings/:vetsVanId', requireAuth, async (req: any, res) => {
+    try {
+      const vetsVanId = parseInt(req.params.vetsVanId);
+      const allBookings = await storage.getAllBookings();
+      
+      // Filter bookings for this specific VetsVan
+      const vetsVanBookings = allBookings.filter(booking => 
+        booking.vetsVanId === vetsVanId && booking.status === 'booked'
+      );
+      
+      // Get user details for each booking
+      const bookingsWithUserDetails = await Promise.all(
+        vetsVanBookings.map(async (booking) => {
+          const user = await storage.getUser(booking.userId);
+          return {
+            ...booking,
+            customerName: user?.name || 'غير معروف',
+            customerPhone: user?.phone || 'غير محدد'
+          };
+        })
+      );
+      
+      res.json(bookingsWithUserDetails);
+    } catch (error) {
+      console.error('Error fetching VetsVan bookings:', error);
+      res.status(500).json({ message: 'Failed to fetch VetsVan bookings' });
     }
   });
 

@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useDoctorLocation } from '@/hooks/useDoctorLocation';
 import { Map } from '@/components/map';
+import { DoctorBookingsTable } from '@/components/doctor-bookings-table';
 import { ArrowLeft, Check, X, MapPin, Clock, Navigation, Loader2, Satellite } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
@@ -560,6 +561,22 @@ export default function DoctorDashboard() {
             ))
           )}
         </div>
+
+        {/* Bookings Table for Current VetsVan */}
+        {(() => {
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          const vetsVanId = user.id; // Assuming the user ID is the VetsVan ID for doctors
+          const vetsVanName = user.vetsvanName || user.name || 'VetsVan';
+          
+          return vetsVanId ? (
+            <div className="mt-6">
+              <DoctorBookingsTable 
+                vetsVanId={vetsVanId} 
+                vetsVanName={vetsVanName}
+              />
+            </div>
+          ) : null;
+        })()}
       </div>
 
       {/* Cancel/Reject Confirmation Dialog */}
