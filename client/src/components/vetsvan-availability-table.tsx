@@ -54,7 +54,34 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     return today.toISOString().split('T')[0];
   });
 
-  // تم إزالة الحجز الفوري - التوجيه لصفحة التأكيد فقط
+  // إنشاء mutation للحجز الفوري
+  const directBookingMutation = useMutation({
+    mutationFn: async (bookingData: { shiftId: number; vetsVanId: number; appointmentDate: string; appointmentTime: string }) => {
+      return await apiRequest('/api/bookings', {
+        method: 'POST',
+        body: JSON.stringify(bookingData),
+      });
+    },
+    onSuccess: (result, variables) => {
+      toast({
+        title: language === 'ar' ? '✅ تم تأكيد الحجز' : '✅ Booking Confirmed',
+        description: language === 'ar' ? 
+          `تم حجز موعدك بنجاح في ${variables.appointmentTime} يوم ${variables.appointmentDate}. تم إرسال إشعار للطبيب.` :
+          `Your appointment has been booked successfully at ${variables.appointmentTime} on ${variables.appointmentDate}. Doctor has been notified.`,
+      });
+      // تحديث البيانات
+      queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/availability'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === 'ar' ? '❌ فشل في الحجز' : '❌ Booking Failed',
+        description: language === 'ar' ? 
+          'حدث خطأ أثناء حجز الموعد. يرجى المحاولة مرة أخرى.' :
+          'An error occurred while booking the appointment. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   // دوال التنقل بين التواريخ
   const goToPreviousDay = () => {
@@ -185,35 +212,6 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     if (isTimeSlotBooked) return 'booked';
     return 'available';
   };
-
-  // إنشاء mutation للحجز الفوري
-  const directBookingMutation = useMutation({
-    mutationFn: async (bookingData: { shiftId: number; vetsVanId: number; appointmentDate: string; appointmentTime: string }) => {
-      return await apiRequest('/api/bookings', {
-        method: 'POST',
-        body: JSON.stringify(bookingData),
-      });
-    },
-    onSuccess: (result, variables) => {
-      toast({
-        title: language === 'ar' ? '✅ تم تأكيد الحجز' : '✅ Booking Confirmed',
-        description: language === 'ar' ? 
-          `تم حجز موعدك بنجاح في ${variables.appointmentTime} يوم ${variables.appointmentDate}. تم إرسال إشعار للطبيب.` :
-          `Your appointment has been booked successfully at ${variables.appointmentTime} on ${variables.appointmentDate}. Doctor has been notified.`,
-      });
-      // تحديث البيانات
-      queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/availability'] });
-    },
-    onError: (error: any) => {
-      toast({
-        title: language === 'ar' ? '❌ فشل في الحجز' : '❌ Booking Failed',
-        description: language === 'ar' ? 
-          'حدث خطأ أثناء حجز الموعد. يرجى المحاولة مرة أخرى.' :
-          'An error occurred while booking the appointment. Please try again.',
-        variant: 'destructive',
-      });
-    },
-  });
 
   const handleTimeSlotClick = (vetsvan: VetsVanWithShifts, time: string) => {
     const status = getTimeSlotStatus(vetsvan, time);
