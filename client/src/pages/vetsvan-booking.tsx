@@ -306,8 +306,11 @@ export default function VetsVanBooking() {
           </CardContent>
         </Card>
 
-        {/* جدول التوافر */}
-        <VetsVanAvailabilityTable onSelectTimeSlot={handleTimeSlotSelection} />
+        {/* جدول التوافر مع الحجز الفوري */}
+        <VetsVanAvailabilityTable 
+          enableDirectBooking={true}
+          onSelectTimeSlot={handleTimeSlotSelection} 
+        />
 
         {/* Slide to Confirm */}
         {selectedVetsVan && selectedTime && (

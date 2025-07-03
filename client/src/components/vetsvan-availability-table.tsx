@@ -38,9 +38,10 @@ interface VetsVanWithShifts {
 
 interface VetsVanAvailabilityTableProps {
   onSelectTimeSlot?: (vetsvanId: number, date: string, time: string) => void;
+  enableDirectBooking?: boolean;
 }
 
-export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabilityTableProps) {
+export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking = false }: VetsVanAvailabilityTableProps) {
   const { t, language } = useTranslation();
   const isRTL = getDirection(language) === 'rtl';
   const textAlign = getTextAlign(language);
@@ -185,6 +186,35 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
     return 'available';
   };
 
+  // إنشاء mutation للحجز الفوري
+  const directBookingMutation = useMutation({
+    mutationFn: async (bookingData: { shiftId: number; vetsVanId: number; appointmentDate: string; appointmentTime: string }) => {
+      return await apiRequest('/api/bookings', {
+        method: 'POST',
+        body: JSON.stringify(bookingData),
+      });
+    },
+    onSuccess: (result, variables) => {
+      toast({
+        title: language === 'ar' ? '✅ تم تأكيد الحجز' : '✅ Booking Confirmed',
+        description: language === 'ar' ? 
+          `تم حجز موعدك بنجاح في ${variables.appointmentTime} يوم ${variables.appointmentDate}. تم إرسال إشعار للطبيب.` :
+          `Your appointment has been booked successfully at ${variables.appointmentTime} on ${variables.appointmentDate}. Doctor has been notified.`,
+      });
+      // تحديث البيانات
+      queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/availability'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === 'ar' ? '❌ فشل في الحجز' : '❌ Booking Failed',
+        description: language === 'ar' ? 
+          'حدث خطأ أثناء حجز الموعد. يرجى المحاولة مرة أخرى.' :
+          'An error occurred while booking the appointment. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+
   const handleTimeSlotClick = (vetsvan: VetsVanWithShifts, time: string) => {
     const status = getTimeSlotStatus(vetsvan, time);
     
@@ -196,9 +226,21 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
                shift.status === 'scheduled';
       });
       
-      if (shift && onSelectTimeSlot) {
-        // التوجيه لصفحة التأكيد بدلاً من الحجز الفوري
-        onSelectTimeSlot(vetsvan.id, selectedDate, time);
+      if (shift) {
+        if (enableDirectBooking) {
+          // الحجز الفوري
+          const bookingData = {
+            shiftId: shift.id,
+            vetsVanId: vetsvan.id,
+            appointmentDate: selectedDate,
+            appointmentTime: time,
+          };
+          
+          directBookingMutation.mutate(bookingData);
+        } else if (onSelectTimeSlot) {
+          // التوجيه لصفحة التأكيد
+          onSelectTimeSlot(vetsvan.id, selectedDate, time);
+        }
       }
     }
   };
