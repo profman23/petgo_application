@@ -153,9 +153,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: any): Promise<User> {
+    // التأكد من وجود name إذا لم يكن موجود
+    const userData = {
+      ...insertUser,
+      name: insertUser.name || `${insertUser.firstName} ${insertUser.lastName}`
+    };
+    
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values(userData)
       .returning();
     return user;
   }
@@ -321,7 +327,7 @@ export class DatabaseStorage implements IStorage {
     // إنشاء حساب طبيب تلقائياً عند إنشاء VetsVan جديدة
     // Username = VetsVan Code, Password = 123456 (افتراضي)
     const doctorUserData = {
-      firstName: driverData.vetsvanName,
+      firstName: driverData.vetsvanName || "VetsVan",
       lastName: "Doctor",
       phone: driverData.vetsvanCode, // استخدام VetsVan Code كـ phone/username
       password: "123456", // كلمة مرور افتراضية
