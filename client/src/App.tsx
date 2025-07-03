@@ -23,8 +23,13 @@ import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
-// Check for expired tokens on app start
+// Check for expired tokens on app start (skip for admin routes)
 const checkAndClearExpiredTokens = async () => {
+  // Don't check tokens for admin routes
+  if (window.location.pathname.includes('admin')) {
+    return;
+  }
+  
   const token = localStorage.getItem('token');
   if (!token) return;
   
@@ -43,8 +48,10 @@ const checkAndClearExpiredTokens = async () => {
   }
 };
 
-// Run check immediately
-checkAndClearExpiredTokens();
+// Run check immediately (but skip for admin routes)
+if (!window.location.pathname.includes('admin')) {
+  checkAndClearExpiredTokens();
+}
 
 // Configure default authorization header for API requests
 const token = localStorage.getItem('token');
