@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Calendar, Clock, CheckCircle, User, MapPin, Loader2 } from 'lucide-react';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import { VetsVanAvailabilityTable } from '@/components/vetsvan-availability-table';
 
 interface Booking {
   id: number;
@@ -195,6 +196,22 @@ export default function VetsVanBooking() {
     setSelectedShift(shiftId);
   };
 
+  // دالة للتعامل مع اختيار الوقت من جدول التوافر
+  const handleTimeSlotSelection = (vetsvanId: number, date: string, time: string) => {
+    setSelectedVetsVan(vetsvanId);
+    setSelectedDate(date);
+    setSelectedTime(time);
+    
+    // البحث عن shiftId المناسب
+    const vetsvan = vetsVans.find((v: VetsVanWithShifts) => v.id === vetsvanId);
+    if (vetsvan) {
+      const shift = vetsvan.shifts.find((s: any) => s.date === date);
+      if (shift) {
+        setSelectedShift(shift.id);
+      }
+    }
+  };
+
   // Handle slide-to-confirm
   const handleSlideComplete = () => {
     console.log('Slide completed, creating booking...');
@@ -289,88 +306,8 @@ export default function VetsVanBooking() {
           </CardContent>
         </Card>
 
-        {/* اختيار VetsVan */}
-        {isLoading ? (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto text-purple-600" />
-              <p className="text-gray-500 mt-2">
-                {language === 'ar' ? 'جاري تحميل العيادات المتاحة...' : 'Loading available clinics...'}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base" style={{ textAlign }}>
-                {language === 'ar' ? 'اختر العيادة المتنقلة' : 'Select Mobile Clinic'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {availableVetsVans.length === 0 ? (
-                <p className="text-center text-gray-500 py-4">
-                  {language === 'ar' ? 'لا توجد عيادات متاحة في هذا التاريخ' : 'No clinics available on this date'}
-                </p>
-              ) : (
-                availableVetsVans.map((vetsvan: VetsVanWithShifts) => (
-                  <div
-                    key={vetsvan.id}
-                    className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                      selectedVetsVan === vetsvan.id
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-gray-200 hover:border-purple-300'
-                    }`}
-                    onClick={() => handleVetsVanSelect(vetsvan.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium text-gray-800">{vetsvan.vetsvanName}</h3>
-                        <p className="text-sm text-gray-500">{vetsvan.vetsvanCode}</p>
-                      </div>
-                      {selectedVetsVan === vetsvan.id && (
-                        <CheckCircle className="w-5 h-5 text-purple-600" />
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* اختيار الوقت */}
-        {selectedVetsVan && (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2" style={{ textAlign }}>
-                <Clock className="w-4 h-4 text-purple-600" />
-                {language === 'ar' ? 'اختر الوقت' : 'Select Time'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 gap-2">
-                {getAvailableTimesForVetsVan(selectedVetsVan).map(({ time, shiftId }) => (
-                  <button
-                    key={`${time}-${shiftId}`}
-                    className={`p-2 text-sm border rounded-lg transition-all ${
-                      selectedTime === time
-                        ? 'border-purple-500 bg-purple-500 text-white'
-                        : 'border-gray-200 hover:border-purple-300 text-gray-700'
-                    }`}
-                    onClick={() => handleTimeSelect(time, shiftId)}
-                  >
-                    {time}
-                  </button>
-                ))}
-              </div>
-              {getAvailableTimesForVetsVan(selectedVetsVan).length === 0 && (
-                <p className="text-center text-gray-500 py-4">
-                  {language === 'ar' ? 'لا توجد أوقات متاحة' : 'No available times'}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        )}
+        {/* جدول التوافر */}
+        <VetsVanAvailabilityTable onSelectTimeSlot={handleTimeSlotSelection} />
 
         {/* Slide to Confirm */}
         {selectedVetsVan && selectedTime && (
