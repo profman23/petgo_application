@@ -355,7 +355,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Doctor endpoints for ride management
+  // Doctor endpoints for ride management - updated to use VetsVan booking system
   app.get('/api/doctor/pending-rides', requireAuth, async (req, res) => {
     try {
       const user = req.user as any;
@@ -363,22 +363,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: 'Access denied' });
       }
       
-      const allRides = await storage.getAllRides();
-      const pendingRides = allRides.filter(ride => ride.status === 'requested');
+      // Get doctor's VetsVan ID from login session or find it by doctor ID
+      const doctor = await storage.getDriver(user.id);
+      if (!doctor) {
+        return res.status(404).json({ message: 'Doctor not found' });
+      }
       
-      // Get customer details for each ride
-      const ridesWithCustomers = await Promise.all(
-        pendingRides.map(async (ride) => {
-          const customer = await storage.getUser(ride.customerId);
+      const doctorVetsVanId = doctor.id; // The doctor's VetsVan ID
+      
+      // Get all bookings for this specific VetsVan only
+      const allBookings = await storage.getAllBookings();
+      const doctorBookings = allBookings.filter(booking => 
+        booking.vetsVanId === doctorVetsVanId && 
+        booking.status === 'booked'
+      );
+      
+      // Get customer details for each booking
+      const bookingsWithCustomers = await Promise.all(
+        doctorBookings.map(async (booking) => {
+          const customer = await storage.getUser(booking.userId);
           return {
-            ...ride,
-            customer: customer ? { name: customer.name, phone: customer.phone } : null
+            ...booking,
+            customer: customer ? { 
+              name: customer.name, 
+              phone: customer.phone,
+              id: customer.id
+            } : null
           };
         })
       );
       
-      res.json(ridesWithCustomers);
+      res.json(bookingsWithCustomers);
     } catch (error) {
+      console.error('Error fetching doctor pending bookings:', error);
       res.status(500).json({ message: 'خطأ في جلب الطلبات المعلقة' });
     }
   });

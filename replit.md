@@ -386,6 +386,11 @@ Changelog:
 - July 2, 2025. REPLACED: shadcn/ui Button component with custom HTML button to eliminate white background interference
 - July 2, 2025. ENHANCED: Additional image positioning - clinic moved to -top-10, house moved to -top-12 for maximum detail visibility
 - July 2, 2025. FINALIZED: Complete purple gradient button with no white elements, all text and icons in white color
+- July 3, 2025. FIXED: Booking notification system to target specific VetsVan doctors only instead of all doctors
+- July 3, 2025. UPDATED: /api/doctor/pending-rides endpoint to use VetsVan booking system instead of old ride system
+- July 3, 2025. RESOLVED: Each doctor now receives notifications only for bookings on their assigned VetsVan
+- July 3, 2025. CORRECTED: Doctor login credentials - v001/123456 for VetsVan001, v003/123456 for VETS003
+- July 3, 2025. COMPLETED: VetsVan-specific notification targeting system working correctly
 ```
 
 ## User Preferences
