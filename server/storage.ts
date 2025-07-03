@@ -317,6 +317,27 @@ export class DatabaseStorage implements IStorage {
       .insert(drivers)
       .values(driverData)
       .returning();
+    
+    // إنشاء حساب طبيب تلقائياً عند إنشاء VetsVan جديدة
+    // Username = VetsVan Code, Password = 123456 (افتراضي)
+    const doctorUserData = {
+      firstName: driverData.vetsvanName,
+      lastName: "Doctor",
+      phone: driverData.vetsvanCode, // استخدام VetsVan Code كـ phone/username
+      password: "123456", // كلمة مرور افتراضية
+      membershipType: "doctor" as const,
+      petName: "VetsVan",
+      petType: "cat" as const
+    };
+    
+    try {
+      await this.createUser(doctorUserData);
+      console.log(`Doctor account created for VetsVan: ${driverData.vetsvanCode}`);
+    } catch (error) {
+      console.log(`Failed to create doctor account for ${driverData.vetsvanCode}:`, error);
+      // لا نوقف العملية حتى لو فشل إنشاء حساب الطبيب
+    }
+    
     return driver;
   }
 
