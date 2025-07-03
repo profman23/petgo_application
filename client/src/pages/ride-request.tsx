@@ -194,8 +194,8 @@ export default function RideRequest() {
       return;
     }
 
-    // التأكد من استخدام الموقع الحقيقي
-    const rideData = {
+    // حفظ بيانات الطلب في localStorage للانتقال إلى صفحة حجز VetsVan
+    const requestData = {
       ...data,
       pickupLatitude: currentLocation.latitude,
       pickupLongitude: currentLocation.longitude,
@@ -203,11 +203,14 @@ export default function RideRequest() {
       destinationLongitude: currentLocation.longitude,
       serviceType: serviceType,
       selectedPatients: selectedPatients,
+      location: data.pickupLocation || 'موقعك الحالي'
     };
 
-    console.log('Submitting ride with real GPS location and selected pets:', rideData);
-    requestRide(rideData);
-    setLocation('/ride-tracking');
+    console.log('Saving request data for VetsVan booking:', requestData);
+    localStorage.setItem('pendingRequest', JSON.stringify(requestData));
+    
+    // التوجه إلى صفحة حجز VetsVan
+    setLocation('/vetsvan-booking');
   };
 
   // تحديث الموقع تلقائياً عند تغيير GPS من useGeolocation hook
@@ -305,7 +308,7 @@ export default function RideRequest() {
     }
   };
 
-  // دالة منفصلة لتنفيذ الطلب
+  // دالة منفصلة لتنفيذ الطلب - توجه لصفحة اختيار المواعيد
   const executeRideRequest = async () => {
     console.log('executeRideRequest called');
     console.log('Current location:', currentLocation);
@@ -342,42 +345,26 @@ export default function RideRequest() {
       return;
     }
     
-    // تنفيذ الطلب
-    const formData = form.getValues();
-    const rideData = {
-      ...formData,
+    // حفظ بيانات الطلب في localStorage للاستخدام في صفحة الحجز
+    const requestData = {
       pickupLatitude: currentLocation.latitude,
       pickupLongitude: currentLocation.longitude,
-      destinationLatitude: currentLocation.latitude,
-      destinationLongitude: currentLocation.longitude,
       selectedPatients,
       serviceType,
+      location: form.getValues('pickupLocation'),
     };
     
-    console.log('Sending ride request with data:', rideData);
+    localStorage.setItem('pendingRequest', JSON.stringify(requestData));
     
-    try {
-      const result = await requestRide(rideData);
-      console.log('Ride request successful:', result);
-      
-      toast({
-        title: language === 'ar' ? 'تم إرسال الطلب' : 'Request Sent',
-        description: language === 'ar' ? 'تم إرسال طلبك بنجاح' : 'Your request has been sent successfully',
-      });
-      
-      setLocation('/ride-tracking');
-    } catch (error) {
-      console.error('Ride request failed:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ في إرسال الطلب' : 'Request Failed',
-        description: language === 'ar' ? 'حدث خطأ في إرسال الطلب' : 'An error occurred while sending the request',
-        variant: 'destructive',
-      });
-      
-      // إعادة تعيين السحب عند الفشل
-      setIsSlideComplete(false);
-      setSlidePosition(0);
-    }
+    console.log('Request data saved, redirecting to booking page');
+    
+    toast({
+      title: language === 'ar' ? 'تم تأكيد البيانات' : 'Data Confirmed',
+      description: language === 'ar' ? 'يرجى اختيار موعد الحجز' : 'Please select appointment time',
+    });
+    
+    // توجه لصفحة اختيار المواعيد
+    setLocation('/vetsvan-booking');
   };
 
   const handleSlideComplete = async () => {

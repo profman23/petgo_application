@@ -18,6 +18,7 @@ import Activity from "@/pages/activity";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import VetsVanShifts from "@/pages/vets-van-shifts";
+import VetsVanBooking from "@/pages/vetsvan-booking";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -113,6 +114,7 @@ function Router() {
           <Route path="/doctor-dashboard" component={DoctorDashboard} />
           <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
           <Route path="/ride-request" component={RideRequest} />
+          <Route path="/vetsvan-booking" component={VetsVanBooking} />
           <Route path="/ride-tracking" component={RideTracking} />
           <Route path="/account" component={Account} />
           <Route path="/patients" component={Patients} />
