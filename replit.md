@@ -399,6 +399,11 @@ Changelog:
 - July 3, 2025. Booking creation now happens exclusively through VetsVanBooking component with "Slide to confirm" functionality
 - July 3, 2025. Fixed booking flow: ride-request → vetsvan-booking → slide confirmation → booking creation with notifications
 - July 3, 2025. All booking notifications now sent only after successful "Slide to confirm" action completion
+- July 3, 2025. FIXED: "Rendered more hooks than during the previous render" error in VetsVanAvailabilityTable
+- July 3, 2025. Resolved React hooks rendering issue by properly positioning useMutation hook at component level
+- July 3, 2025. CONFIRMED: Direct booking system working successfully - customers can book appointments immediately
+- July 3, 2025. SUCCESS: Instant doctor notifications functioning properly when customers select time slots
+- July 3, 2025. User confirmed the direct booking system is operating perfectly with immediate notifications
 ```
 
 ## User Preferences
