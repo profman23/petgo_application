@@ -166,7 +166,7 @@ export const shifts = pgTable("shifts", {
   date: text("date").notNull(), // YYYY-MM-DD format
   startTime: text("start_time").notNull(), // HH:MM format
   endTime: text("end_time").notNull(), // HH:MM format
-  duration: text("duration").notNull(), // 'day', 'week', 'month'
+  duration: integer("duration").notNull(), // duration in hours
   status: text("status").default("scheduled").notNull(), // 'scheduled', 'active', 'completed', 'cancelled'
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -183,3 +183,28 @@ export const insertShiftSchema = createInsertSchema(shifts).pick({
 
 export type Shift = typeof shifts.$inferSelect;
 export type InsertShift = z.infer<typeof insertShiftSchema>;
+
+// Bookings table for appointments
+export const bookings = pgTable("bookings", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  shiftId: integer("shift_id").notNull().references(() => shifts.id),
+  vetsVanId: integer("vets_van_id").notNull().references(() => drivers.id),
+  appointmentDate: text("appointment_date").notNull(), // YYYY-MM-DD format
+  appointmentTime: text("appointment_time").notNull(), // HH:MM format
+  status: text("status").default("booked").notNull(), // 'booked', 'completed', 'cancelled'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertBookingSchema = createInsertSchema(bookings).pick({
+  userId: true,
+  shiftId: true,
+  vetsVanId: true,
+  appointmentDate: true,
+  appointmentTime: true,
+  status: true,
+});
+
+export type Booking = typeof bookings.$inferSelect;
+export type InsertBooking = z.infer<typeof insertBookingSchema>;

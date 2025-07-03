@@ -1,7 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
-import { Loader2, Clock, CheckCircle, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { Loader2, Clock, CheckCircle, ChevronLeft, ChevronRight, Calendar, X } from "lucide-react";
 import { useState } from "react";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface Shift {
   id: number;
@@ -11,6 +13,8 @@ interface Shift {
   endTime: string;
   duration: number;
   status: string;
+  isBooked?: boolean;
+  bookingsCount?: number;
 }
 
 interface VetsVanWithShifts {
@@ -29,11 +33,49 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
   const { t, language } = useTranslation();
   const isRTL = getDirection(language) === 'rtl';
   const textAlign = getTextAlign(language);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   // حالة التاريخ المختار
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
+  });
+
+  // وظيفة الحجز
+  const bookingMutation = useMutation({
+    mutationFn: async ({ shiftId, vetsVanId, appointmentDate, appointmentTime }: {
+      shiftId: number;
+      vetsVanId: number;
+      appointmentDate: string;
+      appointmentTime: string;
+    }) => {
+      return await apiRequest('/api/bookings', {
+        method: 'POST',
+        body: JSON.stringify({
+          shiftId,
+          vetsVanId,
+          appointmentDate,
+          appointmentTime
+        })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/availability'] });
+      toast({
+        title: t('success'),
+        description: language === 'ar' ? 'تم حجز الموعد بنجاح' : 'Appointment booked successfully',
+        variant: 'default',
+      });
+    },
+    onError: (error: Error) => {
+      console.error('Booking error:', error);
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'فشل في حجز الموعد' : 'Failed to book appointment',
+        variant: 'destructive',
+      });
+    },
   });
 
   // دوال التنقل بين التواريخ
@@ -133,12 +175,51 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
     if (!vetsvan.isAvailable) return false;
     
     // Check if there's a shift that covers this time slot on selected date
-    return vetsvan.shifts.some(shift => {
+    const shift = vetsvan.shifts.find(shift => {
       return shift.date === selectedDate && 
              shift.startTime <= time && 
              shift.endTime > time &&
              shift.status === 'scheduled';
     });
+    
+    return shift && !shift.isBooked;
+  };
+
+  const getTimeSlotStatus = (vetsvan: VetsVanWithShifts, time: string) => {
+    if (!vetsvan.isAvailable) return 'unavailable';
+    
+    const shift = vetsvan.shifts.find(shift => {
+      return shift.date === selectedDate && 
+             shift.startTime <= time && 
+             shift.endTime > time &&
+             shift.status === 'scheduled';
+    });
+    
+    if (!shift) return 'unavailable';
+    if (shift.isBooked) return 'booked';
+    return 'available';
+  };
+
+  const handleTimeSlotClick = (vetsvan: VetsVanWithShifts, time: string) => {
+    const status = getTimeSlotStatus(vetsvan, time);
+    
+    if (status === 'available') {
+      const shift = vetsvan.shifts.find(shift => {
+        return shift.date === selectedDate && 
+               shift.startTime <= time && 
+               shift.endTime > time &&
+               shift.status === 'scheduled';
+      });
+      
+      if (shift && !bookingMutation.isPending) {
+        bookingMutation.mutate({
+          shiftId: shift.id,
+          vetsVanId: vetsvan.id,
+          appointmentDate: selectedDate,
+          appointmentTime: time
+        });
+      }
+    }
   };
 
   return (
@@ -223,27 +304,32 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
                   {timeSlot}
                 </td>
                 {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => {
-                  const isAvailable = isTimeSlotAvailable(vetsvan, timeSlot);
+                  const status = getTimeSlotStatus(vetsvan, timeSlot);
+                  const isLoading = bookingMutation.isPending;
                   
                   return (
                     <td key={`${vetsvan.id}-${timeSlot}`} className="border border-gray-300 p-2">
                       <div className="flex justify-center">
                         <button
-                          onClick={() => {
-                            if (isAvailable && onSelectTimeSlot) {
-                              onSelectTimeSlot(vetsvan.id, selectedDate, timeSlot);
-                            }
-                          }}
-                          disabled={!isAvailable}
+                          onClick={() => handleTimeSlotClick(vetsvan, timeSlot)}
+                          disabled={status !== 'available' || isLoading}
                           className={`
                             w-full text-xs px-2 py-1 rounded transition-colors
-                            ${isAvailable
+                            ${status === 'available'
                               ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
+                              : status === 'booked'
+                              ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
                               : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             }
+                            ${isLoading ? 'opacity-50' : ''}
                           `}
                         >
-                          {isAvailable ? '✓' : '✗'}
+                          {isLoading ? (
+                            <Loader2 className="w-3 h-3 animate-spin mx-auto" />
+                          ) : (
+                            status === 'available' ? '✓' : 
+                            status === 'booked' ? (language === 'ar' ? 'محجوز' : 'Booked') : '✗'
+                          )}
                         </button>
                       </div>
                     </td>

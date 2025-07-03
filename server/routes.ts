@@ -737,16 +737,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const drivers = await storage.getAllDrivers();
       const shifts = await storage.getAllShifts();
+      const bookings = await storage.getAllBookings();
       
-      // Group shifts by VetsVan ID
+      // Group shifts by VetsVan ID and check for bookings
       const vetsvanWithShifts = drivers.map(driver => {
         const driverShifts = shifts.filter(shift => shift.vetsVanId === driver.id);
+        
+        // Add booking status to each shift
+        const shiftsWithBookingStatus = driverShifts.map(shift => {
+          const shiftBookings = bookings.filter(booking => 
+            booking.shiftId === shift.id && booking.status === 'booked'
+          );
+          
+          return {
+            ...shift,
+            isBooked: shiftBookings.length > 0,
+            bookingsCount: shiftBookings.length
+          };
+        });
+        
         return {
           id: driver.id,
           vetsvanCode: driver.vetsvanCode,
           vetsvanName: driver.vetsvanName,
           isAvailable: driver.isAvailable,
-          shifts: driverShifts
+          shifts: shiftsWithBookingStatus
         };
       });
 
@@ -754,6 +769,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching VetsVan availability:', error);
       res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
+    }
+  });
+
+  // Book an appointment
+  app.post('/api/bookings', requireAuth, async (req: any, res) => {
+    try {
+      const { shiftId, vetsVanId, appointmentDate, appointmentTime } = req.body;
+      const userId = req.user.id;
+
+      // Check if shift is already booked
+      const existingBookings = await storage.getShiftBookings(shiftId);
+      if (existingBookings.length > 0) {
+        return res.status(400).json({ message: 'This time slot is already booked' });
+      }
+
+      // Create booking
+      const booking = await storage.createBooking({
+        userId,
+        shiftId,
+        vetsVanId,
+        appointmentDate,
+        appointmentTime,
+        status: 'booked'
+      });
+
+      res.json({ success: true, booking });
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      res.status(500).json({ message: 'Failed to book appointment' });
+    }
+  });
+
+  // Get user's bookings
+  app.get('/api/user/bookings', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const bookings = await storage.getUserBookings(userId);
+      res.json(bookings);
+    } catch (error) {
+      console.error('Error fetching user bookings:', error);
+      res.status(500).json({ message: 'Failed to fetch bookings' });
     }
   });
 

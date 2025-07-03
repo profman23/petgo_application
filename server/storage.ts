@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 
@@ -40,6 +40,12 @@ export interface IStorage {
   getAllShifts(): Promise<Shift[]>;
   createShift(shift: InsertShift): Promise<Shift>;
   deleteShift(id: number): Promise<void>;
+
+  // Bookings operations
+  createBooking(booking: InsertBooking): Promise<Booking>;
+  getUserBookings(userId: number): Promise<Booking[]>;
+  getShiftBookings(shiftId: number): Promise<Booking[]>;
+  getAllBookings(): Promise<Booking[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -434,6 +440,24 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(shifts)
       .where(eq(shifts.id, id));
+  }
+
+  // Bookings operations
+  async createBooking(bookingData: InsertBooking): Promise<Booking> {
+    const [booking] = await db.insert(bookings).values(bookingData).returning();
+    return booking;
+  }
+
+  async getUserBookings(userId: number): Promise<Booking[]> {
+    return await db.select().from(bookings).where(eq(bookings.userId, userId));
+  }
+
+  async getShiftBookings(shiftId: number): Promise<Booking[]> {
+    return await db.select().from(bookings).where(eq(bookings.shiftId, shiftId));
+  }
+
+  async getAllBookings(): Promise<Booking[]> {
+    return await db.select().from(bookings);
   }
 }
 
