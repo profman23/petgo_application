@@ -865,9 +865,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (customerLat && customerLon) {
         let minDistance = Infinity;
         vetsvanWithShifts.forEach(vetsvan => {
-          if (vetsvan.distanceFromCustomer && vetsvan.distanceFromCustomer < minDistance) {
-            minDistance = vetsvan.distanceFromCustomer;
-            closestVetsVanId = vetsvan.id;
+          if (vetsvan.distanceFromCustomer) {
+            const distance = parseFloat(vetsvan.distanceFromCustomer);
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestVetsVanId = vetsvan.id;
+            }
           }
         });
       }
@@ -878,7 +881,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isClosest: vetsvan.id === closestVetsVanId
       }));
 
-      res.json(vetsvanWithClosestFlag);
+      // Sort VetsVans by distance (closest first)
+      const sortedVetsVans = vetsvanWithClosestFlag.sort((a, b) => {
+        if (a.distanceFromCustomer && b.distanceFromCustomer) {
+          return parseFloat(a.distanceFromCustomer) - parseFloat(b.distanceFromCustomer);
+        }
+        if (a.distanceFromCustomer && !b.distanceFromCustomer) return -1;
+        if (!a.distanceFromCustomer && b.distanceFromCustomer) return 1;
+        return 0;
+      });
+
+      res.json(sortedVetsVans);
     } catch (error) {
       console.error('Error fetching VetsVan availability:', error);
       res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
