@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2 } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import {
@@ -46,6 +46,9 @@ export default function AdminDashboard() {
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeTab, setActiveTab] = useState('management'); // 'management' or 'shifts'
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     vetsvanCode: "",
     vetsvanName: "",
@@ -174,10 +177,69 @@ export default function AdminDashboard() {
     },
   });
 
+  // Update location mutation
+  const updateLocationMutation = useMutation({
+    mutationFn: async ({ driverId, latitude, longitude }: { driverId: number; latitude: number; longitude: number }) => {
+      await apiRequest(`/api/admin/drivers/${driverId}/location`, {
+        method: "PUT",
+        body: JSON.stringify({ latitude, longitude }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
+      setShowLocationDialog(false);
+      setSelectedDriver(null);
+      setNewLocation({ latitude: '', longitude: '' });
+      toast({
+        title: language === 'ar' ? 'تم تحديث الموقع' : 'Location Updated',
+        description: language === 'ar' ? 'تم تحديث موقع المركبة بنجاح' : 'VetsVan location updated successfully',
+      });
+    },
+    onError: () => {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'فشل في تحديث الموقع' : 'Failed to update location',
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("admin");
     setLocation("/admin-login");
+  };
+
+  const handleLocationClick = (driver: Driver) => {
+    setSelectedDriver(driver);
+    setNewLocation({
+      latitude: driver.latitude.toString(),
+      longitude: driver.longitude.toString()
+    });
+    setShowLocationDialog(true);
+  };
+
+  const handleLocationUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedDriver || !newLocation.latitude || !newLocation.longitude) return;
+
+    const latitude = parseFloat(newLocation.latitude);
+    const longitude = parseFloat(newLocation.longitude);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'يرجى إدخال أرقام صحيحة للموقع' : 'Please enter valid location numbers',
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateLocationMutation.mutate({
+      driverId: selectedDriver.id,
+      latitude,
+      longitude
+    });
   };
 
   const handleAddDriver = (e: React.FormEvent) => {
@@ -394,6 +456,13 @@ export default function AdminDashboard() {
                               >
                                 {t('changeStatus')}
                               </button>
+                              <button
+                                onClick={() => handleLocationClick(driver)}
+                                className="text-sm text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
+                              >
+                                <MapPin className="w-3 h-3" />
+                                {language === 'ar' ? 'تحديد الموقع' : 'Set Location'}
+                              </button>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <button className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1">
@@ -435,6 +504,86 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Location Update Dialog */}
+      {showLocationDialog && selectedDriver && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" dir={getDirection(language)}>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                {language === 'ar' ? 'تحديد موقع المركبة' : 'Set Vehicle Location'}
+              </h3>
+              <button
+                onClick={() => setShowLocationDialog(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">
+                {language === 'ar' ? 'المركبة: ' : 'Vehicle: '} 
+                {selectedDriver.vetsvanCode} - {selectedDriver.vetsvanName}
+              </p>
+            </div>
+
+            <form onSubmit={handleLocationUpdate} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'خط العرض (Latitude)' : 'Latitude'}
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  value={newLocation.latitude}
+                  onChange={(e) => setNewLocation({ ...newLocation, latitude: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="24.7136"
+                  required
+                  style={{ textAlign: getTextAlign(language) }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'خط الطول (Longitude)' : 'Longitude'}
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  value={newLocation.longitude}
+                  onChange={(e) => setNewLocation({ ...newLocation, longitude: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="46.6753"
+                  required
+                  style={{ textAlign: getTextAlign(language) }}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowLocationDialog(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={updateLocationMutation.isPending}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {updateLocationMutation.isPending 
+                    ? (language === 'ar' ? 'جاري التحديث...' : 'Updating...')
+                    : (language === 'ar' ? 'تحديث الموقع' : 'Update Location')
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

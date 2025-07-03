@@ -1106,6 +1106,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update driver location
+  app.put('/api/admin/drivers/:id/location', requireAdminAuth, async (req, res) => {
+    try {
+      const driverId = parseInt(req.params.id);
+      const { latitude, longitude } = req.body;
+      
+      if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+        return res.status(400).json({ message: 'Valid latitude and longitude are required' });
+      }
+      
+      await storage.updateDriverLocation(driverId, latitude, longitude);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating driver location:', error);
+      res.status(500).json({ message: 'Failed to update location' });
+    }
+  });
+
   // Shifts management endpoints
   app.get('/api/admin/shifts', requireAdminAuth, async (req, res) => {
     try {
