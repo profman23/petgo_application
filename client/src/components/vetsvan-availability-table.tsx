@@ -53,41 +53,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
     return today.toISOString().split('T')[0];
   });
 
-  // وظيفة الحجز
-  const bookingMutation = useMutation({
-    mutationFn: async ({ shiftId, vetsVanId, appointmentDate, appointmentTime }: {
-      shiftId: number;
-      vetsVanId: number;
-      appointmentDate: string;
-      appointmentTime: string;
-    }) => {
-      return await apiRequest('/api/bookings', {
-        method: 'POST',
-        body: JSON.stringify({
-          shiftId,
-          vetsVanId,
-          appointmentDate,
-          appointmentTime
-        })
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/availability'] });
-      toast({
-        title: t('success'),
-        description: language === 'ar' ? 'تم حجز الموعد بنجاح' : 'Appointment booked successfully',
-        variant: 'default',
-      });
-    },
-    onError: (error: Error) => {
-      console.error('Booking error:', error);
-      toast({
-        title: t('error'),
-        description: language === 'ar' ? 'فشل في حجز الموعد' : 'Failed to book appointment',
-        variant: 'destructive',
-      });
-    },
-  });
+  // تم إزالة الحجز الفوري - التوجيه لصفحة التأكيد فقط
 
   // دوال التنقل بين التواريخ
   const goToPreviousDay = () => {
@@ -230,13 +196,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
                shift.status === 'scheduled';
       });
       
-      if (shift && !bookingMutation.isPending) {
-        bookingMutation.mutate({
-          shiftId: shift.id,
-          vetsVanId: vetsvan.id,
-          appointmentDate: selectedDate,
-          appointmentTime: time
-        });
+      if (shift && onSelectTimeSlot) {
+        // التوجيه لصفحة التأكيد بدلاً من الحجز الفوري
+        onSelectTimeSlot(vetsvan.id, selectedDate, time);
       }
     }
   };
@@ -324,7 +286,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
                 </td>
                 {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => {
                   const status = getTimeSlotStatus(vetsvan, timeSlot);
-                  const isLoading = bookingMutation.isPending;
+                  const isLoading = false;
                   
                   return (
                     <td key={`${vetsvan.id}-${timeSlot}`} className="border border-gray-300 p-2">

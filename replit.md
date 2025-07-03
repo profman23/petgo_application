@@ -394,6 +394,11 @@ Changelog:
 - July 3, 2025. FIXED: Frontend DoctorBookingsTable component to use correct vetsVanId parameter
 - July 3, 2025. RESOLVED: Eliminated duplicate endpoints causing cross-notifications between doctors
 - July 3, 2025. CONFIRMED: Each doctor now receives bookings for their specific VetsVan only
+- July 3, 2025. ELIMINATED DUPLICATE BOOKING SYSTEM: Completely removed booking functionality from VetsVanAvailabilityTable component
+- July 3, 2025. VetsVanAvailabilityTable now only displays availability and redirects to booking confirmation page
+- July 3, 2025. Booking creation now happens exclusively through VetsVanBooking component with "Slide to confirm" functionality
+- July 3, 2025. Fixed booking flow: ride-request → vetsvan-booking → slide confirmation → booking creation with notifications
+- July 3, 2025. All booking notifications now sent only after successful "Slide to confirm" action completion
 ```
 
 ## User Preferences
