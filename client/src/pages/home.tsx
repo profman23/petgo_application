@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope } from 'lucide-react';
+import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2 } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import vetsVanImage from "@assets/image_1751292329902.png";
@@ -95,6 +95,168 @@ export default function Home() {
   const textAlign = getTextAlign(language);
   const direction = getDirection(language);
 
+  // Simple location state management
+  const [locationInfo, setLocationInfo] = useState({
+    isLoading: true,
+    address: language === 'ar' ? 'جاري تحديد موقعك...' : 'Detecting your location...',
+    error: null as string | null
+  });
+
+  // Saudi cities for location detection
+  const saudiCities = [
+    { name: 'الرياض', nameEn: 'Riyadh', lat: 24.7136, lon: 46.6753, radius: 50 },
+    { name: 'جدة', nameEn: 'Jeddah', lat: 21.4858, lon: 39.1925, radius: 40 },
+    { name: 'الدمام', nameEn: 'Dammam', lat: 26.4207, lon: 50.0888, radius: 30 },
+    { name: 'مكة المكرمة', nameEn: 'Mecca', lat: 21.3891, lon: 39.8579, radius: 25 },
+    { name: 'المدينة المنورة', nameEn: 'Medina', lat: 24.5247, lon: 39.5692, radius: 25 },
+    { name: 'الطائف', nameEn: 'Taif', lat: 21.2703, lon: 40.4178, radius: 20 }
+  ];
+
+  // Calculate distance and find closest city
+  const findClosestCity = (lat: number, lon: number) => {
+    const R = 6371; // Earth's radius in km
+    let closestCity = saudiCities[0];
+    let minDistance = Infinity;
+
+    for (const city of saudiCities) {
+      const dLat = (lat - city.lat) * Math.PI / 180;
+      const dLon = (lon - city.lon) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(city.lat * Math.PI / 180) * Math.cos(lat * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c;
+
+      if (distance < minDistance && distance <= city.radius) {
+        minDistance = distance;
+        closestCity = city;
+      }
+    }
+
+    return { city: closestCity, distance: minDistance };
+  };
+
+  // Get user location and detailed address
+  const getCurrentLocation = () => {
+    setLocationInfo(prev => ({
+      ...prev,
+      isLoading: true,
+      address: language === 'ar' ? 'جاري تحديد موقعك...' : 'Detecting your location...',
+      error: null
+    }));
+
+    if (!navigator.geolocation) {
+      setLocationInfo({
+        isLoading: false,
+        address: language === 'ar' ? 'الرياض - موقع افتراضي' : 'Riyadh - Default Location',
+        error: language === 'ar' ? 'المتصفح لا يدعم تحديد الموقع' : 'Browser does not support geolocation'
+      });
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        const { city, distance } = findClosestCity(latitude, longitude);
+        
+        try {
+          // Try to get detailed address from OpenStreetMap
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=16&addressdetails=1&accept-language=${language === 'ar' ? 'ar' : 'en'}`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            let address = '';
+            
+            if (data && data.address) {
+              const addr = data.address;
+              const parts = [];
+              
+              if (addr.road || addr.pedestrian) {
+                parts.push(addr.road || addr.pedestrian);
+              }
+              if (addr.neighbourhood || addr.suburb) {
+                parts.push(addr.neighbourhood || addr.suburb);
+              }
+              if (addr.city || addr.town) {
+                parts.push(addr.city || addr.town);
+              }
+              
+              if (parts.length > 0) {
+                address = parts.join(', ');
+              } else if (data.display_name) {
+                const displayParts = data.display_name.split(',').slice(0, 3);
+                address = displayParts.join(', ');
+              }
+            }
+            
+            if (address) {
+              setLocationInfo({
+                isLoading: false,
+                address: address,
+                error: null
+              });
+              return;
+            }
+          }
+        } catch (error) {
+          console.warn('Geocoding failed, using fallback:', error);
+        }
+        
+        // Fallback to closest city
+        const cityName = language === 'ar' ? city.name : city.nameEn;
+        let fallbackAddress;
+        
+        if (distance < 5) {
+          fallbackAddress = language === 'ar' ? `${cityName} - موقعك الحالي` : `${cityName} - Your Current Location`;
+        } else if (distance < 20) {
+          fallbackAddress = language === 'ar' ? `بالقرب من ${cityName}` : `Near ${cityName}`;
+        } else {
+          fallbackAddress = language === 'ar' ? `${cityName} - المملكة العربية السعودية` : `${cityName} - Saudi Arabia`;
+        }
+        
+        setLocationInfo({
+          isLoading: false,
+          address: fallbackAddress,
+          error: null
+        });
+      },
+      (error) => {
+        let errorMessage = language === 'ar' ? 'خطأ في تحديد الموقع' : 'Location error';
+        let fallbackAddress = language === 'ar' ? 'الرياض - موقع افتراضي' : 'Riyadh - Default Location';
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = language === 'ar' ? 'تم رفض إذن الوصول للموقع' : 'Location permission denied';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = language === 'ar' ? 'الموقع غير متاح' : 'Location unavailable';
+            break;
+          case error.TIMEOUT:
+            errorMessage = language === 'ar' ? 'انتهت مهلة تحديد الموقع' : 'Location timeout';
+            break;
+        }
+        
+        setLocationInfo({
+          isLoading: false,
+          address: fallbackAddress,
+          error: errorMessage
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // Cache for 5 minutes
+      }
+    );
+  };
+
+  // Initialize location detection on component mount
+  useEffect(() => {
+    getCurrentLocation();
+  }, [language]); // Re-run when language changes
+
   // Get active ride info
   const { activeRide, isLoadingActiveRide } = useRide();
   const actualActiveRide = activeRide || null;
@@ -169,14 +331,27 @@ export default function Home() {
 
         {/* Current Location */}
         <div className="p-3 bg-blue-50 border-b">
-          <h3 className="font-semibold text-gray-800 mb-1 text-sm" style={{ textAlign }}>
-            {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
-          </h3>
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="font-semibold text-gray-800 text-sm" style={{ textAlign }}>
+              {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
+            </h3>
+            {locationInfo.isLoading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
+          </div>
           <div className="flex items-center">
             <MapPin className="w-4 h-4 text-blue-600 mr-2" />
-            <span className="text-gray-700 text-sm">
-              {language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Current Location'}
+            <span className="text-gray-700 text-sm flex-1">
+              {locationInfo.address}
             </span>
+            {locationInfo.error && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={getCurrentLocation}
+                className="text-xs text-blue-600 p-1 h-auto"
+              >
+                {language === 'ar' ? 'إعادة تحديد' : 'Refresh'}
+              </Button>
+            )}
           </div>
         </div>
 
