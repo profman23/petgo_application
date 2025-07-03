@@ -5,6 +5,16 @@ import { useState } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
+interface Booking {
+  id: number;
+  userId: number;
+  shiftId: number;
+  vetsVanId: number;
+  appointmentDate: string;
+  appointmentTime: string;
+  status: string;
+}
+
 interface Shift {
   id: number;
   vetsVanId: number;
@@ -15,6 +25,7 @@ interface Shift {
   status: string;
   isBooked?: boolean;
   bookingsCount?: number;
+  bookings?: Booking[];
 }
 
 interface VetsVanWithShifts {
@@ -158,10 +169,10 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
     );
   }
 
-  // Generate time slots from 8 AM to 8 PM (every hour)
+  // Generate time slots from 9 AM to 8 PM (every hour)
   const generateTimeSlots = () => {
     const slots = [];
-    for (let hour = 8; hour <= 20; hour++) {
+    for (let hour = 9; hour <= 20; hour++) {
       const time = `${hour.toString().padStart(2, '0')}:00`;
       slots.push(time);
     }
@@ -196,7 +207,15 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
     });
     
     if (!shift) return 'unavailable';
-    if (shift.isBooked) return 'booked';
+    
+    // Check if this specific time slot is booked
+    const isTimeSlotBooked = shift.bookings?.some(booking => 
+      booking.appointmentTime === time && 
+      booking.appointmentDate === selectedDate &&
+      booking.status === 'booked'
+    );
+    
+    if (isTimeSlotBooked) return 'booked';
     return 'available';
   };
 

@@ -743,7 +743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const vetsvanWithShifts = drivers.map(driver => {
         const driverShifts = shifts.filter(shift => shift.vetsVanId === driver.id);
         
-        // Add booking status to each shift
+        // Add detailed booking information to each shift
         const shiftsWithBookingStatus = driverShifts.map(shift => {
           const shiftBookings = bookings.filter(booking => 
             booking.shiftId === shift.id && booking.status === 'booked'
@@ -752,7 +752,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return {
             ...shift,
             isBooked: shiftBookings.length > 0,
-            bookingsCount: shiftBookings.length
+            bookingsCount: shiftBookings.length,
+            bookings: shiftBookings // Include actual booking details
           };
         });
         
@@ -778,9 +779,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { shiftId, vetsVanId, appointmentDate, appointmentTime } = req.body;
       const userId = req.user.id;
 
-      // Check if shift is already booked
+      // Check if this specific time slot is already booked
       const existingBookings = await storage.getShiftBookings(shiftId);
-      if (existingBookings.length > 0) {
+      const timeSlotBooked = existingBookings.some(booking => 
+        booking.appointmentTime === appointmentTime && 
+        booking.appointmentDate === appointmentDate &&
+        booking.status === 'booked'
+      );
+      
+      if (timeSlotBooked) {
         return res.status(400).json({ message: 'This time slot is already booked' });
       }
 

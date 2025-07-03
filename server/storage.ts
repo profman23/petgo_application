@@ -165,33 +165,33 @@ export class DatabaseStorage implements IStorage {
             date.setDate(date.getDate() + dayOffset);
             const dateStr = date.toISOString().split('T')[0];
             
-            // Create morning shift (8 AM - 12 PM)
+            // Create morning shift (9 AM - 1 PM)
             await db.insert(shifts).values({
               vetsVanId: vetsvan.id,
               date: dateStr,
-              startTime: '08:00',
-              endTime: '12:00',
+              startTime: '09:00',
+              endTime: '13:00',
               duration: 4,
               status: 'scheduled'
             }).onConflictDoNothing();
             
-            // Create afternoon shift (1 PM - 5 PM)
+            // Create afternoon shift (2 PM - 6 PM)
             await db.insert(shifts).values({
               vetsVanId: vetsvan.id,
               date: dateStr,
-              startTime: '13:00',
-              endTime: '17:00',
+              startTime: '14:00',
+              endTime: '18:00',
               duration: 4,
               status: 'scheduled'
             }).onConflictDoNothing();
             
-            // Create evening shift (6 PM - 10 PM)
+            // Create evening shift (7 PM - 8 PM)
             await db.insert(shifts).values({
               vetsVanId: vetsvan.id,
               date: dateStr,
-              startTime: '18:00',
-              endTime: '22:00',
-              duration: 4,
+              startTime: '19:00',
+              endTime: '20:00',
+              duration: 1,
               status: 'scheduled'
             }).onConflictDoNothing();
           }
