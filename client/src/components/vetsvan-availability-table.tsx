@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
-import { Loader2, Clock, CheckCircle } from "lucide-react";
+import { Loader2, Clock, CheckCircle, ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { useState } from "react";
 
 interface Shift {
   id: number;
@@ -28,18 +29,71 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
   const { t, language } = useTranslation();
   const isRTL = getDirection(language) === 'rtl';
   const textAlign = getTextAlign(language);
+  
+  // حالة التاريخ المختار
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
+
+  // دوال التنقل بين التواريخ
+  const goToPreviousDay = () => {
+    const currentDate = new Date(selectedDate);
+    currentDate.setDate(currentDate.getDate() - 1);
+    setSelectedDate(currentDate.toISOString().split('T')[0]);
+  };
+
+  const goToNextDay = () => {
+    const currentDate = new Date(selectedDate);
+    currentDate.setDate(currentDate.getDate() + 1);
+    setSelectedDate(currentDate.toISOString().split('T')[0]);
+  };
+
+  // دالة لتنسيق التاريخ بالعربية والإنجليزية
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // تحقق من كونه اليوم أو الغد
+    if (date.toDateString() === today.toDateString()) {
+      return language === 'ar' ? 'اليوم' : 'Today';
+    } else if (date.toDateString() === tomorrow.toDateString()) {
+      return language === 'ar' ? 'غدا' : 'Tomorrow';
+    }
+
+    // تنسيق التاريخ العادي
+    if (language === 'ar') {
+      return date.toLocaleDateString('ar-SA', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } else {
+      return date.toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+  };
 
   const { data: vetsvanData, isLoading, error } = useQuery({
     queryKey: ['/api/vetsvan/availability'],
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-8 bg-white rounded-lg shadow-md">
-        <Loader2 className="h-6 w-6 animate-spin text-purple-600 mr-2" />
-        <span className="text-gray-600">{t('loading')}</span>
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin mr-2" />
+          <span>{language === 'ar' ? 'جاري تحميل المواعيد...' : 'Loading appointments...'}</span>
+        </div>
       </div>
     );
   }
@@ -52,7 +106,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
     );
   }
 
-  if (!vetsvanData || vetsvanData.length === 0) {
+  if (!vetsvanData || !Array.isArray(vetsvanData) || vetsvanData.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
         <p className="text-gray-600 text-center">
@@ -74,44 +128,61 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
 
   const timeSlots = generateTimeSlots();
 
-  // Check if a time slot is available for a specific VetsVan
-  const isTimeSlotAvailable = (vetsvan: VetsVanWithShifts, date: string, time: string) => {
+  // Check if a time slot is available for a specific VetsVan on selected date
+  const isTimeSlotAvailable = (vetsvan: VetsVanWithShifts, time: string) => {
     if (!vetsvan.isAvailable) return false;
     
-    // Check if there's a shift that covers this time slot
+    // Check if there's a shift that covers this time slot on selected date
     return vetsvan.shifts.some(shift => {
-      return shift.date === date && 
+      return shift.date === selectedDate && 
              shift.startTime <= time && 
              shift.endTime > time &&
              shift.status === 'scheduled';
     });
   };
 
-  // Get today's date and next 7 days
-  const getAvailableDates = () => {
-    const dates = [];
-    const today = new Date();
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-      dates.push(date.toISOString().split('T')[0]);
-    }
-    return dates;
-  };
-
-  const availableDates = getAvailableDates();
-
   return (
     <div 
       className="bg-white rounded-lg shadow-lg p-4 mb-6"
       style={{ direction: isRTL ? 'rtl' : 'ltr' }}
     >
-      {/* Header */}
+      {/* Header with Date Navigation */}
       <div className="mb-4">
         <h3 className={`text-lg font-semibold text-gray-800 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
           {language === 'ar' ? 'المواعيد المتاحة - VetsVan' : 'Available Appointments - VetsVan'}
         </h3>
-        <p className={`text-sm text-gray-600 mt-1 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
+        
+        {/* Date Navigation */}
+        <div className="flex items-center justify-between mt-4 mb-2">
+          <button
+            onClick={goToPreviousDay}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            <span className="text-sm font-medium">
+              {language === 'ar' ? 'السابق' : 'Previous'}
+            </span>
+          </button>
+          
+          <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 rounded-lg">
+            <Calendar className="w-4 h-4 text-purple-600" />
+            <span className="text-sm font-semibold text-purple-800">
+              {formatDate(selectedDate)}
+            </span>
+          </div>
+          
+          <button
+            onClick={goToNextDay}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+          >
+            <span className="text-sm font-medium">
+              {language === 'ar' ? 'التالي' : 'Next'}
+            </span>
+            {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </button>
+        </div>
+        
+        <p className={`text-sm text-gray-600 mt-2 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
           {language === 'ar' ? 'اختر الوقت المناسب لك' : 'Select a suitable time for you'}
         </p>
       </div>
@@ -151,73 +222,37 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot }: VetsVanAvailabili
                 <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50">
                   {timeSlot}
                 </td>
-                {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => (
-                  <td key={`${vetsvan.id}-${timeSlot}`} className="border border-gray-300 p-1">
-                    <div className="flex justify-center">
-                      {availableDates.map((date) => {
-                        const isAvailable = isTimeSlotAvailable(vetsvan, date, timeSlot);
-                        const dayName = new Date(date).toLocaleDateString(
-                          language === 'ar' ? 'ar-SA' : 'en-US', 
-                          { weekday: 'short' }
-                        );
-                        
-                        return (
-                          <button
-                            key={`${date}-${timeSlot}`}
-                            className={`
-                              text-xs px-2 py-1 rounded m-1 transition-colors
-                              ${isAvailable
-                                ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
-                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              }
-                            `}
-                            disabled={!isAvailable}
-                            onClick={() => {
-                              if (isAvailable && onSelectTimeSlot) {
-                                onSelectTimeSlot(vetsvan.id, date, timeSlot);
-                              }
-                            }}
-                            title={`${dayName} ${date}`}
-                          >
-                            {dayName}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </td>
-                ))}
+                {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => {
+                  const isAvailable = isTimeSlotAvailable(vetsvan, timeSlot);
+                  
+                  return (
+                    <td key={`${vetsvan.id}-${timeSlot}`} className="border border-gray-300 p-2">
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => {
+                            if (isAvailable && onSelectTimeSlot) {
+                              onSelectTimeSlot(vetsvan.id, selectedDate, timeSlot);
+                            }
+                          }}
+                          disabled={!isAvailable}
+                          className={`
+                            w-full text-xs px-2 py-1 rounded transition-colors
+                            ${isAvailable
+                              ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
+                              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            }
+                          `}
+                        >
+                          {isAvailable ? '✓' : '✗'}
+                        </button>
+                      </div>
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* Legend */}
-      <div className={`mt-4 flex flex-wrap gap-4 text-xs ${textAlign === 'right' ? 'justify-end' : 'justify-start'}`}>
-        <div className="flex items-center">
-          <div className="w-4 h-4 bg-green-100 border border-green-300 rounded mr-2"></div>
-          <span className="text-gray-600">
-            {language === 'ar' ? 'متاح' : 'Available'}
-          </span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded mr-2"></div>
-          <span className="text-gray-600">
-            {language === 'ar' ? 'غير متاح' : 'Not Available'}
-          </span>
-        </div>
-        <div className="flex items-center">
-          <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-          <span className="text-gray-600">
-            {language === 'ar' ? 'VetsVan متاح' : 'VetsVan Available'}
-          </span>
-        </div>
-        <div className="flex items-center">
-          <Clock className="h-4 w-4 text-red-500 mr-2" />
-          <span className="text-gray-600">
-            {language === 'ar' ? 'VetsVan غير متاح' : 'VetsVan Unavailable'}
-          </span>
-        </div>
       </div>
     </div>
   );
