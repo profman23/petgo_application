@@ -71,5 +71,6 @@ export function useCustomerLocation() {
     startWatching,
     stopWatching,
     updateLocation: updateCustomerLocation,
+    currentLocation: latitude && longitude ? { latitude, longitude, accuracy } : null,
   };
 }

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Calendar, Clock, CheckCircle, User, MapPin, Loader2 } from 'lucide-react';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { VetsVanAvailabilityTable } from '@/components/vetsvan-availability-table';
+import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 
 interface Booking {
   id: number;
@@ -48,6 +49,9 @@ export default function VetsVanBooking() {
   const queryClient = useQueryClient();
   const textAlign = getTextAlign(language);
   const direction = getDirection(language);
+  
+  // استخدام hook الموقع الحالي
+  const { latitude, longitude, accuracy } = useCustomerLocation();
 
   const [requestData, setRequestData] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -156,35 +160,49 @@ export default function VetsVanBooking() {
     setIsCreatingBooking(true);
 
     try {
-      // Get customer location from pendingRequest data
-      const pendingRequestData = localStorage.getItem('pendingRequest');
+      // Get customer location from currentLocation hook first, then fallback to pendingRequest
       let customerLocation = null;
       
-      console.log('Pending request data from localStorage:', pendingRequestData);
-      
-      if (pendingRequestData) {
-        try {
-          const requestData = JSON.parse(pendingRequestData);
-          console.log('Parsed request data:', requestData);
-          
-          if (requestData.pickupLatitude && requestData.pickupLongitude) {
-            customerLocation = {
-              latitude: requestData.pickupLatitude,
-              longitude: requestData.pickupLongitude,
-              address: requestData.location || null
-            };
-            console.log('Customer location prepared:', customerLocation);
-          } else {
-            console.log('Missing location data in pending request:', {
-              pickupLatitude: requestData.pickupLatitude,
-              pickupLongitude: requestData.pickupLongitude
-            });
-          }
-        } catch (e) {
-          console.error('Error parsing pending request data:', e);
-        }
+      // أولوية للموقع الحالي من hook
+      if (latitude && longitude) {
+        customerLocation = {
+          latitude: latitude,
+          longitude: longitude,
+          address: null // لا نحتاج عنوان مفصل الآن
+        };
+        console.log('✅ Using current location from hook:', customerLocation);
       } else {
-        console.log('No pending request data found in localStorage');
+        // fallback للموقع من localStorage
+        const pendingRequestData = localStorage.getItem('pendingRequest');
+        console.log('Pending request data from localStorage:', pendingRequestData);
+        
+        if (pendingRequestData) {
+          try {
+            const requestData = JSON.parse(pendingRequestData);
+            console.log('Parsed request data:', requestData);
+            
+            if (requestData.pickupLatitude && requestData.pickupLongitude) {
+              customerLocation = {
+                latitude: requestData.pickupLatitude,
+                longitude: requestData.pickupLongitude,
+                address: requestData.location || null
+              };
+              console.log('Using pendingRequest location:', customerLocation);
+            }
+          } catch (e) {
+            console.error('Error parsing pending request data:', e);
+          }
+        }
+      }
+      
+      // إذا لم نجد موقع، استخدم الرياض كـ fallback
+      if (!customerLocation) {
+        customerLocation = {
+          latitude: 24.7136,
+          longitude: 46.6753,
+          address: language === 'ar' ? 'الرياض - موقع افتراضي' : 'Riyadh - Default Location'
+        };
+        console.log('⚠️ Using default Riyadh location as fallback:', customerLocation);
       }
       
       const bookingData = {
