@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -24,6 +24,7 @@ import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
+import { LanguageSelector } from '@/components/language-selector';
 import { FixedFooter } from '@/components/fixed-footer';
 
 
@@ -45,6 +46,7 @@ export default function RideRequest() {
   const [slidePosition, setSlidePosition] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
   const [isSlideComplete, setIsSlideComplete] = useState(false);
+  const [user, setUser] = useState<any>(null);
   
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -516,10 +518,72 @@ export default function RideRequest() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 pb-20 pt-4" style={{ direction }}>
+  // تحميل بيانات المستخدم
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setLocation('/');
+      return;
+    }
 
-      <div className="p-4">
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        setLocation('/');
+      }
+    }
+  }, [setLocation]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLocation('/');
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={direction}>
+      <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
+        {/* Header */}
+        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+                <img 
+                  src={logoImage} 
+                  alt="VETS VAN Logo" 
+                  className="h-full w-auto object-contain"
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                    maxWidth: '120px'
+                  }}
+                />
+              </div>
+              <div className="text-lg font-bold text-gray-800">
+                {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <LanguageSelector />
+              <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-white hover:bg-purple-700 px-2 py-1 h-8"
+              >
+                {language === 'ar' ? 'خروج' : 'Logout'}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 pb-20">
         {/* Pet Selection Section */}
         <Card className="mb-6">
           <CardContent className="p-4">
@@ -899,10 +963,11 @@ export default function RideRequest() {
             </Form>
           </CardContent>
         </Card>
-      </div>
 
-      {/* Fixed Footer */}
-      <FixedFooter />
+        {/* Fixed Footer */}
+        <FixedFooter />
+        </div>
+      </div>
     </div>
   );
 }
