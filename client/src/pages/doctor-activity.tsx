@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DoctorFooter } from '@/components/doctor-footer';
-import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
 import { useToast } from '@/hooks/use-toast';
@@ -478,23 +478,54 @@ export default function DoctorActivity() {
               </div>
 
               {/* Interactive Map Placeholder */}
-              <div className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-dashed border-blue-300 rounded-lg p-8 text-center">
+              <div className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-dashed border-blue-300 rounded-lg p-6 text-center">
                 <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
                   {language === 'ar' ? 'موقع العميل على الخريطة' : 'Customer Location on Map'}
                 </h3>
-                <p className="text-gray-600 mb-4">
-                  {language === 'ar' ? 
-                    `خط العرض: ${selectedBooking.customerLocation.latitude}` :
-                    `Latitude: ${selectedBooking.customerLocation.latitude}`
-                  }
-                </p>
-                <p className="text-gray-600 mb-6">
-                  {language === 'ar' ? 
-                    `خط الطول: ${selectedBooking.customerLocation.longitude}` :
-                    `Longitude: ${selectedBooking.customerLocation.longitude}`
-                  }
-                </p>
+                
+                {/* Detailed Location Info */}
+                <div className="bg-white rounded-lg p-4 mb-4 border border-blue-200">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        {language === 'ar' ? 'خط العرض:' : 'Latitude:'}
+                      </span>
+                      <br />
+                      <span className="font-mono text-blue-600">
+                        {selectedBooking.customerLocation.latitude.toFixed(6)}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-semibold text-gray-700">
+                        {language === 'ar' ? 'خط الطول:' : 'Longitude:'}
+                      </span>
+                      <br />
+                      <span className="font-mono text-blue-600">
+                        {selectedBooking.customerLocation.longitude.toFixed(6)}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Copy Coordinates Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-3 text-xs"
+                    onClick={() => {
+                      if (selectedBooking?.customerLocation) {
+                        const coords = `${selectedBooking.customerLocation.latitude},${selectedBooking.customerLocation.longitude}`;
+                        navigator.clipboard.writeText(coords);
+                        toast({
+                          title: language === 'ar' ? 'تم النسخ' : 'Copied',
+                          description: language === 'ar' ? 'تم نسخ الإحداثيات' : 'Coordinates copied to clipboard',
+                        });
+                      }
+                    }}
+                  >
+                    📋 {language === 'ar' ? 'نسخ الإحداثيات' : 'Copy Coordinates'}
+                  </Button>
+                </div>
                 
                 {/* Action Buttons */}
                 <div className="flex gap-3 justify-center">

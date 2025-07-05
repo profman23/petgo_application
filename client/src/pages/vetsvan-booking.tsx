@@ -200,7 +200,7 @@ export default function VetsVanBooking() {
         console.log('✅ Using GPS location from hook:', customerLocation);
       }
 
-      // إذا لم نجد، نحاول GPS مباشرة
+      // إذا لم نجد، نحاول GPS مباشرة مع تحديد العنوان
       if (!customerLocation) {
         try {
           console.log('🔍 Attempting to get current position directly...');
@@ -212,17 +212,36 @@ export default function VetsVanBooking() {
             
             navigator.geolocation.getCurrentPosition(resolve, reject, {
               enableHighAccuracy: true,
-              timeout: 10000,
-              maximumAge: 60000
+              timeout: 15000,
+              maximumAge: 30000
             });
           });
           
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          // الحصول على العنوان باستخدام reverse geocoding
+          let address = null;
+          try {
+            console.log('🔍 Getting address for coordinates:', lat, lng);
+            const geocodingUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=${language === 'ar' ? 'ar' : 'en'}`;
+            const response = await fetch(geocodingUrl);
+            const data = await response.json();
+            
+            if (data && data.display_name) {
+              address = data.display_name;
+              console.log('✅ Got address from geocoding:', address);
+            }
+          } catch (geocodingError) {
+            console.log('⚠️ Reverse geocoding failed:', geocodingError);
+          }
+          
           customerLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            address: null
+            latitude: lat,
+            longitude: lng,
+            address: address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`
           };
-          console.log('✅ Got fresh GPS location directly:', customerLocation);
+          console.log('✅ Got fresh GPS location with address:', customerLocation);
         } catch (gpsError) {
           console.log('⚠️ Direct GPS failed:', gpsError);
         }

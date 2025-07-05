@@ -106,20 +106,45 @@ export default function RideRequest() {
           form.setValue('pickupLatitude', latitude);
           form.setValue('pickupLongitude', longitude);
           
-          // تحديد اسم الموقع بناءً على الإحداثيات الحقيقية - عرض مبسط
-          let locationName = 'موقعك الحالي';
+          // الحصول على العنوان الدقيق باستخدام reverse geocoding
+          let locationName = language === 'ar' ? 'موقعك الحالي' : 'Your Current Location';
           
-          if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
-            locationName = 'الرياض - موقعك الحالي';
-          } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
-            locationName = 'جدة - موقعك الحالي';
-          } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
-            locationName = 'الدمام - موقعك الحالي';
-          } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
-            locationName = 'المدينة المنورة - موقعك الحالي';
-          }
-          
-          form.setValue('pickupLocation', locationName);
+          // استخدام reverse geocoding للحصول على العنوان الدقيق
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=${language === 'ar' ? 'ar' : 'en'}`)
+            .then(response => response.json())
+            .then(data => {
+              if (data && data.display_name) {
+                locationName = data.display_name;
+                console.log('Address from reverse geocoding:', locationName);
+                form.setValue('pickupLocation', locationName);
+              } else {
+                // Fallback to city detection if reverse geocoding fails
+                if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
+                  locationName = language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location';
+                } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
+                  locationName = language === 'ar' ? 'جدة - موقعك الحالي' : 'Jeddah - Your Location';
+                } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
+                  locationName = language === 'ar' ? 'الدمام - موقعك الحالي' : 'Dammam - Your Location';
+                } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
+                  locationName = language === 'ar' ? 'المدينة المنورة - موقعك الحالي' : 'Medina - Your Location';
+                }
+                form.setValue('pickupLocation', locationName);
+              }
+            })
+            .catch(error => {
+              console.log('Reverse geocoding failed:', error);
+              // Fallback to city detection
+              if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
+                locationName = language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location';
+              } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
+                locationName = language === 'ar' ? 'جدة - موقعك الحالي' : 'Jeddah - Your Location';
+              } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
+                locationName = language === 'ar' ? 'الدمام - موقعك الحالي' : 'Dammam - Your Location';
+              } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
+                locationName = language === 'ar' ? 'المدينة المنورة - موقعك الحالي' : 'Medina - Your Location';
+              }
+              form.setValue('pickupLocation', locationName);
+            });
           
           // Location set successfully without notification
         },
