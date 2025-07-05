@@ -17,8 +17,15 @@ async function throwIfResNotOk(res: Response, url: string) {
       }
       return;
     }
-    const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
+    const text = await res.text();
+    try {
+      // Try to parse JSON response to extract clean message
+      const errorData = JSON.parse(text);
+      throw new Error(errorData.message || text || res.statusText);
+    } catch (parseError) {
+      // If not JSON, use the text as is
+      throw new Error(text || res.statusText);
+    }
   }
 }
 
