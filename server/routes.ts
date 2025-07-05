@@ -93,9 +93,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         membershipType: 'standard'
       };
       
-      const existingUser = await storage.getUserByPhone(fullUserData.phone);
-      if (existingUser) {
+      const existingUserByPhone = await storage.getUserByPhone(fullUserData.phone);
+      if (existingUserByPhone) {
         return res.status(400).json({ message: 'رقم الهاتف مستخدم بالفعل' });
+      }
+      
+      // Check if email is already registered
+      if (fullUserData.email) {
+        const existingUserByEmail = await storage.getUserByEmail(fullUserData.email);
+        if (existingUserByEmail) {
+          return res.status(400).json({ message: 'الإيميل مستخدم بالفعل' });
+        }
       }
       
       const user = await storage.createUser(fullUserData);
@@ -121,6 +129,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
+      
+      // Handle database unique constraint violations
+      if (error.code === '23505') { // PostgreSQL unique constraint violation
+        if (error.constraint === 'users_phone_unique') {
+          return res.status(400).json({ message: 'رقم الهاتف مستخدم بالفعل' });
+        }
+        if (error.constraint === 'users_email_unique') {
+          return res.status(400).json({ message: 'الإيميل مستخدم بالفعل' });
+        }
+      }
+      
       console.error('Registration error:', error);
       res.status(500).json({ message: 'خطأ في الخادم' });
     }
