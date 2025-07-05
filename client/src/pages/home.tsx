@@ -313,11 +313,15 @@ export default function Home() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="w-12 h-12 bg-purple-800 rounded-full border-4 border-purple-400 p-1 shadow-lg">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
-                  className="w-full h-full object-cover rounded-full"
+                  className="h-full w-auto object-contain"
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                    maxWidth: '120px'
+                  }}
                 />
               </div>
               <div className="text-lg font-bold text-gray-800">
