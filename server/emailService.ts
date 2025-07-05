@@ -53,16 +53,42 @@ export class EmailService {
     vetsVanName: string
   ): Promise<boolean> {
     try {
+      // Check if appointment is today
+      const today = new Date();
+      const appointmentDateObj = new Date(appointmentDate);
+      const isToday = appointmentDateObj.toDateString() === today.toDateString();
+
       const template: EmailTemplate = {
         to: userEmail,
         subject: 'تأكيد موعد خدمة VETS VAN',
-        html: this.generateBookingConfirmationHTML(userName, appointmentDate, appointmentTime, vetsVanName),
-        text: this.generateBookingConfirmationText(userName, appointmentDate, appointmentTime, vetsVanName)
+        html: this.generateBookingConfirmationHTML(userName, appointmentDate, appointmentTime, vetsVanName, isToday),
+        text: this.generateBookingConfirmationText(userName, appointmentDate, appointmentTime, vetsVanName, isToday)
       };
 
       return await this.sendEmail(template);
     } catch (error) {
       console.error('Error preparing booking confirmation email:', error);
+      return false;
+    }
+  }
+
+  async sendPreAppointmentNotification(
+    userEmail: string,
+    userName: string,
+    appointmentTime: string,
+    vetsVanName: string
+  ): Promise<boolean> {
+    try {
+      const template: EmailTemplate = {
+        to: userEmail,
+        subject: 'VETS VAN في الطريق إليك الآن',
+        html: this.generatePreAppointmentHTML(userName, appointmentTime, vetsVanName),
+        text: this.generatePreAppointmentText(userName, appointmentTime, vetsVanName)
+      };
+
+      return await this.sendEmail(template);
+    } catch (error) {
+      console.error('Error preparing pre-appointment notification:', error);
       return false;
     }
   }
@@ -177,7 +203,8 @@ VETS VAN - نحن نأتي إليك
     userName: string,
     appointmentDate: string,
     appointmentTime: string,
-    vetsVanName: string
+    vetsVanName: string,
+    isToday: boolean = false
   ): string {
     return `
       <!DOCTYPE html>
@@ -201,7 +228,7 @@ VETS VAN - نحن نأتي إليك
         <div class="container">
           <div class="header">
             <h1>✅ تم تأكيد موعدك</h1>
-            <p>VETS VAN في طريقه إليك</p>
+            <p>${isToday ? 'VETS VAN في طريقه إليك' : 'موعدك محجوز بنجاح'}</p>
           </div>
           <div class="content">
             <h2>عزيزي ${userName},</h2>
@@ -238,10 +265,12 @@ VETS VAN - نحن نأتي إليك
     userName: string,
     appointmentDate: string,
     appointmentTime: string,
-    vetsVanName: string
+    vetsVanName: string,
+    isToday: boolean = false
   ): string {
     return `
 ✅ تم تأكيد موعدك - VETS VAN
+${isToday ? 'VETS VAN في طريقه إليك' : 'موعدك محجوز بنجاح'}
 
 عزيزي ${userName},
 
@@ -263,6 +292,145 @@ VETS VAN - نحن نأتي إليك
 VETS VAN - رعاية محترفة في منزلك
 لأي تعديل أو إلغاء، تواصل معنا عبر التطبيق
     `;
+  }
+
+  private generatePreAppointmentHTML(
+    userName: string,
+    appointmentTime: string,
+    vetsVanName: string
+  ): string {
+    return `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>VETS VAN في الطريق إليك</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+          .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .header { background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; padding: 30px; text-align: center; }
+          .content { padding: 30px; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+          .alert-card { background-color: #FEF3C7; border: 2px solid #F59E0B; border-radius: 8px; padding: 20px; margin: 20px 0; }
+          h1 { margin: 0; font-size: 28px; }
+          h2 { color: #8B2F8B; margin-top: 0; }
+          .highlight { background-color: #8B2F8B; color: white; padding: 10px; border-radius: 5px; display: inline-block; margin: 10px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🚐 VETS VAN في الطريق إليك الآن!</h1>
+            <p>الطبيب البيطري قادم إليك</p>
+          </div>
+          <div class="content">
+            <h2>عزيزي ${userName},</h2>
+            <p>نحن سعداء لإبلاغك أن <strong>${vetsVanName}</strong> في الطريق إليك الآن!</p>
+            
+            <div class="alert-card">
+              <h3>⏰ تفاصيل الوصول:</h3>
+              <p><strong>🕐 موعد الوصول المتوقع:</strong> ${appointmentTime}</p>
+              <p><strong>🚐 العيادة المتنقلة:</strong> ${vetsVanName}</p>
+              <div class="highlight">سيصل الطبيب خلال 30 دقيقة</div>
+            </div>
+
+            <h3>يرجى التحضير للزيارة:</h3>
+            <ul>
+              <li>🏠 كن متواجداً في الموقع المحدد</li>
+              <li>🐾 جهز حيوانك الأليف وأبقه في مكان آمن</li>
+              <li>📋 أحضر أي تقارير طبية أو أدوية سابقة</li>
+              <li>📱 تأكد من تفعيل الهاتف لاستقبال اتصال الطبيب</li>
+            </ul>
+
+            <p><strong>ملاحظة مهمة:</strong> سيتصل بك الطبيب البيطري قبل الوصول مباشرة للتأكيد.</p>
+          </div>
+          <div class="footer">
+            <p>🐾 VETS VAN - نحن في طريقنا إليك 🐾</p>
+            <p>لأي استفسار عاجل، تواصل معنا عبر التطبيق</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  private generatePreAppointmentText(
+    userName: string,
+    appointmentTime: string,
+    vetsVanName: string
+  ): string {
+    return `
+🚐 VETS VAN في الطريق إليك الآن!
+
+عزيزي ${userName},
+
+نحن سعداء لإبلاغك أن ${vetsVanName} في الطريق إليك الآن!
+
+⏰ تفاصيل الوصول:
+🕐 موعد الوصول المتوقع: ${appointmentTime}
+🚐 العيادة المتنقلة: ${vetsVanName}
+
+** سيصل الطبيب خلال 30 دقيقة **
+
+يرجى التحضير للزيارة:
+- كن متواجداً في الموقع المحدد
+- جهز حيوانك الأليف وأبقه في مكان آمن
+- أحضر أي تقارير طبية أو أدوية سابقة
+- تأكد من تفعيل الهاتف لاستقبال اتصال الطبيب
+
+ملاحظة مهمة: سيتصل بك الطبيب البيطري قبل الوصول مباشرة للتأكيد.
+
+VETS VAN - نحن في طريقنا إليك
+لأي استفسار عاجل، تواصل معنا عبر التطبيق
+    `;
+  }
+
+  // Schedule pre-appointment notification
+  schedulePreAppointmentNotification(
+    userEmail: string,
+    userName: string,
+    appointmentDate: string,
+    appointmentTime: string,
+    vetsVanName: string
+  ): void {
+    try {
+      // Parse appointment date and time
+      const appointmentDateTime = new Date(`${appointmentDate} ${appointmentTime}`);
+      
+      // Calculate notification time (30 minutes before appointment)
+      const notificationTime = new Date(appointmentDateTime.getTime() - (30 * 60 * 1000));
+      
+      // Only schedule if notification time is in the future
+      const now = new Date();
+      if (notificationTime > now) {
+        const delay = notificationTime.getTime() - now.getTime();
+        
+        console.log(`📧 Scheduling pre-appointment notification for ${userEmail}`);
+        console.log(`⏰ Notification will be sent at: ${notificationTime.toLocaleString('ar-SA')}`);
+        console.log(`⏳ Delay: ${Math.round(delay / (1000 * 60))} minutes`);
+        
+        setTimeout(async () => {
+          console.log(`🚨 Sending pre-appointment notification to ${userEmail}`);
+          const success = await this.sendPreAppointmentNotification(
+            userEmail,
+            userName,
+            appointmentTime,
+            vetsVanName
+          );
+          
+          if (success) {
+            console.log(`✅ Pre-appointment notification sent successfully to ${userEmail}`);
+          } else {
+            console.log(`❌ Failed to send pre-appointment notification to ${userEmail}`);
+          }
+        }, delay);
+      } else {
+        console.log(`⚠️ Appointment time is too close or has passed, skipping pre-notification for ${userEmail}`);
+      }
+    } catch (error) {
+      console.error('Error scheduling pre-appointment notification:', error);
+    }
   }
 }
 

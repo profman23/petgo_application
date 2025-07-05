@@ -995,6 +995,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             vetsVanName
           );
           console.log(`✅ Booking confirmation email sent to ${user.email}`);
+
+          // Schedule pre-appointment notification (30 minutes before)
+          emailService.schedulePreAppointmentNotification(
+            user.email,
+            user.firstName || user.name,
+            appointmentDate,
+            appointmentTime,
+            vetsVanName
+          );
+          console.log(`📅 Pre-appointment notification scheduled for ${user.email}`);
         } catch (emailError) {
           console.error('❌ Failed to send booking confirmation email:', emailError);
           // Don't fail booking if email fails
