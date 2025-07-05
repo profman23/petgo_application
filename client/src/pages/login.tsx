@@ -165,28 +165,34 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
       <div className="w-full max-w-md">
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
-          {/* Header with back button - matching doctor login style */}
-          <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-6 text-center relative rounded-t-lg">
+          {/* Header with back button and improved logo design */}
+          <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 px-6 py-8 text-center relative rounded-t-lg">
             {/* Back button */}
             <button
               onClick={() => setLocation('/user-type-selection')}
-              className="absolute top-4 left-4 p-2 text-white hover:bg-purple-800 rounded-lg transition-colors"
+              className="absolute top-4 left-4 p-3 text-white hover:bg-purple-800/50 rounded-xl transition-all duration-300 backdrop-blur-sm border border-purple-400/30"
               title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
             >
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
             
-            <div className="mb-4">
-              <img 
-                src={logoImage} 
-                alt="Vets Van" 
-                className="h-16 mx-auto object-contain rounded-lg border-2 border-purple-300"
-              />
+            {/* Logo Container - Enhanced Rectangular Design */}
+            <div className="mb-8 flex justify-center">
+              <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border-4 border-purple-200/60 hover:border-purple-300/80 hover:shadow-purple-500/20 transition-all duration-500 hover:scale-105">
+                <img 
+                  src={logoImage} 
+                  alt="Vets Van - Mobile Veterinary Clinic" 
+                  className="h-24 w-auto max-w-[320px] object-contain mx-auto"
+                  style={{ 
+                    filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.15)) contrast(1.1)',
+                  }}
+                />
+              </div>
             </div>
-            <h1 className="text-2xl font-bold text-white" style={{ textAlign: getTextAlign(language) }}>
+            <h1 className="text-3xl font-bold text-white mb-2" style={{ textAlign: getTextAlign(language) }}>
               {isRegistering ? t('createNewAccount') : t('customerLogin')}
             </h1>
-            <p className="text-purple-100 mt-2" style={{ textAlign: getTextAlign(language) }}>
+            <p className="text-purple-100/90 text-lg" style={{ textAlign: getTextAlign(language) }}>
               {isRegistering ? t('joinMobileVetService') : t('welcomeBack')}
             </p>
           </div>
