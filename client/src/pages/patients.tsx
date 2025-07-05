@@ -3,12 +3,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation, getDirection } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Plus, Heart, Calendar, PawPrint, Cat, Dog, Bird } from 'lucide-react';
+import { ArrowLeft, Plus, Heart, Calendar, PawPrint, Cat, Dog, Bird, Bell } from 'lucide-react';
 import { PatientForm } from '@/components/patient-form';
 import { EditPatientForm } from '@/components/edit-patient-form';
 import { useLocation } from 'wouter';
-const logoPath = '/generated-icon.png';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { FixedFooter } from '@/components/fixed-footer';
+import { LanguageSelector } from '@/components/language-selector';
 
 interface Patient {
   id: number;
@@ -45,6 +46,12 @@ export default function Patients() {
     } else {
       setLocation('/account');
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLocation('/login');
   };
 
   const handleAddPatient = () => {
@@ -95,13 +102,13 @@ export default function Patients() {
   return (
     <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={getDirection(language)}>
       <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
-        {/* Header - Same design as home.tsx */}
+        {/* Header - Exact same design as home.tsx */}
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
               <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
-                  src={logoPath} 
+                  src={logoImage} 
                   alt="VETS VAN Logo" 
                   className="h-full w-auto object-contain"
                   style={{ 
@@ -115,6 +122,8 @@ export default function Patients() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
+              <LanguageSelector />
+              <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 onClick={handleAddPatient}
                 className="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-2"
@@ -122,16 +131,14 @@ export default function Patients() {
               >
                 <Plus className="h-4 w-4" />
               </Button>
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-sm"
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-white hover:bg-purple-700 px-2 py-1 h-8"
               >
-                <ArrowLeft 
-                  className="w-4 h-4" 
-                  style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} 
-                />
-                {language === 'ar' ? 'العودة' : 'Back'}
-              </button>
+                {language === 'ar' ? 'خروج' : 'Logout'}
+              </Button>
             </div>
           </div>
         </div>

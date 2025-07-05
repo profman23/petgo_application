@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp, Bell } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import logoPath from '@assets/10773561_1751295833176.png';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { FixedFooter } from '@/components/fixed-footer';
 import { LanguageSelector } from '@/components/language-selector';
+import { Button } from '@/components/ui/button';
 
 export default function Account() {
   const { t, language } = useTranslation();
@@ -102,6 +103,12 @@ export default function Account() {
     setLocation('/home');
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLocation('/login');
+  };
+
   const handlePatientsClick = () => {
     setLocation('/patients');
   };
@@ -119,13 +126,13 @@ export default function Account() {
   return (
     <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
-        {/* Header - Same design as home.tsx */}
+        {/* Header - Exact same design as home.tsx */}
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
               <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
-                  src={logoPath} 
+                  src={logoImage} 
                   alt="VETS VAN Logo" 
                   className="h-full w-auto object-contain"
                   style={{ 
@@ -140,17 +147,15 @@ export default function Account() {
             </div>
             <div className="flex items-center space-x-2">
               <LanguageSelector />
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-sm"
+              <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-white hover:bg-purple-700 px-2 py-1 h-8"
               >
-                {direction === 'rtl' ? (
-                  <ArrowRight className="w-4 h-4" />
-                ) : (
-                  <ArrowLeft className="w-4 h-4" />
-                )}
-                {language === 'ar' ? 'العودة' : 'Back'}
-              </button>
+                {language === 'ar' ? 'خروج' : 'Logout'}
+              </Button>
             </div>
           </div>
         </div>

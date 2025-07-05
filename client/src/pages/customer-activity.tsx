@@ -6,7 +6,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FixedFooter } from '@/components/fixed-footer';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-const logoPath = '/generated-icon.png';
+import { LanguageSelector } from '@/components/language-selector';
+import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import { Button } from '@/components/ui/button';
+import { Bell } from 'lucide-react';
 
 interface Booking {
   id: number;
@@ -50,6 +53,12 @@ export default function CustomerActivity() {
 
   const handleBack = () => {
     setLocation('/home');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLocation('/login');
   };
 
   const getStatusColor = (status: string) => {
@@ -154,13 +163,13 @@ export default function CustomerActivity() {
       style={{ direction }}
     >
       <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
-        {/* Header - Same design as home.tsx */}
+        {/* Header - Exact same design as home.tsx */}
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
               <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
-                  src={logoPath} 
+                  src={logoImage} 
                   alt="VETS VAN Logo" 
                   className="h-full w-auto object-contain"
                   style={{ 
@@ -174,17 +183,16 @@ export default function CustomerActivity() {
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              <button
-                onClick={handleBack}
-                className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-sm"
+              <LanguageSelector />
+              <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="text-white hover:bg-purple-700 px-2 py-1 h-8"
               >
-                {direction === 'rtl' ? (
-                  <ArrowRight className="w-4 h-4" />
-                ) : (
-                  <ArrowLeft className="w-4 h-4" />
-                )}
-                {language === 'ar' ? 'العودة' : 'Back'}
-              </button>
+                {language === 'ar' ? 'خروج' : 'Logout'}
+              </Button>
             </div>
           </div>
         </div>
