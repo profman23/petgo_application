@@ -164,7 +164,7 @@ export default function DoctorAccount() {
         <div className="flex items-center justify-between p-4">
           <Button
             variant="ghost"
-            onClick={() => setLocation('/doctor-dashboard')}
+            onClick={() => setLocation('/user-type-selection')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />

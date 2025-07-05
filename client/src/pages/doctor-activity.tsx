@@ -143,7 +143,7 @@ export default function DoctorActivity() {
         <div className="flex items-center justify-between p-4">
           <Button
             variant="ghost"
-            onClick={() => setLocation('/doctor-dashboard')}
+            onClick={() => setLocation('/user-type-selection')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -270,18 +270,7 @@ export default function DoctorActivity() {
                     </div>
                   </div>
 
-                  {booking.status === 'pending' && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 bg-green-600 hover:bg-green-700">
-                          {language === 'ar' ? 'قبول' : 'Accept'}
-                        </Button>
-                        <Button size="sm" variant="outline" className="flex-1 text-red-600 border-red-600 hover:bg-red-50">
-                          {language === 'ar' ? 'رفض' : 'Reject'}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+
                 </div>
               ))}
             </CardContent>

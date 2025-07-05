@@ -1012,6 +1012,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get bookings for current doctor's VetsVan (no VetsVan ID required)
+  app.get('/api/doctor/bookings', requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user as any;
+      
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      // Get doctor's VetsVan ID from username mapping
+      let vetsVanId: number;
+      
+      if (user.username === 'v001') {
+        vetsVanId = 1; // VetsVan001
+      } else if (user.username === 'v003') {
+        vetsVanId = 3; // VETS003
+      } else {
+        return res.status(404).json({ message: 'Doctor not found' });
+      }
+      
+      const allBookings = await storage.getAllBookings();
+      
+      // Filter bookings for this specific VetsVan - show ALL bookings regardless of status
+      const vetsVanBookings = allBookings.filter(booking => 
+        booking.vetsVanId === vetsVanId
+      );
+      
+      // Get user details for each booking
+      const bookingsWithUserDetails = await Promise.all(
+        vetsVanBookings.map(async (booking) => {
+          const customer = await storage.getUser(booking.userId);
+          return {
+            ...booking,
+            customerName: customer?.name || 'غير معروف',
+            customerPhone: customer?.phone || 'غير محدد'
+          };
+        })
+      );
+      
+      res.json(bookingsWithUserDetails);
+    } catch (error) {
+      console.error('Error fetching doctor bookings:', error);
+      res.status(500).json({ message: 'Failed to fetch doctor bookings' });
+    }
+  });
+
   // Get user's bookings
   app.get('/api/user/bookings', requireAuth, async (req: any, res) => {
     try {
