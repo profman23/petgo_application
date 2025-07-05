@@ -667,17 +667,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update user profile
   app.put('/api/user/profile', requireAuth, async (req, res) => {
     try {
-      const { firstName, lastName, name, petName, petType } = req.body;
+      const { firstName, lastName, email, name, petName, petType } = req.body;
       
       // Validate required fields
-      if (!firstName || !lastName || !name) {
-        return res.status(400).json({ message: 'First name, last name, and name are required' });
+      if (!firstName || !lastName) {
+        return res.status(400).json({ message: 'First name and last name are required' });
       }
 
       const userId = req.user.id;
       const updatedUser = await storage.updateUser(userId, {
         firstName,
         lastName,
+        email,
         name,
         petName,
         petType

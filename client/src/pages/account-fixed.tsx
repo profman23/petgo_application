@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp, Bell } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp, Bell, Mail } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -19,6 +19,7 @@ export default function Account() {
   // Form states
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   
   // Password reset modal state
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -41,6 +42,7 @@ export default function Account() {
     if (userProfile) {
       setFirstName(userProfile.firstName || '');
       setLastName(userProfile.lastName || '');
+      setEmail(userProfile.email || '');
     }
   }, [userProfile]);
 
@@ -85,6 +87,7 @@ export default function Account() {
     updateProfileMutation.mutate({
       firstName,
       lastName,
+      email,
     });
   };
 
@@ -260,6 +263,23 @@ export default function Account() {
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
                   placeholder={language === 'ar' ? 'أدخل الاسم الأخير' : 'Enter last name'}
                 />
+              </div>
+
+              {/* Email */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2" style={{ textAlign }}>
+                  {language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email address'}
+                  />
+                  <Mail size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                </div>
               </div>
 
               {/* Phone (Read-only) */}
