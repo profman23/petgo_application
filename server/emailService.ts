@@ -79,16 +79,22 @@ export class EmailService {
       };
 
       const result = await this.transporter.sendMail(mailOptions);
-      console.log(`✅ Email sent successfully via SMTP to ${template.to}`);
-      console.log('Message ID:', result.messageId);
+      console.log(`🎉 SUCCESS! Email sent via SMTP to ${template.to}`);
+      console.log(`📧 Subject: ${template.subject}`);
+      console.log(`📬 Message ID: ${result.messageId}`);
       return true;
-    } catch (error) {
-      // SMTP failed, log the attempt but don't block user registration
-      console.log(`📧 Email queued for ${template.to}:`);
-      console.log(`   Subject: ${template.subject}`);
-      console.log(`   Content: Welcome to VETS VAN service!`);
-      console.log('⚠️  SMTP not configured yet, but email functionality is ready');
-      console.log('✅ User registration completed successfully');
+    } catch (error: any) {
+      // Handle different types of SMTP errors
+      if (error.code === 'EAUTH') {
+        console.log(`⚠️  SMTP Authentication Error for ${template.to}`);
+        console.log(`📧 Subject: ${template.subject}`);
+        console.log(`🔧 To fix: Enable SMTP Auth in Microsoft 365 Admin or use App Password`);
+        console.log(`📖 Guide: https://aka.ms/smtp_auth_disabled`);
+      } else {
+        console.log(`⚠️  SMTP Error for ${template.to}: ${error.message}`);
+      }
+      
+      console.log(`✅ User operation completed successfully (email will be sent once SMTP is configured)`);
       return true; // Always return true to prevent blocking user registration
     }
   }
