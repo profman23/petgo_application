@@ -47,6 +47,13 @@ export default function DoctorActivity() {
   const [audioEnabled, setAudioEnabled] = useState(audioNotification.isAudioEnabled());
   const previousBookingCount = useRef<number>(0);
 
+  // Fetch VetsVan location information
+  const { data: vetsVanInfo } = useQuery({
+    queryKey: ['/api/doctor/vetsvan-location'],
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: false,
+  });
+
   // Fetch bookings for the current doctor's VetsVan
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['/api/doctor/bookings'],
@@ -296,6 +303,52 @@ export default function DoctorActivity() {
             </div>
           </CardContent>
         </Card>
+
+        {/* VetsVan Location Info Card */}
+        {vetsVanInfo && (
+          <Card className="mb-6 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-blue-900" style={{ textAlign }}>
+                      {vetsVanInfo.vetsvanName} ({vetsVanInfo.vetsvanCode})
+                    </h3>
+                    <p className="text-sm text-blue-700" style={{ textAlign }}>
+                      {vetsVanInfo.carModel} - {vetsVanInfo.carColor}
+                    </p>
+                    <p className="text-xs text-blue-600" style={{ textAlign }}>
+                      {language === 'ar' ? 'رقم اللوحة:' : 'Plate:'} {vetsVanInfo.plateNumber}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-blue-600 mb-1" style={{ textAlign }}>
+                    {language === 'ar' ? 'الموقع المحدد:' : 'Set Location:'}
+                  </div>
+                  <div className="text-sm font-mono text-blue-800" style={{ textAlign }}>
+                    {vetsVanInfo.latitude?.toFixed(6)}, {vetsVanInfo.longitude?.toFixed(6)}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 text-xs h-6 px-2 bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200"
+                    onClick={() => {
+                      const url = `https://www.google.com/maps?q=${vetsVanInfo.latitude},${vetsVanInfo.longitude}`;
+                      window.open(url, '_blank');
+                    }}
+                  >
+                    <MapPin className="w-3 h-3 mr-1" />
+                    {language === 'ar' ? 'عرض في الخرائط' : 'View on Maps'}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Activity Title */}
         <div className="mb-6">

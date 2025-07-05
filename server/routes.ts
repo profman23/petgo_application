@@ -1253,6 +1253,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Doctor VetsVan location endpoint
+  app.get('/api/doctor/vetsvan-location', requireAuth, async (req, res) => {
+    try {
+      const user = req.user;
+      
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+      
+      // Get the doctor's VetsVan information with location
+      const driver = await storage.getDriverByUsername(user.phone);
+      if (!driver) {
+        return res.status(404).json({ message: 'VetsVan not found' });
+      }
+      
+      res.json({
+        vetsVanId: driver.id,
+        vetsvanCode: driver.vetsvanCode,
+        vetsvanName: driver.vetsvanName,
+        latitude: driver.latitude,
+        longitude: driver.longitude,
+        carModel: driver.carModel,
+        carColor: driver.carColor,
+        plateNumber: driver.plateNumber
+      });
+    } catch (error) {
+      console.error('Error fetching VetsVan location:', error);
+      res.status(500).json({ message: 'Failed to fetch VetsVan location' });
+    }
+  });
+
   // Doctor profile and account endpoints
   app.put('/api/doctor/profile', requireAuth, async (req, res) => {
     try {
