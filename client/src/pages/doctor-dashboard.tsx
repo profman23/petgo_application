@@ -14,6 +14,7 @@ import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playNotificationSound, requestAudioPermission } from '@/utils/audio';
 import { useState, useRef } from 'react';
+import { DoctorFooter } from '@/components/doctor-footer';
 
 export default function DoctorDashboard() {
   const [, setLocation] = useLocation();
@@ -370,7 +371,7 @@ export default function DoctorDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={direction}>
+    <div className="min-h-screen bg-gray-50 pb-20" dir={direction}>
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="flex items-center justify-between p-4">
@@ -632,6 +633,8 @@ export default function DoctorDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <DoctorFooter />
     </div>
   );
 }

@@ -1202,6 +1202,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Doctor profile and account endpoints
+  app.put('/api/doctor/profile', requireAuth, async (req, res) => {
+    try {
+      const user = req.user;
+      
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+      
+      const { name, phone, email } = req.body;
+      
+      // Update doctor profile in database
+      const updatedUser = await storage.updateUser(user.id, { name, phone, email });
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      res.json({ user: updatedUser });
+    } catch (error) {
+      console.error('Error updating doctor profile:', error);
+      res.status(500).json({ message: 'Failed to update profile' });
+    }
+  });
+
+  app.put('/api/doctor/change-password', requireAuth, async (req, res) => {
+    try {
+      const user = req.user;
+      
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+      
+      const { currentPassword, newPassword } = req.body;
+      
+      // For doctors, check current password against the driver's password
+      const driver = await storage.getDriver(user.id);
+      if (!driver || driver.password !== currentPassword) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+      
+      // Update password
+      const updatedUser = await storage.updateUserPassword(user.id, newPassword);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error changing doctor password:', error);
+      res.status(500).json({ message: 'Failed to change password' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
