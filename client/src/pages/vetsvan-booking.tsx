@@ -160,17 +160,20 @@ export default function VetsVanBooking() {
     setIsCreatingBooking(true);
 
     try {
+      console.log('🎯 Starting location detection...');
+      console.log('📍 GPS Values from hook:', { latitude, longitude, accuracy });
+      
       // Get customer location from currentLocation hook first, then fallback to pendingRequest
       let customerLocation = null;
       
       // أولوية للموقع الحالي من hook
       if (latitude && longitude) {
         customerLocation = {
-          latitude: latitude,
-          longitude: longitude,
-          address: null // لا نحتاج عنوان مفصل الآن
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+          address: null
         };
-        console.log('✅ Using current location from hook:', customerLocation);
+        console.log('✅ Using GPS location from hook:', customerLocation);
       } else {
         // fallback للموقع من localStorage
         const pendingRequestData = localStorage.getItem('pendingRequest');
@@ -213,11 +216,15 @@ export default function VetsVanBooking() {
         customerLocation
       };
 
-      console.log('Creating booking with data:', bookingData);
-      const result = await apiRequest('/api/bookings', {
-        method: 'POST',
-        body: JSON.stringify(bookingData),
+      console.log('🔍 Final booking data before sending:', JSON.stringify(bookingData, null, 2));
+      console.log('🌍 Customer location specifically:', {
+        exists: !!customerLocation,
+        latitude: customerLocation?.latitude,
+        longitude: customerLocation?.longitude,
+        fromSource: latitude && longitude ? 'GPS Hook' : 'Fallback'
       });
+      
+      const result = await apiRequest('POST', '/api/bookings', bookingData);
 
       console.log('Booking successful:', result);
       
