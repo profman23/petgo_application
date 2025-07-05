@@ -484,4 +484,389 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+// Temporary fallback to MemStorage due to database connection issues
+class MemStorage implements IStorage {
+  private users: Map<number, User>;
+  private drivers: Map<number, Driver>;
+  private rides: Map<number, Ride>;
+  private patients: Map<number, Patient>;
+  private admins: Map<number, Admin>;
+  private shifts: Map<number, Shift>;
+  private bookings: Map<number, Booking>;
+  private currentUserId: number;
+  private currentDriverId: number;
+  private currentRideId: number;
+  private currentPatientId: number;
+  private currentAdminId: number;
+  private currentShiftId: number;
+  private currentBookingId: number;
+
+  constructor() {
+    this.users = new Map();
+    this.drivers = new Map();
+    this.rides = new Map();
+    this.patients = new Map();
+    this.admins = new Map();
+    this.shifts = new Map();
+    this.bookings = new Map();
+    this.currentUserId = 1;
+    this.currentDriverId = 1;
+    this.currentRideId = 1;
+    this.currentPatientId = 1;
+    this.currentAdminId = 1;
+    this.currentShiftId = 1;
+    this.currentBookingId = 1;
+
+    this.initializeTestData();
+  }
+
+  private initializeTestData() {
+    // Test users
+    this.createUser({
+      name: 'عميل تجريبي',
+      phone: '0501234567',
+      password: '123456',
+      petName: 'فلافي',
+      petType: 'قطة',
+      address: 'الرياض',
+      membershipType: 'premium'
+    });
+
+    // Test admins
+    const admin: Admin = {
+      id: this.currentAdminId++,
+      username: 'admin',
+      password: '123456',
+      name: 'مدير النظام',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.admins.set(admin.id, admin);
+
+    // Test drivers
+    const driver1: Driver = {
+      id: this.currentDriverId++,
+      vetsvanCode: 'V001',
+      vetsvanName: 'VETS VAN 1',
+      name: 'د. محمد العلي',
+      phone: '0551234567',
+      username: 'v001',
+      password: '123456',
+      latitude: 24.7136,
+      longitude: 46.6753,
+      isAvailable: true,
+      rating: 4.8,
+      carModel: 'Mercedes Sprinter',
+      carColor: 'أبيض',
+      plateNumber: 'VET-001',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.drivers.set(driver1.id, driver1);
+
+    const driver2: Driver = {
+      id: this.currentDriverId++,
+      vetsvanCode: 'V003',
+      vetsvanName: 'VETS003',
+      name: 'د. سارة أحمد',
+      phone: '0551234568',
+      username: 'v003',
+      password: '123456',
+      latitude: 24.7436,
+      longitude: 46.6853,
+      isAvailable: true,
+      rating: 4.9,
+      carModel: 'عيادة متنقلة',
+      carColor: 'أزرق',
+      plateNumber: 'VET-002',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.drivers.set(driver2.id, driver2);
+
+    // Create shifts for both VetsVans
+    for (const driver of [driver1, driver2]) {
+      for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+        const date = new Date();
+        date.setDate(date.getDate() + dayOffset);
+        const dateStr = date.toISOString().split('T')[0];
+        
+        const times = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00'];
+        times.forEach(time => {
+          const shift: Shift = {
+            id: this.currentShiftId++,
+            vetsVanId: driver.id,
+            appointmentDate: dateStr,
+            appointmentTime: time,
+            isAvailable: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          this.shifts.set(shift.id, shift);
+        });
+      }
+    }
+  }
+
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByPhone(phone: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.phone === phone);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(user => user.email === email);
+  }
+
+  async getUserByIdentifier(identifier: string): Promise<User | undefined> {
+    let user = await this.getUserByPhone(identifier);
+    if (user) return user;
+    user = await this.getUserByEmail(identifier);
+    return user;
+  }
+
+  async createUser(insertUser: any): Promise<User> {
+    const user: User = { 
+      id: this.currentUserId++,
+      name: insertUser.name,
+      phone: insertUser.phone,
+      email: insertUser.email,
+      password: insertUser.password,
+      petName: insertUser.petName,
+      petType: insertUser.petType,
+      address: insertUser.address,
+      membershipType: insertUser.membershipType || 'basic',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.users.set(user.id, user);
+    return user;
+  }
+
+  async updateUser(id: number, data: Partial<User>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...data, updatedAt: new Date() };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async updateUserPassword(id: number, newPassword: string): Promise<User | undefined> {
+    return this.updateUser(id, { password: newPassword });
+  }
+
+  async getAllDrivers(): Promise<Driver[]> {
+    return Array.from(this.drivers.values());
+  }
+
+  async getAvailableDrivers(): Promise<Driver[]> {
+    return Array.from(this.drivers.values()).filter(driver => driver.isAvailable);
+  }
+
+  async getDriver(id: number): Promise<Driver | undefined> {
+    return this.drivers.get(id);
+  }
+
+  async getDriverByUsername(username: string): Promise<Driver | undefined> {
+    return Array.from(this.drivers.values()).find(driver => driver.username === username);
+  }
+
+  async updateDriverLocation(id: number, latitude: number, longitude: number): Promise<void> {
+    const driver = this.drivers.get(id);
+    if (driver) {
+      driver.latitude = latitude;
+      driver.longitude = longitude;
+      driver.updatedAt = new Date();
+      this.drivers.set(id, driver);
+    }
+  }
+
+  async updateDriverAvailability(id: number, isAvailable: boolean): Promise<void> {
+    const driver = this.drivers.get(id);
+    if (driver) {
+      driver.isAvailable = isAvailable;
+      driver.updatedAt = new Date();
+      this.drivers.set(id, driver);
+    }
+  }
+
+  async createRide(rideData: RideRequest): Promise<Ride> {
+    const ride: Ride = {
+      id: this.currentRideId++,
+      userId: rideData.userId,
+      pickupLat: rideData.pickupLat,
+      pickupLng: rideData.pickupLng,
+      dropoffLat: rideData.dropoffLat || rideData.pickupLat,
+      dropoffLng: rideData.dropoffLng || rideData.pickupLng,
+      pickupAddress: rideData.pickupAddress,
+      dropoffAddress: rideData.dropoffAddress || rideData.pickupAddress,
+      status: 'requested',
+      estimatedTime: 10,
+      estimatedCost: 25,
+      driverId: rideData.driverId,
+      selectedPetIds: rideData.selectedPetIds,
+      serviceType: rideData.serviceType,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.rides.set(ride.id, ride);
+    return ride;
+  }
+
+  async getRide(id: number): Promise<Ride | undefined> {
+    return this.rides.get(id);
+  }
+
+  async getAllRides(): Promise<Ride[]> {
+    return Array.from(this.rides.values());
+  }
+
+  async updateRideStatus(id: number, status: string): Promise<void> {
+    const ride = this.rides.get(id);
+    if (ride) {
+      ride.status = status;
+      ride.updatedAt = new Date();
+      this.rides.set(id, ride);
+    }
+  }
+
+  async assignDriverToRide(rideId: number, driverId: number): Promise<void> {
+    const ride = this.rides.get(rideId);
+    if (ride) {
+      ride.driverId = driverId;
+      ride.updatedAt = new Date();
+      this.rides.set(rideId, ride);
+    }
+  }
+
+  async getUserActiveRide(userId: number): Promise<Ride | undefined> {
+    return Array.from(this.rides.values()).find(
+      ride => ride.userId === userId && !['completed', 'cancelled'].includes(ride.status)
+    );
+  }
+
+  async getDriverActiveRide(driverId: number): Promise<Ride | undefined> {
+    return Array.from(this.rides.values()).find(
+      ride => ride.driverId === driverId && !['completed', 'cancelled'].includes(ride.status)
+    );
+  }
+
+  async getUserPatients(userId: number): Promise<Patient[]> {
+    return Array.from(this.patients.values()).filter(patient => patient.userId === userId);
+  }
+
+  async createPatient(insertPatient: InsertPatient): Promise<Patient> {
+    const patient: Patient = {
+      id: this.currentPatientId++,
+      userId: insertPatient.userId,
+      name: insertPatient.name,
+      type: insertPatient.type,
+      ageYear: insertPatient.ageYear,
+      ageMonth: insertPatient.ageMonth,
+      ageDay: insertPatient.ageDay,
+      photo: insertPatient.photo,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.patients.set(patient.id, patient);
+    return patient;
+  }
+
+  async updatePatient(patientId: number, userId: number, updateData: Partial<Patient>): Promise<Patient | undefined> {
+    const patient = this.patients.get(patientId);
+    if (!patient || patient.userId !== userId) return undefined;
+    
+    const updatedPatient = { ...patient, ...updateData, updatedAt: new Date() };
+    this.patients.set(patientId, updatedPatient);
+    return updatedPatient;
+  }
+
+  async getAdminByUsername(username: string): Promise<Admin | undefined> {
+    return Array.from(this.admins.values()).find(admin => admin.username === username);
+  }
+
+  async createDriver(driverData: InsertDriver): Promise<Driver> {
+    const driver: Driver = {
+      id: this.currentDriverId++,
+      vetsvanCode: driverData.vetsvanCode,
+      vetsvanName: driverData.vetsvanName,
+      name: driverData.name,
+      phone: driverData.phone,
+      username: driverData.username,
+      password: driverData.password,
+      latitude: driverData.latitude || 24.7136,
+      longitude: driverData.longitude || 46.6753,
+      isAvailable: true,
+      rating: 4.5,
+      carModel: driverData.carModel,
+      carColor: driverData.carColor,
+      plateNumber: driverData.plateNumber,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.drivers.set(driver.id, driver);
+    return driver;
+  }
+
+  async deleteDriver(id: number): Promise<void> {
+    this.drivers.delete(id);
+  }
+
+  async getAllShifts(): Promise<Shift[]> {
+    return Array.from(this.shifts.values());
+  }
+
+  async createShift(shiftData: InsertShift): Promise<Shift> {
+    const shift: Shift = {
+      id: this.currentShiftId++,
+      vetsVanId: shiftData.vetsVanId,
+      appointmentDate: shiftData.appointmentDate,
+      appointmentTime: shiftData.appointmentTime,
+      isAvailable: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.shifts.set(shift.id, shift);
+    return shift;
+  }
+
+  async deleteShift(id: number): Promise<void> {
+    this.shifts.delete(id);
+  }
+
+  async createBooking(bookingData: InsertBooking): Promise<Booking> {
+    const booking: Booking = {
+      id: this.currentBookingId++,
+      userId: bookingData.userId,
+      vetsVanId: bookingData.vetsVanId,
+      shiftId: bookingData.shiftId,
+      appointmentDate: bookingData.appointmentDate,
+      appointmentTime: bookingData.appointmentTime,
+      status: bookingData.status || 'confirmed',
+      customerName: bookingData.customerName,
+      customerPhone: bookingData.customerPhone,
+      customerLocation: bookingData.customerLocation,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.bookings.set(booking.id, booking);
+    return booking;
+  }
+
+  async getUserBookings(userId: number): Promise<Booking[]> {
+    return Array.from(this.bookings.values()).filter(booking => booking.userId === userId);
+  }
+
+  async getShiftBookings(shiftId: number): Promise<Booking[]> {
+    return Array.from(this.bookings.values()).filter(booking => booking.shiftId === shiftId);
+  }
+
+  async getAllBookings(): Promise<Booking[]> {
+    return Array.from(this.bookings.values());
+  }
+}
+
+export const storage = new MemStorage();

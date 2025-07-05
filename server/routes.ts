@@ -71,6 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType }
       });
     } catch (error) {
+      console.error('Login error:', error);
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
