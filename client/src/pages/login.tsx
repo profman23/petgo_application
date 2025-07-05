@@ -109,12 +109,18 @@ export default function Login() {
     mutationFn: async (data: any) => {
       // Validate captcha first
       if (parseInt(data.captcha) !== captcha.answer) {
-        throw new Error('رمز التحقق غير صحيح');
+        throw new Error(language === 'ar' ? 'رمز التحقق غير صحيح' : 'Invalid verification code');
       }
+      
+      // Add language to registration data
+      const dataWithLanguage = {
+        ...data,
+        preferredLanguage: language
+      };
       
       const response = await apiRequest('/api/auth/register', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(dataWithLanguage)
       });
       return response as AuthResponse;
     },

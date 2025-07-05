@@ -31,6 +31,28 @@ function requireAuth(req: any, res: any, next: any) {
   next();
 }
 
+// Error message translations
+function getErrorMessage(key: string, language: string = 'ar') {
+  const messages = {
+    ar: {
+      phoneExists: 'رقم الهاتف مستخدم بالفعل',
+      emailExists: 'الإيميل مستخدم بالفعل',
+      serverError: 'خطأ في الخادم',
+      phoneInvalid: 'رقم الهاتف يجب أن يبدأ بـ 05 ويكون 10 أرقام',
+      logoutSuccess: 'تم تسجيل الخروج بنجاح'
+    },
+    en: {
+      phoneExists: 'Phone number already exists',
+      emailExists: 'Email address already exists',
+      serverError: 'Server error',
+      phoneInvalid: 'Phone number must start with 05 and be 10 digits',
+      logoutSuccess: 'Successfully logged out'
+    }
+  };
+  
+  return messages[language]?.[key] || messages.ar[key];
+}
+
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in kilometers
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -93,16 +115,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         membershipType: 'standard'
       };
       
+      const userLanguage = req.body.preferredLanguage || 'ar';
+      
       const existingUserByPhone = await storage.getUserByPhone(fullUserData.phone);
       if (existingUserByPhone) {
-        return res.status(400).json({ message: 'رقم الهاتف مستخدم بالفعل' });
+        return res.status(400).json({ message: getErrorMessage('phoneExists', userLanguage) });
       }
       
       // Check if email is already registered
       if (fullUserData.email) {
         const existingUserByEmail = await storage.getUserByEmail(fullUserData.email);
         if (existingUserByEmail) {
-          return res.status(400).json({ message: 'الإيميل مستخدم بالفعل' });
+          return res.status(400).json({ message: getErrorMessage('emailExists', userLanguage) });
         }
       }
       
@@ -132,16 +156,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Handle database unique constraint violations
       if (error.code === '23505') { // PostgreSQL unique constraint violation
+        const userLanguage = req.body.preferredLanguage || 'ar';
+        
         if (error.constraint === 'users_phone_unique') {
-          return res.status(400).json({ message: 'رقم الهاتف مستخدم بالفعل' });
+          return res.status(400).json({ message: getErrorMessage('phoneExists', userLanguage) });
         }
         if (error.constraint === 'users_email_unique') {
-          return res.status(400).json({ message: 'الإيميل مستخدم بالفعل' });
+          return res.status(400).json({ message: getErrorMessage('emailExists', userLanguage) });
         }
       }
       
       console.error('Registration error:', error);
-      res.status(500).json({ message: 'خطأ في الخادم' });
+      const userLanguage = req.body.preferredLanguage || 'ar';
+      res.status(500).json({ message: getErrorMessage('serverError', userLanguage) });
     }
   });
 
