@@ -933,7 +933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Book an appointment
   app.post('/api/bookings', requireAuth, async (req: any, res) => {
     try {
-      const { shiftId, vetsVanId, appointmentDate, appointmentTime } = req.body;
+      const { shiftId, vetsVanId, appointmentDate, appointmentTime, customerLocation } = req.body;
       const userId = req.user.id;
 
       // Check if this specific time slot is already booked
@@ -948,14 +948,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'This time slot is already booked' });
       }
 
-      // Create booking
+      // Create booking with customer location
       const booking = await storage.createBooking({
         userId,
         shiftId,
         vetsVanId,
         appointmentDate,
         appointmentTime,
-        status: 'booked'
+        status: 'booked',
+        customerLocation: customerLocation || null
       });
 
       // Get user details for the notification
@@ -1041,7 +1042,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return {
             ...booking,
             customerName: customer?.name || 'غير معروف',
-            customerPhone: customer?.phone || 'غير محدد'
+            customerPhone: customer?.phone || 'غير محدد',
+            customerLocation: booking.customerLocation ? {
+              latitude: booking.customerLocation.latitude,
+              longitude: booking.customerLocation.longitude,
+              address: booking.customerLocation.address || null
+            } : null
           };
         })
       );

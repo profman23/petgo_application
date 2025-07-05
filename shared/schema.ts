@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, real, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -193,6 +193,11 @@ export const bookings = pgTable("bookings", {
   appointmentDate: text("appointment_date").notNull(), // YYYY-MM-DD format
   appointmentTime: text("appointment_time").notNull(), // HH:MM format
   status: text("status").default("booked").notNull(), // 'booked', 'completed', 'cancelled'
+  customerLocation: jsonb("customer_location").$type<{
+    latitude: number;
+    longitude: number;
+    address?: string;
+  }>(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

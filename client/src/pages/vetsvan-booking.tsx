@@ -156,11 +156,31 @@ export default function VetsVanBooking() {
     setIsCreatingBooking(true);
 
     try {
+      // Get customer location from pendingRequest data
+      const pendingRequestData = localStorage.getItem('pendingRequest');
+      let customerLocation = null;
+      
+      if (pendingRequestData) {
+        try {
+          const requestData = JSON.parse(pendingRequestData);
+          if (requestData.pickupLatitude && requestData.pickupLongitude) {
+            customerLocation = {
+              latitude: requestData.pickupLatitude,
+              longitude: requestData.pickupLongitude,
+              address: requestData.location || null
+            };
+          }
+        } catch (e) {
+          console.error('Error parsing pending request data:', e);
+        }
+      }
+      
       const bookingData = {
         shiftId: selectedShift,
         vetsVanId: selectedVetsVan,
         appointmentDate: selectedDate,
         appointmentTime: selectedTime,
+        customerLocation
       };
 
       console.log('Creating booking with data:', bookingData);

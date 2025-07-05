@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DoctorFooter } from '@/components/doctor-footer';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -22,12 +23,19 @@ interface Booking {
   customerName: string;
   customerPhone: string;
   createdAt: string;
+  customerLocation?: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  };
 }
 
 export default function DoctorActivity() {
   const [, setLocation] = useLocation();
   const t = useTranslation();
   const { language } = useLanguage();
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [showMap, setShowMap] = useState(false);
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
   const { toast } = useToast();
@@ -96,9 +104,37 @@ export default function DoctorActivity() {
     }
   };
 
-  // Group bookings by date
+  // Handle booking click to show map
+  const handleBookingClick = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setShowMap(true);
+  };
+
+  // Open Google Maps with customer location
+  const openGoogleMaps = () => {
+    if (selectedBooking?.customerLocation) {
+      const { latitude, longitude } = selectedBooking.customerLocation;
+      const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      
+      // Try to open in new window/tab
+      const newWindow = window.open(googleMapsUrl, '_blank');
+      
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        // If popup was blocked, try direct navigation
+        window.location.href = googleMapsUrl;
+      }
+      
+      toast({
+        title: language === 'ar' ? 'فتح خرائط جوجل' : 'Opening Google Maps',
+        description: language === 'ar' ? 'يتم فتح موقع العميل في خرائط جوجل' : 'Opening customer location in Google Maps',
+      });
+    }
+  };
+
+  // Group bookings by date with Today's Requests first
   const groupedBookings = React.useMemo(() => {
     const groups: { [key: string]: Booking[] } = {};
+    const today = new Date().toISOString().split('T')[0];
     
     (bookings as Booking[]).forEach((booking: Booking) => {
       const date = booking.appointmentDate;
@@ -108,8 +144,14 @@ export default function DoctorActivity() {
       groups[date].push(booking);
     });
 
-    // Sort dates
-    const sortedDates = Object.keys(groups).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    // Sort dates with today's requests first
+    const sortedDates = Object.keys(groups).sort((a, b) => {
+      // Today's date always comes first
+      if (a === today && b !== today) return -1;
+      if (b === today && a !== today) return 1;
+      // For other dates, sort normally
+      return new Date(a).getTime() - new Date(b).getTime();
+    });
     
     const result: { [key: string]: Booking[] } = {};
     sortedDates.forEach(date => {
@@ -307,7 +349,8 @@ export default function DoctorActivity() {
               {dateBookings.map((booking) => (
                 <div 
                   key={booking.id} 
-                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow"
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer hover:bg-blue-50"
+                  onClick={() => handleBookingClick(booking)}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -349,6 +392,123 @@ export default function DoctorActivity() {
           </Card>
         ))}
       </div>
+
+      {/* Customer Location Map Dialog */}
+      <Dialog open={showMap} onOpenChange={setShowMap}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle style={{ textAlign }}>
+              {language === 'ar' ? 'موقع العميل' : 'Customer Location'}
+              {selectedBooking && (
+                <span className="text-sm font-normal text-gray-600 mr-2">
+                  - {selectedBooking.customerName}
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedBooking && selectedBooking.customerLocation ? (
+            <div className="space-y-4">
+              {/* Address Display */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                  <span className="font-semibold" style={{ textAlign }}>
+                    {language === 'ar' ? 'العنوان' : 'Address'}:
+                  </span>
+                </div>
+                <p className="text-gray-700" style={{ textAlign }}>
+                  {selectedBooking.customerLocation.address || 
+                    `${selectedBooking.customerLocation.latitude}, ${selectedBooking.customerLocation.longitude}`
+                  }
+                </p>
+              </div>
+
+              {/* Interactive Map Placeholder */}
+              <div className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-dashed border-blue-300 rounded-lg p-8 text-center">
+                <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  {language === 'ar' ? 'موقع العميل على الخريطة' : 'Customer Location on Map'}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {language === 'ar' ? 
+                    `خط العرض: ${selectedBooking.customerLocation.latitude}` :
+                    `Latitude: ${selectedBooking.customerLocation.latitude}`
+                  }
+                </p>
+                <p className="text-gray-600 mb-6">
+                  {language === 'ar' ? 
+                    `خط الطول: ${selectedBooking.customerLocation.longitude}` :
+                    `Longitude: ${selectedBooking.customerLocation.longitude}`
+                  }
+                </p>
+                
+                {/* Action Buttons */}
+                <div className="flex gap-3 justify-center">
+                  <Button 
+                    onClick={openGoogleMaps}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                  >
+                    <MapPin className="w-4 h-4 mr-2" />
+                    {language === 'ar' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'}
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      const { latitude, longitude } = selectedBooking.customerLocation!;
+                      navigator.clipboard.writeText(`${latitude}, ${longitude}`);
+                      toast({
+                        title: language === 'ar' ? 'تم النسخ' : 'Copied',
+                        description: language === 'ar' ? 'تم نسخ الإحداثيات' : 'Coordinates copied to clipboard',
+                      });
+                    }}
+                  >
+                    {language === 'ar' ? 'نسخ الإحداثيات' : 'Copy Coordinates'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Customer Contact Info */}
+              <div className="bg-purple-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-purple-900 mb-3" style={{ textAlign }}>
+                  {language === 'ar' ? 'معلومات التواصل' : 'Contact Information'}
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <User className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm" style={{ textAlign }}>
+                      {selectedBooking.customerName}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm" style={{ textAlign }}>
+                      {selectedBooking.customerPhone}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-purple-600" />
+                    <span className="text-sm" style={{ textAlign }}>
+                      {formatTime(selectedBooking.appointmentTime)} - {formatDate(selectedBooking.appointmentDate)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600">
+                {language === 'ar' ? 
+                  'لم يتم العثور على موقع العميل' : 
+                  'Customer location not available'
+                }
+              </p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <DoctorFooter />
     </div>
