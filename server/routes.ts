@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema } from "@shared/schema";
 import { ZodError } from "zod";
+import { emailService } from "./emailService";
 
 // Simple session middleware
 const sessions = new Map();
@@ -99,6 +100,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser(fullUserData);
       const sessionId = generateSessionId();
       sessions.set(sessionId, { user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType } });
+      
+      // Send welcome email if email is provided
+      if (user.email) {
+        try {
+          await emailService.sendWelcomeEmail(user.email, user.firstName || user.name, user.petName || 'حيوانك الأليف');
+          console.log(`✅ Welcome email sent to ${user.email}`);
+        } catch (emailError) {
+          console.error('❌ Failed to send welcome email:', emailError);
+          // Don't fail registration if email fails
+        }
+      }
       
       res.json({ 
         token: sessionId, 
@@ -966,6 +978,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get user details for the notification
       const user = await storage.getUser(userId);
       const customerName = user?.name || 'عميل جديد';
+      
+      // Get VetsVan details for email
+      const vetsVan = await storage.getDriver(vetsVanId);
+      const vetsVanName = vetsVan?.vetsvanName || 'VetsVan';
+      
+      // Send booking confirmation email if user has email
+      if (user?.email) {
+        try {
+          await emailService.sendBookingConfirmationEmail(
+            user.email,
+            user.firstName || user.name,
+            appointmentDate,
+            appointmentTime,
+            vetsVanName
+          );
+          console.log(`✅ Booking confirmation email sent to ${user.email}`);
+        } catch (emailError) {
+          console.error('❌ Failed to send booking confirmation email:', emailError);
+          // Don't fail booking if email fails
+        }
+      }
       
       // Store notification for real-time updates
       // This could be enhanced with WebSocket or Server-Sent Events for real-time notifications

@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
-import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart } from 'lucide-react';
+import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart, Mail } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
@@ -38,6 +38,7 @@ export default function Login() {
     lastName: '',
     petName: '',
     petType: 'كلب',
+    email: '',
     phone: '',
     password: '',
     captcha: '',
@@ -323,6 +324,21 @@ export default function Login() {
                     <SelectItem value="طير">{language === 'ar' ? 'طير' : 'Bird'}</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'} *</label>
+                <div className="relative">
+                  <Input
+                    type="email"
+                    placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email address'}
+                    className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                    value={formData.email || ''}
+                    onChange={(e) => updateFormData('email', e.target.value)}
+                    required
+                  />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                </div>
               </div>
 
               <div>

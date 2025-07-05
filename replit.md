@@ -452,6 +452,13 @@ Changelog:
 - July 5, 2025. ENHANCED: Doctor Activity page with VetsVan info card displaying location coordinates, vehicle model, color, plate number
 - July 5, 2025. INTEGRATED: Google Maps button for doctors to view VetsVan location directly from admin-set coordinates
 - July 5, 2025. SUCCESS: Complete location flow working - admin sets VetsVan locations, doctors view them in their interface with map integration
+- July 5, 2025. MIGRATED: Email service completely rewritten from SendGrid to Microsoft Graph API for Outlook integration
+- July 5, 2025. INSTALLED: Azure MSAL Node (@azure/msal-node) and Axios packages for Microsoft 365 authentication
+- July 5, 2025. CONFIGURED: Microsoft Graph API client credentials flow for automated email sending
+- July 5, 2025. IMPLEMENTED: New EmailService class using ConfidentialClientApplication for token-based authentication
+- July 5, 2025. REQUIRED: Azure App Registration setup with AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID, FROM_EMAIL environment variables
+- July 5, 2025. ENHANCED: Email functionality maintains welcome emails for new users and booking confirmation emails for appointments
+- July 5, 2025. COMPLETED: Full migration to Microsoft 365 email system per user's Outlook account preference
 ```
 
 ## User Preferences

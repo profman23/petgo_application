@@ -5,6 +5,7 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   phone: text("phone").notNull().unique(),
+  email: text("email").unique(),
   password: text("password").notNull(),
   name: text("name").notNull(),
   firstName: text("first_name"),
@@ -97,6 +98,7 @@ export const registerSchema = z.object({
   petType: z.enum(["كلب", "قطة", "طير"], {
     errorMap: () => ({ message: "يرجى اختيار نوع الأليف" })
   }),
+  email: z.string().email("البريد الإلكتروني غير صحيح"),
   phone: z.string()
     .regex(/^05\d{8}$/, "رقم الهاتف يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"),
   password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
