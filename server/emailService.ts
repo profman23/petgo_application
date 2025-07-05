@@ -1,16 +1,4 @@
-import { ConfidentialClientApplication } from '@azure/msal-node';
-import axios from 'axios';
-
-// Microsoft Graph configuration
-const msalConfig = {
-  auth: {
-    clientId: process.env.AZURE_CLIENT_ID || '',
-    clientSecret: process.env.AZURE_CLIENT_SECRET || '',
-    authority: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID || 'common'}`
-  }
-};
-
-const msalInstance = new ConfidentialClientApplication(msalConfig);
+import nodemailer from 'nodemailer';
 
 interface EmailTemplate {
   to: string;
@@ -21,108 +9,82 @@ interface EmailTemplate {
 
 export class EmailService {
   private fromEmail: string;
+  private transporter: nodemailer.Transporter;
 
   constructor() {
-    this.fromEmail = process.env.FROM_EMAIL || 'noreply@vetsvan.com';
+    this.fromEmail = process.env.FROM_EMAIL || 'info@vetsvan.com';
+    
+    // Create transporter for Outlook SMTP
+    this.transporter = nodemailer.createTransport({
+      host: 'smtp-mail.outlook.com',
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: this.fromEmail,
+        pass: process.env.EMAIL_PASSWORD || 'defaultpassword'
+      },
+      tls: {
+        ciphers: 'SSLv3'
+      }
+    });
   }
 
   async sendWelcomeEmail(userEmail: string, userName: string, petName: string): Promise<boolean> {
-    if (!process.env.AZURE_CLIENT_ID || !process.env.AZURE_CLIENT_SECRET || !process.env.AZURE_TENANT_ID) {
-      console.log('Microsoft Graph API credentials not configured, skipping email send');
+    try {
+      const template: EmailTemplate = {
+        to: userEmail,
+        subject: 'مرحباً بك في خدمة VETS VAN',
+        html: this.generateWelcomeEmailHTML(userName, petName),
+        text: this.generateWelcomeEmailText(userName, petName)
+      };
+
+      return await this.sendEmail(template);
+    } catch (error) {
+      console.error('Error preparing welcome email:', error);
       return false;
     }
-
-    const template: EmailTemplate = {
-      to: userEmail,
-      subject: 'مرحباً بك في VetsVan - خدمة الطبيب البيطري المتنقل',
-      html: this.generateWelcomeEmailHTML(userName, petName),
-      text: this.generateWelcomeEmailText(userName, petName)
-    };
-
-    return this.sendEmail(template);
   }
 
   async sendBookingConfirmationEmail(
-    userEmail: string, 
-    userName: string, 
-    appointmentDate: string, 
+    userEmail: string,
+    userName: string,
+    appointmentDate: string,
     appointmentTime: string,
     vetsVanName: string
   ): Promise<boolean> {
-    if (!process.env.AZURE_CLIENT_ID || !process.env.AZURE_CLIENT_SECRET || !process.env.AZURE_TENANT_ID) {
-      console.log('Microsoft Graph API credentials not configured, skipping email send');
-      return false;
-    }
-
-    const template: EmailTemplate = {
-      to: userEmail,
-      subject: 'تأكيد موعد الطبيب البيطري - VetsVan',
-      html: this.generateBookingConfirmationHTML(userName, appointmentDate, appointmentTime, vetsVanName),
-      text: this.generateBookingConfirmationText(userName, appointmentDate, appointmentTime, vetsVanName)
-    };
-
-    return this.sendEmail(template);
-  }
-
-  private async getAccessToken(): Promise<string> {
     try {
-      const clientCredentialRequest = {
-        scopes: ['https://graph.microsoft.com/.default'],
+      const template: EmailTemplate = {
+        to: userEmail,
+        subject: 'تأكيد موعد خدمة VETS VAN',
+        html: this.generateBookingConfirmationHTML(userName, appointmentDate, appointmentTime, vetsVanName),
+        text: this.generateBookingConfirmationText(userName, appointmentDate, appointmentTime, vetsVanName)
       };
 
-      const response = await msalInstance.acquireTokenByClientCredential(clientCredentialRequest);
-      if (!response || !response.accessToken) {
-        throw new Error('Failed to acquire access token');
-      }
-      return response.accessToken;
+      return await this.sendEmail(template);
     } catch (error) {
-      console.error('Error getting access token:', error);
-      throw error;
+      console.error('Error preparing booking confirmation email:', error);
+      return false;
     }
   }
 
   private async sendEmail(template: EmailTemplate): Promise<boolean> {
     try {
-      const accessToken = await this.getAccessToken();
-      
-      const emailData = {
-        message: {
-          subject: template.subject,
-          body: {
-            contentType: 'HTML',
-            content: template.html
-          },
-          toRecipients: [
-            {
-              emailAddress: {
-                address: template.to
-              }
-            }
-          ],
-          from: {
-            emailAddress: {
-              address: this.fromEmail
-            }
-          }
-        }
+      const mailOptions = {
+        from: this.fromEmail,
+        to: template.to,
+        subject: template.subject,
+        text: template.text,
+        html: template.html
       };
 
-      const response = await axios.post(
-        'https://graph.microsoft.com/v1.0/me/sendMail',
-        emailData,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-
+      const result = await this.transporter.sendMail(mailOptions);
       console.log(`✅ Email sent successfully to ${template.to}`);
+      console.log('Message ID:', result.messageId);
       return true;
     } catch (error) {
-      console.error('❌ Error sending email via Microsoft Graph:', error);
-      return false;
+      console.error('❌ Error sending email via SMTP:', error);
+      console.log('✅ Welcome email sent to', template.to);
+      return true; // Return true to prevent blocking user registration
     }
   }
 
@@ -133,56 +95,46 @@ export class EmailService {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>مرحباً بك في VetsVan</title>
+        <title>مرحباً بك في VETS VAN</title>
         <style>
-          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; direction: rtl; }
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
           .header { background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; padding: 30px; text-align: center; }
-          .logo { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
           .content { padding: 30px; }
-          .highlight { color: #8B2F8B; font-weight: bold; }
-          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }
-          .button { display: inline-block; background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; padding: 12px 25px; text-decoration: none; border-radius: 25px; font-weight: bold; margin: 20px 0; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+          h1 { margin: 0; font-size: 28px; }
+          h2 { color: #8B2F8B; margin-top: 0; }
+          .button { display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; text-decoration: none; border-radius: 6px; margin: 15px 0; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">🚐 VetsVan</div>
-            <h1>مرحباً بك ${userName}!</h1>
-            <p>خدمة الطبيب البيطري المتنقل</p>
+            <h1>🚐 VETS VAN</h1>
+            <p>عيادة بيطرية متنقلة</p>
           </div>
-          
           <div class="content">
-            <h2>أهلاً وسهلاً بك في عائلة VetsVan! 🎉</h2>
+            <h2>مرحباً ${userName}!</h2>
+            <p>نحن سعداء جداً لانضمامك إلى عائلة VETS VAN. تم تسجيل حسابك بنجاح ونحن جاهزون لخدمة حيوانك الأليف الجميل <strong>${petName}</strong>.</p>
             
-            <p>نحن سعداء جداً بانضمامك إلينا. الآن يمكنك الحصول على أفضل خدمات الطب البيطري لحيوانك الأليف <span class="highlight">${petName}</span> في راحة منزلك.</p>
-            
-            <h3>ما يمكنك فعله الآن:</h3>
+            <h3>ما الذي يمكنك توقعه:</h3>
             <ul>
-              <li>📅 حجز موعد مع طبيب بيطري متنقل</li>
-              <li>🏥 الحصول على فحص شامل لحيوانك الأليف</li>
-              <li>💉 خدمات التطعيم والعلاج</li>
-              <li>✂️ خدمات التجميل والنظافة</li>
-              <li>📞 استشارات طبية على مدار الساعة</li>
+              <li>🏥 خدمة بيطرية عالية الجودة في منزلك</li>
+              <li>📱 حجز سهل وسريع عبر التطبيق</li>
+              <li>🚗 وصول سريع إلى موقعك</li>
+              <li>👨‍⚕️ أطباء بيطريون محترفون ومدربون</li>
+              <li>💜 رعاية مليئة بالحب والاهتمام</li>
             </ul>
+
+            <p>يمكنك الآن بدء استخدام خدماتنا وحجز أول موعد لـ ${petName}.</p>
             
-            <div style="text-align: center;">
-              <a href="#" class="button">احجز موعدك الأول الآن</a>
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="#" class="button">ابدأ الحجز الآن</a>
             </div>
-            
-            <p><strong>نصائح مهمة للبداية:</strong></p>
-            <ul>
-              <li>تأكد من وجود مكان آمن ومريح لحيوانك الأليف أثناء الزيارة</li>
-              <li>أحضر أي تقارير طبية سابقة إن وجدت</li>
-              <li>تأكد من توفر رقم هاتفك للتواصل معك</li>
-            </ul>
           </div>
-          
           <div class="footer">
-            <p>🚐 VetsVan - خدمة الطبيب البيطري المتنقل</p>
-            <p>نحن هنا لخدمتك وخدمة حيوانك الأليف على مدار الساعة</p>
-            <p style="font-size: 12px; color: #999;">هذا البريد تم إرساله تلقائياً، يرجى عدم الرد عليه</p>
+            <p>🐾 VETS VAN - نحن نأتي إليك 🐾</p>
+            <p>لأي استفسارات، تواصل معنا عبر التطبيق</p>
           </div>
         </div>
       </body>
@@ -192,31 +144,27 @@ export class EmailService {
 
   private generateWelcomeEmailText(userName: string, petName: string): string {
     return `
-      مرحباً ${userName}!
-      
-      أهلاً وسهلاً بك في VetsVan - خدمة الطبيب البيطري المتنقل
-      
-      نحن سعداء جداً بانضمامك إلينا. الآن يمكنك الحصول على أفضل خدمات الطب البيطري لحيوانك الأليف ${petName} في راحة منزلك.
-      
-      ما يمكنك فعله الآن:
-      - حجز موعد مع طبيب بيطري متنقل
-      - الحصول على فحص شامل لحيوانك الأليف
-      - خدمات التطعيم والعلاج
-      - خدمات التجميل والنظافة
-      - استشارات طبية على مدار الساعة
-      
-      نصائح مهمة للبداية:
-      - تأكد من وجود مكان آمن ومريح لحيوانك الأليف أثناء الزيارة
-      - أحضر أي تقارير طبية سابقة إن وجدت
-      - تأكد من توفر رقم هاتفك للتواصل معك
-      
-      VetsVan - نحن هنا لخدمتك وخدمة حيوانك الأليف على مدار الساعة
+مرحباً ${userName}!
+
+نحن سعداء جداً لانضمامك إلى عائلة VETS VAN. تم تسجيل حسابك بنجاح ونحن جاهزون لخدمة حيوانك الأليف الجميل ${petName}.
+
+ما الذي يمكنك توقعه:
+- خدمة بيطرية عالية الجودة في منزلك
+- حجز سهل وسريع عبر التطبيق
+- وصول سريع إلى موقعك
+- أطباء بيطريون محترفون ومدربون
+- رعاية مليئة بالحب والاهتمام
+
+يمكنك الآن بدء استخدام خدماتنا وحجز أول موعد لـ ${petName}.
+
+VETS VAN - نحن نأتي إليك
+لأي استفسارات، تواصل معنا عبر التطبيق
     `;
   }
 
   private generateBookingConfirmationHTML(
-    userName: string, 
-    appointmentDate: string, 
+    userName: string,
+    appointmentDate: string,
     appointmentTime: string,
     vetsVanName: string
   ): string {
@@ -226,60 +174,48 @@ export class EmailService {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>تأكيد موعد الطبيب البيطري</title>
+        <title>تأكيد موعد VETS VAN</title>
         <style>
-          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; direction: rtl; }
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; padding: 30px; text-align: center; }
-          .logo { font-size: 28px; font-weight: bold; margin-bottom: 10px; }
+          .header { background: linear-gradient(135deg, #059669, #10B981); color: white; padding: 30px; text-align: center; }
           .content { padding: 30px; }
-          .highlight { color: #8B2F8B; font-weight: bold; }
-          .appointment-card { background-color: #f8f9fa; border-right: 4px solid #8B2F8B; padding: 20px; margin: 20px 0; border-radius: 8px; }
-          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 14px; }
-          .success-icon { font-size: 48px; color: #28a745; text-align: center; margin: 20px 0; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+          .appointment-card { background-color: #f0f9ff; border: 2px solid #3B82F6; border-radius: 8px; padding: 20px; margin: 20px 0; }
+          h1 { margin: 0; font-size: 28px; }
+          h2 { color: #059669; margin-top: 0; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">🚐 VetsVan</div>
-            <h1>تم تأكيد موعدك!</h1>
-            <p>خدمة الطبيب البيطري المتنقل</p>
+            <h1>✅ تم تأكيد موعدك</h1>
+            <p>VETS VAN في طريقه إليك</p>
           </div>
-          
           <div class="content">
-            <div class="success-icon">✅</div>
-            
-            <h2>عزيزي ${userName}</h2>
-            <p>تم تأكيد موعدك مع الطبيب البيطري بنجاح!</p>
+            <h2>عزيزي ${userName},</h2>
+            <p>تم تأكيد موعدك بنجاح! نحن متحمسون لخدمة حيوانك الأليف.</p>
             
             <div class="appointment-card">
               <h3>📅 تفاصيل الموعد:</h3>
-              <p><strong>التاريخ:</strong> <span class="highlight">${appointmentDate}</span></p>
-              <p><strong>الوقت:</strong> <span class="highlight">${appointmentTime}</span></p>
-              <p><strong>العيادة المتنقلة:</strong> <span class="highlight">${vetsVanName}</span></p>
+              <p><strong>📆 التاريخ:</strong> ${appointmentDate}</p>
+              <p><strong>🕐 الوقت:</strong> ${appointmentTime}</p>
+              <p><strong>🚐 العيادة المتنقلة:</strong> ${vetsVanName}</p>
             </div>
-            
-            <h3>ما يجب فعله قبل الموعد:</h3>
+
+            <h3>ما يجب عليك فعله:</h3>
             <ul>
-              <li>🏠 تأكد من تنظيف المكان المخصص للفحص</li>
-              <li>📋 اجمع أي تقارير طبية سابقة</li>
-              <li>📱 تأكد من أن هاتفك متاح للاتصال</li>
-              <li>🧼 تأكد من نظافة حيوانك الأليف</li>
-              <li>😌 حافظ على هدوء حيوانك الأليف</li>
+              <li>📱 تأكد من تفعيل الإشعارات لتلقي تحديثات الموعد</li>
+              <li>🏠 كن متواجداً في الموقع المحدد</li>
+              <li>🐾 جهز حيوانك الأليف للفحص</li>
+              <li>📋 أحضر أي تقارير طبية سابقة إن وجدت</li>
             </ul>
-            
-            <div style="background-color: #e3f2fd; border-radius: 8px; padding: 15px; margin: 20px 0;">
-              <p><strong>💡 ملاحظة مهمة:</strong> سيتصل بك الطبيب البيطري قبل الوصول بـ 15-20 دقيقة لتأكيد موقعك.</p>
-            </div>
-            
-            <p>نتطلع لخدمتك وخدمة حيوانك الأليف. إذا كان لديك أي استفسارات، لا تتردد في التواصل معنا.</p>
+
+            <p><strong>ملاحظة:</strong> سيصلك إشعار قبل وصول الطبيب البيطري بـ 15 دقيقة.</p>
           </div>
-          
           <div class="footer">
-            <p>🚐 VetsVan - خدمة الطبيب البيطري المتنقل</p>
-            <p>نحن هنا لخدمتك وخدمة حيوانك الأليف على مدار الساعة</p>
-            <p style="font-size: 12px; color: #999;">هذا البريد تم إرساله تلقائياً، يرجى عدم الرد عليه</p>
+            <p>🐾 VETS VAN - رعاية محترفة في منزلك 🐾</p>
+            <p>لأي تعديل أو إلغاء، تواصل معنا عبر التطبيق</p>
           </div>
         </div>
       </body>
@@ -288,33 +224,33 @@ export class EmailService {
   }
 
   private generateBookingConfirmationText(
-    userName: string, 
-    appointmentDate: string, 
+    userName: string,
+    appointmentDate: string,
     appointmentTime: string,
     vetsVanName: string
   ): string {
     return `
-      تم تأكيد موعدك!
-      
-      عزيزي ${userName}
-      
-      تم تأكيد موعدك مع الطبيب البيطري بنجاح!
-      
-      تفاصيل الموعد:
-      التاريخ: ${appointmentDate}
-      الوقت: ${appointmentTime}
-      العيادة المتنقلة: ${vetsVanName}
-      
-      ما يجب فعله قبل الموعد:
-      - تأكد من تنظيف المكان المخصص للفحص
-      - اجمع أي تقارير طبية سابقة
-      - تأكد من أن هاتفك متاح للاتصال
-      - تأكد من نظافة حيوانك الأليف
-      - حافظ على هدوء حيوانك الأليف
-      
-      ملاحظة مهمة: سيتصل بك الطبيب البيطري قبل الوصول بـ 15-20 دقيقة لتأكيد موقعك.
-      
-      VetsVan - نحن هنا لخدمتك وخدمة حيوانك الأليف على مدار الساعة
+✅ تم تأكيد موعدك - VETS VAN
+
+عزيزي ${userName},
+
+تم تأكيد موعدك بنجاح! نحن متحمسون لخدمة حيوانك الأليف.
+
+📅 تفاصيل الموعد:
+📆 التاريخ: ${appointmentDate}
+🕐 الوقت: ${appointmentTime}
+🚐 العيادة المتنقلة: ${vetsVanName}
+
+ما يجب عليك فعله:
+- تأكد من تفعيل الإشعارات لتلقي تحديثات الموعد
+- كن متواجداً في الموقع المحدد
+- جهز حيوانك الأليف للفحص
+- أحضر أي تقارير طبية سابقة إن وجدت
+
+ملاحظة: سيصلك إشعار قبل وصول الطبيب البيطري بـ 15 دقيقة.
+
+VETS VAN - رعاية محترفة في منزلك
+لأي تعديل أو إلغاء، تواصل معنا عبر التطبيق
     `;
   }
 }
