@@ -85,11 +85,31 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     },
   });
 
+  // التحقق من صحة التاريخ (منع التواريخ السابقة)
+  const isDateValid = (date: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    return date >= today;
+  };
+
   // دوال التنقل بين التواريخ
   const goToPreviousDay = () => {
     const currentDate = new Date(selectedDate);
     currentDate.setDate(currentDate.getDate() - 1);
-    setSelectedDate(currentDate.toISOString().split('T')[0]);
+    const newDate = currentDate.toISOString().split('T')[0];
+    
+    // التحقق من أن التاريخ الجديد ليس في الماضي
+    if (!isDateValid(newDate)) {
+      toast({
+        title: language === 'ar' ? 'تاريخ غير صالح' : 'Invalid Date',
+        description: language === 'ar' ? 
+          'لا يمكن حجز موعد في تاريخ سابق' :
+          'Cannot book appointment for past dates',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    setSelectedDate(newDate);
   };
 
   const goToNextDay = () => {
@@ -97,6 +117,21 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     currentDate.setDate(currentDate.getDate() + 1);
     setSelectedDate(currentDate.toISOString().split('T')[0]);
   };
+
+  // التحقق من التاريخ المحدد عند التغيير وتصحيحه إذا لزم الأمر
+  useEffect(() => {
+    if (selectedDate && !isDateValid(selectedDate)) {
+      const today = new Date().toISOString().split('T')[0];
+      setSelectedDate(today);
+      toast({
+        title: language === 'ar' ? 'تم تصحيح التاريخ' : 'Date Corrected',
+        description: language === 'ar' ? 
+          'لا يمكن حجز موعد في تاريخ سابق. تم تحديد اليوم الحالي تلقائياً.' :
+          'Cannot book appointment for past dates. Current date has been set automatically.',
+        variant: 'destructive',
+      });
+    }
+  }, [selectedDate, language, toast]);
 
   // دالة لتنسيق التاريخ بالعربية والإنجليزية
   const formatDate = (dateStr: string) => {
@@ -236,6 +271,19 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   };
 
   const handleTimeSlotClick = (vetsvan: VetsVanWithShifts, time: string) => {
+    // التحقق من أن التاريخ المحدد ليس في الماضي
+    const today = new Date().toISOString().split('T')[0];
+    if (selectedDate < today) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' 
+          ? 'لا يمكن حجز موعد في تاريخ سابق'
+          : 'Cannot book appointment for past dates',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const status = getTimeSlotStatus(vetsvan, time);
     
     if (status === 'available') {

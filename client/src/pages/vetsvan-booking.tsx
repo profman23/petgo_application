@@ -68,11 +68,32 @@ export default function VetsVanBooking() {
     }
   }, [setLocation]);
 
-  // تحديد التاريخ الحالي
+  // تحديد التاريخ الحالي وتحديث التاريخ المحدد إذا كان في الماضي
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
     setSelectedDate(today);
   }, []);
+
+  // التحقق من صحة التاريخ المحدد (منع التواريخ السابقة)
+  const isDateValid = (date: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    return date >= today;
+  };
+
+  // التحقق من التاريخ المحدد وتصحيحه إذا لزم الأمر
+  useEffect(() => {
+    if (selectedDate && !isDateValid(selectedDate)) {
+      const today = new Date().toISOString().split('T')[0];
+      setSelectedDate(today);
+      toast({
+        title: t('error'),
+        description: language === 'ar' 
+          ? 'لا يمكن حجز موعد في تاريخ سابق. تم تحديد اليوم الحالي تلقائياً.'
+          : 'Cannot book appointment for past dates. Current date has been set automatically.',
+        variant: 'destructive',
+      });
+    }
+  }, [selectedDate, t, language, toast]);
 
   // استعلام جلب VetsVan المتاحة
   const { data: vetsVans = [], isLoading } = useQuery({

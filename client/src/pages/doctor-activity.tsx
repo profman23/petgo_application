@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { DoctorFooter } from '@/components/doctor-footer';
-import { ArrowLeft, Calendar, Clock, MapPin, User, Phone } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
+import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
+import { useToast } from '@/hooks/use-toast';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 
 interface Booking {
@@ -28,15 +30,71 @@ export default function DoctorActivity() {
   const { language } = useLanguage();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
+  const { toast } = useToast();
 
   // Get current doctor info
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  // State for tracking notifications
+  const [audioEnabled, setAudioEnabled] = useState(audioNotification.isAudioEnabled());
+  const previousBookingCount = useRef<number>(0);
 
   // Fetch bookings for the current doctor's VetsVan
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['/api/doctor/bookings'],
     refetchInterval: 5000, // Refresh every 5 seconds
   });
+
+  // Audio notification system
+  useEffect(() => {
+    const currentBookingCount = (bookings as Booking[]).length;
+    
+    // Play notification sound when new booking is added
+    if (previousBookingCount.current > 0 && currentBookingCount > previousBookingCount.current) {
+      const playAudioNotification = async () => {
+        try {
+          await playBookingNotification();
+          toast({
+            title: language === 'ar' ? '🔔 طلب جديد!' : '🔔 New Booking!',
+            description: language === 'ar' 
+              ? 'تم إضافة موعد جديد إلى جدولك'
+              : 'A new appointment has been added to your schedule',
+            variant: 'default',
+          });
+        } catch (error) {
+          console.warn('Audio notification failed:', error);
+        }
+      };
+      
+      playAudioNotification();
+    }
+    
+    // Update the previous count
+    previousBookingCount.current = currentBookingCount;
+  }, [bookings, language, toast]);
+
+  // Audio control functions
+  const toggleAudio = () => {
+    if (audioEnabled) {
+      audioNotification.disable();
+      setAudioEnabled(false);
+      toast({
+        title: language === 'ar' ? 'تم إيقاف الإشعارات الصوتية' : 'Audio notifications disabled',
+        description: language === 'ar' ? 'لن تسمع أصوات الإشعارات' : 'You will not hear notification sounds',
+        variant: 'destructive',
+      });
+    } else {
+      audioNotification.enable();
+      setAudioEnabled(true);
+      toast({
+        title: language === 'ar' ? 'تم تفعيل الإشعارات الصوتية' : 'Audio notifications enabled',
+        description: language === 'ar' ? 'ستسمع صوت إشعار عند كل موعد جديد' : 'You will hear notification sounds for new appointments',
+        variant: 'default',
+      });
+      // Test the audio
+      testAudioNotification();
+    }
+  };
 
   // Group bookings by date
   const groupedBookings = React.useMemo(() => {
@@ -159,7 +217,21 @@ export default function DoctorActivity() {
               {language === 'ar' ? 'النشاط' : 'Activity'}
             </h1>
           </div>
-          <div className="w-16" /> {/* Spacer for center alignment */}
+          <Button
+            variant="ghost"
+            onClick={toggleAudio}
+            className={`p-2 rounded-full ${audioEnabled ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}
+            title={language === 'ar' 
+              ? (audioEnabled ? 'إيقاف الإشعارات الصوتية' : 'تفعيل الإشعارات الصوتية')
+              : (audioEnabled ? 'Disable audio notifications' : 'Enable audio notifications')
+            }
+          >
+            {audioEnabled ? (
+              <Volume2 className="w-5 h-5" />
+            ) : (
+              <VolumeX className="w-5 h-5" />
+            )}
+          </Button>
         </div>
       </header>
 
