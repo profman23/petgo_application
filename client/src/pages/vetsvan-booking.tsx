@@ -207,13 +207,19 @@ export default function VetsVanBooking() {
           if (pendingRequestData) {
             try {
               const requestData = JSON.parse(pendingRequestData);
-              if (requestData.pickupLatitude && requestData.pickupLongitude) {
+              console.log('📋 Full request data:', requestData);
+              
+              // البحث عن البيانات في المستوى الأول أو في customerLocation
+              const lat = requestData.pickupLatitude || requestData.customerLocation?.latitude;
+              const lng = requestData.pickupLongitude || requestData.customerLocation?.longitude;
+              
+              if (lat && lng) {
                 customerLocation = {
-                  latitude: requestData.pickupLatitude,
-                  longitude: requestData.pickupLongitude,
-                  address: requestData.location || null
+                  latitude: Number(lat),
+                  longitude: Number(lng),
+                  address: requestData.location || requestData.customerLocation?.address || null
                 };
-                console.log('✅ Using pendingRequest location:', customerLocation);
+                console.log('✅ Using localStorage location:', customerLocation);
               }
             } catch (e) {
               console.error('Error parsing pending request data:', e);

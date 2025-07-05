@@ -209,6 +209,7 @@ export const insertBookingSchema = createInsertSchema(bookings).pick({
   appointmentDate: true,
   appointmentTime: true,
   status: true,
+  customerLocation: true,
 });
 
 export type Booking = typeof bookings.$inferSelect;
