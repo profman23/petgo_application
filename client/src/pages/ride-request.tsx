@@ -354,7 +354,12 @@ export default function RideRequest() {
       location: form.getValues('pickupLocation'),
     };
     
+    console.log('Saving request data to localStorage:', requestData);
     localStorage.setItem('pendingRequest', JSON.stringify(requestData));
+    
+    // تأكد من حفظ البيانات
+    const savedData = localStorage.getItem('pendingRequest');
+    console.log('Verification - data saved in localStorage:', savedData);
     
     console.log('Request data saved, redirecting to booking page');
     

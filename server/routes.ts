@@ -935,6 +935,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { shiftId, vetsVanId, appointmentDate, appointmentTime, customerLocation } = req.body;
       const userId = req.user.id;
+      
+      console.log('📍 Creating booking with request body:', req.body);
+      console.log('📍 Customer location received:', customerLocation);
+      console.log('📍 User ID:', userId);
 
       // Check if this specific time slot is already booked
       const existingBookings = await storage.getShiftBookings(shiftId);
