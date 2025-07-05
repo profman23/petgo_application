@@ -1016,20 +1016,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/doctor/bookings', requireAuth, async (req: any, res) => {
     try {
       const user = req.user as any;
-      
       if (user.membershipType !== 'doctor') {
         return res.status(403).json({ message: 'Access denied' });
       }
       
-      // Get doctor's VetsVan ID from username mapping
-      let vetsVanId: number;
+      // Get doctor's VetsVan ID from user data (direct mapping from doctors table)
+      const vetsVanId = user.vetsVanId || user.id;
       
-      if (user.username === 'v001') {
-        vetsVanId = 1; // VetsVan001
-      } else if (user.username === 'v003') {
-        vetsVanId = 3; // VETS003
-      } else {
-        return res.status(404).json({ message: 'Doctor not found' });
+      if (!vetsVanId) {
+        return res.status(404).json({ message: 'VetsVan ID not found' });
       }
       
       const allBookings = await storage.getAllBookings();
