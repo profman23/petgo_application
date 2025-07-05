@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useLanguage } from '@/lib/i18n';
 
 interface GeolocationState {
   latitude: number | null;
@@ -16,6 +17,8 @@ interface GeolocationOptions {
 }
 
 export function useGeolocation(options: GeolocationOptions = {}) {
+  const { language } = useLanguage();
+  
   const [state, setState] = useState<GeolocationState>({
     latitude: null,
     longitude: null,
@@ -46,17 +49,17 @@ export function useGeolocation(options: GeolocationOptions = {}) {
   }, []);
 
   const onError = useCallback((error: GeolocationPositionError) => {
-    let errorMessage = 'خطأ في تحديد الموقع';
+    let errorMessage = language === 'ar' ? 'خطأ في تحديد الموقع' : 'Location error';
     
     switch (error.code) {
       case error.PERMISSION_DENIED:
-        errorMessage = 'تم رفض إذن الوصول للموقع';
+        errorMessage = language === 'ar' ? 'تم رفض إذن الوصول للموقع' : 'Location access denied';
         break;
       case error.POSITION_UNAVAILABLE:
-        errorMessage = 'الموقع غير متاح';
+        errorMessage = language === 'ar' ? 'الموقع غير متاح' : 'Location unavailable';
         break;
       case error.TIMEOUT:
-        errorMessage = 'انتهت مهلة تحديد الموقع';
+        errorMessage = language === 'ar' ? 'انتهت مهلة تحديد الموقع' : 'Location timeout';
         break;
     }
 
@@ -65,13 +68,13 @@ export function useGeolocation(options: GeolocationOptions = {}) {
       error: errorMessage,
       isLoading: false,
     }));
-  }, []);
+  }, [language]);
 
   const getCurrentPosition = useCallback(() => {
     if (!navigator.geolocation) {
       setState(prev => ({
         ...prev,
-        error: 'المتصفح لا يدعم تحديد الموقع',
+        error: language === 'ar' ? 'المتصفح لا يدعم تحديد الموقع' : 'Browser does not support geolocation',
         isLoading: false,
       }));
       return;
@@ -88,13 +91,13 @@ export function useGeolocation(options: GeolocationOptions = {}) {
         maximumAge,
       }
     );
-  }, [enableHighAccuracy, timeout, maximumAge, updateLocation, onError]);
+  }, [enableHighAccuracy, timeout, maximumAge, updateLocation, onError, language]);
 
   const startWatching = useCallback(() => {
     if (!navigator.geolocation) {
       setState(prev => ({
         ...prev,
-        error: 'المتصفح لا يدعم تحديد الموقع',
+        error: language === 'ar' ? 'المتصفح لا يدعم تحديد الموقع' : 'Browser does not support geolocation',
         isLoading: false,
       }));
       return;
@@ -111,7 +114,7 @@ export function useGeolocation(options: GeolocationOptions = {}) {
     );
 
     setWatchId(id);
-  }, [enableHighAccuracy, timeout, maximumAge, updateLocation, onError]);
+  }, [enableHighAccuracy, timeout, maximumAge, updateLocation, onError, language]);
 
   const stopWatching = useCallback(() => {
     if (watchId !== null) {
