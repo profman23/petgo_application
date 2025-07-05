@@ -162,20 +162,46 @@ export default function VetsVanBooking() {
     try {
       console.log('🎯 Starting location detection...');
       console.log('📍 GPS Values from hook:', { latitude, longitude, accuracy });
+      console.log('📱 localStorage content:', localStorage.getItem('pendingRequest'));
       
       // Get customer location from currentLocation hook first, then fallback to pendingRequest
       let customerLocation = null;
       
-      // أولوية للموقع الحالي من hook
-      if (latitude && longitude) {
+      // أولاً نحاول الحصول على الموقع من localStorage 
+      const pendingRequestData = localStorage.getItem('pendingRequest');
+      console.log('📋 Checking localStorage first...');
+      
+      if (pendingRequestData) {
+        try {
+          const requestData = JSON.parse(pendingRequestData);
+          console.log('📋 Full request data:', requestData);
+          
+          // البحث عن البيانات في المستوى الأول
+          if (requestData.pickupLatitude && requestData.pickupLongitude) {
+            customerLocation = {
+              latitude: Number(requestData.pickupLatitude),
+              longitude: Number(requestData.pickupLongitude),
+              address: requestData.location || null
+            };
+            console.log('✅ Using localStorage location:', customerLocation);
+          }
+        } catch (e) {
+          console.error('Error parsing pending request data:', e);
+        }
+      }
+
+      // إذا لم نجد في localStorage، نحاول GPS
+      if (!customerLocation && latitude && longitude) {
         customerLocation = {
           latitude: Number(latitude),
           longitude: Number(longitude),
           address: null
         };
         console.log('✅ Using GPS location from hook:', customerLocation);
-      } else {
-        // محاولة الحصول على الموقع مباشرة من المتصفح
+      }
+
+      // إذا لم نجد، نحاول GPS مباشرة
+      if (!customerLocation) {
         try {
           console.log('🔍 Attempting to get current position directly...');
           const position = await new Promise<GeolocationPosition>((resolve, reject) => {
@@ -199,32 +225,6 @@ export default function VetsVanBooking() {
           console.log('✅ Got fresh GPS location directly:', customerLocation);
         } catch (gpsError) {
           console.log('⚠️ Direct GPS failed:', gpsError);
-          
-          // fallback للموقع من localStorage
-          const pendingRequestData = localStorage.getItem('pendingRequest');
-          console.log('Checking localStorage for location...');
-          
-          if (pendingRequestData) {
-            try {
-              const requestData = JSON.parse(pendingRequestData);
-              console.log('📋 Full request data:', requestData);
-              
-              // البحث عن البيانات في المستوى الأول أو في customerLocation
-              const lat = requestData.pickupLatitude || requestData.customerLocation?.latitude;
-              const lng = requestData.pickupLongitude || requestData.customerLocation?.longitude;
-              
-              if (lat && lng) {
-                customerLocation = {
-                  latitude: Number(lat),
-                  longitude: Number(lng),
-                  address: requestData.location || requestData.customerLocation?.address || null
-                };
-                console.log('✅ Using localStorage location:', customerLocation);
-              }
-            } catch (e) {
-              console.error('Error parsing pending request data:', e);
-            }
-          }
         }
       }
       
