@@ -5,6 +5,16 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomerLocation } from "@/hooks/useCustomerLocation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Booking {
   id: number;
@@ -58,6 +68,17 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
+  });
+
+  // حالة dialog التأكيد
+  const [confirmationDialog, setConfirmationDialog] = useState<{
+    isOpen: boolean;
+    vetsvan: VetsVanWithShifts | null;
+    timeSlot: string;
+  }>({
+    isOpen: false,
+    vetsvan: null,
+    timeSlot: ''
   });
 
   // إنشاء mutation للحجز الفوري
@@ -338,22 +359,68 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
       });
       
       if (shift) {
-        if (enableDirectBooking) {
-          // الحجز الفوري
-          const bookingData = {
-            shiftId: shift.id,
-            vetsVanId: vetsvan.id,
-            appointmentDate: selectedDate,
-            appointmentTime: time,
-          };
-          
-          directBookingMutation.mutate(bookingData);
-        } else if (onSelectTimeSlot) {
-          // التوجيه لصفحة التأكيد
-          onSelectTimeSlot(vetsvan.id, selectedDate, time);
-        }
+        // إظهار dialog التأكيد
+        setConfirmationDialog({
+          isOpen: true,
+          vetsvan: vetsvan,
+          timeSlot: time
+        });
       }
     }
+  };
+
+  // تأكيد الحجز
+  const confirmBooking = () => {
+    if (!confirmationDialog.vetsvan) return;
+
+    const vetsvan = confirmationDialog.vetsvan;
+    const time = confirmationDialog.timeSlot;
+    
+    const shift = vetsvan.shifts.find(shift => {
+      return shift.date === selectedDate && 
+             shift.startTime <= time && 
+             shift.endTime > time &&
+             shift.status === 'scheduled';
+    });
+    
+    if (shift) {
+      const bookingData = {
+        shiftId: shift.id,
+        vetsVanId: vetsvan.id,
+        appointmentDate: selectedDate,
+        appointmentTime: time,
+        customerLocation: { latitude, longitude }
+      };
+      
+      if (!latitude || !longitude) {
+        toast({
+          title: language === 'ar' ? 'خطأ' : 'Error',
+          description: language === 'ar' 
+            ? 'لم يتم العثور على موقعك. يرجى المحاولة مرة أخرى.'
+            : 'Could not find your location. Please try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      
+      directBookingMutation.mutate(bookingData);
+      
+      // إغلاق dialog
+      setConfirmationDialog({
+        isOpen: false,
+        vetsvan: null,
+        timeSlot: ''
+      });
+    }
+  };
+
+  // إلغاء dialog التأكيد
+  const cancelConfirmation = () => {
+    setConfirmationDialog({
+      isOpen: false,
+      vetsvan: null,
+      timeSlot: ''
+    });
   };
 
   return (
@@ -492,6 +559,63 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           </tbody>
         </table>
       </div>
+
+      {/* Dialog التأكيد */}
+      <AlertDialog open={confirmationDialog.isOpen} onOpenChange={cancelConfirmation}>
+        <AlertDialogContent 
+          className="max-w-md mx-auto"
+          style={{ direction: isRTL ? 'rtl' : 'ltr' }}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle className={`text-lg font-semibold ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
+              {language === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className={`${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
+              {confirmationDialog.vetsvan && (
+                <>
+                  <div className="mb-2">
+                    <strong>{language === 'ar' ? 'VetsVan:' : 'VetsVan:'}</strong> {confirmationDialog.vetsvan.vetsvanName}
+                  </div>
+                  <div className="mb-2">
+                    <strong>{language === 'ar' ? 'التاريخ:' : 'Date:'}</strong> {formatDate(selectedDate)}
+                  </div>
+                  <div className="mb-2">
+                    <strong>{language === 'ar' ? 'الوقت:' : 'Time:'}</strong> {confirmationDialog.timeSlot}
+                  </div>
+                  <div className="mt-3 text-sm text-gray-600">
+                    {language === 'ar' 
+                      ? 'هل أنت متأكد من رغبتك في حجز هذا الموعد؟'
+                      : 'Are you sure you want to book this appointment?'
+                    }
+                  </div>
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex justify-end gap-2">
+            <AlertDialogCancel 
+              onClick={cancelConfirmation}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg"
+            >
+              {language === 'ar' ? 'إلغاء' : 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmBooking}
+              disabled={directBookingMutation.isPending}
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg disabled:opacity-50"
+            >
+              {directBookingMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  {language === 'ar' ? 'جاري الحجز...' : 'Booking...'}
+                </>
+              ) : (
+                language === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
