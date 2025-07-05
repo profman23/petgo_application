@@ -87,7 +87,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 });
 
 export const loginSchema = z.object({
-  phone: z.string().min(1, "رقم الهاتف أو اسم المستخدم مطلوب"),
+  identifier: z.string().min(1, "رقم الهاتف أو الإيميل مطلوب"),
   password: z.string().min(1, "كلمة المرور مطلوبة"),
 });
 

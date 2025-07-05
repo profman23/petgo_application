@@ -16,7 +16,7 @@ import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 
 interface LoginFormData {
-  phone: string;
+  identifier: string;
   password: string;
 }
 
@@ -50,7 +50,7 @@ export default function Login() {
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      phone: '',
+      identifier: '',
       password: '',
     },
   });
@@ -204,16 +204,16 @@ export default function Login() {
               <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                 <FormField
                   control={loginForm.control}
-                  name="phone"
+                  name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('phoneNumber')}</FormLabel>
+                      <FormLabel>{language === 'ar' ? 'رقم الهاتف أو الإيميل' : 'Phone Number or Email'}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             {...field}
-                            type="tel"
-                            placeholder={t('enterPhone')}
+                            type="text"
+                            placeholder={language === 'ar' ? 'أدخل رقم الهاتف أو الإيميل' : 'Enter phone number or email'}
                             className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                             style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
                           />

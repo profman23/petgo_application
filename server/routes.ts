@@ -56,11 +56,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post('/api/auth/login', async (req, res) => {
     try {
-      const { phone, password } = loginSchema.parse(req.body);
+      const { identifier, password } = loginSchema.parse(req.body);
       
-      const user = await storage.getUserByPhone(phone);
+      const user = await storage.getUserByIdentifier(identifier);
       if (!user || user.password !== password) {
-        return res.status(401).json({ message: 'رقم الهاتف أو كلمة المرور غير صحيحة' });
+        return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
       }
       
       const sessionId = generateSessionId();
