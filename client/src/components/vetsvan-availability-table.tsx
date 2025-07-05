@@ -4,6 +4,7 @@ import { Loader2, Clock, CheckCircle, ChevronLeft, ChevronRight, Calendar, X, Na
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useCustomerLocation } from "@/hooks/useCustomerLocation";
 
 interface Booking {
   id: number;
@@ -50,6 +51,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Get customer location
+  const { latitude, longitude } = useCustomerLocation();
+  
   // حالة التاريخ المختار
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const today = new Date();
@@ -59,9 +63,48 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   // إنشاء mutation للحجز الفوري
   const directBookingMutation = useMutation({
     mutationFn: async (bookingData: { shiftId: number; vetsVanId: number; appointmentDate: string; appointmentTime: string }) => {
+      // Get customer location for the booking
+      let customerLocation = null;
+      
+      // First try to get location from localStorage (from ride request)
+      const pendingRequestData = localStorage.getItem('pendingRequest');
+      if (pendingRequestData) {
+        try {
+          const requestData = JSON.parse(pendingRequestData);
+          if (requestData.pickupLatitude && requestData.pickupLongitude) {
+            customerLocation = {
+              latitude: Number(requestData.pickupLatitude),
+              longitude: Number(requestData.pickupLongitude),
+              address: requestData.location || null
+            };
+            console.log('📍 VetsVanAvailabilityTable: Using localStorage location:', customerLocation);
+          }
+        } catch (e) {
+          console.error('Error parsing pending request data:', e);
+        }
+      }
+      
+      // Fallback to GPS hook values
+      if (!customerLocation && latitude && longitude) {
+        customerLocation = {
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+          address: null
+        };
+        console.log('📍 VetsVanAvailabilityTable: Using GPS location:', customerLocation);
+      }
+      
+      // Add customerLocation to booking data
+      const completeBookingData = {
+        ...bookingData,
+        customerLocation
+      };
+      
+      console.log('📍 VetsVanAvailabilityTable: Sending booking with location:', completeBookingData);
+      
       return await apiRequest('/api/bookings', {
         method: 'POST',
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify(completeBookingData),
       });
     },
     onSuccess: (result, variables) => {
