@@ -17,6 +17,7 @@ import DoctorRideTracking from "@/pages/doctor-ride-tracking";
 import Account from "@/pages/account";
 import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
+import CustomerActivity from "@/pages/customer-activity";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import VetsVanShifts from "@/pages/vets-van-shifts";
@@ -102,7 +103,7 @@ function Router() {
   const [location] = useLocation();
   
   // Pages that should show the footer
-  const pagesWithFooter = ['/', '/home', '/account', '/activity', '/patients'];
+  const pagesWithFooter = ['/', '/home', '/account', '/activity', '/customer-activity', '/patients'];
   const shouldShowFooter = pagesWithFooter.includes(location);
 
   return (
@@ -122,7 +123,8 @@ function Router() {
           <Route path="/ride-tracking" component={RideTracking} />
           <Route path="/account" component={Account} />
           <Route path="/patients" component={Patients} />
-          <Route path="/activity" component={Activity} />
+          <Route path="/activity" component={CustomerActivity} />
+          <Route path="/customer-activity" component={CustomerActivity} />
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />

@@ -1050,6 +1050,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's bookings for Activity page
+  app.get('/api/user/bookings', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const userBookings = await storage.getUserBookings(userId);
+      
+      // Get VetsVan details for each booking
+      const bookingsWithDetails = await Promise.all(
+        userBookings.map(async (booking) => {
+          const vetsVan = await storage.getDriver(booking.vetsVanId);
+          const shift = await storage.getAllShifts().then(shifts => 
+            shifts.find(s => s.id === booking.shiftId)
+          );
+          
+          return {
+            ...booking,
+            vetsVanName: vetsVan?.vetsvanName || 'VetsVan',
+            vetsVanCode: vetsVan?.vetsvanCode || '',
+            carModel: vetsVan?.carModel || '',
+            carColor: vetsVan?.carColor || '',
+            plateNumber: vetsVan?.plateNumber || '',
+            shiftDetails: shift || null
+          };
+        })
+      );
+      
+      // Sort by appointment date and time (newest first)
+      const sortedBookings = bookingsWithDetails.sort((a, b) => {
+        const dateA = new Date(`${a.appointmentDate}T${a.appointmentTime}`).getTime();
+        const dateB = new Date(`${b.appointmentDate}T${b.appointmentTime}`).getTime();
+        return dateB - dateA;
+      });
+      
+      res.json(sortedBookings);
+    } catch (error) {
+      console.error('Error fetching user bookings:', error);
+      res.status(500).json({ message: 'Failed to fetch user bookings' });
+    }
+  });
+
   // Get bookings for current doctor's VetsVan (no VetsVan ID required)
   app.get('/api/doctor/bookings', requireAuth, async (req: any, res) => {
     try {
