@@ -322,7 +322,8 @@ export default function VetsVanBooking() {
 
   // Handle slide-to-confirm
   const handleSlideComplete = () => {
-    console.log('Slide completed, creating booking...');
+    console.log('🚀 SLIDE COMPLETED - handleSlideComplete called');
+    console.log('⚡ About to call createBooking...');
     createBooking();
   };
 
