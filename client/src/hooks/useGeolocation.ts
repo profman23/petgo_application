@@ -128,11 +128,9 @@ export function useGeolocation(options: GeolocationOptions = {}) {
     }
 
     return () => {
-      if (watchId !== null) {
-        navigator.geolocation.clearWatch(watchId);
-      }
+      stopWatching();
     };
-  }, [watch, startWatching, getCurrentPosition, watchId]);
+  }, [watch]); // إزالة watchId من dependencies لتجنب infinite loop
 
   return {
     ...state,
