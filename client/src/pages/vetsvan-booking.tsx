@@ -175,25 +175,49 @@ export default function VetsVanBooking() {
         };
         console.log('✅ Using GPS location from hook:', customerLocation);
       } else {
-        // fallback للموقع من localStorage
-        const pendingRequestData = localStorage.getItem('pendingRequest');
-        console.log('Pending request data from localStorage:', pendingRequestData);
-        
-        if (pendingRequestData) {
-          try {
-            const requestData = JSON.parse(pendingRequestData);
-            console.log('Parsed request data:', requestData);
-            
-            if (requestData.pickupLatitude && requestData.pickupLongitude) {
-              customerLocation = {
-                latitude: requestData.pickupLatitude,
-                longitude: requestData.pickupLongitude,
-                address: requestData.location || null
-              };
-              console.log('Using pendingRequest location:', customerLocation);
+        // محاولة الحصول على الموقع مباشرة من المتصفح
+        try {
+          console.log('🔍 Attempting to get current position directly...');
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            if (!navigator.geolocation) {
+              reject(new Error('Geolocation not supported'));
+              return;
             }
-          } catch (e) {
-            console.error('Error parsing pending request data:', e);
+            
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 60000
+            });
+          });
+          
+          customerLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            address: null
+          };
+          console.log('✅ Got fresh GPS location directly:', customerLocation);
+        } catch (gpsError) {
+          console.log('⚠️ Direct GPS failed:', gpsError);
+          
+          // fallback للموقع من localStorage
+          const pendingRequestData = localStorage.getItem('pendingRequest');
+          console.log('Checking localStorage for location...');
+          
+          if (pendingRequestData) {
+            try {
+              const requestData = JSON.parse(pendingRequestData);
+              if (requestData.pickupLatitude && requestData.pickupLongitude) {
+                customerLocation = {
+                  latitude: requestData.pickupLatitude,
+                  longitude: requestData.pickupLongitude,
+                  address: requestData.location || null
+                };
+                console.log('✅ Using pendingRequest location:', customerLocation);
+              }
+            } catch (e) {
+              console.error('Error parsing pending request data:', e);
+            }
           }
         }
       }
