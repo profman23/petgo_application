@@ -1,53 +1,108 @@
 import React from 'react';
-import { Link, useLocation } from 'wouter';
-import { Home, Activity, User } from 'lucide-react';
-import { useTranslation, useLanguage } from '@/lib/i18n';
+import { useLocation } from 'wouter';
+import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 
 export function DoctorFooter() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const t = useTranslation();
   const { language } = useLanguage();
+  const direction = getDirection(language);
+  const textAlign = getTextAlign(language);
 
-  const navItems = [
+  const navigationItems = [
     {
-      icon: Home,
-      label: language === 'ar' ? 'الرئيسية' : 'Home',
+      id: 'home',
       path: '/doctor-dashboard',
-      isActive: location === '/doctor-dashboard'
+      label: language === 'ar' ? 'الرئيسية' : 'Home',
+      bgColor: 'bg-gradient-to-br from-purple-700 via-purple-800 to-purple-900',
+      hoverColor: 'hover:from-purple-800 hover:via-purple-900 hover:to-purple-950',
+      icon: '🏠'
     },
     {
-      icon: Activity,
-      label: language === 'ar' ? 'النشاط' : 'Activity',
+      id: 'activity',
       path: '/doctor-activity',
-      isActive: location === '/doctor-activity'
+      label: language === 'ar' ? 'النشاط' : 'Activity',
+      bgColor: 'bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500',
+      hoverColor: 'hover:from-gray-400 hover:via-gray-500 hover:to-gray-600',
+      icon: '🐾'
     },
     {
-      icon: User,
-      label: language === 'ar' ? 'الحساب' : 'Account',
+      id: 'account',
       path: '/doctor-account',
-      isActive: location === '/doctor-account'
+      label: language === 'ar' ? 'الحساب' : 'Account',
+      bgColor: 'bg-gradient-to-br from-purple-700 via-purple-800 to-purple-900',
+      hoverColor: 'hover:from-purple-800 hover:via-purple-900 hover:to-purple-950',
+      icon: '🐱'
     }
   ];
 
+  const handleNavigation = (path: string) => {
+    setLocation(path);
+  };
+
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-      <div className="flex items-center justify-around py-2">
-        {navItems.map((item) => {
-          const IconComponent = item.icon;
-          return (
-            <Link key={item.path} href={item.path}>
-              <div className={`flex flex-col items-center p-3 rounded-lg transition-all duration-200 ${
-                item.isActive
-                  ? 'bg-gradient-to-br from-purple-600 to-purple-800 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}>
-                <IconComponent className="w-5 h-5 mb-1" />
-                <span className="text-xs font-medium">{item.label}</span>
-              </div>
-            </Link>
-          );
-        })}
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-transparent">
+      <div className="max-w-md mx-auto">
+        <div className="flex items-center justify-around py-3 px-6">
+          {navigationItems.map((item) => {
+            const isActive = location === item.path;
+            
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavigation(item.path)}
+                className={`
+                  flex flex-col items-center justify-center 
+                  px-6 py-4 rounded-2xl min-w-[90px] relative
+                  transition-all duration-300 ease-in-out
+                  transform hover:scale-105 active:scale-95
+                  ${item.bgColor} ${item.hoverColor}
+                  shadow-lg hover:shadow-xl
+                  ${isActive 
+                    ? 'ring-4 ring-white ring-opacity-50 scale-105' 
+                    : 'hover:ring-2 hover:ring-white hover:ring-opacity-30'
+                  }
+                `}
+                style={{ 
+                  textAlign: 'center'
+                }}
+              >
+                {/* 3D Icon Container */}
+                <div className={`
+                  w-12 h-12 rounded-xl flex items-center justify-center mb-2
+                  bg-white/20 backdrop-blur-sm border border-white/30
+                  shadow-inner transition-all duration-300
+                  ${isActive ? 'bg-white/30 shadow-lg' : ''}
+                `}>
+                  <span className={`text-2xl filter drop-shadow-sm ${
+                    item.id === 'activity' ? 'text-purple-800' : ''
+                  }`}>
+                    {item.icon}
+                  </span>
+                </div>
+
+                {/* Label with 3D Effect */}
+                <span className={`
+                  text-sm font-bold text-white
+                  filter drop-shadow-md
+                  transition-all duration-300
+                  ${isActive ? 'text-shadow-lg' : ''}
+                `}>
+                  {item.label}
+                </span>
+
+                {/* Shine Effect */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                
+                {/* Active Glow */}
+                {isActive && (
+                  <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-sm"></div>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </footer>
+    </div>
   );
 }
