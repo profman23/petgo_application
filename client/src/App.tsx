@@ -14,7 +14,7 @@ import DoctorAccount from "@/pages/doctor-account";
 import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
 import DoctorRideTracking from "@/pages/doctor-ride-tracking";
-import Account from "@/pages/account";
+import Account from "@/pages/account-fixed";
 import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
 import CustomerActivity from "@/pages/customer-activity";

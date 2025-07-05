@@ -155,32 +155,46 @@ export default function Account() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white" dir={direction}>
-      {/* Header with Enhanced Logo and Back Button */}
-      <div className="bg-white shadow-lg border-b border-purple-100 p-4">
-        <div className="flex items-center justify-between max-w-md mx-auto">
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50 px-3 py-2 rounded-lg transition-colors"
-          >
-            <ArrowIcon size={16} />
-            <span className="text-sm font-medium">{t('back')}</span>
-          </button>
-          
-          <div className="flex items-center gap-2">
-            <LanguageSelector />
-            <div className="w-12 h-12 flex items-center justify-center bg-purple-50 rounded-xl border-2 border-purple-100 shadow-sm">
-              <img 
-                src={logoPath} 
-                alt="VETS VAN Logo" 
-                className="h-10 w-auto object-contain"
-              />
+    <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={direction}>
+      <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
+        {/* Header - Same design as home.tsx */}
+        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+                <img 
+                  src={logoPath} 
+                  alt="VETS VAN Logo" 
+                  className="h-full w-auto object-contain"
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                    maxWidth: '120px'
+                  }}
+                />
+              </div>
+              <div className="text-lg font-bold text-gray-800">
+                {language === 'ar' ? 'حسابي' : 'My Account'}
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <LanguageSelector />
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-sm"
+              >
+                {direction === 'rtl' ? (
+                  <ArrowRight className="w-4 h-4" />
+                ) : (
+                  <ArrowLeft className="w-4 h-4" />
+                )}
+                {language === 'ar' ? 'العودة' : 'Back'}
+              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-md mx-auto p-6">
+        {/* Content */}
+        <div className="p-4 pb-20">
         {/* User Header Section */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center gap-4" style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row' }}>
@@ -400,12 +414,11 @@ export default function Account() {
           </div>
         </div>
       )}
-      
-      {/* Add padding for fixed footer */}
-      <div className="pb-20"></div>
-      
-      {/* Fixed Footer */}
-      <FixedFooter />
+        </div>
+        
+        {/* Fixed Footer */}
+        <FixedFooter />
+      </div>
     </div>
   );
 }

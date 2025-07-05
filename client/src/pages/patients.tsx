@@ -7,6 +7,8 @@ import { ArrowLeft, Plus, Heart, Calendar, PawPrint, Cat, Dog, Bird } from 'luci
 import { PatientForm } from '@/components/patient-form';
 import { EditPatientForm } from '@/components/edit-patient-form';
 import { useLocation } from 'wouter';
+const logoPath = '/generated-icon.png';
+import { FixedFooter } from '@/components/fixed-footer';
 
 interface Patient {
   id: number;
@@ -91,42 +93,51 @@ export default function Patients() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
-      <div className="max-w-4xl mx-auto">
-        
-        {/* Header */}
-        <Card className="border-2 border-purple-200 shadow-lg mb-6">
-          <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBack}
-                  className="text-white hover:bg-purple-500 p-2"
-                >
-                  <ArrowLeft 
-                    className="h-5 w-5" 
-                    style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} 
-                  />
-                </Button>
-                <div>
-                  <CardTitle className="text-xl">{t('patients')}</CardTitle>
-                  <p className="text-purple-100 text-sm">{t('myPatients')}</p>
-                </div>
+    <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={getDirection(language)}>
+      <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
+        {/* Header - Same design as home.tsx */}
+        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+                <img 
+                  src={logoPath} 
+                  alt="VETS VAN Logo" 
+                  className="h-full w-auto object-contain"
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                    maxWidth: '120px'
+                  }}
+                />
               </div>
-              
-              {/* Add Patient Button */}
+              <div className="text-lg font-bold text-gray-800">
+                {language === 'ar' ? 'حيواناتي الأليفة' : 'My Pets'}
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
               <Button
                 onClick={handleAddPatient}
-                className="bg-white/20 hover:bg-white/30 text-white border-white/30 rounded-full p-3"
+                className="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-2"
                 size="sm"
               >
-                <Plus className="h-6 w-6" />
+                <Plus className="h-4 w-4" />
               </Button>
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-sm"
+              >
+                <ArrowLeft 
+                  className="w-4 h-4" 
+                  style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} 
+                />
+                {language === 'ar' ? 'العودة' : 'Back'}
+              </button>
             </div>
-          </CardHeader>
-        </Card>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4 pb-20">
 
         {/* Patients List */}
         <div className="space-y-4">
@@ -240,6 +251,10 @@ export default function Patients() {
             </Button>
           </div>
         )}
+        </div>
+        
+        {/* Fixed Footer */}
+        <FixedFooter />
       </div>
     </div>
   );

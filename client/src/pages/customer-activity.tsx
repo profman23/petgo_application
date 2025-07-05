@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Calendar, Clock, MapPin, Car, CheckCircle, XCircle, AlertCircle, Phone, User } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import logoPath from '@assets/10773561_1751295833176.png';
+import { useLocation } from 'wouter';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { FixedFooter } from '@/components/fixed-footer';
+import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
+const logoPath = '/generated-icon.png';
 
 interface Booking {
   id: number;
@@ -51,33 +52,48 @@ export default function CustomerActivity() {
     setLocation('/home');
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed':
-        return <CheckCircle className="text-green-500" size={20} />;
-      case 'booked':
-        return <CheckCircle className="text-green-500" size={20} />;
+      case 'confirmed':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
       case 'cancelled':
-        return <XCircle className="text-red-500" size={20} />;
-      case 'in_progress':
-        return <AlertCircle className="text-orange-500" size={20} />;
+        return 'bg-red-100 text-red-800';
+      case 'completed':
+        return 'bg-blue-100 text-blue-800';
       default:
-        return <Clock className="text-gray-500" size={20} />;
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusText = (status: string) => {
-    switch (status) {
-      case 'booked':
-        return language === 'ar' ? 'مؤكد' : 'Confirmed';
-      case 'completed':
-        return language === 'ar' ? 'مكتمل' : 'Completed';
-      case 'cancelled':
-        return language === 'ar' ? 'ملغي' : 'Cancelled';
-      case 'in_progress':
-        return language === 'ar' ? 'قيد التنفيذ' : 'In Progress';
-      default:
-        return language === 'ar' ? 'غير محدد' : 'Unknown';
+    if (language === 'ar') {
+      switch (status) {
+        case 'confirmed':
+          return 'مؤكد';
+        case 'pending':
+          return 'في انتظار الموافقة';
+        case 'cancelled':
+          return 'ملغي';
+        case 'completed':
+          return 'مكتمل';
+        default:
+          return status;
+      }
+    } else {
+      switch (status) {
+        case 'confirmed':
+          return 'Confirmed';
+        case 'pending':
+          return 'Pending';
+        case 'cancelled':
+          return 'Cancelled';
+        case 'completed':
+          return 'Completed';
+        default:
+          return status;
+      }
     }
   };
 
@@ -87,15 +103,13 @@ export default function CustomerActivity() {
       return date.toLocaleDateString('ar-SA', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric',
-        weekday: 'long'
+        day: 'numeric'
       });
     } else {
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric',
-        weekday: 'long'
+        day: 'numeric'
       });
     }
   };
@@ -139,158 +153,139 @@ export default function CustomerActivity() {
       className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2"
       style={{ direction }}
     >
-      {/* Header */}
-      <div className="bg-white shadow-sm p-2 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleBack}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              {direction === 'rtl' ? (
-                <ArrowRight className="w-5 h-5 text-gray-700" />
-              ) : (
-                <ArrowLeft className="w-5 h-5 text-gray-700" />
-              )}
-            </button>
-            
-            <div className="flex items-center gap-2">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg p-2 shadow-lg border-2 border-purple-600">
+      <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
+        {/* Header - Same design as home.tsx */}
+        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoPath} 
-                  alt="VetsVan Logo" 
-                  className="w-full h-full object-contain"
+                  alt="VETS VAN Logo" 
+                  className="h-full w-auto object-contain"
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                    maxWidth: '120px'
+                  }}
                 />
               </div>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900" style={{ textAlign }}>
-                  {language === 'ar' ? 'نشاطي' : 'My Activity'}
-                </h1>
-                <p className="text-sm text-gray-600" style={{ textAlign }}>
-                  {language === 'ar' ? 'جميع حجوزاتك' : 'All your bookings'}
-                </p>
+              <div className="text-lg font-bold text-gray-800">
+                {language === 'ar' ? 'نشاطي' : 'My Activity'}
               </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-sm"
+              >
+                {direction === 'rtl' ? (
+                  <ArrowRight className="w-4 h-4" />
+                ) : (
+                  <ArrowLeft className="w-4 h-4" />
+                )}
+                {language === 'ar' ? 'العودة' : 'Back'}
+              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="p-4 pb-20">
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="animate-pulse">
-                <CardContent className="p-4">
-                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : bookings.length === 0 ? (
-          <div className="text-center py-12">
-            <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2" style={{ textAlign }}>
-              {language === 'ar' ? 'لا توجد حجوزات' : 'No Bookings'}
-            </h3>
-            <p className="text-gray-500" style={{ textAlign }}>
-              {language === 'ar' 
-                ? 'لم تقم بحجز أي مواعيد بعد. ابدأ بحجز موعدك الأول!'
-                : 'You haven\'t booked any appointments yet. Start by booking your first appointment!'
-              }
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {sortedDates.map((date) => (
-              <div key={date}>
-                {/* Date Header */}
-                <div className="mb-4">
-                  <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2" style={{ textAlign }}>
-                    <Calendar className="w-5 h-5 text-purple-600" />
-                    {formatDate(date)}
-                  </h2>
-                </div>
-
-                {/* Bookings for this date */}
-                <div className="space-y-3">
-                  {groupedBookings[date].map((booking) => (
-                    <Card key={booking.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            {/* Booking Status */}
-                            <div className="flex items-center gap-2 mb-3">
-                              {getStatusIcon(booking.status)}
-                              <span className="font-semibold text-gray-800" style={{ textAlign }}>
+        {/* Content */}
+        <div className="p-4 pb-20">
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-4">
+                    <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : bookings.length === 0 ? (
+            <div className="text-center py-12">
+              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-600 mb-2" style={{ textAlign }}>
+                {language === 'ar' ? 'لا توجد حجوزات' : 'No Bookings'}
+              </h3>
+              <p className="text-gray-500" style={{ textAlign }}>
+                {language === 'ar' 
+                  ? 'لم تقم بحجز أي مواعيد بعد. ابدأ بحجز موعدك الأول!'
+                  : 'You haven\'t booked any appointments yet. Start by booking your first appointment!'
+                }
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {sortedDates.map((date) => (
+                <div key={date} className="space-y-3">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+                    <Calendar className="w-4 h-4 text-purple-600" />
+                    <h3 className="font-semibold text-gray-800" style={{ textAlign }}>
+                      {formatDate(date)}
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {groupedBookings[date].map((booking) => (
+                      <Card key={booking.id} className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="space-y-3">
+                            {/* Header with status and time */}
+                            <div className="flex items-center justify-between">
+                              <Badge className={getStatusColor(booking.status)}>
                                 {getStatusText(booking.status)}
-                              </span>
-                              <span className="text-sm text-gray-500">
-                                #{booking.id}
-                              </span>
+                              </Badge>
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <Clock className="w-3 h-3" />
+                                {formatTime(booking.appointmentTime)}
+                              </div>
                             </div>
 
                             {/* VetsVan Details */}
-                            <div className="mb-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Car className="w-4 h-4 text-purple-600" />
-                                <span className="font-medium text-gray-900" style={{ textAlign }}>
-                                  {booking.vetsVanName}
-                                </span>
-                                <span className="text-sm text-gray-500">
-                                  ({booking.vetsVanCode})
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Truck className="w-4 h-4 text-purple-600" />
+                                <span className="font-medium text-gray-800" style={{ textAlign }}>
+                                  {booking.vetsVanName} ({booking.vetsVanCode})
                                 </span>
                               </div>
                               
                               <div className="text-sm text-gray-600 space-y-1" style={{ textAlign }}>
                                 <div>
-                                  <strong>{language === 'ar' ? 'السيارة:' : 'Vehicle:'}</strong> {booking.carModel} - {booking.carColor}
+                                  {language === 'ar' ? 'الموديل:' : 'Model:'} {booking.carModel}
                                 </div>
                                 <div>
-                                  <strong>{language === 'ar' ? 'رقم اللوحة:' : 'Plate Number:'}</strong> {booking.plateNumber}
+                                  {language === 'ar' ? 'اللون:' : 'Color:'} {booking.carColor}
+                                </div>
+                                <div>
+                                  {language === 'ar' ? 'رقم اللوحة:' : 'Plate:'} {booking.plateNumber}
                                 </div>
                               </div>
                             </div>
 
-                            {/* Appointment Time */}
-                            <div className="flex items-center gap-2 mb-3">
-                              <Clock className="w-4 h-4 text-orange-600" />
-                              <span className="text-gray-700" style={{ textAlign }}>
-                                <strong>{language === 'ar' ? 'الوقت:' : 'Time:'}</strong> {formatTime(booking.appointmentTime)}
-                              </span>
-                            </div>
-
-                            {/* Location (if available) */}
+                            {/* Location if available */}
                             {booking.customerLocation && (
-                              <div className="flex items-center gap-2 mb-3">
-                                <MapPin className="w-4 h-4 text-blue-600" />
-                                <span className="text-sm text-gray-600" style={{ textAlign }}>
+                              <div className="flex items-start gap-2 text-sm text-gray-600">
+                                <MapPin className="w-3 h-3 mt-0.5 text-purple-600" />
+                                <div style={{ textAlign }}>
                                   {booking.customerLocation.address || 
-                                    `${booking.customerLocation.latitude.toFixed(6)}, ${booking.customerLocation.longitude.toFixed(6)}`
+                                    `${booking.customerLocation.latitude}, ${booking.customerLocation.longitude}`
                                   }
-                                </span>
+                                </div>
                               </div>
                             )}
-
-                            {/* Booking Date */}
-                            <div className="text-xs text-gray-400" style={{ textAlign }}>
-                              {language === 'ar' ? 'تم الحجز في:' : 'Booked on:'} {' '}
-                              {new Date(booking.createdAt).toLocaleString(
-                                language === 'ar' ? 'ar-SA' : 'en-US'
-                              )}
-                            </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <FixedFooter />
