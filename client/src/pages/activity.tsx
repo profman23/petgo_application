@@ -43,6 +43,12 @@ export default function Activity() {
     setLocation('/home');
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLocation('/');
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -138,6 +144,12 @@ export default function Activity() {
                 className="h-10 w-auto object-contain"
               />
             </div>
+            <button
+              onClick={handleLogout}
+              className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors text-sm"
+            >
+              {language === 'ar' ? 'خروج' : 'Logout'}
+            </button>
           </div>
         </div>
       </div>

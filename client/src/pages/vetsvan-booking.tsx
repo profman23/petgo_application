@@ -339,6 +339,12 @@ export default function VetsVanBooking() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setLocation('/');
+  };
+
   // Handle slide-to-confirm
   const handleSlideComplete = () => {
     console.log('🚀 SLIDE COMPLETED - handleSlideComplete called');
@@ -385,6 +391,14 @@ export default function VetsVanBooking() {
               >
                 <ArrowLeft className={`w-4 h-4 ${language === 'ar' ? 'rotate-180' : ''}`} />
                 {language === 'ar' ? 'رجوع' : 'Back'}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+              >
+                {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
             </div>
           </div>
