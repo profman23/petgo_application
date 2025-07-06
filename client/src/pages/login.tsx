@@ -174,33 +174,33 @@ export default function Login() {
       <div className="w-full max-w-md">
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button and improved logo design */}
-          <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 px-6 py-8 text-center relative rounded-t-lg">
+          <div className="bg-white px-6 py-6 text-center relative rounded-t-lg border-b border-gray-100">
             {/* Back button */}
             <button
               onClick={() => setLocation('/user-type-selection')}
-              className="absolute top-4 left-4 p-3 text-white hover:bg-purple-800/50 rounded-xl transition-all duration-300 backdrop-blur-sm border border-purple-400/30"
+              className="absolute top-4 left-4 p-2 text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-300 border border-purple-200/50"
               title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
             >
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
             
-            {/* Logo Container - Enhanced Rectangular Design */}
-            <div className="mb-8 flex justify-center">
-              <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border-4 border-purple-200/60 hover:border-purple-300/80 hover:shadow-purple-500/20 transition-all duration-500 hover:scale-105">
+            {/* Logo Container - Smaller Design */}
+            <div className="mb-6 flex justify-center">
+              <div className="bg-gray-50 rounded-2xl p-3 shadow-md border-2 border-purple-100 hover:border-purple-200 transition-all duration-300 hover:scale-105">
                 <img 
                   src={logoImage} 
                   alt="Vets Van - Mobile Veterinary Clinic" 
-                  className="h-24 w-auto max-w-[320px] object-contain mx-auto"
+                  className="h-16 w-auto max-w-[200px] object-contain mx-auto"
                   style={{ 
-                    filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.15)) contrast(1.1)',
+                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1)) contrast(1.05)',
                   }}
                 />
               </div>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-2" style={{ textAlign: getTextAlign(language) }}>
+            <h1 className="text-2xl font-bold text-gray-800 mb-2" style={{ textAlign: getTextAlign(language) }}>
               {isRegistering ? t('createNewAccount') : t('customerLogin')}
             </h1>
-            <p className="text-purple-100/90 text-lg" style={{ textAlign: getTextAlign(language) }}>
+            <p className="text-gray-600 text-base" style={{ textAlign: getTextAlign(language) }}>
               {isRegistering ? t('joinMobileVetService') : t('welcomeBack')}
             </p>
           </div>
