@@ -147,6 +147,7 @@ export default function Activity() {
 
   // Open review dialog
   const openReviewDialog = (booking: Booking) => {
+    console.log('Opening review dialog for booking:', booking.id);
     setSelectedBooking(booking);
     setShowReviewDialog(true);
   };
@@ -293,9 +294,9 @@ export default function Activity() {
                       <Button
                         onClick={() => openReviewDialog(booking)}
                         variant="outline"
-                        className="w-full text-purple-600 border-purple-200 hover:bg-purple-50"
+                        className="w-full text-purple-600 border-purple-200 hover:bg-purple-50 font-semibold py-2 px-4"
                       >
-                        <Star className="w-4 h-4 mr-2" />
+                        <Star className="w-4 h-4 mr-2 fill-current" />
                         {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
                       </Button>
                     </div>
@@ -308,61 +309,70 @@ export default function Activity() {
       </div>
 
       {/* Review Dialog */}
-      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle style={{ textAlign }}>
-              {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {/* Star Rating */}
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-3" style={{ textAlign }}>
-                {language === 'ar' ? 'كيف كانت تجربتك مع الخدمة؟' : 'How was your experience with our service?'}
-              </p>
-              <div className="flex justify-center gap-1">
-                {renderStars(rating)}
+      {showReviewDialog && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+          <div className="w-full max-w-md bg-white border-2 border-purple-200 shadow-2xl rounded-lg p-6 relative z-50">
+            <div className="flex justify-between items-center mb-4">
+              <h2 style={{ textAlign }} className="text-xl font-bold text-purple-800">
+                {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
+              </h2>
+              <button
+                onClick={() => setShowReviewDialog(false)}
+                className="text-gray-500 hover:text-gray-700 text-xl font-bold p-1"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Star Rating */}
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-4" style={{ textAlign }}>
+                  {language === 'ar' ? 'كيف كانت تجربتك مع الخدمة؟' : 'How was your experience with our service?'}
+                </p>
+                <div className="flex justify-center gap-2">
+                  {renderStars(rating)}
+                </div>
+              </div>
+
+              {/* Comment */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block" style={{ textAlign }}>
+                  {language === 'ar' ? 'تعليق (اختياري)' : 'Comment (Optional)'}
+                </label>
+                <Textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={language === 'ar' ? 'شاركنا رأيك في الخدمة...' : 'Share your thoughts about the service...'}
+                  className="min-h-[80px] border-2 border-purple-200 focus:border-purple-400"
+                  style={{ textAlign }}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowReviewDialog(false)}
+                  variant="outline"
+                  className="flex-1 border-2 border-purple-200 hover:bg-purple-50"
+                >
+                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                </Button>
+                <Button
+                  onClick={handleSubmitReview}
+                  disabled={submitReviewMutation.isPending}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4"
+                >
+                  {submitReviewMutation.isPending 
+                    ? (language === 'ar' ? 'جاري الإرسال...' : 'Submitting...')
+                    : (language === 'ar' ? 'إرسال التقييم' : 'Submit Review')
+                  }
+                </Button>
               </div>
             </div>
-
-            {/* Comment */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block" style={{ textAlign }}>
-                {language === 'ar' ? 'تعليق (اختياري)' : 'Comment (Optional)'}
-              </label>
-              <Textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder={language === 'ar' ? 'شاركنا رأيك في الخدمة...' : 'Share your thoughts about the service...'}
-                className="min-h-[80px]"
-                style={{ textAlign }}
-              />
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex gap-2">
-              <Button
-                onClick={() => setShowReviewDialog(false)}
-                variant="outline"
-                className="flex-1"
-              >
-                {language === 'ar' ? 'إلغاء' : 'Cancel'}
-              </Button>
-              <Button
-                onClick={handleSubmitReview}
-                disabled={submitReviewMutation.isPending}
-                className="flex-1 bg-purple-600 hover:bg-purple-700"
-              >
-                {submitReviewMutation.isPending 
-                  ? (language === 'ar' ? 'جاري الإرسال...' : 'Submitting...')
-                  : (language === 'ar' ? 'إرسال التقييم' : 'Submit Review')
-                }
-              </Button>
-            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      )}
 
       {/* Fixed Footer */}
       <FixedFooter />
