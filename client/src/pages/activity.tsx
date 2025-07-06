@@ -117,7 +117,8 @@ export default function Activity() {
       case 'completed':
         return <CheckCircle className="text-green-500" size={20} />;
       case 'booked':
-        return <Clock className="text-blue-500" size={20} />;
+      case 'confirmed':
+        return <Clock className="text-yellow-500" size={20} />;
       case 'cancelled':
         return <XCircle className="text-red-500" size={20} />;
       default:
@@ -139,7 +140,8 @@ export default function Activity() {
       case 'completed':
         return 'text-green-600 bg-green-50 border-green-200';
       case 'booked':
-        return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'confirmed':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'cancelled':
         return 'text-red-600 bg-red-50 border-red-200';
       default:
