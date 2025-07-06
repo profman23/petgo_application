@@ -57,6 +57,15 @@
   outline: none !important;
 }
 
+/* Custom Select Pets Logo styling with white background */
+.select-pets-logo {
+  background-color: white !important;
+  padding: 2px;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  mix-blend-mode: multiply; /* Removes black background */
+}
+
 /* Custom animations for car movement */
 @keyframes bounce-left-to-right {
   0% {

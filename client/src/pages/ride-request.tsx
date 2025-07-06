@@ -635,7 +635,7 @@ export default function RideRequest() {
                     <img 
                       src={selectPetsLogo} 
                       alt="Select Pets Logo" 
-                      className="w-6 h-6 rounded-full object-cover"
+                      className="w-6 h-6 select-pets-logo object-cover"
                     />
                     <label className="text-sm font-medium text-gray-700">
                       {language === 'ar' ? 'اختر الحيوانات الأليفة:' : 'Select Pets:'}
