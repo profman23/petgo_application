@@ -294,8 +294,8 @@ export default function Login() {
                 </Button>
 
                 <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-2">
-                    {language === 'ar' ? 'حساب تجريبي: 0501234567 / 123456' : 'Test account: 0501234567 / 123456'}
+                  <p className="text-xs text-gray-400/60 mb-2 font-light italic">
+                    Powered By Ghazala Software
                   </p>
                   <Button 
                     type="button" 
