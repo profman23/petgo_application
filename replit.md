@@ -339,6 +339,8 @@ Changelog:
 - July 6, 2025. ADDED: /api/user/reviews endpoint for comprehensive review management across activity pages
 - July 6, 2025. CONFIGURED: Default application route changed to /login (customer login page) instead of user type selection
 - July 6, 2025. UPDATED: Root path (/) now directly loads customer login page for streamlined user experience
+- July 6, 2025. FIXED: Login success redirect issue - both login and registration now properly redirect to /home instead of root path
+- July 6, 2025. RESOLVED: Infinite login loop problem - users successfully navigate to home page after authentication
 - July 1, 2025. ENHANCED: Border made more visible - increased to 3px thickness with darker gray color (#9ca3af)
 - July 1, 2025. REFINED: Added 8px margin and border-radius for rounded corners and better frame visibility
 - July 1, 2025. IMPLEMENTED: Pre-loading screen system with image preloading before app initialization
