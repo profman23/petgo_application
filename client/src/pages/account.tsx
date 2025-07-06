@@ -155,8 +155,8 @@ export default function Account() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={direction}>
-      <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
+    <div className="min-h-screen bg-gray-50" dir={direction}>
+      <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header - Same design as home.tsx */}
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
