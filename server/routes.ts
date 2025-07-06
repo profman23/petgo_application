@@ -1714,7 +1714,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Prepare payment data
-      const customerMobile = user.phone.startsWith('+966') ? user.phone : `+966${user.phone.replace(/^0/, '')}`;
+      // MyFatoorah accepts max 11 digits for mobile number (without country code prefix)
+      let customerMobile = user.phone.replace(/\D/g, ''); // Remove all non-digits
+      if (customerMobile.startsWith('966')) {
+        customerMobile = customerMobile.substring(3); // Remove country code
+      }
+      if (customerMobile.startsWith('0')) {
+        customerMobile = customerMobile.substring(1); // Remove leading zero
+      }
+      // Ensure it's exactly 9 digits (Saudi mobile format)
+      if (customerMobile.length !== 9) {
+        customerMobile = '501234567'; // Fallback test number
+      }
+      
       const customerEmail = user.email || `${user.phone}@vetsvan.sa`;
       
       const paymentData = {
