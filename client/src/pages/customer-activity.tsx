@@ -62,6 +62,12 @@ export default function CustomerActivity() {
     refetchInterval: 5000, // Refresh every 5 seconds to show new bookings
   });
 
+  // Fetch user reviews to check which bookings have been rated
+  const { data: userReviews = [] } = useQuery<any[]>({
+    queryKey: ['/api/user/reviews'],
+    retry: false,
+  });
+
 
 
   // Submit review mutation
@@ -95,10 +101,12 @@ export default function CustomerActivity() {
 
   // Open review dialog
   const openReviewDialog = (booking: Booking) => {
-    setSelectedBooking(booking);
-    setShowReviewDialog(true);
-    setRating(0);
-    setComment('');
+    if (!isBookingReviewed(booking.id)) {
+      setSelectedBooking(booking);
+      setShowReviewDialog(true);
+      setRating(0);
+      setComment('');
+    }
   };
 
   // Handle submit review
@@ -145,6 +153,11 @@ export default function CustomerActivity() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setLocation('/login');
+  };
+
+  // Check if booking has been reviewed
+  const isBookingReviewed = (bookingId: number) => {
+    return userReviews.some((review: any) => review.bookingId === bookingId);
   };
 
   const getStatusColor = (status: string) => {
@@ -380,10 +393,20 @@ export default function CustomerActivity() {
                                 <Button
                                   onClick={() => openReviewDialog(booking)}
                                   variant="outline"
-                                  className="w-full text-purple-600 border-purple-200 hover:bg-purple-50 font-semibold py-2 px-4"
+                                  disabled={isBookingReviewed(booking.id)}
+                                  className={`w-full font-semibold py-2 px-4 ${
+                                    isBookingReviewed(booking.id) 
+                                      ? 'text-green-600 border-green-200 bg-green-50 cursor-not-allowed opacity-75' 
+                                      : 'text-purple-600 border-purple-200 hover:bg-purple-50'
+                                  }`}
                                 >
-                                  <Star className="w-4 h-4 mr-2 fill-current" />
-                                  {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
+                                  <Star className={`w-4 h-4 mr-2 ${
+                                    isBookingReviewed(booking.id) ? 'fill-current text-green-600' : 'fill-current'
+                                  }`} />
+                                  {isBookingReviewed(booking.id) 
+                                    ? (language === 'ar' ? 'تم التقييم' : 'Rated')
+                                    : (language === 'ar' ? 'تقييم الخدمة' : 'Rate Service')
+                                  }
                                 </Button>
                               </div>
                             )}

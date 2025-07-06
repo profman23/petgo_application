@@ -1269,6 +1269,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(reviews);
     } catch (error) {
       console.error('Error fetching user reviews:', error);
+      res.status(500).json({ message: 'Failed to fetch user reviews' });
+    }
+  });
+
+  // Get user's reviews
+  app.get('/api/user/reviews', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const reviews = await storage.getUserReviews(userId);
+      res.json(reviews);
+    } catch (error) {
+      console.error('Error fetching user reviews:', error);
       res.status(500).json({ message: 'Failed to fetch reviews' });
     }
   });
