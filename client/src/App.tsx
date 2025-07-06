@@ -136,7 +136,7 @@ function Router() {
             if (token && user) {
               return <Home />;
             } else {
-              return <UserTypeSelection />;
+              return <Login />;
             }
           }} />
           <Route component={NotFound} />

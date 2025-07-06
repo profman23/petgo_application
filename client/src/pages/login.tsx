@@ -179,7 +179,7 @@ export default function Login() {
             <button
               onClick={() => setLocation('/user-type-selection')}
               className="absolute top-4 left-4 p-2 text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-300 border border-purple-200/50"
-              title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
+              title={language === 'ar' ? 'اختر نوع الحساب' : 'Choose Account Type'}
             >
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
