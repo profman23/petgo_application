@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { DoctorFooter } from '@/components/doctor-footer';
-import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
 import { useToast } from '@/hooks/use-toast';
@@ -39,6 +41,7 @@ export default function DoctorActivity() {
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Get current doctor info
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -136,6 +139,48 @@ export default function DoctorActivity() {
         description: language === 'ar' ? 'يتم فتح موقع العميل في خرائط جوجل' : 'Opening customer location in Google Maps',
       });
     }
+  };
+
+  // Complete service mutation
+  const completeServiceMutation = useMutation({
+    mutationFn: async (bookingId: number) => {
+      return await apiRequest(`/api/bookings/${bookingId}/complete`, {
+        method: 'POST'
+      });
+    },
+    onSuccess: (data, bookingId) => {
+      // Invalidate and refetch bookings
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/bookings'] });
+      
+      toast({
+        title: language === 'ar' ? 'تم إكمال الخدمة' : 'Service Completed',
+        description: language === 'ar' ? 
+          'تم إرسال إشعار للعميل عبر الإيميل وسيتمكن من تقييم الخدمة' : 
+          'Customer notified via email and can now rate the service',
+        variant: 'default',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: language === 'ar' ? 'خطأ في إكمال الخدمة' : 'Error Completing Service',
+        description: language === 'ar' ? 'حدث خطأ في إكمال الخدمة' : 'An error occurred while completing the service',
+        variant: 'destructive',
+      });
+    }
+  });
+
+  // Handle complete service
+  const handleCompleteService = (booking: Booking) => {
+    if (booking.status === 'completed') {
+      toast({
+        title: language === 'ar' ? 'الخدمة مكتملة بالفعل' : 'Service Already Completed',
+        description: language === 'ar' ? 'تم إكمال هذه الخدمة مسبقاً' : 'This service has already been completed',
+        variant: 'default',
+      });
+      return;
+    }
+
+    completeServiceMutation.mutate(booking.id);
   };
 
   // Group bookings by date with Today's Requests first
@@ -438,6 +483,50 @@ export default function DoctorActivity() {
                     </div>
                   </div>
 
+                  {/* Complete Service Checkbox */}
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        id={`complete-${booking.id}`}
+                        checked={booking.status === 'completed'}
+                        disabled={booking.status === 'completed' || completeServiceMutation.isPending}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            handleCompleteService(booking);
+                          }
+                        }}
+                        className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+                      />
+                      <label 
+                        htmlFor={`complete-${booking.id}`}
+                        className={`text-sm font-medium cursor-pointer ${
+                          booking.status === 'completed' 
+                            ? 'text-green-600' 
+                            : 'text-gray-700 hover:text-green-600'
+                        }`}
+                        style={{ textAlign }}
+                      >
+                        {booking.status === 'completed' ? (
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                            {language === 'ar' ? 'تم إكمال الخدمة' : 'Service Completed'}
+                          </div>
+                        ) : (
+                          <>
+                            {language === 'ar' ? 'إكمال الخدمة' : 'Complete Service'}
+                          </>
+                        )}
+                      </label>
+                      {completeServiceMutation.isPending && (
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                          <span className="text-xs text-gray-500">
+                            {language === 'ar' ? 'جاري الإكمال...' : 'Completing...'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
                 </div>
               ))}

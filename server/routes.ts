@@ -1206,6 +1206,199 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Complete booking service (Doctor marks service as completed)
+  app.post('/api/bookings/:bookingId/complete', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      
+      // Get booking with user details to send email notification
+      const bookingWithUser = await storage.getBookingWithUserDetails(bookingId);
+      
+      if (!bookingWithUser) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Update booking status to completed
+      await storage.updateBookingStatus(bookingId, 'completed');
+
+      // Send email notification to customer if they have email
+      if (bookingWithUser.user.email) {
+        try {
+          await emailService.sendServiceCompletionEmail(
+            bookingWithUser.user.email,
+            bookingWithUser.user.name,
+            bookingWithUser.appointmentDate,
+            bookingWithUser.appointmentTime
+          );
+          console.log(`✅ Service completion email sent to ${bookingWithUser.user.email}`);
+        } catch (emailError) {
+          console.error('❌ Failed to send service completion email:', emailError);
+          // Don't fail the completion if email fails
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        message: 'Service marked as completed',
+        booking: { ...bookingWithUser, status: 'completed' }
+      });
+
+    } catch (error) {
+      console.error('Error completing booking:', error);
+      res.status(500).json({ message: 'Failed to complete service' });
+    }
+  });
+
+  // Create review for completed service
+  app.post('/api/reviews', requireAuth, async (req: any, res) => {
+    try {
+      const { bookingId, rating, comment } = req.body;
+      const userId = req.user.id;
+
+      // Validate that booking exists and is completed
+      const booking = await storage.getUserBookings(userId).then(bookings => 
+        bookings.find(b => b.id === bookingId && b.status === 'completed')
+      );
+
+      if (!booking) {
+        return res.status(404).json({ message: 'Completed booking not found' });
+      }
+
+      // Check if review already exists
+      const existingReview = await storage.getBookingReview(bookingId);
+      if (existingReview) {
+        return res.status(400).json({ message: 'Review already exists for this booking' });
+      }
+
+      // Create review
+      const review = await storage.createReview({
+        bookingId,
+        userId,
+        rating,
+        comment
+      });
+
+      res.json({ success: true, review });
+
+    } catch (error) {
+      console.error('Error creating review:', error);
+      res.status(500).json({ message: 'Failed to create review' });
+    }
+  });
+
+  // Get review for a specific booking
+  app.get('/api/bookings/:bookingId/review', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const review = await storage.getBookingReview(bookingId);
+      res.json(review);
+    } catch (error) {
+      console.error('Error fetching review:', error);
+      res.status(500).json({ message: 'Failed to fetch review' });
+    }
+  });
+
+  // Get user's reviews
+  app.get('/api/user/reviews', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const reviews = await storage.getUserReviews(userId);
+      res.json(reviews);
+    } catch (error) {
+      console.error('Error fetching user reviews:', error);
+      res.status(500).json({ message: 'Failed to fetch reviews' });
+    }
+  });
+
+  // Complete service endpoint (for doctors)
+  app.post('/api/bookings/:id/complete', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.id);
+      const doctorUserId = req.user.id;
+      
+      // Get the booking with user details
+      const bookingWithUser = await storage.getBookingWithUserDetails(bookingId);
+      
+      if (!bookingWithUser) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Update booking status to completed
+      await storage.updateBookingStatus(bookingId, 'completed');
+      
+      // Send completion email to customer
+      try {
+        if (bookingWithUser.user.email) {
+          await emailService.sendServiceCompletionEmail(
+            bookingWithUser.user.email,
+            bookingWithUser.user.firstName || bookingWithUser.user.username,
+            bookingWithUser.appointmentDate,
+            bookingWithUser.appointmentTime
+          );
+        }
+      } catch (emailError) {
+        console.error('Error sending completion email:', emailError);
+        // Don't fail the entire request if email fails
+      }
+      
+      res.json({ 
+        message: 'Service completed successfully',
+        booking: { ...bookingWithUser, status: 'completed' }
+      });
+    } catch (error) {
+      console.error('Error completing service:', error);
+      res.status(500).json({ message: 'Failed to complete service' });
+    }
+  });
+
+  // Submit review endpoint (for customers)
+  app.post('/api/reviews', requireAuth, async (req: any, res) => {
+    try {
+      const { bookingId, rating, comment } = req.body;
+      const userId = req.user.id;
+      
+      if (!bookingId || !rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ message: 'Valid booking ID and rating (1-5) are required' });
+      }
+
+      // Check if user already reviewed this booking
+      const existingReview = await storage.getBookingReview(bookingId);
+      if (existingReview) {
+        return res.status(409).json({ message: 'You have already reviewed this service' });
+      }
+
+      // Create the review
+      const review = await storage.createReview({
+        bookingId,
+        userId,
+        rating,
+        comment: comment || null
+      });
+
+      res.json(review);
+    } catch (error) {
+      console.error('Error creating review:', error);
+      res.status(500).json({ message: 'Failed to submit review' });
+    }
+  });
+
+  // Get reviews for a booking
+  app.get('/api/bookings/:bookingId/review', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const review = await storage.getBookingReview(bookingId);
+      
+      if (!review) {
+        return res.status(404).json({ message: 'No review found for this booking' });
+      }
+      
+      res.json(review);
+    } catch (error) {
+      console.error('Error fetching booking review:', error);
+      res.status(500).json({ message: 'Failed to fetch review' });
+    }
+  });
+
   // Admin Authentication
   const adminSessions = new Map();
 

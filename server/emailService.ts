@@ -93,6 +93,27 @@ export class EmailService {
     }
   }
 
+  async sendServiceCompletionEmail(
+    userEmail: string,
+    userName: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ): Promise<boolean> {
+    try {
+      const template: EmailTemplate = {
+        to: userEmail,
+        subject: 'تم إكمال خدمة VETS VAN - يرجى تقييم الخدمة',
+        html: this.generateServiceCompletionHTML(userName, appointmentDate, appointmentTime),
+        text: this.generateServiceCompletionText(userName, appointmentDate, appointmentTime)
+      };
+
+      return await this.sendEmail(template);
+    } catch (error) {
+      console.error('Error preparing service completion email:', error);
+      return false;
+    }
+  }
+
   private async sendEmail(template: EmailTemplate): Promise<boolean> {
     try {
       // Try to send email via SMTP
@@ -383,6 +404,105 @@ VETS VAN - رعاية محترفة في منزلك
 
 VETS VAN - نحن في طريقنا إليك
 لأي استفسار عاجل، تواصل معنا عبر التطبيق
+    `;
+  }
+
+  private generateServiceCompletionHTML(
+    userName: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ): string {
+    return `
+    <!DOCTYPE html>
+    <html dir="rtl" lang="ar">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>تم إكمال خدمة VETS VAN</title>
+      <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 30px 20px; text-align: center; }
+        .content { padding: 30px; }
+        .success-icon { font-size: 48px; margin-bottom: 20px; }
+        .rating-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+        .stars { font-size: 32px; margin: 10px 0; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="success-icon">✅</div>
+          <h1>تم إكمال الخدمة بنجاح!</h1>
+          <p>عزيزي ${userName}</p>
+        </div>
+        
+        <div class="content">
+          <h2>🎉 خدمة VETS VAN مكتملة</h2>
+          <p>نشكرك لاستخدام خدمة VETS VAN المنزلية. لقد تم إكمال موعدك البيطري بنجاح:</p>
+          
+          <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p><strong>📅 التاريخ:</strong> ${appointmentDate}</p>
+            <p><strong>⏰ الوقت:</strong> ${appointmentTime}</p>
+            <p><strong>✅ الحالة:</strong> مكتملة</p>
+          </div>
+
+          <div class="rating-section">
+            <h3>⭐ قيّم تجربتك</h3>
+            <p>نحن نقدر رأيك! يرجى تقييم الخدمة المقدمة لمساعدتنا في التحسين.</p>
+            <div class="stars">⭐⭐⭐⭐⭐</div>
+            <p><strong>انتقل إلى تطبيق VETS VAN لترك تقييمك</strong></p>
+          </div>
+
+          <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h4>💡 تذكير مهم:</h4>
+            <ul style="text-align: right;">
+              <li>اتبع إرشادات الطبيب البيطري</li>
+              <li>احتفظ بأي وصفات طبية أو أدوية</li>
+              <li>راقب حالة حيوانك الأليف</li>
+              <li>لا تتردد في التواصل معنا عند الحاجة</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <p>VETS VAN - الرعاية البيطرية المنزلية</p>
+          <p>نتطلع لخدمتك مرة أخرى قريباً!</p>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+  }
+
+  private generateServiceCompletionText(
+    userName: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ): string {
+    return `
+تم إكمال خدمة VETS VAN بنجاح!
+
+عزيزي ${userName}،
+
+نشكرك لاستخدام خدمة VETS VAN المنزلية. لقد تم إكمال موعدك البيطري بنجاح:
+
+📅 التاريخ: ${appointmentDate}
+⏰ الوقت: ${appointmentTime}
+✅ الحالة: مكتملة
+
+⭐ قيّم تجربتك:
+نحن نقدر رأيك! يرجى فتح تطبيق VETS VAN وتقييم الخدمة المقدمة لمساعدتنا في التحسين.
+
+💡 تذكير مهم:
+- اتبع إرشادات الطبيب البيطري
+- احتفظ بأي وصفات طبية أو أدوية
+- راقب حالة حيوانك الأليف
+- لا تتردد في التواصل معنا عند الحاجة
+
+VETS VAN - الرعاية البيطرية المنزلية
+نتطلع لخدمتك مرة أخرى قريباً!
     `;
   }
 

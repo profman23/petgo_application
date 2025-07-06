@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 
@@ -49,6 +49,13 @@ export interface IStorage {
   getUserBookings(userId: number): Promise<Booking[]>;
   getShiftBookings(shiftId: number): Promise<Booking[]>;
   getAllBookings(): Promise<Booking[]>;
+  updateBookingStatus(bookingId: number, status: string): Promise<void>;
+  getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined>;
+
+  // Reviews operations
+  createReview(review: InsertReview): Promise<Review>;
+  getBookingReview(bookingId: number): Promise<Review | undefined>;
+  getUserReviews(userId: number): Promise<Review[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -482,6 +489,46 @@ export class DatabaseStorage implements IStorage {
   async getAllBookings(): Promise<Booking[]> {
     return await db.select().from(bookings);
   }
+
+  async updateBookingStatus(bookingId: number, status: string): Promise<void> {
+    await db.update(bookings).set({ status }).where(eq(bookings.id, bookingId));
+  }
+
+  async getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined> {
+    const result = await db.select({
+      id: bookings.id,
+      userId: bookings.userId,
+      shiftId: bookings.shiftId,
+      vetsVanId: bookings.vetsVanId,
+      appointmentDate: bookings.appointmentDate,
+      appointmentTime: bookings.appointmentTime,
+      status: bookings.status,
+      customerLocation: bookings.customerLocation,
+      createdAt: bookings.createdAt,
+      updatedAt: bookings.updatedAt,
+      user: users
+    })
+    .from(bookings)
+    .innerJoin(users, eq(bookings.userId, users.id))
+    .where(eq(bookings.id, bookingId))
+    .limit(1);
+    
+    return result[0] || undefined;
+  }
+
+  async createReview(reviewData: InsertReview): Promise<Review> {
+    const [review] = await db.insert(reviews).values(reviewData).returning();
+    return review;
+  }
+
+  async getBookingReview(bookingId: number): Promise<Review | undefined> {
+    const [review] = await db.select().from(reviews).where(eq(reviews.bookingId, bookingId));
+    return review;
+  }
+
+  async getUserReviews(userId: number): Promise<Review[]> {
+    return await db.select().from(reviews).where(eq(reviews.userId, userId));
+  }
 }
 
 // Temporary fallback to MemStorage due to database connection issues
@@ -493,6 +540,7 @@ class MemStorage implements IStorage {
   private admins: Map<number, Admin>;
   private shifts: Map<number, Shift>;
   private bookings: Map<number, Booking>;
+  private reviews: Map<number, Review>;
   private currentUserId: number;
   private currentDriverId: number;
   private currentRideId: number;
@@ -500,6 +548,7 @@ class MemStorage implements IStorage {
   private currentAdminId: number;
   private currentShiftId: number;
   private currentBookingId: number;
+  private currentReviewId: number;
 
   constructor() {
     this.users = new Map();
@@ -509,6 +558,7 @@ class MemStorage implements IStorage {
     this.admins = new Map();
     this.shifts = new Map();
     this.bookings = new Map();
+    this.reviews = new Map();
     this.currentUserId = 1;
     this.currentDriverId = 1;
     this.currentRideId = 1;
@@ -516,6 +566,7 @@ class MemStorage implements IStorage {
     this.currentAdminId = 1;
     this.currentShiftId = 1;
     this.currentBookingId = 1;
+    this.currentReviewId = 1;
 
     this.initializeTestData();
   }
@@ -866,6 +917,46 @@ class MemStorage implements IStorage {
 
   async getAllBookings(): Promise<Booking[]> {
     return Array.from(this.bookings.values());
+  }
+
+  async updateBookingStatus(bookingId: number, status: string): Promise<void> {
+    const booking = this.bookings.get(bookingId);
+    if (booking) {
+      booking.status = status;
+      booking.updatedAt = new Date();
+      this.bookings.set(bookingId, booking);
+    }
+  }
+
+  async getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined> {
+    const booking = this.bookings.get(bookingId);
+    if (!booking) return undefined;
+    
+    const user = this.users.get(booking.userId);
+    if (!user) return undefined;
+    
+    return { ...booking, user };
+  }
+
+  async createReview(reviewData: InsertReview): Promise<Review> {
+    const review: Review = {
+      id: ++this.currentReviewId,
+      bookingId: reviewData.bookingId,
+      userId: reviewData.userId,
+      rating: reviewData.rating,
+      comment: reviewData.comment,
+      createdAt: new Date(),
+    };
+    this.reviews.set(review.id, review);
+    return review;
+  }
+
+  async getBookingReview(bookingId: number): Promise<Review | undefined> {
+    return Array.from(this.reviews.values()).find(review => review.bookingId === bookingId);
+  }
+
+  async getUserReviews(userId: number): Promise<Review[]> {
+    return Array.from(this.reviews.values()).filter(review => review.userId === userId);
   }
 }
 

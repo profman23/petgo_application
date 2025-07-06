@@ -1,19 +1,43 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Calendar, Clock, MapPin, DollarSign, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { ArrowLeft, ArrowRight, Calendar, Clock, MapPin, CheckCircle, XCircle, AlertCircle, Star, MessageCircle } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 import logoPath from '@assets/10773561_1751295833176.png';
 import { FixedFooter } from '@/components/fixed-footer';
 import { LanguageSelector } from '@/components/language-selector';
 
-interface Ride {
+interface Booking {
   id: number;
+  userId: number;
+  shiftId: number;
+  vetsVanId: number;
+  appointmentDate: string;
+  appointmentTime: string;
   status: string;
-  pickupLocation: string;
-  destination: string;
-  estimatedCost: number | null;
+  customerLocation?: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  vetsVanName?: string;
+  vetsVanLocation?: string;
+}
+
+interface Review {
+  id: number;
+  bookingId: number;
+  userId: number;
+  rating: number;
+  comment?: string;
   createdAt: string;
 }
 
@@ -22,6 +46,12 @@ export default function Activity() {
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
 
   // Check authentication
   useEffect(() => {
@@ -32,11 +62,11 @@ export default function Activity() {
     }
   }, [setLocation]);
 
-  // Fetch ride history
-  const { data: rideHistory = [], isLoading } = useQuery<Ride[]>({
-    queryKey: ['/api/rides'],
+  // Fetch user bookings
+  const { data: bookings = [], isLoading } = useQuery<Booking[]>({
+    queryKey: ['/api/user/bookings'],
     retry: false,
-    refetchInterval: 5000, // Refresh every 5 seconds to show new requests
+    refetchInterval: 5000, // Refresh every 5 seconds to show new updates
   });
 
   const handleBack = () => {
@@ -49,35 +79,55 @@ export default function Activity() {
     setLocation('/');
   };
 
+  // Submit review mutation
+  const submitReviewMutation = useMutation({
+    mutationFn: async (reviewData: { bookingId: number; rating: number; comment: string }) => {
+      return await apiRequest('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewData)
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/bookings'] });
+      setShowReviewDialog(false);
+      setRating(5);
+      setComment('');
+      setSelectedBooking(null);
+      
+      toast({
+        title: language === 'ar' ? 'تم إرسال التقييم' : 'Review Submitted',
+        description: language === 'ar' ? 'شكراً لك على تقييم الخدمة' : 'Thank you for rating our service',
+        variant: 'default',
+      });
+    },
+    onError: () => {
+      toast({
+        title: language === 'ar' ? 'خطأ في إرسال التقييم' : 'Error Submitting Review',
+        description: language === 'ar' ? 'حدث خطأ أثناء إرسال التقييم' : 'An error occurred while submitting the review',
+        variant: 'destructive',
+      });
+    }
+  });
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
         return <CheckCircle className="text-green-500" size={20} />;
-      case 'arrived':
-        return <CheckCircle className="text-green-500" size={20} />;
+      case 'booked':
+        return <Clock className="text-blue-500" size={20} />;
       case 'cancelled':
-      case 'cancelled_by_doctor':
-      case 'rejected':
         return <XCircle className="text-red-500" size={20} />;
-      case 'requested':
-      case 'confirmed':
-      case 'in_progress':
-        return <AlertCircle className="text-orange-500" size={20} />;
       default:
-        return <Clock className="text-gray-500" size={20} />;
+        return <AlertCircle className="text-orange-500" size={20} />;
     }
   };
 
   const getStatusText = (status: string) => {
     const statusMap = {
-      'requested': language === 'ar' ? 'جاري المعالجة' : 'Processing',
-      'confirmed': language === 'ar' ? 'تم القبول' : 'Confirmed',
-      'in_progress': language === 'ar' ? 'قيد التنفيذ' : 'In Progress',
-      'arrived': language === 'ar' ? 'تم الوصول' : 'Arrived',
+      'booked': language === 'ar' ? 'محجوز' : 'Booked',
       'completed': language === 'ar' ? 'تم الانتهاء' : 'Completed',
       'cancelled': language === 'ar' ? 'ملغي' : 'Cancelled',
-      'cancelled_by_doctor': language === 'ar' ? 'ملغي من الطبيب' : 'Cancelled by Doctor',
-      'rejected': language === 'ar' ? 'مرفوض' : 'Rejected',
     };
     return statusMap[status as keyof typeof statusMap] || status;
   };
@@ -86,19 +136,46 @@ export default function Activity() {
     switch (status) {
       case 'completed':
         return 'text-green-600 bg-green-50 border-green-200';
-      case 'arrived':
-        return 'text-green-600 bg-green-50 border-green-200';
+      case 'booked':
+        return 'text-blue-600 bg-blue-50 border-blue-200';
       case 'cancelled':
-      case 'cancelled_by_doctor':
-      case 'rejected':
         return 'text-red-600 bg-red-50 border-red-200';
-      case 'requested':
-      case 'confirmed':
-      case 'in_progress':
-        return 'text-orange-600 bg-orange-50 border-orange-200';
       default:
         return 'text-gray-600 bg-gray-50 border-gray-200';
     }
+  };
+
+  // Open review dialog
+  const openReviewDialog = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setShowReviewDialog(true);
+  };
+
+  // Submit review
+  const handleSubmitReview = () => {
+    if (!selectedBooking) return;
+    
+    submitReviewMutation.mutate({
+      bookingId: selectedBooking.id,
+      rating,
+      comment: comment.trim()
+    });
+  };
+
+  // Render star rating
+  const renderStars = (currentRating: number, interactive = true) => {
+    return Array.from({ length: 5 }, (_, index) => {
+      const filled = index < currentRating;
+      return (
+        <Star
+          key={index}
+          className={`w-6 h-6 cursor-pointer transition-colors ${
+            filled ? 'text-yellow-400 fill-current' : 'text-gray-300'
+          }`}
+          onClick={interactive ? () => setRating(index + 1) : undefined}
+        />
+      );
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -154,103 +231,139 @@ export default function Activity() {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto p-6">
-        {/* Page Title */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2" style={{ textAlign }}>
-            {t('activity')}
-          </h1>
-          <p className="text-gray-600" style={{ textAlign }}>
-            {t('activityDesc')}
-          </p>
-        </div>
+      {/* Main Content */}
+      <div className="max-w-md mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-6 text-center text-purple-800" style={{ textAlign }}>
+          {language === 'ar' ? 'سجل المواعيد' : 'Appointment History'}
+        </h1>
 
-        {/* Activity List */}
-        {rideHistory.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <Calendar className="mx-auto mb-4 text-purple-400" size={48} />
-            <h3 className="text-lg font-semibold text-gray-800 mb-2" style={{ textAlign }}>
-              {language === 'ar' ? 'لا توجد طلبات سابقة' : 'No Previous Requests'}
+        {bookings.length === 0 ? (
+          <div className="text-center py-12">
+            <Calendar className="mx-auto w-16 h-16 text-purple-300 mb-4" />
+            <h3 className="text-lg font-semibold text-purple-600 mb-2">
+              {language === 'ar' ? 'لا توجد مواعيد سابقة' : 'No Previous Appointments'}
             </h3>
             <p className="text-gray-600" style={{ textAlign }}>
-              {language === 'ar' 
-                ? 'لم تقم بأي طلبات للعيادة البيطرية المتنقلة حتى الآن' 
-                : 'You haven\'t made any mobile veterinary clinic requests yet'}
+              {language === 'ar' ? 'لم تقم بأي مواعيد حتى الآن' : 'You haven\'t made any appointments yet'}
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {rideHistory.map((ride: Ride) => (
-              <div 
-                key={ride.id}
-                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
-              >
-                {/* Status and Date */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${getStatusColor(ride.status)}`}>
-                    {getStatusIcon(ride.status)}
-                    <span className="text-sm font-medium">
-                      {getStatusText(ride.status)}
+            {bookings.map((booking: Booking) => (
+              <Card key={booking.id} className="bg-white shadow-sm border border-purple-100 hover:shadow-md transition-shadow">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(booking.status)}
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
+                        {getStatusText(booking.status)}
+                      </span>
+                    </div>
+                    <span className="text-xs text-gray-500" style={{ textAlign }}>
+                      {formatDate(booking.createdAt)}
                     </span>
                   </div>
-                  <div className="text-sm text-gray-500 flex items-center gap-1">
-                    <Calendar size={14} />
-                    <span>{formatDate(ride.createdAt)}</span>
-                  </div>
-                </div>
 
-                {/* Ride Details */}
-                <div className="space-y-3">
-                  {/* Pickup Location */}
-                  <div className="flex items-start gap-3">
-                    <MapPin className="text-purple-500 flex-shrink-0 mt-0.5" size={16} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-800" style={{ textAlign }}>
-                        {language === 'ar' ? 'موقع الاستلام' : 'Pickup Location'}
-                      </p>
-                      <p className="text-sm text-gray-600 break-words" style={{ textAlign }}>
-                        {ride.pickupLocation}
-                      </p>
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={16} className="text-purple-500" />
+                      <span className="text-sm text-gray-700" style={{ textAlign }}>
+                        {language === 'ar' ? 'التاريخ:' : 'Date:'} {booking.appointmentDate}
+                      </span>
                     </div>
-                  </div>
-
-                  {/* Destination */}
-                  <div className="flex items-start gap-3">
-                    <MapPin className="text-green-500 flex-shrink-0 mt-0.5" size={16} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-800" style={{ textAlign }}>
-                        {language === 'ar' ? 'الوجهة' : 'Destination'}
-                      </p>
-                      <p className="text-sm text-gray-600 break-words" style={{ textAlign }}>
-                        {ride.destination}
-                      </p>
+                    <div className="flex items-center gap-2">
+                      <Clock size={16} className="text-blue-500" />
+                      <span className="text-sm text-gray-700" style={{ textAlign }}>
+                        {language === 'ar' ? 'الوقت:' : 'Time:'} {booking.appointmentTime}
+                      </span>
                     </div>
-                  </div>
-
-                  {/* Cost */}
-                  {ride.estimatedCost && (
-                    <div className="flex items-center gap-3">
-                      <DollarSign className="text-yellow-500 flex-shrink-0" size={16} />
-                      <div>
-                        <p className="text-sm font-medium text-gray-800" style={{ textAlign }}>
-                          {language === 'ar' ? 'التكلفة المقدرة' : 'Estimated Cost'}
-                        </p>
-                        <p className="text-sm text-gray-600" style={{ textAlign }}>
-                          {ride.estimatedCost} {language === 'ar' ? 'ريال' : 'SAR'}
-                        </p>
+                    {booking.vetsVanName && (
+                      <div className="flex items-center gap-2">
+                        <MapPin size={16} className="text-green-500" />
+                        <span className="text-sm text-gray-700" style={{ textAlign }}>
+                          {language === 'ar' ? 'العيادة:' : 'Clinic:'} {booking.vetsVanName}
+                        </span>
                       </div>
+                    )}
+                  </div>
+
+                  {/* Rate Service Button for Completed Services */}
+                  {booking.status === 'completed' && (
+                    <div className="pt-3 border-t border-purple-100">
+                      <Button
+                        onClick={() => openReviewDialog(booking)}
+                        variant="outline"
+                        className="w-full text-purple-600 border-purple-200 hover:bg-purple-50"
+                      >
+                        <Star className="w-4 h-4 mr-2" />
+                        {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
+                      </Button>
                     </div>
                   )}
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
-
-        {/* Add padding for fixed footer */}
-        <div className="pb-20"></div>
       </div>
-      
+
+      {/* Review Dialog */}
+      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle style={{ textAlign }}>
+              {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Star Rating */}
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-3" style={{ textAlign }}>
+                {language === 'ar' ? 'كيف كانت تجربتك مع الخدمة؟' : 'How was your experience with our service?'}
+              </p>
+              <div className="flex justify-center gap-1">
+                {renderStars(rating)}
+              </div>
+            </div>
+
+            {/* Comment */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block" style={{ textAlign }}>
+                {language === 'ar' ? 'تعليق (اختياري)' : 'Comment (Optional)'}
+              </label>
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder={language === 'ar' ? 'شاركنا رأيك في الخدمة...' : 'Share your thoughts about the service...'}
+                className="min-h-[80px]"
+                style={{ textAlign }}
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setShowReviewDialog(false)}
+                variant="outline"
+                className="flex-1"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </Button>
+              <Button
+                onClick={handleSubmitReview}
+                disabled={submitReviewMutation.isPending}
+                className="flex-1 bg-purple-600 hover:bg-purple-700"
+              >
+                {submitReviewMutation.isPending 
+                  ? (language === 'ar' ? 'جاري الإرسال...' : 'Submitting...')
+                  : (language === 'ar' ? 'إرسال التقييم' : 'Submit Review')
+                }
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Fixed Footer */}
       <FixedFooter />
     </div>
