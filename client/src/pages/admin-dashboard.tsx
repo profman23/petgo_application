@@ -49,6 +49,7 @@ export default function AdminDashboard() {
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
+  const [showReviewsDialog, setShowReviewsDialog] = useState(false);
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     vetsvanCode: "",
     vetsvanName: "",
@@ -118,6 +119,30 @@ export default function AdminDashboard() {
       };
     },
     enabled: !!adminToken && activeTab === 'reports',
+  });
+
+  // Fetch detailed reviews when dialog is open
+  const { data: detailedReviews, isLoading: isLoadingReviews } = useQuery({
+    queryKey: ["/api/admin/reviews-details"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/reviews-details", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch detailed reviews");
+      return await response.json() as Array<{
+        id: number;
+        rating: number;
+        comment: string;
+        createdAt: string;
+        userName: string;
+        userPhone: string;
+        vetsvanName: string;
+        vetsvanCode: string;
+      }>;
+    },
+    enabled: !!adminToken && showReviewsDialog,
   });
 
   // Add driver mutation
@@ -609,13 +634,19 @@ export default function AdminDashboard() {
                               </div>
                             </div>
 
-                            <div className="bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-lg p-6 text-white">
+                            <div 
+                              className="bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-lg p-6 text-white cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                              onClick={() => setShowReviewsDialog(true)}
+                            >
                               <div className="flex items-center">
                                 <div className="flex-1">
                                   <h4 className="text-sm font-medium opacity-90">
                                     {language === 'ar' ? 'إجمالي التقييمات' : 'Total Reviews'}
                                   </h4>
                                   <p className="text-2xl font-bold">{reportsStats?.totalReviews || 0}</p>
+                                  <p className="text-xs opacity-75 mt-1">
+                                    {language === 'ar' ? 'اضغط لرؤية التفاصيل' : 'Click to view details'}
+                                  </p>
                                 </div>
                                 <div className="text-indigo-200 text-2xl">💬</div>
                               </div>
@@ -753,6 +784,131 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Reviews Details Dialog */}
+      {showReviewsDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" dir={getDirection(language)}>
+          <div className="bg-white rounded-lg w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h3 className="text-xl font-semibold text-gray-900">
+                {language === 'ar' ? 'تفاصيل التقييمات حسب المركبات' : 'Reviews Details by Vehicle'}
+              </h3>
+              <button
+                onClick={() => setShowReviewsDialog(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6">
+              {isLoadingReviews ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                </div>
+              ) : detailedReviews && detailedReviews.length > 0 ? (
+                <div className="space-y-6">
+                  {/* Group reviews by VetsVan */}
+                  {Object.entries(
+                    detailedReviews.reduce((groups, review) => {
+                      const key = `${review.vetsvanCode} - ${review.vetsvanName}`;
+                      if (!groups[key]) groups[key] = [];
+                      groups[key].push(review);
+                      return groups;
+                    }, {} as Record<string, typeof detailedReviews>)
+                  ).map(([vetsvanInfo, reviews]) => (
+                    <div key={vetsvanInfo} className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-lg font-semibold text-purple-900">
+                          {vetsvanInfo}
+                        </h4>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">
+                            {language === 'ar' ? 'عدد التقييمات:' : 'Reviews:'} {reviews.length}
+                          </span>
+                          <span className="text-sm text-gray-600">|</span>
+                          <span className="text-sm text-gray-600">
+                            {language === 'ar' ? 'المتوسط:' : 'Average:'} 
+                            <span className="font-bold text-yellow-600 ml-1">
+                              {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)} ★
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {reviews.map((review) => (
+                          <div key={review.id} className="bg-white rounded-lg p-4 border border-gray-200">
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <h5 className="font-medium text-gray-900">
+                                  {review.userName}
+                                </h5>
+                                <p className="text-sm text-gray-600">
+                                  {review.userPhone}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <div className="flex items-center gap-1">
+                                  {[...Array(5)].map((_, i) => (
+                                    <span
+                                      key={i}
+                                      className={`text-lg ${
+                                        i < review.rating ? 'text-yellow-400' : 'text-gray-300'
+                                      }`}
+                                    >
+                                      ★
+                                    </span>
+                                  ))}
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {new Date(review.createdAt).toLocaleDateString(
+                                    language === 'ar' ? 'ar-SA' : 'en-US'
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            {review.comment && (
+                              <div className="mt-3 p-3 bg-gray-50 rounded-md">
+                                <p className="text-sm text-gray-700" style={{ textAlign: getTextAlign(language) }}>
+                                  "{review.comment}"
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-gray-400 text-6xl mb-4">💬</div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {language === 'ar' ? 'لا توجد تقييمات' : 'No Reviews Yet'}
+                  </h3>
+                  <p className="text-gray-600">
+                    {language === 'ar' 
+                      ? 'سيتم عرض التقييمات هنا عندما يقوم العملاء بتقييم الخدمة'
+                      : 'Customer reviews will appear here once services are rated'
+                    }
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <div className="border-t p-4">
+              <button
+                onClick={() => setShowReviewsDialog(false)}
+                className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+              >
+                {language === 'ar' ? 'إغلاق' : 'Close'}
+              </button>
+            </div>
           </div>
         </div>
       )}

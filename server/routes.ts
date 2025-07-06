@@ -1560,6 +1560,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get detailed reviews with user and VetsVan information
+  app.get('/api/admin/reviews-details', requireAdminAuth, async (req, res) => {
+    try {
+      const reviewsDetails = await storage.getDetailedReviews();
+      res.json(reviewsDetails);
+    } catch (error) {
+      console.error('Error fetching detailed reviews:', error);
+      res.status(500).json({ message: 'Failed to fetch detailed reviews' });
+    }
+  });
+
   // Doctor VetsVan location endpoint
   app.get('/api/doctor/vetsvan-location', requireAuth, async (req, res) => {
     try {

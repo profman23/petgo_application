@@ -66,6 +66,16 @@ export interface IStorage {
     totalVetsVans: number;
     availableVetsVans: number;
   }>;
+  getDetailedReviews(): Promise<Array<{
+    id: number;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    userName: string;
+    userPhone: string;
+    vetsvanName: string;
+    vetsvanCode: string;
+  }>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -571,6 +581,52 @@ export class DatabaseStorage implements IStorage {
       availableVetsVans: availableDrivers.length,
     };
   }
+
+  async getDetailedReviews(): Promise<Array<{
+    id: number;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    userName: string;
+    userPhone: string;
+    vetsvanName: string;
+    vetsvanCode: string;
+  }>> {
+    // Get all reviews with booking details
+    const allReviews = await db.select().from(reviews);
+    const detailedReviews = [];
+    
+    for (const review of allReviews) {
+      // Get booking details
+      const [booking] = await db.select().from(bookings).where(eq(bookings.id, review.bookingId));
+      if (!booking) continue;
+      
+      // Get user details
+      const [user] = await db.select().from(users).where(eq(users.id, review.userId));
+      if (!user) continue;
+      
+      // Get shift details to get VetsVan info
+      const [shift] = await db.select().from(shifts).where(eq(shifts.id, booking.shiftId));
+      if (!shift) continue;
+      
+      // Get driver details
+      const [driver] = await db.select().from(drivers).where(eq(drivers.id, shift.vetsVanId));
+      if (!driver) continue;
+      
+      detailedReviews.push({
+        id: review.id,
+        rating: review.rating,
+        comment: review.comment || '',
+        createdAt: review.createdAt.toISOString(),
+        userName: user.name || `${user.firstName} ${user.lastName}`,
+        userPhone: user.phone || '',
+        vetsvanName: driver.vetsvanName || driver.name,
+        vetsvanCode: driver.vetsvanCode || '',
+      });
+    }
+    
+    return detailedReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
 }
 
 // Temporary fallback to MemStorage due to database connection issues
@@ -1031,6 +1087,50 @@ class MemStorage implements IStorage {
       totalVetsVans: allDrivers.length,
       availableVetsVans: availableDrivers.length,
     };
+  }
+
+  async getDetailedReviews(): Promise<Array<{
+    id: number;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    userName: string;
+    userPhone: string;
+    vetsvanName: string;
+    vetsvanCode: string;
+  }>> {
+    const detailedReviews = [];
+    
+    for (const review of this.reviews.values()) {
+      // Get booking details
+      const booking = this.bookings.get(review.bookingId);
+      if (!booking) continue;
+      
+      // Get user details
+      const user = this.users.get(review.userId);
+      if (!user) continue;
+      
+      // Get shift details to get VetsVan info
+      const shift = this.shifts.get(booking.shiftId);
+      if (!shift) continue;
+      
+      // Get driver details
+      const driver = this.drivers.get(shift.vetsVanId);
+      if (!driver) continue;
+      
+      detailedReviews.push({
+        id: review.id,
+        rating: review.rating,
+        comment: review.comment || '',
+        createdAt: review.createdAt.toISOString(),
+        userName: user.name || `${user.firstName} ${user.lastName}`,
+        userPhone: user.phone || '',
+        vetsvanName: driver.vetsvanName || driver.name,
+        vetsvanCode: driver.vetsvanCode || '',
+      });
+    }
+    
+    return detailedReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 }
 
