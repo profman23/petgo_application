@@ -18,7 +18,7 @@ import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
-import selectPetsLogo from "@/assets/select-pets-logo.jpeg";
+import selectPetsLogo from "@/assets/select-pets-logo-new.png";
 import serviceTypeIcon from "@assets/freepik_assistant_1751437667818_1751437676533.png";
 import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.png";
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
