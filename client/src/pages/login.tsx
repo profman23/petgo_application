@@ -294,9 +294,6 @@ export default function Login() {
                 </Button>
 
                 <div className="text-center">
-                  <p className="text-xs text-gray-400/60 mb-2 font-light italic">
-                    Powered By Ghazala Software
-                  </p>
                   <Button 
                     type="button" 
                     variant="outline" 
@@ -305,9 +302,17 @@ export default function Login() {
                       hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
                       bg-white hover:bg-purple-50 text-purple-600 border-purple-300 hover:border-purple-400"
                   >
-                    <UserPlus className={`w-5 h-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-                    {t('createNewAccount')}
+                    <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                      <UserPlus className="w-5 h-5" />
+                      <span>{t('createNewAccount')}</span>
+                    </div>
                   </Button>
+                  
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <p className="text-sm text-gray-500 font-medium tracking-wide">
+                      Powered By Ghazala Software
+                    </p>
+                  </div>
                 </div>
               </form>
             </Form>
