@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FixedFooter } from '@/components/fixed-footer';
@@ -10,6 +10,9 @@ import { LanguageSelector } from '@/components/language-selector';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface Booking {
   id: number;
@@ -30,10 +33,19 @@ interface Booking {
 }
 
 export default function CustomerActivity() {
+  console.log('CustomerActivity page loaded!');
   const { t, language } = useTranslation();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Review dialog states
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
 
   // Check authentication
   useEffect(() => {
@@ -50,6 +62,83 @@ export default function CustomerActivity() {
     retry: false,
     refetchInterval: 5000, // Refresh every 5 seconds to show new bookings
   });
+
+  console.log('CustomerActivity bookings data:', bookings);
+  console.log('CustomerActivity loading state:', isLoading);
+
+  // Submit review mutation
+  const submitReviewMutation = useMutation({
+    mutationFn: async (reviewData: { bookingId: number; rating: number; comment: string }) => {
+      return await apiRequest(`/api/bookings/${reviewData.bookingId}/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: reviewData.rating, comment: reviewData.comment })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user/bookings'] });
+      setShowReviewDialog(false);
+      setRating(0);
+      setComment('');
+      setSelectedBooking(null);
+      toast({
+        title: language === 'ar' ? 'تم إرسال التقييم' : 'Review Submitted',
+        description: language === 'ar' ? 'شكراً لك على تقييمك' : 'Thank you for your feedback',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في إرسال التقييم' : 'Failed to submit review',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Open review dialog
+  const openReviewDialog = (booking: Booking) => {
+    console.log('Opening review dialog for booking:', booking.id);
+    setSelectedBooking(booking);
+    setShowReviewDialog(true);
+    setRating(0);
+    setComment('');
+  };
+
+  // Handle submit review
+  const handleSubmitReview = () => {
+    if (!selectedBooking || rating === 0) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'يرجى اختيار تقييم' : 'Please select a rating',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    submitReviewMutation.mutate({
+      bookingId: selectedBooking.id,
+      rating,
+      comment,
+    });
+  };
+
+  // Render stars for rating
+  const renderStars = (currentRating: number) => {
+    return Array.from({ length: 5 }, (_, index) => {
+      const starIndex = index + 1;
+      return (
+        <button
+          key={starIndex}
+          onClick={() => setRating(starIndex)}
+          className={`text-2xl transition-colors ${
+            starIndex <= currentRating ? 'text-yellow-400' : 'text-gray-300'
+          } hover:text-yellow-400`}
+        >
+          <Star className={`w-8 h-8 ${starIndex <= currentRating ? 'fill-current' : ''}`} />
+        </button>
+      );
+    });
+  };
 
   const handleBack = () => {
     setLocation('/home');
@@ -284,6 +373,21 @@ export default function CustomerActivity() {
                                 </div>
                               </div>
                             )}
+
+                            {/* Rate Service Button for Completed Services */}
+                            {console.log('CustomerActivity Booking status:', booking.status, 'ID:', booking.id)}
+                            {booking.status === 'completed' && (
+                              <div className="pt-3 border-t border-purple-100">
+                                <Button
+                                  onClick={() => openReviewDialog(booking)}
+                                  variant="outline"
+                                  className="w-full text-purple-600 border-purple-200 hover:bg-purple-50 font-semibold py-2 px-4"
+                                >
+                                  <Star className="w-4 h-4 mr-2 fill-current" />
+                                  {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         </CardContent>
                       </Card>
@@ -295,6 +399,72 @@ export default function CustomerActivity() {
           )}
         </div>
       </div>
+
+      {/* Review Dialog */}
+      {showReviewDialog && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+          <div className="w-full max-w-md bg-white border-2 border-purple-200 shadow-2xl rounded-lg p-6 relative z-50">
+            <div className="flex justify-between items-center mb-4">
+              <h2 style={{ textAlign }} className="text-xl font-bold text-purple-800">
+                {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
+              </h2>
+              <button
+                onClick={() => setShowReviewDialog(false)}
+                className="text-gray-500 hover:text-gray-700 text-xl font-bold p-1"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {/* Star Rating */}
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-4" style={{ textAlign }}>
+                  {language === 'ar' ? 'كيف كانت تجربتك مع الخدمة؟' : 'How was your experience with our service?'}
+                </p>
+                <div className="flex justify-center gap-2">
+                  {renderStars(rating)}
+                </div>
+              </div>
+
+              {/* Comment */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-2 block" style={{ textAlign }}>
+                  {language === 'ar' ? 'تعليق (اختياري)' : 'Comment (Optional)'}
+                </label>
+                <Textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder={language === 'ar' ? 'شاركنا رأيك في الخدمة...' : 'Share your thoughts about the service...'}
+                  className="min-h-[80px] border-2 border-purple-200 focus:border-purple-400"
+                  style={{ textAlign }}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowReviewDialog(false)}
+                  variant="outline"
+                  className="flex-1 border-2 border-purple-200 hover:bg-purple-50"
+                >
+                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                </Button>
+                <Button
+                  onClick={handleSubmitReview}
+                  disabled={submitReviewMutation.isPending}
+                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4"
+                >
+                  {submitReviewMutation.isPending 
+                    ? (language === 'ar' ? 'جاري الإرسال...' : 'Submitting...')
+                    : (language === 'ar' ? 'إرسال التقييم' : 'Submit Review')
+                  }
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <FixedFooter />
     </div>
