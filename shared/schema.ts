@@ -82,8 +82,9 @@ export const insertUserSchema = createInsertSchema(users).pick({
   name: true,
   firstName: true,
   lastName: true,
-  petName: true,
-  petType: true,
+  email: true,
+  address: true,
+  membershipType: true,
 });
 
 export const loginSchema = z.object({
@@ -94,10 +95,6 @@ export const loginSchema = z.object({
 export const registerSchema = z.object({
   firstName: z.string().min(2, "الاسم الأول مطلوب (حد أدنى حرفين)"),
   lastName: z.string().min(2, "الاسم الثاني مطلوب (حد أدنى حرفين)"),
-  petName: z.string().min(2, "اسم الأليف مطلوب (حد أدنى حرفين)"),
-  petType: z.enum(["كلب", "قطة", "طير"], {
-    errorMap: () => ({ message: "يرجى اختيار نوع الأليف" })
-  }),
   email: z.string().email("البريد الإلكتروني غير صحيح"),
   phone: z.string()
     .regex(/^05\d{8}$/, "رقم الهاتف يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"),

@@ -18,17 +18,12 @@ async function throwIfResNotOk(res: Response, url: string) {
       return;
     }
     const text = await res.text();
-    console.log('Raw error response text:', text);
     try {
       // Try to parse JSON response to extract clean message
       const errorData = JSON.parse(text);
-      console.log('Parsed error data:', errorData);
-      const cleanMessage = errorData.message || text || res.statusText;
-      console.log('Clean message to throw:', cleanMessage);
-      throw new Error(cleanMessage);
+      throw new Error(errorData.message || text || res.statusText);
     } catch (parseError) {
       // If not JSON, use the text as is
-      console.log('JSON parse failed, using text as is:', text);
       throw new Error(text || res.statusText);
     }
   }

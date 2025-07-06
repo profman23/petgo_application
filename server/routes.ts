@@ -137,7 +137,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send welcome email if email is provided
       if (user.email) {
         try {
-          await emailService.sendWelcomeEmail(user.email, user.firstName || user.name, user.petName || 'حيوانك الأليف');
+          await emailService.sendWelcomeEmail(user.email, user.firstName || user.name, 'حيوانك الأليف');
           console.log(`✅ Welcome email sent to ${user.email}`);
         } catch (emailError) {
           console.error('❌ Failed to send welcome email:', emailError);

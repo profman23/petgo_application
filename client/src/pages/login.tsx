@@ -36,8 +36,6 @@ export default function Login() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    petName: '',
-    petType: 'كلب',
     email: '',
     phone: '',
     password: '',
@@ -130,16 +128,20 @@ export default function Login() {
       
       // رسالة ترحيب مفصلة
       toast({
-        title: t('registrationSuccess'),
-        description: `${t('welcomeNewUser')} ${formData.firstName}! يمكنك الآن طلب الخدمات البيطرية لحيوانك الأليف ${formData.petName}.`,
+        title: language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Registration Successful',
+        description: language === 'ar' ? 
+          `مرحباً ${formData.firstName}! يمكنك الآن طلب الخدمات البيطرية المتنقلة لحيواناتك الأليفة.` :
+          `Welcome ${formData.firstName}! You can now request mobile veterinary services for your pets.`,
         variant: "default",
       });
       
       // رسالة ترحيب إضافية بعد ثانيتين
       setTimeout(() => {
         toast({
-          title: "نصائح للبداية",
-          description: "يمكنك طلب طبيب بيطري متنقل الآن، وسيصل إليك في أسرع وقت ممكن!",
+          title: language === 'ar' ? "نصائح للبداية" : "Getting Started",
+          description: language === 'ar' ? 
+            "يمكنك طلب طبيب بيطري متنقل الآن، وسيصل إليك في أسرع وقت ممكن!" :
+            "You can now request a mobile veterinarian who will reach you as soon as possible!",
         });
       }, 2000);
       
@@ -282,14 +284,16 @@ export default function Login() {
               </form>
             </Form>
           ) : (
-            <form onSubmit={handleRegisterSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleRegisterSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">{t('firstName')} *</label>
+                  <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'الاسم الأول' : 'First Name'} *
+                  </label>
                   <Input
                     type="text"
-                    placeholder={t('enterFirstName')}
-                    className={`${language === 'ar' ? 'text-right' : 'text-left'}`}
+                    placeholder={language === 'ar' ? 'أدخل الاسم الأول' : 'Enter first name'}
+                    className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.firstName}
                     onChange={(e) => updateFormData('firstName', e.target.value)}
                     required
@@ -297,11 +301,13 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">{t('lastName')} *</label>
+                  <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'الاسم الأخير' : 'Last Name'} *
+                  </label>
                   <Input
                     type="text"
-                    placeholder={t('enterLastName')}
-                    className={`${language === 'ar' ? 'text-right' : 'text-left'}`}
+                    placeholder={language === 'ar' ? 'أدخل الاسم الأخير' : 'Enter last name'}
+                    className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.lastName}
                     onChange={(e) => updateFormData('lastName', e.target.value)}
                     required
@@ -310,91 +316,70 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">{t('petName')} *</label>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder={t('enterPetName')}
-                    className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                    value={formData.petName}
-                    onChange={(e) => updateFormData('petName', e.target.value)}
-                    required
-                  />
-                  <Heart className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">{t('petType')} *</label>
-                <Select value={formData.petType} onValueChange={(value) => updateFormData('petType', value)}>
-                  <SelectTrigger className={`${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                    <SelectValue placeholder={language === 'ar' ? 'اختر نوع الأليف' : 'Select pet type'} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="كلب">{language === 'ar' ? 'كلب' : 'Dog'}</SelectItem>
-                    <SelectItem value="قطة">{language === 'ar' ? 'قطة' : 'Cat'}</SelectItem>
-                    <SelectItem value="طير">{language === 'ar' ? 'طير' : 'Bird'}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'} *</label>
+                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                  {language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'} *
+                </label>
                 <div className="relative">
                   <Input
                     type="email"
-                    placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email address'}
-                    className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                    placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter your email address'}
+                    className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.email || ''}
                     onChange={(e) => updateFormData('email', e.target.value)}
                     required
                   />
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">{t('phoneNumber')} *</label>
+                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                  {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
+                </label>
                 <div className="relative">
                   <Input
                     type="tel"
-                    placeholder={t('enterPhone')}
-                    className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                    placeholder={language === 'ar' ? 'أدخل رقم الهاتف' : 'Enter your phone number'}
+                    className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.phone}
                     onChange={(e) => updateFormData('phone', e.target.value)}
                     required
                   />
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">{t('password')} *</label>
+                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                  {language === 'ar' ? 'كلمة المرور' : 'Password'} *
+                </label>
                 <div className="relative">
                   <Input
                     type="password"
-                    placeholder={t('enterPassword')}
-                    className={`pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                    placeholder={language === 'ar' ? 'أدخل كلمة المرور (6 أحرف على الأقل)' : 'Enter password (minimum 6 characters)'}
+                    className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.password}
                     onChange={(e) => updateFormData('password', e.target.value)}
                     required
                     minLength={6}
                   />
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 </div>
               </div>
 
-              <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                <h3 className="text-center text-lg font-semibold text-yellow-800 mb-2">{t('mathCaptcha')} *</h3>
-                <div className="flex justify-center mb-3">
-                  <div className="inline-block bg-white border-2 border-blue-200 px-4 py-2 rounded text-xl font-bold text-blue-800">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-2 border-blue-200">
+                <h3 className="text-center text-lg font-semibold text-blue-800 mb-4" style={{ textAlign: getTextAlign(language) }}>
+                  {language === 'ar' ? 'التحقق الأمني' : 'Security Verification'} *
+                </h3>
+                <div className="flex justify-center mb-4">
+                  <div className="inline-block bg-white border-3 border-blue-300 px-6 py-3 rounded-xl text-2xl font-bold text-blue-900 shadow-lg">
                     {captcha.question}
                   </div>
                 </div>
                 <Input
                   type="number"
-                  placeholder={t('enterCaptchaAnswer')}
-                  className="text-center text-lg mb-2"
+                  placeholder={language === 'ar' ? 'أدخل الإجابة' : 'Enter your answer'}
+                  className="text-center text-xl mb-4 h-12 border-2 border-blue-300"
                   value={formData.captcha}
                   onChange={(e) => updateFormData('captcha', e.target.value)}
                   required
@@ -403,11 +388,11 @@ export default function Login() {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    size="sm" 
+                    size="lg" 
                     onClick={generateCaptcha}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-3 border-2 border-blue-300 hover:bg-blue-100"
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className="w-5 h-5" />
                     {language === 'ar' ? 'تجديد السؤال' : 'Refresh Question'}
                   </Button>
                 </div>
@@ -415,20 +400,27 @@ export default function Login() {
 
               <Button 
                 type="submit" 
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
+                className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
                 disabled={registerMutation.isPending}
               >
-                {registerMutation.isPending ? t('loading') : t('createNewAccount')}
+                {registerMutation.isPending ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    {language === 'ar' ? 'جاري إنشاء الحساب...' : 'Creating Account...'}
+                  </div>
+                ) : (
+                  language === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'
+                )}
               </Button>
 
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => setIsRegistering(false)}
-                className="w-full"
+                className="w-full h-12 border-2 border-gray-300 hover:border-purple-400 hover:bg-purple-50 text-gray-700 hover:text-purple-700 font-medium rounded-xl transition-all duration-300"
               >
-                <ArrowLeft className={`w-4 h-4 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-                {t('backToLogin')}
+                <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'ml-3 rotate-180' : 'mr-3'}`} />
+                {language === 'ar' ? 'العودة إلى تسجيل الدخول' : 'Back to Login'}
               </Button>
             </form>
           )}
