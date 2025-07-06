@@ -18,6 +18,7 @@ import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
+import selectPetsLogo from "@/assets/select-pets-logo.jpeg";
 import serviceTypeIcon from "@assets/freepik_assistant_1751437667818_1751437676533.png";
 import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.png";
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
@@ -630,9 +631,16 @@ export default function RideRequest() {
               <div className="space-y-4">
                 {/* Multi-Select Pets using Clean Design */}
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-gray-700" style={{ textAlign }}>
-                    {language === 'ar' ? 'اختر الحيوانات الأليفة:' : 'Select Pets:'}
-                  </label>
+                  <div className="flex items-center gap-2" style={{ flexDirection: language === 'ar' ? 'row-reverse' : 'row', textAlign }}>
+                    <img 
+                      src={selectPetsLogo} 
+                      alt="Select Pets Logo" 
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'اختر الحيوانات الأليفة:' : 'Select Pets:'}
+                    </label>
+                  </div>
                   
                   {/* Pet Selection Dropdown */}
                   <Select
