@@ -205,27 +205,40 @@ export default function Login() {
             </p>
           </div>
 
-        <CardContent className="p-8">
+        <CardContent className="p-8 bg-white/95 backdrop-blur-sm">
 
           {!isRegistering ? (
             <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
                 <FormField
                   control={loginForm.control}
                   name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{language === 'ar' ? 'رقم الهاتف أو الإيميل' : 'Phone Number or Email'}</FormLabel>
+                      <FormLabel className="text-gray-700 font-semibold">
+                        {language === 'ar' ? 'رقم الهاتف أو الإيميل' : 'Phone Number or Email'}
+                      </FormLabel>
                       <FormControl>
-                        <div className="relative">
+                        <div className="relative group">
                           <Input
                             {...field}
                             type="text"
                             placeholder={language === 'ar' ? 'أدخل رقم الهاتف أو الإيميل' : 'Enter phone number or email'}
-                            className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                            style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
+                            className={`pr-4 pl-16 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
+                              focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
+                              ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            style={{ 
+                              borderColor: 'var(--purple-primary)', 
+                              '--tw-ring-color': 'var(--purple-primary)',
+                              fontSize: '16px'
+                            } as any}
                           />
-                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
+                            <Phone className="text-purple-500 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
+                            <div className="w-px h-4 bg-gray-300"></div>
+                            <Mail className="text-purple-500 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
+                          </div>
+                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -238,17 +251,24 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('password')}</FormLabel>
+                      <FormLabel className="text-gray-700 font-semibold">{t('password')}</FormLabel>
                       <FormControl>
-                        <div className="relative">
+                        <div className="relative group">
                           <Input
                             {...field}
                             type="password"
                             placeholder={t('enterPassword')}
-                            className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                            style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
+                            className={`pr-4 pl-12 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
+                              focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
+                              ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                            style={{ 
+                              borderColor: 'var(--purple-primary)', 
+                              '--tw-ring-color': 'var(--purple-primary)',
+                              fontSize: '16px'
+                            } as any}
                           />
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
+                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -258,13 +278,19 @@ export default function Login() {
 
                 <Button 
                   type="submit" 
-                  className="w-full text-white" 
+                  className="w-full text-white py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 
+                    hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
+                    bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800" 
                   disabled={loginMutation.isPending}
-                  style={{ backgroundColor: 'var(--purple-primary)', borderColor: 'var(--purple-primary)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--purple-dark)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--purple-primary)'}
+                  style={{ 
+                    background: loginMutation.isPending ? 'var(--purple-primary)' : undefined,
+                    boxShadow: '0 8px 25px rgba(139, 47, 139, 0.3)'
+                  }}
                 >
-                  {loginMutation.isPending ? t('loading') : t('login')}
+                  <div className="flex items-center justify-center space-x-2">
+                    {loginMutation.isPending && <RefreshCw className="w-4 h-4 animate-spin" />}
+                    <span>{loginMutation.isPending ? t('loading') : t('login')}</span>
+                  </div>
                 </Button>
 
                 <div className="text-center">
@@ -275,9 +301,11 @@ export default function Login() {
                     type="button" 
                     variant="outline" 
                     onClick={() => setIsRegistering(true)}
-                    className="w-full"
+                    className="w-full py-3 rounded-xl font-semibold border-2 transition-all duration-300 
+                      hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
+                      bg-white hover:bg-purple-50 text-purple-600 border-purple-300 hover:border-purple-400"
                   >
-                    <UserPlus className={`w-4 h-4 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                    <UserPlus className={`w-5 h-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
                     {t('createNewAccount')}
                   </Button>
                 </div>
