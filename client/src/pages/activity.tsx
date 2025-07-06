@@ -42,6 +42,7 @@ interface Review {
 }
 
 export default function Activity() {
+  console.log('Activity page loaded!');
   const { t, language } = useTranslation();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
@@ -68,6 +69,9 @@ export default function Activity() {
     retry: false,
     refetchInterval: 5000, // Refresh every 5 seconds to show new updates
   });
+
+  console.log('Bookings data:', bookings);
+  console.log('Loading state:', isLoading);
 
   const handleBack = () => {
     setLocation('/home');
