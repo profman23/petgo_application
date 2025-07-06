@@ -653,7 +653,7 @@ export default function RideRequest() {
                     </SelectTrigger>
                     <SelectContent>
                       {patients.filter(patient => !selectedPatients.includes(patient.id)).map((patient: Patient) => (
-                        <SelectItem key={patient.id} value={patient.id.toString()}>
+                        <SelectItem key={patient.id} value={patient.id.toString()} className="select-item-custom">
                           <div className="flex items-center gap-2">
                             <span>
                               {patient.type === 'Cat' ? '🐱' : patient.type === 'Dog' ? '🐶' : '🐦'}
@@ -750,13 +750,13 @@ export default function RideRequest() {
                 } />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general-checkup">
+                <SelectItem value="general-checkup" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <span>🩺</span>
                     <span>{t('generalCheckUp')}</span>
                   </div>
                 </SelectItem>
-                <SelectItem value="grooming">
+                <SelectItem value="grooming" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <span>✂️</span>
                     <span>{t('grooming')}</span>
