@@ -355,32 +355,37 @@ export default function VetsVanBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={direction} style={{ fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleBack}
-            className="p-2"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          
-          <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir={direction} style={{ fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
+      {/* Header Section - Consistent Design */}
+      <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 px-6 py-8 text-center relative">
+        {/* Back button */}
+        <button
+          onClick={handleBack}
+          className="absolute top-4 left-4 p-3 text-white hover:bg-purple-800/50 rounded-xl transition-all duration-300 backdrop-blur-sm border border-purple-400/30"
+          title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
+        >
+          <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
+        </button>
+        
+        {/* Logo Container - Enhanced Rectangular Design */}
+        <div className="mb-8 flex justify-center">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border-4 border-purple-200/60 hover:border-purple-300/80 hover:shadow-purple-500/20 transition-all duration-500 hover:scale-105">
             <img 
               src={logoImage} 
-              alt="VetsVan Logo" 
-              className="w-10 h-10 rounded-lg object-cover border-2 border-purple-200"
+              alt="Vets Van - Mobile Veterinary Clinic" 
+              className="h-24 w-auto max-w-[320px] object-contain mx-auto"
+              style={{ 
+                filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.15)) contrast(1.1)',
+              }}
             />
-            <h1 className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
-              {language === 'ar' ? 'حجز موعد' : 'Book Appointment'}
-            </h1>
           </div>
-          
-          <div className="w-10"></div>
         </div>
+        <h1 className="text-3xl font-bold text-white mb-2" style={{ textAlign }}>
+          {language === 'ar' ? 'حجز موعد' : 'Book Appointment'}
+        </h1>
+        <p className="text-purple-100/90 text-lg" style={{ textAlign }}>
+          {language === 'ar' ? 'اختر الوقت المناسب لك' : 'Choose the convenient time for you'}
+        </p>
       </div>
 
       <div className="max-w-md mx-auto p-4 space-y-4">
