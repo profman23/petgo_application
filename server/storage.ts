@@ -56,6 +56,16 @@ export interface IStorage {
   createReview(review: InsertReview): Promise<Review>;
   getBookingReview(bookingId: number): Promise<Review | undefined>;
   getUserReviews(userId: number): Promise<Review[]>;
+
+  // Reports operations
+  getReportsStats(): Promise<{
+    totalBookings: number;
+    completedBookings: number;
+    averageRating: number;
+    totalReviews: number;
+    totalVetsVans: number;
+    availableVetsVans: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -529,6 +539,38 @@ export class DatabaseStorage implements IStorage {
   async getUserReviews(userId: number): Promise<Review[]> {
     return await db.select().from(reviews).where(eq(reviews.userId, userId));
   }
+
+  async getReportsStats(): Promise<{
+    totalBookings: number;
+    completedBookings: number;
+    averageRating: number;
+    totalReviews: number;
+    totalVetsVans: number;
+    availableVetsVans: number;
+  }> {
+    // Get all bookings
+    const allBookings = await db.select().from(bookings);
+    const completedBookings = allBookings.filter(b => b.status === 'completed');
+    
+    // Get all reviews
+    const allReviews = await db.select().from(reviews);
+    const averageRating = allReviews.length > 0 
+      ? allReviews.reduce((sum, review) => sum + review.rating, 0) / allReviews.length 
+      : 0;
+    
+    // Get all drivers (VetsVans)
+    const allDrivers = await db.select().from(drivers);
+    const availableDrivers = allDrivers.filter(d => d.isAvailable);
+    
+    return {
+      totalBookings: allBookings.length,
+      completedBookings: completedBookings.length,
+      averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
+      totalReviews: allReviews.length,
+      totalVetsVans: allDrivers.length,
+      availableVetsVans: availableDrivers.length,
+    };
+  }
 }
 
 // Temporary fallback to MemStorage due to database connection issues
@@ -957,6 +999,38 @@ class MemStorage implements IStorage {
 
   async getUserReviews(userId: number): Promise<Review[]> {
     return Array.from(this.reviews.values()).filter(review => review.userId === userId);
+  }
+
+  async getReportsStats(): Promise<{
+    totalBookings: number;
+    completedBookings: number;
+    averageRating: number;
+    totalReviews: number;
+    totalVetsVans: number;
+    availableVetsVans: number;
+  }> {
+    // Get all bookings
+    const allBookings = Array.from(this.bookings.values());
+    const completedBookings = allBookings.filter(b => b.status === 'completed');
+    
+    // Get all reviews
+    const allReviews = Array.from(this.reviews.values());
+    const averageRating = allReviews.length > 0 
+      ? allReviews.reduce((sum, review) => sum + review.rating, 0) / allReviews.length 
+      : 0;
+    
+    // Get all drivers (VetsVans)
+    const allDrivers = Array.from(this.drivers.values());
+    const availableDrivers = allDrivers.filter(d => d.isAvailable);
+    
+    return {
+      totalBookings: allBookings.length,
+      completedBookings: completedBookings.length,
+      averageRating: Math.round(averageRating * 10) / 10, // Round to 1 decimal
+      totalReviews: allReviews.length,
+      totalVetsVans: allDrivers.length,
+      availableVetsVans: availableDrivers.length,
+    };
   }
 }
 

@@ -1549,6 +1549,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get reports statistics
+  app.get('/api/admin/reports', requireAdminAuth, async (req, res) => {
+    try {
+      const stats = await storage.getReportsStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error fetching reports stats:', error);
+      res.status(500).json({ message: 'Failed to fetch reports stats' });
+    }
+  });
+
   // Doctor VetsVan location endpoint
   app.get('/api/doctor/vetsvan-location', requireAuth, async (req, res) => {
     try {
