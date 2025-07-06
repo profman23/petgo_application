@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb, numeric } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -197,6 +197,11 @@ export const bookings = pgTable("bookings", {
     longitude: number;
     address?: string;
   }>(),
+  paymentStatus: text("payment_status").default("pending").notNull(), // 'pending', 'paid', 'failed', 'refunded'
+  paymentId: text("payment_id"), // MyFatoorah payment ID
+  invoiceId: text("invoice_id"), // MyFatoorah invoice ID
+  paymentAmount: numeric("payment_amount", { precision: 10, scale: 2 }),
+  paymentMethod: text("payment_method"), // 'visa', 'mastercard', 'mada', etc.
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -209,6 +214,8 @@ export const insertBookingSchema = createInsertSchema(bookings).pick({
   appointmentTime: true,
   status: true,
   customerLocation: true,
+  paymentStatus: true,
+  paymentAmount: true,
 });
 
 export type Booking = typeof bookings.$inferSelect;

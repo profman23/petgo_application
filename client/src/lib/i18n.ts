@@ -126,6 +126,79 @@ export const translations = {
     arabic: 'العربية',
     english: 'English',
     selectLanguage: 'اختر اللغة',
+    
+    // Payment
+    payment: {
+      title: 'الدفع الإلكتروني',
+      subtitle: 'اختر طريقة الدفع المناسبة لك',
+      orderSummary: 'ملخص الطلب',
+      service: 'الخدمة',
+      vetService: 'خدمة بيطرية منزلية',
+      total: 'المجموع',
+      sar: 'ريال',
+      selectPaymentMethod: 'اختر طريقة الدفع',
+      loadingMethods: 'جاري تحميل طرق الدفع...',
+      serviceCharge: 'رسوم الخدمة',
+      payNow: 'ادفع الآن',
+      processing: 'جاري المعالجة...',
+      selectMethod: 'اختر طريقة الدفع',
+      selectMethodDesc: 'يرجى اختيار طريقة دفع للمتابعة',
+      failed: 'فشل في إتمام عملية الدفع',
+      invalidBooking: 'حجز غير صالح',
+      securityNotice: 'جميع المعاملات محمية بتشفير SSL',
+      success: {
+        title: 'تم الدفع بنجاح!',
+        message: 'تم إتمام عملية الدفع بنجاح',
+        details: 'تفاصيل الدفع',
+        bookingId: 'رقم الحجز',
+        amount: 'المبلغ',
+        method: 'طريقة الدفع',
+        status: 'الحالة',
+        card: 'بطاقة',
+        paid: 'مدفوع',
+        confirmation: 'سيتم إرسال رسالة تأكيد على رقم الهاتف المسجل',
+        viewBookings: 'عرض الحجوزات',
+        goHome: 'العودة للرئيسية',
+        autoRedirect: 'سيتم التوجيه تلقائياً خلال 10 ثوانٍ'
+      },
+      error: {
+        whatHappened: 'ماذا حدث؟',
+        support: 'في حالة استمرار المشكلة، يرجى التواصل مع خدمة العملاء',
+        tryAgain: 'حاول مرة أخرى',
+        goHome: 'العودة للرئيسية',
+        helpText: 'لمساعدة إضافية، تواصل معنا عبر الهاتف أو WhatsApp',
+        failed: {
+          title: 'فشل في الدفع',
+          message: 'لم يتم إتمام عملية الدفع بنجاح'
+        },
+        cancelled: {
+          title: 'تم إلغاء الدفع',
+          message: 'تم إلغاء عملية الدفع من قبل المستخدم'
+        },
+        missing: {
+          title: 'خطأ في البيانات',
+          message: 'معلومات الدفع مفقودة أو غير صحيحة'
+        },
+        callback: {
+          title: 'خطأ في النظام',
+          message: 'حدث خطأ أثناء التحقق من حالة الدفع'
+        },
+        unknown: {
+          title: 'خطأ غير معروف',
+          message: 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى'
+        },
+        reasons: {
+          insufficientFunds: 'رصيد غير كافٍ في الحساب',
+          invalidCard: 'بيانات البطاقة غير صحيحة',
+          networkIssue: 'مشكلة في الاتصال بالشبكة',
+          bankDecline: 'تم رفض العملية من البنك',
+          userCancelled: 'تم إلغاء العملية من قبل المستخدم',
+          technicalIssue: 'مشكلة تقنية في النظام',
+          callbackError: 'خطأ في استقبال نتيجة الدفع',
+          unknownError: 'خطأ غير محدد في النظام'
+        }
+      }
+    },
   },
   
   en: {
@@ -232,6 +305,42 @@ export const translations = {
     arabic: 'العربية',
     english: 'English',
     selectLanguage: 'Select Language',
+    
+    // Payment
+    payment: {
+      title: 'Online Payment',
+      subtitle: 'Choose your preferred payment method',
+      orderSummary: 'Order Summary',
+      service: 'Service',
+      vetService: 'Home Veterinary Service',
+      total: 'Total',
+      sar: 'SAR',
+      selectPaymentMethod: 'Select Payment Method',
+      loadingMethods: 'Loading payment methods...',
+      serviceCharge: 'Service Charge',
+      payNow: 'Pay Now',
+      processing: 'Processing...',
+      selectMethod: 'Select Payment Method',
+      selectMethodDesc: 'Please select a payment method to continue',
+      failed: 'Payment failed',
+      invalidBooking: 'Invalid booking',
+      securityNotice: 'All transactions are protected with SSL encryption',
+      success: {
+        title: 'Payment Successful!',
+        message: 'Your payment has been completed successfully',
+        details: 'Payment Details',
+        bookingId: 'Booking ID',
+        amount: 'Amount',
+        method: 'Payment Method',
+        status: 'Status',
+        card: 'Card',
+        paid: 'Paid',
+        confirmation: 'A confirmation message will be sent to your registered phone number',
+        viewBookings: 'View Bookings',
+        goHome: 'Go Home',
+        autoRedirect: 'You will be redirected automatically in 10 seconds'
+      }
+    },
   }
 };
 

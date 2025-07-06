@@ -22,6 +22,9 @@ import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
+import PaymentPage from "@/pages/payment";
+import PaymentSuccessPage from "@/pages/payment-success";
+import PaymentErrorPage from "@/pages/payment-error";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -129,6 +132,9 @@ function Router() {
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
+          <Route path="/payment/:bookingId" component={PaymentPage} />
+          <Route path="/payment-success" component={PaymentSuccessPage} />
+          <Route path="/payment-error" component={PaymentErrorPage} />
           <Route path="/home" component={Home} />
           <Route path="/" component={Login} />
           <Route component={NotFound} />

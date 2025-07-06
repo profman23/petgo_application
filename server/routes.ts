@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
+import { paymentService } from "./paymentService";
 
 // Simple session middleware
 const sessions = new Map();
@@ -1666,6 +1667,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error changing doctor password:', error);
       res.status(500).json({ message: 'Failed to change password' });
+    }
+  });
+
+  // Payment Integration Endpoints
+  
+  // Initiate payment (get payment methods)
+  app.post('/api/payment/initiate', requireAuth, async (req: any, res) => {
+    try {
+      const { amount } = req.body;
+      
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ message: 'Valid amount is required' });
+      }
+      
+      const paymentMethods = await paymentService.initiatePayment(amount, 'SAR');
+      res.json({ paymentMethods });
+    } catch (error: any) {
+      console.error('Payment initiation error:', error);
+      res.status(500).json({ message: error.message || 'Failed to initiate payment' });
+    }
+  });
+  
+  // Execute payment
+  app.post('/api/payment/execute', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { bookingId, paymentMethodId, amount } = req.body;
+      
+      if (!bookingId || !paymentMethodId || !amount) {
+        return res.status(400).json({ message: 'Booking ID, payment method, and amount are required' });
+      }
+      
+      // Get booking details
+      const userBookings = await storage.getUserBookings(userId);
+      const booking = userBookings.find(b => b.id === bookingId);
+      
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+      
+      // Get user details
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      // Prepare payment data
+      const customerMobile = user.phone.startsWith('+966') ? user.phone : `+966${user.phone.replace(/^0/, '')}`;
+      const customerEmail = user.email || `${user.phone}@vetsvan.sa`;
+      
+      const paymentData = {
+        paymentMethodId,
+        invoiceValue: amount,
+        customerName: user.name || user.firstName || 'عميل VetsVan',
+        customerEmail,
+        customerMobile,
+        callbackUrl: `${req.protocol}://${req.get('host')}/api/payment/callback`,
+        errorUrl: `${req.protocol}://${req.get('host')}/api/payment/error`,
+        customerReference: `BOOKING_${bookingId}`,
+        invoiceItems: [{
+          ItemName: 'خدمة بيطرية - VetsVan',
+          Quantity: 1,
+          UnitPrice: amount
+        }]
+      };
+      
+      const paymentUrl = await paymentService.executePayment(paymentData);
+      
+      // Update booking with payment information
+      await storage.updateBookingPayment(bookingId, {
+        paymentStatus: 'pending',
+        paymentAmount: amount.toString()
+      });
+      
+      res.json({ 
+        success: true,
+        paymentUrl,
+        customerReference: paymentData.customerReference
+      });
+    } catch (error: any) {
+      console.error('Payment execution error:', error);
+      res.status(500).json({ message: error.message || 'Failed to execute payment' });
+    }
+  });
+  
+  // Payment callback (success)
+  app.get('/api/payment/callback', async (req, res) => {
+    try {
+      const { paymentId } = req.query;
+      
+      if (!paymentId) {
+        return res.redirect('/payment-error?reason=missing_payment_id');
+      }
+      
+      // Get payment status from MyFatoorah
+      const paymentStatus = await paymentService.getPaymentStatus(paymentId as string);
+      
+      // Find booking by customer reference
+      const customerReference = paymentStatus.CustomerReference;
+      const bookingId = customerReference?.replace('BOOKING_', '');
+      
+      if (bookingId && paymentStatus.InvoiceStatus === 'Paid') {
+        // Update booking payment status
+        await storage.updateBookingPayment(parseInt(bookingId), {
+          paymentStatus: 'paid',
+          paymentId: paymentId as string,
+          invoiceId: paymentStatus.InvoiceId.toString(),
+          paymentMethod: paymentStatus.InvoiceTransactions[0]?.PaymentMethod || 'unknown'
+        });
+        
+        res.redirect('/payment-success?bookingId=' + bookingId);
+      } else {
+        await storage.updateBookingPayment(parseInt(bookingId), {
+          paymentStatus: 'failed'
+        });
+        res.redirect('/payment-error?reason=payment_failed');
+      }
+    } catch (error) {
+      console.error('Payment callback error:', error);
+      res.redirect('/payment-error?reason=callback_error');
+    }
+  });
+  
+  // Payment error callback
+  app.get('/api/payment/error', async (req, res) => {
+    res.redirect('/payment-error?reason=payment_cancelled');
+  });
+  
+  // Get payment status for a booking
+  app.get('/api/payment/status/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const userId = req.user.id;
+      
+      // Verify booking belongs to user
+      const userBookings = await storage.getUserBookings(userId);
+      const booking = userBookings.find(b => b.id === bookingId);
+      
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+      
+      res.json({
+        bookingId,
+        paymentStatus: booking.paymentStatus || 'pending',
+        paymentAmount: booking.paymentAmount,
+        paymentMethod: booking.paymentMethod,
+        paymentId: booking.paymentId,
+        invoiceId: booking.invoiceId
+      });
+    } catch (error) {
+      console.error('Payment status check error:', error);
+      res.status(500).json({ message: 'Failed to check payment status' });
     }
   });
 
