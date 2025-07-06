@@ -250,6 +250,7 @@ export default function Activity() {
           </div>
         ) : (
           <div className="space-y-4">
+            {console.log('All bookings:', bookings)}
             {bookings.map((booking: Booking) => (
               <Card key={booking.id} className="bg-white shadow-sm border border-purple-100 hover:shadow-md transition-shadow">
                 <CardContent className="p-4">
@@ -289,6 +290,7 @@ export default function Activity() {
                   </div>
 
                   {/* Rate Service Button for Completed Services */}
+                  {console.log('Booking status:', booking.status, 'ID:', booking.id)}
                   {booking.status === 'completed' && (
                     <div className="pt-3 border-t border-purple-100">
                       <Button
@@ -301,6 +303,7 @@ export default function Activity() {
                       </Button>
                     </div>
                   )}
+                  {booking.status === 'completed' && console.log('Should show review button for booking:', booking.id)}
                 </CardContent>
               </Card>
             ))}
