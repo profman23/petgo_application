@@ -111,7 +111,7 @@ function Router() {
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
           <Route path="/user-type-selection" component={UserTypeSelection} />
-          <Route path="/login" component={UserTypeSelection} />
+          <Route path="/login" component={Login} />
           <Route path="/login/customer" component={Login} />
           <Route path="/login/doctor" component={DoctorLogin} />
           <Route path="/doctor-dashboard" component={DoctorActivity} />
@@ -130,15 +130,7 @@ function Router() {
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/home" component={Home} />
-          <Route path="/" component={() => {
-            const token = localStorage.getItem('token');
-            const user = localStorage.getItem('user');
-            if (token && user) {
-              return <Home />;
-            } else {
-              return <Login />;
-            }
-          }} />
+          <Route path="/" component={Login} />
           <Route component={NotFound} />
         </Switch>
       </div>
