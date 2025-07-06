@@ -31,7 +31,7 @@ import { FixedFooter } from '@/components/fixed-footer';
 const formSchema = rideRequestSchema.extend({
   pickupLocation: z.string().min(1, 'الموقع مطلوب'),
   serviceType: z.string().min(1, 'نوع الخدمة مطلوب'),
-  selectedPatients: z.array(z.number()).min(1, 'يرجى اختيار حيوان أليف واحد على الأقل'),
+  selectedPatients: z.array(z.number()).min(1, 'يرجى اختيار حيوان أليف'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -197,13 +197,13 @@ export default function RideRequest() {
       return;
     }
 
-    // التحقق من اختيار الحيوانات الأليفة
+    // التحقق من اختيار الحيوان الأليف
     if (selectedPatients.length === 0) {
       toast({
-        title: language === 'ar' ? 'يرجى اختيار الحيوانات الأليفة' : 'Please select pets',
+        title: language === 'ar' ? 'يرجى اختيار الحيوان الأليف' : 'Please select pet',
         description: language === 'ar' ? 
-          'يرجى اختيار حيوان أليف واحد على الأقل للخدمة البيطرية.' : 
-          'Please select at least one pet for veterinary service.',
+          'يرجى اختيار حيوان أليف للخدمة البيطرية.' : 
+          'Please select a pet for veterinary service.',
         variant: 'destructive',
       });
       return;
@@ -354,8 +354,8 @@ export default function RideRequest() {
         });
       } else if (selectedPatients.length === 0) {
         toast({
-          title: language === 'ar' ? 'يرجى اختيار الحيوانات الأليفة' : 'Please select pets',
-          description: language === 'ar' ? 'يرجى اختيار حيوان أليف واحد على الأقل' : 'Please select at least one pet',
+          title: language === 'ar' ? 'يرجى اختيار الحيوان الأليف' : 'Please select pet',
+          description: language === 'ar' ? 'يرجى اختيار حيوان أليف' : 'Please select a pet',
           variant: 'destructive',
         });
       } else if (!serviceType) {
@@ -423,8 +423,8 @@ export default function RideRequest() {
         });
       } else if (selectedPatients.length === 0) {
         toast({
-          title: language === 'ar' ? 'يرجى اختيار الحيوانات الأليفة' : 'Please select pets',
-          description: language === 'ar' ? 'يرجى اختيار حيوان أليف واحد على الأقل' : 'Please select at least one pet',
+          title: language === 'ar' ? 'يرجى اختيار الحيوان الأليف' : 'Please select pet',
+          description: language === 'ar' ? 'يرجى اختيار حيوان أليف' : 'Please select a pet',
           variant: 'destructive',
         });
       } else if (!serviceType) {
@@ -628,161 +628,44 @@ export default function RideRequest() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Multi-Select Button */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className={`w-full h-12 justify-between px-4 text-sm font-medium ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
-                      style={{ textAlign }}
-                    >
-                      {selectedPatients.length === 0
-                        ? (language === 'ar' ? 'اختر الحيوانات الأليفة...' : 'Select pets...')
-                        : selectedPatients.length === 1
-                        ? patients.find(p => p.id === selectedPatients[0])?.name
-                        : `${selectedPatients.length} ${language === 'ar' ? 'حيوانات مختارة' : 'pets selected'}`
-                      }
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full max-w-md p-0 max-h-80" align="start">
-                    <Command className="rounded-lg border shadow-md">
-                      <CommandInput 
-                        placeholder={language === 'ar' ? 'ابحث عن حيوان أليف...' : 'Search pets...'} 
-                        className={`h-12 px-4 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
-                        style={{ textAlign }}
-                      />
-                      <CommandEmpty className="p-4 text-center text-gray-500">
-                        {language === 'ar' ? 'لم يتم العثور على حيوانات أليفة.' : 'No pets found.'}
-                      </CommandEmpty>
-                      <CommandGroup className="max-h-60 overflow-y-auto">
-                        {/* Select All Option */}
-                        <CommandItem
-                          onSelect={() => {
-                            if (selectedPatients.length === patients.length) {
-                              setSelectedPatients([]);
-                            } else {
-                              setSelectedPatients(patients.map(p => p.id));
-                            }
-                          }}
-                          className="cursor-pointer border-b border-gray-200 font-medium p-3 hover:bg-gray-50"
-                        >
-                          <div className="flex items-center justify-between w-full">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
-                                selectedPatients.length === patients.length
-                                  ? 'bg-purple-500 border-purple-500'
-                                  : selectedPatients.length > 0
-                                  ? 'bg-purple-200 border-purple-300'
-                                  : 'border-gray-300'
-                              }`}>
-                                {selectedPatients.length === patients.length && (
-                                  <Check className="h-3 w-3 text-white" />
-                                )}
-                                {selectedPatients.length > 0 && selectedPatients.length < patients.length && (
-                                  <div className="w-2 h-2 bg-purple-500 rounded"></div>
-                                )}
-                              </div>
-                              <span style={{ textAlign }}>
-                                {language === 'ar' ? 'اختيار الكل' : 'Select All'}
-                              </span>
-                            </div>
-                          </div>
-                        </CommandItem>
-                        
-                        {/* Individual Pets */}
-                        {patients.map((patient: Patient) => (
-                          <CommandItem
-                            key={patient.id}
-                            value={patient.name}
-                            onSelect={() => {
-                              const isSelected = selectedPatients.includes(patient.id);
-                              if (isSelected) {
-                                setSelectedPatients(prev => prev.filter(id => id !== patient.id));
-                              } else {
-                                setSelectedPatients(prev => [...prev, patient.id]);
-                              }
-                            }}
-                            className="cursor-pointer p-3 hover:bg-purple-50"
-                          >
-                            <div className="flex items-center justify-between w-full">
-                              <div className="flex items-center gap-3">
-                                <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
-                                  selectedPatients.includes(patient.id)
-                                    ? 'bg-purple-500 border-purple-500'
-                                    : 'border-gray-300 hover:border-purple-300'
-                                }`}>
-                                  {selectedPatients.includes(patient.id) && (
-                                    <Check className="h-3 w-3 text-white" />
-                                  )}
-                                </div>
-                                <span className="text-lg">
-                                  {patient.type === 'Cat' ? '🐱' : patient.type === 'Dog' ? '🐶' : '🐦'}
-                                </span>
-                                <div>
-                                  <div className="font-medium" style={{ textAlign }}>
-                                    {patient.name}
-                                  </div>
-                                  <div className="text-sm text-gray-500" style={{ textAlign }}>
-                                    {patient.type === 'Cat' ? (language === 'ar' ? 'قطة' : 'Cat') :
-                                     patient.type === 'Dog' ? (language === 'ar' ? 'كلب' : 'Dog') :
-                                     (language === 'ar' ? 'طائر' : 'Bird')}
-                                    {patient.ageYear && (
-                                      <span> • {patient.ageYear} {language === 'ar' ? 'سنة' : 'years'}</span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-
-                {/* Selected Pets Display */}
-                {selectedPatients.length > 0 && (
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-medium text-purple-800" style={{ textAlign }}>
-                        {language === 'ar' ? 'الحيوانات المختارة:' : 'Selected Pets:'}
-                      </h4>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedPatients([])}
-                        className="text-purple-600 hover:text-purple-800"
-                      >
-                        {language === 'ar' ? 'إلغاء الكل' : 'Clear All'}
-                      </Button>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedPatients.map(petId => {
-                        const pet = patients.find(p => p.id === petId);
-                        if (!pet) return null;
-                        return (
-                          <div
-                            key={petId}
-                            className="flex items-center gap-2 bg-white border border-purple-300 rounded-full px-3 py-1 text-sm"
-                          >
-                            <span>
-                              {pet.type === 'Cat' ? '🐱' : pet.type === 'Dog' ? '🐶' : '🐦'}
+                {/* Select Pets Dropdown - using same style as Service Type */}
+                <Select
+                  value={selectedPatients.length > 0 ? selectedPatients[0]?.toString() : ''}
+                  onValueChange={(value) => {
+                    if (value) {
+                      const petId = parseInt(value);
+                      setSelectedPatients([petId]); // Select only one pet for simplicity
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={
+                      language === 'ar' ? 'اختر الحيوان الأليف...' : 'Select pet...'
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {patients.map((patient: Patient) => (
+                      <SelectItem key={patient.id} value={patient.id.toString()}>
+                        <div className="flex items-center gap-2">
+                          <span>
+                            {patient.type === 'Cat' ? '🐱' : patient.type === 'Dog' ? '🐶' : '🐦'}
+                          </span>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{patient.name}</span>
+                            <span className="text-xs text-gray-500">
+                              {patient.type === 'Cat' ? (language === 'ar' ? 'قطة' : 'Cat') :
+                               patient.type === 'Dog' ? (language === 'ar' ? 'كلب' : 'Dog') :
+                               (language === 'ar' ? 'طائر' : 'Bird')}
+                              {patient.ageYear && (
+                                <span> • {patient.ageYear} {language === 'ar' ? 'سنة' : 'years'}</span>
+                              )}
                             </span>
-                            <span className="font-medium">{pet.name}</span>
-                            <button
-                              onClick={() => setSelectedPatients(prev => prev.filter(id => id !== petId))}
-                              className="text-purple-500 hover:text-purple-700"
-                            >
-                              ×
-                            </button>
                           </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
           </CardContent>
