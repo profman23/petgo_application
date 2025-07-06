@@ -94,12 +94,17 @@ export default function DoctorLogin() {
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
             
-            <div className="mb-4">
-              <img 
-                src={logoImage} 
-                alt="Vets Van" 
-                className="h-16 mx-auto object-contain rounded-lg border-2 border-purple-300"
-              />
+            <div className="mb-4 flex justify-center">
+              <div className="bg-white rounded-2xl p-3 shadow-md border-2 border-purple-100 hover:border-purple-200 transition-all duration-300 hover:scale-105">
+                <img 
+                  src={logoImage} 
+                  alt="Vets Van" 
+                  className="h-16 w-auto max-w-[200px] object-contain mx-auto"
+                  style={{ 
+                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1)) contrast(1.05)',
+                  }}
+                />
+              </div>
             </div>
             <h1 className="text-2xl font-bold text-gray-800" style={{ textAlign: getTextAlign(language) }}>
               {language === 'ar' ? 'دخول الطبيب البيطري' : 'Veterinary Doctor Login'}

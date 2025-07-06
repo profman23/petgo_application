@@ -186,7 +186,7 @@ export default function Login() {
             
             {/* Logo Container - Smaller Design */}
             <div className="mb-6 flex justify-center">
-              <div className="bg-gray-50 rounded-2xl p-3 shadow-md border-2 border-purple-100 hover:border-purple-200 transition-all duration-300 hover:scale-105">
+              <div className="bg-white rounded-2xl p-3 shadow-md border-2 border-purple-100 hover:border-purple-200 transition-all duration-300 hover:scale-105">
                 <img 
                   src={logoImage} 
                   alt="Vets Van - Mobile Veterinary Clinic" 
