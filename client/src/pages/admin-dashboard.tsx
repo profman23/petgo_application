@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3 } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import {
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('management'); // 'management' or 'shifts'
+  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', or 'reports'
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
@@ -313,6 +313,17 @@ export default function AdminDashboard() {
               <Clock className="ml-3 h-6 w-6" />
               {language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}
             </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+                activeTab === 'reports'
+                  ? 'bg-purple-100 text-purple-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <BarChart3 className="ml-3 h-6 w-6" />
+              {language === 'ar' ? 'التقارير' : 'Reports'}
+            </button>
           </nav>
         </div>
 
@@ -499,6 +510,138 @@ export default function AdminDashboard() {
                 </div>
               )}
 
+              {activeTab === 'reports' && (
+                <div>
+                  {/* Reports Section */}
+                  <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">
+                        {language === 'ar' ? 'التقارير والإحصائيات' : 'Reports & Analytics'}
+                      </h3>
+                      
+                      {/* Stats Cards */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div className="bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg p-6 text-white">
+                          <div className="flex items-center">
+                            <div className="flex-1">
+                              <h4 className="text-sm font-medium opacity-90">
+                                {language === 'ar' ? 'إجمالي VETS VAN' : 'Total Vets Vans'}
+                              </h4>
+                              <p className="text-2xl font-bold">{drivers?.length || 0}</p>
+                            </div>
+                            <Car className="h-8 w-8 opacity-80" />
+                          </div>
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-green-400 to-green-600 rounded-lg p-6 text-white">
+                          <div className="flex items-center">
+                            <div className="flex-1">
+                              <h4 className="text-sm font-medium opacity-90">
+                                {language === 'ar' ? 'VETS VAN متاحة' : 'Available Vets Vans'}
+                              </h4>
+                              <p className="text-2xl font-bold">{drivers?.filter(d => d.isAvailable).length || 0}</p>
+                            </div>
+                            <Car className="h-8 w-8 opacity-80" />
+                          </div>
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg p-6 text-white">
+                          <div className="flex items-center">
+                            <div className="flex-1">
+                              <h4 className="text-sm font-medium opacity-90">
+                                {language === 'ar' ? 'VETS VAN مشغولة' : 'Busy Vets Vans'}
+                              </h4>
+                              <p className="text-2xl font-bold">{drivers?.filter(d => !d.isAvailable).length || 0}</p>
+                            </div>
+                            <Car className="h-8 w-8 opacity-80" />
+                          </div>
+                        </div>
+                        
+                        <div className="bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg p-6 text-white">
+                          <div className="flex items-center">
+                            <div className="flex-1">
+                              <h4 className="text-sm font-medium opacity-90">
+                                {language === 'ar' ? 'معدل التوفر' : 'Availability Rate'}
+                              </h4>
+                              <p className="text-2xl font-bold">
+                                {drivers?.length ? Math.round((drivers.filter(d => d.isAvailable).length / drivers.length) * 100) : 0}%
+                              </p>
+                            </div>
+                            <BarChart3 className="h-8 w-8 opacity-80" />
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Recent Activity Table */}
+                      <div className="bg-white border border-gray-200 rounded-lg">
+                        <div className="px-4 py-5 sm:p-6">
+                          <h4 className="text-lg font-medium text-gray-900 mb-4">
+                            {language === 'ar' ? 'النشاط الحديث' : 'Recent Activity'}
+                          </h4>
+                          <div className="overflow-hidden">
+                            <table className="min-w-full divide-y divide-gray-200">
+                              <thead className="bg-gray-50">
+                                <tr>
+                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'VETS VAN' : 'Vets Van'}
+                                  </th>
+                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'الحالة' : 'Status'}
+                                  </th>
+                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'الموقع' : 'Location'}
+                                  </th>
+                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'تاريخ الإنشاء' : 'Created Date'}
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody className="bg-white divide-y divide-gray-200">
+                                {drivers?.slice(0, 5).map((driver) => (
+                                  <tr key={driver.id}>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                      {driver.vetsvanName} ({driver.vetsvanCode})
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                        driver.isAvailable 
+                                          ? 'bg-green-100 text-green-800' 
+                                          : 'bg-red-100 text-red-800'
+                                      }`}>
+                                        {driver.isAvailable 
+                                          ? (language === 'ar' ? 'متاح' : 'Available')
+                                          : (language === 'ar' ? 'مشغول' : 'Busy')
+                                        }
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                      {driver.latitude.toFixed(4)}, {driver.longitude.toFixed(4)}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                      {new Date(driver.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                            {(!drivers || drivers.length === 0) && (
+                              <div className="text-center py-8">
+                                <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
+                                <h3 className="mt-2 text-sm font-medium text-gray-900">
+                                  {language === 'ar' ? 'لا توجد بيانات' : 'No data available'}
+                                </h3>
+                                <p className="mt-1 text-sm text-gray-500">
+                                  {language === 'ar' ? 'أضف VETS VAN لرؤية التقارير' : 'Add Vets Vans to see reports'}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
             </div>
           </div>
