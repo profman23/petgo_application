@@ -275,11 +275,11 @@ export default function Login() {
                   type="submit" 
                   className="w-full text-white py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 
                     hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
-                    bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800" 
+                    bg-gradient-to-r from-purple-800 to-purple-900 hover:from-purple-900 hover:to-purple-950" 
                   disabled={loginMutation.isPending}
                   style={{ 
-                    background: loginMutation.isPending ? 'var(--purple-primary)' : undefined,
-                    boxShadow: '0 8px 25px rgba(139, 47, 139, 0.3)'
+                    background: loginMutation.isPending ? '#6B21A8' : undefined,
+                    boxShadow: '0 8px 25px rgba(107, 33, 168, 0.4)'
                   }}
                 >
                   <div className="flex items-center justify-center space-x-2">

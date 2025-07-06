@@ -165,11 +165,14 @@ export default function DoctorLogin() {
 
                 <Button
                   type="submit"
-                  className="w-full text-white py-3"
+                  className="w-full text-white py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 
+                    hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
+                    bg-gradient-to-r from-purple-800 to-purple-900 hover:from-purple-900 hover:to-purple-950"
                   disabled={loginMutation.isPending}
-                  style={{ backgroundColor: 'var(--purple-primary)', borderColor: 'var(--purple-primary)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--purple-dark)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--purple-primary)'}
+                  style={{ 
+                    background: loginMutation.isPending ? '#6B21A8' : undefined,
+                    boxShadow: '0 8px 25px rgba(107, 33, 168, 0.4)'
+                  }}
                 >
                   {loginMutation.isPending 
                     ? (language === 'ar' ? 'جاري تسجيل الدخول...' : 'Logging in...') 
