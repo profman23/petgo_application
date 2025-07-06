@@ -197,12 +197,7 @@ export default function Login() {
                 />
               </div>
             </div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2" style={{ textAlign: getTextAlign(language) }}>
-              {isRegistering ? t('createNewAccount') : t('customerLogin')}
-            </h1>
-            <p className="text-gray-600 text-base" style={{ textAlign: getTextAlign(language) }}>
-              {isRegistering ? t('joinMobileVetService') : t('welcomeBack')}
-            </p>
+
           </div>
 
         <CardContent className="p-8 bg-white/95 backdrop-blur-sm">
