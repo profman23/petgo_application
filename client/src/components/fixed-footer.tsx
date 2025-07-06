@@ -11,7 +11,7 @@ export function FixedFooter() {
   const navigationItems = [
     {
       id: 'home',
-      path: '/',
+      path: '/home',
       label: language === 'ar' ? 'الرئيسية' : 'Home',
       bgColor: 'bg-gradient-to-br from-purple-700 via-purple-800 to-purple-900',
       hoverColor: 'hover:from-purple-800 hover:via-purple-900 hover:to-purple-950',

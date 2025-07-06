@@ -103,7 +103,7 @@ function Router() {
   const [location] = useLocation();
   
   // Pages that should show the footer
-  const pagesWithFooter = ['/', '/home', '/account', '/activity', '/customer-activity', '/patients'];
+  const pagesWithFooter = ['/home', '/account', '/activity', '/customer-activity', '/patients'];
   const shouldShowFooter = pagesWithFooter.includes(location);
 
   return (
