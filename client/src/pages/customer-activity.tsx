@@ -33,7 +33,6 @@ interface Booking {
 }
 
 export default function CustomerActivity() {
-  console.log('CustomerActivity page loaded!');
   const { t, language } = useTranslation();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
@@ -63,8 +62,7 @@ export default function CustomerActivity() {
     refetchInterval: 5000, // Refresh every 5 seconds to show new bookings
   });
 
-  console.log('CustomerActivity bookings data:', bookings);
-  console.log('CustomerActivity loading state:', isLoading);
+
 
   // Submit review mutation
   const submitReviewMutation = useMutation({
@@ -97,7 +95,6 @@ export default function CustomerActivity() {
 
   // Open review dialog
   const openReviewDialog = (booking: Booking) => {
-    console.log('Opening review dialog for booking:', booking.id);
     setSelectedBooking(booking);
     setShowReviewDialog(true);
     setRating(0);
@@ -375,7 +372,6 @@ export default function CustomerActivity() {
                             )}
 
                             {/* Rate Service Button for Completed Services */}
-                            {console.log('CustomerActivity Booking status:', booking.status, 'ID:', booking.id)}
                             {booking.status === 'completed' && (
                               <div className="pt-3 border-t border-purple-100">
                                 <Button
