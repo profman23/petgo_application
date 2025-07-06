@@ -355,40 +355,42 @@ export default function VetsVanBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white" dir={direction} style={{ fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
-      {/* Header Section - Consistent Design */}
-      <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-purple-800 px-6 py-8 text-center relative">
-        {/* Back button */}
-        <button
-          onClick={handleBack}
-          className="absolute top-4 left-4 p-3 text-white hover:bg-purple-800/50 rounded-xl transition-all duration-300 backdrop-blur-sm border border-purple-400/30"
-          title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
-        >
-          <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
-        </button>
-        
-        {/* Logo Container - Enhanced Rectangular Design */}
-        <div className="mb-8 flex justify-center">
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 shadow-2xl border-4 border-purple-200/60 hover:border-purple-300/80 hover:shadow-purple-500/20 transition-all duration-500 hover:scale-105">
-            <img 
-              src={logoImage} 
-              alt="Vets Van - Mobile Veterinary Clinic" 
-              className="h-24 w-auto max-w-[320px] object-contain mx-auto"
-              style={{ 
-                filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.15)) contrast(1.1)',
-              }}
-            />
+    <div className="min-h-screen bg-gray-50 border-2 border-gray-400 rounded-lg m-2" dir={direction} style={{ fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
+      <div className="max-w-md mx-auto bg-white shadow-sm rounded-lg overflow-hidden">
+        {/* Header - Same as ride-request */}
+        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+                <img 
+                  src={logoImage} 
+                  alt="VETS VAN Logo" 
+                  className="h-full w-auto object-contain"
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                    maxWidth: '120px'
+                  }}
+                />
+              </div>
+              <div className="text-lg font-bold text-gray-800">
+                {language === 'ar' ? 'حجز موعد' : 'Book Appointment'}
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBack}
+                className="text-gray-600 hover:bg-gray-100 px-2 py-1 h-8"
+              >
+                <ArrowLeft className={`w-4 h-4 ${language === 'ar' ? 'rotate-180' : ''}`} />
+                {language === 'ar' ? 'رجوع' : 'Back'}
+              </Button>
+            </div>
           </div>
         </div>
-        <h1 className="text-3xl font-bold text-white mb-2" style={{ textAlign }}>
-          {language === 'ar' ? 'حجز موعد' : 'Book Appointment'}
-        </h1>
-        <p className="text-purple-100/90 text-lg" style={{ textAlign }}>
-          {language === 'ar' ? 'اختر الوقت المناسب لك' : 'Choose the convenient time for you'}
-        </p>
-      </div>
 
-      <div className="max-w-md mx-auto p-4 space-y-4">
+        <div className="p-4 space-y-4">
         {/* معلومات الطلب */}
         <Card>
           <CardHeader className="pb-3">
@@ -564,6 +566,7 @@ export default function VetsVanBooking() {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
     </div>
   );
