@@ -1249,43 +1249,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create review for completed service
-  app.post('/api/reviews', requireAuth, async (req: any, res) => {
-    try {
-      const { bookingId, rating, comment } = req.body;
-      const userId = req.user.id;
-
-      // Validate that booking exists and is completed
-      const booking = await storage.getUserBookings(userId).then(bookings => 
-        bookings.find(b => b.id === bookingId && b.status === 'completed')
-      );
-
-      if (!booking) {
-        return res.status(404).json({ message: 'Completed booking not found' });
-      }
-
-      // Check if review already exists
-      const existingReview = await storage.getBookingReview(bookingId);
-      if (existingReview) {
-        return res.status(400).json({ message: 'Review already exists for this booking' });
-      }
-
-      // Create review
-      const review = await storage.createReview({
-        bookingId,
-        userId,
-        rating,
-        comment
-      });
-
-      res.json({ success: true, review });
-
-    } catch (error) {
-      console.error('Error creating review:', error);
-      res.status(500).json({ message: 'Failed to create review' });
-    }
-  });
-
   // Get review for a specific booking
   app.get('/api/bookings/:bookingId/review', requireAuth, async (req: any, res) => {
     try {
@@ -1351,14 +1314,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Submit review endpoint (for customers)
-  app.post('/api/reviews', requireAuth, async (req: any, res) => {
+  // Submit review endpoint for specific booking (for customers)
+  app.post('/api/bookings/:bookingId/review', requireAuth, async (req: any, res) => {
     try {
-      const { bookingId, rating, comment } = req.body;
+      const bookingId = parseInt(req.params.bookingId);
+      const { rating, comment } = req.body;
       const userId = req.user.id;
       
-      if (!bookingId || !rating || rating < 1 || rating > 5) {
-        return res.status(400).json({ message: 'Valid booking ID and rating (1-5) are required' });
+      if (!rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ message: 'Valid rating (1-5) is required' });
+      }
+
+      // Verify booking exists and belongs to user
+      const userBookings = await storage.getUserBookings(userId);
+      const booking = userBookings.find(b => b.id === bookingId && b.status === 'completed');
+      
+      if (!booking) {
+        return res.status(404).json({ message: 'Completed booking not found' });
       }
 
       // Check if user already reviewed this booking

@@ -82,10 +82,10 @@ export default function Activity() {
   // Submit review mutation
   const submitReviewMutation = useMutation({
     mutationFn: async (reviewData: { bookingId: number; rating: number; comment: string }) => {
-      return await apiRequest('/api/reviews', {
+      return await apiRequest(`/api/bookings/${reviewData.bookingId}/review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reviewData)
+        body: JSON.stringify({ rating: reviewData.rating, comment: reviewData.comment })
       });
     },
     onSuccess: () => {
