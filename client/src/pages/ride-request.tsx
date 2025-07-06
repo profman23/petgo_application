@@ -634,37 +634,6 @@ export default function RideRequest() {
                     {language === 'ar' ? 'اختر الحيوانات الأليفة:' : 'Select Pets:'}
                   </label>
                   
-                  {/* Display Selected Pets */}
-                  <div className="min-h-[48px] border border-gray-300 rounded-md p-2 bg-white flex flex-wrap gap-2 items-center">
-                    {selectedPatients.length === 0 ? (
-                      <span className="text-gray-500 text-sm" style={{ textAlign }}>
-                        {language === 'ar' ? 'اختر الحيوانات الأليفة...' : 'Select pets...'}
-                      </span>
-                    ) : (
-                      selectedPatients.map(petId => {
-                        const pet = patients.find(p => p.id === petId);
-                        if (!pet) return null;
-                        return (
-                          <div
-                            key={petId}
-                            className="flex items-center gap-2 bg-purple-100 border border-purple-300 rounded-full px-3 py-1 text-sm"
-                          >
-                            <span>
-                              {pet.type === 'Cat' ? '🐱' : pet.type === 'Dog' ? '🐶' : '🐦'}
-                            </span>
-                            <span className="font-medium">{pet.name}</span>
-                            <button
-                              onClick={() => setSelectedPatients(prev => prev.filter(id => id !== petId))}
-                              className="text-purple-600 hover:text-purple-800 ml-1"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-
                   {/* Pet Selection Dropdown */}
                   <Select
                     value=""
@@ -705,6 +674,37 @@ export default function RideRequest() {
                       ))}
                     </SelectContent>
                   </Select>
+
+                  {/* Display Selected Pets */}
+                  <div className="min-h-[48px] border border-gray-300 rounded-md p-2 bg-white flex flex-wrap gap-2 items-center">
+                    {selectedPatients.length === 0 ? (
+                      <span className="text-gray-500 text-sm" style={{ textAlign }}>
+                        {language === 'ar' ? 'لم يتم اختيار حيوانات بعد...' : 'No pets selected yet...'}
+                      </span>
+                    ) : (
+                      selectedPatients.map(petId => {
+                        const pet = patients.find(p => p.id === petId);
+                        if (!pet) return null;
+                        return (
+                          <div
+                            key={petId}
+                            className="flex items-center gap-2 bg-purple-100 border border-purple-300 rounded-full px-3 py-1 text-sm"
+                          >
+                            <span>
+                              {pet.type === 'Cat' ? '🐱' : pet.type === 'Dog' ? '🐶' : '🐦'}
+                            </span>
+                            <span className="font-medium">{pet.name}</span>
+                            <button
+                              onClick={() => setSelectedPatients(prev => prev.filter(id => id !== petId))}
+                              className="text-purple-600 hover:text-purple-800 ml-1"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
 
                   {/* Quick Select All Button */}
                   {patients.length > 1 && selectedPatients.length < patients.length && (
