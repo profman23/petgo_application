@@ -26,7 +26,7 @@ import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
-import { FixedFooter } from '@/components/fixed-footer';
+
 
 
 const formSchema = rideRequestSchema.extend({
@@ -908,8 +908,7 @@ export default function RideRequest() {
           </CardContent>
         </Card>
 
-        {/* Fixed Footer */}
-        <FixedFooter />
+
         </div>
       </div>
     </div>
