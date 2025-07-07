@@ -1795,6 +1795,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Taqnyat Webhook endpoint for SMS status updates
+  app.post('/api/webhook/taqnyat', async (req, res) => {
+    try {
+      console.log('Taqnyat Webhook received:', JSON.stringify(req.body, null, 2));
+      
+      const { 
+        status, 
+        messageId, 
+        recipient, 
+        message, 
+        deliveredAt, 
+        errorCode, 
+        errorMessage 
+      } = req.body;
+
+      // Log the webhook data for debugging
+      console.log('SMS Status Update:', {
+        messageId,
+        recipient,
+        status,
+        deliveredAt,
+        errorCode,
+        errorMessage
+      });
+
+      // Here you can save the status to database if needed
+      // For now, we'll just log it
+      
+      // Always respond with 200 OK to acknowledge receipt
+      res.status(200).json({ 
+        success: true, 
+        message: 'Webhook received successfully',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error processing Taqnyat webhook:', error);
+      // Still return 200 to prevent webhook retries
+      res.status(200).json({ 
+        success: false, 
+        message: 'Webhook processed with errors',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
