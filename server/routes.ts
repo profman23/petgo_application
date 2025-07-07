@@ -1149,6 +1149,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update booking status (Doctor only)
+  app.put('/api/bookings/:id/status', requireAdminAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.id);
+      const { status } = req.body;
+      
+      // Validate status
+      const validStatuses = ['pending_review', 'confirmed', 'in_progress', 'completed', 'cancelled'];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ 
+          message: 'Invalid status. Valid statuses: ' + validStatuses.join(', ') 
+        });
+      }
+      
+      console.log(`🔄 Doctor ${req.user.username} updating booking ${bookingId} status to: ${status}`);
+      
+      const updatedBooking = await storage.updateBookingStatus(bookingId, status);
+      
+      if (!updatedBooking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+      
+      console.log(`✅ Booking ${bookingId} status updated successfully to: ${status}`);
+      res.json({ 
+        success: true, 
+        booking: updatedBooking,
+        message: `Booking status updated to ${status}` 
+      });
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      res.status(500).json({ message: 'Failed to update booking status' });
+    }
+  });
+
   // Get bookings for current doctor's VetsVan (no VetsVan ID required)
   app.get('/api/doctor/bookings', requireAuth, async (req: any, res) => {
     try {

@@ -49,7 +49,7 @@ export interface IStorage {
   getUserBookings(userId: number): Promise<Booking[]>;
   getShiftBookings(shiftId: number): Promise<Booking[]>;
   getAllBookings(): Promise<Booking[]>;
-  updateBookingStatus(bookingId: number, status: string): Promise<void>;
+  updateBookingStatus(bookingId: number, status: string): Promise<Booking | undefined>;
   getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined>;
   // Payment update methods removed per user request
 
@@ -511,8 +511,13 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(bookings);
   }
 
-  async updateBookingStatus(bookingId: number, status: string): Promise<void> {
-    await db.update(bookings).set({ status }).where(eq(bookings.id, bookingId));
+  async updateBookingStatus(bookingId: number, status: string): Promise<Booking | undefined> {
+    const [updatedBooking] = await db
+      .update(bookings)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(bookings.id, bookingId))
+      .returning();
+    return updatedBooking;
   }
 
   async getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined> {
@@ -1020,13 +1025,15 @@ class MemStorage implements IStorage {
     return Array.from(this.bookings.values());
   }
 
-  async updateBookingStatus(bookingId: number, status: string): Promise<void> {
+  async updateBookingStatus(bookingId: number, status: string): Promise<Booking | undefined> {
     const booking = this.bookings.get(bookingId);
     if (booking) {
       booking.status = status;
       booking.updatedAt = new Date();
       this.bookings.set(bookingId, booking);
+      return booking;
     }
+    return undefined;
   }
 
   async getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined> {

@@ -163,9 +163,13 @@ export default function CustomerActivity() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'pending_review':
+        return 'bg-blue-100 text-blue-800';
       case 'confirmed':
       case 'booked':
         return 'bg-yellow-100 text-yellow-800';
+      case 'in_progress':
+        return 'bg-purple-100 text-purple-800';
       case 'pending':
         return 'bg-orange-100 text-orange-800';
       case 'cancelled':
@@ -180,9 +184,13 @@ export default function CustomerActivity() {
   const getStatusText = (status: string) => {
     if (language === 'ar') {
       switch (status) {
+        case 'pending_review':
+          return 'جاري مراجعة الطلب';
         case 'confirmed':
         case 'booked':
           return 'محجوز';
+        case 'in_progress':
+          return 'جاري التنفيذ';
         case 'pending':
           return 'في انتظار الموافقة';
         case 'cancelled':
@@ -194,9 +202,13 @@ export default function CustomerActivity() {
       }
     } else {
       switch (status) {
+        case 'pending_review':
+          return 'Under Review';
         case 'confirmed':
         case 'booked':
           return 'Booked';
+        case 'in_progress':
+          return 'In Progress';
         case 'pending':
           return 'Pending';
         case 'cancelled':

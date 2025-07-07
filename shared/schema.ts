@@ -191,7 +191,7 @@ export const bookings = pgTable("bookings", {
   vetsVanId: integer("vets_van_id").notNull().references(() => drivers.id),
   appointmentDate: text("appointment_date").notNull(), // YYYY-MM-DD format
   appointmentTime: text("appointment_time").notNull(), // HH:MM format
-  status: text("status").default("booked").notNull(), // 'booked', 'completed', 'cancelled'
+  status: text("status").default("pending_review").notNull(), // 'pending_review', 'confirmed', 'in_progress', 'completed', 'cancelled'
   customerLocation: jsonb("customer_location").$type<{
     latitude: number;
     longitude: number;
