@@ -407,6 +407,17 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   const getTimeSlotStatus = (vetsvan: VetsVanWithShifts, time: string) => {
     if (!vetsvan.isAvailable) return 'unavailable';
     
+    // First check if user has a booking at this time and VetsVan
+    const userBooking = userBookings.find((booking: any) => 
+      booking.appointmentTime === time && 
+      booking.appointmentDate === selectedDate &&
+      booking.vetsVanId === vetsvan.id
+    );
+    
+    if (userBooking) {
+      return { type: 'user_booking', booking: userBooking };
+    }
+    
     const shift = vetsvan.shifts.find(shift => {
       return shift.date === selectedDate && 
              shift.startTime <= time && 
@@ -416,7 +427,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     
     if (!shift) return 'unavailable';
     
-    // Check if this specific time slot is booked
+    // Check if this specific time slot is booked by others
     const isTimeSlotBooked = shift.bookings?.some(booking => 
       booking.appointmentTime === time && 
       booking.appointmentDate === selectedDate &&
@@ -562,64 +573,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         </p>
       </div>
 
-      {/* Current Bookings Section */}
-      {userBookings && userBookings.length > 0 && (
-        <div className="mb-6">
-          <h4 className={`text-md font-semibold text-gray-800 mb-3 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
-            {language === 'ar' ? 'حجوزاتك الحالية' : 'Your Current Bookings'}
-          </h4>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300">
-              <thead>
-                <tr className="bg-blue-100">
-                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'التاريخ' : 'Date'}
-                  </th>
-                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'الوقت' : 'Time'}
-                  </th>
-                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'VetsVan' : 'VetsVan'}
-                  </th>
-                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'الحالة' : 'Status'}
-                  </th>
-                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'رقم الحجز' : 'Booking ID'}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {userBookings.map((booking: any) => (
-                  <tr key={booking.id} className="hover:bg-gray-50">
-                    <td className="border border-gray-300 p-2 text-sm text-center">
-                      {new Date(booking.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </td>
-                    <td className="border border-gray-300 p-2 text-sm text-center">
-                      {booking.appointmentTime}
-                    </td>
-                    <td className="border border-gray-300 p-2 text-sm text-center">
-                      {booking.vetsVanName} ({booking.vetsVanCode})
-                    </td>
-                    <td className="border border-gray-300 p-2 text-sm text-center">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
-                        {getStatusText(booking.status)}
-                      </span>
-                    </td>
-                    <td className="border border-gray-300 p-2 text-sm text-center text-gray-500">
-                      #{booking.id}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
+
 
       {/* Available Appointments Table */}
       <div className="overflow-x-auto">
@@ -678,30 +632,45 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                   const status = getTimeSlotStatus(vetsvan, timeSlot);
                   const isLoading = false;
                   
+                  // Check if this is a user booking
+                  const isUserBooking = status && typeof status === 'object' && status.type === 'user_booking';
+                  const userBooking = isUserBooking ? status.booking : null;
+                  
                   return (
                     <td key={`${vetsvan.id}-${timeSlot}`} className="border border-gray-300 p-2">
                       <div className="flex justify-center">
-                        <button
-                          onClick={() => handleTimeSlotClick(vetsvan, timeSlot)}
-                          disabled={status !== 'available' || isLoading}
-                          className={`
-                            w-full text-xs px-2 py-1 rounded transition-colors
-                            ${status === 'available'
-                              ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
-                              : status === 'booked'
-                              ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
-                              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            }
-                            ${isLoading ? 'opacity-50' : ''}
-                          `}
-                        >
-                          {isLoading ? (
-                            <Loader2 className="w-3 h-3 animate-spin mx-auto" />
-                          ) : (
-                            status === 'available' ? '✓' : 
-                            status === 'booked' ? (language === 'ar' ? 'محجوز' : 'Booked') : '✗'
-                          )}
-                        </button>
+                        {isUserBooking ? (
+                          // Show user booking status
+                          <div className={`
+                            w-full text-xs px-2 py-1 rounded border text-center
+                            ${getStatusColor(userBooking.status)}
+                          `}>
+                            {getStatusText(userBooking.status)}
+                          </div>
+                        ) : (
+                          // Show normal booking button
+                          <button
+                            onClick={() => handleTimeSlotClick(vetsvan, timeSlot)}
+                            disabled={status !== 'available' || isLoading}
+                            className={`
+                              w-full text-xs px-2 py-1 rounded transition-colors
+                              ${status === 'available'
+                                ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
+                                : status === 'booked'
+                                ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
+                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              }
+                              ${isLoading ? 'opacity-50' : ''}
+                            `}
+                          >
+                            {isLoading ? (
+                              <Loader2 className="w-3 h-3 animate-spin mx-auto" />
+                            ) : (
+                              status === 'available' ? '✓' : 
+                              status === 'booked' ? (language === 'ar' ? 'محجوز' : 'Booked') : '✗'
+                            )}
+                          </button>
+                        )}
                       </div>
                     </td>
                   );
