@@ -105,6 +105,66 @@ export default function VetsVanBooking() {
     staleTime: 30 * 1000,
   });
 
+  // جلب حجوزات العميل الحالية
+  const { data: userBookings = [], isLoading: bookingsLoading } = useQuery({
+    queryKey: ['/api/user/bookings'],
+    retry: false,
+    refetchInterval: 2000, // تحديث كل ثانيتين لرؤية تحديثات الحالة
+  });
+
+  // دالة لعرض نص الحالة
+  const getStatusText = (status: string) => {
+    if (language === 'ar') {
+      switch (status) {
+        case 'pending_review':
+          return 'قيد المراجعة';
+        case 'confirmed':
+          return 'مؤكد';
+        case 'in_progress':
+          return 'جاري التنفيذ';
+        case 'completed':
+          return 'مكتمل';
+        case 'cancelled':
+          return 'ملغي';
+        default:
+          return status;
+      }
+    } else {
+      switch (status) {
+        case 'pending_review':
+          return 'Pending Review';
+        case 'confirmed':
+          return 'Confirmed';
+        case 'in_progress':
+          return 'In Progress';
+        case 'completed':
+          return 'Completed';
+        case 'cancelled':
+          return 'Cancelled';
+        default:
+          return status;
+      }
+    }
+  };
+
+  // دالة لاختيار لون الحالة
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending_review':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'confirmed':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'in_progress':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'completed':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
   // فلترة VetsVan حسب التاريخ المحدد
   const availableVetsVans = vetsVans.filter((vetsvan: VetsVanWithShifts) => 
     vetsvan.shifts.some(shift => shift.date === selectedDate)
@@ -487,6 +547,59 @@ export default function VetsVanBooking() {
             </div>
           </CardContent>
         </Card>
+
+        {/* الحجوزات الحالية */}
+        {userBookings && userBookings.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2" style={{ textAlign }}>
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                {language === 'ar' ? 'حجوزاتك الحالية' : 'Your Current Bookings'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {userBookings.map((booking: any) => (
+                  <div key={booking.id} className="border border-gray-200 rounded-lg p-3 bg-gray-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Calendar className="w-4 h-4 text-purple-600" />
+                          <span className="font-medium text-gray-800" style={{ textAlign }}>
+                            {new Date(booking.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </span>
+                          <Clock className="w-4 h-4 text-gray-500 ml-2" />
+                          <span className="text-gray-600">
+                            {booking.appointmentTime}
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-sm text-gray-600" style={{ textAlign }}>
+                            {booking.vetsVanName} ({booking.vetsVanCode})
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
+                          {getStatusText(booking.status)}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          #{booking.id}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* جدول التوافر مع الحجز الفوري */}
         <VetsVanAvailabilityTable 
