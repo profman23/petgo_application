@@ -148,6 +148,9 @@ export default function VetsVanBooking() {
   const [isCreatingBooking, setIsCreatingBooking] = useState(false);
 
   const createBooking = async () => {
+    console.log('🔥 createBooking function called - starting booking process');
+    console.log('🔍 Selected values:', { selectedVetsVan, selectedShift, selectedTime, selectedDate });
+    
     if (!selectedVetsVan || !selectedShift || !selectedTime || !selectedDate) {
       toast({
         title: language === 'ar' ? 'خطأ' : 'Error',
@@ -276,6 +279,7 @@ export default function VetsVanBooking() {
       const result = await apiRequest('POST', '/api/bookings', bookingData);
 
       console.log('Booking successful:', result);
+      console.log('✅ About to start payment redirection process...');
       
       toast({
         title: language === 'ar' ? '✅ تم تأكيد الحجز' : '✅ Booking Confirmed',
