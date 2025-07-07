@@ -288,6 +288,66 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
+  // جلب حجوزات العميل الحالية
+  const { data: userBookings = [] } = useQuery({
+    queryKey: ['/api/user/bookings'],
+    retry: false,
+    refetchInterval: 2000, // تحديث كل ثانيتين لرؤية تحديثات الحالة
+  });
+
+  // دالة لعرض نص الحالة
+  const getStatusText = (status: string) => {
+    if (language === 'ar') {
+      switch (status) {
+        case 'pending_review':
+          return 'قيد المراجعة';
+        case 'confirmed':
+          return 'مؤكد';
+        case 'in_progress':
+          return 'جاري التنفيذ';
+        case 'completed':
+          return 'مكتمل';
+        case 'cancelled':
+          return 'ملغي';
+        default:
+          return status;
+      }
+    } else {
+      switch (status) {
+        case 'pending_review':
+          return 'Pending Review';
+        case 'confirmed':
+          return 'Confirmed';
+        case 'in_progress':
+          return 'In Progress';
+        case 'completed':
+          return 'Completed';
+        case 'cancelled':
+          return 'Cancelled';
+        default:
+          return status;
+      }
+    }
+  };
+
+  // دالة لاختيار لون الحالة
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending_review':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'confirmed':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'in_progress':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'completed':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -502,7 +562,66 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         </p>
       </div>
 
-      {/* Table */}
+      {/* Current Bookings Section */}
+      {userBookings && userBookings.length > 0 && (
+        <div className="mb-6">
+          <h4 className={`text-md font-semibold text-gray-800 mb-3 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
+            {language === 'ar' ? 'حجوزاتك الحالية' : 'Your Current Bookings'}
+          </h4>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-blue-100">
+                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'التاريخ' : 'Date'}
+                  </th>
+                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'الوقت' : 'Time'}
+                  </th>
+                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'VetsVan' : 'VetsVan'}
+                  </th>
+                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'الحالة' : 'Status'}
+                  </th>
+                  <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'رقم الحجز' : 'Booking ID'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {userBookings.map((booking: any) => (
+                  <tr key={booking.id} className="hover:bg-gray-50">
+                    <td className="border border-gray-300 p-2 text-sm text-center">
+                      {new Date(booking.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </td>
+                    <td className="border border-gray-300 p-2 text-sm text-center">
+                      {booking.appointmentTime}
+                    </td>
+                    <td className="border border-gray-300 p-2 text-sm text-center">
+                      {booking.vetsVanName} ({booking.vetsVanCode})
+                    </td>
+                    <td className="border border-gray-300 p-2 text-sm text-center">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
+                        {getStatusText(booking.status)}
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 p-2 text-sm text-center text-gray-500">
+                      #{booking.id}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Available Appointments Table */}
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border border-gray-300">
           {/* VetsVan Header Row */}
