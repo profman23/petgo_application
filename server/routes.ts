@@ -1884,9 +1884,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('💳 Real Payment Test - 1 SAR:', JSON.stringify(paymentData, null, 2));
 
-      // Execute real payment with MyFatoorah Production
-      const result = await paymentService.executePayment(paymentData);
-      const paymentUrl = result.Data.PaymentURL;
+      // Step 1: Get available payment methods
+      const paymentMethods = await paymentService.initiatePayment(1, 'SAR');
+      
+      if (!paymentMethods || paymentMethods.length === 0) {
+        throw new Error('لا توجد طرق دفع متاحة');
+      }
+      
+      // Step 2: Select the first available payment method (usually credit card)
+      const selectedMethod = paymentMethods[0];
+      console.log(`🏦 Selected Payment Method: ${selectedMethod.PaymentMethodEn} (ID: ${selectedMethod.PaymentMethodId})`);
+      
+      // Step 3: Execute payment with the selected method
+      const paymentUrl = await paymentService.executePayment({
+        paymentMethodId: selectedMethod.PaymentMethodId,
+        customerName: paymentData.customerName,
+        customerEmail: paymentData.customerEmail,
+        customerMobile: paymentData.customerMobile,
+        invoiceValue: 1,
+        callbackUrl: paymentData.callBackUrl,
+        errorUrl: paymentData.errorUrl,
+        customerReference: paymentData.customerReference
+      });
       
       console.log(`🌐 Real Payment URL generated: ${paymentUrl}`);
       
@@ -1895,6 +1914,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentUrl,
         customerReference: paymentData.customerReference,
         amount: 1,
+        paymentMethod: selectedMethod.PaymentMethodEn,
         message: 'دفع حقيقي بقيمة 1 ريال - اختبار'
       });
     } catch (error: any) {
