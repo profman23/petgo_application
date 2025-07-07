@@ -404,8 +404,28 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     return shift && !shift.isBooked;
   };
 
+  // Function to check if time slot is in the past
+  const isTimeSlotInPast = (date: string, time: string) => {
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+    
+    // If selected date is before today, it's in the past
+    if (date < currentDate) return true;
+    
+    // If selected date is today, check if time is before current time
+    if (date === currentDate && time < currentTime) return true;
+    
+    return false;
+  };
+
   const getTimeSlotStatus = (vetsvan: VetsVanWithShifts, time: string) => {
     if (!vetsvan.isAvailable) return 'unavailable';
+    
+    // Check if the time slot is in the past
+    if (isTimeSlotInPast(selectedDate, time)) {
+      return 'past_time';
+    }
     
     // First check if user has a booking at this time and VetsVan
     const userBooking = userBookings.find((booking: any) => 
@@ -448,20 +468,19 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   };
 
   const handleTimeSlotClick = (vetsvan: VetsVanWithShifts, time: string) => {
-    // التحقق من أن التاريخ المحدد ليس في الماضي
-    const today = new Date().toISOString().split('T')[0];
-    if (selectedDate < today) {
+    const status = getTimeSlotStatus(vetsvan, time);
+    
+    // منع النقر على الأوقات الماضية
+    if (status === 'past_time') {
       toast({
         title: language === 'ar' ? 'خطأ' : 'Error',
         description: language === 'ar' 
-          ? 'لا يمكن حجز موعد في تاريخ سابق'
-          : 'Cannot book appointment for past dates',
+          ? 'لا يمكن حجز موعد في وقت سابق للوقت الحالي'
+          : 'Cannot book appointment for past time',
         variant: 'destructive',
       });
       return;
     }
-
-    const status = getTimeSlotStatus(vetsvan, time);
     
     if (status === 'available') {
       const shift = vetsvan.shifts.find(shift => {
@@ -667,6 +686,8 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                                 ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
                                 : status === 'booked'
                                 ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
+                                : status === 'past_time'
+                                ? 'bg-red-100 text-red-600 cursor-not-allowed opacity-60'
                                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                               }
                               ${isLoading ? 'opacity-50' : ''}
@@ -676,7 +697,8 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                               <Loader2 className="w-3 h-3 animate-spin mx-auto" />
                             ) : (
                               status === 'available' ? '✓' : 
-                              status === 'booked' ? (language === 'ar' ? 'محجوز' : 'Booked') : '✗'
+                              status === 'booked' ? (language === 'ar' ? 'محجوز' : 'Booked') :
+                              status === 'past_time' ? (language === 'ar' ? 'منتهي' : 'Past') : '✗'
                             )}
                           </button>
                         )}
