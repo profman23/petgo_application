@@ -1824,11 +1824,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // For now, we'll just log it
       
       // Always respond with 200 OK to acknowledge receipt
-      res.status(200).send('VETSVAN WEBHOOK RECEIVED OK');
+      res.status(200).send('VETSVANWEBHOOKRECEIVEDOK');
     } catch (error) {
       console.error('Error processing Taqnyat webhook:', error);
       // Still return 200 to prevent webhook retries
-      res.status(200).send('VETSVAN WEBHOOK RECEIVED OK');
+      res.status(200).send('VETSVANWEBHOOKRECEIVEDOK');
     }
   });
 
