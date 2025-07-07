@@ -1002,7 +1002,7 @@ class MemStorage implements IStorage {
       shiftId: bookingData.shiftId,
       appointmentDate: bookingData.appointmentDate,
       appointmentTime: bookingData.appointmentTime,
-      status: bookingData.status || 'confirmed',
+      status: bookingData.status || 'pending_review',
       customerName: bookingData.customerName,
       customerPhone: bookingData.customerPhone,
       customerLocation: bookingData.customerLocation,

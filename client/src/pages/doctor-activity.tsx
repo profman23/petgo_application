@@ -95,7 +95,7 @@ export default function DoctorActivity() {
     if (language === 'ar') {
       switch (status) {
         case 'pending_review':
-          return 'جاري مراجعة الطلب';
+          return 'قيد المراجعة';
         case 'confirmed':
           return 'مؤكد';
         case 'in_progress':
@@ -145,7 +145,7 @@ export default function DoctorActivity() {
   const getStatusOptions = () => {
     if (language === 'ar') {
       return [
-        { value: 'pending_review', label: 'جاري مراجعة الطلب' },
+        { value: 'pending_review', label: 'قيد المراجعة' },
         { value: 'confirmed', label: 'مؤكد' },
         { value: 'in_progress', label: 'جاري التنفيذ' },
         { value: 'completed', label: 'مكتمل' },

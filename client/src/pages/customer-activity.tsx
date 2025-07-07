@@ -60,7 +60,7 @@ export default function CustomerActivity() {
   const { data: bookings = [], isLoading } = useQuery<Booking[]>({
     queryKey: ['/api/user/bookings'],
     retry: false,
-    refetchInterval: 5000, // Refresh every 5 seconds to show new bookings
+    refetchInterval: 2000, // Refresh every 2 seconds for real-time status updates
   });
 
   // Fetch user reviews to check which bookings have been rated
@@ -185,7 +185,7 @@ export default function CustomerActivity() {
     if (language === 'ar') {
       switch (status) {
         case 'pending_review':
-          return 'جاري مراجعة الطلب';
+          return 'قيد المراجعة';
         case 'confirmed':
         case 'booked':
           return 'محجوز';
@@ -203,7 +203,7 @@ export default function CustomerActivity() {
     } else {
       switch (status) {
         case 'pending_review':
-          return 'Under Review';
+          return 'Pending for Review';
         case 'confirmed':
         case 'booked':
           return 'Booked';

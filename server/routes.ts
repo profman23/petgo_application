@@ -1006,7 +1006,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const timeSlotBooked = existingBookings.some(booking => 
         booking.appointmentTime === appointmentTime && 
         booking.appointmentDate === appointmentDate &&
-        booking.status === 'booked'
+        ['pending_review', 'confirmed', 'in_progress'].includes(booking.status)
       );
       
       if (timeSlotBooked) {
@@ -1020,7 +1020,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         vetsVanId,
         appointmentDate,
         appointmentTime,
-        status: 'booked',
+        status: 'pending_review',
         customerLocation: customerLocation || null
       });
 
@@ -1150,7 +1150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update booking status (Doctor only)
-  app.put('/api/bookings/:id/status', requireAdminAuth, async (req: any, res) => {
+  app.put('/api/bookings/:id/status', requireAuth, async (req: any, res) => {
     try {
       const bookingId = parseInt(req.params.id);
       const { status } = req.body;
