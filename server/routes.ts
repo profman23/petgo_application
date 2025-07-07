@@ -1729,7 +1729,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const smsData = {
         recipients: [phoneNumber],
         body: message,
-        sender: "TAQNYAT" // Fallback to default sender name, replace with your registered sender
+        sender: "Taqnyat.sa" // Registered sender name
       };
 
       // Log the request for debugging
