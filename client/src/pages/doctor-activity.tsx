@@ -67,7 +67,11 @@ export default function DoctorActivity() {
   // Mutation to update booking status
   const updateStatusMutation = useMutation({
     mutationFn: async ({ bookingId, status }: { bookingId: number; status: string }) => {
-      return await apiRequest('PUT', `/api/bookings/${bookingId}/status`, { status });
+      return await apiRequest(`/api/bookings/${bookingId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
     },
     onSuccess: (data, variables) => {
       toast({
