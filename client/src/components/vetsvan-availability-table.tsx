@@ -135,8 +135,41 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           `تم حجز موعدك بنجاح في ${variables.appointmentTime} يوم ${variables.appointmentDate}. تم إرسال إشعار للطبيب.` :
           `Your appointment has been booked successfully at ${variables.appointmentTime} on ${variables.appointmentDate}. Doctor has been notified.`,
       });
+      
+      // حفظ معرف الحجز في localStorage للعودة إليه بعد الدفع
+      localStorage.setItem('pendingPaymentBooking', result.booking.id.toString());
+      
       // تحديث البيانات
       queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/availability'] });
+
+      // توجيه للدفع فوراً بعد تأكيد الحجز
+      console.log('🔄 [VetsVanAvailabilityTable] Redirecting to payment...');
+      console.log('📋 [VetsVanAvailabilityTable] Booking ID saved:', result.booking.id);
+      
+      // إضافة delay قصير لضمان ظهور رسالة التأكيد ثم التوجيه
+      setTimeout(() => {
+        console.log('🌐 [VetsVanAvailabilityTable] Opening MyFatoorah payment link...');
+        const paymentUrl = 'https://sa.myfatoorah.com/SAU/la/05069707813916358';
+        
+        try {
+          // محاولة فتح الرابط بطرق مختلفة لضمان العمل
+          window.location.href = paymentUrl;
+          
+          // طريقة بديلة في حالة فشل الأولى
+          setTimeout(() => {
+            if (window.location.href !== paymentUrl) {
+              window.location.replace(paymentUrl);
+            }
+          }, 500);
+          
+        } catch (error) {
+          console.error('Failed to redirect to payment:', error);
+          // كـ backup، إنشاء رابط مخفي والنقر عليه
+          const link = document.createElement('a');
+          link.href = paymentUrl;
+          link.click();
+        }
+      }, 2000);
     },
     onError: (error: any) => {
       toast({
