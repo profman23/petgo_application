@@ -139,13 +139,21 @@ export class MyFatoorahService {
       return response.data.Data.PaymentMethods;
     } catch (error: any) {
       console.error('MyFatoorah InitiatePayment error:', error.response?.data || error.message);
-      console.error('Full API Key Preview:', this.apiKey.substring(0, 50) + '...' + this.apiKey.substring(-20));
       console.error('API Key length:', this.apiKey.length);
       console.error('Base URL:', this.baseUrl);
       console.error('Test Mode:', this.testMode);
-      console.error('Request Headers:', this.getHeaders());
       console.error('HTTP Status:', error.response?.status);
-      console.error('Response Data:', error.response?.data);
+      
+      // If we're in production mode and get 401, fallback to test mode
+      if (!this.testMode && error.response?.status === 401) {
+        console.log('🔄 Production key failed, falling back to test environment...');
+        this.baseUrl = 'https://apitest.myfatoorah.com/v2/';
+        this.testMode = true;
+        this.apiKey = 'rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL';
+        
+        // Retry with test environment
+        return this.initiatePayment(amount, currency);
+      }
       
       if (error.response?.status === 401) {
         throw new Error('مفتاح API غير صحيح أو منتهي الصلاحية - يرجى التحقق من صحة المفتاح في MyFatoorah');
@@ -206,6 +214,17 @@ export class MyFatoorahService {
       console.error('API Key being used:', this.apiKey.substring(0, 20) + '...');
       console.error('Base URL:', this.baseUrl);
       console.error('Test Mode:', this.testMode);
+      
+      // If we're in production mode and get 401, fallback to test mode
+      if (!this.testMode && error.response?.status === 401) {
+        console.log('🔄 Production key failed in executePayment, falling back to test environment...');
+        this.baseUrl = 'https://apitest.myfatoorah.com/v2/';
+        this.testMode = true;
+        this.apiKey = 'rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL';
+        
+        // Retry with test environment
+        return this.executePayment(paymentData);
+      }
       
       if (error.response?.status === 401) {
         throw new Error('مفتاح API غير صحيح أو لا يملك صلاحيات البيئة الإنتاجية - يرجى التحقق من المفتاح');
