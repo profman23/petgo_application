@@ -1835,6 +1835,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // MyFatoorah Webhook Endpoint (HTTPS required)
+  app.post('/api/webhook/myfatoorah', async (req, res) => {
+    try {
+      console.log('🔔 MyFatoorah Webhook received:', JSON.stringify(req.body, null, 2));
+      
+      const { 
+        InvoiceId, 
+        InvoiceStatus, 
+        InvoiceReference, 
+        CustomerReference,
+        InvoiceValue,
+        PaidValue,
+        CreatedDate,
+        ExpiryDate 
+      } = req.body;
+
+      // Verify webhook authenticity (basic validation)
+      if (!InvoiceId || !InvoiceStatus) {
+        console.error('❌ Invalid webhook data received');
+        return res.status(400).json({ error: 'Invalid webhook data' });
+      }
+
+      console.log(`💳 Payment Update - Invoice ${InvoiceId}: ${InvoiceStatus}`);
+      
+      // Update payment status in database based on webhook data
+      if (CustomerReference) {
+        try {
+          // CustomerReference contains our booking ID with BOOKING_ prefix
+          const bookingId = parseInt(CustomerReference.replace('BOOKING_', ''));
+          
+          if (InvoiceStatus === 'Paid') {
+            // Update booking payment status to paid
+            await storage.updateBookingPayment(bookingId, {
+              paymentStatus: 'paid',
+              paymentId: InvoiceId.toString(),
+              invoiceId: InvoiceId.toString(),
+              paymentMethod: 'MyFatoorah',
+              paymentAmount: (PaidValue || InvoiceValue || 150).toString()
+            });
+            
+            console.log(`✅ Booking ${bookingId} payment confirmed via webhook`);
+            
+            // Send payment confirmation email
+            try {
+              const userBookings = await storage.getUserBookings(0); // Get all bookings to find this one
+              const booking = userBookings.find(b => b.id === bookingId);
+              
+              if (booking && booking.user && booking.user.email) {
+                await emailService.sendPaymentConfirmationEmail(
+                  booking.user.email,
+                  booking.user.firstName || 'عزيزي العميل',
+                  booking.appointmentDate,
+                  booking.appointmentTime,
+                  PaidValue || InvoiceValue || 150
+                );
+                console.log(`📧 Payment confirmation email sent for booking ${bookingId}`);
+              }
+            } catch (emailError) {
+              console.error('Failed to send payment confirmation email:', emailError);
+            }
+            
+          } else if (InvoiceStatus === 'Failed' || InvoiceStatus === 'Expired' || InvoiceStatus === 'Cancelled') {
+            // Update booking payment status to failed
+            await storage.updateBookingPayment(bookingId, {
+              paymentStatus: 'failed',
+              paymentId: InvoiceId.toString(),
+              invoiceId: InvoiceId.toString()
+            });
+            
+            console.log(`❌ Booking ${bookingId} payment failed via webhook: ${InvoiceStatus}`);
+          }
+          
+        } catch (dbError) {
+          console.error('Database update error in webhook:', dbError);
+        }
+      }
+
+      // Respond to MyFatoorah (important for webhook acknowledgment)
+      res.status(200).json({ 
+        success: true, 
+        message: 'Webhook processed successfully',
+        invoiceId: InvoiceId,
+        status: InvoiceStatus,
+        timestamp: new Date().toISOString()
+      });
+
+    } catch (error) {
+      console.error('❌ MyFatoorah webhook error:', error);
+      res.status(500).json({ error: 'Webhook processing failed' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

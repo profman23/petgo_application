@@ -114,6 +114,28 @@ export class EmailService {
     }
   }
 
+  async sendPaymentConfirmationEmail(
+    userEmail: string,
+    userName: string,
+    appointmentDate: string,
+    appointmentTime: string,
+    amount: number
+  ): Promise<boolean> {
+    try {
+      const template: EmailTemplate = {
+        to: userEmail,
+        subject: 'تأكيد سداد رسوم خدمة VETS VAN - Payment Confirmation',
+        html: this.generatePaymentConfirmationHTML(userName, appointmentDate, appointmentTime, amount),
+        text: this.generatePaymentConfirmationText(userName, appointmentDate, appointmentTime, amount)
+      };
+
+      return await this.sendEmail(template);
+    } catch (error) {
+      console.error('Error preparing payment confirmation email:', error);
+      return false;
+    }
+  }
+
   private async sendEmail(template: EmailTemplate): Promise<boolean> {
     try {
       // Try to send email via SMTP
@@ -551,6 +573,104 @@ VETS VAN - الرعاية البيطرية المنزلية
     } catch (error) {
       console.error('Error scheduling pre-appointment notification:', error);
     }
+  }
+
+  private generatePaymentConfirmationHTML(
+    userName: string,
+    appointmentDate: string,
+    appointmentTime: string,
+    amount: number
+  ): string {
+    return `
+    <!DOCTYPE html>
+    <html dir="rtl" lang="ar">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>تأكيد سداد رسوم VETS VAN</title>
+      <style>
+        body { font-family: 'Arial', sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .header { background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 30px 20px; text-align: center; }
+        .content { padding: 30px; }
+        .payment-icon { font-size: 48px; margin-bottom: 20px; }
+        .amount-section { background: #ecfdf5; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; border: 2px solid #10b981; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="payment-icon">💳</div>
+          <h1>تم تأكيد السداد بنجاح!</h1>
+          <p>عزيزي ${userName}</p>
+        </div>
+        
+        <div class="content">
+          <h2>✅ تم سداد رسوم الخدمة</h2>
+          <p>نؤكد لك استلام دفعتك بنجاح. موعدك البيطري مؤكد ومدفوع بالكامل:</p>
+          
+          <div class="amount-section">
+            <h3>💰 تفاصيل الدفع</h3>
+            <p style="font-size: 24px; font-weight: bold; color: #059669;">${amount} ريال سعودي</p>
+            <p><strong>الحالة:</strong> مدفوع ✅</p>
+          </div>
+
+          <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p><strong>📅 موعدك المؤكد:</strong></p>
+            <p><strong>التاريخ:</strong> ${appointmentDate}</p>
+            <p><strong>الوقت:</strong> ${appointmentTime}</p>
+            <p><strong>حالة الحجز:</strong> مؤكد ومدفوع</p>
+          </div>
+
+          <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h4>📋 الخطوات التالية:</h4>
+            <ul style="text-align: right;">
+              <li>سيتم إرسال تذكير قبل الموعد بـ 30 دقيقة</li>
+              <li>تأكد من وجودك في الموقع المحدد</li>
+              <li>جهز حيوانك الأليف للفحص</li>
+              <li>أحضر أي تقارير طبية سابقة</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <p>VETS VAN - الرعاية البيطرية المنزلية</p>
+          <p>شكراً لثقتك بخدماتنا</p>
+        </div>
+      </div>
+    </body>
+    </html>
+    `;
+  }
+
+  private generatePaymentConfirmationText(
+    userName: string,
+    appointmentDate: string,
+    appointmentTime: string,
+    amount: number
+  ): string {
+    return `
+💳 تم تأكيد السداد بنجاح!
+
+عزيزي ${userName},
+
+✅ نؤكد لك استلام دفعتك بنجاح:
+
+💰 المبلغ المدفوع: ${amount} ريال سعودي
+📅 التاريخ: ${appointmentDate}
+⏰ الوقت: ${appointmentTime}
+✅ الحالة: مؤكد ومدفوع
+
+📋 الخطوات التالية:
+- سيتم إرسال تذكير قبل الموعد بـ 30 دقيقة
+- تأكد من وجودك في الموقع المحدد
+- جهز حيوانك الأليف للفحص
+- أحضر أي تقارير طبية سابقة
+
+VETS VAN - الرعاية البيطرية المنزلية
+شكراً لثقتك بخدماتنا
+    `;
   }
 }
 
