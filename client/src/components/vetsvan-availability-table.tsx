@@ -377,10 +377,10 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     );
   }
 
-  // Generate time slots from 9 AM to 8 PM (every hour)
+  // Generate time slots from 9 AM to 9 PM (every hour)
   const generateTimeSlots = () => {
     const slots = [];
-    for (let hour = 9; hour <= 20; hour++) {
+    for (let hour = 9; hour <= 21; hour++) {
       const time = `${hour.toString().padStart(2, '0')}:00`;
       slots.push(time);
     }
