@@ -51,7 +51,6 @@ export default function AdminDashboard() {
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
   const [showReviewsDialog, setShowReviewsDialog] = useState(false);
   const [showSmsDialog, setShowSmsDialog] = useState(false);
-  const [smsMessage, setSmsMessage] = useState('');
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     vetsvanCode: "",
     vetsvanName: "",
@@ -255,21 +254,20 @@ export default function AdminDashboard() {
 
   // Send SMS mutation
   const sendSmsMutation = useMutation({
-    mutationFn: async ({ message }: { message: string }) => {
+    mutationFn: async () => {
       await apiRequest("/api/admin/send-sms", {
         method: "POST",
         body: JSON.stringify({ 
-          message,
+          message: "test sms from Taqnyat.sa , for testing",
           phoneNumber: "966548336693" // Test number
         }),
       });
     },
     onSuccess: () => {
       setShowSmsDialog(false);
-      setSmsMessage('');
       toast({
         title: language === 'ar' ? 'تم إرسال الرسالة' : 'SMS Sent',
-        description: language === 'ar' ? 'تم إرسال الرسالة النصية بنجاح' : 'SMS message sent successfully',
+        description: language === 'ar' ? 'تم إرسال الرسالة النصية بنجاح للرقم 966548336693' : 'SMS message sent successfully to 966548336693',
       });
     },
     onError: () => {
@@ -321,15 +319,7 @@ export default function AdminDashboard() {
 
   const handleSendSms = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!smsMessage.trim()) {
-      toast({
-        title: t('error'),
-        description: language === 'ar' ? 'يرجى كتابة نص الرسالة' : 'Please enter message text',
-        variant: "destructive",
-      });
-      return;
-    }
-    sendSmsMutation.mutate({ message: smsMessage });
+    sendSmsMutation.mutate();
   };
 
   const handleAddDriver = (e: React.FormEvent) => {
@@ -1002,24 +992,19 @@ export default function AdminDashboard() {
               </p>
             </div>
 
+            <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-900 mb-2">
+                {language === 'ar' ? 'نص الرسالة التجريبية:' : 'Test Message Text:'}
+              </h4>
+              <p className="text-sm text-gray-700 font-mono">
+                test sms from Taqnyat.sa , for testing
+              </p>
+              <p className="text-xs text-gray-500 mt-2">
+                {language === 'ar' ? 'رسالة ثابتة للاختبار - لا يمكن تعديلها' : 'Fixed test message - cannot be edited'}
+              </p>
+            </div>
+
             <form onSubmit={handleSendSms} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ar' ? 'نص الرسالة' : 'Message Text'}
-                </label>
-                <textarea
-                  value={smsMessage}
-                  onChange={(e) => setSmsMessage(e.target.value)}
-                  rows={4}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder={language === 'ar' ? 'اكتب رسالتك هنا...' : 'Type your message here...'}
-                  required
-                  style={{ textAlign: getTextAlign(language) }}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  {language === 'ar' ? 'الحد الأقصى 160 حرف' : 'Maximum 160 characters'}
-                </p>
-              </div>
 
               <div className="flex gap-3 pt-4">
                 <button
