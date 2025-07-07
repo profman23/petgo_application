@@ -1707,6 +1707,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send SMS using Taqnyat API
+  app.post('/api/admin/send-sms', requireAdminAuth, async (req, res) => {
+    try {
+      const { message, phoneNumber } = req.body;
+      
+      if (!message || !phoneNumber) {
+        return res.status(400).json({ message: 'Message and phone number are required' });
+      }
+
+      // Taqnyat API configuration
+      const taqnyatApiUrl = 'https://api.taqnyat.sa/sms/send';
+      const bearerToken = process.env.TAQNYAT_API_KEY;
+      
+      if (!bearerToken) {
+        console.error('TAQNYAT_API_KEY is not configured');
+        return res.status(500).json({ message: 'SMS service not configured' });
+      }
+
+      // Prepare SMS data for Taqnyat
+      const smsData = {
+        recipients: [phoneNumber],
+        body: message,
+        sender: "VETSVAN" // Your sender name registered with Taqnyat
+      };
+
+      // Send SMS via Taqnyat API
+      const response = await fetch(taqnyatApiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${bearerToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(smsData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Taqnyat API Error:', errorData);
+        return res.status(500).json({ 
+          message: 'Failed to send SMS',
+          error: errorData 
+        });
+      }
+
+      const result = await response.json();
+      console.log('SMS sent successfully:', result);
+
+      res.json({ 
+        success: true, 
+        message: 'SMS sent successfully',
+        data: result 
+      });
+    } catch (error) {
+      console.error('Error sending SMS:', error);
+      res.status(500).json({ message: 'Failed to send SMS' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

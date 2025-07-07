@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3 } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import {
@@ -50,6 +50,8 @@ export default function AdminDashboard() {
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
   const [showReviewsDialog, setShowReviewsDialog] = useState(false);
+  const [showSmsDialog, setShowSmsDialog] = useState(false);
+  const [smsMessage, setSmsMessage] = useState('');
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     vetsvanCode: "",
     vetsvanName: "",
@@ -251,6 +253,34 @@ export default function AdminDashboard() {
     },
   });
 
+  // Send SMS mutation
+  const sendSmsMutation = useMutation({
+    mutationFn: async ({ message }: { message: string }) => {
+      await apiRequest("/api/admin/send-sms", {
+        method: "POST",
+        body: JSON.stringify({ 
+          message,
+          phoneNumber: "966548336693" // Test number
+        }),
+      });
+    },
+    onSuccess: () => {
+      setShowSmsDialog(false);
+      setSmsMessage('');
+      toast({
+        title: language === 'ar' ? 'تم إرسال الرسالة' : 'SMS Sent',
+        description: language === 'ar' ? 'تم إرسال الرسالة النصية بنجاح' : 'SMS message sent successfully',
+      });
+    },
+    onError: () => {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'فشل في إرسال الرسالة النصية' : 'Failed to send SMS message',
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("admin");
@@ -287,6 +317,19 @@ export default function AdminDashboard() {
       latitude,
       longitude
     });
+  };
+
+  const handleSendSms = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!smsMessage.trim()) {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'يرجى كتابة نص الرسالة' : 'Please enter message text',
+        variant: "destructive",
+      });
+      return;
+    }
+    sendSmsMutation.mutate({ message: smsMessage });
   };
 
   const handleAddDriver = (e: React.FormEvent) => {
@@ -698,6 +741,26 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                       )}
+                      
+                      {/* SMS Communication Section */}
+                      <div className="bg-white border rounded-lg p-6 mt-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-lg font-medium text-gray-900">
+                            {language === 'ar' ? 'إرسال الرسائل النصية' : 'SMS Communication'}
+                          </h4>
+                          <MessageSquare className="h-6 w-6 text-purple-600" />
+                        </div>
+                        <p className="text-sm text-gray-600 mb-4">
+                          {language === 'ar' ? 'إرسال رسائل نصية للعملاء باستخدام منصة تقنيات' : 'Send SMS messages to customers using Taqnyat platform'}
+                        </p>
+                        <button
+                          onClick={() => setShowSmsDialog(true)}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                        >
+                          <MessageSquare className="h-4 w-4 ml-2" />
+                          {language === 'ar' ? 'إرسال رسالة نصية' : 'Send SMS Message'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -909,6 +972,75 @@ export default function AdminDashboard() {
                 {language === 'ar' ? 'إغلاق' : 'Close'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* SMS Dialog */}
+      {showSmsDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" dir={getDirection(language)}>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                {language === 'ar' ? 'إرسال رسالة نصية' : 'Send SMS Message'}
+              </h3>
+              <button
+                onClick={() => setShowSmsDialog(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-600">
+                {language === 'ar' ? 'رقم الهاتف: ' : 'Phone Number: '} 
+                <span className="font-medium">966548336693</span>
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                {language === 'ar' ? 'رقم تجريبي لاختبار النظام' : 'Test number for system testing'}
+              </p>
+            </div>
+
+            <form onSubmit={handleSendSms} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'نص الرسالة' : 'Message Text'}
+                </label>
+                <textarea
+                  value={smsMessage}
+                  onChange={(e) => setSmsMessage(e.target.value)}
+                  rows={4}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder={language === 'ar' ? 'اكتب رسالتك هنا...' : 'Type your message here...'}
+                  required
+                  style={{ textAlign: getTextAlign(language) }}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {language === 'ar' ? 'الحد الأقصى 160 حرف' : 'Maximum 160 characters'}
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowSmsDialog(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={sendSmsMutation.isPending}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {sendSmsMutation.isPending 
+                    ? (language === 'ar' ? 'جاري الإرسال...' : 'Sending...')
+                    : (language === 'ar' ? 'إرسال الرسالة' : 'Send Message')
+                  }
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
