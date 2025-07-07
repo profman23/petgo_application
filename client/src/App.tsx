@@ -25,6 +25,7 @@ import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentPage from "@/pages/payment";
 import PaymentSuccessPage from "@/pages/payment-success";
 import PaymentErrorPage from "@/pages/payment-error";
+import PaymentTest from "@/pages/payment-test";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -135,6 +136,7 @@ function Router() {
           <Route path="/payment/:bookingId" component={PaymentPage} />
           <Route path="/payment-success" component={PaymentSuccessPage} />
           <Route path="/payment-error" component={PaymentErrorPage} />
+          <Route path="/payment-test" component={PaymentTest} />
           <Route path="/home" component={Home} />
           <Route path="/" component={Login} />
           <Route component={NotFound} />

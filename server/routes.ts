@@ -1835,6 +1835,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Real Payment Test - 1 SAR
+  app.post('/api/payment/test-real', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      // Prepare payment data for 1 SAR test
+      let customerMobile = user.phone.replace(/\D/g, '');
+      if (customerMobile.startsWith('966')) {
+        customerMobile = customerMobile.substring(3);
+      }
+      if (customerMobile.startsWith('0')) {
+        customerMobile = customerMobile.substring(1);
+      }
+      if (customerMobile.length !== 9) {
+        customerMobile = '501234567';
+      }
+      
+      const customerEmail = user.email || `${user.phone}@vetsvan.sa`;
+      
+      const paymentData = {
+        customerName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'عميل VETS VAN',
+        customerMobile,
+        customerEmail,
+        invoiceValue: 1, // 1 SAR for testing
+        currencyIso: 'SAR',
+        customerReference: `TEST_${Date.now()}`,
+        language: 'ar',
+        displayCurrencyIso: 'SAR',
+        mobileCountryCode: '+966',
+        callBackUrl: `${req.protocol}://${req.get('host')}/api/payment/callback`,
+        errorUrl: `${req.protocol}://${req.get('host')}/api/payment/error`,
+        supplierCode: 1,
+        supplierValue: 1,
+        suppliers: [
+          {
+            supplierCode: 1,
+            proposedShare: 1,
+            invoiceShare: 1
+          }
+        ]
+      };
+
+      console.log('💳 Real Payment Test - 1 SAR:', JSON.stringify(paymentData, null, 2));
+
+      // Execute real payment with MyFatoorah Production
+      const result = await paymentService.executePayment(paymentData);
+      const paymentUrl = result.Data.PaymentURL;
+      
+      console.log(`🌐 Real Payment URL generated: ${paymentUrl}`);
+      
+      res.json({ 
+        success: true,
+        paymentUrl,
+        customerReference: paymentData.customerReference,
+        amount: 1,
+        message: 'دفع حقيقي بقيمة 1 ريال - اختبار'
+      });
+    } catch (error: any) {
+      console.error('Real payment test error:', error);
+      res.status(500).json({ message: error.message || 'Failed to create real payment test' });
+    }
+  });
+
   // MyFatoorah Webhook Endpoint (HTTPS required)
   app.post('/api/webhook/myfatoorah', async (req, res) => {
     try {
