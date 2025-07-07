@@ -1716,8 +1716,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Message and phone number are required' });
       }
 
-      // Taqnyat API configuration
-      const taqnyatApiUrl = 'https://api.taqnyat.sa/sms/send';
+      // Taqnyat API configuration  
+      const taqnyatApiUrl = 'https://api.taqnyat.sa/v1/messages';
       const bearerToken = process.env.TAQNYAT_API_KEY;
       
       if (!bearerToken) {
@@ -1729,7 +1729,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const smsData = {
         recipients: [phoneNumber],
         body: message,
-        sender: "VETSVAN" // Your sender name registered with Taqnyat
+        sender: "TAQNYAT" // Fallback to default sender name, replace with your registered sender
       };
 
       // Log the request for debugging
@@ -1737,7 +1737,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         url: taqnyatApiUrl,
         recipients: smsData.recipients,
         sender: smsData.sender,
-        messageLength: message.length
+        messageLength: message.length,
+        hasApiKey: !!bearerToken,
+        apiKeyLength: bearerToken ? bearerToken.length : 0
       });
 
       // Send SMS via Taqnyat API
