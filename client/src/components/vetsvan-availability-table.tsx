@@ -428,13 +428,22 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     if (!shift) return 'unavailable';
     
     // Check if this specific time slot is booked by others
-    const isTimeSlotBooked = shift.bookings?.some(booking => 
+    const otherBooking = shift.bookings?.find(booking => 
       booking.appointmentTime === time && 
-      booking.appointmentDate === selectedDate &&
-      booking.status === 'booked'
+      booking.appointmentDate === selectedDate
     );
     
-    if (isTimeSlotBooked) return 'booked';
+    if (otherBooking) {
+      // If booking is cancelled, show as available
+      if (otherBooking.status === 'cancelled') {
+        return 'available';
+      }
+      // If booking is confirmed, in_progress, completed, or pending_review, show as booked
+      if (['confirmed', 'in_progress', 'completed', 'pending_review'].includes(otherBooking.status)) {
+        return 'booked';
+      }
+    }
+    
     return 'available';
   };
 

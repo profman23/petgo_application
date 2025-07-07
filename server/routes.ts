@@ -918,15 +918,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Add detailed booking information to each shift
         const shiftsWithBookingStatus = driverShifts.map(shift => {
+          // Get all bookings for this shift (not just 'booked' status)
           const shiftBookings = bookings.filter(booking => 
-            booking.shiftId === shift.id && booking.status === 'booked'
+            booking.shiftId === shift.id
           );
           
           return {
             ...shift,
-            isBooked: shiftBookings.length > 0,
+            isBooked: shiftBookings.some(booking => 
+              ['pending_review', 'confirmed', 'in_progress', 'completed'].includes(booking.status)
+            ),
             bookingsCount: shiftBookings.length,
-            bookings: shiftBookings // Include actual booking details
+            bookings: shiftBookings // Include actual booking details with all statuses
           };
         });
         
