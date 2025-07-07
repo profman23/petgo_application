@@ -51,11 +51,17 @@ export default function PaymentTest() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <AlertTriangle className="h-6 w-6 text-amber-500" />
+            <span className="text-amber-600 font-medium">
+              {language === 'ar' ? 'بيئة الاختبار' : 'Test Environment'}
+            </span>
+          </div>
           <h1 className={`text-3xl font-bold ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-900 mb-2`}>
-            {language === 'ar' ? 'اختبار الدفع الحقيقي' : 'Real Payment Test'}
+            {language === 'ar' ? 'اختبار نظام الدفع' : 'Payment System Test'}
           </h1>
           <p className={`text-gray-600 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-            {language === 'ar' ? 'اختبار دفع حقيقي بقيمة 1 ريال سعودي' : 'Real payment test with 1 SAR'}
+            {language === 'ar' ? 'اختبار تجريبي بقيمة 1 ريال - استخدم بطاقات الاختبار فقط' : 'Demo test with 1 SAR - Test cards only'}
           </p>
         </div>
 
@@ -70,8 +76,8 @@ export default function PaymentTest() {
           <CardContent className="text-amber-700">
             <p className={language === 'ar' ? 'text-right' : 'text-left'}>
               {language === 'ar' 
-                ? 'هذا دفع حقيقي بقيمة 1 ريال سعودي. سيتم خصم المبلغ من بطاقتك الائتمانية فعلياً. استخدم هذا الاختبار فقط للتأكد من عمل النظام.'
-                : 'This is a real payment of 1 SAR. The amount will be actually charged to your credit card. Use this test only to verify the system is working.'
+                ? 'هذا اختبار تجريبي بقيمة 1 ريال في بيئة MyFatoorah الاختبارية. استخدم بطاقات الاختبار التجريبية فقط - لن يتم خصم أي مبلغ حقيقي.'
+                : 'This is a demo test with 1 SAR in MyFatoorah test environment. Use test cards only - no real charges will be made.'
               }
             </p>
           </CardContent>
