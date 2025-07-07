@@ -22,7 +22,7 @@ import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
-// Payment pages removed per user request
+import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -130,7 +130,7 @@ function Router() {
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
-          {/* Payment routes removed per user request */}
+          <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={Home} />
           <Route path="/" component={Login} />
           <Route component={NotFound} />

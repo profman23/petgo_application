@@ -284,14 +284,23 @@ export default function VetsVanBooking() {
           `Your appointment has been booked successfully at ${selectedTime} on ${selectedDate}`,
       });
 
+      // حفظ معرف الحجز في localStorage للعودة إليه بعد الدفع
+      localStorage.setItem('pendingPaymentBooking', result.id.toString());
+      
+      // توجيه للدفع فوراً بعد تأكيد الحجز
+      console.log('🔄 Redirecting to payment...');
+      
+      // إضافة delay قصير لضمان ظهور رسالة التأكيد
+      setTimeout(() => {
+        // فتح رابط الدفع في نفس النافذة
+        window.location.href = 'https://sa.myfatoorah.com/SAU/la/05069707813916358';
+      }, 2000);
+
       // مسح البيانات المؤقتة
       localStorage.removeItem('pendingRequest');
       
       // تحديث الاستعلامات
       queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/availability'] });
-      
-      // التوجه لصفحة تتبع الحجز أو الصفحة الرئيسية
-      setLocation('/home');
     } catch (error: any) {
       console.error('Booking failed:', error);
       toast({

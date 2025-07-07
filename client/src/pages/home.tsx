@@ -290,6 +290,17 @@ export default function Home() {
         setLocation('/');
       }
     }
+
+    // التحقق من عودة المستخدم من صفحة الدفع
+    const pendingPaymentBooking = localStorage.getItem('pendingPaymentBooking');
+    if (pendingPaymentBooking) {
+      console.log('🔄 User returned from payment, redirecting to processing page...');
+      // إزالة العلامة لمنع التكرار
+      localStorage.removeItem('pendingPaymentBooking');
+      // توجه لصفحة معالجة الطلب
+      setLocation('/payment-processing');
+      return;
+    }
   }, [setLocation]);
 
   const handleLogout = () => {
