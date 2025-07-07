@@ -258,7 +258,7 @@ export default function AdminDashboard() {
       await apiRequest("/api/admin/send-sms", {
         method: "POST",
         body: JSON.stringify({ 
-          message: "test sms from Taqnyat.sa , for testing",
+          message: "test sms from Taqnyat.sa , for testing internet sms service",
           phoneNumber: "966548336693" // Test number
         }),
       });
@@ -997,7 +997,7 @@ export default function AdminDashboard() {
                 {language === 'ar' ? 'نص الرسالة التجريبية:' : 'Test Message Text:'}
               </h4>
               <p className="text-sm text-gray-700 font-mono">
-                test sms from Taqnyat.sa , for testing
+                test sms from Taqnyat.sa , for testing internet sms service
               </p>
               <p className="text-xs text-gray-500 mt-2">
                 {language === 'ar' ? 'رسالة ثابتة للاختبار - لا يمكن تعديلها' : 'Fixed test message - cannot be edited'}
