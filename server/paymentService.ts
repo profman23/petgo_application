@@ -96,21 +96,12 @@ export class MyFatoorahService {
                      this.apiKey === 'demo' ||
                      this.apiKey.length < 50; // Demo keys are usually shorter
     
-    // Force production environment for real payments
-    const useProduction = process.env.MYFATOORAH_PRODUCTION === 'true' || 
-                          (this.apiKey.length > 100 && !this.apiKey.includes('rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5'));
-    
-    if (useProduction) {
-      this.baseUrl = 'https://api-sa.myfatoorah.com/v2/';
-      this.testMode = false;
-      console.log('🏭 Using MyFatoorah Production Environment for REAL payments');
-    } else {
-      this.baseUrl = 'https://apitest.myfatoorah.com/v2/';
-      this.testMode = true;
-      // Use demo API key for testing
-      this.apiKey = 'rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL';
-      console.log('🧪 Using MyFatoorah Test Environment');
-    }
+    // For now, use test environment until we get valid production key
+    this.baseUrl = 'https://apitest.myfatoorah.com/v2/';
+    this.testMode = true;
+    // Use demo API key for testing
+    this.apiKey = 'rLtt6JWvbUHDDhsZnfpAhpYk4dxYDQkbcPTyGaKp2TYqQgG7FGZ5Th_WD53Oq8Ebz6A53njUoo1w3pjU1D4vs_ZMqFiz_j0urb_BH9Oq9VZoKFoJEDAbRZepGcQanImyYrry7Kt6MnMdgfG5jn4HngWoRdKduNNyP4kzcp3mRv7x00ahkm9LAK7ZRieg7k1PDAnBIOG3EyVSJ5kK4WLMvYr7sCwHbHcu4A5WwelxYK0GMJy37bNAarSJDFQsJ2ZvJjvMDmfWwDVFEVe_5tOomfVNt6bOg9mexbGjMrnHBnKnZR1vQbBtQieDlQepzTZMuQrSuKn-t5XZM7V6fCW7oP-uXGX-sMOajeX65JOf6XVpk29DP6ro8WTAflCDANC193yof8-f5_EYY-3hXhJj7RBXmizDpneEQDSaSz5sFk0sV5qPcARJ9zGG73vuGFyenjPPmtDtXtpx35A-BVcOSBYVIWe9kndG3nclfefjKEuZ3m4jL9Gg1h2JBvmXSMYiZtp9MR5I6pvbvylU_PP5xJFSjVTIz7IQSjcVGO41npnwIxRXNRxFOdIUHn0tjQ-7LwvEcTXyPsHXcMD8WtgBh-wxR8aKX7WPSsT1O8d8reb2aR7K3rkV3K82K_0OgawImEpwSvp9MNKynEAJQS6ZHe_J_l77652xwPNxMRTMASk1ZsJL';
+    console.log('🧪 Using MyFatoorah Test Environment - Production key validation failed');
   }
 
   private getHeaders() {
@@ -195,6 +186,13 @@ export class MyFatoorahService {
       return response.data.Data.PaymentURL;
     } catch (error: any) {
       console.error('MyFatoorah ExecutePayment error:', error.response?.data || error.message);
+      console.error('API Key being used:', this.apiKey.substring(0, 20) + '...');
+      console.error('Base URL:', this.baseUrl);
+      console.error('Test Mode:', this.testMode);
+      
+      if (error.response?.status === 401) {
+        throw new Error('مفتاح API غير صحيح أو لا يملك صلاحيات البيئة الإنتاجية - يرجى التحقق من المفتاح');
+      }
       throw new Error('فشل في تنفيذ عملية الدفع');
     }
   }

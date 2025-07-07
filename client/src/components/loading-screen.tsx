@@ -13,10 +13,8 @@ interface LoadingScreenProps {
 }
 
 export function LoadingScreen({ onLoadingComplete }: LoadingScreenProps) {
-  const { language } = useLanguage();
-  const t = translations[language];
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [loadingText, setLoadingText] = useState('');
+  const [loadingText, setLoadingText] = useState('Loading...');
 
   useEffect(() => {
     // Simple timeout-based loading instead of complex image preloading
@@ -34,7 +32,7 @@ export function LoadingScreen({ onLoadingComplete }: LoadingScreenProps) {
       {/* Simple Loading Text */}
       <div className="text-center">
         <p className="text-2xl font-bold text-purple-700">
-          {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+          Loading...
         </p>
       </div>
     </div>
