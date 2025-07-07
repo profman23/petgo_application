@@ -52,32 +52,32 @@ export default function PaymentTest() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <AlertTriangle className="h-6 w-6 text-amber-500" />
-            <span className="text-amber-600 font-medium">
-              {language === 'ar' ? 'بيئة الاختبار' : 'Test Environment'}
+            <CreditCard className="h-6 w-6 text-green-500" />
+            <span className="text-green-600 font-medium">
+              {language === 'ar' ? 'بيئة الإنتاج' : 'Production Environment'}
             </span>
           </div>
           <h1 className={`text-3xl font-bold ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-900 mb-2`}>
-            {language === 'ar' ? 'اختبار نظام الدفع' : 'Payment System Test'}
+            {language === 'ar' ? 'دفع حقيقي' : 'Real Payment'}
           </h1>
           <p className={`text-gray-600 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-            {language === 'ar' ? 'اختبار تجريبي بقيمة 1 ريال - استخدم بطاقات الاختبار فقط' : 'Demo test with 1 SAR - Test cards only'}
+            {language === 'ar' ? 'دفع حقيقي بقيمة 1 ريال سعودي - سيتم الخصم فعلياً' : 'Real payment of 1 SAR - Actual charge will be made'}
           </p>
         </div>
 
         {/* Warning Card */}
-        <Card className="mb-6 border-amber-200 bg-amber-50">
+        <Card className="mb-6 border-red-200 bg-red-50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-amber-800">
+            <CardTitle className="flex items-center gap-2 text-red-800">
               <AlertTriangle className="h-5 w-5" />
-              {language === 'ar' ? 'تحذير مهم' : 'Important Warning'}
+              {language === 'ar' ? 'تحذير مهم - دفع حقيقي' : 'Important Warning - Real Payment'}
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-amber-700">
+          <CardContent className="text-red-700">
             <p className={language === 'ar' ? 'text-right' : 'text-left'}>
               {language === 'ar' 
-                ? 'هذا اختبار تجريبي بقيمة 1 ريال في بيئة MyFatoorah الاختبارية. استخدم بطاقات الاختبار التجريبية فقط - لن يتم خصم أي مبلغ حقيقي.'
-                : 'This is a demo test with 1 SAR in MyFatoorah test environment. Use test cards only - no real charges will be made.'
+                ? 'هذا دفع حقيقي بقيمة 1 ريال سعودي في بيئة MyFatoorah الإنتاجية. سيتم خصم المبلغ من بطاقتك الائتمانية فعلياً. استخدم بطاقتك الحقيقية.'
+                : 'This is a REAL payment of 1 SAR in MyFatoorah production environment. The amount will be actually charged to your credit card. Use your real card.'
               }
             </p>
           </CardContent>
