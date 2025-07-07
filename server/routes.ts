@@ -1732,6 +1732,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sender: "VETSVAN" // Your sender name registered with Taqnyat
       };
 
+      // Log the request for debugging
+      console.log('Sending SMS request to Taqnyat:', {
+        url: taqnyatApiUrl,
+        recipients: smsData.recipients,
+        sender: smsData.sender,
+        messageLength: message.length
+      });
+
       // Send SMS via Taqnyat API
       const response = await fetch(taqnyatApiUrl, {
         method: 'POST',
@@ -1742,17 +1750,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         body: JSON.stringify(smsData)
       });
 
+      console.log('Taqnyat API Response Status:', response.status);
+      console.log('Taqnyat API Response Headers:', Object.fromEntries(response.headers.entries()));
+
+      const responseText = await response.text();
+      console.log('Taqnyat API Response Body:', responseText);
+
       if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Taqnyat API Error:', errorData);
+        console.error('Taqnyat API Error - Status:', response.status);
+        console.error('Taqnyat API Error - Body:', responseText);
+        
         return res.status(500).json({ 
-          message: 'Failed to send SMS',
-          error: errorData 
+          message: 'Failed to send SMS via Taqnyat',
+          error: `API returned ${response.status}: ${responseText}`,
+          apiStatus: response.status
         });
       }
 
-      const result = await response.json();
-      console.log('SMS sent successfully:', result);
+      // Try to parse JSON response
+      let result;
+      try {
+        result = JSON.parse(responseText);
+        console.log('SMS sent successfully:', result);
+      } catch (parseError) {
+        console.error('Failed to parse Taqnyat response as JSON:', parseError);
+        console.log('Response text:', responseText);
+        
+        // If response is successful but not JSON, treat as success
+        if (response.status >= 200 && response.status < 300) {
+          result = { message: 'SMS sent successfully', rawResponse: responseText };
+        } else {
+          throw new Error(`Invalid JSON response: ${responseText}`);
+        }
+      }
 
       res.json({ 
         success: true, 
