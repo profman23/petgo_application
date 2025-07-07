@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, CreditCard, CheckCircle } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FixedFooter } from '@/components/fixed-footer';
@@ -24,11 +24,7 @@ interface Booking {
   carModel: string;
   carColor: string;
   plateNumber: string;
-  paymentStatus?: string;
-  paymentAmount?: string;
-  paymentMethod?: string;
-  paymentId?: string;
-  invoiceId?: string;
+  // Payment fields removed per user request
   customerLocation?: {
     latitude: number;
     longitude: number;
@@ -392,31 +388,7 @@ export default function CustomerActivity() {
                               </div>
                             )}
 
-                            {/* Payment Button for Confirmed Bookings */}
-                            {(booking.status === 'booked' || booking.status === 'confirmed') && 
-                             (!booking.paymentStatus || booking.paymentStatus === 'pending') && (
-                              <div className="pt-3 border-t border-purple-100">
-                                <Button
-                                  onClick={() => setLocation(`/payment/${booking.id}`)}
-                                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4"
-                                >
-                                  <CreditCard className="w-4 h-4 mr-2" />
-                                  {language === 'ar' ? 'ادفع الآن - 150 ريال' : 'Pay Now - 150 SAR'}
-                                </Button>
-                              </div>
-                            )}
-
-                            {/* Payment Status Display */}
-                            {booking.paymentStatus === 'paid' && (
-                              <div className="pt-3 border-t border-green-100">
-                                <div className="flex items-center justify-center gap-2 text-green-600 bg-green-50 rounded-lg py-2 px-4">
-                                  <CheckCircle className="w-4 h-4" />
-                                  <span className="font-medium">
-                                    {language === 'ar' ? 'تم الدفع بنجاح' : 'Payment Completed'}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
+                            {/* Payment sections removed per user request */}
 
                             {/* Rate Service Button for Completed Services */}
                             {booking.status === 'completed' && (

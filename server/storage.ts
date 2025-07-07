@@ -51,13 +51,7 @@ export interface IStorage {
   getAllBookings(): Promise<Booking[]>;
   updateBookingStatus(bookingId: number, status: string): Promise<void>;
   getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined>;
-  updateBookingPayment(bookingId: number, paymentData: { 
-    paymentStatus?: string; 
-    paymentId?: string; 
-    invoiceId?: string; 
-    paymentAmount?: string; 
-    paymentMethod?: string; 
-  }): Promise<void>;
+  // Payment update methods removed per user request
 
   // Reviews operations
   createReview(review: InsertReview): Promise<Review>;
@@ -635,20 +629,7 @@ export class DatabaseStorage implements IStorage {
     return detailedReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
-  async updateBookingPayment(bookingId: number, paymentData: { 
-    paymentStatus?: string; 
-    paymentId?: string; 
-    invoiceId?: string; 
-    paymentAmount?: string; 
-    paymentMethod?: string; 
-  }): Promise<void> {
-    await db.update(bookings)
-      .set({
-        ...paymentData,
-        updatedAt: new Date()
-      })
-      .where(eq(bookings.id, bookingId));
-  }
+  // Payment update method removed per user request
 }
 
 // Temporary fallback to MemStorage due to database connection issues
@@ -1058,19 +1039,7 @@ class MemStorage implements IStorage {
     return { ...booking, user };
   }
 
-  async updateBookingPayment(bookingId: number, paymentData: { 
-    paymentStatus?: string; 
-    paymentId?: string; 
-    invoiceId?: string; 
-    paymentAmount?: string; 
-    paymentMethod?: string; 
-  }): Promise<void> {
-    const booking = this.bookings.get(bookingId);
-    if (booking) {
-      Object.assign(booking, paymentData, { updatedAt: new Date() });
-      this.bookings.set(bookingId, booking);
-    }
-  }
+  // Payment methods removed per user request
 
   async createReview(reviewData: InsertReview): Promise<Review> {
     const review: Review = {
