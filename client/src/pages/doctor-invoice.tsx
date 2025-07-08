@@ -218,10 +218,38 @@ export default function DoctorInvoice() {
   };
 
   // Handle pet vitals
-  const openVitalsModal = (pet: Pet) => {
+  const openVitalsModal = async (pet: Pet) => {
     setSelectedPet(pet);
     setShowVitalsModal(true);
-    setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+    
+    // Load existing vitals data if available
+    if (booking) {
+      try {
+        const response = await fetch(`/api/pet-vitals/${booking.id}`);
+        if (response.ok) {
+          const existingVitals = await response.json();
+          const petVitals = existingVitals.find((vital: any) => vital.petId === pet.id);
+          
+          if (petVitals) {
+            setVitalsData({
+              weight: petVitals.weight?.toString() || '',
+              temperature: petVitals.temperature?.toString() || '',
+              heartRate: petVitals.heartRate?.toString() || '',
+              notes: petVitals.notes || ''
+            });
+          } else {
+            setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+          }
+        } else {
+          setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+        }
+      } catch (error) {
+        console.error('Error loading existing vitals:', error);
+        setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+      }
+    } else {
+      setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+    }
   };
 
   const saveVitals = async () => {
@@ -242,15 +270,43 @@ export default function DoctorInvoice() {
       console.log('Selected pet:', selectedPet);
       console.log('Booking:', booking);
 
-      await apiRequest('/api/pet-vitals', {
-        method: 'POST',
-        body: vitalsPayload
-      });
+      // Check if vitals already exist for this pet
+      const existingVitalsResponse = await fetch(`/api/pet-vitals/${booking.id}`);
+      let isUpdate = false;
+      let existingVitalId = null;
+      
+      if (existingVitalsResponse.ok) {
+        const existingVitals = await existingVitalsResponse.json();
+        const existingPetVital = existingVitals.find((vital: any) => vital.petId === selectedPet.id);
+        if (existingPetVital) {
+          isUpdate = true;
+          existingVitalId = existingPetVital.id;
+        }
+      }
 
-      toast({
-        title: language === 'ar' ? "تم حفظ المؤشرات الحيوية" : "Pet vitals saved successfully",
-        variant: "default"
-      });
+      if (isUpdate && existingVitalId) {
+        // Update existing vitals
+        await apiRequest(`/api/pet-vitals/${existingVitalId}`, {
+          method: 'PUT',
+          body: vitalsPayload
+        });
+        
+        toast({
+          title: language === 'ar' ? "تم تحديث المؤشرات الحيوية" : "Pet vitals updated successfully",
+          variant: "default"
+        });
+      } else {
+        // Create new vitals
+        await apiRequest('/api/pet-vitals', {
+          method: 'POST',
+          body: vitalsPayload
+        });
+        
+        toast({
+          title: language === 'ar' ? "تم حفظ المؤشرات الحيوية" : "Pet vitals saved successfully",
+          variant: "default"
+        });
+      }
 
       setShowVitalsModal(false);
     } catch (error) {
