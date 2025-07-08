@@ -361,6 +361,43 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 max-width: 200px !important;
                 object-fit: contain !important;
               }
+              .section {
+                margin-bottom: 8px !important;
+                padding: 8px !important;
+                font-size: 12px !important;
+              }
+              .section-title {
+                font-size: 14px !important;
+                padding: 6px !important;
+                margin-bottom: 6px !important;
+              }
+              .info-item {
+                padding: 2px 0 !important;
+                font-size: 11px !important;
+              }
+              .info-label {
+                font-size: 11px !important;
+              }
+              .pet-card {
+                padding: 6px !important;
+                margin-bottom: 6px !important;
+              }
+              .pet-name {
+                font-size: 13px !important;
+              }
+              .pet-detail {
+                font-size: 10px !important;
+              }
+              .header {
+                margin-bottom: 10px !important;
+                padding-bottom: 8px !important;
+              }
+              .company-name {
+                font-size: 24px !important;
+              }
+              .company-tagline {
+                font-size: 12px !important;
+              }
             }
           </style>
         </head>

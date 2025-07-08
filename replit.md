@@ -621,6 +621,7 @@ Changelog:
 - July 8, 2025. ADDED: Company logo header (IMG-20250415-WA0047_1751986059751.jpg) at top of invoice for professional branding
 - July 8, 2025. OPTIMIZED: Reduced spacing between sections (mb-8 to mb-4, p-6 to p-4) for better layout formatting
 - July 8, 2025. FIXED: Print functionality logo size issue - added CSS print styles to control logo size at 60px height during printing
+- July 8, 2025. OPTIMIZED: Print layout for single page display - reduced section spacing, font sizes, and padding for Customer Information and Pet Information sections
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
