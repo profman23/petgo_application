@@ -239,6 +239,8 @@ export default function DoctorInvoice() {
       };
 
       console.log('Sending vitals payload:', vitalsPayload);
+      console.log('Selected pet:', selectedPet);
+      console.log('Booking:', booking);
 
       await apiRequest('/api/pet-vitals', {
         method: 'POST',

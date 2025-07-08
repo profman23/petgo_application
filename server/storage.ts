@@ -593,6 +593,7 @@ export class DatabaseStorage implements IStorage {
         email: customer.email,
       },
       pets: selectedPetsData.map((pet: any) => ({
+        id: pet.id,
         name: pet.name,
         type: pet.type,
         ageYear: pet.ageYear || 0,
@@ -1207,6 +1208,7 @@ class MemStorage implements IStorage {
         email: customer.email,
       },
       pets: selectedPetsData.map((pet: any) => ({
+        id: pet.id,
         name: pet.name,
         type: pet.type,
         ageYear: pet.ageYear || 0,
