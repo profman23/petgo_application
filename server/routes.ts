@@ -25,6 +25,7 @@ function requireAuth(req: any, res: any, next: any) {
   
   if (!session) {
     console.log('Invalid token:', sessionId);
+    console.log('Available sessions:', Array.from(sessions.keys()));
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
@@ -2032,15 +2033,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/pet-attachments/pet/:petId/:bookingId', requireAuth, async (req, res) => {
+  // Get pet attachments for specific pet and booking
+  app.get('/api/pet-attachments', requireAuth, async (req, res) => {
     try {
-      const petId = parseInt(req.params.petId);
-      const bookingId = parseInt(req.params.bookingId);
+      const petId = parseInt(req.query.petId as string);
+      const bookingId = parseInt(req.query.bookingId as string);
+      
+      if (isNaN(petId) || isNaN(bookingId)) {
+        return res.status(400).json({ message: 'Invalid petId or bookingId in query parameters' });
+      }
+      
       const attachments = await storage.getPetAttachmentsByPet(petId, bookingId);
-      res.json(attachments);
+      res.json(attachments || []);
     } catch (error) {
       console.error('Error fetching pet attachments:', error);
-      res.status(500).json({ message: 'Error fetching pet attachments' });
+      res.status(500).json({ message: 'Error fetching pet attachments', error: error.message });
     }
   });
 

@@ -275,7 +275,7 @@ export type PetVital = typeof petVitals.$inferSelect;
 // Pet Attachments table
 export const petAttachments = pgTable("pet_attachments", {
   id: serial("id").primaryKey(),
-  petId: integer("pet_id").notNull().references(() => pets.id),
+  petId: integer("pet_id").notNull().references(() => patients.id),
   bookingId: integer("booking_id").notNull().references(() => bookings.id),
   fileName: varchar("file_name").notNull(),
   fileType: varchar("file_type").notNull(),

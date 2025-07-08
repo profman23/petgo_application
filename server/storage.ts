@@ -776,6 +776,71 @@ export class DatabaseStorage implements IStorage {
     return detailedReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
+  // Pet vitals operations
+  async createPetVital(vital: InsertPetVital): Promise<PetVital> {
+    console.log('DatabaseStorage createPetVital called with:', vital);
+    const [newVital] = await db
+      .insert(petVitals)
+      .values(vital)
+      .returning();
+    return newVital;
+  }
+
+  async getPetVitalsByBooking(bookingId: number): Promise<PetVital[]> {
+    return await db
+      .select()
+      .from(petVitals)
+      .where(eq(petVitals.bookingId, bookingId));
+  }
+
+  async updatePetVital(id: number, vital: Partial<InsertPetVital>): Promise<PetVital> {
+    const [updatedVital] = await db
+      .update(petVitals)
+      .set(vital)
+      .where(eq(petVitals.id, id))
+      .returning();
+    return updatedVital;
+  }
+
+  // Pet attachments operations
+  async createPetAttachment(attachment: InsertPetAttachment): Promise<PetAttachment> {
+    const [newAttachment] = await db
+      .insert(petAttachments)
+      .values(attachment)
+      .returning();
+    return newAttachment;
+  }
+
+  async getPetAttachmentsByBooking(bookingId: number): Promise<PetAttachment[]> {
+    return await db
+      .select()
+      .from(petAttachments)
+      .where(eq(petAttachments.bookingId, bookingId));
+  }
+
+  async getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]> {
+    try {
+      console.log(`DatabaseStorage: Getting attachments for petId=${petId}, bookingId=${bookingId}`);
+      const result = await db
+        .select()
+        .from(petAttachments)
+        .where(and(eq(petAttachments.petId, petId), eq(petAttachments.bookingId, bookingId)));
+      console.log(`DatabaseStorage: Found ${result.length} attachments`);
+      return result;
+    } catch (error) {
+      console.error('DatabaseStorage: Error in getPetAttachmentsByPet:', error);
+      return [];
+    }
+  }
+
+  async deletePetAttachment(id: number, uploadedBy: string): Promise<boolean> {
+    const result = await db
+      .delete(petAttachments)
+      .where(and(eq(petAttachments.id, id), eq(petAttachments.uploadedBy, uploadedBy)))
+      .returning();
+    return result.length > 0;
+  }
+
   // Payment update method removed per user request
 }
 
@@ -1529,10 +1594,19 @@ class MemStorage implements IStorage {
   }
 
   async getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]> {
-    return await db
-      .select()
-      .from(petAttachments)
-      .where(and(eq(petAttachments.petId, petId), eq(petAttachments.bookingId, bookingId)));
+    try {
+      console.log(`DatabaseStorage: Getting attachments for petId=${petId}, bookingId=${bookingId}`);
+      const result = await db
+        .select()
+        .from(petAttachments)
+        .where(and(eq(petAttachments.petId, petId), eq(petAttachments.bookingId, bookingId)));
+      console.log(`DatabaseStorage: Found ${result.length} attachments`);
+      return result;
+    } catch (error) {
+      console.error('DatabaseStorage: Error in getPetAttachmentsByPet:', error);
+      // Return empty array instead of throwing error
+      return [];
+    }
   }
 
   async deletePetAttachment(id: number, uploadedBy: string): Promise<boolean> {
