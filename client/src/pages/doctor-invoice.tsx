@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
+import InvoiceGeneratorNew from '@/components/InvoiceGeneratorNew';
 
 interface InvoiceItem {
   id: string;
@@ -87,6 +88,7 @@ export default function DoctorInvoice() {
   });
   const [totalPaid, setTotalPaid] = useState(0);
   const [payments, setPayments] = useState<any[]>([]);
+  const [showInvoiceGenerator, setShowInvoiceGenerator] = useState(false);
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -371,25 +373,34 @@ export default function DoctorInvoice() {
     }
   };
 
+  // Fetch doctor info for invoice
+  const { data: doctorInfo } = useQuery({
+    queryKey: ['/api/doctor/vetsvan-location'],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/doctor/vetsvan-location', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch doctor info');
+      return response.json();
+    }
+  });
+
   // Generate invoice
   const generateInvoice = async () => {
     try {
-      const invoiceData = {
-        bookingId: params?.bookingId,
-        items: invoiceItems,
-        discount,
-        notes,
-        subtotal,
-        total: finalTotal,
-      };
+      if (!booking || !doctorInfo) {
+        toast({
+          title: language === 'ar' ? 'بيانات غير مكتملة' : 'Incomplete data',
+          description: language === 'ar' ? 'يرجى التأكد من توفر جميع البيانات' : 'Please ensure all data is available',
+          variant: 'destructive',
+        });
+        return;
+      }
 
-      // Here you would typically send this to your backend
-      console.log('Invoice data:', invoiceData);
-      
-      toast({
-        title: language === 'ar' ? '✅ تم إنشاء الفاتورة بنجاح' : '✅ Invoice generated successfully',
-        description: language === 'ar' ? 'تم حفظ الفاتورة في النظام' : 'Invoice has been saved to the system',
-      });
+      setShowInvoiceGenerator(true);
     } catch (error) {
       toast({
         title: language === 'ar' ? '❌ خطأ في إنشاء الفاتورة' : '❌ Error generating invoice',
@@ -872,6 +883,29 @@ export default function DoctorInvoice() {
           petId={selectedPetForUpload.id}
           petName={selectedPetForUpload.name}
           bookingId={booking.id}
+        />
+      )}
+
+      {/* Invoice Generator */}
+      {showInvoiceGenerator && booking && doctorInfo && (
+        <InvoiceGeneratorNew
+          invoiceData={{
+            bookingId: booking.id,
+            customer: booking.customer,
+            pets: booking.pets,
+            appointmentDate: booking.appointmentDate,
+            appointmentTime: booking.appointmentTime,
+            serviceType: booking.serviceType,
+            items: invoiceItems,
+            subtotal: subtotal,
+            discount: discount,
+            tax: tax,
+            total: finalTotal,
+            notes: notes,
+            doctorName: doctorInfo.name || 'Dr. VETS VAN',
+            vetsVanCode: doctorInfo.vetsvanCode || 'VETS001'
+          }}
+          onClose={() => setShowInvoiceGenerator(false)}
         />
       )}
     </div>
