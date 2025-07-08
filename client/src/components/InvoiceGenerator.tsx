@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, Download, Printer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
-import riyalLogo from "@assets/Screenshot 2025-07-08 171944_1751984409622.png";
+import riyalLogo from "@assets/Screenshot 2025-07-08 171929_1751985624644.png";
 
 interface InvoiceItem {
   id: string;

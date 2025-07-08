@@ -5,7 +5,7 @@ import { FileText, Download, Printer, X, Phone, Mail, Calendar, Clock, User, Paw
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
-import riyalLogo from "@assets/Screenshot 2025-07-08 171944_1751984409622.png";
+import riyalLogo from "@assets/Screenshot 2025-07-08 171929_1751985624644.png";
 
 interface InvoiceItem {
   id: string;
