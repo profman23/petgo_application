@@ -623,6 +623,10 @@ Changelog:
 - July 8, 2025. FIXED: Print functionality logo size issue - added CSS print styles to control logo size at 60px height during printing
 - July 8, 2025. OPTIMIZED: Print layout for single page display - reduced section spacing, font sizes, and padding for Customer Information and Pet Information sections
 - July 8, 2025. ENHANCED: Comprehensive print optimization - reduced all section sizes, logo (50px), fonts (9-13px), QR code (80px), and spacing for complete single-page layout
+- July 8, 2025. IMPLEMENTED: Generate Invoice confirmation system with selective read-only functionality
+- July 8, 2025. ADDED: Confirmation popup dialog before making invoice items read-only
+- July 8, 2025. ENHANCED: Invoice Item Section becomes view-only after confirmation while Pet Information Section remains editable
+- July 8, 2025. CREATED: Read-only indicator badge for locked invoice items with proper bilingual support
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

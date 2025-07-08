@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
@@ -89,6 +90,8 @@ export default function DoctorInvoice() {
   const [totalPaid, setTotalPaid] = useState(0);
   const [payments, setPayments] = useState<any[]>([]);
   const [showInvoiceGenerator, setShowInvoiceGenerator] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isRecordLocked, setIsRecordLocked] = useState(false);
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -155,6 +158,11 @@ export default function DoctorInvoice() {
       months: 'شهر',
       days: 'يوم',
       sar: 'ريال',
+      confirmTitle: 'تأكيد إنشاء الفاتورة',
+      confirmMessage: 'هل أنت متأكد من إنشاء الفاتورة؟ سيتم حفظ جميع بنود الفاتورة وجعلها للمشاهدة فقط. لن تتمكن من تعديلها لاحقاً.',
+      confirm: 'موافق',
+      invoiceGenerated: 'تم إنشاء الفاتورة بنجاح',
+      readOnly: 'للمشاهدة فقط',
     },
     en: {
       invoiceTitle: 'VETS VAN Service Invoice',
@@ -201,6 +209,11 @@ export default function DoctorInvoice() {
       months: 'months',
       days: 'days',
       sar: 'SAR',
+      confirmTitle: 'Confirm Invoice Generation',
+      confirmMessage: 'Are you sure you want to generate the invoice? All invoice items will be saved and made read-only. You will not be able to edit them later.',
+      confirm: 'Confirm',
+      invoiceGenerated: 'Invoice generated successfully',
+      readOnly: 'Read Only',
     }
   };
 
@@ -388,8 +401,13 @@ export default function DoctorInvoice() {
     }
   });
 
-  // Generate invoice
-  const generateInvoice = async () => {
+  // Show confirmation dialog for invoice generation
+  const handleGenerateInvoiceClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  // Generate invoice after confirmation
+  const confirmGenerateInvoice = async () => {
     try {
       if (!booking || !doctorInfo) {
         toast({
@@ -400,7 +418,16 @@ export default function DoctorInvoice() {
         return;
       }
 
+      // Lock the record (make invoice items read-only)
+      setIsRecordLocked(true);
+      setShowConfirmDialog(false);
       setShowInvoiceGenerator(true);
+
+      toast({
+        title: t('invoiceGenerated'),
+        description: language === 'ar' ? 'تم حفظ بنود الفاتورة وجعلها للمشاهدة فقط' : 'Invoice items have been saved and made read-only',
+        variant: 'default',
+      });
     } catch (error) {
       toast({
         title: language === 'ar' ? '❌ خطأ في إنشاء الفاتورة' : '❌ Error generating invoice',
@@ -572,9 +599,17 @@ export default function DoctorInvoice() {
 
         {/* Invoice Items */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">
-            {t('invoiceItems')}
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">
+              {t('invoiceItems')}
+            </h2>
+            {isRecordLocked && (
+              <div className="flex items-center bg-red-100 text-red-700 px-3 py-1 rounded-lg text-sm">
+                <AlertTriangle className="h-4 w-4 mr-1" />
+                {t('readOnly')}
+              </div>
+            )}
+          </div>
           
           <div className="overflow-x-auto">
             <table className="w-full mb-4">
@@ -599,43 +634,63 @@ export default function DoctorInvoice() {
                 {invoiceItems.map((item) => (
                   <tr key={item.id} className="border-b">
                     <td className="py-2 px-2">
-                      <Input
-                        value={item.description}
-                        onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                        placeholder={t('description')}
-                        className="w-full"
-                      />
+                      {isRecordLocked ? (
+                        <div className="bg-gray-100 p-2 rounded text-gray-700">
+                          {item.description || t('description')}
+                        </div>
+                      ) : (
+                        <Input
+                          value={item.description}
+                          onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                          placeholder={t('description')}
+                          className="w-full"
+                        />
+                      )}
                     </td>
                     <td className="py-2 px-2">
-                      <Input
-                        type="number"
-                        min="1"
-                        value={item.quantity}
-                        onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 1)}
-                        className="w-full text-center"
-                      />
+                      {isRecordLocked ? (
+                        <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                          {item.quantity}
+                        </div>
+                      ) : (
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 1)}
+                          className="w-full text-center"
+                        />
+                      )}
                     </td>
                     <td className="py-2 px-2">
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={item.unitPrice}
-                        onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                        className="w-full text-center"
-                      />
+                      {isRecordLocked ? (
+                        <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                          {item.unitPrice.toFixed(2)}
+                        </div>
+                      ) : (
+                        <Input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={item.unitPrice}
+                          onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
+                          className="w-full text-center"
+                        />
+                      )}
                     </td>
                     <td className="py-2 px-2 text-center">
                       {item.total.toFixed(2)}
                     </td>
                     <td className="py-2 px-2 text-center">
-                      <button
-                        onClick={() => removeItem(item.id)}
-                        className="text-red-600 hover:text-red-800"
-                        disabled={invoiceItems.length === 1}
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
+                      {!isRecordLocked && (
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          className="text-red-600 hover:text-red-800"
+                          disabled={invoiceItems.length === 1}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -643,13 +698,15 @@ export default function DoctorInvoice() {
             </table>
           </div>
 
-          <button
-            onClick={addItem}
-            className="flex items-center text-purple-600 hover:text-purple-800 mb-4"
-          >
-            <Plus className="h-4 w-4 ml-1" />
-            {t('addItem')}
-          </button>
+          {!isRecordLocked && (
+            <button
+              onClick={addItem}
+              className="flex items-center text-purple-600 hover:text-purple-800 mb-4"
+            >
+              <Plus className="h-4 w-4 ml-1" />
+              {t('addItem')}
+            </button>
+          )}
 
           {/* Totals */}
           <div className="border-t pt-4">
@@ -769,7 +826,7 @@ export default function DoctorInvoice() {
         {/* Actions */}
         <div className="flex justify-center mb-6">
           <Button
-            onClick={generateInvoice}
+            onClick={handleGenerateInvoiceClick}
             className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg"
           >
             <Receipt className="h-6 w-6 ml-2" />
@@ -908,6 +965,41 @@ export default function DoctorInvoice() {
           onClose={() => setShowInvoiceGenerator(false)}
         />
       )}
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent 
+          className="sm:max-w-md"
+          dir={getDirection(language)}
+          style={{ textAlign: getTextAlign(language) }}
+        >
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <AlertTriangle className="h-5 w-5 text-orange-500 mr-2" />
+              {t('confirmTitle')}
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              {t('confirmMessage')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-start">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowConfirmDialog(false)}
+            >
+              {t('cancel')}
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmGenerateInvoice}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              {t('confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
