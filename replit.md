@@ -604,6 +604,12 @@ Changelog:
 - July 8, 2025. ENHANCED: Professional invoice layout with company branding, enhanced QR codes, improved typography, and better section organization
 - July 8, 2025. IMPROVED: Invoice print and download functionality with optimized CSS styling for both screen and print media
 - July 8, 2025. UPDATED: doctor-invoice.tsx to use InvoiceGeneratorProfessional component for better formatted invoices
+- July 8, 2025. ENHANCED: QR Code color changed to black as requested by user for better scanning compatibility
+- July 8, 2025. MODIFIED: Company logo display changed from circular to rectangular shape for improved professional appearance
+- July 8, 2025. ADDED: Clear visual separators between invoice sections using gradient lines and enhanced borders
+- July 8, 2025. IMPROVED: Service items table with professional gradient headers, alternating row colors, hover effects, and enhanced typography
+- July 8, 2025. RESTRUCTURED: Each invoice section (Customer Info, Pet Info, Service Details, Totals) now has distinct visual separation with colored borders and backgrounds
+- July 8, 2025. COMPLETED: Professional invoice formatting with perfect section separation and enhanced table design as requested
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
