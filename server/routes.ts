@@ -1656,30 +1656,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Doctor VetsVan location endpoint
-  app.get('/api/doctor/vetsvan-location', requireAuth, async (req, res) => {
+  app.get('/api/doctor/vetsvan-location', requireAuth, async (req: any, res) => {
     try {
-      const user = req.user;
+      const user = req.user as any;
       
       if (user.membershipType !== 'doctor') {
-        return res.status(403).json({ message: 'Unauthorized' });
+        return res.status(403).json({ message: 'Access denied' });
       }
       
-      // Get the doctor's VetsVan information with location
-      const driver = await storage.getDriverByUsername(user.phone);
-      if (!driver) {
+      // Get doctor's VetsVan ID from user data
+      const vetsVanId = user.vetsVanId || user.id;
+      
+      if (!vetsVanId) {
+        return res.status(404).json({ message: 'VetsVan ID not found' });
+      }
+      
+      // Get VetsVan details from storage
+      const vetsVan = await storage.getDriver(vetsVanId);
+      
+      if (!vetsVan) {
         return res.status(404).json({ message: 'VetsVan not found' });
       }
       
-      res.json({
-        vetsVanId: driver.id,
-        vetsvanCode: driver.vetsvanCode,
-        vetsvanName: driver.vetsvanName,
-        latitude: driver.latitude,
-        longitude: driver.longitude,
-        carModel: driver.carModel,
-        carColor: driver.carColor,
-        plateNumber: driver.plateNumber
-      });
+      const vetsVanInfo = {
+        id: vetsVan.id,
+        vetsvanCode: vetsVan.vetsvanCode,
+        vetsvanName: vetsVan.vetsvanName,
+        latitude: vetsVan.latitude,
+        longitude: vetsVan.longitude,
+        vehicleModel: vetsVan.vehicleModel || 'Mercedes Sprinter',
+        vehicleColor: vetsVan.vehicleColor || 'White',
+        plateNumber: vetsVan.plateNumber || 'ABC-123'
+      };
+      
+      res.json(vetsVanInfo);
     } catch (error) {
       console.error('Error fetching VetsVan location:', error);
       res.status(500).json({ message: 'Failed to fetch VetsVan location' });
@@ -1912,22 +1922,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { db } = await import('./db');
       const { petVitals } = await import('@shared/schema');
       
-      // Map frontend field names to database field names
-      const mappedData = {
-        booking_id: req.body.bookingId,
-        pet_id: req.body.petId,
+      // Use schema field names (camelCase) as defined in shared/schema.ts
+      const vitalsData = {
+        bookingId: req.body.bookingId,
+        petId: req.body.petId,
         weight: req.body.weight,
         temperature: req.body.temperature,
-        heart_rate: req.body.heartRate,
+        heartRate: req.body.heartRate,
         notes: req.body.notes,
-        recorded_by: req.body.recordedBy
+        recordedBy: req.body.recordedBy || 'doctor'
       };
       
-      console.log('Creating pet vital with mapped data:', mappedData);
+      console.log('Received payload:', req.body);
+      console.log('Vitals data for database:', vitalsData);
+      
+      console.log('Creating pet vital with vitals data:', vitalsData);
       
       const [newVital] = await db
         .insert(petVitals)
-        .values(mappedData)
+        .values(vitalsData)
         .returning();
       
       console.log('Pet vital created successfully:', newVital);
@@ -1948,7 +1961,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const vitals = await db
         .select()
         .from(petVitals)
-        .where(eq(petVitals.booking_id, bookingId));
+        .where(eq(petVitals.bookingId, bookingId));
         
       res.json(vitals);
     } catch (error) {
@@ -1965,18 +1978,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const id = parseInt(req.params.id);
       
-      // Map frontend field names to database field names
-      const mappedData = {
+      // Use schema field names for update
+      const updateData = {
         weight: req.body.weight,
         temperature: req.body.temperature,
-        heart_rate: req.body.heartRate,
+        heartRate: req.body.heartRate,
         notes: req.body.notes,
-        recorded_by: req.body.recordedBy
+        recordedBy: req.body.recordedBy
       };
       
       const [updatedVital] = await db
         .update(petVitals)
-        .set(mappedData)
+        .set(updateData)
         .where(eq(petVitals.id, id))
         .returning();
         

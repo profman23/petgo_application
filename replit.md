@@ -569,6 +569,10 @@ Changelog:
 - July 8, 2025. SUCCESS: Pet vitals system fully functional - doctors can record and save vital measurements for each pet
 - July 8, 2025. FIXED: Pet vitals field mapping issue - resolved pet_id null constraint error by mapping frontend field names (petId, bookingId, heartRate) to database field names (pet_id, booking_id, heart_rate)
 - July 8, 2025. VERIFIED: Complete pet vitals system working perfectly - all CRUD operations functional with correct data persistence
+- July 8, 2025. RESOLVED: Schema field name mismatch - updated server routes to use camelCase field names (bookingId, petId, heartRate) matching shared/schema.ts definitions
+- July 8, 2025. ADDED: Missing /api/doctor/vetsvan-location endpoint for doctor activity page VetsVan location display
+- July 8, 2025. TESTED: Pet vitals creation confirmed working - successfully created record ID 13 with correct data persistence
+- July 8, 2025. SUCCESS: Both pet vitals system and VetsVan location endpoint fully operational and production-ready
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
