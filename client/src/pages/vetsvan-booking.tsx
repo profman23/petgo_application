@@ -59,6 +59,12 @@ export default function VetsVanBooking() {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedShift, setSelectedShift] = useState<number | null>(null);
 
+  // جلب بيانات الحيوانات الأليفة للعميل
+  const { data: allPatients = [] } = useQuery({
+    queryKey: ['/api/patients'],
+    enabled: !!requestData
+  });
+
   // تحميل بيانات الطلب من localStorage
   useEffect(() => {
     const savedData = localStorage.getItem('pendingRequest');
@@ -320,17 +326,27 @@ export default function VetsVanBooking() {
         console.log('⚠️ Using default Riyadh location as fallback:', customerLocation);
       }
       
+      // تحويل معرفات الحيوانات إلى تفاصيل كاملة
+      const selectedPatientIds = requestData?.selectedPatients || [];
+      const selectedPetsData = allPatients.filter(pet => 
+        selectedPatientIds.includes(pet.id)
+      );
+
       const bookingData = {
         shiftId: selectedShift,
         vetsVanId: selectedVetsVan,
         appointmentDate: selectedDate,
         appointmentTime: selectedTime,
         customerLocation,
-        selectedPets: requestData?.selectedPatients || [],
+        selectedPets: selectedPetsData,
         serviceType: requestData?.selectedService || 'General Check Up'
       };
 
       console.log('🔍 Final booking data before sending:', JSON.stringify(bookingData, null, 2));
+      console.log('🐾 Selected patients IDs:', selectedPatientIds);
+      console.log('🐾 Selected pets details:', selectedPetsData);
+      console.log('🏥 Selected service data:', requestData?.selectedService);
+      console.log('📦 Full request data object:', requestData);
       console.log('🌍 Customer location specifically:', {
         exists: !!customerLocation,
         latitude: customerLocation?.latitude,
