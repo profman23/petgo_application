@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import PaymentModal from './payment-modal';
 
 interface InvoiceItem {
   id: string;
@@ -67,6 +68,7 @@ export default function DoctorInvoice() {
   ]);
   const [notes, setNotes] = useState('');
   const [applyDiscount, setApplyDiscount] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   
   // Tax rate constant (15%)
   const TAX_RATE = 0.15;
@@ -118,6 +120,8 @@ export default function DoctorInvoice() {
       discount: 'الخصم',
       finalTotal: 'المجموع النهائي',
       addPayment: 'إضافة دفعة',
+      paymentAdded: 'تمت إضافة الدفعة',
+      paymentSuccess: 'تمت إضافة الدفعة بنجاح',
       notes: 'ملاحظات',
       generateInvoice: 'إنشاء الفاتورة',
       back: 'رجوع',
@@ -159,6 +163,8 @@ export default function DoctorInvoice() {
       discount: 'Discount',
       finalTotal: 'Final Total',
       addPayment: 'Add Payment',
+      paymentAdded: 'Payment Added',
+      paymentSuccess: 'Payment has been added successfully',
       notes: 'Notes',
       generateInvoice: 'Generate Invoice',
       back: 'Back',
@@ -186,6 +192,18 @@ export default function DoctorInvoice() {
   };
 
   const t = (key: keyof typeof translations.ar) => translations[language as keyof typeof translations][key];
+
+  // Handle payment submission
+  const handlePaymentSubmit = (paymentData: any) => {
+    toast({
+      title: t('paymentAdded'),
+      description: t('paymentSuccess'),
+      variant: 'default',
+    });
+    
+    // Here you could save payment data to database if needed
+    console.log('Payment submitted:', paymentData);
+  };
 
   // Calculate totals
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.total, 0);
@@ -619,13 +637,7 @@ export default function DoctorInvoice() {
                 {/* Add Payment Button */}
                 <div className="flex justify-end">
                   <button
-                    onClick={() => {
-                      toast({
-                        title: language === 'ar' ? 'دفعة جديدة' : 'New Payment',
-                        description: language === 'ar' ? 'تم فتح نظام الدفع' : 'Payment system opened',
-                        variant: 'default',
-                      });
-                    }}
+                    onClick={() => setShowPaymentModal(true)}
                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center transition-colors"
                   >
                     <svg className="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -752,6 +764,14 @@ export default function DoctorInvoice() {
           </div>
         </div>
       )}
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        currentTotal={finalTotal}
+        onPaymentSubmit={handlePaymentSubmit}
+      />
     </div>
   );
 }
