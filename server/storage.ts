@@ -51,6 +51,7 @@ export interface IStorage {
   getAllBookings(): Promise<Booking[]>;
   updateBookingStatus(bookingId: number, status: string): Promise<Booking | undefined>;
   getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined>;
+  getBookingWithDetails(bookingId: number): Promise<any>;
   // Payment update methods removed per user request
 
   // Reviews operations
@@ -557,6 +558,47 @@ export class DatabaseStorage implements IStorage {
     .limit(1);
     
     return result[0] || undefined;
+  }
+
+  async getBookingWithDetails(bookingId: number): Promise<any> {
+    // Get booking with customer details
+    const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
+    if (!booking) return undefined;
+
+    // Get customer details
+    const [customer] = await db.select().from(users).where(eq(users.id, booking.userId));
+    if (!customer) return undefined;
+
+    // Get customer's pets
+    const pets = await db.select().from(patients).where(eq(patients.userId, booking.userId));
+
+    // Get VetsVan details  
+    const [vetsVan] = await db.select().from(drivers).where(eq(drivers.id, booking.vetsVanId));
+
+    return {
+      id: booking.id,
+      customer: {
+        firstName: customer.firstName || customer.name?.split(' ')[0] || '',
+        lastName: customer.lastName || customer.name?.split(' ').slice(1).join(' ') || '',
+        phone: customer.phone,
+        email: customer.email,
+      },
+      pets: pets.map(pet => ({
+        name: pet.name,
+        type: pet.type,
+        ageYear: pet.ageYear || 0,
+        ageMonth: pet.ageMonth || 0,
+        ageDay: pet.ageDay || 0,
+      })),
+      appointmentDate: booking.appointmentDate,
+      appointmentTime: booking.appointmentTime,
+      serviceType: 'General Check Up', // Default service type
+      location: booking.customerLocation,
+      status: booking.status,
+      vetsVanId: booking.vetsVanId,
+      vetsVanCode: vetsVan?.vetsvanCode || '',
+      vetsVanName: vetsVan?.vetsvanName || '',
+    };
   }
 
   async createReview(reviewData: InsertReview): Promise<Review> {
@@ -1128,6 +1170,45 @@ class MemStorage implements IStorage {
     if (!user) return undefined;
     
     return { ...booking, user };
+  }
+
+  async getBookingWithDetails(bookingId: number): Promise<any> {
+    const booking = this.bookings.get(bookingId);
+    if (!booking) return undefined;
+
+    const customer = this.users.get(booking.userId);
+    if (!customer) return undefined;
+
+    // Get customer's pets
+    const customerPets = Array.from(this.patients.values()).filter(pet => pet.userId === booking.userId);
+
+    // Get VetsVan details
+    const vetsVan = this.drivers.get(booking.vetsVanId);
+
+    return {
+      id: booking.id,
+      customer: {
+        firstName: customer.firstName || customer.name?.split(' ')[0] || '',
+        lastName: customer.lastName || customer.name?.split(' ').slice(1).join(' ') || '',
+        phone: customer.phone,
+        email: customer.email,
+      },
+      pets: customerPets.map(pet => ({
+        name: pet.name,
+        type: pet.type,
+        ageYear: pet.ageYear || 0,
+        ageMonth: pet.ageMonth || 0,
+        ageDay: pet.ageDay || 0,
+      })),
+      appointmentDate: booking.appointmentDate,
+      appointmentTime: booking.appointmentTime,
+      serviceType: 'General Check Up', // Default service type
+      location: booking.customerLocation,
+      status: booking.status,
+      vetsVanId: booking.vetsVanId,
+      vetsVanCode: vetsVan?.vetsvanCode || '',
+      vetsVanName: vetsVan?.vetsvanName || '',
+    };
   }
 
   // Payment methods removed per user request

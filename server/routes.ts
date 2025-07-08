@@ -1232,6 +1232,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get individual booking details for doctor invoice
+  app.get('/api/doctor/booking/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user as any;
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Access denied' });
+      }
+      
+      const bookingId = parseInt(req.params.bookingId);
+      const booking = await storage.getBookingWithDetails(bookingId);
+      
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Verify this booking belongs to the doctor's VetsVan
+      const vetsVanId = user.vetsVanId || user.id;
+      if (booking.vetsVanId !== vetsVanId) {
+        return res.status(403).json({ message: 'Access denied - booking not for your VetsVan' });
+      }
+
+      res.json(booking);
+    } catch (error) {
+      console.error('Error fetching booking details:', error);
+      res.status(500).json({ message: 'Failed to fetch booking details' });
+    }
+  });
+
   // Get user's bookings
   app.get('/api/user/bookings', requireAuth, async (req: any, res) => {
     try {

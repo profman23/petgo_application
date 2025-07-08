@@ -522,7 +522,7 @@ export default function DoctorActivity() {
 
                   {/* Status Update Control */}
                   <div className="mt-3 pt-3 border-t border-gray-200">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 mb-3">
                       <span className="text-sm font-medium text-gray-700" style={{ textAlign }}>
                         {language === 'ar' ? 'حالة الحجز:' : 'Booking Status:'}
                       </span>
@@ -555,6 +555,22 @@ export default function DoctorActivity() {
                           </span>
                         </div>
                       )}
+                    </div>
+
+                    {/* Open Record Button */}
+                    <div className="flex justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-purple-100 border-purple-300 text-purple-700 hover:bg-purple-200 hover:border-purple-400"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click event
+                          setLocation(`/doctor-invoice/${booking.id}`);
+                        }}
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        {language === 'ar' ? 'فتح السجل' : 'Open Record'}
+                      </Button>
                     </div>
                   </div>
 

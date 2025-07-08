@@ -11,6 +11,7 @@ import RideTracking from "@/pages/ride-tracking";
 import DoctorDashboard from "@/pages/doctor-dashboard";
 import DoctorActivity from "@/pages/doctor-activity";
 import DoctorAccount from "@/pages/doctor-account";
+import DoctorInvoice from "@/pages/doctor-invoice";
 import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
 import DoctorRideTracking from "@/pages/doctor-ride-tracking";
@@ -118,6 +119,7 @@ function Router() {
           <Route path="/doctor-dashboard" component={DoctorActivity} />
           <Route path="/doctor-activity" component={DoctorActivity} />
           <Route path="/doctor-account" component={DoctorAccount} />
+          <Route path="/doctor-invoice/:bookingId" component={DoctorInvoice} />
           <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
           <Route path="/ride-request" component={RideRequest} />
           <Route path="/vetsvan-booking" component={VetsVanBooking} />
