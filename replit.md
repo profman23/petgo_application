@@ -596,6 +596,10 @@ Changelog:
 - July 8, 2025. Fixed root cause: Pet attachment methods (createPetAttachment, getPetAttachmentsByPet, deletePetAttachment) were only in MemStorage, not DatabaseStorage
 - July 8, 2025. VERIFIED: Complete pet attachment workflow tested - upload returns 201 Created, retrieval returns proper data from PostgreSQL database
 - July 8, 2025. SUCCESS: Pet attachment system production-ready with full database persistence and doctor interface integration
+- July 8, 2025. FIXED: Critical "discount is not defined" runtime error in doctor-invoice.tsx - corrected to use discountAmount variable
+- July 8, 2025. RESOLVED: "tax is not defined" error by updating to use taxAmount variable for proper invoice calculations
+- July 8, 2025. ENHANCED: Invoice generation system now fully functional with correct variable mapping
+- July 8, 2025. COMPLETED: InvoiceGeneratorNew component ready with professional design, QR codes, Vets Van logo, and comprehensive billing details
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
