@@ -1004,6 +1004,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('📍 Customer location received:', customerLocation);
       console.log('📍 User ID:', userId);
       console.log('🐾 Selected pets received:', selectedPets);
+      console.log('🐾 Selected pets type:', typeof selectedPets);
+      console.log('🐾 Selected pets length:', selectedPets?.length);
       console.log('🏥 Service type received:', serviceType);
 
       // Check if this specific time slot is already booked

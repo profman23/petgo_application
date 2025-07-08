@@ -565,6 +565,9 @@ export class DatabaseStorage implements IStorage {
     const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
     if (!booking) return undefined;
 
+    console.log('🔍 getBookingWithDetails - booking data:', booking);
+    console.log('🐾 selectedPets from booking:', booking.selectedPets);
+
     // Get customer details
     const [customer] = await db.select().from(users).where(eq(users.id, booking.userId));
     if (!customer) return undefined;
@@ -574,6 +577,7 @@ export class DatabaseStorage implements IStorage {
 
     // Use selected pets from booking instead of all customer pets
     const selectedPetsData = booking.selectedPets || [];
+    console.log('🐾 selectedPetsData used:', selectedPetsData);
 
     return {
       id: booking.id,

@@ -555,6 +555,12 @@ Changelog:
 - July 8, 2025. ENHANCED: Admin dashboard with notification controls (audio toggle, request counter, bell icon)
 - July 8, 2025. INTEGRATED: Browser notifications permission system for admin alerts
 - July 8, 2025. COMPLETED: Admin receives instant notifications similar to doctor interface when new bookings arrive
+- July 8, 2025. IMPLEMENTED: Enhanced doctor invoice system to show only customer-selected pets instead of all pets
+- July 8, 2025. ADDED: selectedPets and serviceType fields to bookings database table with JSONB support
+- July 8, 2025. UPDATED: Booking creation process to capture and store selected pets from ride request
+- July 8, 2025. ENHANCED: vetsvan-booking page to fetch pet details and convert IDs to full pet objects
+- July 8, 2025. DEBUGGING: Fixed pet selection data transmission - converts pet IDs to complete pet details before sending to server
+- July 8, 2025. ADDED: Comprehensive logging system to monitor pet data flow from frontend to database
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
