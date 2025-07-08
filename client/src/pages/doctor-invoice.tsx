@@ -65,11 +65,12 @@ export default function DoctorInvoice() {
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([
     { id: '1', description: '', quantity: 1, unitPrice: 0, total: 0 }
   ]);
-  const [discount, setDiscount] = useState(0);
   const [notes, setNotes] = useState('');
   
   // Tax rate constant (15%)
   const TAX_RATE = 0.15;
+  // Discount rate constant (10%)
+  const DISCOUNT_RATE = 0.10;
   const [showVitalsModal, setShowVitalsModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [vitalsData, setVitalsData] = useState({
@@ -189,7 +190,8 @@ export default function DoctorInvoice() {
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.total, 0);
   const taxAmount = subtotal * TAX_RATE;
   const totalWithTax = subtotal + taxAmount;
-  const finalTotal = totalWithTax - discount;
+  const discountAmount = totalWithTax * DISCOUNT_RATE;
+  const finalTotal = totalWithTax - discountAmount;
 
   // Update item total when quantity or price changes
   const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
@@ -594,17 +596,9 @@ export default function DoctorInvoice() {
                   <span>{taxAmount.toFixed(2)} {t('sar')}</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span>{t('discount')}:</span>
+                  <span>{t('discount')} (10%):</span>
                   <div className="flex items-center">
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={discount}
-                      onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                      className="w-24 text-center ml-2"
-                    />
-                    <span className="ml-2">{t('sar')}</span>
+                    <span className="text-lg font-medium">{discountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">

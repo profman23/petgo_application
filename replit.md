@@ -581,6 +581,8 @@ Changelog:
 - July 8, 2025. ADDED: Tax field (15%) automatically calculated from subtotal in Invoice Items section
 - July 8, 2025. IMPLEMENTED: Complete invoice calculation: Subtotal + Tax - Discount = Final Total
 - July 8, 2025. ADDED: Green "Add Payment" button with icon in totals section for payment processing
+- July 8, 2025. UPDATED: Discount system changed from amount input to fixed 10% percentage discount
+- July 8, 2025. IMPLEMENTED: Automatic discount calculation - 10% of (subtotal + tax) with no user input required
 - July 8, 2025. FIXED: Frontend apiRequest body serialization - updated to properly handle both string and object payloads
 - July 8, 2025. RESOLVED: 500 Internal Server Error when saving pet vitals from doctor interface
 - July 8, 2025. ENHANCED: Error handling in doctor vitals modal with detailed error messages and console logging
