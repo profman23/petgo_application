@@ -613,6 +613,7 @@ Changelog:
 - July 8, 2025. UPDATED: Currency display format changed from Riyal symbol (﷼) to "SAR" text as requested by user
 - July 8, 2025. FIXED: Updated all invoice components (InvoiceGenerator.tsx, InvoiceGeneratorNew.tsx, InvoiceGeneratorProfessional.tsx) to consistently use "SAR" instead of Arabic "ريال"
 - July 8, 2025. ENHANCED: Replaced text "SAR" with Saudi Riyal currency symbol/logo as SVG icon in all invoice components for professional visual currency display
+- July 8, 2025. UPDATED: Improved Saudi Riyal currency symbol design to match user's preferred logo style with better proportions and visibility
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
