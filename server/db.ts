@@ -13,3 +13,30 @@ if (!process.env.DATABASE_URL) {
 
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
+
+// Initialize database schema
+export async function initDatabase() {
+  try {
+    console.log('Initializing database schema...');
+    
+    // Create pet_attachments table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS pet_attachments (
+        id SERIAL PRIMARY KEY,
+        pet_id INTEGER NOT NULL,
+        booking_id INTEGER NOT NULL,
+        file_name VARCHAR(255) NOT NULL,
+        file_type VARCHAR(100),
+        file_size INTEGER,
+        file_url TEXT,
+        description TEXT,
+        uploaded_by VARCHAR(100) NOT NULL,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    
+    console.log('Database schema initialized successfully');
+  } catch (error) {
+    console.error('Error initializing database:', error);
+  }
+}

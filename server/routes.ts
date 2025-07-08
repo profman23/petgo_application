@@ -2000,6 +2000,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Pet Attachments endpoints
+  app.post('/api/pet-attachments', requireAuth, async (req: any, res) => {
+    try {
+      const doctorId = req.user?.id;
+      if (!doctorId) {
+        return res.status(401).json({ message: 'Unauthorized - Doctor ID required' });
+      }
+
+      const attachmentData = {
+        ...req.body,
+        uploadedBy: doctorId.toString()
+      };
+
+      const newAttachment = await storage.createPetAttachment(attachmentData);
+      res.status(201).json(newAttachment);
+    } catch (error) {
+      console.error('Error creating pet attachment:', error);
+      res.status(500).json({ message: 'Error creating pet attachment' });
+    }
+  });
+
+  app.get('/api/pet-attachments/booking/:bookingId', requireAuth, async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const attachments = await storage.getPetAttachmentsByBooking(bookingId);
+      res.json(attachments);
+    } catch (error) {
+      console.error('Error fetching pet attachments:', error);
+      res.status(500).json({ message: 'Error fetching pet attachments' });
+    }
+  });
+
+  app.get('/api/pet-attachments/pet/:petId/:bookingId', requireAuth, async (req, res) => {
+    try {
+      const petId = parseInt(req.params.petId);
+      const bookingId = parseInt(req.params.bookingId);
+      const attachments = await storage.getPetAttachmentsByPet(petId, bookingId);
+      res.json(attachments);
+    } catch (error) {
+      console.error('Error fetching pet attachments:', error);
+      res.status(500).json({ message: 'Error fetching pet attachments' });
+    }
+  });
+
+  app.delete('/api/pet-attachments/:id', requireAuth, async (req: any, res) => {
+    try {
+      const attachmentId = parseInt(req.params.id);
+      const doctorId = req.user?.id?.toString();
+      
+      if (!doctorId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const deleted = await storage.deletePetAttachment(attachmentId, doctorId);
+      if (deleted) {
+        res.json({ message: 'Attachment deleted successfully' });
+      } else {
+        res.status(404).json({ message: 'Attachment not found or unauthorized' });
+      }
+    } catch (error) {
+      console.error('Error deleting pet attachment:', error);
+      res.status(500).json({ message: 'Error deleting pet attachment' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

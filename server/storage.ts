@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 
@@ -100,6 +100,12 @@ export interface IStorage {
   createPetVital(vital: InsertPetVital): Promise<PetVital>;
   getPetVitalsByBooking(bookingId: number): Promise<PetVital[]>;
   updatePetVital(id: number, vital: Partial<InsertPetVital>): Promise<PetVital>;
+
+  // Pet attachments operations
+  createPetAttachment(attachment: InsertPetAttachment): Promise<PetAttachment>;
+  getPetAttachmentsByBooking(bookingId: number): Promise<PetAttachment[]>;
+  getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]>;
+  deletePetAttachment(id: number, uploadedBy: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -784,6 +790,7 @@ class MemStorage implements IStorage {
   private bookings: Map<number, Booking>;
   private reviews: Map<number, Review>;
   private petVitals: Map<number, PetVital>;
+  private petAttachments: Map<number, PetAttachment>;
   private currentUserId: number;
   private currentDriverId: number;
   private currentRideId: number;
@@ -793,6 +800,7 @@ class MemStorage implements IStorage {
   private currentBookingId: number;
   private currentReviewId: number;
   private currentPetVitalId: number;
+  private currentPetAttachmentId: number;
 
   constructor() {
     this.users = new Map();
@@ -804,6 +812,7 @@ class MemStorage implements IStorage {
     this.bookings = new Map();
     this.reviews = new Map();
     this.petVitals = new Map();
+    this.petAttachments = new Map();
     this.currentUserId = 1;
     this.currentDriverId = 1;
     this.currentRideId = 1;
@@ -813,6 +822,7 @@ class MemStorage implements IStorage {
     this.currentBookingId = 1;
     this.currentReviewId = 1;
     this.currentPetVitalId = 1;
+    this.currentPetAttachmentId = 1;
 
     this.initializeTestData();
   }
@@ -1436,6 +1446,46 @@ class MemStorage implements IStorage {
     return updatedVital;
   }
 
+  // Pet attachments operations (MemStorage implementation)
+  async createPetAttachment(attachment: InsertPetAttachment): Promise<PetAttachment> {
+    const id = this.currentPetAttachmentId++;
+    const petAttachment: PetAttachment = {
+      id,
+      petId: attachment.petId,
+      bookingId: attachment.bookingId,
+      fileName: attachment.fileName,
+      fileType: attachment.fileType,
+      fileSize: attachment.fileSize,
+      fileUrl: attachment.fileUrl,
+      uploadedBy: attachment.uploadedBy,
+      uploadedAt: new Date(),
+      description: attachment.description || null,
+    };
+    this.petAttachments.set(id, petAttachment);
+    return petAttachment;
+  }
+
+  async getPetAttachmentsByBooking(bookingId: number): Promise<PetAttachment[]> {
+    return Array.from(this.petAttachments.values()).filter(
+      attachment => attachment.bookingId === bookingId
+    );
+  }
+
+  async getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]> {
+    return Array.from(this.petAttachments.values()).filter(
+      attachment => attachment.petId === petId && attachment.bookingId === bookingId
+    );
+  }
+
+  async deletePetAttachment(id: number, uploadedBy: string): Promise<boolean> {
+    const attachment = this.petAttachments.get(id);
+    if (attachment && attachment.uploadedBy === uploadedBy) {
+      this.petAttachments.delete(id);
+      return true;
+    }
+    return false;
+  }
+
   // Pet vitals operations
   async createPetVital(vital: InsertPetVital): Promise<PetVital> {
     console.log('DatabaseStorage createPetVital called with:', vital);
@@ -1460,6 +1510,37 @@ class MemStorage implements IStorage {
       .where(eq(petVitals.id, id))
       .returning();
     return updatedVital;
+  }
+
+  // Pet attachments operations (DatabaseStorage implementation)
+  async createPetAttachment(attachment: InsertPetAttachment): Promise<PetAttachment> {
+    const [newAttachment] = await db
+      .insert(petAttachments)
+      .values(attachment)
+      .returning();
+    return newAttachment;
+  }
+
+  async getPetAttachmentsByBooking(bookingId: number): Promise<PetAttachment[]> {
+    return await db
+      .select()
+      .from(petAttachments)
+      .where(eq(petAttachments.bookingId, bookingId));
+  }
+
+  async getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]> {
+    return await db
+      .select()
+      .from(petAttachments)
+      .where(and(eq(petAttachments.petId, petId), eq(petAttachments.bookingId, bookingId)));
+  }
+
+  async deletePetAttachment(id: number, uploadedBy: string): Promise<boolean> {
+    const result = await db
+      .delete(petAttachments)
+      .where(and(eq(petAttachments.id, id), eq(petAttachments.uploadedBy, uploadedBy)))
+      .returning();
+    return result.length > 0;
   }
 }
 

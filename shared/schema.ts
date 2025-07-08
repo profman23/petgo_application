@@ -271,4 +271,32 @@ export const insertPetVitalSchema = createInsertSchema(petVitals).pick({
 });
 
 export type PetVital = typeof petVitals.$inferSelect;
+
+// Pet Attachments table
+export const petAttachments = pgTable("pet_attachments", {
+  id: serial("id").primaryKey(),
+  petId: integer("pet_id").notNull().references(() => pets.id),
+  bookingId: integer("booking_id").notNull().references(() => bookings.id),
+  fileName: varchar("file_name").notNull(),
+  fileType: varchar("file_type").notNull(),
+  fileSize: integer("file_size").notNull(),
+  fileUrl: text("file_url").notNull(),
+  uploadedBy: varchar("uploaded_by").notNull(), // doctor ID
+  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
+  description: text("description"),
+});
+
+export const insertPetAttachmentSchema = createInsertSchema(petAttachments).pick({
+  petId: true,
+  bookingId: true,
+  fileName: true,
+  fileType: true,
+  fileSize: true,
+  fileUrl: true,
+  uploadedBy: true,
+  description: true,
+});
+
+export type PetAttachment = typeof petAttachments.$inferSelect;
+export type InsertPetAttachment = typeof petAttachments.$inferInsert;
 export type InsertPetVital = z.infer<typeof insertPetVitalSchema>;

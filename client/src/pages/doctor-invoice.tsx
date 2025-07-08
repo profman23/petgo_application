@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
+import UploadAttachmentModal from '@/components/UploadAttachmentModal';
 
 interface InvoiceItem {
   id: string;
@@ -76,6 +77,8 @@ export default function DoctorInvoice() {
   const DISCOUNT_RATE = 0.10;
   const [showVitalsModal, setShowVitalsModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedPetForUpload, setSelectedPetForUpload] = useState<Pet | null>(null);
   const [vitalsData, setVitalsData] = useState({
     weight: '',
     temperature: '',
@@ -396,6 +399,16 @@ export default function DoctorInvoice() {
     }
   };
 
+  const openUploadModal = (pet: Pet) => {
+    setSelectedPetForUpload(pet);
+    setShowUploadModal(true);
+  };
+
+  const closeUploadModal = () => {
+    setShowUploadModal(false);
+    setSelectedPetForUpload(null);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -498,13 +511,20 @@ export default function DoctorInvoice() {
                   </p>
                 </div>
               </div>
-              <div className="mt-4">
+              <div className="mt-4 flex space-x-2">
                 <Button 
                   onClick={() => openVitalsModal(pet)}
                   className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
                   <Stethoscope className="h-4 w-4 mr-2" />
                   {t('vitals')}
+                </Button>
+                <Button 
+                  onClick={() => openUploadModal(pet)}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'رفع مرفق' : 'Upload'}
                 </Button>
               </div>
             </div>
@@ -843,6 +863,17 @@ export default function DoctorInvoice() {
         remainingBalance={remainingBalance}
         onPaymentSubmit={handlePaymentSubmit}
       />
+
+      {/* Upload Attachment Modal */}
+      {showUploadModal && selectedPetForUpload && booking && (
+        <UploadAttachmentModal
+          isOpen={showUploadModal}
+          onClose={closeUploadModal}
+          petId={selectedPetForUpload.id}
+          petName={selectedPetForUpload.name}
+          bookingId={booking.id}
+        />
+      )}
     </div>
   );
 }
