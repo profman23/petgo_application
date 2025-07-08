@@ -536,11 +536,33 @@ export default function DoctorInvoice() {
       setShowConfirmDialog(false);
       setShowInvoiceGenerator(true);
 
-      toast({
-        title: t('invoiceGenerated'),
-        description: language === 'ar' ? 'تم حفظ بنود الفاتورة وجعلها للمشاهدة فقط' : 'Invoice items have been saved and made read-only',
-        variant: 'default',
-      });
+      // Send invoice link via email
+      try {
+        const emailResponse = await apiRequest(`/api/send-invoice-email/${booking.id}`, {
+          method: 'POST'
+        });
+        
+        if (emailResponse.success) {
+          toast({
+            title: t('invoiceGenerated'),
+            description: language === 'ar' ? 'تم حفظ بنود الفاتورة وإرسال رابط الفاتورة للعميل' : 'Invoice items saved and invoice link sent to customer',
+            variant: 'default',
+          });
+        } else {
+          toast({
+            title: t('invoiceGenerated'),
+            description: language === 'ar' ? 'تم حفظ بنود الفاتورة ولكن فشل إرسال الرابط' : 'Invoice items saved but failed to send email link',
+            variant: 'default',
+          });
+        }
+      } catch (emailError) {
+        console.error('Error sending invoice email:', emailError);
+        toast({
+          title: t('invoiceGenerated'),
+          description: language === 'ar' ? 'تم حفظ بنود الفاتورة ولكن فشل إرسال الرابط' : 'Invoice items saved but failed to send email link',
+          variant: 'default',
+        });
+      }
     } catch (error) {
       console.error('Error generating invoice:', error);
       toast({

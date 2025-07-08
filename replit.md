@@ -644,6 +644,12 @@ Changelog:
 - July 8, 2025. SUCCESS: User confirmed complete invoice persistence system working perfectly - all saved data displays correctly
 - July 8, 2025. VERIFIED: Invoice Items Section now shows previously saved content (Quantity, Unit Price, Description, Total) after page navigation
 - July 8, 2025. COMPLETED: Full invoice generation workflow with database persistence and read-only confirmation system operational
+- July 8, 2025. IMPLEMENTED: Invoice link email system - customers receive invoice links via email after "Generate Invoice" confirmation
+- July 8, 2025. ADDED: EmailService.sendInvoiceLinkEmail() method with professional HTML templates and bilingual support
+- July 8, 2025. CREATED: /invoice-view page for customers to view and download invoices from email links
+- July 8, 2025. INTEGRATED: API endpoint /api/send-invoice-email/:bookingId for sending invoice links after generation
+- July 8, 2025. ENHANCED: confirmGenerateInvoice function now automatically sends invoice links to customer emails
+- July 8, 2025. COMPLETED: Full invoice workflow - generate → confirm → lock → email link → customer access
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

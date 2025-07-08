@@ -790,3 +790,5 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     </div>
   );
 }
+
+export { InvoiceGeneratorProfessional };

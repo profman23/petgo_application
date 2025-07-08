@@ -1916,6 +1916,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send invoice link via email
+  app.post('/api/send-invoice-email/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      
+      // Get booking details
+      const booking = await storage.getBookingWithDetails(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Generate invoice link
+      const invoiceLink = `${req.protocol}://${req.get('host')}/invoice-view?bookingId=${bookingId}`;
+      
+      // Send email with invoice link
+      const { emailService } = await import('./emailService');
+      const emailSent = await emailService.sendInvoiceLinkEmail(
+        booking.customer.email,
+        `${booking.customer.firstName} ${booking.customer.lastName}`,
+        `INV-${bookingId}`,
+        invoiceLink
+      );
+
+      if (emailSent) {
+        res.json({ 
+          success: true, 
+          message: 'Invoice link sent successfully',
+          invoiceLink 
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: 'Failed to send invoice link' 
+        });
+      }
+    } catch (error) {
+      console.error('Error sending invoice email:', error);
+      res.status(500).json({ message: 'Failed to send invoice email' });
+    }
+  });
+
+  // Invoice view endpoint for customers
+  app.get('/api/invoice-view/:bookingId', async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      
+      // Get booking details
+      const booking = await storage.getBookingWithDetails(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Get invoice items
+      const invoiceItems = await storage.getInvoiceItems(bookingId);
+      
+      // Get invoice status
+      const invoiceStatus = await storage.getInvoiceStatus(bookingId);
+      
+      res.json({
+        booking,
+        invoiceItems,
+        invoiceStatus,
+        isGenerated: invoiceStatus?.isGenerated || false
+      });
+    } catch (error) {
+      console.error('Error fetching invoice view:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice' });
+    }
+  });
+
   // Pet vitals API endpoints
   app.post('/api/pet-vitals', async (req, res) => {
     try {
