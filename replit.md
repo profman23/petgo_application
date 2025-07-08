@@ -611,6 +611,7 @@ Changelog:
 - July 8, 2025. RESTRUCTURED: Each invoice section (Customer Info, Pet Info, Service Details, Totals) now has distinct visual separation with colored borders and backgrounds
 - July 8, 2025. COMPLETED: Professional invoice formatting with perfect section separation and enhanced table design as requested
 - July 8, 2025. UPDATED: Currency display format changed from Riyal symbol (﷼) to "SAR" text as requested by user
+- July 8, 2025. FIXED: Updated all invoice components (InvoiceGenerator.tsx, InvoiceGeneratorNew.tsx, InvoiceGeneratorProfessional.tsx) to consistently use "SAR" instead of Arabic "ريال"
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

@@ -64,7 +64,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
   };
 
   const formatCurrency = (amount: number) => {
-    return `${amount.toFixed(2)} ${language === 'ar' ? 'ريال' : 'SAR'}`;
+    return `${amount.toFixed(2)} SAR`;
   };
 
   // Generate QR Code
