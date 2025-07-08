@@ -121,19 +121,19 @@ function Router() {
           <Route path="/doctor-account" component={DoctorAccount} />
           <Route path="/doctor-invoice/:bookingId" component={DoctorInvoice} />
           <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
-          <Route path="/ride-request" component={RideRequest} />
-          <Route path="/vetsvan-booking" component={VetsVanBooking} />
-          <Route path="/ride-tracking" component={RideTracking} />
-          <Route path="/account" component={Account} />
-          <Route path="/patients" component={Patients} />
-          <Route path="/activity" component={CustomerActivity} />
-          <Route path="/customer-activity" component={CustomerActivity} />
+          <Route path="/ride-request" component={() => <AuthCheck><RideRequest /></AuthCheck>} />
+          <Route path="/vetsvan-booking" component={() => <AuthCheck><VetsVanBooking /></AuthCheck>} />
+          <Route path="/ride-tracking" component={() => <AuthCheck><RideTracking /></AuthCheck>} />
+          <Route path="/account" component={() => <AuthCheck><Account /></AuthCheck>} />
+          <Route path="/patients" component={() => <AuthCheck><Patients /></AuthCheck>} />
+          <Route path="/activity" component={() => <AuthCheck><CustomerActivity /></AuthCheck>} />
+          <Route path="/customer-activity" component={() => <AuthCheck><CustomerActivity /></AuthCheck>} />
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
-          <Route path="/home" component={Home} />
+          <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
           <Route path="/" component={Login} />
           <Route component={NotFound} />
         </Switch>
@@ -163,10 +163,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <AuthCheck>
-          <Toaster />
-          <Router />
-        </AuthCheck>
+        <Toaster />
+        <Router />
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -1912,9 +1912,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { db } = await import('./db');
       const { petVitals } = await import('@shared/schema');
       
+      // Map frontend field names to database field names
+      const mappedData = {
+        booking_id: req.body.bookingId,
+        pet_id: req.body.petId,
+        weight: req.body.weight,
+        temperature: req.body.temperature,
+        heart_rate: req.body.heartRate,
+        notes: req.body.notes,
+        recorded_by: req.body.recordedBy
+      };
+      
+      console.log('Creating pet vital with mapped data:', mappedData);
+      
       const [newVital] = await db
         .insert(petVitals)
-        .values(req.body)
+        .values(mappedData)
         .returning();
       
       console.log('Pet vital created successfully:', newVital);
@@ -1935,7 +1948,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const vitals = await db
         .select()
         .from(petVitals)
-        .where(eq(petVitals.bookingId, bookingId));
+        .where(eq(petVitals.booking_id, bookingId));
         
       res.json(vitals);
     } catch (error) {
@@ -1951,9 +1964,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { eq } = await import('drizzle-orm');
       
       const id = parseInt(req.params.id);
+      
+      // Map frontend field names to database field names
+      const mappedData = {
+        weight: req.body.weight,
+        temperature: req.body.temperature,
+        heart_rate: req.body.heartRate,
+        notes: req.body.notes,
+        recorded_by: req.body.recordedBy
+      };
+      
       const [updatedVital] = await db
         .update(petVitals)
-        .set(req.body)
+        .set(mappedData)
         .where(eq(petVitals.id, id))
         .returning();
         
