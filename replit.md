@@ -577,6 +577,10 @@ Changelog:
 - July 8, 2025. ENHANCED: Pet vitals system now properly sorts records by date and displays latest saved values
 - July 8, 2025. RESOLVED: "Unexpected token '<'" JSON parsing error by implementing proper API authentication with apiRequest
 - July 8, 2025. COMPLETED: Pet vitals system fully functional with correct data persistence and retrieval
+- July 8, 2025. ENHANCED: Invoice system with fixed 15% tax calculation and Add Payment button
+- July 8, 2025. ADDED: Tax field (15%) automatically calculated from subtotal in Invoice Items section
+- July 8, 2025. IMPLEMENTED: Complete invoice calculation: Subtotal + Tax - Discount = Final Total
+- July 8, 2025. ADDED: Green "Add Payment" button with icon in totals section for payment processing
 - July 8, 2025. FIXED: Frontend apiRequest body serialization - updated to properly handle both string and object payloads
 - July 8, 2025. RESOLVED: 500 Internal Server Error when saving pet vitals from doctor interface
 - July 8, 2025. ENHANCED: Error handling in doctor vitals modal with detailed error messages and console logging
