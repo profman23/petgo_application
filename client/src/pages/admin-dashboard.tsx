@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
+import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,6 +61,11 @@ export default function AdminDashboard() {
     username: "",
     password: "",
   });
+
+  // State for tracking notifications and audio
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const lastRequestCountRef = useRef(0);
+  const [currentRequestCount, setCurrentRequestCount] = useState(0);
 
   // Check admin authentication and prevent doctors access
   useEffect(() => {
@@ -148,7 +154,7 @@ export default function AdminDashboard() {
     enabled: !!adminToken && showReviewsDialog,
   });
 
-  // Fetch all VetsVan requests
+  // Fetch all VetsVan requests with real-time notifications
   const { data: vetsVanRequests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
     queryFn: async () => {
@@ -177,8 +183,59 @@ export default function AdminDashboard() {
         createdAt: string;
       }>;
     },
-    enabled: !!adminToken && activeTab === 'requests',
+    enabled: !!adminToken,
+    refetchInterval: 2000, // Poll every 2 seconds for real-time updates
+    refetchIntervalInBackground: true,
   });
+
+  // Monitor for new requests and trigger notifications
+  useEffect(() => {
+    if (vetsVanRequests && vetsVanRequests.length > 0) {
+      const currentCount = vetsVanRequests.length;
+      
+      // Check if there are new requests
+      if (lastRequestCountRef.current > 0 && currentCount > lastRequestCountRef.current) {
+        const newRequestsCount = currentCount - lastRequestCountRef.current;
+        
+        // Play audio notification if enabled
+        if (audioEnabled) {
+          playBookingNotification();
+        }
+        
+        // Show toast notification for new requests
+        toast({
+          title: language === 'ar' ? '🔔 طلب جديد!' : '🔔 New Request!',
+          description: language === 'ar' 
+            ? `تم استلام ${newRequestsCount} طلب جديد من العملاء` 
+            : `${newRequestsCount} new customer request(s) received`,
+          duration: 5000,
+        });
+        
+        // Show browser notification if permission granted
+        if (Notification.permission === 'granted') {
+          new Notification(
+            language === 'ar' ? 'VETS VAN - طلب جديد' : 'VETS VAN - New Request',
+            {
+              body: language === 'ar' 
+                ? `${newRequestsCount} طلب جديد من العملاء` 
+                : `${newRequestsCount} new customer request(s)`,
+              icon: '/favicon.ico'
+            }
+          );
+        }
+      }
+      
+      lastRequestCountRef.current = currentCount;
+      setCurrentRequestCount(currentCount);
+    }
+  }, [vetsVanRequests, audioEnabled, language, toast]);
+
+  // Request browser notification permission on component mount
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
 
   // Add driver mutation
   const addDriverMutation = useMutation({
@@ -422,6 +479,33 @@ export default function AdminDashboard() {
             </div>
             <div className="flex items-center gap-4">
               <LanguageSelector />
+              
+              {/* Audio notification toggle */}
+              <button
+                onClick={() => setAudioEnabled(!audioEnabled)}
+                className={`p-2 rounded-full transition-colors duration-200 ${
+                  audioEnabled 
+                    ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title={audioEnabled 
+                  ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
+                  : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
+                }
+              >
+                {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+              </button>
+
+              {/* Notifications counter */}
+              {currentRequestCount > 0 && (
+                <div className="relative">
+                  <Bell className="h-6 w-6 text-purple-600" />
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                  </span>
+                </div>
+              )}
+              
               <button
                 onClick={handleLogout}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
