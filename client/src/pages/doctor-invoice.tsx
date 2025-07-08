@@ -58,7 +58,7 @@ export default function DoctorInvoice() {
   const { data: booking, isLoading } = useQuery({
     queryKey: [`/api/doctor/booking/${params?.bookingId}`],
     queryFn: async () => {
-      const token = localStorage.getItem('doctorToken');
+      const token = localStorage.getItem('token');
       const response = await fetch(`/api/doctor/booking/${params?.bookingId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
