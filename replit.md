@@ -618,6 +618,8 @@ Changelog:
 - July 8, 2025. FIXED: Image loading issue by properly importing Riyal logo using @assets path alias instead of relative URL for reliable asset loading
 - July 8, 2025. ENHANCED: Added white background with rounded corners to Saudi Riyal currency symbol for improved visibility and professional appearance
 - July 8, 2025. UPDATED: Replaced Saudi Riyal currency symbol with new improved design (Screenshot 2025-07-08 171929_1751985624644.png) for better clarity and professional appearance
+- July 8, 2025. ADDED: Company logo header (IMG-20250415-WA0047_1751986059751.jpg) at top of invoice for professional branding
+- July 8, 2025. OPTIMIZED: Reduced spacing between sections (mb-8 to mb-4, p-6 to p-4) for better layout formatting
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

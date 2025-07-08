@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, Download, Printer, X, Phone, Mail, Calendar, Clock, User, PawPrint } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
-import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import logoImage from "@assets/IMG-20250415-WA0047_1751986059751.jpg";
 import riyalLogo from "@assets/Screenshot 2025-07-08 171929_1751985624644.png";
 
 interface InvoiceItem {
@@ -429,24 +429,24 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
 
         {/* Invoice Content */}
         <div ref={invoiceRef} className="invoice-container p-8">
+          {/* Company Logo Header */}
+          <div className="text-center mb-4">
+            <img 
+              src={logoImage}
+              alt="Vets Van Logo"
+              className="mx-auto h-20 object-contain"
+            />
+          </div>
+          
           {/* Header Section */}
-          <div className="header mb-8">
+          <div className="header mb-4">
             <div className="logo-section">
-              <div className="flex items-center mb-4">
-                <div className="relative mr-4">
-                  <img 
-                    src={logoImage} 
-                    alt="VETS VAN Logo" 
-                    className="w-20 h-12 object-cover rounded-lg border-4 border-purple-500 shadow-lg"
-                  />
+              <div className="mb-3">
+                <div className="company-name text-3xl font-black text-purple-800">
+                  VETS VAN
                 </div>
-                <div>
-                  <div className="company-name text-3xl font-black text-purple-800">
-                    VETS VAN
-                  </div>
-                  <div className="company-tagline text-gray-600 font-medium">
-                    {language === 'ar' ? 'خدمات بيطرية متنقلة في منزلك' : 'Mobile Veterinary Services at Your Home'}
-                  </div>
+                <div className="company-tagline text-gray-600 font-medium">
+                  {language === 'ar' ? 'خدمات بيطرية متنقلة في منزلك' : 'Mobile Veterinary Services at Your Home'}
                 </div>
               </div>
               <div className="contact-info text-sm text-gray-600 space-y-1">
