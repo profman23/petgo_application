@@ -600,6 +600,10 @@ Changelog:
 - July 8, 2025. RESOLVED: "tax is not defined" error by updating to use taxAmount variable for proper invoice calculations
 - July 8, 2025. ENHANCED: Invoice generation system now fully functional with correct variable mapping
 - July 8, 2025. COMPLETED: InvoiceGeneratorNew component ready with professional design, QR codes, Vets Van logo, and comprehensive billing details
+- July 8, 2025. CREATED: InvoiceGeneratorProfessional component with enhanced professional formatting and improved design
+- July 8, 2025. ENHANCED: Professional invoice layout with company branding, enhanced QR codes, improved typography, and better section organization
+- July 8, 2025. IMPROVED: Invoice print and download functionality with optimized CSS styling for both screen and print media
+- July 8, 2025. UPDATED: doctor-invoice.tsx to use InvoiceGeneratorProfessional component for better formatted invoices
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

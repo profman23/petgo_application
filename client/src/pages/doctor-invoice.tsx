@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
-import InvoiceGeneratorNew from '@/components/InvoiceGeneratorNew';
+import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
 
 interface InvoiceItem {
   id: string;
@@ -888,7 +888,7 @@ export default function DoctorInvoice() {
 
       {/* Invoice Generator */}
       {showInvoiceGenerator && booking && doctorInfo && (
-        <InvoiceGeneratorNew
+        <InvoiceGeneratorProfessional
           invoiceData={{
             bookingId: booking.id,
             customer: booking.customer,
