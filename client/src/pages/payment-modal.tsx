@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentTotal: number;
+  remainingBalance?: number;
   onPaymentSubmit: (payment: PaymentData) => void;
 }
 
@@ -33,7 +34,9 @@ const translations = {
     sar: 'ريال',
     enterAmount: 'أدخل المبلغ',
     enterDescription: 'أدخل وصف الدفعة',
-    selectPaymentType: 'اختر نوع الدفع'
+    selectPaymentType: 'اختر نوع الدفع',
+    remainingBalance: 'الرصيد المتبقي',
+    amountError: 'المبلغ لا يمكن أن يتجاوز الرصيد المتبقي'
   },
   en: {
     currentInvoice: 'Current Invoice',
@@ -49,31 +52,49 @@ const translations = {
     sar: 'SAR',
     enterAmount: 'Enter amount',
     enterDescription: 'Enter payment description',
-    selectPaymentType: 'Select payment type'
+    selectPaymentType: 'Select payment type',
+    remainingBalance: 'Remaining Balance',
+    amountError: 'Amount cannot exceed remaining balance'
   }
 };
 
-export default function PaymentModal({ isOpen, onClose, currentTotal, onPaymentSubmit }: PaymentModalProps) {
+export default function PaymentModal({ isOpen, onClose, currentTotal, remainingBalance, onPaymentSubmit }: PaymentModalProps) {
   const { language } = useLanguage();
-  const [amount, setAmount] = useState(currentTotal);
+  const [amount, setAmount] = useState(0);
   const [paymentType, setPaymentType] = useState('');
   const [description, setDescription] = useState('');
+
+  // Reset form when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setAmount(remainingBalance || currentTotal);
+      setPaymentType('');
+      setDescription('');
+    }
+  }, [isOpen, remainingBalance, currentTotal]);
 
   const t = (key: keyof typeof translations.ar) => translations[language as keyof typeof translations][key];
 
   const handleSubmit = () => {
-    if (amount > 0 && paymentType && description.trim()) {
-      onPaymentSubmit({
-        amount,
-        paymentType,
-        description
-      });
-      onClose();
-      // Reset form
-      setAmount(currentTotal);
-      setPaymentType('');
-      setDescription('');
+    if (!amount || !paymentType) return;
+    
+    const remainingAmount = remainingBalance || currentTotal;
+    if (amount > remainingAmount) {
+      alert(t('amountError'));
+      return;
     }
+    
+    onPaymentSubmit({
+      amount,
+      paymentType,
+      description
+    });
+    
+    // Reset form
+    setAmount(0);
+    setPaymentType('');
+    setDescription('');
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -96,6 +117,18 @@ export default function PaymentModal({ isOpen, onClose, currentTotal, onPaymentS
 
         {/* Content */}
         <div className="p-6 space-y-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+          {/* Current Invoice & Remaining Balance */}
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+            <div className="text-sm font-medium text-gray-700 mb-2">
+              {t('currentInvoice')}: <span className="text-lg font-bold text-purple-600">{currentTotal.toFixed(2)} {t('sar')}</span>
+            </div>
+            {remainingBalance !== undefined && (
+              <div className="text-sm font-medium text-gray-700">
+                {t('remainingBalance')}: <span className="text-lg font-bold text-red-600">{remainingBalance.toFixed(2)} {t('sar')}</span>
+              </div>
+            )}
+          </div>
+          
           {/* Amount */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">

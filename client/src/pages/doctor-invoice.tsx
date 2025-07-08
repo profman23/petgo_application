@@ -82,6 +82,8 @@ export default function DoctorInvoice() {
     heartRate: '',
     notes: ''
   });
+  const [totalPaid, setTotalPaid] = useState(0);
+  const [payments, setPayments] = useState<any[]>([]);
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -122,6 +124,9 @@ export default function DoctorInvoice() {
       addPayment: 'إضافة دفعة',
       paymentAdded: 'تمت إضافة الدفعة',
       paymentSuccess: 'تمت إضافة الدفعة بنجاح',
+      remainingBalance: 'الرصيد المتبقي',
+      totalPaid: 'إجمالي المدفوع',
+      paymentHistory: 'سجل المدفوعات',
       notes: 'ملاحظات',
       generateInvoice: 'إنشاء الفاتورة',
       back: 'رجوع',
@@ -165,6 +170,9 @@ export default function DoctorInvoice() {
       addPayment: 'Add Payment',
       paymentAdded: 'Payment Added',
       paymentSuccess: 'Payment has been added successfully',
+      remainingBalance: 'Remaining Balance',
+      totalPaid: 'Total Paid',
+      paymentHistory: 'Payment History',
       notes: 'Notes',
       generateInvoice: 'Generate Invoice',
       back: 'Back',
@@ -195,14 +203,23 @@ export default function DoctorInvoice() {
 
   // Handle payment submission
   const handlePaymentSubmit = (paymentData: any) => {
+    const newPayment = {
+      id: Date.now(),
+      amount: parseFloat(paymentData.amount),
+      type: paymentData.paymentType,
+      description: paymentData.description,
+      date: new Date().toISOString()
+    };
+    
+    setPayments(prev => [...prev, newPayment]);
+    setTotalPaid(prev => prev + newPayment.amount);
+    setShowPaymentModal(false);
+    
     toast({
       title: t('paymentAdded'),
-      description: t('paymentSuccess'),
+      description: `${t('paymentSuccess')} - ${newPayment.amount} ${t('sar')}`,
       variant: 'default',
     });
-    
-    // Here you could save payment data to database if needed
-    console.log('Payment submitted:', paymentData);
   };
 
   // Calculate totals
@@ -211,6 +228,7 @@ export default function DoctorInvoice() {
   const totalWithTax = subtotal + taxAmount;
   const discountAmount = applyDiscount ? totalWithTax * DISCOUNT_RATE : 0;
   const finalTotal = totalWithTax - discountAmount;
+  const remainingBalance = finalTotal - totalPaid;
 
   // Update item total when quantity or price changes
   const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
@@ -633,17 +651,34 @@ export default function DoctorInvoice() {
                   <span>{t('finalTotal')}:</span>
                   <span>{finalTotal.toFixed(2)} {t('sar')}</span>
                 </div>
+
+                {/* Payment Summary */}
+                <div className="border-t pt-4 mb-4">
+                  <div className="flex justify-between text-green-600 font-semibold mb-2">
+                    <span>{t('totalPaid')}:</span>
+                    <span>{totalPaid.toFixed(2)} {t('sar')}</span>
+                  </div>
+                  <div className="flex justify-between text-red-600 font-semibold mb-4">
+                    <span>{t('remainingBalance')}:</span>
+                    <span>{remainingBalance.toFixed(2)} {t('sar')}</span>
+                  </div>
+                </div>
                 
                 {/* Add Payment Button */}
                 <div className="flex justify-end">
                   <button
                     onClick={() => setShowPaymentModal(true)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center transition-colors"
+                    disabled={remainingBalance <= 0}
+                    className={`px-6 py-2 rounded-lg flex items-center transition-colors ${
+                      remainingBalance <= 0 
+                        ? 'bg-gray-400 cursor-not-allowed text-white' 
+                        : 'bg-green-600 hover:bg-green-700 text-white'
+                    }`}
                   >
                     <svg className="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    {t('addPayment')}
+                    {remainingBalance <= 0 ? `${t('paymentAdded')} ✓` : t('addPayment')}
                   </button>
                 </div>
               </div>
@@ -664,6 +699,41 @@ export default function DoctorInvoice() {
             className="w-full"
           />
         </div>
+
+        {/* Payment History */}
+        {payments.length > 0 && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">
+              {t('paymentHistory')}
+            </h2>
+            <div className="space-y-3">
+              {payments.map((payment) => (
+                <div key={payment.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
+                  <div>
+                    <div className="font-semibold text-green-600">
+                      {payment.amount.toFixed(2)} {t('sar')}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {payment.type} • {payment.description}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {new Date(payment.date).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                    </div>
+                  </div>
+                  <div className="text-green-500">
+                    ✓
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex justify-between font-bold">
+                <span>{t('totalPaid')}:</span>
+                <span className="text-green-600">{totalPaid.toFixed(2)} {t('sar')}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex justify-center mb-6">
@@ -770,6 +840,7 @@ export default function DoctorInvoice() {
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
         currentTotal={finalTotal}
+        remainingBalance={remainingBalance}
         onPaymentSubmit={handlePaymentSubmit}
       />
     </div>
