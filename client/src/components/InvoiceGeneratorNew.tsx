@@ -63,8 +63,26 @@ export default function InvoiceGeneratorNew({ invoiceData, onClose }: InvoiceGen
     return d.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US');
   };
 
+  // Saudi Riyal Currency Icon Component
+  const RiyalIcon = () => (
+    <svg 
+      width="16" 
+      height="16" 
+      viewBox="0 0 100 100" 
+      className="inline-block ml-1"
+      fill="currentColor"
+    >
+      <path d="M15 20 L15 80 L25 80 L25 55 L35 55 L35 80 L45 80 L45 35 L75 35 L75 25 L45 25 L45 20 L35 20 L35 25 L25 25 L25 20 Z M55 45 L85 45 L85 55 L55 55 Z M55 65 L85 65 L85 75 L55 75 Z"/>
+    </svg>
+  );
+
   const formatCurrency = (amount: number) => {
-    return `${amount.toFixed(2)} SAR`;
+    return (
+      <span className="flex items-center justify-center">
+        {amount.toFixed(2)}
+        <RiyalIcon />
+      </span>
+    );
   };
 
   // Generate QR Code
