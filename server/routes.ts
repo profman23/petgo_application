@@ -1905,6 +1905,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Pet vitals API endpoints
+  app.post('/api/pet-vitals', async (req, res) => {
+    try {
+      const vital = await storage.createPetVital(req.body);
+      res.json(vital);
+    } catch (error) {
+      console.error('Error creating pet vital:', error);
+      res.status(500).json({ message: 'Failed to create pet vital' });
+    }
+  });
+
+  app.get('/api/pet-vitals/booking/:bookingId', async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const vitals = await storage.getPetVitalsByBooking(bookingId);
+      res.json(vitals);
+    } catch (error) {
+      console.error('Error fetching pet vitals:', error);
+      res.status(500).json({ message: 'Failed to fetch pet vitals' });
+    }
+  });
+
+  app.put('/api/pet-vitals/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const vital = await storage.updatePetVital(id, req.body);
+      res.json(vital);
+    } catch (error) {
+      console.error('Error updating pet vital:', error);
+      res.status(500).json({ message: 'Failed to update pet vital' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

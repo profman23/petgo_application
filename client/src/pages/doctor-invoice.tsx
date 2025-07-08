@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface InvoiceItem {
   id: string;
@@ -24,11 +25,24 @@ interface Customer {
 }
 
 interface Pet {
+  id: number;
   name: string;
   type: string;
   ageYear: number;
   ageMonth: number;
   ageDay: number;
+}
+
+interface PetVital {
+  id?: number;
+  bookingId: number;
+  petId: number;
+  weight?: number | null;
+  temperature?: number | null;
+  heartRate?: number | null;
+  notes?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface BookingDetails {
@@ -53,6 +67,14 @@ export default function DoctorInvoice() {
   ]);
   const [discount, setDiscount] = useState(0);
   const [notes, setNotes] = useState('');
+  const [showVitalsModal, setShowVitalsModal] = useState(false);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [vitalsData, setVitalsData] = useState({
+    weight: '',
+    temperature: '',
+    heartRate: '',
+    notes: ''
+  });
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -98,6 +120,13 @@ export default function DoctorInvoice() {
       date: 'التاريخ',
       time: 'الوقت',
       service: 'نوع الخدمة',
+      vitals: 'المؤشرات الحيوية',
+      weight: 'الوزن (كيلو)',
+      temperature: 'درجة الحرارة (°س)',
+      heartRate: 'نبضات القلب',
+      save: 'حفظ',
+      cancel: 'إلغاء',
+      vitalsFor: 'المؤشرات الحيوية لـ',
       petName: 'اسم الأليف',
       petType: 'نوع الأليف',
       age: 'العمر',
@@ -130,6 +159,13 @@ export default function DoctorInvoice() {
       date: 'Date',
       time: 'Time',
       service: 'Service Type',
+      vitals: 'Pet Vitals',
+      weight: 'Weight (KG)',
+      temperature: 'Temperature (°C)',
+      heartRate: 'Heart Rate',
+      save: 'Save',
+      cancel: 'Cancel',
+      vitalsFor: 'Vitals for',
       petName: 'Pet Name',
       petType: 'Pet Type',
       age: 'Age',
@@ -178,6 +214,46 @@ export default function DoctorInvoice() {
   const removeItem = (id: string) => {
     if (invoiceItems.length > 1) {
       setInvoiceItems(items => items.filter(item => item.id !== id));
+    }
+  };
+
+  // Handle pet vitals
+  const openVitalsModal = (pet: Pet) => {
+    setSelectedPet(pet);
+    setShowVitalsModal(true);
+    setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+  };
+
+  const saveVitals = async () => {
+    if (!selectedPet || !booking) return;
+
+    try {
+      const vitalsPayload = {
+        bookingId: booking.id,
+        petId: selectedPet.id,
+        weight: vitalsData.weight ? parseFloat(vitalsData.weight) : null,
+        temperature: vitalsData.temperature ? parseFloat(vitalsData.temperature) : null,
+        heartRate: vitalsData.heartRate ? parseInt(vitalsData.heartRate) : null,
+        notes: vitalsData.notes || null
+      };
+
+      await apiRequest('/api/pet-vitals', {
+        method: 'POST',
+        body: JSON.stringify(vitalsPayload),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      toast({
+        title: language === 'ar' ? "تم حفظ المؤشرات الحيوية" : "Pet vitals saved successfully",
+        variant: "default"
+      });
+
+      setShowVitalsModal(false);
+    } catch (error) {
+      toast({
+        title: language === 'ar' ? "فشل في حفظ المؤشرات الحيوية" : "Failed to save pet vitals",
+        variant: "destructive"
+      });
     }
   };
 
@@ -310,6 +386,15 @@ export default function DoctorInvoice() {
                     {pet.ageYear} {t('years')} {pet.ageMonth} {t('months')} {pet.ageDay} {t('days')}
                   </p>
                 </div>
+              </div>
+              <div className="mt-4">
+                <Button 
+                  onClick={() => openVitalsModal(pet)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <Stethoscope className="h-4 w-4 mr-2" />
+                  {t('vitals')}
+                </Button>
               </div>
             </div>
           ))}
@@ -480,6 +565,94 @@ export default function DoctorInvoice() {
           </Button>
         </div>
       </div>
+
+      {/* Pet Vitals Modal */}
+      {showVitalsModal && selectedPet && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div 
+            className="bg-white rounded-lg shadow-xl w-full max-w-md"
+            dir={getDirection(language)}
+            style={{ textAlign: getTextAlign(language) }}
+          >
+            <div className="p-6">
+              <h3 className="text-lg font-semibold mb-4">
+                {t('vitalsFor')} {selectedPet.name}
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('weight')}
+                  </label>
+                  <Input
+                    type="number"
+                    value={vitalsData.weight}
+                    onChange={(e) => setVitalsData(prev => ({ ...prev, weight: e.target.value }))}
+                    placeholder="0.0"
+                    step="0.1"
+                    className="w-full"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('temperature')}
+                  </label>
+                  <Input
+                    type="number"
+                    value={vitalsData.temperature}
+                    onChange={(e) => setVitalsData(prev => ({ ...prev, temperature: e.target.value }))}
+                    placeholder="0.0"
+                    step="0.1"
+                    className="w-full"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('heartRate')}
+                  </label>
+                  <Input
+                    type="number"
+                    value={vitalsData.heartRate}
+                    onChange={(e) => setVitalsData(prev => ({ ...prev, heartRate: e.target.value }))}
+                    placeholder="0"
+                    className="w-full"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('notes')}
+                  </label>
+                  <Textarea
+                    value={vitalsData.notes}
+                    onChange={(e) => setVitalsData(prev => ({ ...prev, notes: e.target.value }))}
+                    placeholder={t('notes')}
+                    rows={3}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end gap-3 mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowVitalsModal(false)}
+                >
+                  {t('cancel')}
+                </Button>
+                <Button
+                  onClick={saveVitals}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  {t('save')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 
@@ -95,6 +95,11 @@ export interface IStorage {
     serviceType: string;
     createdAt: string;
   }>>;
+
+  // Pet vitals operations
+  createPetVital(vital: InsertPetVital): Promise<PetVital>;
+  getPetVitalsByBooking(bookingId: number): Promise<PetVital[]>;
+  updatePetVital(id: number, vital: Partial<InsertPetVital>): Promise<PetVital>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1381,6 +1386,71 @@ class MemStorage implements IStorage {
     }
     
     return detailedRequests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  // Pet vitals operations (MemStorage implementation)
+  async createPetVital(vital: InsertPetVital): Promise<PetVital> {
+    const id = Date.now(); // Simple ID generation
+    const petVital: PetVital = {
+      id,
+      bookingId: vital.bookingId,
+      petId: vital.petId,
+      weight: vital.weight,
+      temperature: vital.temperature,
+      heartRate: vital.heartRate,
+      notes: vital.notes || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    // Store in memory (would need to add petVitals Map to constructor)
+    return petVital;
+  }
+
+  async getPetVitalsByBooking(bookingId: number): Promise<PetVital[]> {
+    // In memory implementation - would return from petVitals Map
+    return [];
+  }
+
+  async updatePetVital(id: number, vital: Partial<InsertPetVital>): Promise<PetVital> {
+    // In memory implementation - would update in petVitals Map
+    const updatedVital: PetVital = {
+      id,
+      bookingId: vital.bookingId || 0,
+      petId: vital.petId || 0,
+      weight: vital.weight || null,
+      temperature: vital.temperature || null,
+      heartRate: vital.heartRate || null,
+      notes: vital.notes || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    return updatedVital;
+  }
+
+  // Pet vitals operations
+  async createPetVital(vital: InsertPetVital): Promise<PetVital> {
+    const [newVital] = await db
+      .insert(petVitals)
+      .values(vital)
+      .returning();
+    return newVital;
+  }
+
+  async getPetVitalsByBooking(bookingId: number): Promise<PetVital[]> {
+    return await db
+      .select()
+      .from(petVitals)
+      .where(eq(petVitals.bookingId, bookingId));
+  }
+
+  async updatePetVital(id: number, vital: Partial<InsertPetVital>): Promise<PetVital> {
+    const [updatedVital] = await db
+      .update(petVitals)
+      .set(vital)
+      .where(eq(petVitals.id, id))
+      .returning();
+    return updatedVital;
   }
 }
 

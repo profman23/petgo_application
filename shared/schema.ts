@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb, numeric } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, real, timestamp, jsonb, numeric, decimal, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -246,3 +246,29 @@ export const insertReviewSchema = createInsertSchema(reviews).pick({
 
 export type Review = typeof reviews.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
+
+// Pet vitals table for storing vital signs recorded by doctors
+export const petVitals = pgTable("pet_vitals", {
+  id: serial("id").primaryKey(),
+  bookingId: integer("booking_id").references(() => bookings.id).notNull(),
+  petId: integer("pet_id").references(() => patients.id).notNull(),
+  weight: decimal("weight", { precision: 5, scale: 2 }), // in KG
+  temperature: decimal("temperature", { precision: 4, scale: 1 }), // in Celsius  
+  heartRate: integer("heart_rate"), // beats per minute
+  notes: text("notes"), // additional notes from doctor
+  recordedAt: timestamp("recorded_at").defaultNow(),
+  recordedBy: varchar("recorded_by").notNull(), // doctor's username/id
+});
+
+export const insertPetVitalSchema = createInsertSchema(petVitals).pick({
+  bookingId: true,
+  petId: true,
+  weight: true,
+  temperature: true,
+  heartRate: true,
+  notes: true,
+  recordedBy: true,
+});
+
+export type PetVital = typeof petVitals.$inferSelect;
+export type InsertPetVital = z.infer<typeof insertPetVitalSchema>;
