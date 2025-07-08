@@ -615,6 +615,7 @@ Changelog:
 - July 8, 2025. ENHANCED: Replaced text "SAR" with Saudi Riyal currency symbol/logo as SVG icon in all invoice components for professional visual currency display
 - July 8, 2025. UPDATED: Improved Saudi Riyal currency symbol design to match user's preferred logo style with better proportions and visibility
 - July 8, 2025. IMPLEMENTED: Direct image integration for Saudi Riyal currency symbol using user's exact logo image (Screenshot 2025-07-08 171944_1751984409622.png) in all invoice components
+- July 8, 2025. FIXED: Image loading issue by properly importing Riyal logo using @assets path alias instead of relative URL for reliable asset loading
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

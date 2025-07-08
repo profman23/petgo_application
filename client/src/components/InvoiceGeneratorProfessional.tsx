@@ -5,6 +5,7 @@ import { FileText, Download, Printer, X, Phone, Mail, Calendar, Clock, User, Paw
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import riyalLogo from "@assets/Screenshot 2025-07-08 171944_1751984409622.png";
 
 interface InvoiceItem {
   id: string;
@@ -71,7 +72,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
   // Saudi Riyal Currency Icon Component
   const RiyalIcon = () => (
     <img 
-      src="/attached_assets/Screenshot 2025-07-08 171944_1751984409622.png"
+      src={riyalLogo}
       alt="SAR"
       width="20" 
       height="20" 

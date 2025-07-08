@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, Download, Printer } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
+import riyalLogo from "@assets/Screenshot 2025-07-08 171944_1751984409622.png";
 
 interface InvoiceItem {
   id: string;
@@ -66,7 +67,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
   // Saudi Riyal Currency Icon Component
   const RiyalIcon = () => (
     <img 
-      src="/attached_assets/Screenshot 2025-07-08 171944_1751984409622.png"
+      src={riyalLogo}
       alt="SAR"
       width="20" 
       height="20" 
