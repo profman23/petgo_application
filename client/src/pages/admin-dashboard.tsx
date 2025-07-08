@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Badge } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import {
@@ -18,6 +18,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge as UIBadge } from '@/components/ui/badge';
 
 interface Driver {
   id: number;
@@ -798,139 +800,152 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {/* VetsVan Requests Tab */}
+              {/* VetsVan Requests Tab - Cards Layout */}
               {activeTab === 'requests' && (
-                <div>
-                  <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">
-                        {language === 'ar' ? 'جميع طلبات VETS VAN' : 'All Vets Van Requests'}
-                      </h3>
-                      
-                      {isLoadingRequests ? (
-                        <div className="flex justify-center py-12">
-                          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-                        </div>
-                      ) : vetsVanRequests && vetsVanRequests.length > 0 ? (
-                        <div className="overflow-x-auto">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  {language === 'ar' ? 'العميل' : 'Customer'}
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  {language === 'ar' ? 'VETS VAN' : 'Vets Van'}
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  {language === 'ar' ? 'الموعد' : 'Appointment'}
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  {language === 'ar' ? 'الحالة' : 'Status'}
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  {language === 'ar' ? 'الخدمة' : 'Service'}
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  {language === 'ar' ? 'الحيوانات الأليفة' : 'Pets'}
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                  {language === 'ar' ? 'تاريخ الطلب' : 'Created'}
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                              {vetsVanRequests.map((request) => (
-                                <tr key={request.id} className="hover:bg-gray-50">
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div>
-                                      <div className="text-sm font-medium text-gray-900">
-                                        {request.customerName}
-                                      </div>
-                                      <div className="text-sm text-gray-500">
-                                        {request.customerPhone}
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900">
-                                      {request.vetsvanCode}
-                                    </div>
-                                    <div className="text-sm text-gray-500">
-                                      {request.vetsvanName}
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">
-                                      {new Date(request.appointmentDate).toLocaleDateString('ar-SA')}
-                                    </div>
-                                    <div className="text-sm text-gray-500">
-                                      {request.appointmentTime}
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                      request.status === 'confirmed' 
-                                        ? 'bg-green-100 text-green-800'
-                                        : request.status === 'pending_review'
-                                        ? 'bg-yellow-100 text-yellow-800'
-                                        : request.status === 'cancelled'
-                                        ? 'bg-red-100 text-red-800'
-                                        : 'bg-gray-100 text-gray-800'
-                                    }`}>
-                                      {request.status === 'confirmed' && (language === 'ar' ? 'مؤكد' : 'Confirmed')}
-                                      {request.status === 'pending_review' && (language === 'ar' ? 'قيد المراجعة' : 'Pending Review')}
-                                      {request.status === 'cancelled' && (language === 'ar' ? 'ملغي' : 'Cancelled')}
-                                      {!['confirmed', 'pending_review', 'cancelled'].includes(request.status) && request.status}
-                                    </span>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    {request.serviceType === 'general_checkup' && (language === 'ar' ? 'كشف عام' : 'General Check Up')}
-                                    {request.serviceType === 'grooming' && (language === 'ar' ? 'تنظيف' : 'Grooming')}
-                                    {!['general_checkup', 'grooming'].includes(request.serviceType) && request.serviceType}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">
-                                      {request.pets && request.pets.length > 0 ? (
-                                        request.pets.map((pet, index) => (
-                                          <div key={index} className="mb-1">
-                                            <span className="font-medium">{pet.name}</span>
-                                            <span className="text-gray-500 ml-1">
-                                              ({pet.type === 'cat' && (language === 'ar' ? 'قطة' : 'Cat')}
-                                              {pet.type === 'dog' && (language === 'ar' ? 'كلب' : 'Dog')}
-                                              {pet.type === 'bird' && (language === 'ar' ? 'طائر' : 'Bird')}
-                                              {!['cat', 'dog', 'bird'].includes(pet.type) && pet.type})
-                                            </span>
-                                          </div>
-                                        ))
-                                      ) : (
-                                        <span className="text-gray-400">
-                                          {language === 'ar' ? 'لا توجد حيوانات' : 'No pets'}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {new Date(request.createdAt).toLocaleDateString('ar-SA')}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      ) : (
-                        <div className="text-center py-12">
-                          <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                          <h3 className="mt-2 text-sm font-medium text-gray-900">
-                            {language === 'ar' ? 'لا توجد طلبات' : 'No requests found'}
-                          </h3>
-                          <p className="mt-1 text-sm text-gray-500">
-                            {language === 'ar' ? 'لم يتم العثور على أي طلبات VETS VAN' : 'No VetsVan requests have been made yet'}
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                <div className="space-y-6" dir={getDirection(language)}>
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
+                      {language === 'ar' ? 'جميع طلبات VETS VAN' : 'All VetsVan Requests'}
+                    </h2>
+                    <p className="text-gray-600" style={{ textAlign: getTextAlign(language) }}>
+                      {language === 'ar' ? 'عرض جميع طلبات العملاء لكل سيارات VETS VAN' : 'View all customer requests for all VetsVan vehicles'}
+                    </p>
                   </div>
+
+                  {isLoadingRequests ? (
+                    <div className="flex justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                      <span className="ml-2 text-purple-600">
+                        {language === 'ar' ? 'جارٍ تحميل الطلبات...' : 'Loading requests...'}
+                      </span>
+                    </div>
+                  ) : vetsVanRequests && vetsVanRequests.length > 0 ? (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                      {vetsVanRequests.map((request) => (
+                        <Card key={request.id} className="border border-gray-200 hover:shadow-lg transition-shadow">
+                          <CardHeader className="pb-3">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                  <User className="h-5 w-5 text-purple-600" />
+                                  <span className="text-gray-900">{request.customerName}</span>
+                                </CardTitle>
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Phone className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm text-gray-600">{request.customerPhone}</span>
+                                </div>
+                              </div>
+                              <UIBadge 
+                                variant={
+                                  request.status === 'confirmed' ? 'default' :
+                                  request.status === 'pending_review' ? 'secondary' :
+                                  request.status === 'cancelled' ? 'destructive' : 'outline'
+                                }
+                                className="text-xs"
+                              >
+                                {request.status === 'confirmed' && (language === 'ar' ? 'مؤكد' : 'Confirmed')}
+                                {request.status === 'pending_review' && (language === 'ar' ? 'قيد المراجعة' : 'Pending Review')}
+                                {request.status === 'cancelled' && (language === 'ar' ? 'ملغي' : 'Cancelled')}
+                                {!['confirmed', 'pending_review', 'cancelled'].includes(request.status) && request.status}
+                              </UIBadge>
+                            </div>
+                          </CardHeader>
+                          
+                          <CardContent className="space-y-4">
+                            {/* VetsVan Info */}
+                            <div className="bg-purple-50 rounded-lg p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+                                <span className="font-medium text-purple-900">
+                                  {request.vetsvanCode}
+                                </span>
+                              </div>
+                              <p className="text-sm text-purple-700">{request.vetsvanName}</p>
+                            </div>
+
+                            {/* Appointment Details */}
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm font-medium text-gray-700">
+                                  {language === 'ar' ? 'التاريخ:' : 'Date:'}
+                                </span>
+                                <span className="text-sm text-gray-600">
+                                  {new Date(request.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                                </span>
+                              </div>
+                              
+                              <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-blue-600" />
+                                <span className="text-sm font-medium text-gray-700">
+                                  {language === 'ar' ? 'الوقت:' : 'Time:'}
+                                </span>
+                                <span className="text-sm text-gray-600">{request.appointmentTime}</span>
+                              </div>
+                            </div>
+
+                            {/* Service Type */}
+                            <div className="bg-blue-50 rounded-lg p-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                <span className="text-sm font-medium text-blue-900">
+                                  {language === 'ar' ? 'نوع الخدمة:' : 'Service Type:'}
+                                </span>
+                              </div>
+                              <p className="text-sm text-blue-700 mt-1">
+                                {request.serviceType === 'general_checkup' && (language === 'ar' ? 'كشف عام' : 'General Check Up')}
+                                {request.serviceType === 'grooming' && (language === 'ar' ? 'تنظيف' : 'Grooming')}
+                                {!['general_checkup', 'grooming'].includes(request.serviceType) && request.serviceType}
+                              </p>
+                            </div>
+
+                            {/* Pets */}
+                            {request.pets && request.pets.length > 0 && (
+                              <div className="bg-green-50 rounded-lg p-3">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                                  <span className="text-sm font-medium text-green-900">
+                                    {language === 'ar' ? 'الحيوانات الأليفة:' : 'Pets:'}
+                                  </span>
+                                </div>
+                                <div className="space-y-1">
+                                  {request.pets.map((pet, index) => (
+                                    <div key={index} className="flex items-center gap-2">
+                                      <span className="text-sm font-medium text-green-800">{pet.name}</span>
+                                      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                                        {pet.type === 'cat' && (language === 'ar' ? 'قطة' : 'Cat')}
+                                        {pet.type === 'dog' && (language === 'ar' ? 'كلب' : 'Dog')}
+                                        {pet.type === 'bird' && (language === 'ar' ? 'طائر' : 'Bird')}
+                                        {!['cat', 'dog', 'bird'].includes(pet.type) && pet.type}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Created Date */}
+                            <div className="border-t pt-3 mt-4">
+                              <div className="flex items-center justify-between text-xs text-gray-500">
+                                <span>{language === 'ar' ? 'تاريخ الطلب:' : 'Created:'}</span>
+                                <span>{new Date(request.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}</span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                      <h3 className="mt-2 text-lg font-medium text-gray-900">
+                        {language === 'ar' ? 'لا توجد طلبات حتى الآن' : 'No requests found'}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {language === 'ar' ? 'لم يتم تقديم أي طلبات VETS VAN بعد' : 'No VetsVan requests have been made yet'}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
