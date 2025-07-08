@@ -356,46 +356,97 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             }
             @media print {
               .logo-header img {
-                height: 60px !important;
+                height: 50px !important;
                 width: auto !important;
-                max-width: 200px !important;
+                max-width: 180px !important;
                 object-fit: contain !important;
               }
               .section {
-                margin-bottom: 8px !important;
-                padding: 8px !important;
-                font-size: 12px !important;
+                margin-bottom: 6px !important;
+                padding: 6px !important;
+                font-size: 11px !important;
               }
               .section-title {
-                font-size: 14px !important;
-                padding: 6px !important;
-                margin-bottom: 6px !important;
+                font-size: 13px !important;
+                padding: 4px !important;
+                margin-bottom: 4px !important;
               }
               .info-item {
-                padding: 2px 0 !important;
-                font-size: 11px !important;
+                padding: 1px 0 !important;
+                font-size: 10px !important;
+                line-height: 1.2 !important;
               }
               .info-label {
-                font-size: 11px !important;
-              }
-              .pet-card {
-                padding: 6px !important;
-                margin-bottom: 6px !important;
-              }
-              .pet-name {
-                font-size: 13px !important;
-              }
-              .pet-detail {
                 font-size: 10px !important;
               }
+              .pet-card {
+                padding: 4px !important;
+                margin-bottom: 4px !important;
+              }
+              .pet-name {
+                font-size: 12px !important;
+              }
+              .pet-detail {
+                font-size: 9px !important;
+              }
               .header {
-                margin-bottom: 10px !important;
-                padding-bottom: 8px !important;
+                margin-bottom: 8px !important;
+                padding-bottom: 6px !important;
               }
               .company-name {
-                font-size: 24px !important;
+                font-size: 20px !important;
               }
               .company-tagline {
+                font-size: 10px !important;
+              }
+              .invoice-details {
+                font-size: 11px !important;
+              }
+              .invoice-number {
+                font-size: 16px !important;
+              }
+              .contact-info {
+                font-size: 9px !important;
+              }
+              .qr-section {
+                margin: 8px 0 !important;
+              }
+              .qr-code {
+                width: 80px !important;
+                height: 80px !important;
+              }
+              .service-items-table th {
+                font-size: 10px !important;
+                padding: 4px !important;
+              }
+              .service-items-table td {
+                font-size: 9px !important;
+                padding: 3px !important;
+              }
+              .totals-section {
+                margin-top: 8px !important;
+                padding: 6px !important;
+              }
+              .total-row {
+                font-size: 10px !important;
+                padding: 2px 0 !important;
+              }
+              .final-total {
+                font-size: 14px !important;
+                padding: 8px !important;
+                margin-top: 6px !important;
+              }
+              .notes-section {
+                margin-top: 8px !important;
+                padding: 6px !important;
+                font-size: 10px !important;
+              }
+              .footer {
+                margin-top: 8px !important;
+                padding-top: 6px !important;
+                font-size: 9px !important;
+              }
+              .thank-you {
                 font-size: 12px !important;
               }
             }
