@@ -782,6 +782,7 @@ class MemStorage implements IStorage {
   private shifts: Map<number, Shift>;
   private bookings: Map<number, Booking>;
   private reviews: Map<number, Review>;
+  private petVitals: Map<number, PetVital>;
   private currentUserId: number;
   private currentDriverId: number;
   private currentRideId: number;
@@ -790,6 +791,7 @@ class MemStorage implements IStorage {
   private currentShiftId: number;
   private currentBookingId: number;
   private currentReviewId: number;
+  private currentPetVitalId: number;
 
   constructor() {
     this.users = new Map();
@@ -800,6 +802,7 @@ class MemStorage implements IStorage {
     this.shifts = new Map();
     this.bookings = new Map();
     this.reviews = new Map();
+    this.petVitals = new Map();
     this.currentUserId = 1;
     this.currentDriverId = 1;
     this.currentRideId = 1;
@@ -808,6 +811,7 @@ class MemStorage implements IStorage {
     this.currentShiftId = 1;
     this.currentBookingId = 1;
     this.currentReviewId = 1;
+    this.currentPetVitalId = 1;
 
     this.initializeTestData();
   }
@@ -1390,7 +1394,7 @@ class MemStorage implements IStorage {
 
   // Pet vitals operations (MemStorage implementation)
   async createPetVital(vital: InsertPetVital): Promise<PetVital> {
-    const id = Date.now(); // Simple ID generation
+    const id = this.currentPetVitalId++;
     const petVital: PetVital = {
       id,
       bookingId: vital.bookingId,
@@ -1403,28 +1407,30 @@ class MemStorage implements IStorage {
       updatedAt: new Date()
     };
     
-    // Store in memory (would need to add petVitals Map to constructor)
+    this.petVitals.set(id, petVital);
     return petVital;
   }
 
   async getPetVitalsByBooking(bookingId: number): Promise<PetVital[]> {
-    // In memory implementation - would return from petVitals Map
-    return [];
+    const vitals = Array.from(this.petVitals.values()).filter(
+      vital => vital.bookingId === bookingId
+    );
+    return vitals;
   }
 
   async updatePetVital(id: number, vital: Partial<InsertPetVital>): Promise<PetVital> {
-    // In memory implementation - would update in petVitals Map
+    const existingVital = this.petVitals.get(id);
+    if (!existingVital) {
+      throw new Error('Pet vital not found');
+    }
+    
     const updatedVital: PetVital = {
-      id,
-      bookingId: vital.bookingId || 0,
-      petId: vital.petId || 0,
-      weight: vital.weight || null,
-      temperature: vital.temperature || null,
-      heartRate: vital.heartRate || null,
-      notes: vital.notes || null,
-      createdAt: new Date(),
+      ...existingVital,
+      ...vital,
       updatedAt: new Date()
     };
+    
+    this.petVitals.set(id, updatedVital);
     return updatedVital;
   }
 

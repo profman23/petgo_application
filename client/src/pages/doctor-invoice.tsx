@@ -234,7 +234,8 @@ export default function DoctorInvoice() {
         weight: vitalsData.weight ? parseFloat(vitalsData.weight) : null,
         temperature: vitalsData.temperature ? parseFloat(vitalsData.temperature) : null,
         heartRate: vitalsData.heartRate ? parseInt(vitalsData.heartRate) : null,
-        notes: vitalsData.notes || null
+        notes: vitalsData.notes || null,
+        recordedBy: 'doctor'
       };
 
       await apiRequest('/api/pet-vitals', {
