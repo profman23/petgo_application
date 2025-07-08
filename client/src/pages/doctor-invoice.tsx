@@ -67,6 +67,9 @@ export default function DoctorInvoice() {
   ]);
   const [discount, setDiscount] = useState(0);
   const [notes, setNotes] = useState('');
+  
+  // Tax rate constant (15%)
+  const TAX_RATE = 0.15;
   const [showVitalsModal, setShowVitalsModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [vitalsData, setVitalsData] = useState({
@@ -109,8 +112,10 @@ export default function DoctorInvoice() {
       addItem: 'إضافة صنف',
       removeItem: 'حذف الصنف',
       subtotal: 'المجموع الفرعي',
+      tax: 'الضريبة (15%)',
       discount: 'الخصم',
       finalTotal: 'المجموع النهائي',
+      addPayment: 'إضافة دفعة',
       notes: 'ملاحظات',
       generateInvoice: 'إنشاء الفاتورة',
       back: 'رجوع',
@@ -148,8 +153,10 @@ export default function DoctorInvoice() {
       addItem: 'Add Item',
       removeItem: 'Remove Item',
       subtotal: 'Subtotal',
+      tax: 'Tax (15%)',
       discount: 'Discount',
       finalTotal: 'Final Total',
+      addPayment: 'Add Payment',
       notes: 'Notes',
       generateInvoice: 'Generate Invoice',
       back: 'Back',
@@ -180,7 +187,9 @@ export default function DoctorInvoice() {
 
   // Calculate totals
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.total, 0);
-  const finalTotal = subtotal - discount;
+  const taxAmount = subtotal * TAX_RATE;
+  const totalWithTax = subtotal + taxAmount;
+  const finalTotal = totalWithTax - discount;
 
   // Update item total when quantity or price changes
   const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
@@ -580,6 +589,10 @@ export default function DoctorInvoice() {
                   <span>{t('subtotal')}:</span>
                   <span>{subtotal.toFixed(2)} {t('sar')}</span>
                 </div>
+                <div className="flex justify-between mb-2">
+                  <span>{t('tax')}:</span>
+                  <span>{taxAmount.toFixed(2)} {t('sar')}</span>
+                </div>
                 <div className="flex justify-between items-center mb-2">
                   <span>{t('discount')}:</span>
                   <div className="flex items-center">
@@ -594,9 +607,28 @@ export default function DoctorInvoice() {
                     <span className="ml-2">{t('sar')}</span>
                   </div>
                 </div>
-                <div className="flex justify-between font-bold text-lg border-t pt-2">
+                <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
                   <span>{t('finalTotal')}:</span>
                   <span>{finalTotal.toFixed(2)} {t('sar')}</span>
+                </div>
+                
+                {/* Add Payment Button */}
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      toast({
+                        title: language === 'ar' ? 'دفعة جديدة' : 'New Payment',
+                        description: language === 'ar' ? 'تم فتح نظام الدفع' : 'Payment system opened',
+                        variant: 'default',
+                      });
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center transition-colors"
+                  >
+                    <svg className="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    {t('addPayment')}
+                  </button>
                 </div>
               </div>
             </div>
