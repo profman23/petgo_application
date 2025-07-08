@@ -66,6 +66,7 @@ export default function DoctorInvoice() {
     { id: '1', description: '', quantity: 1, unitPrice: 0, total: 0 }
   ]);
   const [notes, setNotes] = useState('');
+  const [applyDiscount, setApplyDiscount] = useState(false);
   
   // Tax rate constant (15%)
   const TAX_RATE = 0.15;
@@ -190,7 +191,7 @@ export default function DoctorInvoice() {
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.total, 0);
   const taxAmount = subtotal * TAX_RATE;
   const totalWithTax = subtotal + taxAmount;
-  const discountAmount = totalWithTax * DISCOUNT_RATE;
+  const discountAmount = applyDiscount ? totalWithTax * DISCOUNT_RATE : 0;
   const finalTotal = totalWithTax - discountAmount;
 
   // Update item total when quantity or price changes
@@ -596,8 +597,17 @@ export default function DoctorInvoice() {
                   <span>{taxAmount.toFixed(2)} {t('sar')}</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span>{t('discount')} (10%):</span>
-                  <div className="flex items-center">
+                  <span>{t('discount')}:</span>
+                  <div className="flex items-center space-x-2">
+                    <select
+                      value={applyDiscount ? "yes" : "no"}
+                      onChange={(e) => setApplyDiscount(e.target.value === "yes")}
+                      className="border border-gray-300 rounded px-3 py-1 text-sm"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
+                    >
+                      <option value="no">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</option>
+                      <option value="yes">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</option>
+                    </select>
                     <span className="text-lg font-medium">{discountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
                 </div>
