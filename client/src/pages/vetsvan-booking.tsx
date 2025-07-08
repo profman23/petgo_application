@@ -60,10 +60,20 @@ export default function VetsVanBooking() {
   const [selectedShift, setSelectedShift] = useState<number | null>(null);
 
   // جلب بيانات الحيوانات الأليفة للعميل
-  const { data: allPatients = [] } = useQuery({
+  const { data: allPatients = [], isLoading: patientsLoading, error: patientsError } = useQuery({
     queryKey: ['/api/patients'],
     enabled: !!requestData
   });
+
+  // تسجيل بيانات الحيوانات لتشخيص المشكلة
+  useEffect(() => {
+    console.log('🔍 VetsVan Booking Debug Info:');
+    console.log('📦 Request data:', requestData);
+    console.log('🐾 All patients from API:', allPatients);
+    console.log('📋 Patients loading:', patientsLoading);
+    console.log('❌ Patients error:', patientsError);
+    console.log('📊 Selected patient IDs from localStorage:', requestData?.selectedPatients);
+  }, [requestData, allPatients, patientsLoading, patientsError]);
 
   // تحميل بيانات الطلب من localStorage
   useEffect(() => {
