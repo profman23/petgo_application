@@ -150,14 +150,19 @@ export default function DoctorInvoice() {
   // Load saved invoice items when data is available
   useEffect(() => {
     if (savedInvoiceItems && savedInvoiceItems.length > 0) {
+      console.log('Loading saved invoice items:', savedInvoiceItems);
       const loadedItems = savedInvoiceItems.map((item: any, index: number) => ({
         id: (index + 1).toString(),
-        description: item.description,
-        quantity: item.quantity,
-        unitPrice: parseFloat(item.unitPrice),
-        total: parseFloat(item.total)
+        description: item.description || '',
+        quantity: parseInt(item.quantity) || 1,
+        unitPrice: parseFloat(item.unitPrice) || 0,
+        total: parseFloat(item.total) || 0
       }));
+      console.log('Loaded items:', loadedItems);
       setInvoiceItems(loadedItems);
+    } else if (savedInvoiceItems && savedInvoiceItems.length === 0) {
+      // If no saved items, keep the default item
+      setInvoiceItems([{ id: '1', description: '', quantity: 1, unitPrice: 0, total: 0 }]);
     }
   }, [savedInvoiceItems]);
 

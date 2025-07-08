@@ -877,10 +877,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getInvoiceItems(bookingId: number): Promise<InvoiceItem[]> {
-    return await db
+    const items = await db
       .select()
       .from(invoiceItems)
       .where(eq(invoiceItems.bookingId, bookingId));
+    
+    // Convert decimal fields to numbers for frontend compatibility
+    return items.map(item => ({
+      ...item,
+      unitPrice: item.unitPrice.toString(),
+      total: item.total.toString()
+    }));
   }
 
   async deleteInvoiceItems(bookingId: number): Promise<void> {
