@@ -573,6 +573,10 @@ Changelog:
 - July 8, 2025. ADDED: Missing /api/doctor/vetsvan-location endpoint for doctor activity page VetsVan location display
 - July 8, 2025. TESTED: Pet vitals creation confirmed working - successfully created record ID 13 with correct data persistence
 - July 8, 2025. SUCCESS: Both pet vitals system and VetsVan location endpoint fully operational and production-ready
+- July 8, 2025. FIXED: Frontend apiRequest body serialization - updated to properly handle both string and object payloads
+- July 8, 2025. RESOLVED: 500 Internal Server Error when saving pet vitals from doctor interface
+- July 8, 2025. ENHANCED: Error handling in doctor vitals modal with detailed error messages and console logging
+- July 8, 2025. CONFIRMED: Pet vitals system now fully functional from frontend with successful record creation (ID: 16, 17)
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

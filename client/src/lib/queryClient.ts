@@ -55,7 +55,7 @@ export async function apiRequest(
   const res = await fetch(url, {
     method: options?.method || 'GET',
     headers,
-    body: options?.body,
+    body: typeof options?.body === 'string' ? options.body : JSON.stringify(options?.body),
     credentials: "include",
   });
 

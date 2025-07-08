@@ -1926,8 +1926,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const vitalsData = {
         bookingId: req.body.bookingId,
         petId: req.body.petId,
-        weight: req.body.weight,
-        temperature: req.body.temperature,
+        weight: req.body.weight ? req.body.weight.toString() : null,
+        temperature: req.body.temperature ? req.body.temperature.toString() : null,
         heartRate: req.body.heartRate,
         notes: req.body.notes,
         recordedBy: req.body.recordedBy || 'doctor'

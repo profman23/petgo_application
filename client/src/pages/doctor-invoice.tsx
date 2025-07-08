@@ -238,10 +238,11 @@ export default function DoctorInvoice() {
         recordedBy: 'doctor'
       };
 
+      console.log('Sending vitals payload:', vitalsPayload);
+
       await apiRequest('/api/pet-vitals', {
         method: 'POST',
-        body: JSON.stringify(vitalsPayload),
-        headers: { 'Content-Type': 'application/json' }
+        body: vitalsPayload
       });
 
       toast({
@@ -251,8 +252,10 @@ export default function DoctorInvoice() {
 
       setShowVitalsModal(false);
     } catch (error) {
+      console.error('Error saving pet vitals:', error);
       toast({
         title: language === 'ar' ? "فشل في حفظ المؤشرات الحيوية" : "Failed to save pet vitals",
+        description: error instanceof Error ? error.message : "Unknown error occurred",
         variant: "destructive"
       });
     }
