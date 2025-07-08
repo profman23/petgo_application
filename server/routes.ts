@@ -2072,6 +2072,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Invoice Items endpoints
+  app.post('/api/invoice-items/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const { items } = req.body;
+      
+      if (!items || !Array.isArray(items)) {
+        return res.status(400).json({ message: 'Items array is required' });
+      }
+      
+      const savedItems = await storage.saveInvoiceItems(bookingId, items);
+      res.json(savedItems);
+    } catch (error) {
+      console.error('Error saving invoice items:', error);
+      res.status(500).json({ message: 'Failed to save invoice items' });
+    }
+  });
+
+  app.get('/api/invoice-items/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const items = await storage.getInvoiceItems(bookingId);
+      res.json(items);
+    } catch (error) {
+      console.error('Error fetching invoice items:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice items' });
+    }
+  });
+
+  app.delete('/api/invoice-items/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      await storage.deleteInvoiceItems(bookingId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting invoice items:', error);
+      res.status(500).json({ message: 'Failed to delete invoice items' });
+    }
+  });
+
+  // Invoice Status endpoints
+  app.post('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const { subtotal, taxAmount, discountAmount, finalTotal, notes } = req.body;
+      
+      const statusData = {
+        bookingId,
+        subtotal: parseFloat(subtotal),
+        taxAmount: parseFloat(taxAmount),
+        discountAmount: parseFloat(discountAmount),
+        finalTotal: parseFloat(finalTotal),
+        generatedBy: req.user.id.toString(),
+        notes: notes || null
+      };
+      
+      const savedStatus = await storage.saveInvoiceStatus(statusData);
+      res.json(savedStatus);
+    } catch (error) {
+      console.error('Error saving invoice status:', error);
+      res.status(500).json({ message: 'Failed to save invoice status' });
+    }
+  });
+
+  app.get('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const status = await storage.getInvoiceStatus(bookingId);
+      res.json(status);
+    } catch (error) {
+      console.error('Error fetching invoice status:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice status' });
+    }
+  });
+
+  app.put('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const updateData = req.body;
+      
+      const updatedStatus = await storage.updateInvoiceStatus(bookingId, updateData);
+      res.json(updatedStatus);
+    } catch (error) {
+      console.error('Error updating invoice status:', error);
+      res.status(500).json({ message: 'Failed to update invoice status' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

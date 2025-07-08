@@ -627,6 +627,14 @@ Changelog:
 - July 8, 2025. ADDED: Confirmation popup dialog before making invoice items read-only
 - July 8, 2025. ENHANCED: Invoice Item Section becomes view-only after confirmation while Pet Information Section remains editable
 - July 8, 2025. CREATED: Read-only indicator badge for locked invoice items with proper bilingual support
+- July 8, 2025. IMPLEMENTED: Complete database persistence solution for invoice items addressing critical navigation issue
+- July 8, 2025. CREATED: invoice_items and invoice_status tables in PostgreSQL database with proper foreign key relationships to bookings
+- July 8, 2025. ADDED: Comprehensive storage operations in server/storage.ts for invoice item and status CRUD operations
+- July 8, 2025. IMPLEMENTED: API endpoints in server/routes.ts for invoice item and status management (/api/invoice-items/:bookingId, /api/invoice-status/:bookingId)
+- July 8, 2025. UPDATED: client/src/pages/doctor-invoice.tsx to load and save invoice items from database, ensuring persistence across navigation
+- July 8, 2025. ENHANCED: Auto-save functionality with 1-second delay to prevent excessive database calls during editing
+- July 8, 2025. RESOLVED: Invoice items now persist across page navigation through database storage instead of local state
+- July 8, 2025. COMPLETED: Pet Information Section (Pet Vitals, Upload) remains editable even after invoice generation as requested
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

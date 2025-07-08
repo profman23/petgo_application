@@ -109,6 +109,78 @@ export default function DoctorInvoice() {
     enabled: !!params?.bookingId,
   });
 
+  // Fetch saved invoice items
+  const { data: savedInvoiceItems } = useQuery({
+    queryKey: [`/api/invoice-items/${params?.bookingId}`],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/invoice-items/${params?.bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        if (response.status === 404) return []; // No items found
+        throw new Error('Failed to fetch invoice items');
+      }
+      return await response.json();
+    },
+    enabled: !!params?.bookingId,
+  });
+
+  // Fetch invoice status
+  const { data: invoiceStatus } = useQuery({
+    queryKey: [`/api/invoice-status/${params?.bookingId}`],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/invoice-status/${params?.bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        if (response.status === 404) return null; // No status found
+        throw new Error('Failed to fetch invoice status');
+      }
+      return await response.json();
+    },
+    enabled: !!params?.bookingId,
+  });
+
+  // Load saved invoice items when data is available
+  useEffect(() => {
+    if (savedInvoiceItems && savedInvoiceItems.length > 0) {
+      const loadedItems = savedInvoiceItems.map((item: any, index: number) => ({
+        id: (index + 1).toString(),
+        description: item.description,
+        quantity: item.quantity,
+        unitPrice: parseFloat(item.unitPrice),
+        total: parseFloat(item.total)
+      }));
+      setInvoiceItems(loadedItems);
+    }
+  }, [savedInvoiceItems]);
+
+  // Auto-save when items are modified
+  useEffect(() => {
+    if (invoiceItems.length > 0 && booking && !isRecordLocked) {
+      const timeoutId = setTimeout(() => {
+        saveInvoiceItems(invoiceItems);
+      }, 1000); // Save after 1 second of inactivity
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [invoiceItems, booking, isRecordLocked]);
+
+  // Load invoice status when data is available
+  useEffect(() => {
+    if (invoiceStatus && invoiceStatus.isGenerated) {
+      setIsRecordLocked(true);
+      setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
+      setNotes(invoiceStatus.notes || '');
+    }
+  }, [invoiceStatus]);
+
   const getDirection = (lang: string) => lang === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = (lang: string) => lang === 'ar' ? 'right' : 'left';
 
@@ -264,22 +336,40 @@ export default function DoctorInvoice() {
     );
   };
 
+  // Save invoice items to database (auto-save)
+  const saveInvoiceItems = async (itemsToSave: InvoiceItem[]) => {
+    if (!booking || isRecordLocked) return;
+    
+    try {
+      await apiRequest(`/api/invoice-items/${booking.id}`, {
+        method: 'POST',
+        body: { items: itemsToSave }
+      });
+    } catch (error) {
+      console.error('Error auto-saving invoice items:', error);
+    }
+  };
+
   // Add new item
   const addItem = () => {
     const newId = (invoiceItems.length + 1).toString();
-    setInvoiceItems([...invoiceItems, { 
+    const newItems = [...invoiceItems, { 
       id: newId, 
       description: '', 
       quantity: 1, 
       unitPrice: 0, 
       total: 0 
-    }]);
+    }];
+    setInvoiceItems(newItems);
+    saveInvoiceItems(newItems);
   };
 
   // Remove item
   const removeItem = (id: string) => {
     if (invoiceItems.length > 1) {
-      setInvoiceItems(items => items.filter(item => item.id !== id));
+      const newItems = invoiceItems.filter(item => item.id !== id);
+      setInvoiceItems(newItems);
+      saveInvoiceItems(newItems);
     }
   };
 
@@ -418,6 +508,24 @@ export default function DoctorInvoice() {
         return;
       }
 
+      // Save invoice items to database
+      await apiRequest(`/api/invoice-items/${booking.id}`, {
+        method: 'POST',
+        body: { items: invoiceItems }
+      });
+
+      // Save invoice status to database
+      await apiRequest(`/api/invoice-status/${booking.id}`, {
+        method: 'POST',
+        body: {
+          subtotal,
+          taxAmount,
+          discountAmount,
+          finalTotal,
+          notes
+        }
+      });
+
       // Lock the record (make invoice items read-only)
       setIsRecordLocked(true);
       setShowConfirmDialog(false);
@@ -429,6 +537,7 @@ export default function DoctorInvoice() {
         variant: 'default',
       });
     } catch (error) {
+      console.error('Error generating invoice:', error);
       toast({
         title: language === 'ar' ? '❌ خطأ في إنشاء الفاتورة' : '❌ Error generating invoice',
         description: language === 'ar' ? 'حدث خطأ أثناء إنشاء الفاتورة' : 'An error occurred while generating the invoice',

@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 
@@ -106,6 +106,16 @@ export interface IStorage {
   getPetAttachmentsByBooking(bookingId: number): Promise<PetAttachment[]>;
   getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]>;
   deletePetAttachment(id: number, uploadedBy: string): Promise<boolean>;
+
+  // Invoice Items operations
+  saveInvoiceItems(bookingId: number, items: any[]): Promise<InvoiceItem[]>;
+  getInvoiceItems(bookingId: number): Promise<InvoiceItem[]>;
+  deleteInvoiceItems(bookingId: number): Promise<void>;
+
+  // Invoice Status operations
+  saveInvoiceStatus(status: InsertInvoiceStatus): Promise<InvoiceStatus>;
+  getInvoiceStatus(bookingId: number): Promise<InvoiceStatus | undefined>;
+  updateInvoiceStatus(bookingId: number, data: Partial<InvoiceStatus>): Promise<InvoiceStatus | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1615,6 +1625,85 @@ class MemStorage implements IStorage {
       .where(and(eq(petAttachments.id, id), eq(petAttachments.uploadedBy, uploadedBy)))
       .returning();
     return result.length > 0;
+  }
+
+  // Invoice Items operations (DatabaseStorage implementation)
+  async saveInvoiceItems(bookingId: number, items: any[]): Promise<InvoiceItem[]> {
+    // First delete existing invoice items for this booking
+    await db.delete(invoiceItems).where(eq(invoiceItems.bookingId, bookingId));
+    
+    // Insert new invoice items
+    const insertData = items.map(item => ({
+      bookingId,
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice.toString(),
+      total: item.total.toString(),
+    }));
+    
+    if (insertData.length === 0) return [];
+    
+    const savedItems = await db.insert(invoiceItems).values(insertData).returning();
+    return savedItems;
+  }
+
+  async getInvoiceItems(bookingId: number): Promise<InvoiceItem[]> {
+    return await db
+      .select()
+      .from(invoiceItems)
+      .where(eq(invoiceItems.bookingId, bookingId));
+  }
+
+  async deleteInvoiceItems(bookingId: number): Promise<void> {
+    await db.delete(invoiceItems).where(eq(invoiceItems.bookingId, bookingId));
+  }
+
+  // Invoice Status operations (DatabaseStorage implementation)
+  async saveInvoiceStatus(status: InsertInvoiceStatus): Promise<InvoiceStatus> {
+    const [savedStatus] = await db
+      .insert(invoiceStatus)
+      .values({
+        ...status,
+        subtotal: status.subtotal.toString(),
+        taxAmount: status.taxAmount.toString(),
+        discountAmount: status.discountAmount.toString(),
+        finalTotal: status.finalTotal.toString(),
+        isGenerated: true,
+        generatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: invoiceStatus.bookingId,
+        set: {
+          isGenerated: true,
+          generatedAt: new Date(),
+          generatedBy: status.generatedBy,
+          notes: status.notes,
+          subtotal: status.subtotal.toString(),
+          taxAmount: status.taxAmount.toString(),
+          discountAmount: status.discountAmount.toString(),
+          finalTotal: status.finalTotal.toString(),
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return savedStatus;
+  }
+
+  async getInvoiceStatus(bookingId: number): Promise<InvoiceStatus | undefined> {
+    const [status] = await db
+      .select()
+      .from(invoiceStatus)
+      .where(eq(invoiceStatus.bookingId, bookingId));
+    return status;
+  }
+
+  async updateInvoiceStatus(bookingId: number, data: Partial<InvoiceStatus>): Promise<InvoiceStatus | undefined> {
+    const [updatedStatus] = await db
+      .update(invoiceStatus)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(invoiceStatus.bookingId, bookingId))
+      .returning();
+    return updatedStatus;
   }
 }
 

@@ -300,3 +300,56 @@ export const insertPetAttachmentSchema = createInsertSchema(petAttachments).pick
 export type PetAttachment = typeof petAttachments.$inferSelect;
 export type InsertPetAttachment = typeof petAttachments.$inferInsert;
 export type InsertPetVital = z.infer<typeof insertPetVitalSchema>;
+
+// Invoice Items table for storing saved invoice items
+export const invoiceItems = pgTable("invoice_items", {
+  id: serial("id").primaryKey(),
+  bookingId: integer("booking_id").references(() => bookings.id).notNull(),
+  description: text("description").notNull(),
+  quantity: integer("quantity").notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertInvoiceItemSchema = createInsertSchema(invoiceItems).pick({
+  bookingId: true,
+  description: true,
+  quantity: true,
+  unitPrice: true,
+  total: true,
+});
+
+export type InvoiceItem = typeof invoiceItems.$inferSelect;
+export type InsertInvoiceItem = z.infer<typeof insertInvoiceItemSchema>;
+
+// Invoice Status table to track if invoice is generated
+export const invoiceStatus = pgTable("invoice_status", {
+  id: serial("id").primaryKey(),
+  bookingId: integer("booking_id").references(() => bookings.id).notNull().unique(),
+  isGenerated: boolean("is_generated").notNull().default(false),
+  generatedAt: timestamp("generated_at"),
+  generatedBy: varchar("generated_by").notNull(), // doctor ID
+  notes: text("notes"),
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
+  discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull(),
+  finalTotal: decimal("final_total", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertInvoiceStatusSchema = createInsertSchema(invoiceStatus).pick({
+  bookingId: true,
+  isGenerated: true,
+  generatedBy: true,
+  notes: true,
+  subtotal: true,
+  taxAmount: true,
+  discountAmount: true,
+  finalTotal: true,
+});
+
+export type InvoiceStatus = typeof invoiceStatus.$inferSelect;
+export type InsertInvoiceStatus = z.infer<typeof insertInvoiceStatusSchema>;
