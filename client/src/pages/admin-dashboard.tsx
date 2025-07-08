@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Badge } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import {
@@ -162,6 +162,7 @@ export default function AdminDashboard() {
         id: number;
         customerName: string;
         customerPhone: string;
+        customerEmail: string;
         vetsvanCode: string;
         vetsvanName: string;
         appointmentDate: string;
@@ -307,6 +308,36 @@ export default function AdminDashboard() {
       toast({
         title: t('error'),
         description: language === 'ar' ? 'فشل في إرسال الرسالة النصية' : 'Failed to send SMS message',
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update booking status mutation
+  const updateBookingStatusMutation = useMutation({
+    mutationFn: async ({ bookingId, status }: { bookingId: number; status: string }) => {
+      const response = await fetch(`/api/admin/booking/${bookingId}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Failed to update booking status");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/vetsvan-requests"] });
+      toast({
+        title: language === 'ar' ? 'تم تحديث الحالة' : 'Status Updated',
+        description: language === 'ar' ? 'تم تحديث حالة الحجز بنجاح' : 'Booking status updated successfully',
+      });
+    },
+    onError: () => {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'فشل في تحديث حالة الحجز' : 'Failed to update booking status',
         variant: "destructive",
       });
     },
@@ -834,6 +865,10 @@ export default function AdminDashboard() {
                                   <Phone className="h-4 w-4 text-gray-500" />
                                   <span className="text-sm text-gray-600">{request.customerPhone}</span>
                                 </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Mail className="h-4 w-4 text-gray-500" />
+                                  <span className="text-sm text-gray-600">{request.customerEmail}</span>
+                                </div>
                               </div>
                               <UIBadge 
                                 variant={
@@ -923,6 +958,39 @@ export default function AdminDashboard() {
                                 </div>
                               </div>
                             )}
+
+                            {/* Status Update */}
+                            <div className="bg-gray-50 rounded-lg p-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+                                <span className="text-sm font-medium text-gray-900">
+                                  {language === 'ar' ? 'تحديث الحالة:' : 'Update Status:'}
+                                </span>
+                              </div>
+                              <select
+                                value={request.status}
+                                onChange={(e) => {
+                                  const newStatus = e.target.value;
+                                  updateBookingStatusMutation.mutate({ 
+                                    bookingId: request.id, 
+                                    status: newStatus 
+                                  });
+                                }}
+                                disabled={updateBookingStatusMutation.isPending}
+                                className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                                style={{ textAlign: getTextAlign(language) }}
+                              >
+                                <option value="pending_review">
+                                  {language === 'ar' ? 'قيد المراجعة' : 'Pending Review'}
+                                </option>
+                                <option value="confirmed">
+                                  {language === 'ar' ? 'مؤكد' : 'Confirmed'}
+                                </option>
+                                <option value="cancelled">
+                                  {language === 'ar' ? 'ملغي' : 'Cancelled'}
+                                </option>
+                              </select>
+                            </div>
 
                             {/* Created Date */}
                             <div className="border-t pt-3 mt-4">

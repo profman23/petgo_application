@@ -77,6 +77,23 @@ export interface IStorage {
     vetsvanName: string;
     vetsvanCode: string;
   }>>;
+  
+  // VetsVan requests operations
+  getAllVetsVanRequestsWithDetails(): Promise<Array<{
+    id: number;
+    customerName: string;
+    customerPhone: string;
+    customerEmail: string;
+    vetsvanCode: string;
+    vetsvanName: string;
+    appointmentDate: string;
+    appointmentTime: string;
+    status: string;
+    location: any;
+    pets: Array<{ name: string; type: string; }>;
+    serviceType: string;
+    createdAt: string;
+  }>>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -554,6 +571,73 @@ export class DatabaseStorage implements IStorage {
 
   async getUserReviews(userId: number): Promise<Review[]> {
     return await db.select().from(reviews).where(eq(reviews.userId, userId));
+  }
+
+  async getAllVetsVanRequestsWithDetails(): Promise<Array<{
+    id: number;
+    customerName: string;
+    customerPhone: string;
+    customerEmail: string;
+    vetsvanCode: string;
+    vetsvanName: string;
+    appointmentDate: string;
+    appointmentTime: string;
+    status: string;
+    location: any;
+    pets: Array<{ name: string; type: string; }>;
+    serviceType: string;
+    createdAt: string;
+  }>> {
+    const allBookings = await db.select().from(bookings);
+    const detailedRequests = [];
+    
+    for (const booking of allBookings) {
+      // Get user details
+      const [user] = await db.select().from(users).where(eq(users.id, booking.userId));
+      if (!user) continue;
+      
+      // Get shift details to get VetsVan info
+      const [shift] = await db.select().from(shifts).where(eq(shifts.id, booking.shiftId));
+      if (!shift) continue;
+      
+      // Get driver details
+      const [driver] = await db.select().from(drivers).where(eq(drivers.id, shift.vetsVanId));
+      if (!driver) continue;
+      
+      // Parse pets data
+      let pets = [];
+      try {
+        pets = typeof booking.pets === 'string' ? JSON.parse(booking.pets) : (booking.pets || []);
+      } catch (e) {
+        pets = [];
+      }
+
+      // Parse location data
+      let location = null;
+      try {
+        location = typeof booking.customerLocation === 'string' ? JSON.parse(booking.customerLocation) : booking.customerLocation;
+      } catch (e) {
+        location = null;
+      }
+      
+      detailedRequests.push({
+        id: booking.id,
+        customerName: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown Customer',
+        customerPhone: user.phone || 'N/A',
+        customerEmail: user.email || 'N/A',
+        vetsvanCode: driver.vetsvanCode || 'N/A',
+        vetsvanName: driver.vetsvanName || driver.name || 'N/A',
+        appointmentDate: booking.appointmentDate,
+        appointmentTime: booking.appointmentTime,
+        status: booking.status,
+        location: location,
+        pets: pets,
+        serviceType: booking.serviceType || 'general_checkup',
+        createdAt: booking.createdAt.toISOString(),
+      });
+    }
+    
+    return detailedRequests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   async getReportsStats(): Promise<{
@@ -1143,6 +1227,75 @@ class MemStorage implements IStorage {
     }
     
     return detailedReviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async getAllVetsVanRequestsWithDetails(): Promise<Array<{
+    id: number;
+    customerName: string;
+    customerPhone: string;
+    customerEmail: string;
+    vetsvanCode: string;
+    vetsvanName: string;
+    appointmentDate: string;
+    appointmentTime: string;
+    status: string;
+    location: any;
+    pets: Array<{ name: string; type: string; }>;
+    serviceType: string;
+    createdAt: string;
+  }>> {
+    console.log('getAllVetsVanRequestsWithDetails called in MemStorage');
+    console.log('Total bookings:', this.bookings.size);
+    const detailedRequests = [];
+    
+    for (const booking of this.bookings.values()) {
+      console.log('Processing booking:', booking.id);
+      // Get user details
+      const user = this.users.get(booking.userId);
+      if (!user) continue;
+      
+      // Get shift details to get VetsVan info
+      const shift = this.shifts.get(booking.shiftId);
+      if (!shift) continue;
+      
+      // Get driver details
+      const driver = this.drivers.get(shift.vetsVanId);
+      if (!driver) continue;
+      
+      // Parse pets data
+      let pets = [];
+      try {
+        pets = typeof booking.pets === 'string' ? JSON.parse(booking.pets) : (booking.pets || []);
+      } catch (e) {
+        pets = [];
+      }
+
+      // Parse location data
+      let location = null;
+      try {
+        location = typeof booking.customerLocation === 'string' ? JSON.parse(booking.customerLocation) : booking.customerLocation;
+      } catch (e) {
+        location = null;
+      }
+      
+      detailedRequests.push({
+        id: booking.id,
+        customerName: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Unknown Customer',
+        customerPhone: user.phone || 'N/A',
+        customerEmail: user.email || 'N/A',
+        vetsvanCode: driver.vetsvanCode || 'N/A',
+        vetsvanName: driver.vetsvanName || driver.name || 'N/A',
+        appointmentDate: booking.appointmentDate,
+        appointmentTime: booking.appointmentTime,
+        status: booking.status,
+        location: location,
+        pets: pets,
+        serviceType: booking.serviceType || 'general_checkup',
+        createdAt: booking.createdAt.toISOString(),
+      });
+    }
+    
+    return detailedRequests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 }
 

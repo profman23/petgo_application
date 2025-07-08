@@ -1800,49 +1800,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all VetsVan requests for admin dashboard
   app.get('/api/admin/vetsvan-requests', requireAdminAuth, async (req, res) => {
     try {
-      const allBookings = await storage.getAllBookings();
-      
-      // Transform bookings data for admin view
-      const requestsData = allBookings.map((booking: any) => {
-        // Parse pets data if it's a string
-        let pets = [];
-        try {
-          pets = typeof booking.pets === 'string' ? JSON.parse(booking.pets) : (booking.pets || []);
-        } catch (e) {
-          pets = [];
-        }
-
-        // Parse location data if it's a string
-        let location = null;
-        try {
-          location = typeof booking.location === 'string' ? JSON.parse(booking.location) : booking.location;
-        } catch (e) {
-          location = null;
-        }
-
-        return {
-          id: booking.id,
-          customerName: `${booking.user?.firstName || ''} ${booking.user?.lastName || ''}`.trim() || 'Unknown Customer',
-          customerPhone: booking.user?.phone || 'N/A',
-          vetsvanCode: booking.driver?.vetsvanCode || 'N/A',
-          vetsvanName: booking.driver?.vetsvanName || 'N/A',
-          appointmentDate: booking.appointmentDate,
-          appointmentTime: booking.appointmentTime,
-          status: booking.status,
-          location: location,
-          pets: pets,
-          serviceType: booking.serviceType || 'general_checkup',
-          createdAt: booking.createdAt
-        };
-      });
-
-      // Sort by creation date (newest first)
-      requestsData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-      res.json(requestsData);
+      console.log('Admin VetsVan requests called - starting data fetch...');
+      const detailedRequests = await storage.getAllVetsVanRequestsWithDetails();
+      console.log('VetsVan requests data fetched successfully:', detailedRequests.length, 'requests');
+      res.json(detailedRequests);
     } catch (error) {
       console.error('Error fetching VetsVan requests:', error);
+      console.error('Error stack:', error.stack);
       res.status(500).json({ message: 'Failed to fetch VetsVan requests' });
+    }
+  });
+
+  // Update booking status from admin dashboard
+  app.put('/api/admin/booking/:bookingId/status', requireAdminAuth, async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const { status } = req.body;
+      
+      if (!bookingId || !status) {
+        return res.status(400).json({ message: 'Booking ID and status are required' });
+      }
+      
+      const updatedBooking = await storage.updateBookingStatus(bookingId, status);
+      
+      if (!updatedBooking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+      
+      res.json({ success: true, booking: updatedBooking });
+    } catch (error) {
+      console.error('Error updating booking status:', error);
+      res.status(500).json({ message: 'Failed to update booking status' });
     }
   });
 
