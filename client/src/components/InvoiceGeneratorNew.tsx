@@ -65,15 +65,13 @@ export default function InvoiceGeneratorNew({ invoiceData, onClose }: InvoiceGen
 
   // Saudi Riyal Currency Icon Component
   const RiyalIcon = () => (
-    <svg 
-      width="18" 
-      height="18" 
-      viewBox="0 0 100 100" 
-      className="inline-block ml-1"
-      fill="currentColor"
-    >
-      <path d="M10 15 L10 85 L25 85 L25 55 L40 55 L40 85 L55 85 L55 35 L85 35 L85 20 L55 20 L55 15 L40 15 L40 20 L25 20 L25 15 Z M65 45 L90 45 L90 55 L65 55 Z M65 65 L90 65 L90 75 L65 75 Z"/>
-    </svg>
+    <img 
+      src="/attached_assets/Screenshot 2025-07-08 171944_1751984409622.png"
+      alt="SAR"
+      width="20" 
+      height="20" 
+      className="inline-block ml-1 object-contain"
+    />
   );
 
   const formatCurrency = (amount: number) => {
