@@ -84,14 +84,18 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   // إنشاء mutation للحجز الفوري
   const directBookingMutation = useMutation({
     mutationFn: async (bookingData: { shiftId: number; vetsVanId: number; appointmentDate: string; appointmentTime: string }) => {
-      // Get customer location for the booking
+      // Get customer location and pet/service data for the booking
       let customerLocation = null;
+      let selectedPets: any[] = [];
+      let serviceType = 'General Check Up';
       
-      // First try to get location from localStorage (from ride request)
+      // First try to get data from localStorage (from ride request)
       const pendingRequestData = localStorage.getItem('pendingRequest');
       if (pendingRequestData) {
         try {
           const requestData = JSON.parse(pendingRequestData);
+          
+          // Get location data
           if (requestData.pickupLatitude && requestData.pickupLongitude) {
             customerLocation = {
               latitude: Number(requestData.pickupLatitude),
@@ -100,12 +104,34 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             };
             console.log('📍 VetsVanAvailabilityTable: Using localStorage location:', customerLocation);
           }
+          
+          // Get selected pets and service type
+          if (requestData.selectedPatients && Array.isArray(requestData.selectedPatients)) {
+            console.log('🐾 VetsVanAvailabilityTable: Found selectedPatients in localStorage:', requestData.selectedPatients);
+            
+            // Fetch all patients to get full details for selected IDs
+            try {
+              const patientsResponse = await apiRequest('/api/patients');
+              const allPatients = patientsResponse || [];
+              selectedPets = allPatients.filter((pet: any) => 
+                requestData.selectedPatients.includes(pet.id)
+              );
+              console.log('🐾 VetsVanAvailabilityTable: Converted pets data:', selectedPets);
+            } catch (error) {
+              console.error('Error fetching patients data:', error);
+            }
+          }
+          
+          if (requestData.selectedService) {
+            serviceType = requestData.selectedService;
+            console.log('🏥 VetsVanAvailabilityTable: Found service type:', serviceType);
+          }
         } catch (e) {
           console.error('Error parsing pending request data:', e);
         }
       }
       
-      // Fallback to GPS hook values
+      // Fallback to GPS hook values for location
       if (!customerLocation && latitude && longitude) {
         customerLocation = {
           latitude: Number(latitude),
@@ -115,13 +141,15 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         console.log('📍 VetsVanAvailabilityTable: Using GPS location:', customerLocation);
       }
       
-      // Add customerLocation to booking data
+      // Add all required data to booking
       const completeBookingData = {
         ...bookingData,
-        customerLocation
+        customerLocation,
+        selectedPets,
+        serviceType
       };
       
-      console.log('📍 VetsVanAvailabilityTable: Sending booking with location:', completeBookingData);
+      console.log('📍 VetsVanAvailabilityTable: Sending complete booking data:', completeBookingData);
       
       return await apiRequest('/api/bookings', {
         method: 'POST',
