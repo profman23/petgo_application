@@ -71,7 +71,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
       alt="SAR"
       width="20" 
       height="20" 
-      className="inline-block ml-1 object-contain"
+      className="inline-block ml-1 object-contain bg-white rounded px-1 py-0.5"
     />
   );
 
