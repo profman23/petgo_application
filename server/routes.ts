@@ -997,7 +997,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Book an appointment
   app.post('/api/bookings', requireAuth, async (req: any, res) => {
     try {
-      const { shiftId, vetsVanId, appointmentDate, appointmentTime, customerLocation } = req.body;
+      const { shiftId, vetsVanId, appointmentDate, appointmentTime, customerLocation, selectedPets, serviceType } = req.body;
       const userId = req.user.id;
       
       console.log('📍 Creating booking with request body:', req.body);
@@ -1024,7 +1024,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         appointmentDate,
         appointmentTime,
         status: 'pending_review',
-        customerLocation: customerLocation || null
+        customerLocation: customerLocation || null,
+        selectedPets: selectedPets || [],
+        serviceType: serviceType || 'General Check Up'
       });
 
       // Get user details for the notification

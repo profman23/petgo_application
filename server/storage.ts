@@ -569,11 +569,11 @@ export class DatabaseStorage implements IStorage {
     const [customer] = await db.select().from(users).where(eq(users.id, booking.userId));
     if (!customer) return undefined;
 
-    // Get customer's pets
-    const pets = await db.select().from(patients).where(eq(patients.userId, booking.userId));
-
     // Get VetsVan details  
     const [vetsVan] = await db.select().from(drivers).where(eq(drivers.id, booking.vetsVanId));
+
+    // Use selected pets from booking instead of all customer pets
+    const selectedPetsData = booking.selectedPets || [];
 
     return {
       id: booking.id,
@@ -583,7 +583,7 @@ export class DatabaseStorage implements IStorage {
         phone: customer.phone,
         email: customer.email,
       },
-      pets: pets.map(pet => ({
+      pets: selectedPetsData.map((pet: any) => ({
         name: pet.name,
         type: pet.type,
         ageYear: pet.ageYear || 0,
@@ -592,7 +592,7 @@ export class DatabaseStorage implements IStorage {
       })),
       appointmentDate: booking.appointmentDate,
       appointmentTime: booking.appointmentTime,
-      serviceType: 'General Check Up', // Default service type
+      serviceType: booking.serviceType || 'General Check Up',
       location: booking.customerLocation,
       status: booking.status,
       vetsVanId: booking.vetsVanId,
@@ -1129,9 +1129,9 @@ class MemStorage implements IStorage {
       appointmentDate: bookingData.appointmentDate,
       appointmentTime: bookingData.appointmentTime,
       status: bookingData.status || 'pending_review',
-      customerName: bookingData.customerName,
-      customerPhone: bookingData.customerPhone,
       customerLocation: bookingData.customerLocation,
+      selectedPets: bookingData.selectedPets || [],
+      serviceType: bookingData.serviceType || 'General Check Up',
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -1179,11 +1179,11 @@ class MemStorage implements IStorage {
     const customer = this.users.get(booking.userId);
     if (!customer) return undefined;
 
-    // Get customer's pets
-    const customerPets = Array.from(this.patients.values()).filter(pet => pet.userId === booking.userId);
-
     // Get VetsVan details
     const vetsVan = this.drivers.get(booking.vetsVanId);
+
+    // Use selected pets from booking instead of all customer pets
+    const selectedPetsData = booking.selectedPets || [];
 
     return {
       id: booking.id,
@@ -1193,7 +1193,7 @@ class MemStorage implements IStorage {
         phone: customer.phone,
         email: customer.email,
       },
-      pets: customerPets.map(pet => ({
+      pets: selectedPetsData.map((pet: any) => ({
         name: pet.name,
         type: pet.type,
         ageYear: pet.ageYear || 0,
@@ -1202,7 +1202,7 @@ class MemStorage implements IStorage {
       })),
       appointmentDate: booking.appointmentDate,
       appointmentTime: booking.appointmentTime,
-      serviceType: 'General Check Up', // Default service type
+      serviceType: booking.serviceType || 'General Check Up',
       location: booking.customerLocation,
       status: booking.status,
       vetsVanId: booking.vetsVanId,

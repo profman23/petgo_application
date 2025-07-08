@@ -197,6 +197,15 @@ export const bookings = pgTable("bookings", {
     longitude: number;
     address?: string;
   }>(),
+  selectedPets: jsonb("selected_pets").$type<Array<{
+    id: number;
+    name: string;
+    type: string;
+    ageYear?: number;
+    ageMonth?: number;
+    ageDay?: number;
+  }>>(),
+  serviceType: text("service_type").default("General Check Up"),
   // Payment fields removed per user request
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -210,6 +219,8 @@ export const insertBookingSchema = createInsertSchema(bookings).pick({
   appointmentTime: true,
   status: true,
   customerLocation: true,
+  selectedPets: true,
+  serviceType: true,
   // Payment fields removed
 });
 

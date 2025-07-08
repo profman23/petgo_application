@@ -325,7 +325,9 @@ export default function VetsVanBooking() {
         vetsVanId: selectedVetsVan,
         appointmentDate: selectedDate,
         appointmentTime: selectedTime,
-        customerLocation
+        customerLocation,
+        selectedPets: requestData?.selectedPatients || [],
+        serviceType: requestData?.selectedService || 'General Check Up'
       };
 
       console.log('🔍 Final booking data before sending:', JSON.stringify(bookingData, null, 2));
