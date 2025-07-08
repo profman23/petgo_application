@@ -161,9 +161,19 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               display: flex; 
               justify-content: space-between; 
               align-items: flex-start; 
-              margin-bottom: 30px; 
-              padding-bottom: 20px; 
+              margin-bottom: 15px; 
+              padding-bottom: 15px; 
               border-bottom: 3px solid #8B2F8B;
+            }
+            .logo-header {
+              text-align: center;
+              margin-bottom: 15px;
+            }
+            .logo-header img {
+              height: 60px !important;
+              width: auto !important;
+              max-width: 200px !important;
+              object-fit: contain !important;
             }
             .logo-section { flex: 1.5; }
             .company-name { 
@@ -338,6 +348,20 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               color: #8B2F8B; 
               margin-bottom: 10px;
             }
+            .logo-header img {
+              height: 60px !important;
+              width: auto !important;
+              max-width: 200px !important;
+              object-fit: contain !important;
+            }
+            @media print {
+              .logo-header img {
+                height: 60px !important;
+                width: auto !important;
+                max-width: 200px !important;
+                object-fit: contain !important;
+              }
+            }
           </style>
         </head>
         <body>
@@ -430,7 +454,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
         {/* Invoice Content */}
         <div ref={invoiceRef} className="invoice-container p-8">
           {/* Company Logo Header */}
-          <div className="text-center mb-4">
+          <div className="logo-header">
             <img 
               src={logoImage}
               alt="Vets Van Logo"
