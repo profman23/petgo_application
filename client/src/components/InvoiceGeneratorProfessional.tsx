@@ -69,7 +69,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
   };
 
   const formatCurrency = (amount: number) => {
-    return `${amount.toFixed(2)} ${language === 'ar' ? 'ريال سعودي' : 'SAR'}`;
+    return `${amount.toFixed(2)} SAR`;
   };
 
   const formatTime = (time: string) => {
