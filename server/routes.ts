@@ -1908,8 +1908,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Pet vitals API endpoints
   app.post('/api/pet-vitals', async (req, res) => {
     try {
-      const vital = await storage.createPetVital(req.body);
-      res.json(vital);
+      // Direct database insert as a workaround
+      const { db } = await import('./db');
+      const { petVitals } = await import('@shared/schema');
+      
+      const [newVital] = await db
+        .insert(petVitals)
+        .values(req.body)
+        .returning();
+      
+      console.log('Pet vital created successfully:', newVital);
+      res.json(newVital);
     } catch (error) {
       console.error('Error creating pet vital:', error);
       res.status(500).json({ message: 'Failed to create pet vital' });
@@ -1918,8 +1927,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/pet-vitals/booking/:bookingId', async (req, res) => {
     try {
+      const { db } = await import('./db');
+      const { petVitals } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      
       const bookingId = parseInt(req.params.bookingId);
-      const vitals = await storage.getPetVitalsByBooking(bookingId);
+      const vitals = await db
+        .select()
+        .from(petVitals)
+        .where(eq(petVitals.bookingId, bookingId));
+        
       res.json(vitals);
     } catch (error) {
       console.error('Error fetching pet vitals:', error);
@@ -1929,9 +1946,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/pet-vitals/:id', async (req, res) => {
     try {
+      const { db } = await import('./db');
+      const { petVitals } = await import('@shared/schema');
+      const { eq } = await import('drizzle-orm');
+      
       const id = parseInt(req.params.id);
-      const vital = await storage.updatePetVital(id, req.body);
-      res.json(vital);
+      const [updatedVital] = await db
+        .update(petVitals)
+        .set(req.body)
+        .where(eq(petVitals.id, id))
+        .returning();
+        
+      res.json(updatedVital);
     } catch (error) {
       console.error('Error updating pet vital:', error);
       res.status(500).json({ message: 'Failed to update pet vital' });

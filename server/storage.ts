@@ -1436,6 +1436,7 @@ class MemStorage implements IStorage {
 
   // Pet vitals operations
   async createPetVital(vital: InsertPetVital): Promise<PetVital> {
+    console.log('DatabaseStorage createPetVital called with:', vital);
     const [newVital] = await db
       .insert(petVitals)
       .values(vital)
