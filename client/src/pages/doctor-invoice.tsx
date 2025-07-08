@@ -225,21 +225,16 @@ export default function DoctorInvoice() {
     // Load existing vitals data if available
     if (booking) {
       try {
-        const response = await fetch(`/api/pet-vitals/${booking.id}`);
-        if (response.ok) {
-          const existingVitals = await response.json();
-          const petVitals = existingVitals.find((vital: any) => vital.petId === pet.id);
-          
-          if (petVitals) {
-            setVitalsData({
-              weight: petVitals.weight?.toString() || '',
-              temperature: petVitals.temperature?.toString() || '',
-              heartRate: petVitals.heartRate?.toString() || '',
-              notes: petVitals.notes || ''
-            });
-          } else {
-            setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
-          }
+        const existingVitals = await apiRequest(`/api/pet-vitals/booking/${booking.id}`);
+        const petVitals = existingVitals.find((vital: any) => vital.petId === pet.id);
+        
+        if (petVitals) {
+          setVitalsData({
+            weight: petVitals.weight?.toString() || '',
+            temperature: petVitals.temperature?.toString() || '',
+            heartRate: petVitals.heartRate?.toString() || '',
+            notes: petVitals.notes || ''
+          });
         } else {
           setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
         }
@@ -271,17 +266,14 @@ export default function DoctorInvoice() {
       console.log('Booking:', booking);
 
       // Check if vitals already exist for this pet
-      const existingVitalsResponse = await fetch(`/api/pet-vitals/${booking.id}`);
+      const existingVitals = await apiRequest(`/api/pet-vitals/booking/${booking.id}`);
       let isUpdate = false;
       let existingVitalId = null;
       
-      if (existingVitalsResponse.ok) {
-        const existingVitals = await existingVitalsResponse.json();
-        const existingPetVital = existingVitals.find((vital: any) => vital.petId === selectedPet.id);
-        if (existingPetVital) {
-          isUpdate = true;
-          existingVitalId = existingPetVital.id;
-        }
+      const existingPetVital = existingVitals.find((vital: any) => vital.petId === selectedPet.id);
+      if (existingPetVital) {
+        isUpdate = true;
+        existingVitalId = existingPetVital.id;
       }
 
       if (isUpdate && existingVitalId) {
