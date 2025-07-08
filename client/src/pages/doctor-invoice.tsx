@@ -226,7 +226,11 @@ export default function DoctorInvoice() {
     if (booking) {
       try {
         const existingVitals = await apiRequest(`/api/pet-vitals/booking/${booking.id}`);
-        const petVitals = existingVitals.find((vital: any) => vital.petId === pet.id);
+        // Get the most recent vitals for this pet (sorted by recordedAt descending)
+        const petVitalsArray = existingVitals.filter((vital: any) => vital.petId === pet.id);
+        const petVitals = petVitalsArray.length > 0 ? 
+          petVitalsArray.sort((a: any, b: any) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime())[0] : 
+          null;
         
         if (petVitals) {
           setVitalsData({
@@ -270,7 +274,12 @@ export default function DoctorInvoice() {
       let isUpdate = false;
       let existingVitalId = null;
       
-      const existingPetVital = existingVitals.find((vital: any) => vital.petId === selectedPet.id);
+      // Get the most recent vitals for this pet
+      const petVitalsArray = existingVitals.filter((vital: any) => vital.petId === selectedPet.id);
+      const existingPetVital = petVitalsArray.length > 0 ? 
+        petVitalsArray.sort((a: any, b: any) => new Date(b.recordedAt).getTime() - new Date(a.recordedAt).getTime())[0] : 
+        null;
+        
       if (existingPetVital) {
         isUpdate = true;
         existingVitalId = existingPetVital.id;
