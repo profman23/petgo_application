@@ -93,17 +93,13 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  firstName: z.string().min(2, "الاسم مطلوب (حد أدنى حرفين)"),
-  lastName: z.string().optional().default(""),
+  firstName: z.string().min(2, "الاسم الأول مطلوب (حد أدنى حرفين)"),
+  lastName: z.string().min(2, "الاسم الثاني مطلوب (حد أدنى حرفين)"),
   email: z.string().email("البريد الإلكتروني غير صحيح"),
   phone: z.string()
     .regex(/^05\d{8}$/, "رقم الهاتف يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"),
   password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
-  confirmPassword: z.string().min(6, "تأكيد كلمة المرور مطلوب"),
-  captcha: z.number().min(1, "يرجى إدخال رمز التحقق"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "كلمة المرور غير متطابقة",
-  path: ["confirmPassword"],
+  captcha: z.string().min(1, "يرجى إدخال رمز التحقق"),
 });
 
 export const rideRequestSchema = createInsertSchema(rides).pick({
