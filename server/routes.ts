@@ -127,10 +127,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate OTP (6-digit number)
       const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // Create OTP verification record
+      // Create OTP verification record with expiration time (10 minutes from now)
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
       await storage.createOtpVerification({
         email: userData.email,
         code: otpCode,
+        expiresAt: expiresAt,
         userData: JSON.stringify({
           ...userData,
           name: `${userData.firstName} ${userData.lastName}`,
@@ -141,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send OTP email
       if (userData.email) {
         try {
-          await emailService.sendOtpEmail(userData.email, otpCode, userData.firstName || userData.lastName);
+          await emailService.sendOtpVerificationEmail(userData.email, userData.firstName || userData.lastName, otpCode);
           console.log(`✅ OTP email sent to ${userData.email}`);
         } catch (emailError) {
           console.error('❌ Failed to send OTP email:', emailError);

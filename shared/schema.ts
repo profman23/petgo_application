@@ -70,6 +70,7 @@ export const otpVerifications = pgTable("otp_verifications", {
   code: text("code").notNull(),
   isVerified: boolean("is_verified").notNull().default(false),
   expiresAt: timestamp("expires_at").notNull(),
+  userData: jsonb("user_data"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -122,6 +123,7 @@ export const insertOtpVerificationSchema = createInsertSchema(otpVerifications).
   email: true,
   code: true,
   expiresAt: true,
+  userData: true,
 });
 
 export const rideRequestSchema = createInsertSchema(rides).pick({
