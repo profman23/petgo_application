@@ -217,7 +217,8 @@ export default function AdminDashboard() {
   }, [setLocation, toast, language]);
 
   const adminToken = localStorage.getItem("adminToken");
-  const admin = JSON.parse(localStorage.getItem("admin") || "{}");
+  const adminData = localStorage.getItem("admin");
+  const admin = adminData ? JSON.parse(adminData) : {};
 
   // Fetch drivers
   const { data: drivers, isLoading } = useQuery({
