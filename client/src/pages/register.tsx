@@ -15,11 +15,7 @@ import { Loader2, Eye, EyeOff, User, Phone, Lock, Mail, MapPin } from 'lucide-re
 import { OtpVerification } from '@/components/OtpVerification';
 import logoPath from '@assets/IMG-20250415-WA0047_1751986059751.jpg';
 
-const petTypeOptions = [
-  { value: 'Cat', labelAr: 'قطة', labelEn: 'Cat', icon: '🐱' },
-  { value: 'Dog', labelAr: 'كلب', labelEn: 'Dog', icon: '🐶' },
-  { value: 'Bird', labelAr: 'طائر', labelEn: 'Bird', icon: '🐦' }
-];
+// Removed petTypeOptions as we'll use simple form
 
 export default function Register() {
   const { toast } = useToast();
@@ -36,14 +32,9 @@ export default function Register() {
     ar: {
       title: 'إنشاء حساب جديد',
       subtitle: 'انضم إلى عائلة VETS VAN',
-      firstName: 'الاسم الأول',
-      lastName: 'اسم العائلة',
+      name: 'الاسم',
       phone: 'رقم الهاتف',
       email: 'البريد الإلكتروني',
-      address: 'العنوان',
-      petName: 'اسم الحيوان الأليف',
-      petType: 'نوع الحيوان الأليف',
-      selectPetType: 'اختر نوع الحيوان الأليف',
       password: 'كلمة المرور',
       confirmPassword: 'تأكيد كلمة المرور',
       captcha: 'حل المسألة',
@@ -53,26 +44,18 @@ export default function Register() {
       accountCreated: 'تم إنشاء الحساب بنجاح!',
       phonePlaceholder: '05xxxxxxxx',
       emailPlaceholder: 'your@email.com',
-      addressPlaceholder: 'الرياض، حي النموذجي',
-      petNamePlaceholder: 'اسم حيوانك الأليف',
+      namePlaceholder: 'الاسم الكامل',
       passwordPlaceholder: 'كلمة المرور',
       confirmPasswordPlaceholder: 'تأكيد كلمة المرور',
       captchaPlaceholder: 'أدخل الإجابة',
-      firstNamePlaceholder: 'أحمد',
-      lastNamePlaceholder: 'محمد',
       sendingOtp: 'جاري إرسال رمز التحقق...'
     },
     en: {
       title: 'Create New Account',
       subtitle: 'Join the VETS VAN family',
-      firstName: 'First Name',
-      lastName: 'Last Name',
+      name: 'Name',
       phone: 'Phone Number',
       email: 'Email Address',
-      address: 'Address',
-      petName: 'Pet Name',
-      petType: 'Pet Type',
-      selectPetType: 'Select pet type',
       password: 'Password',
       confirmPassword: 'Confirm Password',
       captcha: 'Solve the problem',
@@ -82,13 +65,10 @@ export default function Register() {
       accountCreated: 'Account created successfully!',
       phonePlaceholder: '05xxxxxxxx',
       emailPlaceholder: 'your@email.com',
-      addressPlaceholder: 'Riyadh, Model District',
-      petNamePlaceholder: 'Your pet name',
+      namePlaceholder: 'Full Name',
       passwordPlaceholder: 'Password',
       confirmPasswordPlaceholder: 'Confirm password',
       captchaPlaceholder: 'Enter answer',
-      firstNamePlaceholder: 'Ahmed',
-      lastNamePlaceholder: 'Mohammed',
       sendingOtp: 'Sending verification code...'
     }
   };
@@ -102,9 +82,6 @@ export default function Register() {
       lastName: '',
       phone: '',
       email: '',
-      address: '',
-      petName: '',
-      petType: '',
       password: '',
       confirmPassword: '',
       captcha: 0
@@ -228,8 +205,8 @@ export default function Register() {
 
           {/* Registration Form */}
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* Name Fields */}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Name Field - Combined */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -238,11 +215,11 @@ export default function Register() {
                     <FormItem>
                       <FormLabel className="flex items-center gap-2">
                         <User className="w-4 h-4" />
-                        {texts.firstName}
+                        {texts.name}
                       </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder={texts.firstNamePlaceholder}
+                          placeholder={texts.namePlaceholder}
                           {...field}
                           className="text-right"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
@@ -253,31 +230,6 @@ export default function Register() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        {texts.lastName}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={texts.lastNamePlaceholder}
-                          {...field}
-                          className="text-right"
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Contact Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="phone"
@@ -298,102 +250,30 @@ export default function Register() {
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Mail className="w-4 h-4" />
-                        {texts.email}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder={texts.emailPlaceholder}
-                          {...field}
-                          dir="ltr"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
 
-              {/* Address */}
+              {/* Email Field */}
               <FormField
                 control={form.control}
-                name="address"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      {texts.address}
+                      <Mail className="w-4 h-4" />
+                      {texts.email}
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={texts.addressPlaceholder}
+                        type="email"
+                        placeholder={texts.emailPlaceholder}
                         {...field}
-                        className="text-right"
-                        dir={language === 'ar' ? 'rtl' : 'ltr'}
+                        dir="ltr"
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {/* Pet Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="petName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{texts.petName}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={texts.petNamePlaceholder}
-                          {...field}
-                          className="text-right"
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="petType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{texts.petType}</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder={texts.selectPetType} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {petTypeOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              <div className="flex items-center gap-2">
-                                <span>{option.icon}</span>
-                                <span>{language === 'ar' ? option.labelAr : option.labelEn}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
 
               {/* Password Fields */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
