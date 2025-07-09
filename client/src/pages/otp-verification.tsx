@@ -89,16 +89,40 @@ export default function OtpVerification() {
         preferredLanguage: language
       });
     },
-    onSuccess: () => {
-      toast({
-        title: t.otpVerifiedSuccess,
-        variant: "default",
-      });
+    onSuccess: (data: any) => {
+      // Clear OTP-related localStorage
+      localStorage.removeItem('otpEmail');
+      localStorage.removeItem('otpUserName');
       
-      // Wait 2 seconds then redirect to login
-      setTimeout(() => {
-        setLocation("/login");
-      }, 2000);
+      if (data.token && data.user) {
+        // Account created successfully - auto login
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        toast({
+          title: language === 'ar' ? 'تم إنشاء الحساب بنجاح!' : 'Account created successfully!',
+          description: language === 'ar' ? 
+            `مرحباً ${data.user.name}، تم تسجيل دخولك بنجاح` :
+            `Welcome ${data.user.name}, you are now logged in`,
+          variant: "default",
+        });
+        
+        // Redirect to home page
+        setTimeout(() => {
+          window.location.href = '/home';
+        }, 1500);
+      } else {
+        // Just verification without account creation
+        toast({
+          title: t.otpVerifiedSuccess,
+          variant: "default",
+        });
+        
+        // Wait 2 seconds then redirect to login
+        setTimeout(() => {
+          setLocation("/login");
+        }, 2000);
+      }
     },
     onError: (error: any) => {
       const errorMessage = error.message || t.invalidOtp;

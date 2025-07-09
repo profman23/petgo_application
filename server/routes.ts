@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
+import bcrypt from 'bcrypt';
 // Payment service removed per user request
 
 // Simple session middleware
@@ -83,7 +84,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { identifier, password } = loginSchema.parse(req.body);
       
       const user = await storage.getUserByIdentifier(identifier);
-      if (!user || user.password !== password) {
+      if (!user) {
+        return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
+      }
+      
+      // Check password with bcrypt
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      
+      if (!isPasswordValid) {
         return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
       }
       
@@ -248,8 +256,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/auth/verify-otp', async (req, res) => {
     try {
-      const { email, otpCode } = otpVerificationSchema.parse(req.body);
+      const { email, otpCode } = req.body;
       const userLanguage = req.body.preferredLanguage || 'ar';
+      
+      if (!email || !otpCode) {
+        return res.status(400).json({ 
+          message: userLanguage === 'en' 
+            ? 'Email and OTP code are required' 
+            : 'الإيميل ورمز التحقق مطلوبان'
+        });
+      }
       
       // Find OTP verification record
       const otpRecord = await storage.getOtpVerification(email, otpCode);
@@ -272,22 +288,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // OTP is valid - clean up
-      await storage.deleteOtpVerification(email);
-      
-      res.json({ 
-        message: userLanguage === 'en' 
-          ? 'Email verified successfully' 
-          : 'تم التحقق من الإيميل بنجاح',
-        verified: true 
-      });
+      // OTP is valid - create user account
+      if (otpRecord.userData) {
+        try {
+          // Handle both string and already parsed userData
+          let userData;
+          if (typeof otpRecord.userData === 'string') {
+            userData = JSON.parse(otpRecord.userData);
+          } else if (typeof otpRecord.userData === 'object') {
+            userData = otpRecord.userData;
+          } else {
+            throw new Error('Invalid userData format');
+          }
+          
+          // Hash the password before storing
+          const hashedPassword = await bcrypt.hash(userData.password, 10);
+          
+          // Create the user account
+          const newUser = await storage.createUser({
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            phone: userData.phone,
+            email: userData.email,
+            password: hashedPassword,
+            name: userData.name,
+            membershipType: userData.membershipType || 'standard'
+          });
+          
+          // Send welcome email
+          if (userData.email) {
+            try {
+              await emailService.sendWelcomeEmail(userData.email, userData.firstName || userData.name);
+              console.log(`✅ Welcome email sent to ${userData.email}`);
+            } catch (emailError) {
+              console.error('❌ Failed to send welcome email:', emailError);
+            }
+          }
+          
+          // Clean up OTP record
+          await storage.deleteOtpVerification(email);
+          
+          // Create session for automatic login
+          const sessionId = generateSessionId();
+          sessions.set(sessionId, { 
+            user: { 
+              id: newUser.id, 
+              phone: newUser.phone, 
+              name: newUser.name, 
+              membershipType: newUser.membershipType 
+            } 
+          });
+          
+          res.json({ 
+            message: userLanguage === 'en' 
+              ? 'Account created successfully' 
+              : 'تم إنشاء الحساب بنجاح',
+            verified: true,
+            token: sessionId,
+            user: {
+              id: newUser.id,
+              phone: newUser.phone,
+              name: newUser.name,
+              membershipType: newUser.membershipType
+            }
+          });
+        } catch (userCreationError) {
+          console.error('User creation error:', userCreationError);
+          return res.status(500).json({ 
+            message: userLanguage === 'en' 
+              ? 'Failed to create user account' 
+              : 'فشل في إنشاء حساب المستخدم'
+          });
+        }
+      } else {
+        // Just verify OTP without creating user
+        await storage.deleteOtpVerification(email);
+        res.json({ 
+          message: userLanguage === 'en' 
+            ? 'Email verified successfully' 
+            : 'تم التحقق من الإيميل بنجاح',
+          verified: true 
+        });
+      }
     } catch (error) {
       console.error('Verify OTP error:', error);
       const userLanguage = req.body.preferredLanguage || 'ar';
-      
-      if (error instanceof ZodError) {
-        return res.status(400).json({ message: error.errors[0].message });
-      }
       
       res.status(500).json({ 
         message: userLanguage === 'en' ? 'Server error' : 'خطأ في الخادم' 
