@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', or 'requests'
+  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
@@ -562,6 +562,17 @@ export default function AdminDashboard() {
             >
               <FileText className="ml-3 h-6 w-6" />
               {language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}
+            </button>
+            <button
+              onClick={() => setActiveTab('import')}
+              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+                activeTab === 'import'
+                  ? 'bg-purple-100 text-purple-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Upload className="ml-3 h-6 w-6" />
+              {language === 'ar' ? 'استيراد البيانات' : 'Import'}
             </button>
           </nav>
         </div>
@@ -1098,6 +1109,111 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Import Tab */}
+              {activeTab === 'import' && (
+                <div>
+                  <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6" style={{ textAlign: getTextAlign(language) }}>
+                        {language === 'ar' ? 'استيراد المنتجات والخدمات' : 'Import Products & Services'}
+                      </h3>
+                      
+                      {/* Upload Section */}
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
+                        <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                        <p className="text-lg font-medium text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
+                          {language === 'ar' ? 'ارفع ملف البيانات' : 'Upload Data File'}
+                        </p>
+                        <p className="text-sm text-gray-500 mb-4" style={{ textAlign: getTextAlign(language) }}>
+                          {language === 'ar' 
+                            ? 'يمكنك رفع ملفات Excel أو CSV تحتوي على بيانات المنتجات والخدمات' 
+                            : 'Upload Excel or CSV files containing products and services data'
+                          }
+                        </p>
+                        
+                        <div className="flex flex-col items-center gap-4">
+                          <input
+                            type="file"
+                            accept=".xlsx,.xls,.csv"
+                            className="hidden"
+                            id="import-file"
+                          />
+                          <label
+                            htmlFor="import-file"
+                            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                          >
+                            <Upload className="h-5 w-5 mr-2" />
+                            {language === 'ar' ? 'اختيار الملف' : 'Choose File'}
+                          </label>
+                          
+                          <div className="text-xs text-gray-500" style={{ textAlign: getTextAlign(language) }}>
+                            {language === 'ar' 
+                              ? 'الصيغ المدعومة: .xlsx, .xls, .csv - الحد الأقصى: 10 ميجابايت'
+                              : 'Supported formats: .xlsx, .xls, .csv - Max size: 10MB'
+                            }
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Template Download Section */}
+                      <div className="mt-8">
+                        <h4 className="text-md font-medium text-gray-900 mb-4" style={{ textAlign: getTextAlign(language) }}>
+                          {language === 'ar' ? 'نماذج للتحميل' : 'Download Templates'}
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h5 className="font-medium text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
+                              {language === 'ar' ? 'نموذج المنتجات' : 'Products Template'}
+                            </h5>
+                            <p className="text-sm text-gray-600 mb-3" style={{ textAlign: getTextAlign(language) }}>
+                              {language === 'ar' 
+                                ? 'نموذج Excel يحتوي على الأعمدة المطلوبة لاستيراد المنتجات'
+                                : 'Excel template with required columns for importing products'
+                              }
+                            </p>
+                            <button className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800">
+                              <FileText className="h-4 w-4 mr-1" />
+                              {language === 'ar' ? 'تحميل النموذج' : 'Download Template'}
+                            </button>
+                          </div>
+                          
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h5 className="font-medium text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
+                              {language === 'ar' ? 'نموذج الخدمات' : 'Services Template'}
+                            </h5>
+                            <p className="text-sm text-gray-600 mb-3" style={{ textAlign: getTextAlign(language) }}>
+                              {language === 'ar' 
+                                ? 'نموذج Excel يحتوي على الأعمدة المطلوبة لاستيراد الخدمات'
+                                : 'Excel template with required columns for importing services'
+                              }
+                            </p>
+                            <button className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800">
+                              <FileText className="h-4 w-4 mr-1" />
+                              {language === 'ar' ? 'تحميل النموذج' : 'Download Template'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Import History */}
+                      <div className="mt-8">
+                        <h4 className="text-md font-medium text-gray-900 mb-4" style={{ textAlign: getTextAlign(language) }}>
+                          {language === 'ar' ? 'سجل عمليات الاستيراد' : 'Import History'}
+                        </h4>
+                        <div className="bg-gray-50 rounded-lg p-6 text-center">
+                          <p className="text-gray-500" style={{ textAlign: getTextAlign(language) }}>
+                            {language === 'ar' 
+                              ? 'لا توجد عمليات استيراد سابقة'
+                              : 'No previous imports found'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
