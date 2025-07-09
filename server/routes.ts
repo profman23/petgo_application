@@ -2340,9 +2340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             price: item.price || 0,
             description: item.description || '',
             category: item.category || 'General',
-            isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            inStock: true
           });
           importedCount++;
         }
@@ -2353,9 +2351,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             price: item.price || 0,
             description: item.description || '',
             category: item.category || 'General',
-            isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            available: true
           });
           importedCount++;
         }
@@ -2363,10 +2359,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create import history record
       await storage.createImportHistory({
-        type,
         fileName,
-        recordsCount: importedCount,
-        importedAt: new Date()
+        fileType: type,
+        importedCount,
+        status: 'completed'
       });
       
       console.log(`Successfully imported ${importedCount} ${type}`);

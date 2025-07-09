@@ -34,6 +34,48 @@ export async function initDatabase() {
         uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    // Create products table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        price NUMERIC(10,2) NOT NULL,
+        category TEXT NOT NULL,
+        description TEXT,
+        in_stock BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Create services table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS services (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        price NUMERIC(10,2) NOT NULL,
+        category TEXT NOT NULL,
+        description TEXT,
+        available BOOLEAN DEFAULT true,
+        duration_minutes INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Create import_history table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS import_history (
+        id SERIAL PRIMARY KEY,
+        file_name VARCHAR(255) NOT NULL,
+        file_type VARCHAR(20) NOT NULL,
+        imported_count INTEGER NOT NULL,
+        status VARCHAR(50) NOT NULL,
+        imported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        imported_by VARCHAR(100)
+      );
+    `);
     
     console.log('Database schema initialized successfully');
   } catch (error) {
