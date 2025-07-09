@@ -54,6 +54,8 @@ export default function AdminDashboard() {
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
   const [showReviewsDialog, setShowReviewsDialog] = useState(false);
   const [showSmsDialog, setShowSmsDialog] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     vetsvanCode: "",
     vetsvanName: "",
@@ -105,6 +107,89 @@ export default function AdminDashboard() {
         description: language === 'ar' ? 'فشل في تحميل النموذج' : 'Failed to download template',
         variant: 'destructive',
       });
+    }
+  };
+
+  // File upload handler
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setSelectedFile(file);
+    setUploadingFile(true);
+
+    try {
+      // Read file content
+      const text = await file.text();
+      
+      // Parse CSV data
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      const data = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim()) {
+          const values = lines[i].split(',').map(v => v.trim());
+          const item: any = {};
+          
+          headers.forEach((header, index) => {
+            if (header === 'price') {
+              item[header] = parseFloat(values[index]) || 0;
+            } else {
+              item[header] = values[index] || '';
+            }
+          });
+          
+          data.push(item);
+        }
+      }
+
+      // Determine file type based on content or filename
+      const fileName = file.name.toLowerCase();
+      const type = fileName.includes('product') ? 'products' : 
+                   fileName.includes('service') ? 'services' : 'products';
+
+      // Send to server
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch('/api/import-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          type,
+          data,
+          fileName: file.name,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to import data');
+      }
+
+      const result = await response.json();
+
+      toast({
+        title: language === 'ar' ? 'تم الاستيراد بنجاح' : 'Import Successful',
+        description: language === 'ar' 
+          ? `تم استيراد ${result.importedCount} عنصر من ${file.name}`
+          : `Imported ${result.importedCount} items from ${file.name}`,
+      });
+
+      // Reset file input
+      event.target.value = '';
+      setSelectedFile(null);
+
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ في الاستيراد' : 'Import Error',
+        description: language === 'ar' ? 'فشل في استيراد البيانات' : 'Failed to import data',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingFile(false);
     }
   };
 
@@ -1178,17 +1263,39 @@ export default function AdminDashboard() {
                         <div className="flex flex-col items-center gap-4">
                           <input
                             type="file"
-                            accept=".xlsx,.xls,.csv"
+                            accept=".csv,.xlsx,.xls"
                             className="hidden"
                             id="import-file"
+                            onChange={handleFileUpload}
+                            disabled={uploadingFile}
                           />
                           <label
                             htmlFor="import-file"
-                            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                            className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white cursor-pointer transition-colors ${
+                              uploadingFile 
+                                ? 'bg-gray-400 cursor-not-allowed' 
+                                : 'bg-purple-600 hover:bg-purple-700'
+                            }`}
                           >
-                            <Upload className="h-5 w-5 mr-2" />
-                            {language === 'ar' ? 'اختيار الملف' : 'Choose File'}
+                            {uploadingFile ? (
+                              <>
+                                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                {language === 'ar' ? 'جاري الرفع...' : 'Uploading...'}
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="h-5 w-5 mr-2" />
+                                {language === 'ar' ? 'اختيار الملف' : 'Choose File'}
+                              </>
+                            )}
                           </label>
+                          
+                          {selectedFile && (
+                            <div className="text-sm text-gray-600 mt-2" style={{ textAlign: getTextAlign(language) }}>
+                              {language === 'ar' ? 'الملف المحدد: ' : 'Selected file: '}
+                              <span className="font-medium">{selectedFile.name}</span>
+                            </div>
+                          )}
                           
                           <div className="text-xs text-gray-500" style={{ textAlign: getTextAlign(language) }}>
                             {language === 'ar' 
@@ -1241,6 +1348,48 @@ export default function AdminDashboard() {
                               <FileText className="h-4 w-4 mr-1" />
                               {language === 'ar' ? 'تحميل نموذج الخدمات' : 'Download Services Template'}
                             </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Import Instructions */}
+                      <div className="mt-8 bg-blue-50 border-l-4 border-blue-400 p-4">
+                        <div className="flex">
+                          <div className="flex-shrink-0">
+                            <FileText className="h-5 w-5 text-blue-400" />
+                          </div>
+                          <div className="ml-3">
+                            <h4 className="text-sm font-medium text-blue-800" style={{ textAlign: getTextAlign(language) }}>
+                              {language === 'ar' ? 'تعليمات الاستيراد' : 'Import Instructions'}
+                            </h4>
+                            <div className="mt-2 text-sm text-blue-700" style={{ textAlign: getTextAlign(language) }}>
+                              <ul className="list-disc list-inside space-y-1">
+                                <li>
+                                  {language === 'ar' 
+                                    ? 'قم بتحميل النموذج المناسب (منتجات أو خدمات)'
+                                    : 'Download the appropriate template (products or services)'
+                                  }
+                                </li>
+                                <li>
+                                  {language === 'ar' 
+                                    ? 'املأ البيانات في الأعمدة المطلوبة: الاسم، السعر، الفئة، الوصف'
+                                    : 'Fill in the required columns: name, price, category, description'
+                                  }
+                                </li>
+                                <li>
+                                  {language === 'ar' 
+                                    ? 'احفظ الملف بصيغة CSV وارفعه هنا'
+                                    : 'Save the file as CSV and upload it here'
+                                  }
+                                </li>
+                                <li>
+                                  {language === 'ar' 
+                                    ? 'ستتم إضافة البيانات إلى قاعدة البيانات تلقائياً'
+                                    : 'Data will be automatically added to the database'
+                                  }
+                                </li>
+                              </ul>
+                            </div>
                           </div>
                         </div>
                       </div>
