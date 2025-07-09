@@ -130,6 +130,10 @@ export interface IStorage {
   // Import history
   getImportHistory(): Promise<any[]>;
   createImportHistory(importData: any): Promise<any>;
+  
+  // Bulk import operations
+  bulkCreateServices(services: any[]): Promise<{ imported: number; updated: number; failed: number }>;
+  bulkCreateProducts(products: any[]): Promise<{ imported: number; updated: number; failed: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1115,6 +1119,123 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // Bulk import operations
+  async bulkCreateServices(servicesList: any[]): Promise<{ imported: number; updated: number; failed: number }> {
+    let imported = 0;
+    let updated = 0;
+    let failed = 0;
+    
+    for (const serviceData of servicesList) {
+      try {
+        // Check if service exists by name
+        const existingServices = await db
+          .select()
+          .from(services)
+          .where(eq(services.name, serviceData.name));
+          
+        if (existingServices.length > 0) {
+          // Update existing service
+          await db
+            .update(services)
+            .set({
+              nameAr: serviceData.nameAr || serviceData.name,
+              description: serviceData.description || '',
+              descriptionAr: serviceData.descriptionAr || serviceData.description || '',
+              price: serviceData.price || 0,
+              category: serviceData.category || 'General',
+              categoryAr: serviceData.categoryAr || serviceData.category || 'عام',
+              duration: serviceData.duration || 30,
+              isActive: true,
+              updatedAt: new Date()
+            })
+            .where(eq(services.id, existingServices[0].id));
+          updated++;
+        } else {
+          // Create new service
+          await db
+            .insert(services)
+            .values({
+              name: serviceData.name,
+              nameAr: serviceData.nameAr || serviceData.name,
+              description: serviceData.description || '',
+              descriptionAr: serviceData.descriptionAr || serviceData.description || '',
+              price: serviceData.price || 0,
+              category: serviceData.category || 'General',
+              categoryAr: serviceData.categoryAr || serviceData.category || 'عام',
+              duration: serviceData.duration || 30,
+              isActive: true
+            });
+          imported++;
+        }
+      } catch (error) {
+        console.error('Error processing service:', serviceData.name, error);
+        failed++;
+      }
+    }
+    
+    return { imported, updated, failed };
+  }
+
+  async bulkCreateProducts(productsList: any[]): Promise<{ imported: number; updated: number; failed: number }> {
+    let imported = 0;
+    let updated = 0;
+    let failed = 0;
+    
+    for (const productData of productsList) {
+      try {
+        // Check if product exists by name
+        const existingProducts = await db
+          .select()
+          .from(products)
+          .where(eq(products.name, productData.name));
+          
+        if (existingProducts.length > 0) {
+          // Update existing product
+          await db
+            .update(products)
+            .set({
+              nameAr: productData.nameAr || productData.name,
+              description: productData.description || '',
+              descriptionAr: productData.descriptionAr || productData.description || '',
+              price: productData.price || 0,
+              category: productData.category || 'General',
+              categoryAr: productData.categoryAr || productData.category || 'عام',
+              sku: productData.sku || '',
+              unit: productData.unit || 'piece',
+              unitAr: productData.unitAr || productData.unit || 'قطعة',
+              isActive: true,
+              updatedAt: new Date()
+            })
+            .where(eq(products.id, existingProducts[0].id));
+          updated++;
+        } else {
+          // Create new product
+          await db
+            .insert(products)
+            .values({
+              name: productData.name,
+              nameAr: productData.nameAr || productData.name,
+              description: productData.description || '',
+              descriptionAr: productData.descriptionAr || productData.description || '',
+              price: productData.price || 0,
+              category: productData.category || 'General',
+              categoryAr: productData.categoryAr || productData.category || 'عام',
+              sku: productData.sku || '',
+              unit: productData.unit || 'piece',
+              unitAr: productData.unitAr || productData.unit || 'قطعة',
+              isActive: true
+            });
+          imported++;
+        }
+      } catch (error) {
+        console.error('Error processing product:', productData.name, error);
+        failed++;
+      }
+    }
+    
+    return { imported, updated, failed };
+  }
+
   // Payment update method removed per user request
 }
 
@@ -1913,6 +2034,119 @@ class MemStorage implements IStorage {
     const newHistory = { ...importData, id: this.currentImportHistoryId++ };
     this.importHistory.set(newHistory.id, newHistory);
     return newHistory;
+  }
+
+  // Bulk import operations (MemStorage implementation)
+  async bulkCreateServices(servicesList: any[]): Promise<{ imported: number; updated: number; failed: number }> {
+    let imported = 0;
+    let updated = 0;
+    let failed = 0;
+    
+    for (const serviceData of servicesList) {
+      try {
+        // Check if service exists by name
+        const existingService = Array.from(this.services.values()).find(s => s.name === serviceData.name);
+        
+        if (existingService) {
+          // Update existing service
+          const updatedService = {
+            ...existingService,
+            nameAr: serviceData.nameAr || serviceData.name,
+            description: serviceData.description || '',
+            descriptionAr: serviceData.descriptionAr || serviceData.description || '',
+            price: serviceData.price || 0,
+            category: serviceData.category || 'General',
+            categoryAr: serviceData.categoryAr || serviceData.category || 'عام',
+            duration: serviceData.duration || 30,
+            isActive: true,
+            updatedAt: new Date()
+          };
+          this.services.set(existingService.id, updatedService);
+          updated++;
+        } else {
+          // Create new service
+          const newService = {
+            id: this.currentServiceId++,
+            name: serviceData.name,
+            nameAr: serviceData.nameAr || serviceData.name,
+            description: serviceData.description || '',
+            descriptionAr: serviceData.descriptionAr || serviceData.description || '',
+            price: serviceData.price || 0,
+            category: serviceData.category || 'General',
+            categoryAr: serviceData.categoryAr || serviceData.category || 'عام',
+            duration: serviceData.duration || 30,
+            isActive: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          this.services.set(newService.id, newService);
+          imported++;
+        }
+      } catch (error) {
+        console.error('Error processing service:', serviceData.name, error);
+        failed++;
+      }
+    }
+    
+    return { imported, updated, failed };
+  }
+
+  async bulkCreateProducts(productsList: any[]): Promise<{ imported: number; updated: number; failed: number }> {
+    let imported = 0;
+    let updated = 0;
+    let failed = 0;
+    
+    for (const productData of productsList) {
+      try {
+        // Check if product exists by name
+        const existingProduct = Array.from(this.products.values()).find(p => p.name === productData.name);
+        
+        if (existingProduct) {
+          // Update existing product
+          const updatedProduct = {
+            ...existingProduct,
+            nameAr: productData.nameAr || productData.name,
+            description: productData.description || '',
+            descriptionAr: productData.descriptionAr || productData.description || '',
+            price: productData.price || 0,
+            category: productData.category || 'General',
+            categoryAr: productData.categoryAr || productData.category || 'عام',
+            sku: productData.sku || '',
+            unit: productData.unit || 'piece',
+            unitAr: productData.unitAr || productData.unit || 'قطعة',
+            isActive: true,
+            updatedAt: new Date()
+          };
+          this.products.set(existingProduct.id, updatedProduct);
+          updated++;
+        } else {
+          // Create new product
+          const newProduct = {
+            id: this.currentProductId++,
+            name: productData.name,
+            nameAr: productData.nameAr || productData.name,
+            description: productData.description || '',
+            descriptionAr: productData.descriptionAr || productData.description || '',
+            price: productData.price || 0,
+            category: productData.category || 'General',
+            categoryAr: productData.categoryAr || productData.category || 'عام',
+            sku: productData.sku || '',
+            unit: productData.unit || 'piece',
+            unitAr: productData.unitAr || productData.unit || 'قطعة',
+            isActive: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          this.products.set(newProduct.id, newProduct);
+          imported++;
+        }
+      } catch (error) {
+        console.error('Error processing product:', productData.name, error);
+        failed++;
+      }
+    }
+    
+    return { imported, updated, failed };
   }
 
   // Invoice Items operations (MemStorage implementation)

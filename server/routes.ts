@@ -2329,48 +2329,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/import-data', requireAdminAuth, async (req, res) => {
     try {
       const { type, data, fileName } = req.body;
-      let importedCount = 0;
       
-      console.log('Processing import request:', { type, fileName, dataLength: data.length });
+      console.log('Processing bulk import request:', { type, fileName, dataLength: data.length });
+      
+      let result = { imported: 0, updated: 0, failed: 0 };
       
       if (type === 'products') {
-        for (const item of data) {
-          await storage.createProduct({
-            name: item.name || 'Unknown Product',
-            price: item.price || 0,
-            description: item.description || '',
-            category: item.category || 'General',
-            isActive: true
-          });
-          importedCount++;
-        }
+        result = await storage.bulkCreateProducts(data);
       } else if (type === 'services') {
-        for (const item of data) {
-          await storage.createService({
-            name: item.name || 'Unknown Service',
-            price: item.price || 0,
-            description: item.description || '',
-            category: item.category || 'General',
-            isActive: true
-          });
-          importedCount++;
-        }
+        result = await storage.bulkCreateServices(data);
+      } else {
+        return res.status(400).json({ error: 'Invalid import type. Must be products or services.' });
       }
       
       // Create import history record
       await storage.createImportHistory({
         fileName,
         fileType: type,
-        recordsImported: importedCount,
-        recordsUpdated: 0,
-        recordsSkipped: 0,
-        status: 'completed'
+        recordsImported: result.imported,
+        recordsUpdated: result.updated,
+        recordsSkipped: result.failed,
+        status: result.failed > 0 ? 'partial' : 'completed',
+        errorMessage: result.failed > 0 ? `${result.failed} records failed to import` : null
       });
       
-      console.log(`Successfully imported ${importedCount} ${type}`);
+      console.log(`Bulk import completed:`, result);
       res.json({ 
-        message: `Successfully imported ${importedCount} ${type}`,
-        importedCount 
+        message: `Successfully processed ${result.imported + result.updated} ${type}`,
+        ...result 
       });
     } catch (error) {
       console.error('Error importing data:', error);

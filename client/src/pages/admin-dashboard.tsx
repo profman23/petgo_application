@@ -4,10 +4,11 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
+import Papa from 'papaparse';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -111,42 +112,87 @@ export default function AdminDashboard() {
     }
   };
 
-  // File upload handler
+  // File upload handler with improved CSV/Excel parsing
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: language === 'ar' ? 'ملف كبير جداً' : 'File Too Large',
+        description: language === 'ar' ? 'حجم الملف يجب أن يكون أقل من 10 ميجابايت' : 'File size must be less than 10MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file extension
+    const validExtensions = ['.csv', '.xlsx', '.xls'];
+    const fileExtension = file.name.toLowerCase().substr(file.name.lastIndexOf('.'));
+    if (!validExtensions.includes(fileExtension)) {
+      toast({
+        title: language === 'ar' ? 'نوع ملف غير مدعوم' : 'Unsupported File Type',
+        description: language === 'ar' ? 'يرجى رفع ملف CSV أو Excel' : 'Please upload a CSV or Excel file',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setSelectedFile(file);
     setUploadingFile(true);
 
     try {
-      // Read file content
-      const text = await file.text();
-      
-      // Parse CSV data
-      const lines = text.split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      const data = [];
+      let data: any[] = [];
 
-      for (let i = 1; i < lines.length; i++) {
-        if (lines[i].trim()) {
-          const values = lines[i].split(',').map(v => v.trim());
-          const item: any = {};
-          
-          headers.forEach((header, index) => {
-            if (header === 'price') {
-              item[header] = parseFloat(values[index]) || 0;
-            } else {
-              item[header] = values[index] || '';
+      if (fileExtension === '.csv') {
+        // Use papaparse for CSV files
+        const text = await file.text();
+        const parseResult = Papa.parse(text, {
+          header: true,
+          skipEmptyLines: true,
+          transform: (value: string, field: string) => {
+            // Transform price field to number
+            if (field === 'price') {
+              return parseFloat(value) || 0;
             }
-          });
-          
-          data.push(item);
+            return value.trim();
+          }
+        });
+
+        if (parseResult.errors.length > 0) {
+          console.warn('CSV parsing warnings:', parseResult.errors);
         }
+
+        data = parseResult.data;
+      } else {
+        // For Excel files, we'll need to convert to CSV first or use xlsx library
+        // For now, show error for Excel files
+        toast({
+          title: language === 'ar' ? 'Excel غير مدعوم حالياً' : 'Excel Not Supported Yet',
+          description: language === 'ar' ? 'يرجى تحويل الملف إلى CSV أولاً' : 'Please convert to CSV format first',
+          variant: 'destructive',
+        });
+        setUploadingFile(false);
+        setSelectedFile(null);
+        return;
       }
 
-      // Use current import sub-tab to determine file type
-      const type = importSubTab;
+      // Validate required columns based on import type
+      const requiredColumns = importSubTab === 'products' 
+        ? ['name', 'price', 'category', 'description']
+        : ['name', 'price', 'category', 'description'];
+
+      if (data.length === 0) {
+        throw new Error('No data found in file');
+      }
+
+      const firstItem = data[0];
+      const missingColumns = requiredColumns.filter(col => !(col in firstItem));
+      
+      if (missingColumns.length > 0) {
+        throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
+      }
 
       // Send to server
       const token = localStorage.getItem("adminToken");
@@ -157,14 +203,15 @@ export default function AdminDashboard() {
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          type,
+          type: importSubTab,
           data,
           fileName: file.name,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to import data');
+        const errorData = await response.text();
+        throw new Error(`Server error: ${errorData}`);
       }
 
       const result = await response.json();
@@ -172,19 +219,28 @@ export default function AdminDashboard() {
       toast({
         title: language === 'ar' ? 'تم الاستيراد بنجاح' : 'Import Successful',
         description: language === 'ar' 
-          ? `تم استيراد ${result.importedCount} عنصر من ${file.name}`
-          : `Imported ${result.importedCount} items from ${file.name}`,
+          ? `تم استيراد ${result.imported || 0} عنصر جديد، تحديث ${result.updated || 0} عنصر من ${file.name}`
+          : `Imported ${result.imported || 0} new items, updated ${result.updated || 0} items from ${file.name}`,
       });
 
       // Reset file input
       event.target.value = '';
       setSelectedFile(null);
 
-    } catch (error) {
+      // Refresh relevant data
+      if (importSubTab === 'services') {
+        queryClient.invalidateQueries({ queryKey: ["/api/services"] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      }
+
+    } catch (error: any) {
       console.error('Error uploading file:', error);
       toast({
         title: language === 'ar' ? 'خطأ في الاستيراد' : 'Import Error',
-        description: language === 'ar' ? 'فشل في استيراد البيانات' : 'Failed to import data',
+        description: language === 'ar' 
+          ? `فشل في استيراد البيانات: ${error.message}` 
+          : `Failed to import data: ${error.message}`,
         variant: 'destructive',
       });
     } finally {
