@@ -93,23 +93,6 @@ export class EmailService {
     }
   }
 
-  // Generate and send OTP for account registration
-  async sendOtpEmail(userEmail: string, otp: string): Promise<boolean> {
-    try {
-      const template: EmailTemplate = {
-        to: userEmail,
-        subject: 'رمز التحقق - VETS VAN',
-        html: this.generateOtpEmailHTML(otp),
-        text: this.generateOtpEmailText(otp)
-      };
-
-      return await this.sendEmail(template);
-    } catch (error) {
-      console.error('Error preparing OTP email:', error);
-      return false;
-    }
-  }
-
   async sendServiceCompletionEmail(
     userEmail: string,
     userName: string,
@@ -652,90 +635,6 @@ VETS VAN - الرعاية البيطرية المنزلية
         </div>
       </body>
       </html>
-    `;
-  }
-
-  private generateOtpEmailHTML(otp: string): string {
-    return `
-      <!DOCTYPE html>
-      <html dir="rtl" lang="ar">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>رمز التحقق - VETS VAN</title>
-        <style>
-          body { font-family: 'Arial', sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
-          .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; padding: 30px; text-align: center; }
-          .content { padding: 30px; text-align: center; }
-          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
-          .otp-box { background-color: #f0f9ff; border: 3px solid #3b82f6; border-radius: 12px; padding: 30px; margin: 20px 0; }
-          .otp-code { font-size: 36px; font-weight: bold; color: #1d4ed8; letter-spacing: 8px; margin: 20px 0; }
-          .warning { background-color: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 15px; border-radius: 8px; margin: 20px 0; }
-          h1 { margin: 0; font-size: 28px; }
-          h2 { color: #8B2F8B; margin-top: 0; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🔐 رمز التحقق</h1>
-            <p>VETS VAN - خدمة الطب البيطري</p>
-          </div>
-          <div class="content">
-            <h2>مرحباً بك في VETS VAN</h2>
-            <p>شكراً لك على التسجيل في خدمة VETS VAN المنزلية للطب البيطري.</p>
-            
-            <div class="otp-box">
-              <h3>🔢 رمز التحقق الخاص بك:</h3>
-              <div class="otp-code">${otp}</div>
-              <p><strong>أدخل هذا الرمز في التطبيق لإكمال عملية التسجيل</strong></p>
-            </div>
-
-            <div class="warning">
-              <h4>⚠️ مهم جداً:</h4>
-              <ul style="text-align: right;">
-                <li>هذا الرمز صالح لمدة 10 دقائق فقط</li>
-                <li>لا تشارك هذا الرمز مع أي شخص آخر</li>
-                <li>استخدم الرمز مرة واحدة فقط</li>
-                <li>إذا لم تطلب هذا الرمز، تجاهل هذه الرسالة</li>
-              </ul>
-            </div>
-
-            <p>إذا واجهت أي مشكلة، يرجى المحاولة مرة أخرى أو التواصل مع فريق الدعم.</p>
-          </div>
-          <div class="footer">
-            <p>🐾 VETS VAN - نحن نهتم بصحة حيوانك الأليف 🐾</p>
-            <p>هذه رسالة آلية، يرجى عدم الرد عليها</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  private generateOtpEmailText(otp: string): string {
-    return `
-🔐 رمز التحقق - VETS VAN
-
-مرحباً بك في VETS VAN
-
-شكراً لك على التسجيل في خدمة VETS VAN المنزلية للطب البيطري.
-
-🔢 رمز التحقق الخاص بك: ${otp}
-
-أدخل هذا الرمز في التطبيق لإكمال عملية التسجيل.
-
-⚠️ مهم جداً:
-- هذا الرمز صالح لمدة 10 دقائق فقط
-- لا تشارك هذا الرمز مع أي شخص آخر
-- استخدم الرمز مرة واحدة فقط
-- إذا لم تطلب هذا الرمز، تجاهل هذه الرسالة
-
-إذا واجهت أي مشكلة، يرجى المحاولة مرة أخرى أو التواصل مع فريق الدعم.
-
-VETS VAN - نحن نهتم بصحة حيوانك الأليف
-هذه رسالة آلية، يرجى عدم الرد عليها
     `;
   }
 

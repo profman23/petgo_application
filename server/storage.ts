@@ -1,6 +1,6 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerification, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtp } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, not, inArray, desc, sql } from "drizzle-orm";
+import { eq, and, not, inArray, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -134,13 +134,6 @@ export interface IStorage {
   // Bulk import operations
   bulkCreateServices(services: any[]): Promise<{ imported: number; updated: number; failed: number }>;
   bulkCreateProducts(products: any[]): Promise<{ imported: number; updated: number; failed: number }>;
-
-  // OTP operations
-  createOtp(email: string, otp: string): Promise<OtpVerification>;
-  verifyOtp(email: string, otp: string): Promise<boolean>;
-  getOtp(email: string): Promise<OtpVerification | undefined>;
-  deleteOtp(email: string): Promise<void>;
-  incrementOtpAttempts(email: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1241,89 +1234,6 @@ export class DatabaseStorage implements IStorage {
     }
     
     return { imported, updated, failed };
-  }
-
-  // OTP operations for email verification during registration
-  async createOtp(email: string, otp: string): Promise<OtpVerification> {
-    // Set expiration time to 10 minutes from now
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-    
-    // Delete any existing OTP for this email first
-    await this.deleteOtp(email);
-    
-    const [newOtp] = await db
-      .insert(otpVerification)
-      .values({
-        email,
-        otp,
-        expiresAt,
-        isUsed: false,
-        attempts: 0
-      })
-      .returning();
-      
-    return newOtp;
-  }
-
-  async verifyOtp(email: string, otp: string): Promise<boolean> {
-    const [otpRecord] = await db
-      .select()
-      .from(otpVerification)
-      .where(and(
-        eq(otpVerification.email, email),
-        eq(otpVerification.otp, otp),
-        eq(otpVerification.isUsed, false)
-      ));
-
-    if (!otpRecord) {
-      return false;
-    }
-
-    // Check if OTP is expired
-    if (new Date() > otpRecord.expiresAt) {
-      return false;
-    }
-
-    // Mark OTP as used
-    await db
-      .update(otpVerification)
-      .set({ isUsed: true })
-      .where(eq(otpVerification.id, otpRecord.id));
-
-    return true;
-  }
-
-  async getOtp(email: string): Promise<OtpVerification | undefined> {
-    const [otpRecord] = await db
-      .select()
-      .from(otpVerification)
-      .where(and(
-        eq(otpVerification.email, email),
-        eq(otpVerification.isUsed, false)
-      ))
-      .orderBy(desc(otpVerification.createdAt));
-
-    return otpRecord;
-  }
-
-  async deleteOtp(email: string): Promise<void> {
-    await db
-      .delete(otpVerification)
-      .where(eq(otpVerification.email, email));
-  }
-
-  async incrementOtpAttempts(email: string): Promise<void> {
-    await db
-      .update(otpVerification)
-      .set({ 
-        attempts: 
-        // This will increment the attempts by 1. In PostgreSQL you can use SQL expression
-        sql`attempts + 1`
-      })
-      .where(and(
-        eq(otpVerification.email, email),
-        eq(otpVerification.isUsed, false)
-      ));
   }
 
   // Payment update method removed per user request
@@ -2584,59 +2494,6 @@ class MemStorage implements IStorage {
       .select()
       .from(importHistory)
       .orderBy(desc(importHistory.importedAt));
-  }
-
-  // OTP operations (MemStorage implementation - for fallback)
-  private otpVerifications: Map<string, OtpVerification> = new Map();
-
-  async createOtp(email: string, otp: string): Promise<OtpVerification> {
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-    
-    const otpRecord: OtpVerification = {
-      id: Date.now(),
-      email,
-      otp,
-      expiresAt,
-      isUsed: false,
-      attempts: 0,
-      createdAt: new Date()
-    };
-    
-    this.otpVerifications.set(email, otpRecord);
-    return otpRecord;
-  }
-
-  async verifyOtp(email: string, otp: string): Promise<boolean> {
-    const otpRecord = this.otpVerifications.get(email);
-    
-    if (!otpRecord || otpRecord.isUsed || otpRecord.otp !== otp) {
-      return false;
-    }
-
-    if (new Date() > otpRecord.expiresAt) {
-      return false;
-    }
-
-    otpRecord.isUsed = true;
-    this.otpVerifications.set(email, otpRecord);
-    return true;
-  }
-
-  async getOtp(email: string): Promise<OtpVerification | undefined> {
-    const otpRecord = this.otpVerifications.get(email);
-    return otpRecord && !otpRecord.isUsed ? otpRecord : undefined;
-  }
-
-  async deleteOtp(email: string): Promise<void> {
-    this.otpVerifications.delete(email);
-  }
-
-  async incrementOtpAttempts(email: string): Promise<void> {
-    const otpRecord = this.otpVerifications.get(email);
-    if (otpRecord && !otpRecord.isUsed) {
-      otpRecord.attempts++;
-      this.otpVerifications.set(email, otpRecord);
-    }
   }
 
   // Sample data initialization removed per user request

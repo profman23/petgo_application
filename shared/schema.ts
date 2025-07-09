@@ -437,32 +437,6 @@ export const insertImportHistorySchema = createInsertSchema(importHistory).pick(
   importedBy: true,
 });
 
-// OTP table for email verification during registration
-export const otpVerification = pgTable("otp_verification", {
-  id: serial("id").primaryKey(),
-  email: text("email").notNull(),
-  otp: text("otp").notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  isUsed: boolean("is_used").default(false),
-  attempts: integer("attempts").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const insertOtpSchema = createInsertSchema(otpVerification).pick({
-  email: true,
-  otp: true,
-  expiresAt: true,
-});
-
-export const verifyOtpSchema = z.object({
-  email: z.string().email("البريد الإلكتروني غير صحيح"),
-  otp: z.string().length(6, "رمز التحقق يجب أن يكون 6 أرقام"),
-});
-
-export type OtpVerification = typeof otpVerification.$inferSelect;
-export type InsertOtp = z.infer<typeof insertOtpSchema>;
-export type VerifyOtp = z.infer<typeof verifyOtpSchema>;
-
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type Service = typeof services.$inferSelect;
