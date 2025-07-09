@@ -110,14 +110,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove captcha from data before storing
       const { captcha, ...userData } = validatedData;
       
+      const userLanguage = req.body.preferredLanguage || 'ar';
+      
+      // First check if OTP was verified for this email
+      if (userData.email) {
+        const isOtpValid = await storage.isOtpVerified(userData.email);
+        if (!isOtpValid) {
+          return res.status(400).json({ 
+            message: userLanguage === 'ar' ? 'يجب التحقق من البريد الإلكتروني أولاً' : 'Email verification required first'
+          });
+        }
+      }
+      
       // Combine firstName and lastName into name
       const fullUserData = {
         ...userData,
         name: `${userData.firstName} ${userData.lastName}`,
         membershipType: 'standard'
       };
-      
-      const userLanguage = req.body.preferredLanguage || 'ar';
       
       const existingUserByPhone = await storage.getUserByPhone(fullUserData.phone);
       if (existingUserByPhone) {
@@ -133,6 +143,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const user = await storage.createUser(fullUserData);
+      
+      // Delete OTP record after successful registration
+      if (userData.email) {
+        await storage.deleteOtp(userData.email);
+      }
+      
       const sessionId = generateSessionId();
       sessions.set(sessionId, { user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType } });
       

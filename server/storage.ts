@@ -141,6 +141,7 @@ export interface IStorage {
   getOtp(email: string): Promise<OtpVerification | undefined>;
   deleteOtp(email: string): Promise<void>;
   incrementOtpAttempts(email: string): Promise<void>;
+  isOtpVerified(email: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1324,6 +1325,19 @@ export class DatabaseStorage implements IStorage {
         eq(otpVerification.email, email),
         eq(otpVerification.isUsed, false)
       ));
+  }
+
+  async isOtpVerified(email: string): Promise<boolean> {
+    const [otpRecord] = await db
+      .select()
+      .from(otpVerification)
+      .where(and(
+        eq(otpVerification.email, email),
+        eq(otpVerification.isUsed, true)
+      ))
+      .orderBy(desc(otpVerification.createdAt));
+
+    return !!otpRecord;
   }
 
   // Payment update method removed per user request
@@ -2637,6 +2651,11 @@ class MemStorage implements IStorage {
       otpRecord.attempts++;
       this.otpVerifications.set(email, otpRecord);
     }
+  }
+
+  async isOtpVerified(email: string): Promise<boolean> {
+    const otpRecord = this.otpVerifications.get(email);
+    return otpRecord?.isUsed || false;
   }
 
   // Sample data initialization removed per user request
