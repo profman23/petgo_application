@@ -96,6 +96,7 @@ export default function DoctorInvoice() {
   const [showInvoiceGenerator, setShowInvoiceGenerator] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isRecordLocked, setIsRecordLocked] = useState(false);
+  const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -847,7 +848,31 @@ export default function DoctorInvoice() {
                                 <Command>
                                   <CommandInput placeholder={language === 'ar' ? 'ابحث...' : 'Search...'} />
                                   <CommandEmpty>{language === 'ar' ? 'لا توجد نتائج' : 'No results found'}</CommandEmpty>
-                                  {products.length > 0 && (
+                                  
+                                  {/* Sub Tabs for Products/Services */}
+                                  <div className="flex border-b border-gray-200 bg-gray-50 p-2">
+                                    <button
+                                      onClick={() => setInvoiceSubTab('products')}
+                                      className={`px-3 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
+                                        invoiceSubTab === 'products'
+                                          ? 'border-purple-500 text-purple-600 bg-purple-50'
+                                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                      }`}
+                                    >
+                                      {language === 'ar' ? '📦 المنتجات' : '📦 Products'}
+                                    </button>
+                                    <button
+                                      onClick={() => setInvoiceSubTab('services')}
+                                      className={`px-3 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
+                                        invoiceSubTab === 'services'
+                                          ? 'border-purple-500 text-purple-600 bg-purple-50'
+                                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                      }`}
+                                    >
+                                      {language === 'ar' ? '🩺 الخدمات' : '🩺 Services'}
+                                    </button>
+                                  </div>
+                                  {invoiceSubTab === 'products' && products.length > 0 && (
                                     <CommandGroup heading={t('products')}>
                                       {products.map((product: any) => (
                                         <CommandItem
@@ -864,7 +889,7 @@ export default function DoctorInvoice() {
                                       ))}
                                     </CommandGroup>
                                   )}
-                                  {services.length > 0 && (
+                                  {invoiceSubTab === 'services' && services.length > 0 && (
                                     <CommandGroup heading={t('services')}>
                                       {services.map((service: any) => (
                                         <CommandItem

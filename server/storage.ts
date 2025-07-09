@@ -188,8 +188,7 @@ export class DatabaseStorage implements IStorage {
       // Initialize test shifts
       await this.initializeTestShifts();
       
-      // Initialize sample products and services
-      await this.initializeSampleData();
+      // Sample data initialization removed per user request
     } catch (error) {
       console.error('Error initializing test data:', error);
     }
@@ -257,75 +256,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  private async initializeSampleData() {
-    try {
-      // Initialize sample products
-      const existingProducts = await this.getProducts();
-      if (existingProducts.length === 0) {
-        const sampleProducts = [
-          {
-            name: 'Premium Cat Food',
-            nameAr: 'طعام قطط فاخر',
-            description: 'High-quality dry food for adult cats',
-            descriptionAr: 'طعام جاف عالي الجودة للقطط البالغة',
-            price: 45.00,
-            category: 'Pet Food',
-            categoryAr: 'طعام الحيوانات',
-            isActive: true
-          },
-          {
-            name: 'Dog Vitamins',
-            nameAr: 'فيتامينات الكلاب',
-            description: 'Essential vitamins for healthy dogs',
-            descriptionAr: 'فيتامينات أساسية للكلاب الصحية',
-            price: 35.00,
-            category: 'Supplements',
-            categoryAr: 'مكملات غذائية',
-            isActive: true
-          }
-        ];
-        
-        for (const product of sampleProducts) {
-          await this.createProduct(product);
-        }
-      }
-
-      // Initialize sample services
-      const existingServices = await this.getServices();
-      if (existingServices.length === 0) {
-        const sampleServices = [
-          {
-            name: 'Complete Health Checkup',
-            nameAr: 'فحص صحي شامل',
-            description: 'Comprehensive health examination for pets',
-            descriptionAr: 'فحص صحي شامل للحيوانات الأليفة',
-            price: 150.00,
-            category: 'Health Services',
-            categoryAr: 'خدمات صحية',
-            duration: 60,
-            isActive: true
-          },
-          {
-            name: 'Vaccination Service',
-            nameAr: 'خدمة التطعيم',
-            description: 'Essential vaccinations for pets',
-            descriptionAr: 'التطعيمات الأساسية للحيوانات الأليفة',
-            price: 80.00,
-            category: 'Prevention',
-            categoryAr: 'الوقاية',
-            duration: 30,
-            isActive: true
-          }
-        ];
-        
-        for (const service of sampleServices) {
-          await this.createService(service);
-        }
-      }
-    } catch (error) {
-      console.error('Error initializing sample data:', error);
-    }
-  }
+  // Sample data initialization method removed per user request
 
   private async initializeTestShifts() {
     try {
@@ -2331,58 +2262,7 @@ class MemStorage implements IStorage {
       .orderBy(desc(importHistory.importedAt));
   }
 
-  // Initialize sample products and services
-  async createSampleData() {
-    try {
-      // Check if products already exist
-      const existingProducts = await this.getProducts();
-      if (existingProducts.length === 0) {
-        // Sample products
-        const sampleProducts = [
-          { name: 'أطعمة جافة للقطط', price: '45.00', category: 'أطعمة', description: 'أطعمة جافة عالية الجودة للقطط البالغة' },
-          { name: 'أطعمة جافة للكلاب', price: '65.00', category: 'أطعمة', description: 'أطعمة جافة متوازنة للكلاب الصغيرة والمتوسطة' },
-          { name: 'لعبة كرة للقطط', price: '15.00', category: 'ألعاب', description: 'لعبة كرة تفاعلية للقطط' },
-          { name: 'طوق للكلاب', price: '25.00', category: 'إكسسوارات', description: 'طوق مريح وقابل للتعديل للكلاب' },
-          { name: 'صندوق رمل للقطط', price: '35.00', category: 'نظافة', description: 'صندوق رمل عالي الجودة للقطط' },
-        ];
-
-        for (const product of sampleProducts) {
-          await this.createProduct({
-            name: product.name,
-            price: product.price,
-            category: product.category,
-            description: product.description,
-            isActive: true,
-          });
-        }
-      }
-
-      // Check if services already exist
-      const existingServices = await this.getServices();
-      if (existingServices.length === 0) {
-        // Sample services
-        const sampleServices = [
-          { name: 'فحص شامل للحيوان', price: '150.00', category: 'فحوصات', description: 'فحص شامل لصحة الحيوان الأليف' },
-          { name: 'تطعيم أساسي', price: '80.00', category: 'تطعيمات', description: 'تطعيم أساسي للحيوانات الأليفة' },
-          { name: 'قص أظافر', price: '30.00', category: 'عناية', description: 'قص أظافر الحيوانات الأليفة' },
-          { name: 'تنظيف أسنان', price: '120.00', category: 'عناية', description: 'تنظيف أسنان الحيوانات الأليفة' },
-          { name: 'استحمام وتنظيف', price: '60.00', category: 'عناية', description: 'استحمام وتنظيف شامل للحيوان الأليف' },
-        ];
-
-        for (const service of sampleServices) {
-          await this.createService({
-            name: service.name,
-            price: service.price,
-            category: service.category,
-            description: service.description,
-            isActive: true,
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error initializing sample products and services:', error);
-    }
-  }
+  // Sample data initialization removed per user request
 }
 
 export const storage = new DatabaseStorage();

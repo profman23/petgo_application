@@ -56,6 +56,7 @@ export default function AdminDashboard() {
   const [showSmsDialog, setShowSmsDialog] = useState(false);
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [importSubTab, setImportSubTab] = useState<'products' | 'services'>('products');
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     vetsvanCode: "",
     vetsvanName: "",
@@ -144,10 +145,8 @@ export default function AdminDashboard() {
         }
       }
 
-      // Determine file type based on content or filename
-      const fileName = file.name.toLowerCase();
-      const type = fileName.includes('product') ? 'products' : 
-                   fileName.includes('service') ? 'services' : 'products';
+      // Use current import sub-tab to determine file type
+      const type = importSubTab;
 
       // Send to server
       const token = localStorage.getItem("adminToken");
@@ -1254,19 +1253,46 @@ export default function AdminDashboard() {
                   <div className="bg-white overflow-hidden shadow rounded-lg">
                     <div className="px-4 py-5 sm:p-6">
                       <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6" style={{ textAlign: getTextAlign(language) }}>
-                        {language === 'ar' ? 'استيراد المنتجات والخدمات' : 'Import Products & Services'}
+                        {language === 'ar' ? 'استيراد البيانات' : 'Import Data'}
                       </h3>
+                      
+                      {/* Sub Tabs */}
+                      <div className="flex border-b border-gray-200 mb-6">
+                        <button
+                          onClick={() => setImportSubTab('products')}
+                          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                            importSubTab === 'products'
+                              ? 'border-purple-500 text-purple-600 bg-purple-50'
+                              : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {language === 'ar' ? '📦 المنتجات' : '📦 Products'}
+                        </button>
+                        <button
+                          onClick={() => setImportSubTab('services')}
+                          className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                            importSubTab === 'services'
+                              ? 'border-purple-500 text-purple-600 bg-purple-50'
+                              : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {language === 'ar' ? '🩺 الخدمات' : '🩺 Services'}
+                        </button>
+                      </div>
                       
                       {/* Upload Section */}
                       <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
                         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                         <p className="text-lg font-medium text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
-                          {language === 'ar' ? 'ارفع ملف البيانات' : 'Upload Data File'}
+                          {language === 'ar' 
+                            ? `ارفع ملف ${importSubTab === 'products' ? 'المنتجات' : 'الخدمات'}` 
+                            : `Upload ${importSubTab === 'products' ? 'Products' : 'Services'} File`
+                          }
                         </p>
                         <p className="text-sm text-gray-500 mb-4" style={{ textAlign: getTextAlign(language) }}>
                           {language === 'ar' 
-                            ? 'يمكنك رفع ملفات Excel أو CSV تحتوي على بيانات المنتجات والخدمات' 
-                            : 'Upload Excel or CSV files containing products and services data'
+                            ? `يمكنك رفع ملفات Excel أو CSV تحتوي على بيانات ${importSubTab === 'products' ? 'المنتجات' : 'الخدمات'}` 
+                            : `Upload Excel or CSV files containing ${importSubTab === 'products' ? 'products' : 'services'} data`
                           }
                         </p>
                         
@@ -1319,46 +1345,31 @@ export default function AdminDashboard() {
                       {/* Template Download Section */}
                       <div className="mt-8">
                         <h4 className="text-md font-medium text-gray-900 mb-4" style={{ textAlign: getTextAlign(language) }}>
-                          {language === 'ar' ? 'نماذج للتحميل' : 'Download Templates'}
+                          {language === 'ar' ? 'تحميل النموذج' : 'Download Template'}
                         </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h5 className="font-medium text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
-                              {language === 'ar' ? 'نموذج المنتجات' : 'Products Template'}
-                            </h5>
-                            <p className="text-sm text-gray-600 mb-3" style={{ textAlign: getTextAlign(language) }}>
-                              {language === 'ar' 
-                                ? 'نموذج CSV يحتوي على الأعمدة المطلوبة لاستيراد المنتجات (الاسم، السعر، الفئة، الوصف)'
-                                : 'CSV template with required columns for importing products (name, price, category, description)'
-                              }
-                            </p>
-                            <button 
-                              onClick={() => downloadTemplate('products')}
-                              className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 hover:underline"
-                            >
-                              <FileText className="h-4 w-4 mr-1" />
-                              {language === 'ar' ? 'تحميل نموذج المنتجات' : 'Download Products Template'}
-                            </button>
-                          </div>
-                          
-                          <div className="bg-gray-50 p-4 rounded-lg">
-                            <h5 className="font-medium text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
-                              {language === 'ar' ? 'نموذج الخدمات' : 'Services Template'}
-                            </h5>
-                            <p className="text-sm text-gray-600 mb-3" style={{ textAlign: getTextAlign(language) }}>
-                              {language === 'ar' 
-                                ? 'نموذج CSV يحتوي على الأعمدة المطلوبة لاستيراد الخدمات (الاسم، السعر، الفئة، الوصف)'
-                                : 'CSV template with required columns for importing services (name, price, category, description)'
-                              }
-                            </p>
-                            <button 
-                              onClick={() => downloadTemplate('services')}
-                              className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 hover:underline"
-                            >
-                              <FileText className="h-4 w-4 mr-1" />
-                              {language === 'ar' ? 'تحميل نموذج الخدمات' : 'Download Services Template'}
-                            </button>
-                          </div>
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <h5 className="font-medium text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
+                            {language === 'ar' 
+                              ? `نموذج ${importSubTab === 'products' ? 'المنتجات' : 'الخدمات'}` 
+                              : `${importSubTab === 'products' ? 'Products' : 'Services'} Template`
+                            }
+                          </h5>
+                          <p className="text-sm text-gray-600 mb-3" style={{ textAlign: getTextAlign(language) }}>
+                            {language === 'ar' 
+                              ? `نموذج CSV يحتوي على الأعمدة المطلوبة لاستيراد ${importSubTab === 'products' ? 'المنتجات' : 'الخدمات'} (الاسم، السعر، الفئة، الوصف)`
+                              : `CSV template with required columns for importing ${importSubTab === 'products' ? 'products' : 'services'} (name, price, category, description)`
+                            }
+                          </p>
+                          <button 
+                            onClick={() => downloadTemplate(importSubTab)}
+                            className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 hover:underline"
+                          >
+                            <FileText className="h-4 w-4 mr-1" />
+                            {language === 'ar' 
+                              ? `تحميل نموذج ${importSubTab === 'products' ? 'المنتجات' : 'الخدمات'}` 
+                              : `Download ${importSubTab === 'products' ? 'Products' : 'Services'} Template`
+                            }
+                          </button>
                         </div>
                       </div>
 
