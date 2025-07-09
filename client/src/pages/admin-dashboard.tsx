@@ -218,7 +218,16 @@ export default function AdminDashboard() {
 
   const adminToken = localStorage.getItem("adminToken");
   const adminData = localStorage.getItem("admin");
-  const admin = adminData ? JSON.parse(adminData) : {};
+  let admin = {};
+  try {
+    if (adminData && adminData !== "undefined" && adminData !== "null") {
+      admin = JSON.parse(adminData);
+    }
+  } catch (error) {
+    console.error('Error parsing admin data:', error);
+    localStorage.removeItem("admin");
+    localStorage.removeItem("adminToken");
+  }
 
   // Fetch drivers
   const { data: drivers, isLoading } = useQuery({

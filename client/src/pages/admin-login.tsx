@@ -29,10 +29,12 @@ export default function AdminLogin() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
 
-  // Clear any existing regular tokens when accessing admin login
+  // Clear any existing tokens when accessing admin login
   useEffect(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
   }, []);
 
   const loginMutation = useMutation({
