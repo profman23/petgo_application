@@ -2230,6 +2230,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Products and Services endpoints
+  app.get('/api/products', async (req, res) => {
+    try {
+      const products = await storage.getProducts();
+      res.json(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Failed to fetch products' });
+    }
+  });
+
+  app.get('/api/services', async (req, res) => {
+    try {
+      const services = await storage.getServices();
+      res.json(services);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      res.status(500).json({ error: 'Failed to fetch services' });
+    }
+  });
+
+  app.post('/api/products', requireAdminAuth, async (req, res) => {
+    try {
+      const product = await storage.createProduct(req.body);
+      res.status(201).json(product);
+    } catch (error) {
+      console.error('Error creating product:', error);
+      res.status(500).json({ error: 'Failed to create product' });
+    }
+  });
+
+  app.post('/api/services', requireAdminAuth, async (req, res) => {
+    try {
+      const service = await storage.createService(req.body);
+      res.status(201).json(service);
+    } catch (error) {
+      console.error('Error creating service:', error);
+      res.status(500).json({ error: 'Failed to create service' });
+    }
+  });
+
+  app.put('/api/products/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const product = await storage.updateProduct(parseInt(id), req.body);
+      res.json(product);
+    } catch (error) {
+      console.error('Error updating product:', error);
+      res.status(500).json({ error: 'Failed to update product' });
+    }
+  });
+
+  app.put('/api/services/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const service = await storage.updateService(parseInt(id), req.body);
+      res.json(service);
+    } catch (error) {
+      console.error('Error updating service:', error);
+      res.status(500).json({ error: 'Failed to update service' });
+    }
+  });
+
+  app.delete('/api/products/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteProduct(parseInt(id));
+      res.json({ message: 'Product deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      res.status(500).json({ error: 'Failed to delete product' });
+    }
+  });
+
+  app.delete('/api/services/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteService(parseInt(id));
+      res.json({ message: 'Service deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting service:', error);
+      res.status(500).json({ error: 'Failed to delete service' });
+    }
+  });
+
+  // Import endpoints
+  app.get('/api/import-history', requireAdminAuth, async (req, res) => {
+    try {
+      const history = await storage.getImportHistory();
+      res.json(history);
+    } catch (error) {
+      console.error('Error fetching import history:', error);
+      res.status(500).json({ error: 'Failed to fetch import history' });
+    }
+  });
+
+  app.post('/api/import-data', requireAdminAuth, async (req, res) => {
+    try {
+      const { type, data, fileName } = req.body;
+      let importedCount = 0;
+      
+      console.log('Processing import request:', { type, fileName, dataLength: data.length });
+      
+      if (type === 'products') {
+        for (const item of data) {
+          await storage.createProduct({
+            name: item.name || 'Unknown Product',
+            price: item.price || 0,
+            description: item.description || '',
+            category: item.category || 'General',
+            isActive: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+          importedCount++;
+        }
+      } else if (type === 'services') {
+        for (const item of data) {
+          await storage.createService({
+            name: item.name || 'Unknown Service',
+            price: item.price || 0,
+            description: item.description || '',
+            category: item.category || 'General',
+            isActive: true,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+          importedCount++;
+        }
+      }
+      
+      // Create import history record
+      await storage.createImportHistory({
+        type,
+        fileName,
+        recordsCount: importedCount,
+        importedAt: new Date()
+      });
+      
+      console.log(`Successfully imported ${importedCount} ${type}`);
+      res.json({ 
+        message: `Successfully imported ${importedCount} ${type}`,
+        importedCount 
+      });
+    } catch (error) {
+      console.error('Error importing data:', error);
+      res.status(500).json({ error: 'Failed to import data' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

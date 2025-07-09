@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc } from "drizzle-orm";
 
@@ -116,6 +116,20 @@ export interface IStorage {
   saveInvoiceStatus(status: InsertInvoiceStatus): Promise<InvoiceStatus>;
   getInvoiceStatus(bookingId: number): Promise<InvoiceStatus | undefined>;
   updateInvoiceStatus(bookingId: number, data: Partial<InvoiceStatus>): Promise<InvoiceStatus | undefined>;
+  
+  // Products and Services for import system
+  getProducts(): Promise<any[]>;
+  getServices(): Promise<any[]>;
+  createProduct(product: any): Promise<any>;
+  createService(service: any): Promise<any>;
+  updateProduct(id: number, product: any): Promise<any>;
+  updateService(id: number, service: any): Promise<any>;
+  deleteProduct(id: number): Promise<void>;
+  deleteService(id: number): Promise<void>;
+  
+  // Import history
+  getImportHistory(): Promise<any[]>;
+  createImportHistory(importData: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -170,6 +184,9 @@ export class DatabaseStorage implements IStorage {
       
       // Initialize test shifts
       await this.initializeTestShifts();
+      
+      // Initialize sample products and services
+      await this.createSampleData();
     } catch (error) {
       console.error('Error initializing test data:', error);
     }
@@ -944,6 +961,140 @@ export class DatabaseStorage implements IStorage {
     return updatedStatus;
   }
 
+  // Products and Services for import system
+  async getProducts(): Promise<any[]> {
+    try {
+      const result = await db
+        .select()
+        .from(products)
+        .where(eq(products.isActive, true))
+        .orderBy(products.name);
+      return result;
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
+    }
+  }
+
+  async getServices(): Promise<any[]> {
+    try {
+      const result = await db
+        .select()
+        .from(services)
+        .where(eq(services.isActive, true))
+        .orderBy(services.name);
+      return result;
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      return [];
+    }
+  }
+
+  async createProduct(product: any): Promise<any> {
+    try {
+      const [newProduct] = await db
+        .insert(products)
+        .values(product)
+        .returning();
+      return newProduct;
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw error;
+    }
+  }
+
+  async createService(service: any): Promise<any> {
+    try {
+      const [newService] = await db
+        .insert(services)
+        .values(service)
+        .returning();
+      return newService;
+    } catch (error) {
+      console.error('Error creating service:', error);
+      throw error;
+    }
+  }
+
+  async updateProduct(id: number, product: any): Promise<any> {
+    try {
+      const [updatedProduct] = await db
+        .update(products)
+        .set({ ...product, updatedAt: new Date() })
+        .where(eq(products.id, id))
+        .returning();
+      return updatedProduct;
+    } catch (error) {
+      console.error('Error updating product:', error);
+      throw error;
+    }
+  }
+
+  async updateService(id: number, service: any): Promise<any> {
+    try {
+      const [updatedService] = await db
+        .update(services)
+        .set({ ...service, updatedAt: new Date() })
+        .where(eq(services.id, id))
+        .returning();
+      return updatedService;
+    } catch (error) {
+      console.error('Error updating service:', error);
+      throw error;
+    }
+  }
+
+  async deleteProduct(id: number): Promise<void> {
+    try {
+      await db
+        .update(products)
+        .set({ isActive: false, updatedAt: new Date() })
+        .where(eq(products.id, id));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw error;
+    }
+  }
+
+  async deleteService(id: number): Promise<void> {
+    try {
+      await db
+        .update(services)
+        .set({ isActive: false, updatedAt: new Date() })
+        .where(eq(services.id, id));
+    } catch (error) {
+      console.error('Error deleting service:', error);
+      throw error;
+    }
+  }
+
+  // Import history
+  async getImportHistory(): Promise<any[]> {
+    try {
+      const result = await db
+        .select()
+        .from(importHistory)
+        .orderBy(desc(importHistory.importedAt));
+      return result;
+    } catch (error) {
+      console.error('Error fetching import history:', error);
+      return [];
+    }
+  }
+
+  async createImportHistory(importData: any): Promise<any> {
+    try {
+      const [newImportHistory] = await db
+        .insert(importHistory)
+        .values(importData)
+        .returning();
+      return newImportHistory;
+    } catch (error) {
+      console.error('Error creating import history:', error);
+      throw error;
+    }
+  }
+
   // Payment update method removed per user request
 }
 
@@ -959,6 +1110,9 @@ class MemStorage implements IStorage {
   private reviews: Map<number, Review>;
   private petVitals: Map<number, PetVital>;
   private petAttachments: Map<number, PetAttachment>;
+  private products: Map<number, any>;
+  private services: Map<number, any>;
+  private importHistory: Map<number, any>;
   private currentUserId: number;
   private currentDriverId: number;
   private currentRideId: number;
@@ -969,6 +1123,13 @@ class MemStorage implements IStorage {
   private currentReviewId: number;
   private currentPetVitalId: number;
   private currentPetAttachmentId: number;
+  private currentProductId: number;
+  private currentServiceId: number;
+  private currentImportHistoryId: number;
+  private invoiceItems: Map<number, InvoiceItem>;
+  private invoiceStatuses: Map<number, InvoiceStatus>;
+  private currentInvoiceItemId: number;
+  private currentInvoiceStatusId: number;
 
   constructor() {
     this.users = new Map();
@@ -981,6 +1142,9 @@ class MemStorage implements IStorage {
     this.reviews = new Map();
     this.petVitals = new Map();
     this.petAttachments = new Map();
+    this.products = new Map();
+    this.services = new Map();
+    this.importHistory = new Map();
     this.currentUserId = 1;
     this.currentDriverId = 1;
     this.currentRideId = 1;
@@ -991,6 +1155,13 @@ class MemStorage implements IStorage {
     this.currentReviewId = 1;
     this.currentPetVitalId = 1;
     this.currentPetAttachmentId = 1;
+    this.currentProductId = 1;
+    this.currentServiceId = 1;
+    this.currentImportHistoryId = 1;
+    this.invoiceItems = new Map();
+    this.invoiceStatuses = new Map();
+    this.currentInvoiceItemId = 1;
+    this.currentInvoiceStatusId = 1;
 
     this.initializeTestData();
   }
@@ -1654,6 +1825,198 @@ class MemStorage implements IStorage {
     return false;
   }
 
+  // Products and Services for import system
+  async getProducts(): Promise<any[]> {
+    return Array.from(this.products.values()).filter(p => p.isActive);
+  }
+
+  async getServices(): Promise<any[]> {
+    return Array.from(this.services.values()).filter(s => s.isActive);
+  }
+
+  async createProduct(product: any): Promise<any> {
+    const newProduct = { ...product, id: this.currentProductId++ };
+    this.products.set(newProduct.id, newProduct);
+    return newProduct;
+  }
+
+  async createService(service: any): Promise<any> {
+    const newService = { ...service, id: this.currentServiceId++ };
+    this.services.set(newService.id, newService);
+    return newService;
+  }
+
+  async updateProduct(id: number, product: any): Promise<any> {
+    const existingProduct = this.products.get(id);
+    if (!existingProduct) {
+      throw new Error('Product not found');
+    }
+    const updatedProduct = { ...existingProduct, ...product, updatedAt: new Date() };
+    this.products.set(id, updatedProduct);
+    return updatedProduct;
+  }
+
+  async updateService(id: number, service: any): Promise<any> {
+    const existingService = this.services.get(id);
+    if (!existingService) {
+      throw new Error('Service not found');
+    }
+    const updatedService = { ...existingService, ...service, updatedAt: new Date() };
+    this.services.set(id, updatedService);
+    return updatedService;
+  }
+
+  async deleteProduct(id: number): Promise<void> {
+    const product = this.products.get(id);
+    if (product) {
+      product.isActive = false;
+      this.products.set(id, product);
+    }
+  }
+
+  async deleteService(id: number): Promise<void> {
+    const service = this.services.get(id);
+    if (service) {
+      service.isActive = false;
+      this.services.set(id, service);
+    }
+  }
+
+  // Import history
+  async getImportHistory(): Promise<any[]> {
+    return Array.from(this.importHistory.values()).sort((a, b) => 
+      new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime()
+    );
+  }
+
+  async createImportHistory(importData: any): Promise<any> {
+    const newHistory = { ...importData, id: this.currentImportHistoryId++ };
+    this.importHistory.set(newHistory.id, newHistory);
+    return newHistory;
+  }
+
+  // Invoice Items operations (MemStorage implementation)
+  async saveInvoiceItems(bookingId: number, items: any[]): Promise<InvoiceItem[]> {
+    // Remove existing invoice items for this booking
+    const existingItems = Array.from(this.invoiceItems.values()).filter(
+      item => item.bookingId === bookingId
+    );
+    existingItems.forEach(item => this.invoiceItems.delete(item.id));
+    
+    // Add new invoice items
+    const savedItems = items.map(item => ({
+      ...item,
+      id: this.currentInvoiceItemId++,
+      bookingId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }));
+    
+    savedItems.forEach(item => this.invoiceItems.set(item.id, item));
+    return savedItems;
+  }
+
+  async getInvoiceItems(bookingId: number): Promise<InvoiceItem[]> {
+    return Array.from(this.invoiceItems.values()).filter(
+      item => item.bookingId === bookingId
+    );
+  }
+
+  async deleteInvoiceItems(bookingId: number): Promise<void> {
+    const items = Array.from(this.invoiceItems.values()).filter(
+      item => item.bookingId === bookingId
+    );
+    items.forEach(item => this.invoiceItems.delete(item.id));
+  }
+
+  // Invoice Status operations (MemStorage implementation)
+  async saveInvoiceStatus(status: any): Promise<any> {
+    const newStatus = { ...status, id: this.currentInvoiceStatusId++ };
+    this.invoiceStatuses.set(newStatus.bookingId, newStatus);
+    return newStatus;
+  }
+
+  async getInvoiceStatus(bookingId: number): Promise<any> {
+    return this.invoiceStatuses.get(bookingId);
+  }
+
+  async updateInvoiceStatus(bookingId: number, data: any): Promise<any> {
+    const existingStatus = this.invoiceStatuses.get(bookingId);
+    if (!existingStatus) {
+      return undefined;
+    }
+
+    const updatedStatus = { ...existingStatus, ...data, updatedAt: new Date() };
+    this.invoiceStatuses.set(bookingId, updatedStatus);
+    return updatedStatus;
+  }
+
+  // Products operations (MemStorage implementation)
+  async createProduct(product: InsertProduct): Promise<Product> {
+    const newProduct = { ...product, id: this.currentProductId++ };
+    this.products.set(newProduct.id, newProduct);
+    return newProduct;
+  }
+
+  async getProducts(): Promise<Product[]> {
+    return Array.from(this.products.values()).filter(product => product.isActive);
+  }
+
+  async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product> {
+    const existing = this.products.get(id);
+    if (!existing) throw new Error('Product not found');
+    
+    const updated = { ...existing, ...product, updatedAt: new Date() };
+    this.products.set(id, updated);
+    return updated;
+  }
+
+  async deleteProduct(id: number): Promise<void> {
+    const existing = this.products.get(id);
+    if (existing) {
+      this.products.set(id, { ...existing, isActive: false });
+    }
+  }
+
+  // Services operations (MemStorage implementation)
+  async createService(service: InsertService): Promise<Service> {
+    const newService = { ...service, id: this.currentServiceId++ };
+    this.services.set(newService.id, newService);
+    return newService;
+  }
+
+  async getServices(): Promise<Service[]> {
+    return Array.from(this.services.values()).filter(service => service.isActive);
+  }
+
+  async updateService(id: number, service: Partial<InsertService>): Promise<Service> {
+    const existing = this.services.get(id);
+    if (!existing) throw new Error('Service not found');
+    
+    const updated = { ...existing, ...service, updatedAt: new Date() };
+    this.services.set(id, updated);
+    return updated;
+  }
+
+  async deleteService(id: number): Promise<void> {
+    const existing = this.services.get(id);
+    if (existing) {
+      this.services.set(id, { ...existing, isActive: false });
+    }
+  }
+
+  // Import History operations (MemStorage implementation)
+  async createImportHistory(importData: InsertImportHistory): Promise<ImportHistory> {
+    const newImportHistory = { ...importData, id: this.currentImportHistoryId++ };
+    this.importHistory.set(newImportHistory.id, newImportHistory);
+    return newImportHistory;
+  }
+
+  async getImportHistory(): Promise<ImportHistory[]> {
+    return Array.from(this.importHistory.values())
+      .sort((a, b) => new Date(b.importedAt).getTime() - new Date(a.importedAt).getTime());
+  }
+
   // Pet vitals operations
   async createPetVital(vital: InsertPetVital): Promise<PetVital> {
     console.log('DatabaseStorage createPetVital called with:', vital);
@@ -1797,6 +2160,139 @@ class MemStorage implements IStorage {
       .where(eq(invoiceStatus.bookingId, bookingId))
       .returning();
     return updatedStatus;
+  }
+
+  // Products operations (DatabaseStorage implementation)
+  async createProduct(product: InsertProduct): Promise<Product> {
+    const [newProduct] = await db
+      .insert(products)
+      .values(product)
+      .returning();
+    return newProduct;
+  }
+
+  async getProducts(): Promise<Product[]> {
+    return await db
+      .select()
+      .from(products)
+      .where(eq(products.isActive, true));
+  }
+
+  async updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product> {
+    const [updatedProduct] = await db
+      .update(products)
+      .set(product)
+      .where(eq(products.id, id))
+      .returning();
+    return updatedProduct;
+  }
+
+  async deleteProduct(id: number): Promise<void> {
+    await db
+      .update(products)
+      .set({ isActive: false })
+      .where(eq(products.id, id));
+  }
+
+  // Services operations (DatabaseStorage implementation)
+  async createService(service: InsertService): Promise<Service> {
+    const [newService] = await db
+      .insert(services)
+      .values(service)
+      .returning();
+    return newService;
+  }
+
+  async getServices(): Promise<Service[]> {
+    return await db
+      .select()
+      .from(services)
+      .where(eq(services.isActive, true));
+  }
+
+  async updateService(id: number, service: Partial<InsertService>): Promise<Service> {
+    const [updatedService] = await db
+      .update(services)
+      .set(service)
+      .where(eq(services.id, id))
+      .returning();
+    return updatedService;
+  }
+
+  async deleteService(id: number): Promise<void> {
+    await db
+      .update(services)
+      .set({ isActive: false })
+      .where(eq(services.id, id));
+  }
+
+  // Import History operations (DatabaseStorage implementation)
+  async createImportHistory(importData: InsertImportHistory): Promise<ImportHistory> {
+    const [newImportHistory] = await db
+      .insert(importHistory)
+      .values(importData)
+      .returning();
+    return newImportHistory;
+  }
+
+  async getImportHistory(): Promise<ImportHistory[]> {
+    return await db
+      .select()
+      .from(importHistory)
+      .orderBy(desc(importHistory.importedAt));
+  }
+
+  // Initialize sample products and services
+  async createSampleData() {
+    try {
+      // Check if products already exist
+      const existingProducts = await this.getProducts();
+      if (existingProducts.length === 0) {
+        // Sample products
+        const sampleProducts = [
+          { name: 'أطعمة جافة للقطط', price: '45.00', category: 'أطعمة', description: 'أطعمة جافة عالية الجودة للقطط البالغة' },
+          { name: 'أطعمة جافة للكلاب', price: '65.00', category: 'أطعمة', description: 'أطعمة جافة متوازنة للكلاب الصغيرة والمتوسطة' },
+          { name: 'لعبة كرة للقطط', price: '15.00', category: 'ألعاب', description: 'لعبة كرة تفاعلية للقطط' },
+          { name: 'طوق للكلاب', price: '25.00', category: 'إكسسوارات', description: 'طوق مريح وقابل للتعديل للكلاب' },
+          { name: 'صندوق رمل للقطط', price: '35.00', category: 'نظافة', description: 'صندوق رمل عالي الجودة للقطط' },
+        ];
+
+        for (const product of sampleProducts) {
+          await this.createProduct({
+            name: product.name,
+            price: product.price,
+            category: product.category,
+            description: product.description,
+            isActive: true,
+          });
+        }
+      }
+
+      // Check if services already exist
+      const existingServices = await this.getServices();
+      if (existingServices.length === 0) {
+        // Sample services
+        const sampleServices = [
+          { name: 'فحص شامل للحيوان', price: '150.00', category: 'فحوصات', description: 'فحص شامل لصحة الحيوان الأليف' },
+          { name: 'تطعيم أساسي', price: '80.00', category: 'تطعيمات', description: 'تطعيم أساسي للحيوانات الأليفة' },
+          { name: 'قص أظافر', price: '30.00', category: 'عناية', description: 'قص أظافر الحيوانات الأليفة' },
+          { name: 'تنظيف أسنان', price: '120.00', category: 'عناية', description: 'تنظيف أسنان الحيوانات الأليفة' },
+          { name: 'استحمام وتنظيف', price: '60.00', category: 'عناية', description: 'استحمام وتنظيف شامل للحيوان الأليف' },
+        ];
+
+        for (const service of sampleServices) {
+          await this.createService({
+            name: service.name,
+            price: service.price,
+            category: service.category,
+            description: service.description,
+            isActive: true,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error initializing sample products and services:', error);
+    }
   }
 }
 

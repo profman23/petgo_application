@@ -353,3 +353,93 @@ export const insertInvoiceStatusSchema = createInsertSchema(invoiceStatus).pick(
 
 export type InvoiceStatus = typeof invoiceStatus.$inferSelect;
 export type InsertInvoiceStatus = z.infer<typeof insertInvoiceStatusSchema>;
+
+// Products and Services tables for import system
+export const products = pgTable("products", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  nameAr: varchar("name_ar", { length: 255 }),
+  description: text("description"),
+  descriptionAr: text("description_ar"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  category: varchar("category", { length: 100 }),
+  categoryAr: varchar("category_ar", { length: 100 }),
+  sku: varchar("sku", { length: 50 }),
+  unit: varchar("unit", { length: 50 }),
+  unitAr: varchar("unit_ar", { length: 50 }),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const services = pgTable("services", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  nameAr: varchar("name_ar", { length: 255 }),
+  description: text("description"),
+  descriptionAr: text("description_ar"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  category: varchar("category", { length: 100 }),
+  categoryAr: varchar("category_ar", { length: 100 }),
+  duration: integer("duration"), // in minutes
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const importHistory = pgTable("import_history", {
+  id: serial("id").primaryKey(),
+  fileName: varchar("file_name", { length: 255 }).notNull(),
+  fileType: varchar("file_type", { length: 20 }).notNull(), // products or services
+  recordsImported: integer("records_imported").default(0),
+  recordsUpdated: integer("records_updated").default(0),
+  recordsSkipped: integer("records_skipped").default(0),
+  status: varchar("status", { length: 50 }).default("completed"), // completed, failed, partial
+  errorMessage: text("error_message"),
+  importedBy: varchar("imported_by", { length: 255 }),
+  importedAt: timestamp("imported_at").defaultNow(),
+});
+
+export const insertProductSchema = createInsertSchema(products).pick({
+  name: true,
+  nameAr: true,
+  description: true,
+  descriptionAr: true,
+  price: true,
+  category: true,
+  categoryAr: true,
+  sku: true,
+  unit: true,
+  unitAr: true,
+  isActive: true,
+});
+
+export const insertServiceSchema = createInsertSchema(services).pick({
+  name: true,
+  nameAr: true,
+  description: true,
+  descriptionAr: true,
+  price: true,
+  category: true,
+  categoryAr: true,
+  duration: true,
+  isActive: true,
+});
+
+export const insertImportHistorySchema = createInsertSchema(importHistory).pick({
+  fileName: true,
+  fileType: true,
+  recordsImported: true,
+  recordsUpdated: true,
+  recordsSkipped: true,
+  status: true,
+  errorMessage: true,
+  importedBy: true,
+});
+
+export type Product = typeof products.$inferSelect;
+export type InsertProduct = z.infer<typeof insertProductSchema>;
+export type Service = typeof services.$inferSelect;
+export type InsertService = z.infer<typeof insertServiceSchema>;
+export type ImportHistory = typeof importHistory.$inferSelect;
+export type InsertImportHistory = z.infer<typeof insertImportHistorySchema>;

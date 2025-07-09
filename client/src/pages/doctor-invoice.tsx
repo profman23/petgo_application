@@ -12,6 +12,7 @@ import { apiRequest } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
 import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface InvoiceItem {
   id: string;
@@ -147,6 +148,28 @@ export default function DoctorInvoice() {
     enabled: !!params?.bookingId,
   });
 
+  // Fetch products for invoice item selection
+  const { data: products = [], isLoading: isProductsLoading } = useQuery({
+    queryKey: ['/api/products'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/products');
+      return response;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    cacheTime: 30 * 60 * 1000, // 30 minutes
+  });
+
+  // Fetch services for invoice item selection
+  const { data: services = [], isLoading: isServicesLoading } = useQuery({
+    queryKey: ['/api/services'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/services');
+      return response;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    cacheTime: 30 * 60 * 1000, // 30 minutes
+  });
+
   // Load saved invoice items when data is available
   useEffect(() => {
     if (savedInvoiceItems && savedInvoiceItems.length > 0) {
@@ -185,6 +208,8 @@ export default function DoctorInvoice() {
       setNotes(invoiceStatus.notes || '');
     }
   }, [invoiceStatus]);
+
+
 
   const getDirection = (lang: string) => lang === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = (lang: string) => lang === 'ar' ? 'right' : 'left';
@@ -240,6 +265,10 @@ export default function DoctorInvoice() {
       confirm: 'موافق',
       invoiceGenerated: 'تم إنشاء الفاتورة بنجاح',
       readOnly: 'للمشاهدة فقط',
+      selectProduct: 'اختر المنتج أو الخدمة',
+      products: 'المنتجات',
+      services: 'الخدمات',
+      importedItems: 'عناصر مستوردة',
     },
     en: {
       invoiceTitle: 'VETS VAN Service Invoice',
@@ -291,6 +320,10 @@ export default function DoctorInvoice() {
       confirm: 'Confirm',
       invoiceGenerated: 'Invoice generated successfully',
       readOnly: 'Read Only',
+      selectProduct: 'Select Product or Service',
+      products: 'Products',
+      services: 'Services',
+      importedItems: 'Imported Items',
     }
   };
 
@@ -367,6 +400,22 @@ export default function DoctorInvoice() {
     }];
     setInvoiceItems(newItems);
     saveInvoiceItems(newItems);
+  };
+
+  // Handle product/service selection
+  const handleProductServiceSelect = (itemId: string, selectedId: string) => {
+    const selectedProduct = products.find(p => p.id.toString() === selectedId);
+    const selectedService = services.find(s => s.id.toString() === selectedId);
+    
+    if (selectedProduct) {
+      updateItem(itemId, 'description', selectedProduct.name);
+      updateItem(itemId, 'unitPrice', parseFloat(selectedProduct.price));
+      updateItem(itemId, 'total', parseFloat(selectedProduct.price) * invoiceItems.find(item => item.id === itemId)?.quantity || 1);
+    } else if (selectedService) {
+      updateItem(itemId, 'description', selectedService.name);
+      updateItem(itemId, 'unitPrice', parseFloat(selectedService.price));
+      updateItem(itemId, 'total', parseFloat(selectedService.price) * invoiceItems.find(item => item.id === itemId)?.quantity || 1);
+    }
   };
 
   // Remove item
@@ -775,12 +824,51 @@ export default function DoctorInvoice() {
                           {item.description || t('description')}
                         </div>
                       ) : (
-                        <Input
-                          value={item.description}
-                          onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                          placeholder={t('description')}
-                          className="w-full"
-                        />
+                        <div className="space-y-2">
+                          {/* Product/Service Selection */}
+                          {(products.length > 0 || services.length > 0) && (
+                            <Select onValueChange={(value) => handleProductServiceSelect(item.id, value)}>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder={t('selectProduct')} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {products.length > 0 && (
+                                  <>
+                                    <SelectItem disabled value="products-header">
+                                      {t('products')}
+                                    </SelectItem>
+                                    {products.map((product: any) => (
+                                      <SelectItem key={`product-${product.id}`} value={product.id.toString()}>
+                                        {product.name} - {parseFloat(product.price).toFixed(2)} {t('sar')}
+                                      </SelectItem>
+                                    ))}
+                                  </>
+                                )}
+                                {services.length > 0 && (
+                                  <>
+                                    {products.length > 0 && <SelectItem disabled value="separator">---</SelectItem>}
+                                    <SelectItem disabled value="services-header">
+                                      {t('services')}
+                                    </SelectItem>
+                                    {services.map((service: any) => (
+                                      <SelectItem key={`service-${service.id}`} value={service.id.toString()}>
+                                        {service.name} - {parseFloat(service.price).toFixed(2)} {t('sar')}
+                                      </SelectItem>
+                                    ))}
+                                  </>
+                                )}
+                              </SelectContent>
+                            </Select>
+                          )}
+                          
+                          {/* Manual Description Input */}
+                          <Input
+                            value={item.description}
+                            onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                            placeholder={t('description')}
+                            className="w-full"
+                          />
+                        </div>
                       )}
                     </td>
                     <td className="py-2 px-2">
@@ -835,13 +923,23 @@ export default function DoctorInvoice() {
           </div>
 
           {!isRecordLocked && (
-            <button
-              onClick={addItem}
-              className="flex items-center text-purple-600 hover:text-purple-800 mb-4"
-            >
-              <Plus className="h-4 w-4 ml-1" />
-              {t('addItem')}
-            </button>
+            <div className="flex items-center justify-between mb-4">
+              <button
+                onClick={addItem}
+                className="flex items-center text-purple-600 hover:text-purple-800"
+              >
+                <Plus className="h-4 w-4 ml-1" />
+                {t('addItem')}
+              </button>
+              
+              {/* Loading indicator for products/services */}
+              {(isProductsLoading || isServicesLoading) && (
+                <div className="flex items-center text-gray-500 text-sm">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600 mr-2"></div>
+                  {t('importedItems')}...
+                </div>
+              )}
+            </div>
           )}
 
           {/* Totals */}
