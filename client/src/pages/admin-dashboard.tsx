@@ -67,6 +67,47 @@ export default function AdminDashboard() {
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
 
+  // Template download function
+  const downloadTemplate = async (type: 'products' | 'services') => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(`/api/admin/download-template/${type}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download template');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${type}_template.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: language === 'ar' ? 'تم التحميل' : 'Downloaded',
+        description: language === 'ar' 
+          ? `تم تحميل نموذج ${type === 'products' ? 'المنتجات' : 'الخدمات'} بنجاح` 
+          : `${type === 'products' ? 'Products' : 'Services'} template downloaded successfully`,
+      });
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في تحميل النموذج' : 'Failed to download template',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Check admin authentication and prevent doctors access
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
@@ -1170,13 +1211,16 @@ export default function AdminDashboard() {
                             </h5>
                             <p className="text-sm text-gray-600 mb-3" style={{ textAlign: getTextAlign(language) }}>
                               {language === 'ar' 
-                                ? 'نموذج Excel يحتوي على الأعمدة المطلوبة لاستيراد المنتجات'
-                                : 'Excel template with required columns for importing products'
+                                ? 'نموذج CSV يحتوي على الأعمدة المطلوبة لاستيراد المنتجات (الاسم، السعر، الفئة، الوصف)'
+                                : 'CSV template with required columns for importing products (name, price, category, description)'
                               }
                             </p>
-                            <button className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800">
+                            <button 
+                              onClick={() => downloadTemplate('products')}
+                              className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 hover:underline"
+                            >
                               <FileText className="h-4 w-4 mr-1" />
-                              {language === 'ar' ? 'تحميل النموذج' : 'Download Template'}
+                              {language === 'ar' ? 'تحميل نموذج المنتجات' : 'Download Products Template'}
                             </button>
                           </div>
                           
@@ -1186,13 +1230,16 @@ export default function AdminDashboard() {
                             </h5>
                             <p className="text-sm text-gray-600 mb-3" style={{ textAlign: getTextAlign(language) }}>
                               {language === 'ar' 
-                                ? 'نموذج Excel يحتوي على الأعمدة المطلوبة لاستيراد الخدمات'
-                                : 'Excel template with required columns for importing services'
+                                ? 'نموذج CSV يحتوي على الأعمدة المطلوبة لاستيراد الخدمات (الاسم، السعر، الفئة، الوصف)'
+                                : 'CSV template with required columns for importing services (name, price, category, description)'
                               }
                             </p>
-                            <button className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800">
+                            <button 
+                              onClick={() => downloadTemplate('services')}
+                              className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 hover:underline"
+                            >
                               <FileText className="h-4 w-4 mr-1" />
-                              {language === 'ar' ? 'تحميل النموذج' : 'Download Template'}
+                              {language === 'ar' ? 'تحميل نموذج الخدمات' : 'Download Services Template'}
                             </button>
                           </div>
                         </div>

@@ -2380,6 +2380,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download templates endpoint
+  app.get('/api/admin/download-template/:type', requireAdminAuth, (req, res) => {
+    const type = req.params.type;
+    
+    if (type === 'products') {
+      const csv = 'name,price,category,description\n' +
+                  'أطعمة جافة للقطط,45.00,أطعمة,أطعمة جافة عالية الجودة للقطط البالغة\n' +
+                  'أطعمة جافة للكلاب,65.00,أطعمة,أطعمة جافة متوازنة للكلاب الصغيرة والمتوسطة\n' +
+                  'لعبة كرة للقطط,15.00,ألعاب,لعبة كرة تفاعلية للقطط\n' +
+                  'فيتامينات للطيور,25.00,مكملات,فيتامينات أساسية لصحة الطيور';
+      
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="products_template.csv"');
+      res.send('\uFEFF' + csv); // Add BOM for Arabic support
+    } else if (type === 'services') {
+      const csv = 'name,price,category,description\n' +
+                  'فحص شامل للحيوان,150.00,فحوصات,فحص شامل لصحة الحيوان الأليف\n' +
+                  'تطعيم أساسي,80.00,تطعيمات,تطعيم أساسي للحيوانات الأليفة\n' +
+                  'قص أظافر,30.00,عناية,قص أظافر الحيوانات الأليفة\n' +
+                  'تنظيف أسنان,120.00,عناية,تنظيف وفحص أسنان الحيوانات';
+      
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="services_template.csv"');
+      res.send('\uFEFF' + csv); // Add BOM for Arabic support
+    } else {
+      res.status(400).json({ message: 'Invalid template type' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
