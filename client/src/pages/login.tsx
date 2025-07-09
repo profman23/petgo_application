@@ -292,14 +292,14 @@ export default function Login() {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    onClick={() => setIsRegistering(true)}
+                    onClick={() => setLocation('/register')}
                     className="w-full py-3 rounded-xl font-semibold border-2 transition-all duration-300 
                       hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
                       bg-white hover:bg-purple-50 text-purple-600 border-purple-300 hover:border-purple-400"
                   >
                     <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
                       <UserPlus className="w-5 h-5" />
-                      <span>Create New Account</span>
+                      <span>{language === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'}</span>
                     </div>
                   </Button>
                   

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, verifyOtpSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 // Payment service removed per user request
@@ -178,6 +178,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
     sessions.delete(sessionId);
     res.json({ message: 'تم تسجيل الخروج بنجاح' });
+  });
+
+  // OTP endpoints for email verification during registration
+  app.post('/api/auth/send-otp', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      // Check if email is already registered
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        const userLanguage = req.body.preferredLanguage || 'ar';
+        return res.status(400).json({ message: getErrorMessage('emailExists', userLanguage) });
+      }
+
+      // Generate 6-digit OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Save OTP to database
+      await storage.createOtp(email, otp);
+      
+      // Send OTP email
+      try {
+        await emailService.sendOtpEmail(email, otp);
+        console.log(`✅ OTP email sent to ${email}`);
+        res.json({ message: 'OTP sent successfully', success: true });
+      } catch (emailError) {
+        console.error('❌ Failed to send OTP email:', emailError);
+        res.status(500).json({ message: 'Failed to send OTP email' });
+      }
+      
+    } catch (error) {
+      console.error('Send OTP error:', error);
+      res.status(500).json({ message: 'خطأ في الخادم' });
+    }
+  });
+
+  app.post('/api/auth/verify-otp', async (req, res) => {
+    try {
+      const { email, otp } = verifyOtpSchema.parse(req.body);
+      
+      // Verify OTP
+      const isValid = await storage.verifyOtp(email, otp);
+      
+      if (isValid) {
+        res.json({ message: 'OTP verified successfully', success: true });
+      } else {
+        // Increment attempts
+        await storage.incrementOtpAttempts(email);
+        res.status(400).json({ message: 'Invalid or expired OTP', success: false });
+      }
+      
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      res.status(500).json({ message: 'خطأ في الخادم' });
+    }
   });
 
   // Doctor login endpoint  
