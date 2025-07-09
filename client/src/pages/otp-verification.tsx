@@ -83,10 +83,13 @@ export default function OtpVerification() {
 
   const verifyOtpMutation = useMutation({
     mutationFn: async (data: OtpForm) => {
-      return await apiRequest("/api/auth/verify-otp", "POST", {
-        email,
-        otpCode: data.otpCode,
-        preferredLanguage: language
+      return await apiRequest("/api/auth/verify-otp", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          otpCode: data.otpCode,
+          preferredLanguage: language
+        })
       });
     },
     onSuccess: (data: any) => {
@@ -135,9 +138,12 @@ export default function OtpVerification() {
 
   const resendOtpMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/auth/send-otp", "POST", {
-        email,
-        preferredLanguage: language
+      return await apiRequest("/api/auth/send-otp", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          preferredLanguage: language
+        })
       });
     },
     onSuccess: () => {
