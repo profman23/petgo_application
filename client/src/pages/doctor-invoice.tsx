@@ -13,6 +13,9 @@ import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
 import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronDown } from "lucide-react";
 
 interface InvoiceItem {
   id: string;
@@ -402,27 +405,19 @@ export default function DoctorInvoice() {
     saveInvoiceItems(newItems);
   };
 
-  // Handle product/service selection - now adds to description instead of replacing
+  // Handle product/service selection - shows only imported data
   const handleProductServiceSelect = (itemId: string, selectedId: string) => {
     const selectedProduct = products.find(p => p.id.toString() === selectedId);
     const selectedService = services.find(s => s.id.toString() === selectedId);
     
+    const currentItem = invoiceItems.find(item => item.id === itemId);
+    
     if (selectedProduct) {
-      // Add selected product name to current description
-      const currentItem = invoiceItems.find(item => item.id === itemId);
-      const newDescription = currentItem?.description ? 
-        `${currentItem.description} - ${selectedProduct.name}` : 
-        selectedProduct.name;
-      updateItem(itemId, 'description', newDescription);
+      updateItem(itemId, 'description', selectedProduct.name);
       updateItem(itemId, 'unitPrice', parseFloat(selectedProduct.price));
       updateItem(itemId, 'total', parseFloat(selectedProduct.price) * (currentItem?.quantity || 1));
     } else if (selectedService) {
-      // Add selected service name to current description
-      const currentItem = invoiceItems.find(item => item.id === itemId);
-      const newDescription = currentItem?.description ? 
-        `${currentItem.description} - ${selectedService.name}` : 
-        selectedService.name;
-      updateItem(itemId, 'description', newDescription);
+      updateItem(itemId, 'description', selectedService.name);
       updateItem(itemId, 'unitPrice', parseFloat(selectedService.price));
       updateItem(itemId, 'total', parseFloat(selectedService.price) * (currentItem?.quantity || 1));
     }
@@ -834,50 +829,69 @@ export default function DoctorInvoice() {
                           {item.description || t('description')}
                         </div>
                       ) : (
-                        <div className="space-y-2">
-                          {/* Combined Description with Product/Service Selection */}
-                          <div className="flex space-x-2">
+                        <div>
+                          {/* Searchable dropdown for products/services */}
+                          {(products.length > 0 || services.length > 0) ? (
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  role="combobox"
+                                  className="w-full justify-between"
+                                >
+                                  {item.description || t('selectProduct')}
+                                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-full p-0">
+                                <Command>
+                                  <CommandInput placeholder={language === 'ar' ? 'ابحث...' : 'Search...'} />
+                                  <CommandEmpty>{language === 'ar' ? 'لا توجد نتائج' : 'No results found'}</CommandEmpty>
+                                  {products.length > 0 && (
+                                    <CommandGroup heading={t('products')}>
+                                      {products.map((product: any) => (
+                                        <CommandItem
+                                          key={`product-${product.id}`}
+                                          onSelect={() => handleProductServiceSelect(item.id, product.id.toString())}
+                                        >
+                                          <Check
+                                            className={`mr-2 h-4 w-4 ${
+                                              item.description === product.name ? 'opacity-100' : 'opacity-0'
+                                            }`}
+                                          />
+                                          {product.name}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  )}
+                                  {services.length > 0 && (
+                                    <CommandGroup heading={t('services')}>
+                                      {services.map((service: any) => (
+                                        <CommandItem
+                                          key={`service-${service.id}`}
+                                          onSelect={() => handleProductServiceSelect(item.id, service.id.toString())}
+                                        >
+                                          <Check
+                                            className={`mr-2 h-4 w-4 ${
+                                              item.description === service.name ? 'opacity-100' : 'opacity-0'
+                                            }`}
+                                          />
+                                          {service.name}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  )}
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          ) : (
                             <Input
                               value={item.description}
                               onChange={(e) => updateItem(item.id, 'description', e.target.value)}
                               placeholder={t('description')}
-                              className="flex-1"
+                              className="w-full"
                             />
-                            {(products.length > 0 || services.length > 0) && (
-                              <Select onValueChange={(value) => handleProductServiceSelect(item.id, value)}>
-                                <SelectTrigger className="w-40">
-                                  <SelectValue placeholder={language === 'ar' ? 'إضافة' : 'Add'} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {products.length > 0 && (
-                                    <>
-                                      <SelectItem disabled value="products-header">
-                                        {t('products')}
-                                      </SelectItem>
-                                      {products.map((product: any) => (
-                                        <SelectItem key={`product-${product.id}`} value={product.id.toString()}>
-                                          {product.name}
-                                        </SelectItem>
-                                      ))}
-                                    </>
-                                  )}
-                                  {services.length > 0 && (
-                                    <>
-                                      {products.length > 0 && <SelectItem disabled value="separator">---</SelectItem>}
-                                      <SelectItem disabled value="services-header">
-                                        {t('services')}
-                                      </SelectItem>
-                                      {services.map((service: any) => (
-                                        <SelectItem key={`service-${service.id}`} value={service.id.toString()}>
-                                          {service.name}
-                                        </SelectItem>
-                                      ))}
-                                    </>
-                                  )}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          </div>
+                          )}
                         </div>
                       )}
                     </td>
