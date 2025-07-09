@@ -402,19 +402,29 @@ export default function DoctorInvoice() {
     saveInvoiceItems(newItems);
   };
 
-  // Handle product/service selection
+  // Handle product/service selection - now adds to description instead of replacing
   const handleProductServiceSelect = (itemId: string, selectedId: string) => {
     const selectedProduct = products.find(p => p.id.toString() === selectedId);
     const selectedService = services.find(s => s.id.toString() === selectedId);
     
     if (selectedProduct) {
-      updateItem(itemId, 'description', selectedProduct.name);
+      // Add selected product name to current description
+      const currentItem = invoiceItems.find(item => item.id === itemId);
+      const newDescription = currentItem?.description ? 
+        `${currentItem.description} - ${selectedProduct.name}` : 
+        selectedProduct.name;
+      updateItem(itemId, 'description', newDescription);
       updateItem(itemId, 'unitPrice', parseFloat(selectedProduct.price));
-      updateItem(itemId, 'total', parseFloat(selectedProduct.price) * invoiceItems.find(item => item.id === itemId)?.quantity || 1);
+      updateItem(itemId, 'total', parseFloat(selectedProduct.price) * (currentItem?.quantity || 1));
     } else if (selectedService) {
-      updateItem(itemId, 'description', selectedService.name);
+      // Add selected service name to current description
+      const currentItem = invoiceItems.find(item => item.id === itemId);
+      const newDescription = currentItem?.description ? 
+        `${currentItem.description} - ${selectedService.name}` : 
+        selectedService.name;
+      updateItem(itemId, 'description', newDescription);
       updateItem(itemId, 'unitPrice', parseFloat(selectedService.price));
-      updateItem(itemId, 'total', parseFloat(selectedService.price) * invoiceItems.find(item => item.id === itemId)?.quantity || 1);
+      updateItem(itemId, 'total', parseFloat(selectedService.price) * (currentItem?.quantity || 1));
     }
   };
 
@@ -825,49 +835,49 @@ export default function DoctorInvoice() {
                         </div>
                       ) : (
                         <div className="space-y-2">
-                          {/* Product/Service Selection */}
-                          {(products.length > 0 || services.length > 0) && (
-                            <Select onValueChange={(value) => handleProductServiceSelect(item.id, value)}>
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder={t('selectProduct')} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {products.length > 0 && (
-                                  <>
-                                    <SelectItem disabled value="products-header">
-                                      {t('products')}
-                                    </SelectItem>
-                                    {products.map((product: any) => (
-                                      <SelectItem key={`product-${product.id}`} value={product.id.toString()}>
-                                        {product.name} - {parseFloat(product.price).toFixed(2)} {t('sar')}
+                          {/* Combined Description with Product/Service Selection */}
+                          <div className="flex space-x-2">
+                            <Input
+                              value={item.description}
+                              onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                              placeholder={t('description')}
+                              className="flex-1"
+                            />
+                            {(products.length > 0 || services.length > 0) && (
+                              <Select onValueChange={(value) => handleProductServiceSelect(item.id, value)}>
+                                <SelectTrigger className="w-40">
+                                  <SelectValue placeholder={language === 'ar' ? 'إضافة' : 'Add'} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {products.length > 0 && (
+                                    <>
+                                      <SelectItem disabled value="products-header">
+                                        {t('products')}
                                       </SelectItem>
-                                    ))}
-                                  </>
-                                )}
-                                {services.length > 0 && (
-                                  <>
-                                    {products.length > 0 && <SelectItem disabled value="separator">---</SelectItem>}
-                                    <SelectItem disabled value="services-header">
-                                      {t('services')}
-                                    </SelectItem>
-                                    {services.map((service: any) => (
-                                      <SelectItem key={`service-${service.id}`} value={service.id.toString()}>
-                                        {service.name} - {parseFloat(service.price).toFixed(2)} {t('sar')}
+                                      {products.map((product: any) => (
+                                        <SelectItem key={`product-${product.id}`} value={product.id.toString()}>
+                                          {product.name}
+                                        </SelectItem>
+                                      ))}
+                                    </>
+                                  )}
+                                  {services.length > 0 && (
+                                    <>
+                                      {products.length > 0 && <SelectItem disabled value="separator">---</SelectItem>}
+                                      <SelectItem disabled value="services-header">
+                                        {t('services')}
                                       </SelectItem>
-                                    ))}
-                                  </>
-                                )}
-                              </SelectContent>
-                            </Select>
-                          )}
-                          
-                          {/* Manual Description Input */}
-                          <Input
-                            value={item.description}
-                            onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                            placeholder={t('description')}
-                            className="w-full"
-                          />
+                                      {services.map((service: any) => (
+                                        <SelectItem key={`service-${service.id}`} value={service.id.toString()}>
+                                          {service.name}
+                                        </SelectItem>
+                                      ))}
+                                    </>
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
                         </div>
                       )}
                     </td>
