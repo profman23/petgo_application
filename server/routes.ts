@@ -112,14 +112,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const userLanguage = req.body.preferredLanguage || 'ar';
       
-      // First check if OTP was verified for this email
-      if (userData.email) {
-        const isOtpValid = await storage.isOtpVerified(userData.email);
-        if (!isOtpValid) {
-          return res.status(400).json({ 
-            message: userLanguage === 'ar' ? 'يجب التحقق من البريد الإلكتروني أولاً' : 'Email verification required first'
-          });
-        }
+      // MANDATORY: Email and OTP verification required for all registrations
+      if (!userData.email) {
+        return res.status(400).json({ 
+          message: userLanguage === 'ar' ? 'البريد الإلكتروني مطلوب للتسجيل' : 'Email is required for registration'
+        });
+      }
+      
+      // Check if OTP was verified for this email
+      const isOtpValid = await storage.isOtpVerified(userData.email);
+      if (!isOtpValid) {
+        return res.status(400).json({ 
+          message: userLanguage === 'ar' ? 'يجب التحقق من البريد الإلكتروني أولاً' : 'Email verification required first'
+        });
       }
       
       // Combine firstName and lastName into name
