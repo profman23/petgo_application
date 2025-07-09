@@ -112,7 +112,7 @@ export default function OtpVerification() {
         
         // Redirect to home page
         setTimeout(() => {
-          window.location.href = '/home';
+          setLocation('/home');
         }, 1500);
       } else {
         // Just verification without account creation

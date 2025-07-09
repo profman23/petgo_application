@@ -92,7 +92,7 @@ export default function Login() {
         description: `${t('welcomeNewUser')} ${data.user.name}`,
         variant: "default",
       });
-      window.location.href = '/home';
+      setLocation('/home');
     },
     onError: (error: Error) => {
       toast({
