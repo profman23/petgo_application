@@ -35,45 +35,60 @@ export async function initDatabase() {
       );
     `);
 
-    // Create products table if it doesn't exist
+    // Drop and recreate products table with correct schema
+    await pool.query(`DROP TABLE IF EXISTS products CASCADE`);
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS products (
+      CREATE TABLE products (
         id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        price NUMERIC(10,2) NOT NULL,
-        category TEXT NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        name_ar VARCHAR(255),
         description TEXT,
-        in_stock BOOLEAN DEFAULT true,
+        description_ar TEXT,
+        price NUMERIC(10,2) NOT NULL,
+        category VARCHAR(100),
+        category_ar VARCHAR(100),
+        sku VARCHAR(50),
+        unit VARCHAR(50),
+        unit_ar VARCHAR(50),
+        is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
-    // Create services table if it doesn't exist
+    // Drop and recreate services table with correct schema
+    await pool.query(`DROP TABLE IF EXISTS services CASCADE`);
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS services (
+      CREATE TABLE services (
         id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        price NUMERIC(10,2) NOT NULL,
-        category TEXT NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        name_ar VARCHAR(255),
         description TEXT,
-        available BOOLEAN DEFAULT true,
-        duration_minutes INTEGER,
+        description_ar TEXT,
+        price NUMERIC(10,2) NOT NULL,
+        category VARCHAR(100),
+        category_ar VARCHAR(100),
+        duration INTEGER,
+        is_active BOOLEAN DEFAULT true,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
-    // Create import_history table if it doesn't exist
+    // Drop and recreate import_history table with correct schema
+    await pool.query(`DROP TABLE IF EXISTS import_history CASCADE`);
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS import_history (
+      CREATE TABLE import_history (
         id SERIAL PRIMARY KEY,
         file_name VARCHAR(255) NOT NULL,
         file_type VARCHAR(20) NOT NULL,
-        imported_count INTEGER NOT NULL,
-        status VARCHAR(50) NOT NULL,
-        imported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        imported_by VARCHAR(100)
+        records_imported INTEGER DEFAULT 0,
+        records_updated INTEGER DEFAULT 0,
+        records_skipped INTEGER DEFAULT 0,
+        status VARCHAR(50) DEFAULT 'completed',
+        error_message TEXT,
+        imported_by VARCHAR(255),
+        imported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
     

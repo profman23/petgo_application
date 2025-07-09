@@ -179,6 +179,9 @@ export class DatabaseStorage implements IStorage {
         });
       }
 
+      // Initialize admin user
+      await this.initializeAdmin();
+      
       // Initialize drivers
       await this.initializeDrivers();
       
@@ -186,9 +189,25 @@ export class DatabaseStorage implements IStorage {
       await this.initializeTestShifts();
       
       // Initialize sample products and services
-      await this.createSampleData();
+      await this.initializeSampleData();
     } catch (error) {
       console.error('Error initializing test data:', error);
+    }
+  }
+
+  private async initializeAdmin() {
+    try {
+      const existingAdmin = await this.getAdminByUsername('admin');
+      if (!existingAdmin) {
+        await db.insert(admins).values({
+          username: 'admin',
+          password: 'admin123',
+          name: 'System Administrator',
+          role: 'admin'
+        }).onConflictDoNothing();
+      }
+    } catch (error) {
+      console.error('Error initializing admin:', error);
     }
   }
 
@@ -235,6 +254,76 @@ export class DatabaseStorage implements IStorage {
       }
     } catch (error) {
       console.error('Error initializing drivers:', error);
+    }
+  }
+
+  private async initializeSampleData() {
+    try {
+      // Initialize sample products
+      const existingProducts = await this.getProducts();
+      if (existingProducts.length === 0) {
+        const sampleProducts = [
+          {
+            name: 'Premium Cat Food',
+            nameAr: 'طعام قطط فاخر',
+            description: 'High-quality dry food for adult cats',
+            descriptionAr: 'طعام جاف عالي الجودة للقطط البالغة',
+            price: 45.00,
+            category: 'Pet Food',
+            categoryAr: 'طعام الحيوانات',
+            isActive: true
+          },
+          {
+            name: 'Dog Vitamins',
+            nameAr: 'فيتامينات الكلاب',
+            description: 'Essential vitamins for healthy dogs',
+            descriptionAr: 'فيتامينات أساسية للكلاب الصحية',
+            price: 35.00,
+            category: 'Supplements',
+            categoryAr: 'مكملات غذائية',
+            isActive: true
+          }
+        ];
+        
+        for (const product of sampleProducts) {
+          await this.createProduct(product);
+        }
+      }
+
+      // Initialize sample services
+      const existingServices = await this.getServices();
+      if (existingServices.length === 0) {
+        const sampleServices = [
+          {
+            name: 'Complete Health Checkup',
+            nameAr: 'فحص صحي شامل',
+            description: 'Comprehensive health examination for pets',
+            descriptionAr: 'فحص صحي شامل للحيوانات الأليفة',
+            price: 150.00,
+            category: 'Health Services',
+            categoryAr: 'خدمات صحية',
+            duration: 60,
+            isActive: true
+          },
+          {
+            name: 'Vaccination Service',
+            nameAr: 'خدمة التطعيم',
+            description: 'Essential vaccinations for pets',
+            descriptionAr: 'التطعيمات الأساسية للحيوانات الأليفة',
+            price: 80.00,
+            category: 'Prevention',
+            categoryAr: 'الوقاية',
+            duration: 30,
+            isActive: true
+          }
+        ];
+        
+        for (const service of sampleServices) {
+          await this.createService(service);
+        }
+      }
+    } catch (error) {
+      console.error('Error initializing sample data:', error);
     }
   }
 
