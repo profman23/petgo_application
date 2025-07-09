@@ -29,6 +29,22 @@ export class EmailService {
     });
   }
 
+  async sendOtpVerificationEmail(userEmail: string, userName: string, otpCode: string): Promise<boolean> {
+    if (!userEmail) {
+      console.log('Email not provided, skipping OTP verification email');
+      return false;
+    }
+
+    const template: EmailTemplate = {
+      to: userEmail,
+      subject: 'تأكيد إنشاء الحساب - Account Verification - VETS VAN',
+      html: this.generateOtpVerificationHTML(userName, otpCode),
+      text: this.generateOtpVerificationText(userName, otpCode)
+    };
+
+    return await this.sendEmail(template);
+  }
+
   async sendWelcomeEmail(userEmail: string, userName: string, petName: string): Promise<boolean> {
     try {
       const template: EmailTemplate = {
@@ -662,6 +678,99 @@ ${invoiceLink}
 
 VETS VAN - رعاية محترفة في منزلك
 لأي استفسارات، تواصل معنا عبر التطبيق
+    `;
+  }
+
+  private generateOtpVerificationHTML(userName: string, otpCode: string): string {
+    return `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>تأكيد إنشاء الحساب - VETS VAN</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+          .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .header { background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; padding: 30px; text-align: center; }
+          .content { padding: 30px; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+          .otp-card { background-color: #f0f9ff; border: 2px solid #8B2F8B; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+          .otp-code { font-size: 32px; font-weight: bold; color: #8B2F8B; letter-spacing: 8px; margin: 20px 0; padding: 15px; background-color: #f3f4f6; border-radius: 8px; }
+          h1 { margin: 0; font-size: 28px; }
+          h2 { color: #8B2F8B; margin-top: 0; }
+          .warning { background-color: #FEF3C7; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #F59E0B; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🔐 تأكيد إنشاء الحساب</h1>
+            <p>أهلاً بك في VETS VAN</p>
+          </div>
+          <div class="content">
+            <h2>عزيزي ${userName},</h2>
+            <p>مرحباً بك في منصة VETS VAN للعناية البيطرية المتنقلة! لإكمال إنشاء حسابك، يرجى استخدام رمز التحقق التالي:</p>
+            
+            <div class="otp-card">
+              <h3>🔢 رمز التحقق:</h3>
+              <div class="otp-code">${otpCode}</div>
+              <p><strong>يرجى إدخال هذا الرمز في التطبيق لتأكيد حسابك</strong></p>
+            </div>
+
+            <div class="warning">
+              <h4>⚠️ تعليمات مهمة:</h4>
+              <ul>
+                <li>🔒 لا تشارك هذا الرمز مع أي شخص آخر</li>
+                <li>⏰ الرمز صالح لمدة 10 دقائق فقط</li>
+                <li>📱 أدخل الرمز في التطبيق فوراً</li>
+                <li>🔄 يمكنك طلب رمز جديد إذا انتهت صلاحية هذا الرمز</li>
+              </ul>
+            </div>
+
+            <p>بعد تأكيد حسابك، ستتمكن من:</p>
+            <ul>
+              <li>🏠 طلب خدمات بيطرية في المنزل</li>
+              <li>🐾 إدارة معلومات حيواناتك الأليفة</li>
+              <li>📅 حجز مواعيد مع أطباء بيطريين محترفين</li>
+              <li>📋 متابعة تاريخ الرعاية الصحية لحيواناتك</li>
+            </ul>
+          </div>
+          <div class="footer">
+            <p>🐾 VETS VAN - رعاية بيطرية محترفة في منزلك 🐾</p>
+            <p>إذا لم تطلب إنشاء هذا الحساب، يرجى تجاهل هذا البريد</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  private generateOtpVerificationText(userName: string, otpCode: string): string {
+    return `
+🔐 تأكيد إنشاء الحساب - VETS VAN
+أهلاً بك في VETS VAN
+
+عزيزي ${userName},
+
+مرحباً بك في منصة VETS VAN للعناية البيطرية المتنقلة! لإكمال إنشاء حسابك، يرجى استخدام رمز التحقق التالي:
+
+🔢 رمز التحقق: ${otpCode}
+
+⚠️ تعليمات مهمة:
+- لا تشارك هذا الرمز مع أي شخص آخر
+- الرمز صالح لمدة 10 دقائق فقط
+- أدخل الرمز في التطبيق فوراً
+- يمكنك طلب رمز جديد إذا انتهت صلاحية هذا الرمز
+
+بعد تأكيد حسابك، ستتمكن من:
+- طلب خدمات بيطرية في المنزل
+- إدارة معلومات حيواناتك الأليفة
+- حجز مواعيد مع أطباء بيطريين محترفين
+- متابعة تاريخ الرعاية الصحية لحيواناتك
+
+VETS VAN - رعاية بيطرية محترفة في منزلك
+إذا لم تطلب إنشاء هذا الحساب، يرجى تجاهل هذا البريد
     `;
   }
 

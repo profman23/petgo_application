@@ -120,32 +120,23 @@ export default function Login() {
         method: 'POST',
         body: JSON.stringify(dataWithLanguage)
       });
-      return response as AuthResponse;
+      return response;
     },
     onSuccess: (data) => {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Store email for OTP verification
+      localStorage.setItem('otpEmail', formData.email);
+      localStorage.setItem('otpUserName', formData.firstName);
       
-      // رسالة ترحيب مفصلة
       toast({
-        title: language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Registration Successful',
+        title: language === 'ar' ? 'تم إرسال رمز التحقق' : 'Verification Code Sent',
         description: language === 'ar' ? 
-          `مرحباً ${formData.firstName}! يمكنك الآن طلب الخدمات البيطرية المتنقلة لحيواناتك الأليفة.` :
-          `Welcome ${formData.firstName}! You can now request mobile veterinary services for your pets.`,
+          `تم إرسال رمز التحقق إلى ${formData.email}. يرجى التحقق من بريدك الإلكتروني.` :
+          `Verification code sent to ${formData.email}. Please check your email.`,
         variant: "default",
       });
       
-      // رسالة ترحيب إضافية بعد ثانيتين
-      setTimeout(() => {
-        toast({
-          title: language === 'ar' ? "نصائح للبداية" : "Getting Started",
-          description: language === 'ar' ? 
-            "يمكنك طلب طبيب بيطري متنقل الآن، وسيصل إليك في أسرع وقت ممكن!" :
-            "You can now request a mobile veterinarian who will reach you as soon as possible!",
-        });
-      }, 2000);
-      
-      window.location.href = '/home';
+      // Redirect to OTP verification page
+      setLocation('/otp-verification');
     },
     onError: (error: Error) => {
       toast({

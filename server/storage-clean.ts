@@ -452,16 +452,7 @@ export class DatabaseStorage implements IStorage {
 
   // Bookings operations
   async createBooking(booking: InsertBooking): Promise<Booking> {
-    // Ensure customerLocation has proper typing
-    const bookingData = {
-      ...booking,
-      customerLocation: booking.customerLocation ? {
-        ...booking.customerLocation,
-        address: booking.customerLocation.address as string | undefined
-      } : booking.customerLocation
-    };
-    
-    const [newBooking] = await db.insert(bookings).values([bookingData]).returning();
+    const [newBooking] = await db.insert(bookings).values(booking).returning();
     return newBooking;
   }
 
@@ -587,32 +578,27 @@ export class DatabaseStorage implements IStorage {
     vetsvanName: string;
     vetsvanCode: string;
   }>> {
-    const reviewData = await db
-      .select({
-        reviewId: reviews.id,
-        rating: reviews.rating,
-        comment: reviews.comment,
-        reviewCreatedAt: reviews.createdAt,
-        userName: users.name,
-        userPhone: users.phone,
-        vetsvanName: drivers.vetsvanName,
-        vetsvanCode: drivers.vetsvanCode
-      })
-      .from(reviews)
-      .innerJoin(bookings, eq(reviews.bookingId, bookings.id))
-      .innerJoin(users, eq(reviews.userId, users.id))
-      .innerJoin(drivers, eq(bookings.vetsVanId, drivers.id));
+    const allReviews = await db.select().from(reviews);
+    const allBookings = await db.select().from(bookings);
+    const allUsers = await db.select().from(users);
+    const allDrivers = await db.select().from(drivers);
 
-    return reviewData.map(review => ({
-      id: review.reviewId,
-      rating: review.rating,
-      comment: review.comment || "",
-      createdAt: review.reviewCreatedAt?.toISOString() || new Date().toISOString(),
-      userName: review.userName || "Unknown",
-      userPhone: review.userPhone || "Unknown",
-      vetsvanName: review.vetsvanName || "Unknown",
-      vetsvanCode: review.vetsvanCode || "Unknown"
-    }));
+    return allReviews.map(review => {
+      const booking = allBookings.find(b => b.id === review.bookingId);
+      const user = allUsers.find(u => u.id === review.userId);
+      const driver = allDrivers.find(d => d.id === booking?.vetsVanId);
+
+      return {
+        id: review.id,
+        rating: review.rating,
+        comment: review.comment || "",
+        createdAt: review.createdAt?.toISOString() || new Date().toISOString(),
+        userName: user?.name || "Unknown",
+        userPhone: user?.phone || "Unknown",
+        vetsvanName: driver?.vetsvanName || "Unknown",
+        vetsvanCode: driver?.vetsvanCode || "Unknown"
+      };
+    });
   }
 
   // VetsVan requests operations
@@ -631,27 +617,14 @@ export class DatabaseStorage implements IStorage {
     serviceType: string;
     createdAt: string;
   }>> {
-    const bookingData = await db
-      .select({
-        bookingId: bookings.id,
-        appointmentDate: bookings.appointmentDate,
-        appointmentTime: bookings.appointmentTime,
-        status: bookings.status,
-        customerLocation: bookings.customerLocation,
-        selectedPets: bookings.selectedPets,
-        serviceType: bookings.serviceType,
-        bookingCreatedAt: bookings.createdAt,
-        customerName: users.name,
-        customerPhone: users.phone,
-        customerEmail: users.email,
-        vetsvanCode: drivers.vetsvanCode,
-        vetsvanName: drivers.vetsvanName
-      })
-      .from(bookings)
-      .innerJoin(users, eq(bookings.userId, users.id))
-      .innerJoin(drivers, eq(bookings.vetsVanId, drivers.id));
+    const allBookings = await db.select().from(bookings);
+    const allUsers = await db.select().from(users);
+    const allDrivers = await db.select().from(drivers);
 
-    return bookingData.map(booking => {
+    return allBookings.map(booking => {
+      const user = allUsers.find(u => u.id === booking.userId);
+      const driver = allDrivers.find(d => d.id === booking.vetsVanId);
+
       // Extract pet names and types from selectedPets
       const pets = booking.selectedPets?.map((pet: any) => ({
         name: pet.name || "Unknown",
@@ -659,19 +632,19 @@ export class DatabaseStorage implements IStorage {
       })) || [];
 
       return {
-        id: booking.bookingId,
-        customerName: booking.customerName || "Unknown",
-        customerPhone: booking.customerPhone || "Unknown",
-        customerEmail: booking.customerEmail || "Unknown",
-        vetsvanCode: booking.vetsvanCode || "Unknown",
-        vetsvanName: booking.vetsvanName || "Unknown",
+        id: booking.id,
+        customerName: user?.name || "Unknown",
+        customerPhone: user?.phone || "Unknown",
+        customerEmail: user?.email || "Unknown",
+        vetsvanCode: driver?.vetsvanCode || "Unknown",
+        vetsvanName: driver?.vetsvanName || "Unknown",
         appointmentDate: booking.appointmentDate,
         appointmentTime: booking.appointmentTime,
         status: booking.status,
         location: booking.customerLocation,
         pets: pets,
         serviceType: booking.serviceType || "Unknown",
-        createdAt: booking.bookingCreatedAt?.toISOString() || new Date().toISOString()
+        createdAt: booking.createdAt?.toISOString() || new Date().toISOString()
       };
     });
   }
@@ -845,12 +818,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Bulk import operations
-  async bulkCreateServices(serviceList: any[]): Promise<{ imported: number; updated: number; failed: number }> {
+  async bulkCreateServices(services: any[]): Promise<{ imported: number; updated: number; failed: number }> {
     let imported = 0;
     let updated = 0;
     let failed = 0;
 
-    for (const service of serviceList) {
+    for (const service of services) {
       try {
         // Check if service exists by name
         const [existingService] = await db.select().from(services).where(eq(services.name, service.name));
@@ -873,12 +846,12 @@ export class DatabaseStorage implements IStorage {
     return { imported, updated, failed };
   }
 
-  async bulkCreateProducts(productList: any[]): Promise<{ imported: number; updated: number; failed: number }> {
+  async bulkCreateProducts(products: any[]): Promise<{ imported: number; updated: number; failed: number }> {
     let imported = 0;
     let updated = 0;
     let failed = 0;
 
-    for (const product of productList) {
+    for (const product of products) {
       try {
         // Check if product exists by name
         const [existingProduct] = await db.select().from(products).where(eq(products.name, product.name));

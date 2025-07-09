@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 // Payment service removed per user request
@@ -107,49 +107,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const validatedData = registerSchema.parse(req.body);
       
-      // Remove captcha from data before storing
+      // Remove captcha from data
       const { captcha, ...userData } = validatedData;
-      
-      // Combine firstName and lastName into name
-      const fullUserData = {
-        ...userData,
-        name: `${userData.firstName} ${userData.lastName}`,
-        membershipType: 'standard'
-      };
-      
       const userLanguage = req.body.preferredLanguage || 'ar';
       
-      const existingUserByPhone = await storage.getUserByPhone(fullUserData.phone);
+      // Check if phone or email already exists
+      const existingUserByPhone = await storage.getUserByPhone(userData.phone);
       if (existingUserByPhone) {
         return res.status(400).json({ message: getErrorMessage('phoneExists', userLanguage) });
       }
       
-      // Check if email is already registered
-      if (fullUserData.email) {
-        const existingUserByEmail = await storage.getUserByEmail(fullUserData.email);
+      if (userData.email) {
+        const existingUserByEmail = await storage.getUserByEmail(userData.email);
         if (existingUserByEmail) {
           return res.status(400).json({ message: getErrorMessage('emailExists', userLanguage) });
         }
       }
       
-      const user = await storage.createUser(fullUserData);
-      const sessionId = generateSessionId();
-      sessions.set(sessionId, { user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType } });
+      // Generate OTP (6-digit number)
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // Send welcome email if email is provided
-      if (user.email) {
+      // Create OTP verification record
+      await storage.createOtpVerification({
+        email: userData.email,
+        code: otpCode,
+        userData: JSON.stringify({
+          ...userData,
+          name: `${userData.firstName} ${userData.lastName}`,
+          membershipType: 'standard'
+        })
+      });
+      
+      // Send OTP email
+      if (userData.email) {
         try {
-          await emailService.sendWelcomeEmail(user.email, user.firstName || user.name, 'حيوانك الأليف');
-          console.log(`✅ Welcome email sent to ${user.email}`);
+          await emailService.sendOtpEmail(userData.email, otpCode, userData.firstName || userData.lastName);
+          console.log(`✅ OTP email sent to ${userData.email}`);
         } catch (emailError) {
-          console.error('❌ Failed to send welcome email:', emailError);
-          // Don't fail registration if email fails
+          console.error('❌ Failed to send OTP email:', emailError);
+          return res.status(500).json({ 
+            message: userLanguage === 'ar' ? 'فشل في إرسال رمز التحقق' : 'Failed to send verification code' 
+          });
         }
       }
       
       res.json({ 
-        token: sessionId, 
-        user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType }
+        message: userLanguage === 'ar' ? 'تم إرسال رمز التحقق بنجاح' : 'Verification code sent successfully',
+        email: userData.email
       });
     } catch (error) {
       if (error instanceof ZodError) {
@@ -178,6 +182,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
     sessions.delete(sessionId);
     res.json({ message: 'تم تسجيل الخروج بنجاح' });
+  });
+
+  // OTP Verification routes
+  app.post('/api/auth/send-otp', async (req, res) => {
+    try {
+      const { email } = otpVerificationSchema.parse(req.body);
+      const userLanguage = req.body.preferredLanguage || 'ar';
+      
+      // Check if email exists in system
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: userLanguage === 'en' ? 'Email address already exists' : 'الإيميل مستخدم بالفعل' 
+        });
+      }
+      
+      // Generate 6-digit OTP
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Clean up any existing OTPs for this email
+      await storage.deleteOtpVerification(email);
+      
+      // Store OTP in database
+      await storage.createOtpVerification({
+        email,
+        otpCode,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+      });
+      
+      // Send OTP email
+      try {
+        await emailService.sendOtpVerificationEmail(email, 'عزيزي المستخدم', otpCode);
+        console.log(`✅ OTP email sent to ${email}`);
+        
+        res.json({ 
+          message: userLanguage === 'en' 
+            ? 'Verification code sent to your email' 
+            : 'تم إرسال رمز التحقق إلى بريدك الإلكتروني',
+          success: true 
+        });
+      } catch (emailError) {
+        console.error('❌ Failed to send OTP email:', emailError);
+        res.status(500).json({ 
+          message: userLanguage === 'en' 
+            ? 'Failed to send verification code' 
+            : 'فشل في إرسال رمز التحقق'
+        });
+      }
+    } catch (error) {
+      console.error('Send OTP error:', error);
+      const userLanguage = req.body.preferredLanguage || 'ar';
+      
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      
+      res.status(500).json({ 
+        message: userLanguage === 'en' ? 'Server error' : 'خطأ في الخادم' 
+      });
+    }
+  });
+
+  app.post('/api/auth/verify-otp', async (req, res) => {
+    try {
+      const { email, otpCode } = otpVerificationSchema.parse(req.body);
+      const userLanguage = req.body.preferredLanguage || 'ar';
+      
+      // Find OTP verification record
+      const otpRecord = await storage.getOtpVerification(email, otpCode);
+      
+      if (!otpRecord) {
+        return res.status(400).json({ 
+          message: userLanguage === 'en' 
+            ? 'Invalid or expired verification code' 
+            : 'رمز التحقق غير صحيح أو منتهي الصلاحية'
+        });
+      }
+      
+      // Check if OTP is expired
+      if (new Date() > otpRecord.expiresAt) {
+        await storage.deleteOtpVerification(email);
+        return res.status(400).json({ 
+          message: userLanguage === 'en' 
+            ? 'Verification code has expired' 
+            : 'انتهت صلاحية رمز التحقق'
+        });
+      }
+      
+      // OTP is valid - clean up
+      await storage.deleteOtpVerification(email);
+      
+      res.json({ 
+        message: userLanguage === 'en' 
+          ? 'Email verified successfully' 
+          : 'تم التحقق من الإيميل بنجاح',
+        verified: true 
+      });
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      const userLanguage = req.body.preferredLanguage || 'ar';
+      
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      
+      res.status(500).json({ 
+        message: userLanguage === 'en' ? 'Server error' : 'خطأ في الخادم' 
+      });
+    }
   });
 
   // Doctor login endpoint  

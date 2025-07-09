@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
+import OtpVerification from "@/pages/otp-verification";
 import Home from "@/pages/home";
 import RideRequest from "@/pages/ride-request";
 import RideTracking from "@/pages/ride-tracking";
@@ -116,6 +117,7 @@ function Router() {
           <Route path="/user-type-selection" component={UserTypeSelection} />
           <Route path="/login" component={Login} />
           <Route path="/login/customer" component={Login} />
+          <Route path="/otp-verification" component={OtpVerification} />
           <Route path="/login/doctor" component={DoctorLogin} />
           <Route path="/doctor-dashboard" component={DoctorActivity} />
           <Route path="/doctor-activity" component={DoctorActivity} />

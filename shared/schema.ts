@@ -63,6 +63,16 @@ export const rides = pgTable("rides", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// OTP verification table for email confirmation
+export const otpVerifications = pgTable("otp_verifications", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull(),
+  code: text("code").notNull(),
+  isVerified: boolean("is_verified").notNull().default(false),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
@@ -100,6 +110,18 @@ export const registerSchema = z.object({
     .regex(/^05\d{8}$/, "رقم الهاتف يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"),
   password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
   captcha: z.string().min(1, "يرجى إدخال رمز التحقق"),
+});
+
+// OTP verification schema
+export const otpVerificationSchema = z.object({
+  email: z.string().email("البريد الإلكتروني غير صحيح"),
+  otpCode: z.string().length(6, "رمز التحقق يجب أن يحتوي على 6 أرقام"),
+});
+
+export const insertOtpVerificationSchema = createInsertSchema(otpVerifications).pick({
+  email: true,
+  code: true,
+  expiresAt: true,
 });
 
 export const rideRequestSchema = createInsertSchema(rides).pick({
@@ -148,6 +170,9 @@ export const insertAdminSchema = createInsertSchema(admins).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type RegisterUser = z.infer<typeof registerSchema>;
 export type User = typeof users.$inferSelect;
+export type OtpVerification = typeof otpVerifications.$inferSelect;
+export type InsertOtpVerification = z.infer<typeof insertOtpVerificationSchema>;
+export type OtpVerificationRequest = z.infer<typeof otpVerificationSchema>;
 export type Driver = typeof drivers.$inferSelect;
 export type InsertDriver = z.infer<typeof insertDriverSchema>;
 export type Admin = typeof admins.$inferSelect;
