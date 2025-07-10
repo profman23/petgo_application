@@ -766,7 +766,7 @@ export default function Home() {
             <div className="flex items-center justify-center space-x-6 rtl:space-x-reverse">
               {/* WhatsApp Button */}
               <a
-                href="https://wa.me/9665335152250"
+                href="https://wa.me/966535152250"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
@@ -783,7 +783,7 @@ export default function Home() {
               
               {/* Phone Call Button */}
               <a
-                href="tel:+9665335152250"
+                href="tel:+966535152250"
                 className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
               >
                 <img 
