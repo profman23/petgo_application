@@ -654,7 +654,7 @@ export default function Home() {
           {!actualActiveRide && (
             <div className="mb-3 p-3 bg-gradient-to-r from-purple-600 via-blue-100 to-purple-600 rounded-2xl border-2 border-purple-600 shadow-lg">
               <div className="text-center">
-                <div className="text-sm font-semibold text-purple-600 mb-2" style={{ textAlign }}>
+                <div className="text-sm font-semibold text-white mb-2" style={{ textAlign }}>
                   {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
                 </div>
                 
@@ -676,8 +676,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* 3D Veterinary Clinic - Start Position */}
-                  <div className={`absolute top-2 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
+                  {/* 3D Veterinary Clinic - Start Position - Moved Up */}
+                  <div className={`absolute -top-4 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
                     <img 
                       src={newVetClinicImage}
                       alt="Veterinary Clinic" 
@@ -685,8 +685,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Custom House - End Position */}
-                  <div className={`absolute top-1 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
+                  {/* Custom House - End Position - Moved Up */}
+                  <div className={`absolute -top-6 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
                     <img 
                       src={newestHouseImage}
                       alt="House" 
