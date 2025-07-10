@@ -175,13 +175,13 @@ export default function Login() {
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
             
-            {/* Logo Container - Smaller Design */}
+            {/* Logo Container - White Background Enlarged */}
             <div className="mb-6 flex justify-center">
-              <div className="bg-white rounded-2xl p-3 shadow-md transition-all duration-300 hover:scale-105">
+              <div className="bg-white rounded-2xl p-4 shadow-lg border-2 border-purple-600/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
                 <img 
                   src={logoImage} 
                   alt="Vets Van - Mobile Veterinary Clinic" 
-                  className="h-16 w-auto max-w-[200px] object-contain mx-auto"
+                  className="h-20 w-auto max-w-[240px] object-contain mx-auto"
                   style={{ 
                     filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1)) contrast(1.05)',
                   }}
