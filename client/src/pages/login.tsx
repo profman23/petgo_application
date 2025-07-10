@@ -12,7 +12,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
 import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart, Mail } from 'lucide-react';
 import { useLocation } from 'wouter';
-import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import logoImage from "@assets/Screenshot 2025-07-10 182605_1752161515777.png";
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 
 interface LoginFormData {
@@ -167,14 +167,14 @@ export default function Login() {
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
             
-            {/* Logo Container - Seamless White Background */}
+            {/* Logo Container - Clean White Background */}
             <div className="mb-6 flex justify-center">
               <img 
                 src={logoImage} 
-                alt="Vets Van - Mobile Veterinary Clinic" 
-                className="h-24 w-auto max-w-[280px] object-contain mx-auto transition-all duration-300 hover:scale-105"
+                alt="VETS VAN - Mobile Veterinary Clinic" 
+                className="h-20 w-auto max-w-[320px] object-contain mx-auto transition-all duration-300 hover:scale-105"
                 style={{ 
-                  filter: 'contrast(1.05)',
+                  filter: 'brightness(1.02) contrast(1.1)',
                 }}
               />
             </div>
