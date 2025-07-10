@@ -766,7 +766,7 @@ export default function Home() {
             <div className="flex items-center justify-center space-x-6 rtl:space-x-reverse">
               {/* WhatsApp Button */}
               <a
-                href="https://wa.me/966535152250"
+                href="https://wa.me/966920011626"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
@@ -792,7 +792,7 @@ export default function Home() {
               
               {/* Phone Call Button */}
               <a
-                href="tel:+966535152250"
+                href="tel:+966920011626"
                 className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
                 style={{
                   animation: 'shake 2s ease-in-out infinite'
