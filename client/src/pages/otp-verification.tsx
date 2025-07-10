@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,13 @@ export default function OtpVerification() {
   // Get email from localStorage (set during registration)
   const email = localStorage.getItem('otpEmail') || '';
   const userName = localStorage.getItem('otpUserName') || '';
+
+  // Check if email exists, if not redirect back to login
+  useEffect(() => {
+    if (!email) {
+      setLocation('/login');
+    }
+  }, [email, setLocation]);
   
   const translations = {
     ar: {
@@ -171,12 +178,11 @@ export default function OtpVerification() {
   };
 
   const handleBack = () => {
-    setLocation("/register");
+    setLocation("/login");
   };
 
+  // Don't render anything if no email (useEffect will handle redirect)
   if (!email) {
-    // Redirect to register if no email provided
-    setLocation("/register");
     return null;
   }
 
