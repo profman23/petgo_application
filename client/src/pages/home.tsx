@@ -784,24 +784,30 @@ export default function Home() {
                 href="https://wa.me/9665335152250"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-12 h-12 bg-white rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 border border-green-200 hover:border-green-300"
+                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
               >
                 <img 
                   src={whatsappIcon}
                   alt="WhatsApp"
-                  className="w-8 h-8 object-contain"
+                  className="w-12 h-12 object-contain"
+                  style={{
+                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
+                  }}
                 />
               </a>
               
               {/* Phone Call Button */}
               <a
                 href="tel:+9665335152250"
-                className="flex items-center justify-center w-12 h-12 bg-white rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 border border-blue-200 hover:border-blue-300"
+                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
               >
                 <img 
                   src={phoneIcon}
                   alt="Phone Call"
-                  className="w-8 h-8 object-contain"
+                  className="w-12 h-12 object-contain"
+                  style={{
+                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
+                  }}
                 />
               </a>
             </div>
