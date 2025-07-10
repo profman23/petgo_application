@@ -685,12 +685,12 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Custom House - End Position - Moved Up */}
-                  <div className={`absolute -top-6 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
+                  {/* Custom House - End Position - Same Level as Clinic */}
+                  <div className={`absolute top-0 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
                     <img 
                       src={newestHouseImage}
                       alt="House" 
-                      className="w-16 h-16 drop-shadow-xl"
+                      className="w-20 h-20 drop-shadow-xl"
                     />
                   </div>
                 </div>
