@@ -2685,8 +2685,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Booking not found' });
       }
 
-      // Get VetsVan location
-      const driver = await storage.getDriverByVetsVanCode(booking.vetsVanCode);
+      console.log('Booking data:', { id: booking.id, vetsVanId: booking.vetsVanId });
+
+      // Get VetsVan location using vetsVanId (handle both camelCase and snake_case)
+      const vetsVanId = booking.vetsVanId || (booking as any).vets_van_id;
+      const driver = await storage.getDriver(vetsVanId);
+      console.log('Driver search result:', driver ? { id: driver.id, name: driver.name } : 'Driver not found');
+      
       if (!driver) {
         return res.status(404).json({ message: 'VetsVan not found' });
       }
@@ -2705,7 +2710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const trackingData = {
         bookingId: booking.id,
-        vetsVanCode: booking.vetsVanCode,
+        vetsVanCode: driver.vetsvanCode,
         estimatedArrivalMinutes: estimatedMinutes,
         distance: distance,
         customerLocation: {
@@ -2716,12 +2721,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         vetsVanLocation: {
           latitude: vetsVanLat,
           longitude: vetsVanLng,
-          address: `${driver.name} - ${booking.vetsVanCode}`
+          address: `${driver.name} - ${driver.vetsvanCode}`
         },
         driverName: driver.name,
-        carModel: booking.carModel,
-        carColor: booking.carColor,
-        plateNumber: booking.plateNumber,
+        carModel: driver.carModel,
+        carColor: driver.carColor,
+        plateNumber: driver.plateNumber,
         status: booking.status,
         lastUpdated: new Date().toLocaleTimeString()
       };
