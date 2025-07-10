@@ -18,6 +18,7 @@ import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-vet
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
+import PWAInstallBanner from '@/components/PWAInstallBanner';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -767,6 +768,9 @@ export default function Home() {
         onClose={handleLocationPermissionSkip}
         onAllow={handleLocationPermissionAllow}
       />
+      
+      {/* PWA Install Banner */}
+      <PWAInstallBanner />
     </div>
   );
 }

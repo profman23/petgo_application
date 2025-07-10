@@ -1,6 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import path from "path";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema } from "@shared/schema";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
@@ -78,6 +83,24 @@ function calculateRideEstimates(distance: number) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // PWA Routes - Serve Service Worker and Manifest
+  app.get('/sw.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.setHeader('Service-Worker-Allowed', '/');
+    res.sendFile(path.join(__dirname, '../public/sw.js'));
+  });
+
+  app.get('/manifest.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.sendFile(path.join(__dirname, '../public/manifest.json'));
+  });
+
+  // Serve PWA icons
+  app.get('/icons/:iconName', (req, res) => {
+    const iconName = req.params.iconName;
+    res.sendFile(path.join(__dirname, '../public/icons', iconName));
+  });
+
   // Auth routes
   app.post('/api/auth/login', async (req, res) => {
     try {
