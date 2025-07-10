@@ -760,25 +760,9 @@ export default function Home() {
             </div>
           </button>
 
-          {/* Contact Section */}
+          {/* Contact Section - Icons Only */}
           <div className="mt-4 p-4 bg-white rounded-xl shadow-sm border border-purple-100">
-            <div className="text-center mb-3">
-              <h3 className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
-                {language === 'ar' ? 'تواصل معنا' : 'Contact Us'}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1" style={{ textAlign }}>
-                {language === 'ar' ? 'للاستفسارات والطوارئ' : 'For inquiries and emergencies'}
-              </p>
-            </div>
-            
-            <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
-              {/* Phone Number Display */}
-              <div className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
-                <span className="text-lg font-bold text-gray-800 mr-2" dir="ltr">
-                  009665335152250
-                </span>
-              </div>
-              
+            <div className="flex items-center justify-center space-x-6 rtl:space-x-reverse">
               {/* WhatsApp Button */}
               <a
                 href="https://wa.me/9665335152250"
@@ -810,12 +794,6 @@ export default function Home() {
                   }}
                 />
               </a>
-            </div>
-            
-            <div className="text-center mt-3">
-              <p className="text-xs text-gray-500" style={{ textAlign }}>
-                {language === 'ar' ? 'متاح 24/7 لخدمتكم' : 'Available 24/7 to serve you'}
-              </p>
             </div>
           </div>
         </div>
