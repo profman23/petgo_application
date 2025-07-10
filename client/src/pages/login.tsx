@@ -166,14 +166,6 @@ export default function Login() {
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
-            {/* Back button */}
-            <button
-              onClick={() => setLocation('/user-type-selection')}
-              className="absolute top-4 left-4 p-2 text-purple-600 hover:bg-purple-100 rounded-xl transition-all duration-300 border border-purple-600/50"
-              title={language === 'ar' ? 'اختر نوع الحساب' : 'Choose Account Type'}
-            >
-              <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
-            </button>
             
             {/* Logo Container - Seamless White Background */}
             <div className="mb-6 flex justify-center">
