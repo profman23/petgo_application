@@ -106,7 +106,7 @@ export default function Patients() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -126,7 +126,7 @@ export default function Patients() {
               <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 onClick={handleAddPatient}
-                className="bg-purple-600 hover:bg-purple-700 text-white rounded-full p-2"
+                className="bg-purple-600 hover:bg-purple-600 text-white rounded-full p-2"
                 size="sm"
               >
                 <Plus className="h-4 w-4" />
@@ -135,7 +135,7 @@ export default function Patients() {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -151,7 +151,7 @@ export default function Patients() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <Card key={i} className="border-2 border-purple-200 animate-pulse">
+                <Card key={i} className="border-2 border-purple-600 animate-pulse">
                   <CardContent className="p-4">
                     <div className="h-4 bg-gray-300 rounded mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded"></div>
@@ -160,11 +160,11 @@ export default function Patients() {
               ))}
             </div>
           ) : patients.length === 0 ? (
-            <Card className="border-2 border-purple-200 shadow-lg">
+            <Card className="border-2 border-purple-600 shadow-lg">
               <CardContent className="p-8 text-center">
                 <div className="mb-6">
-                  <div className="w-24 h-24 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
-                    <PawPrint className="h-12 w-12 text-purple-400" />
+                  <div className="w-24 h-24 mx-auto mb-4 bg-purple-600 rounded-full flex items-center justify-center">
+                    <PawPrint className="h-12 w-12 text-purple-600" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-700 mb-2">
                     {t('noPatients')}
@@ -174,7 +174,7 @@ export default function Patients() {
                   </p>
                   <Button
                     onClick={handleAddPatient}
-                    className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg font-medium"
+                    className="bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium"
                   >
                     <Plus className="h-5 w-5 mr-2" />
                     {t('addPatient')}
@@ -189,7 +189,7 @@ export default function Patients() {
                 return (
                   <Card 
                     key={patient.id} 
-                    className="border-2 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-200 hover:border-purple-300 cursor-pointer"
+                    className="border-2 border-purple-600 shadow-lg hover:shadow-xl transition-all duration-200 hover:border-purple-600 cursor-pointer"
                     onClick={() => handlePatientEdit(patient)}
                   >
                     <CardContent className="p-4">
@@ -201,10 +201,10 @@ export default function Patients() {
                             <img
                               src={patient.photo}
                               alt={patient.name}
-                              className="w-16 h-16 object-cover rounded-full border-2 border-purple-200"
+                              className="w-16 h-16 object-cover rounded-full border-2 border-purple-600"
                             />
                           ) : (
-                            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center border-2 border-purple-200">
+                            <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center border-2 border-purple-600">
                               <IconComponent className="h-8 w-8 text-purple-600" />
                             </div>
                           )}
@@ -251,7 +251,7 @@ export default function Patients() {
           <div className="fixed bottom-6 right-6">
             <Button
               onClick={handleAddPatient}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200"
+              className="bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:to-purple-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200"
               size="lg"
             >
               <Plus className="h-6 w-6" />

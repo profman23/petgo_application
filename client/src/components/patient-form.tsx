@@ -111,14 +111,14 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
   return (
     <div className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
       <div className="max-w-lg mx-auto">
-        <Card className="border-2 border-purple-200 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg">
+        <Card className="border-2 border-purple-600 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-600 text-white rounded-t-lg">
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onBack}
-                className="text-white hover:bg-purple-500 p-2"
+                className="text-white hover:bg-purple-600 p-2"
               >
                 <ArrowLeft className="h-5 w-5" style={{ transform: isRTL ? 'rotate(180deg)' : 'none' }} />
               </Button>
@@ -137,7 +137,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 <Input
                   id="name"
                   {...form.register('name')}
-                  className="border-2 border-purple-200 focus:border-purple-500 rounded-lg"
+                  className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
                   placeholder={t('patientName')}
                   autoFocus
                 />
@@ -155,7 +155,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   onValueChange={(value) => form.setValue('type', value as 'Cat' | 'Dog' | 'Bird')}
                   defaultValue={form.watch('type')}
                 >
-                  <SelectTrigger className="border-2 border-purple-200 focus:border-purple-500 rounded-lg">
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
                     <SelectValue placeholder={t('selectPatientType')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -244,7 +244,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       <Button
                         type="button"
                         size="sm"
-                        className="absolute -bottom-2 -right-2 bg-purple-600 hover:bg-purple-700 rounded-full p-2"
+                        className="absolute -bottom-2 -right-2 bg-purple-600 hover:bg-purple-600 rounded-full p-2"
                         onClick={() => document.getElementById('photo-upload')?.click()}
                       >
                         <Camera className="h-4 w-4" />
@@ -256,7 +256,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                       onClick={() => document.getElementById('photo-upload')?.click()}
                     >
                       <div className="text-center">
-                        <Camera className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                        <Camera className="h-8 w-8 text-purple-600 mx-auto mb-2" />
                         <p className="text-sm text-purple-600">{t('uploadPhoto')}</p>
                       </div>
                     </div>
@@ -276,7 +276,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 <Button
                   type="submit"
                   disabled={addPatientMutation.isPending}
-                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="w-full bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:to-purple-600 text-white py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   {addPatientMutation.isPending ? t('loading') : t('addPatient')}
                 </Button>

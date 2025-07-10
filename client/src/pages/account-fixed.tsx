@@ -120,7 +120,7 @@ export default function Account() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br #85208550 to-white flex items-center justify-center">
         <div className="text-purple-600">{t('loading')}</div>
       </div>
     );
@@ -133,7 +133,7 @@ export default function Account() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -155,7 +155,7 @@ export default function Account() {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -170,14 +170,14 @@ export default function Account() {
             <div className="flex items-center gap-4" style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row' }}>
               {/* Profile Picture */}
               <div className="relative">
-                <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center">
+                <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center">
                   <User size={32} className="text-purple-600" />
                 </div>
                 
                 {/* Camera Button */}
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white border-2 border-white flex items-center justify-center transition-colors"
+                  className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-600 text-white border-2 border-white flex items-center justify-center transition-colors"
                 >
                   <Camera size={14} />
                 </button>
@@ -207,7 +207,7 @@ export default function Account() {
           {/* Account Details Toggle Button */}
           <button
             onClick={() => setIsAccountDetailsOpen(!isAccountDetailsOpen)}
-            className="w-full bg-white rounded-xl shadow-lg p-4 mb-4 flex items-center justify-between hover:bg-purple-50 transition-colors"
+            className="w-full bg-white rounded-xl shadow-lg p-4 mb-4 flex items-center justify-between hover:bg-purple-100 transition-colors"
           >
             <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
               {language === 'ar' ? 'تفاصيل الحساب' : 'Account Details'}
@@ -222,7 +222,7 @@ export default function Account() {
           {/* Patients Button */}
           <button
             onClick={handlePatientsClick}
-            className="w-full bg-white rounded-xl shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-purple-50 transition-colors"
+            className="w-full bg-white rounded-xl shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-purple-100 transition-colors"
           >
             <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
               {language === 'ar' ? 'الحيوانات الأليفة' : 'Pets'}
@@ -246,7 +246,7 @@ export default function Account() {
                   type="text"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-#852085 focus:border-purple-600"
                   placeholder={language === 'ar' ? 'أدخل الاسم الأول' : 'Enter first name'}
                 />
               </div>
@@ -260,7 +260,7 @@ export default function Account() {
                   type="text"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-#852085 focus:border-purple-600"
                   placeholder={language === 'ar' ? 'أدخل الاسم الأخير' : 'Enter last name'}
                 />
               </div>
@@ -275,7 +275,7 @@ export default function Account() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full p-3 pl-12 border border-gray-300 rounded-lg focus:ring-#852085 focus:border-purple-600"
                     placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email address'}
                   />
                   <Mail size={18} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" />
@@ -297,7 +297,7 @@ export default function Account() {
               <button
                 onClick={handleSaveProfile}
                 disabled={updateProfileMutation.isPending}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg font-medium mb-4 disabled:opacity-50"
+                className="w-full bg-purple-600 hover:bg-purple-600 text-white py-3 px-4 rounded-lg font-medium mb-4 disabled:opacity-50"
               >
                 {updateProfileMutation.isPending ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') : (language === 'ar' ? 'حفظ' : 'Save')}
               </button>
@@ -330,7 +330,7 @@ export default function Account() {
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-#852085 focus:border-purple-600"
                     placeholder={language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}
                   />
                 </div>
@@ -344,7 +344,7 @@ export default function Account() {
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-#852085 focus:border-purple-600"
                     placeholder={language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
                   />
                 </div>
@@ -358,7 +358,7 @@ export default function Account() {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-#852085 focus:border-purple-600"
                     placeholder={language === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}
                   />
                 </div>
@@ -374,7 +374,7 @@ export default function Account() {
                   <button
                     onClick={handleResetPassword}
                     disabled={resetPasswordMutation.isPending}
-                    className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg disabled:opacity-50"
+                    className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-600 text-white rounded-lg disabled:opacity-50"
                   >
                     {resetPasswordMutation.isPending ? (language === 'ar' ? 'جاري التحديث...' : 'Updating...') : (language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password')}
                   </button>

@@ -156,7 +156,7 @@ export default function PaymentModal({ isOpen, onClose, currentTotal, remainingB
             <select
               value={paymentType}
               onChange={(e) => setPaymentType(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
               dir={language === 'ar' ? 'rtl' : 'ltr'}
             >
               <option value="">{t('selectPaymentType')}</option>

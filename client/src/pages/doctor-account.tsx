@@ -237,7 +237,7 @@ export default function DoctorAccount() {
 
               <Button 
                 type="submit" 
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-purple-600 hover:bg-purple-600"
                 disabled={updateProfileMutation.isPending}
               >
                 <Save className="w-4 h-4 mr-2" />
@@ -301,7 +301,7 @@ export default function DoctorAccount() {
 
               <Button 
                 type="submit" 
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-purple-600 hover:bg-purple-600"
                 disabled={changePasswordMutation.isPending}
               >
                 <Lock className="w-4 h-4 mr-2" />

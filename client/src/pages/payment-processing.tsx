@@ -27,14 +27,14 @@ export default function PaymentProcessing() {
 
   return (
     <div 
-      className={`min-h-screen bg-gradient-to-br from-purple-50 to-white flex flex-col ${direction === 'rtl' ? 'font-arabic' : ''}`}
+      className={`min-h-screen bg-gradient-to-br #85208550 to-white flex flex-col ${direction === 'rtl' ? 'font-arabic' : ''}`}
       dir={direction}
     >
       {/* Header */}
       <header className="bg-white shadow-sm border-b px-4 py-3">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white border-2 border-purple-200 rounded-xl p-1 shadow-md hover:shadow-lg transition-all duration-200">
+            <div className="w-12 h-12 bg-white border-2 border-purple-600 rounded-xl p-1 shadow-md hover:shadow-lg transition-all duration-200">
               <img 
                 src={logoImage} 
                 alt="VetsVan Logo" 
@@ -59,7 +59,7 @@ export default function PaymentProcessing() {
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-12 h-12 text-green-600" />
               </div>
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto">
                 <Clock className="w-8 h-8 text-purple-600 animate-pulse" />
               </div>
             </div>
@@ -77,8 +77,8 @@ export default function PaymentProcessing() {
                 }
               </p>
 
-              <div className="bg-purple-50 rounded-lg p-4 mt-6">
-                <p className="text-sm text-purple-700">
+              <div className="#85208550 rounded-lg p-4 mt-6">
+                <p className="text-sm text-purple-600">
                   {language === 'ar'
                     ? '• سيتم التواصل معك خلال 15 دقيقة\n• يمكنك متابعة حالة طلبك في صفحة الأنشطة\n• تأكد من تشغيل الإشعارات'
                     : '• You will be contacted within 15 minutes\n• You can track your request status in the Activity page\n• Make sure notifications are enabled'
@@ -91,7 +91,7 @@ export default function PaymentProcessing() {
             <div className="mt-8">
               <Button
                 onClick={handleGoToActivity}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="w-full bg-purple-600 hover:bg-purple-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <span className="flex items-center justify-center gap-2">
                   {language === 'ar' ? 'عرض أنشطتي' : 'View My Activities'}

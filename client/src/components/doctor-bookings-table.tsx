@@ -141,7 +141,7 @@ export function DoctorBookingsTable({ vetsVanId, vetsVanName }: DoctorBookingsTa
           {language === 'ar' ? `حجوزات ${vetsVanName}` : `${vetsVanName} Bookings`}
         </h3>
         {bookings && bookings.length > 0 && (
-          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-sm font-medium">
+          <span className="bg-purple-600 text-purple-600 px-2 py-1 rounded-full text-sm font-medium">
             {bookings.length}
           </span>
         )}

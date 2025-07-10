@@ -20,22 +20,22 @@
 
 /* Custom button override to remove shadcn/ui styling */
 .custom-purple-button {
-  background: linear-gradient(to right, #7c3aed, #6b21a8) !important;
-  background-color: #7c3aed !important;
+  background: linear-gradient(to right, #852085, #732073) !important;
+  background-color: #852085 !important;
   color: white !important;
   border: none !important;
   outline: none !important;
 }
 
 .custom-purple-button:hover {
-  background: linear-gradient(to right, #6b21a8, #581c87) !important;
-  background-color: #6b21a8 !important;
+  background: linear-gradient(to right, #732073, #611961) !important;
+  background-color: #732073 !important;
   color: white !important;
 }
 
 .custom-purple-button:focus {
-  background: linear-gradient(to right, #7c3aed, #6b21a8) !important;
-  background-color: #7c3aed !important;
+  background: linear-gradient(to right, #852085, #732073) !important;
+  background-color: #852085 !important;
   color: white !important;
   box-shadow: none !important;
 }
@@ -134,12 +134,21 @@
   animation: bounce-right-to-left 6s ease-in-out infinite;
 }
 
-/* Custom purple theme matching the logo */
+/* Custom purple theme with new color #852085 */
 :root {
-  --purple-primary: #8B2F8B;
-  --purple-dark: #7A2A7A;
-  --purple-light: #9F439F;
-  --purple-accent: #B85CB8;
+  --purple-primary: #852085;
+  --purple-dark: #732073;
+  --purple-light: #972097;
+  --purple-accent: #A940A9;
+  --purple-100: #F3E8F3;
+  --purple-200: #E1CCE1;
+  --purple-300: #CEB0CE;
+  --purple-400: #B594B5;
+  --purple-500: #9C789C;
+  --purple-600: #852085;
+  --purple-700: #732073;
+  --purple-800: #611961;
+  --purple-900: #4F134F;
 }
 
 :root {
@@ -283,4 +292,65 @@
   .-right-6 {
     right: -1.5rem !important;
   }
+
+  /* Global purple color override using the new #852085 color */
+  .text-purple-100 { color: var(--purple-100) !important; }
+  .text-purple-200 { color: var(--purple-200) !important; }
+  .text-purple-300 { color: var(--purple-300) !important; }
+  .text-purple-400 { color: var(--purple-400) !important; }
+  .text-purple-500 { color: var(--purple-500) !important; }
+  .text-purple-600 { color: var(--purple-600) !important; }
+  .text-purple-700 { color: var(--purple-700) !important; }
+  .text-purple-800 { color: var(--purple-800) !important; }
+  .text-purple-900 { color: var(--purple-900) !important; }
+
+  .bg-purple-100 { background-color: var(--purple-100) !important; }
+  .bg-purple-200 { background-color: var(--purple-200) !important; }
+  .bg-purple-300 { background-color: var(--purple-300) !important; }
+  .bg-purple-400 { background-color: var(--purple-400) !important; }
+  .bg-purple-500 { background-color: var(--purple-500) !important; }
+  .bg-purple-600 { background-color: var(--purple-600) !important; }
+  .bg-purple-700 { background-color: var(--purple-700) !important; }
+  .bg-purple-800 { background-color: var(--purple-800) !important; }
+  .bg-purple-900 { background-color: var(--purple-900) !important; }
+
+  .border-purple-100 { border-color: var(--purple-100) !important; }
+  .border-purple-200 { border-color: var(--purple-200) !important; }
+  .border-purple-300 { border-color: var(--purple-300) !important; }
+  .border-purple-400 { border-color: var(--purple-400) !important; }
+  .border-purple-500 { border-color: var(--purple-500) !important; }
+  .border-purple-600 { border-color: var(--purple-600) !important; }
+  .border-purple-700 { border-color: var(--purple-700) !important; }
+  .border-purple-800 { border-color: var(--purple-800) !important; }
+  .border-purple-900 { border-color: var(--purple-900) !important; }
+
+  .hover\\:bg-purple-100:hover { background-color: var(--purple-100) !important; }
+  .hover\\:bg-purple-200:hover { background-color: var(--purple-200) !important; }
+  .hover\\:bg-purple-300:hover { background-color: var(--purple-300) !important; }
+  .hover\\:bg-purple-400:hover { background-color: var(--purple-400) !important; }
+  .hover\\:bg-purple-500:hover { background-color: var(--purple-500) !important; }
+  .hover\\:bg-purple-600:hover { background-color: var(--purple-600) !important; }
+  .hover\\:bg-purple-700:hover { background-color: var(--purple-700) !important; }
+  .hover\\:bg-purple-800:hover { background-color: var(--purple-800) !important; }
+  .hover\\:bg-purple-900:hover { background-color: var(--purple-900) !important; }
+
+  .from-purple-100 { --tw-gradient-from: var(--purple-100) !important; }
+  .from-purple-200 { --tw-gradient-from: var(--purple-200) !important; }
+  .from-purple-300 { --tw-gradient-from: var(--purple-300) !important; }
+  .from-purple-400 { --tw-gradient-from: var(--purple-400) !important; }
+  .from-purple-500 { --tw-gradient-from: var(--purple-500) !important; }
+  .from-purple-600 { --tw-gradient-from: var(--purple-600) !important; }
+  .from-purple-700 { --tw-gradient-from: var(--purple-700) !important; }
+  .from-purple-800 { --tw-gradient-from: var(--purple-800) !important; }
+  .from-purple-900 { --tw-gradient-from: var(--purple-900) !important; }
+
+  .to-purple-100 { --tw-gradient-to: var(--purple-100) !important; }
+  .to-purple-200 { --tw-gradient-to: var(--purple-200) !important; }
+  .to-purple-300 { --tw-gradient-to: var(--purple-300) !important; }
+  .to-purple-400 { --tw-gradient-to: var(--purple-400) !important; }
+  .to-purple-500 { --tw-gradient-to: var(--purple-500) !important; }
+  .to-purple-600 { --tw-gradient-to: var(--purple-600) !important; }
+  .to-purple-700 { --tw-gradient-to: var(--purple-700) !important; }
+  .to-purple-800 { --tw-gradient-to: var(--purple-800) !important; }
+  .to-purple-900 { --tw-gradient-to: var(--purple-900) !important; }
 }

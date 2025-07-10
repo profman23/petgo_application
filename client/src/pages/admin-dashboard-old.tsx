@@ -210,7 +210,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('management')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full ${
                 activeTab === 'management'
-                  ? 'bg-purple-100 text-purple-900'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -221,7 +221,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('shifts')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'shifts'
-                  ? 'bg-purple-100 text-purple-900'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -244,7 +244,7 @@ export default function AdminDashboard() {
                         <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVanManagement')}</h3>
                         <button
                           onClick={() => setShowAddForm(!showAddForm)}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-600"
                         >
                           <UserPlus className="h-4 w-4 ml-2" />
                           {t('addNewVetsVan')}
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
                       type="text"
                       value={newDriver.vetsvanCode}
                       onChange={(e) => setNewDriver({ ...newDriver, vetsvanCode: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                       placeholder="V001"
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -270,7 +270,7 @@ export default function AdminDashboard() {
                       type="text"
                       value={newDriver.vetsvanName}
                       onChange={(e) => setNewDriver({ ...newDriver, vetsvanName: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                       placeholder="VETS VAN 1"
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -281,7 +281,7 @@ export default function AdminDashboard() {
                       type="tel"
                       value={newDriver.phone}
                       onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                       placeholder="05xxxxxxxx"
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
                       type="text"
                       value={newDriver.username}
                       onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                       placeholder={t('username')}
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
                       type="password"
                       value={newDriver.password}
                       onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                       placeholder={t('password')}
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -340,8 +340,8 @@ export default function AdminDashboard() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                          <span className="text-purple-800 font-medium text-sm">
+                        <div className="h-10 w-10 rounded-full bg-purple-600 flex items-center justify-center">
+                          <span className="text-purple-600 font-medium text-sm">
                             {driver.name.slice(0, 2)}
                           </span>
                         </div>
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
                             isAvailable: !driver.isAvailable,
                           })
                         }
-                        className="text-sm text-purple-600 hover:text-purple-900"
+                        className="text-sm text-purple-600 hover:text-purple-600"
                       >
                         {t('changeStatus')}
                       </button>

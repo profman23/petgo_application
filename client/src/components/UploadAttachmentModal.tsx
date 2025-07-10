@@ -231,7 +231,7 @@ export default function UploadAttachmentModal({
             <Button
               onClick={handleUpload}
               disabled={!selectedFile || !description.trim() || uploadMutation.isPending}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-purple-600 hover:bg-purple-600 text-white"
             >
               <Upload className="h-4 w-4 mr-2" />
               {uploadMutation.isPending ? 'جاري الرفع...' : t('upload')}

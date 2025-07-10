@@ -171,7 +171,7 @@ export default function VetsVanBooking() {
       case 'confirmed':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'in_progress':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'bg-purple-600 text-purple-600 border-purple-600';
       case 'completed':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'cancelled':
@@ -460,7 +460,7 @@ export default function VetsVanBooking() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -489,7 +489,7 @@ export default function VetsVanBooking() {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -535,8 +535,8 @@ export default function VetsVanBooking() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="bg-purple-50 p-3 rounded-lg text-center">
-              <span className="text-purple-800 font-medium">
+            <div className="#85208550 p-3 rounded-lg text-center">
+              <span className="text-purple-600 font-medium">
                 {new Date(selectedDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
                   weekday: 'long',
                   year: 'numeric',
@@ -558,10 +558,10 @@ export default function VetsVanBooking() {
 
         {/* Slide to Confirm */}
         {selectedVetsVan && selectedTime && (
-          <Card className="border-2 border-purple-200">
+          <Card className="border-2 border-purple-600">
             <CardContent className="p-4">
               <div className="mb-4 text-center">
-                <h3 className="text-lg font-semibold text-purple-800 mb-2" style={{ textAlign }}>
+                <h3 className="text-lg font-semibold text-purple-600 mb-2" style={{ textAlign }}>
                   {language === 'ar' ? 'مراجعة الحجز' : 'Review Booking'}
                 </h3>
                 <div className="space-y-1 text-sm text-gray-600">
@@ -573,7 +573,7 @@ export default function VetsVanBooking() {
 
               {/* Slide to confirm button */}
               <div className="relative">
-                <div className="w-full h-14 bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg relative overflow-hidden">
+                <div className="w-full h-14 bg-gradient-to-r from-purple-600 to-purple-600 rounded-lg relative overflow-hidden">
                   <div 
                     className="absolute left-0 top-0 h-full bg-green-500 transition-all duration-300 ease-out rounded-lg"
                     style={{ width: `${(slidePosition / 100) * 70 + 30}%` }}

@@ -197,7 +197,7 @@ export default function CustomerActivity() {
       case 'booked':
         return 'bg-yellow-100 text-yellow-800';
       case 'in_progress':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-600 text-purple-600';
       case 'pending':
         return 'bg-orange-100 text-orange-800';
       case 'cancelled':
@@ -310,7 +310,7 @@ export default function CustomerActivity() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -332,7 +332,7 @@ export default function CustomerActivity() {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -380,7 +380,7 @@ export default function CustomerActivity() {
                   
                   <div className="space-y-3">
                     {groupedBookings[date].map((booking) => (
-                      <Card key={booking.id} className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow">
+                      <Card key={booking.id} className="border-l-4 border-l-#852085 hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
                           <div className="space-y-3">
                             {/* Header with status and time */}
@@ -431,7 +431,7 @@ export default function CustomerActivity() {
                             {/* Payment sections removed per user request */}
 
                             {/* Action Buttons */}
-                            <div className="pt-3 border-t border-purple-100 space-y-2">
+                            <div className="pt-3 border-t border-purple-600 space-y-2">
                               {/* Tracking Button for Active Bookings */}
                               {(booking.status === 'confirmed' || booking.status === 'booked' || booking.status === 'in_progress') && (
                                 <Button
@@ -453,7 +453,7 @@ export default function CustomerActivity() {
                                   className={`w-full font-semibold py-2 px-4 ${
                                     isBookingReviewed(booking.id) 
                                       ? 'text-green-600 border-green-200 bg-green-50 cursor-not-allowed opacity-75' 
-                                      : 'text-purple-600 border-purple-200 hover:bg-purple-50'
+                                      : 'text-purple-600 border-purple-600 hover:bg-purple-100'
                                   }`}
                                 >
                                   <Star className={`w-4 h-4 mr-2 ${
@@ -481,9 +481,9 @@ export default function CustomerActivity() {
       {/* Review Dialog */}
       {showReviewDialog && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className="w-full max-w-md bg-white border-2 border-purple-200 shadow-2xl rounded-lg p-6 relative z-50">
+          <div className="w-full max-w-md bg-white border-2 border-purple-600 shadow-2xl rounded-lg p-6 relative z-50">
             <div className="flex justify-between items-center mb-4">
-              <h2 style={{ textAlign }} className="text-xl font-bold text-purple-800">
+              <h2 style={{ textAlign }} className="text-xl font-bold text-purple-600">
                 {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
               </h2>
               <button
@@ -514,7 +514,7 @@ export default function CustomerActivity() {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder={language === 'ar' ? 'شاركنا رأيك في الخدمة...' : 'Share your thoughts about the service...'}
-                  className="min-h-[80px] border-2 border-purple-200 focus:border-purple-400"
+                  className="min-h-[80px] border-2 border-purple-600 focus:border-purple-600"
                   style={{ textAlign }}
                 />
               </div>
@@ -524,14 +524,14 @@ export default function CustomerActivity() {
                 <Button
                   onClick={() => setShowReviewDialog(false)}
                   variant="outline"
-                  className="flex-1 border-2 border-purple-200 hover:bg-purple-50"
+                  className="flex-1 border-2 border-purple-600 hover:bg-purple-100"
                 >
                   {language === 'ar' ? 'إلغاء' : 'Cancel'}
                 </Button>
                 <Button
                   onClick={handleSubmitReview}
                   disabled={submitReviewMutation.isPending}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4"
+                  className="flex-1 bg-purple-600 hover:bg-purple-600 text-white font-semibold py-2 px-4"
                 >
                   {submitReviewMutation.isPending 
                     ? (language === 'ar' ? 'جاري الإرسال...' : 'Submitting...')

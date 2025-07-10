@@ -324,7 +324,7 @@ export default function Home() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -346,7 +346,7 @@ export default function Home() {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -408,7 +408,7 @@ export default function Home() {
         {/* Enhanced Progress Animation for Active Ride */}
         {actualActiveRide && (
           <div className="p-3 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border-b">
-            <div className="text-sm font-bold text-purple-800 mb-3 text-center" style={{ textAlign }}>
+            <div className="text-sm font-bold text-purple-600 mb-3 text-center" style={{ textAlign }}>
               {language === 'ar' ? 'تتبع العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic Tracking'}
             </div>
             
@@ -488,7 +488,7 @@ export default function Home() {
               <CardContent className="p-3">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
                       <Truck className="w-5 h-5 text-purple-600" />
                     </div>
                     <div>
@@ -533,7 +533,7 @@ export default function Home() {
                     <div className="flex items-center justify-between relative">
                       <div className="absolute top-4 left-0 right-0 h-1 bg-gray-200 rounded-full"></div>
                       <div 
-                        className="absolute top-4 left-0 h-1 bg-purple-500 rounded-full transition-all duration-1000"
+                        className="absolute top-4 left-0 h-1 bg-purple-600 rounded-full transition-all duration-1000"
                         style={{ width: `${getSimplifiedProgressPercentage(actualActiveRide.status)}%` }}
                       ></div>
                       
@@ -564,15 +564,15 @@ export default function Home() {
                           <div key={step.status} className="relative flex flex-col items-center">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 z-10 ${
                               isActive 
-                                ? 'bg-purple-500 border-purple-500 text-white' 
+                                ? 'bg-purple-600 border-purple-600 text-white' 
                                 : isCurrent
-                                ? 'bg-white border-purple-500 text-purple-500 ring-2 ring-purple-200'
+                                ? 'bg-white border-purple-600 text-purple-600 ring-2 ring-#852085'
                                 : 'bg-white border-gray-300 text-gray-300'
                             }`}>
                               <IconComponent className="w-4 h-4" />
                             </div>
                             <div className={`mt-1 text-xs font-medium ${
-                              isActive || isCurrent ? 'text-purple-700' : 'text-gray-400'
+                              isActive || isCurrent ? 'text-purple-600' : 'text-gray-400'
                             }`} style={{ textAlign }}>
                               {step.status === 'processing' && (language === 'ar' ? 'معالجة' : 'Processing')}
                               {step.status === 'enroute' && (language === 'ar' ? 'في الطريق' : 'On the Way')}
@@ -652,9 +652,9 @@ export default function Home() {
           
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
-            <div className="mb-3 p-3 bg-gradient-to-r from-purple-100 via-blue-100 to-purple-100 rounded-2xl border-2 border-purple-200 shadow-lg">
+            <div className="mb-3 p-3 bg-gradient-to-r from-purple-600 via-blue-100 to-purple-600 rounded-2xl border-2 border-purple-600 shadow-lg">
               <div className="text-center">
-                <div className="text-sm font-semibold text-purple-800 mb-2" style={{ textAlign }}>
+                <div className="text-sm font-semibold text-purple-600 mb-2" style={{ textAlign }}>
                   {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
                 </div>
                 
@@ -662,7 +662,7 @@ export default function Home() {
                 <div className="relative h-16 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2 overflow-hidden shadow-inner">
                   {/* Road markings */}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-full h-2 bg-purple-300 opacity-50 animate-pulse rounded-full"></div>
+                    <div className="w-full h-2 bg-purple-600 opacity-50 animate-pulse rounded-full"></div>
                   </div>
                   
                   {/* New Veterinary Van Image */}
@@ -700,7 +700,7 @@ export default function Home() {
 
           {/* Custom Dog and Cat Image */}
           <div className="flex justify-center mb-3">
-            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm border border-purple-200">
+            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-600 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm border border-purple-600">
               <img 
                 src={petsImage}
                 alt="Dogs and Cats" 

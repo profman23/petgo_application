@@ -57,8 +57,8 @@ export function LanguageSelector() {
           onClick={() => handleLanguageChange('ar')}
           className={`cursor-pointer transition-colors ${
             language === 'ar' 
-              ? 'bg-purple-100 text-purple-900 font-medium' 
-              : 'hover:bg-purple-50'
+              ? 'bg-purple-600 text-purple-600 font-medium' 
+              : 'hover:bg-purple-100'
           }`}
         >
           <span className="text-sm flex items-center gap-2">
@@ -70,8 +70,8 @@ export function LanguageSelector() {
           onClick={() => handleLanguageChange('en')}
           className={`cursor-pointer transition-colors ${
             language === 'en' 
-              ? 'bg-purple-100 text-purple-900 font-medium' 
-              : 'hover:bg-purple-50'
+              ? 'bg-purple-600 text-purple-600 font-medium' 
+              : 'hover:bg-purple-100'
           }`}
         >
           <span className="text-sm flex items-center gap-2">

@@ -554,7 +554,7 @@ export default function RideRequest() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -576,7 +576,7 @@ export default function RideRequest() {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -696,7 +696,7 @@ export default function RideRequest() {
                         return (
                           <div
                             key={petId}
-                            className="flex items-center gap-2 bg-purple-100 border border-purple-300 rounded-full px-3 py-1 text-sm"
+                            className="flex items-center gap-2 bg-purple-600 border border-purple-600 rounded-full px-3 py-1 text-sm"
                           >
                             <span>
                               {pet.type === 'Cat' ? '🐱' : pet.type === 'Dog' ? '🐶' : '🐦'}
@@ -704,7 +704,7 @@ export default function RideRequest() {
                             <span className="font-medium">{pet.name}</span>
                             <button
                               onClick={() => setSelectedPatients(prev => prev.filter(id => id !== petId))}
-                              className="text-purple-600 hover:text-purple-800 ml-1"
+                              className="text-purple-600 hover:text-purple-600 ml-1"
                             >
                               ×
                             </button>
@@ -721,7 +721,7 @@ export default function RideRequest() {
                       variant="outline"
                       size="sm"
                       onClick={() => setSelectedPatients(patients.map(p => p.id))}
-                      className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                      className="text-purple-600 border-purple-600 hover:bg-purple-100"
                     >
                       {language === 'ar' ? 'اختيار الكل' : 'Select All'}
                     </Button>
@@ -835,7 +835,7 @@ export default function RideRequest() {
                 {/* Slide to Confirm Button */}
                 <div className="relative w-full">
                   <div
-                    className="relative w-full h-16 bg-gradient-to-r from-purple-500 to-purple-700 rounded-full overflow-hidden shadow-lg cursor-pointer select-none"
+                    className="relative w-full h-16 bg-gradient-to-r from-purple-600 to-purple-600 rounded-full overflow-hidden shadow-lg cursor-pointer select-none"
                     onMouseDown={handleSlideStart}
                     onMouseMove={handleSlideMove}
                     onMouseUp={handleSlideEnd}
@@ -862,7 +862,7 @@ export default function RideRequest() {
 
                     {/* Progress Fill */}
                     <div 
-                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-purple-400 to-purple-600"
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-purple-600 to-purple-600"
                       style={{ 
                         width: `${Math.min(100, (slidePosition / (window.innerWidth - 100)) * 100)}%`,
                         transition: isSliding ? 'none' : 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)'

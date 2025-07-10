@@ -148,7 +148,7 @@ export default function Account() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br #85208550 to-white flex items-center justify-center">
         <div className="text-purple-600">{t('loading')}</div>
       </div>
     );
@@ -161,7 +161,7 @@ export default function Account() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoPath} 
                   alt="VETS VAN Logo" 
@@ -200,14 +200,14 @@ export default function Account() {
           <div className="flex items-center gap-4" style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row' }}>
             {/* Profile Picture */}
             <div className="relative">
-              <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center">
+              <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center">
                 <User size={32} className="text-purple-600" />
               </div>
               
               {/* Camera Button */}
               <button 
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white border-2 border-white flex items-center justify-center transition-colors"
+                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-600 text-white border-2 border-white flex items-center justify-center transition-colors"
               >
                 <Camera size={14} />
               </button>
@@ -235,7 +235,7 @@ export default function Account() {
         {/* Account Details Toggle Button */}
         <button
           onClick={() => setIsAccountDetailsOpen(!isAccountDetailsOpen)}
-          className="w-full bg-white rounded-xl shadow-lg p-4 mb-4 flex items-center justify-between hover:bg-purple-50 transition-colors"
+          className="w-full bg-white rounded-xl shadow-lg p-4 mb-4 flex items-center justify-between hover:bg-purple-100 transition-colors"
         >
           <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
             {t('accountDetails')}
@@ -250,7 +250,7 @@ export default function Account() {
         {/* Patients Button */}
         <button
           onClick={handlePatientsClick}
-          className="w-full bg-white rounded-xl shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-purple-50 transition-colors"
+          className="w-full bg-white rounded-xl shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-purple-100 transition-colors"
         >
           <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
             {t('patients')}
@@ -272,7 +272,7 @@ export default function Account() {
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('firstNamePlaceholder')}
               />
             </div>
@@ -289,7 +289,7 @@ export default function Account() {
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('lastNamePlaceholder')}
               />
             </div>
@@ -317,7 +317,7 @@ export default function Account() {
           {/* Reset Password Button */}
           <button 
             onClick={() => setShowPasswordDialog(true)}
-            className="w-full border border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 flex items-center justify-center gap-2 py-3 rounded-md transition-colors"
+            className="w-full border border-purple-600 text-purple-600 hover:bg-purple-100 hover:border-purple-600 flex items-center justify-center gap-2 py-3 rounded-md transition-colors"
           >
             <Lock size={16} />
             {t('resetPassword')}
@@ -327,7 +327,7 @@ export default function Account() {
           <button 
             onClick={handleSaveProfile}
             disabled={updateProfileMutation.isPending}
-            className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium py-3 rounded-md transition-colors"
+            className="w-full bg-purple-600 hover:bg-purple-600 disabled:bg-purple-600 text-white font-medium py-3 rounded-md transition-colors"
           >
             {updateProfileMutation.isPending ? t('loading') : t('saveProfile')}
           </button>
@@ -355,7 +355,7 @@ export default function Account() {
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('currentPassword')}
                 />
               </div>
@@ -372,7 +372,7 @@ export default function Account() {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('newPassword')}
                 />
               </div>
@@ -389,7 +389,7 @@ export default function Account() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-200 bg-white px-3 py-2 text-sm focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('confirmNewPassword')}
                 />
               </div>
@@ -406,7 +406,7 @@ export default function Account() {
               <button
                 onClick={handleResetPassword}
                 disabled={resetPasswordMutation.isPending}
-                className="flex-1 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white py-2 rounded-md transition-colors"
+                className="flex-1 bg-purple-600 hover:bg-purple-600 disabled:bg-purple-600 text-white py-2 rounded-md transition-colors"
               >
                 {resetPasswordMutation.isPending ? t('loading') : t('changePassword')}
               </button>

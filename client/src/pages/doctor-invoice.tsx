@@ -743,7 +743,7 @@ export default function DoctorInvoice() {
               <div className="mt-4 flex space-x-2">
                 <Button 
                   onClick={() => openVitalsModal(pet)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-purple-600 hover:bg-purple-600 text-white"
                 >
                   <Stethoscope className="h-4 w-4 mr-2" />
                   {t('vitals')}
@@ -855,7 +855,7 @@ export default function DoctorInvoice() {
                                       onClick={() => setInvoiceSubTab('products')}
                                       className={`px-3 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
                                         invoiceSubTab === 'products'
-                                          ? 'border-purple-500 text-purple-600 bg-purple-50'
+                                          ? 'border-purple-600 text-purple-600 #85208550'
                                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                       }`}
                                     >
@@ -865,7 +865,7 @@ export default function DoctorInvoice() {
                                       onClick={() => setInvoiceSubTab('services')}
                                       className={`px-3 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
                                         invoiceSubTab === 'services'
-                                          ? 'border-purple-500 text-purple-600 bg-purple-50'
+                                          ? 'border-purple-600 text-purple-600 #85208550'
                                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                       }`}
                                     >
@@ -975,7 +975,7 @@ export default function DoctorInvoice() {
             <div className="flex items-center justify-between mb-4">
               <button
                 onClick={addItem}
-                className="flex items-center text-purple-600 hover:text-purple-800"
+                className="flex items-center text-purple-600 hover:text-purple-600"
               >
                 <Plus className="h-4 w-4 ml-1" />
                 {t('addItem')}
@@ -1110,7 +1110,7 @@ export default function DoctorInvoice() {
         <div className="flex justify-center mb-6">
           <Button
             onClick={handleGenerateInvoiceClick}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg"
+            className="bg-purple-600 hover:bg-purple-600 text-white px-8 py-3 text-lg"
           >
             <Receipt className="h-6 w-6 ml-2" />
             {t('generateInvoice')}
@@ -1196,7 +1196,7 @@ export default function DoctorInvoice() {
                 </Button>
                 <Button
                   onClick={saveVitals}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-purple-600 hover:bg-purple-600 text-white"
                 >
                   {t('save')}
                 </Button>
@@ -1276,7 +1276,7 @@ export default function DoctorInvoice() {
             <Button
               type="button"
               onClick={confirmGenerateInvoice}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-purple-600 hover:bg-purple-600 text-white"
             >
               {t('confirm')}
             </Button>

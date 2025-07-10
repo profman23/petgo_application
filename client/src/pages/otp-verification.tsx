@@ -187,14 +187,14 @@ export default function OtpVerification() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white dark:from-purple-950 dark:to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br #85208550 to-white dark:#852085950 dark:to-gray-900 flex items-center justify-center p-4">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       
       <div className="w-full max-w-md space-y-6 relative z-10">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <div className="relative w-20 h-20 rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 group">
+          <div className="relative w-20 h-20 rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-purple-600 dark:border-purple-600 hover:border-purple-600 dark:hover:border-purple-600 group">
             <img
               src={logoPath}
               alt="VetsVan Logo"
@@ -206,8 +206,8 @@ export default function OtpVerification() {
         <Card className="border-0 shadow-2xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
-              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
-                <Mail className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+              <div className="w-16 h-16 bg-purple-600 dark:bg-purple-600 rounded-full flex items-center justify-center">
+                <Mail className="w-8 h-8 text-purple-600 dark:text-purple-600" />
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -219,7 +219,7 @@ export default function OtpVerification() {
             <div className="text-sm text-gray-500 dark:text-gray-400">
               <span>{t.sentTo}</span>
               <br />
-              <span className="font-medium text-purple-600 dark:text-purple-400">{email}</span>
+              <span className="font-medium text-purple-600 dark:text-purple-600">{email}</span>
             </div>
           </CardHeader>
 
@@ -240,7 +240,7 @@ export default function OtpVerification() {
                           type="text"
                           placeholder={t.otpPlaceholder}
                           maxLength={6}
-                          className="text-center text-2xl tracking-widest border-gray-300 dark:border-gray-600 focus:border-purple-500 dark:focus:border-purple-400"
+                          className="text-center text-2xl tracking-widest border-gray-300 dark:border-gray-600 focus:border-purple-600 dark:focus:border-purple-600"
                           dir="ltr"
                         />
                       </FormControl>
@@ -252,7 +252,7 @@ export default function OtpVerification() {
                 <div className="space-y-4">
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg"
+                    className="w-full bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:to-purple-600 text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg"
                     disabled={verifyOtpMutation.isPending}
                   >
                     {verifyOtpMutation.isPending ? t.verifyingText : t.verifyButton}
@@ -261,7 +261,7 @@ export default function OtpVerification() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full border-purple-300 text-purple-600 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-400 dark:hover:bg-purple-900/20"
+                    className="w-full border-purple-600 text-purple-600 hover:bg-purple-100 dark:border-purple-600 dark:text-purple-600 dark:hover:bg-purple-600/20"
                     onClick={handleResendOtp}
                     disabled={isResending || resendOtpMutation.isPending}
                   >

@@ -163,7 +163,7 @@ export default function DoctorActivity() {
       case 'confirmed':
         return 'bg-yellow-100 text-yellow-800';
       case 'in_progress':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-600 text-purple-600';
       case 'completed':
         return 'bg-green-100 text-green-800';
       case 'cancelled':
@@ -395,17 +395,17 @@ export default function DoctorActivity() {
 
       <div className="p-4">
         {/* Doctor Info Card */}
-        <Card className="mb-6 bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200">
+        <Card className="mb-6 bg-gradient-to-r #85208550 to-purple-600 border-purple-600">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
                 <User className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-purple-900" style={{ textAlign }}>
+                <h3 className="font-semibold text-purple-600" style={{ textAlign }}>
                   {user.name || user.username}
                 </h3>
-                <p className="text-sm text-purple-700" style={{ textAlign }}>
+                <p className="text-sm text-purple-600" style={{ textAlign }}>
                   {language === 'ar' ? 'طبيب بيطري' : 'Veterinarian'}
                 </p>
               </div>
@@ -499,7 +499,7 @@ export default function DoctorActivity() {
         {Object.entries(groupedBookings).map(([date, dateBookings]) => (
           <Card key={date} className="mb-6">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-purple-900" style={{ textAlign }}>
+              <CardTitle className="flex items-center gap-2 text-purple-600" style={{ textAlign }}>
                 <Calendar className="w-5 h-5" />
                 {formatDate(date)}
                 <Badge variant="outline" className="ml-auto">
@@ -517,7 +517,7 @@ export default function DoctorActivity() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-purple-600" />
-                      <span className="font-semibold text-purple-900">
+                      <span className="font-semibold text-purple-600">
                         {formatTime(booking.appointmentTime)}
                       </span>
                     </div>
@@ -606,7 +606,7 @@ export default function DoctorActivity() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-purple-100 border-purple-300 text-purple-700 hover:bg-purple-200 hover:border-purple-400"
+                        className="bg-purple-600 border-purple-600 text-purple-600 hover:bg-purple-600 hover:border-purple-600"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent card click event
                           setLocation(`/doctor-invoice/${booking.id}`);
@@ -733,8 +733,8 @@ export default function DoctorActivity() {
               </div>
 
               {/* Customer Contact Info */}
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-purple-900 mb-3" style={{ textAlign }}>
+              <div className="#85208550 p-4 rounded-lg">
+                <h4 className="font-semibold text-purple-600 mb-3" style={{ textAlign }}>
                   {language === 'ar' ? 'معلومات التواصل' : 'Contact Information'}
                 </h4>
                 <div className="space-y-2">

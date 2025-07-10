@@ -172,7 +172,7 @@ export default function DoctorLogin() {
                   type="submit"
                   className="w-full text-white py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 
                     hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
-                    bg-gradient-to-r from-purple-800 to-purple-900 hover:from-purple-900 hover:to-purple-950"
+                    bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:#852085950"
                   disabled={loginMutation.isPending}
                   style={{ 
                     background: loginMutation.isPending ? '#6B21A8' : undefined,

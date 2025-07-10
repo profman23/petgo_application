@@ -108,7 +108,7 @@ const InvoiceView = () => {
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="text-center">
           <p className="text-red-600 mb-4">{t('invoiceNotFound')}</p>
-          <Button onClick={() => navigate('/')} className="bg-purple-600 hover:bg-purple-700">
+          <Button onClick={() => navigate('/')} className="bg-purple-600 hover:bg-purple-600">
             {t('backToHome')}
           </Button>
         </div>
@@ -136,7 +136,7 @@ const InvoiceView = () => {
             <div className="flex items-center space-x-2">
               <Button
                 onClick={() => setShowInvoice(!showInvoice)}
-                className="bg-purple-600 hover:bg-purple-700"
+                className="bg-purple-600 hover:bg-purple-600"
               >
                 <Eye className="h-4 w-4 mr-2" />
                 {t('viewInvoice')}
@@ -144,7 +144,7 @@ const InvoiceView = () => {
               <Button
                 onClick={handlePrint}
                 variant="outline"
-                className="border-purple-600 text-purple-600 hover:bg-purple-50"
+                className="border-purple-600 text-purple-600 hover:bg-purple-100"
               >
                 <Download className="h-4 w-4 mr-2" />
                 {t('downloadInvoice')}

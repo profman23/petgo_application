@@ -519,17 +519,17 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
       <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-gray-200">
         {/* Action Buttons */}
-        <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-purple-50 to-purple-100 no-print rounded-t-2xl">
-          <h3 className="text-2xl font-bold text-purple-800 flex items-center">
+        <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r #85208550 to-purple-600 no-print rounded-t-2xl">
+          <h3 className="text-2xl font-bold text-purple-600 flex items-center">
             <FileText className="h-7 w-7 mr-3" />
             {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
           </h3>
           <div className="flex gap-3">
-            <Button onClick={printInvoice} variant="outline" size="sm" className="text-purple-700 border-purple-300 hover:bg-purple-50">
+            <Button onClick={printInvoice} variant="outline" size="sm" className="text-purple-600 border-purple-600 hover:bg-purple-100">
               <Printer className="h-4 w-4 mr-2" />
               {language === 'ar' ? 'طباعة' : 'Print'}
             </Button>
-            <Button onClick={downloadInvoice} disabled={isGenerating} size="sm" className="bg-purple-600 hover:bg-purple-700">
+            <Button onClick={downloadInvoice} disabled={isGenerating} size="sm" className="bg-purple-600 hover:bg-purple-600">
               <Download className="h-4 w-4 mr-2" />
               {language === 'ar' ? 'تحميل' : 'Download'}
             </Button>
@@ -554,7 +554,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           <div className="header mb-4">
             <div className="logo-section">
               <div className="mb-3">
-                <div className="company-name text-3xl font-black text-purple-800">
+                <div className="company-name text-3xl font-black text-purple-600">
                   VETS VAN
                 </div>
                 <div className="company-tagline text-gray-600 font-medium">
@@ -577,7 +577,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             </div>
             
             <div className="invoice-details text-center">
-              <div className="invoice-number text-2xl font-bold text-purple-800 mb-2">
+              <div className="invoice-number text-2xl font-bold text-purple-600 mb-2">
                 {language === 'ar' ? 'فاتورة رقم' : 'Invoice'} #VETSVAN-{invoiceData.bookingId}
               </div>
               <div className="invoice-date text-gray-600 mb-2 flex items-center justify-center">
@@ -617,11 +617,11 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-200 via-purple-500 to-purple-200 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
 
           {/* Customer Information */}
-          <div className="section border-2 border-purple-200 shadow-lg">
-            <h3 className="section-title flex items-center bg-purple-100 -m-5 mb-4 p-4 rounded-t-lg">
+          <div className="section border-2 border-purple-600 shadow-lg">
+            <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg">
               <User className="h-5 w-5 mr-2" />
               {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
             </h3>
@@ -652,17 +652,17 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-200 via-purple-500 to-purple-200 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
 
           {/* Pets Information */}
-          <div className="section border-2 border-purple-200 shadow-lg">
-            <h3 className="section-title flex items-center bg-purple-100 -m-5 mb-4 p-4 rounded-t-lg">
+          <div className="section border-2 border-purple-600 shadow-lg">
+            <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg">
               <PawPrint className="h-5 w-5 mr-2" />
               {language === 'ar' ? 'معلومات الحيوانات الأليفة' : 'Pet Information'}
             </h3>
             <div className="pets-grid">
               {invoiceData.pets.map((pet) => (
-                <div key={pet.id} className="pet-card border-2 border-purple-100 shadow-md">
+                <div key={pet.id} className="pet-card border-2 border-purple-600 shadow-md">
                   <div className="pet-name">{pet.name}</div>
                   <div className="pet-details">
                     <div><strong>{language === 'ar' ? 'النوع:' : 'Type:'}</strong> {pet.type}</div>
@@ -674,25 +674,25 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-200 via-purple-500 to-purple-200 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
 
           {/* Service Items */}
-          <div className="section border-2 border-purple-200 shadow-lg">
-            <h3 className="section-title flex items-center bg-purple-100 -m-5 mb-4 p-4 rounded-t-lg">
+          <div className="section border-2 border-purple-600 shadow-lg">
+            <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg">
               <FileText className="h-5 w-5 mr-2" />
               {language === 'ar' ? 'تفاصيل الخدمات' : 'Service Details'}
             </h3>
             <div className="overflow-x-auto">
-              <table className="services-table w-full border-2 border-purple-200 rounded-lg overflow-hidden shadow-md">
+              <table className="services-table w-full border-2 border-purple-600 rounded-lg overflow-hidden shadow-md">
                 <thead>
-                  <tr className="bg-gradient-to-r from-purple-600 to-purple-800">
-                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-400">
+                  <tr className="bg-gradient-to-r from-purple-600 to-purple-600">
+                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-600">
                       {language === 'ar' ? 'الخدمة' : 'Service'}
                     </th>
-                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-400">
+                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-600">
                       {language === 'ar' ? 'الكمية' : 'Quantity'}
                     </th>
-                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-400">
+                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-600">
                       {language === 'ar' ? 'السعر' : 'Unit Price'}
                     </th>
                     <th className="text-white font-bold py-4 px-6 text-center">
@@ -702,7 +702,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 </thead>
                 <tbody>
                   {invoiceData.items.map((item, index) => (
-                    <tr key={item.id} className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-purple-50 transition-colors`}>
+                    <tr key={item.id} className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-purple-100 transition-colors`}>
                       <td className="font-medium py-4 px-6 text-left border-r border-gray-200">
                         {item.description}
                       </td>
@@ -712,7 +712,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                       <td className="py-4 px-6 text-center border-r border-gray-200 font-medium">
                         {formatCurrency(item.unitPrice)}
                       </td>
-                      <td className="py-4 px-6 text-center font-bold text-purple-700">
+                      <td className="py-4 px-6 text-center font-bold text-purple-600">
                         {formatCurrency(item.total)}
                       </td>
                     </tr>
@@ -723,39 +723,39 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-200 via-purple-500 to-purple-200 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
 
           {/* Totals */}
-          <div className="total-section border-4 border-purple-300 shadow-xl">
-            <h3 className="section-title text-center text-xl bg-purple-100 -m-6 mb-4 p-4 rounded-t-lg">
+          <div className="total-section border-4 border-purple-600 shadow-xl">
+            <h3 className="section-title text-center text-xl bg-purple-600 -m-6 mb-4 p-4 rounded-t-lg">
               {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
             </h3>
             <div className="space-y-3">
-              <div className="total-row border-b border-purple-200 pb-2">
+              <div className="total-row border-b border-purple-600 pb-2">
                 <span className="font-medium text-lg">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
                 <span className="font-medium text-lg">{formatCurrency(invoiceData.subtotal)}</span>
               </div>
               {invoiceData.discount > 0 && (
-                <div className="total-row text-green-600 border-b border-purple-200 pb-2">
+                <div className="total-row text-green-600 border-b border-purple-600 pb-2">
                   <span className="font-medium text-lg">{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
                   <span className="font-medium text-lg">-{formatCurrency(invoiceData.discount)}</span>
                 </div>
               )}
-              <div className="total-row border-b border-purple-200 pb-2">
+              <div className="total-row border-b border-purple-600 pb-2">
                 <span className="font-medium text-lg">{language === 'ar' ? 'الضريبة (15%):' : 'Tax (15%):'}</span>
                 <span className="font-medium text-lg">{formatCurrency(invoiceData.tax)}</span>
               </div>
-              <div className="final-total bg-gradient-to-r from-purple-100 to-purple-200 border-2 border-purple-400 rounded-lg">
+              <div className="final-total bg-gradient-to-r from-purple-600 to-purple-600 border-2 border-purple-600 rounded-lg">
                 <div className="flex justify-between items-center text-xl">
                   <span className="text-2xl font-bold">{language === 'ar' ? 'المجموع النهائي:' : 'Total Amount:'}</span>
-                  <span className="text-3xl font-black text-purple-800">{formatCurrency(invoiceData.total)}</span>
+                  <span className="text-3xl font-black text-purple-600">{formatCurrency(invoiceData.total)}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-200 via-purple-500 to-purple-200 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
 
           {/* Notes */}
           {invoiceData.notes && (

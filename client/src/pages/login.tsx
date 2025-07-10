@@ -169,7 +169,7 @@ export default function Login() {
             {/* Back button */}
             <button
               onClick={() => setLocation('/user-type-selection')}
-              className="absolute top-4 left-4 p-2 text-purple-600 hover:bg-purple-50 rounded-xl transition-all duration-300 border border-purple-200/50"
+              className="absolute top-4 left-4 p-2 text-purple-600 hover:bg-purple-100 rounded-xl transition-all duration-300 border border-purple-600/50"
               title={language === 'ar' ? 'اختر نوع الحساب' : 'Choose Account Type'}
             >
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
@@ -220,11 +220,11 @@ export default function Login() {
                             } as any}
                           />
                           <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-                            <Phone className="text-purple-500 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
+                            <Phone className="text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
                             <div className="w-px h-4 bg-gray-300"></div>
-                            <Mail className="text-purple-500 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
+                            <Mail className="text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
                           </div>
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -253,8 +253,8 @@ export default function Login() {
                               fontSize: '16px'
                             } as any}
                           />
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
+                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -266,7 +266,7 @@ export default function Login() {
                   type="submit" 
                   className="w-full text-white py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 
                     hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
-                    bg-gradient-to-r from-purple-800 to-purple-900 hover:from-purple-900 hover:to-purple-950" 
+                    bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:#852085950" 
                   disabled={loginMutation.isPending}
                   style={{ 
                     background: loginMutation.isPending ? '#6B21A8' : undefined,
@@ -286,7 +286,7 @@ export default function Login() {
                     onClick={() => setIsRegistering(true)}
                     className="w-full py-3 rounded-xl font-semibold border-2 transition-all duration-300 
                       hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
-                      bg-white hover:bg-purple-50 text-purple-600 border-purple-300 hover:border-purple-400"
+                      bg-white hover:bg-purple-100 text-purple-600 border-purple-600 hover:border-purple-600"
                   >
                     <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
                       <UserPlus className="w-5 h-5" />
@@ -386,7 +386,7 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-2 border-blue-200">
+              <div className="bg-gradient-to-r from-blue-50 #85208550 p-6 rounded-xl border-2 border-blue-200">
                 <h3 className="text-center text-lg font-semibold text-blue-800 mb-4" style={{ textAlign: getTextAlign(language) }}>
                   {language === 'ar' ? 'التحقق الأمني' : 'Security Verification'} *
                 </h3>
@@ -419,7 +419,7 @@ export default function Login() {
 
               <Button 
                 type="submit" 
-                className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
+                className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
                 disabled={registerMutation.isPending}
               >
                 {registerMutation.isPending ? (
@@ -436,7 +436,7 @@ export default function Login() {
                 type="button" 
                 variant="outline" 
                 onClick={() => setIsRegistering(false)}
-                className="w-full h-12 border-2 border-gray-300 hover:border-purple-400 hover:bg-purple-50 text-gray-700 hover:text-purple-700 font-medium rounded-xl transition-all duration-300"
+                className="w-full h-12 border-2 border-gray-300 hover:border-purple-600 hover:bg-purple-100 text-gray-700 hover:text-purple-600 font-medium rounded-xl transition-all duration-300"
               >
                 <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'ml-3 rotate-180' : 'mr-3'}`} />
                 {language === 'ar' ? 'العودة إلى تسجيل الدخول' : 'Back to Login'}

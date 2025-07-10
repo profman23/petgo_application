@@ -211,20 +211,20 @@ export default function Activity() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br #85208550 to-white flex items-center justify-center">
         <div className="text-purple-600">{t('loading')}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-white" dir={direction}>
+    <div className="min-h-screen bg-gradient-to-br #85208550 to-white" dir={direction}>
       {/* Header with Enhanced Logo and Back Button */}
-      <div className="bg-white shadow-lg border-b border-purple-100 p-4">
+      <div className="bg-white shadow-lg border-b border-purple-600 p-4">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50 px-3 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-2 text-purple-600 hover:text-purple-600 hover:bg-purple-100 px-3 py-2 rounded-lg transition-colors"
           >
             <ArrowIcon size={16} />
             <span className="text-sm font-medium">{t('back')}</span>
@@ -232,7 +232,7 @@ export default function Activity() {
           
           <div className="flex items-center gap-2">
             <LanguageSelector />
-            <div className="w-12 h-12 flex items-center justify-center bg-purple-50 rounded-xl border-2 border-purple-100 shadow-sm">
+            <div className="w-12 h-12 flex items-center justify-center #85208550 rounded-xl border-2 border-purple-600 shadow-sm">
               <img 
                 src={logoPath} 
                 alt="VETS VAN Logo" 
@@ -241,7 +241,7 @@ export default function Activity() {
             </div>
             <button
               onClick={handleLogout}
-              className="bg-purple-600 text-white hover:bg-purple-700 px-3 py-1 h-8 rounded-md font-medium transition-colors text-sm"
+              className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors text-sm"
             >
               {language === 'ar' ? 'خروج' : 'Logout'}
             </button>
@@ -251,13 +251,13 @@ export default function Activity() {
 
       {/* Main Content */}
       <div className="max-w-md mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-6 text-center text-purple-800" style={{ textAlign }}>
+        <h1 className="text-2xl font-bold mb-6 text-center text-purple-600" style={{ textAlign }}>
           {language === 'ar' ? 'سجل المواعيد' : 'Appointment History'}
         </h1>
 
         {bookings.length === 0 ? (
           <div className="text-center py-12">
-            <Calendar className="mx-auto w-16 h-16 text-purple-300 mb-4" />
+            <Calendar className="mx-auto w-16 h-16 text-purple-600 mb-4" />
             <h3 className="text-lg font-semibold text-purple-600 mb-2">
               {language === 'ar' ? 'لا توجد مواعيد سابقة' : 'No Previous Appointments'}
             </h3>
@@ -268,7 +268,7 @@ export default function Activity() {
         ) : (
           <div className="space-y-4">
             {bookings.map((booking: Booking) => (
-              <Card key={booking.id} className="bg-white shadow-sm border border-purple-100 hover:shadow-md transition-shadow">
+              <Card key={booking.id} className="bg-white shadow-sm border border-purple-600 hover:shadow-md transition-shadow">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
@@ -284,7 +284,7 @@ export default function Activity() {
 
                   <div className="space-y-2 mb-3">
                     <div className="flex items-center gap-2">
-                      <Calendar size={16} className="text-purple-500" />
+                      <Calendar size={16} className="text-purple-600" />
                       <span className="text-sm text-gray-700" style={{ textAlign }}>
                         {language === 'ar' ? 'التاريخ:' : 'Date:'} {booking.appointmentDate}
                       </span>
@@ -307,7 +307,7 @@ export default function Activity() {
 
                   {/* Rate Service Button for Completed Services */}
                   {booking.status === 'completed' && (
-                    <div className="pt-3 border-t border-purple-100">
+                    <div className="pt-3 border-t border-purple-600">
                       <Button
                         onClick={() => openReviewDialog(booking)}
                         variant="outline"
@@ -315,7 +315,7 @@ export default function Activity() {
                         className={`w-full font-semibold py-2 px-4 ${
                           isBookingReviewed(booking.id) 
                             ? 'text-green-600 border-green-200 bg-green-50 cursor-not-allowed opacity-75' 
-                            : 'text-purple-600 border-purple-200 hover:bg-purple-50'
+                            : 'text-purple-600 border-purple-600 hover:bg-purple-100'
                         }`}
                       >
                         <Star className={`w-4 h-4 mr-2 ${
@@ -338,9 +338,9 @@ export default function Activity() {
       {/* Review Dialog */}
       {showReviewDialog && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className="w-full max-w-md bg-white border-2 border-purple-200 shadow-2xl rounded-lg p-6 relative z-50">
+          <div className="w-full max-w-md bg-white border-2 border-purple-600 shadow-2xl rounded-lg p-6 relative z-50">
             <div className="flex justify-between items-center mb-4">
-              <h2 style={{ textAlign }} className="text-xl font-bold text-purple-800">
+              <h2 style={{ textAlign }} className="text-xl font-bold text-purple-600">
                 {language === 'ar' ? 'تقييم الخدمة' : 'Rate Service'}
               </h2>
               <button
@@ -371,7 +371,7 @@ export default function Activity() {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder={language === 'ar' ? 'شاركنا رأيك في الخدمة...' : 'Share your thoughts about the service...'}
-                  className="min-h-[80px] border-2 border-purple-200 focus:border-purple-400"
+                  className="min-h-[80px] border-2 border-purple-600 focus:border-purple-600"
                   style={{ textAlign }}
                 />
               </div>
@@ -381,14 +381,14 @@ export default function Activity() {
                 <Button
                   onClick={() => setShowReviewDialog(false)}
                   variant="outline"
-                  className="flex-1 border-2 border-purple-200 hover:bg-purple-50"
+                  className="flex-1 border-2 border-purple-600 hover:bg-purple-100"
                 >
                   {language === 'ar' ? 'إلغاء' : 'Cancel'}
                 </Button>
                 <Button
                   onClick={handleSubmitReview}
                   disabled={submitReviewMutation.isPending}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4"
+                  className="flex-1 bg-purple-600 hover:bg-purple-600 text-white font-semibold py-2 px-4"
                 >
                   {submitReviewMutation.isPending 
                     ? (language === 'ar' ? 'جاري الإرسال...' : 'Submitting...')

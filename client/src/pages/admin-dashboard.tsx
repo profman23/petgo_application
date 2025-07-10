@@ -718,7 +718,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('management')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full ${
                 activeTab === 'management'
-                  ? 'bg-purple-100 text-purple-900'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -736,7 +736,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('reports')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'reports'
-                  ? 'bg-purple-100 text-purple-900'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -747,7 +747,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('requests')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'requests'
-                  ? 'bg-purple-100 text-purple-900'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -758,7 +758,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('import')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'import'
-                  ? 'bg-purple-100 text-purple-900'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -781,7 +781,7 @@ export default function AdminDashboard() {
                         <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVanManagement')}</h3>
                         <button
                           onClick={() => setShowAddForm(!showAddForm)}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-600"
                         >
                           <UserPlus className="h-4 w-4 ml-2" />
                           {t('addNewVetsVan')}
@@ -796,7 +796,7 @@ export default function AdminDashboard() {
                               type="text"
                               value={newDriver.vetsvanCode}
                               onChange={(e) => setNewDriver({ ...newDriver, vetsvanCode: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                               placeholder="V001"
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -807,7 +807,7 @@ export default function AdminDashboard() {
                               type="text"
                               value={newDriver.vetsvanName}
                               onChange={(e) => setNewDriver({ ...newDriver, vetsvanName: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                               placeholder="VETS VAN 1"
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -818,7 +818,7 @@ export default function AdminDashboard() {
                               type="tel"
                               value={newDriver.phone}
                               onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                               placeholder="05xxxxxxxx"
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -829,7 +829,7 @@ export default function AdminDashboard() {
                               type="text"
                               value={newDriver.username}
                               onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                               placeholder={t('username')}
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -840,7 +840,7 @@ export default function AdminDashboard() {
                               type="password"
                               value={newDriver.password}
                               onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                               placeholder={t('password')}
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -875,7 +875,7 @@ export default function AdminDashboard() {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center">
                               <div className="flex-shrink-0">
-                                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                <div className="h-10 w-10 rounded-full bg-purple-600 flex items-center justify-center">
                                   <span className="text-sm font-medium text-purple-600">
                                     {driver.name?.charAt(0) || 'V'}
                                   </span>
@@ -904,7 +904,7 @@ export default function AdminDashboard() {
                                     isAvailable: !driver.isAvailable,
                                   })
                                 }
-                                className="text-sm text-purple-600 hover:text-purple-900"
+                                className="text-sm text-purple-600 hover:text-purple-600"
                               >
                                 {t('changeStatus')}
                               </button>
@@ -1004,7 +1004,7 @@ export default function AdminDashboard() {
                               </div>
                             </div>
 
-                            <div className="bg-gradient-to-r from-purple-400 to-purple-600 rounded-lg p-6 text-white">
+                            <div className="bg-gradient-to-r from-purple-600 to-purple-600 rounded-lg p-6 text-white">
                               <div className="flex items-center">
                                 <div className="flex-1">
                                   <h4 className="text-sm font-medium opacity-90">
@@ -1106,7 +1106,7 @@ export default function AdminDashboard() {
                         </p>
                         <button
                           onClick={() => setShowSmsDialog(true)}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-600"
                         >
                           <MessageSquare className="h-4 w-4 ml-2" />
                           {language === 'ar' ? 'إرسال رسالة نصية' : 'Send SMS Message'}
@@ -1174,14 +1174,14 @@ export default function AdminDashboard() {
                           
                           <CardContent className="space-y-4">
                             {/* VetsVan Info */}
-                            <div className="bg-purple-50 rounded-lg p-3">
+                            <div className="#85208550 rounded-lg p-3">
                               <div className="flex items-center gap-2 mb-2">
                                 <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
-                                <span className="font-medium text-purple-900">
+                                <span className="font-medium text-purple-600">
                                   {request.vetsvanCode}
                                 </span>
                               </div>
-                              <p className="text-sm text-purple-700">{request.vetsvanName}</p>
+                              <p className="text-sm text-purple-600">{request.vetsvanName}</p>
                             </div>
 
                             {/* Appointment Details */}
@@ -1263,7 +1263,7 @@ export default function AdminDashboard() {
                                   });
                                 }}
                                 disabled={updateBookingStatusMutation.isPending}
-                                className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                                className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085 bg-white"
                                 style={{ textAlign: getTextAlign(language) }}
                               >
                                 <option value="pending_review">
@@ -1318,7 +1318,7 @@ export default function AdminDashboard() {
                           onClick={() => setImportSubTab('products')}
                           className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                             importSubTab === 'products'
-                              ? 'border-purple-500 text-purple-600 bg-purple-50'
+                              ? 'border-purple-600 text-purple-600 #85208550'
                               : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                           }`}
                         >
@@ -1328,7 +1328,7 @@ export default function AdminDashboard() {
                           onClick={() => setImportSubTab('services')}
                           className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                             importSubTab === 'services'
-                              ? 'border-purple-500 text-purple-600 bg-purple-50'
+                              ? 'border-purple-600 text-purple-600 #85208550'
                               : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                           }`}
                         >
@@ -1337,7 +1337,7 @@ export default function AdminDashboard() {
                       </div>
                       
                       {/* Upload Section */}
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-400 transition-colors">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-purple-600 transition-colors">
                         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                         <p className="text-lg font-medium text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
                           {language === 'ar' 
@@ -1366,7 +1366,7 @@ export default function AdminDashboard() {
                             className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white cursor-pointer transition-colors ${
                               uploadingFile 
                                 ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-purple-600 hover:bg-purple-700'
+                                : 'bg-purple-600 hover:bg-purple-600'
                             }`}
                           >
                             {uploadingFile ? (
@@ -1418,7 +1418,7 @@ export default function AdminDashboard() {
                           </p>
                           <button 
                             onClick={() => downloadTemplate(importSubTab)}
-                            className="inline-flex items-center text-sm text-purple-600 hover:text-purple-800 hover:underline"
+                            className="inline-flex items-center text-sm text-purple-600 hover:text-purple-600 hover:underline"
                           >
                             <FileText className="h-4 w-4 mr-1" />
                             {language === 'ar' 
@@ -1528,7 +1528,7 @@ export default function AdminDashboard() {
                   step="any"
                   value={newLocation.latitude}
                   onChange={(e) => setNewLocation({ ...newLocation, latitude: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
                   placeholder="24.7136"
                   required
                   style={{ textAlign: getTextAlign(language) }}
@@ -1544,7 +1544,7 @@ export default function AdminDashboard() {
                   step="any"
                   value={newLocation.longitude}
                   onChange={(e) => setNewLocation({ ...newLocation, longitude: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
                   placeholder="46.6753"
                   required
                   style={{ textAlign: getTextAlign(language) }}
@@ -1562,7 +1562,7 @@ export default function AdminDashboard() {
                 <button
                   type="submit"
                   disabled={updateLocationMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {updateLocationMutation.isPending 
                     ? (language === 'ar' ? 'جاري التحديث...' : 'Updating...')
@@ -1609,7 +1609,7 @@ export default function AdminDashboard() {
                   ).map(([vetsvanInfo, reviews]) => (
                     <div key={vetsvanInfo} className="bg-gray-50 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-lg font-semibold text-purple-900">
+                        <h4 className="text-lg font-semibold text-purple-600">
                           {vetsvanInfo}
                         </h4>
                         <div className="flex items-center gap-2">
@@ -1691,7 +1691,7 @@ export default function AdminDashboard() {
             <div className="border-t p-4">
               <button
                 onClick={() => setShowReviewsDialog(false)}
-                className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-600"
               >
                 {language === 'ar' ? 'إغلاق' : 'Close'}
               </button>
@@ -1751,7 +1751,7 @@ export default function AdminDashboard() {
                 <button
                   type="submit"
                   disabled={sendSmsMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {sendSmsMutation.isPending 
                     ? (language === 'ar' ? 'جاري الإرسال...' : 'Sending...')

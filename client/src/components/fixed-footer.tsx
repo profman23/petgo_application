@@ -13,8 +13,8 @@ export function FixedFooter() {
       id: 'home',
       path: '/home',
       label: language === 'ar' ? 'الرئيسية' : 'Home',
-      bgColor: 'bg-gradient-to-br from-purple-700 via-purple-800 to-purple-900',
-      hoverColor: 'hover:from-purple-800 hover:via-purple-900 hover:to-purple-950',
+      bgColor: 'bg-gradient-to-br from-purple-600 via-#852085 to-purple-600',
+      hoverColor: 'hover:from-purple-600 hover:via-#852085 hover:#852085950',
       icon: '🏠'
     },
     {
@@ -29,8 +29,8 @@ export function FixedFooter() {
       id: 'account',
       path: '/account',
       label: language === 'ar' ? 'الحساب' : 'Account',
-      bgColor: 'bg-gradient-to-br from-purple-700 via-purple-800 to-purple-900',
-      hoverColor: 'hover:from-purple-800 hover:via-purple-900 hover:to-purple-950',
+      bgColor: 'bg-gradient-to-br from-purple-600 via-#852085 to-purple-600',
+      hoverColor: 'hover:from-purple-600 hover:via-#852085 hover:#852085950',
       icon: '🐱'
     }
   ];
@@ -74,7 +74,7 @@ export function FixedFooter() {
                   ${isActive ? 'bg-white/30 shadow-lg' : ''}
                 `}>
                   <span className={`text-2xl filter drop-shadow-sm ${
-                    item.id === 'activity' ? 'text-purple-800' : ''
+                    item.id === 'activity' ? 'text-purple-600' : ''
                   }`}>
                     {item.icon}
                   </span>

@@ -339,7 +339,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
       case 'confirmed':
         return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'in_progress':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
+        return 'bg-purple-600 text-purple-600 border-purple-600';
       case 'completed':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'cancelled':
@@ -579,9 +579,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             </span>
           </button>
           
-          <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 rounded-lg">
+          <div className="flex items-center gap-2 px-4 py-2 #85208550 border border-purple-600 rounded-lg">
             <Calendar className="w-4 h-4 text-purple-600" />
-            <span className="text-sm font-semibold text-purple-800">
+            <span className="text-sm font-semibold text-purple-600">
               {formatDate(selectedDate)}
             </span>
           </div>
@@ -609,7 +609,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         <table className="w-full border-collapse border border-gray-300">
           {/* VetsVan Header Row */}
           <thead>
-            <tr className="bg-purple-100">
+            <tr className="bg-purple-600">
               <th className="border border-gray-300 p-2 text-sm font-medium text-gray-700">
                 {language === 'ar' ? 'الوقت' : 'Time'}
               </th>
@@ -755,7 +755,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             <AlertDialogAction 
               onClick={confirmBooking}
               disabled={directBookingMutation.isPending}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg disabled:opacity-50"
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-600 text-white rounded-lg disabled:opacity-50"
             >
               {directBookingMutation.isPending ? (
                 <>
