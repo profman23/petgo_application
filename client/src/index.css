@@ -419,4 +419,23 @@
     color: white !important;
     stroke: white !important;
   }
+
+  /* Shake animation for contact icons */
+  @keyframes shake {
+    0% { transform: translateX(0) scale(1); }
+    10% { transform: translateX(-2px) rotate(-1deg) scale(1.02); }
+    20% { transform: translateX(2px) rotate(1deg) scale(1.02); }
+    30% { transform: translateX(-2px) rotate(-1deg) scale(1.02); }
+    40% { transform: translateX(2px) rotate(1deg) scale(1.02); }
+    50% { transform: translateX(-1px) rotate(-0.5deg) scale(1.01); }
+    60% { transform: translateX(1px) rotate(0.5deg) scale(1.01); }
+    70% { transform: translateX(-1px) rotate(-0.5deg) scale(1.01); }
+    80% { transform: translateX(1px) rotate(0.5deg) scale(1.01); }
+    90% { transform: translateX(0) scale(1.01); }
+    100% { transform: translateX(0) scale(1); }
+  }
+
+  .animate-shake {
+    animation: shake 0.5s ease-in-out infinite alternate;
+  }
 }

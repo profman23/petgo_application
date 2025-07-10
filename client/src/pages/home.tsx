@@ -769,7 +769,16 @@ export default function Home() {
                 href="https://wa.me/966535152250"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
+                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
+                style={{
+                  animation: 'shake 0.5s ease-in-out infinite alternate'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.animation = 'shake 0.3s ease-in-out infinite';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.animation = 'shake 0.5s ease-in-out infinite alternate';
+                }}
               >
                 <img 
                   src={whatsappIcon}
@@ -784,7 +793,16 @@ export default function Home() {
               {/* Phone Call Button */}
               <a
                 href="tel:+966535152250"
-                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
+                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
+                style={{
+                  animation: 'shake 0.5s ease-in-out infinite alternate'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.animation = 'shake 0.3s ease-in-out infinite';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.animation = 'shake 0.5s ease-in-out infinite alternate';
+                }}
               >
                 <img 
                   src={phoneIcon}

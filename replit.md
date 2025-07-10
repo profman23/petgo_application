@@ -735,6 +735,9 @@ Changelog:
 - July 10, 2025. REPLACED: WhatsApp icon with new 3D green WhatsApp logo (freepik__background__45619_1752165729974.png)
 - July 10, 2025. COMPLETED: Both contact icons now use high-quality 3D images with transparent backgrounds
 - July 10, 2025. ENLARGED: WhatsApp icon size increased from w-12 h-12 to w-14 h-14 for better visibility
+- July 10, 2025. IMPLEMENTED: Advanced shake animation for both contact icons with rotation, scaling, and smooth transitions
+- July 10, 2025. ENHANCED: Contact icons now feature continuous shake animation with hover acceleration for better UX
+- July 10, 2025. ADDED: CSS keyframes animation with scale, rotation, and translation effects for beautiful user interaction
 ```
 
 ## User Preferences
