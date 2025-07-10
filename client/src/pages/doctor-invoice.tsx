@@ -55,7 +55,9 @@ interface PetVital {
 
 interface BookingDetails {
   id: number;
-  customer: Customer;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
   pets: Pet[];
   appointmentDate: string;
   appointmentTime: string;
@@ -694,19 +696,19 @@ export default function DoctorInvoice() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('name')}
               </label>
-              <p className="text-gray-900">{booking.customer.firstName} {booking.customer.lastName}</p>
+              <p className="text-gray-900">{booking.customerName || 'غير محدد'}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('phone')}
               </label>
-              <p className="text-gray-900">{booking.customer.phone}</p>
+              <p className="text-gray-900">{booking.customerPhone || 'غير محدد'}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('email')}
               </label>
-              <p className="text-gray-900">{booking.customer.email}</p>
+              <p className="text-gray-900">{booking.customerEmail || 'غير محدد'}</p>
             </div>
           </div>
         </div>
@@ -1231,7 +1233,12 @@ export default function DoctorInvoice() {
         <InvoiceGeneratorProfessional
           invoiceData={{
             bookingId: booking.id,
-            customer: booking.customer,
+            customer: {
+              firstName: booking.customerName?.split(' ')[0] || '',
+              lastName: booking.customerName?.split(' ').slice(1).join(' ') || '',
+              phone: booking.customerPhone || '',
+              email: booking.customerEmail || ''
+            },
             pets: booking.pets,
             appointmentDate: booking.appointmentDate,
             appointmentTime: booking.appointmentTime,
