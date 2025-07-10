@@ -162,7 +162,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg">
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
@@ -180,7 +180,7 @@ export default function Login() {
               <img 
                 src={logoImage} 
                 alt="Vets Van - Mobile Veterinary Clinic" 
-                className="h-20 w-auto max-w-[240px] object-contain mx-auto transition-all duration-300 hover:scale-105"
+                className="h-24 w-auto max-w-[280px] object-contain mx-auto transition-all duration-300 hover:scale-105"
                 style={{ 
                   filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1)) contrast(1.05)',
                 }}
