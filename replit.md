@@ -681,6 +681,8 @@ Changelog:
 - July 10, 2025. FIXED: Removed duplicate translation keys to eliminate build warnings
 - July 10, 2025. DISABLED: Payment system integration in vetsvan-booking flow - customers no longer redirected to MyFatoorah payment links
 - July 10, 2025. MODIFIED: VetsVan booking system now redirects to customer activity page instead of payment gateway after successful booking
+- July 10, 2025. FIXED: Added doctor-login route path to App.tsx routing system for proper navigation
+- July 10, 2025. COMPLETED: Removed all MyFatoorah payment redirection code from both vetsvan-booking.tsx and vetsvan-availability-table.tsx
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book

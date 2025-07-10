@@ -119,6 +119,7 @@ function Router() {
           <Route path="/login/customer" component={Login} />
           <Route path="/otp-verification" component={OtpVerification} />
           <Route path="/login/doctor" component={DoctorLogin} />
+          <Route path="/doctor-login" component={DoctorLogin} />
           <Route path="/doctor-dashboard" component={DoctorActivity} />
           <Route path="/doctor-activity" component={DoctorActivity} />
           <Route path="/doctor-account" component={DoctorAccount} />
