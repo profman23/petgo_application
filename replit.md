@@ -740,6 +740,8 @@ Changelog:
 - July 10, 2025. ADDED: CSS keyframes animation with scale, rotation, and translation effects for beautiful user interaction
 - July 10, 2025. REFINED: Smooth gentle rotation animation - 2 degrees right/left rotation only, slower 2-second duration
 - July 10, 2025. OPTIMIZED: Removed complex movements, kept only simple smooth rotation for elegant user experience
+- July 10, 2025. ENHANCED: Increased rotation angle from 2 degrees to 5 degrees for more visible movement
+- July 10, 2025. IMPROVED: Contact icons now rotate more noticeably while maintaining smooth animation
 ```
 
 ## User Preferences
