@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <!-- Gradient matching VetsVan theme -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#852085;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    <!-- Clip path to create cropped effect -->
+    <clipPath id="cropSides">
+      <rect x="64" y="0" width="384" height="512"/>
+    </clipPath>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#bgGradient)"/>
+  
+  <!-- Cropped logo container -->
+  <g clip-path="url(#cropSides)">
+    <!-- VetsVan Logo scaled and positioned to appear cropped -->
+    <g transform="translate(-32, 96) scale(1.5)">
+      <!-- Stylized Van Shape -->
+      <rect x="80" y="160" width="280" height="120" rx="15" fill="white" opacity="0.95"/>
+      <rect x="70" y="170" width="20" height="100" rx="10" fill="white" opacity="0.9"/>
+      <rect x="350" y="170" width="20" height="100" rx="10" fill="white" opacity="0.9"/>
+      
+      <!-- VetsVan Text -->
+      <text x="220" y="210" font-family="Arial, sans-serif" font-size="32" font-weight="bold" 
+            text-anchor="middle" fill="#852085">VETS</text>
+      <text x="220" y="240" font-family="Arial, sans-serif" font-size="28" font-weight="bold" 
+            text-anchor="middle" fill="#7c3aed">VAN</text>
+      
+      <!-- Pet Icons -->
+      <circle cx="150" cy="190" r="12" fill="#852085"/>
+      <circle cx="150" cy="185" r="8" fill="white"/>
+      <circle cx="290" cy="190" r="12" fill="#852085"/>
+      <path d="M285 185 L290 180 L295 185 L292 190 L288 190 Z" fill="white"/>
+      
+      <!-- Medical Cross -->
+      <rect x="215" y="250" width="10" height="20" fill="#852085"/>
+      <rect x="210" y="255" width="20" height="10" fill="#852085"/>
+    </g>
+  </g>
+  
+  <!-- Subtle shadow effect on sides -->
+  <rect x="0" y="0" width="64" height="512" fill="black" opacity="0.1"/>
+  <rect x="448" y="0" width="64" height="512" fill="black" opacity="0.1"/>
+</svg>
