@@ -165,7 +165,7 @@ export default function Login() {
       <div className="w-full max-w-md">
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button and improved logo design */}
-          <div className="bg-white px-6 py-6 text-center relative rounded-t-lg border-b border-gray-100">
+          <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
             {/* Back button */}
             <button
               onClick={() => setLocation('/user-type-selection')}
@@ -175,18 +175,16 @@ export default function Login() {
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
             
-            {/* Logo Container - Clean White Background */}
+            {/* Logo Container - Seamless White Background */}
             <div className="mb-6 flex justify-center">
-              <div className="bg-white rounded-2xl p-4 transition-all duration-300 hover:scale-105">
-                <img 
-                  src={logoImage} 
-                  alt="Vets Van - Mobile Veterinary Clinic" 
-                  className="h-20 w-auto max-w-[240px] object-contain mx-auto"
-                  style={{ 
-                    filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1)) contrast(1.05)',
-                  }}
-                />
-              </div>
+              <img 
+                src={logoImage} 
+                alt="Vets Van - Mobile Veterinary Clinic" 
+                className="h-20 w-auto max-w-[240px] object-contain mx-auto transition-all duration-300 hover:scale-105"
+                style={{ 
+                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1)) contrast(1.05)',
+                }}
+              />
             </div>
 
           </div>
