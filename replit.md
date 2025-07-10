@@ -738,6 +738,8 @@ Changelog:
 - July 10, 2025. IMPLEMENTED: Advanced shake animation for both contact icons with rotation, scaling, and smooth transitions
 - July 10, 2025. ENHANCED: Contact icons now feature continuous shake animation with hover acceleration for better UX
 - July 10, 2025. ADDED: CSS keyframes animation with scale, rotation, and translation effects for beautiful user interaction
+- July 10, 2025. REFINED: Smooth gentle rotation animation - 2 degrees right/left rotation only, slower 2-second duration
+- July 10, 2025. OPTIMIZED: Removed complex movements, kept only simple smooth rotation for elegant user experience
 ```
 
 ## User Preferences

@@ -771,13 +771,13 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
                 style={{
-                  animation: 'shake 0.5s ease-in-out infinite alternate'
+                  animation: 'shake 2s ease-in-out infinite'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.animation = 'shake 0.3s ease-in-out infinite';
+                  e.currentTarget.style.animation = 'shake 1s ease-in-out infinite';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.animation = 'shake 0.5s ease-in-out infinite alternate';
+                  e.currentTarget.style.animation = 'shake 2s ease-in-out infinite';
                 }}
               >
                 <img 
@@ -795,13 +795,13 @@ export default function Home() {
                 href="tel:+966535152250"
                 className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
                 style={{
-                  animation: 'shake 0.5s ease-in-out infinite alternate'
+                  animation: 'shake 2s ease-in-out infinite'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.animation = 'shake 0.3s ease-in-out infinite';
+                  e.currentTarget.style.animation = 'shake 1s ease-in-out infinite';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.animation = 'shake 0.5s ease-in-out infinite alternate';
+                  e.currentTarget.style.animation = 'shake 2s ease-in-out infinite';
                 }}
               >
                 <img 
