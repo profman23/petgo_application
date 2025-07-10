@@ -17,6 +17,7 @@ import newestHouseImage from "@assets/freepik_assistant_1751364682430_1751364706
 import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
+import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -94,6 +95,10 @@ export default function Home() {
   const t = useTranslation();
   const textAlign = getTextAlign(language);
   const direction = getDirection(language);
+  
+  // Location permission modal state
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
 
   // Simple location state management
   const [locationInfo, setLocationInfo] = useState({
@@ -283,6 +288,14 @@ export default function Home() {
       try {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
+        
+        // Check if user has granted location permission before
+        const locationPermission = localStorage.getItem('locationPermissionGranted');
+        if (locationPermission !== 'true') {
+          setShowLocationModal(true);
+        } else {
+          setLocationPermissionGranted(true);
+        }
       } catch (error) {
         console.error('Error parsing user data:', error);
         localStorage.removeItem('user');
@@ -307,6 +320,18 @@ export default function Home() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setLocation('/');
+  };
+
+  const handleLocationPermissionAllow = () => {
+    setLocationPermissionGranted(true);
+    setShowLocationModal(false);
+    localStorage.setItem('locationPermissionGranted', 'true');
+    getCurrentLocation();
+  };
+
+  const handleLocationPermissionSkip = () => {
+    setShowLocationModal(false);
+    localStorage.setItem('locationPermissionGranted', 'skipped');
   };
 
   if (!user) {
@@ -735,6 +760,13 @@ export default function Home() {
 
 
       </div>
+      
+      {/* Location Permission Modal */}
+      <LocationPermissionModal
+        isOpen={showLocationModal}
+        onClose={handleLocationPermissionSkip}
+        onAllow={handleLocationPermissionAllow}
+      />
     </div>
   );
 }
