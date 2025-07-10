@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import logoImage from "@assets/IMG-20250415-WA0047_1751986059751.jpg";
 
 interface LoadingScreenProps {
   onComplete: () => void;
@@ -59,15 +58,6 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
             className="transition-all duration-300 ease-out"
           />
         </svg>
-        
-        {/* Logo in center */}
-        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg">
-          <img 
-            src={logoImage} 
-            alt="VetsVan Logo" 
-            className="w-full h-full object-cover"
-          />
-        </div>
       </div>
     </div>
   );

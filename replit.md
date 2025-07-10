@@ -752,6 +752,7 @@ Changelog:
 - July 10, 2025. SIMPLIFIED: Loading screen design - removed all text and animations, kept only logo with circular progress ring
 - July 10, 2025. OPTIMIZED: Clean white background with purple (#852085) progress circle around logo for minimal elegant loading experience
 - July 10, 2025. REFINED: Loading screen made smaller and thinner - logo reduced to w-24 h-24, stroke width reduced to 3px for cleaner minimal design
+- July 10, 2025. SIMPLIFIED: Removed logo from loading screen - now shows only purple circular progress indicator on white background
 ```
 
 ## User Preferences
