@@ -718,7 +718,7 @@ export default function DoctorInvoice() {
           <h2 className="text-xl font-semibold mb-4">
             {t('petInfo')}
           </h2>
-          {booking.pets.map((pet, index) => (
+          {booking.pets && booking.pets.length > 0 ? booking.pets.map((pet, index) => (
             <div key={index} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -759,7 +759,11 @@ export default function DoctorInvoice() {
                 </Button>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="text-center py-4 text-gray-500">
+              {language === 'ar' ? 'لا توجد حيوانات أليفة مسجلة' : 'No pets registered'}
+            </div>
+          )}
         </div>
 
         {/* Service Details */}

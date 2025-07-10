@@ -673,8 +673,8 @@ function TrackingModal({ booking, trackingData: initialTrackingData, language, o
           </div>
         </div>
 
-        <div className="p-6 max-h-96 overflow-y-auto">
-          {/* Countdown Display */}
+        <div className="p-6">
+          {/* Estimated Arrival Time Only */}
           <div className="text-center mb-6">
             <div className="relative w-32 h-32 mx-auto mb-4">
               {/* Progress Circle */}
@@ -703,77 +703,11 @@ function TrackingModal({ booking, trackingData: initialTrackingData, language, o
                   {formatCountdown()}
                 </div>
                 <div className="text-xs text-gray-600 mt-1">
-                  {language === 'ar' ? 'الوقت المتبقي' : 'Estimated time'}
+                  {language === 'ar' ? 'الوقت المتوقع للوصول' : 'Estimated arrival time'}
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Interactive Map */}
-          {trackingData?.customerLocation && trackingData?.vetsVanLocation && (
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold mb-3" style={{ color: '#852085' }}>
-                {language === 'ar' ? 'الخريطة التفاعلية' : 'Live Map'}
-              </h3>
-              <div className="h-48 rounded-lg overflow-hidden border-2" style={{ borderColor: '#852085' }}>
-                <MapContainer
-                  center={[
-                    (trackingData.customerLocation.latitude + trackingData.vetsVanLocation.latitude) / 2,
-                    (trackingData.customerLocation.longitude + trackingData.vetsVanLocation.longitude) / 2
-                  ]}
-                  zoom={13}
-                  style={{ height: '100%', width: '100%' }}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; OpenStreetMap contributors'
-                  />
-                  
-                  {/* Customer Location Marker */}
-                  <Marker 
-                    position={[trackingData.customerLocation.latitude, trackingData.customerLocation.longitude]}
-                    icon={customerIcon}
-                  >
-                    <Popup>
-                      <div className="text-center">
-                        <strong>{language === 'ar' ? 'موقعك' : 'Your Location'}</strong>
-                        <br />
-                        {trackingData.customerLocation.address}
-                      </div>
-                    </Popup>
-                  </Marker>
-
-                  {/* VetsVan Location Marker */}
-                  <Marker 
-                    position={[trackingData.vetsVanLocation.latitude, trackingData.vetsVanLocation.longitude]}
-                    icon={vetsVanIcon}
-                  >
-                    <Popup>
-                      <div className="text-center">
-                        <strong>{trackingData.driverName}</strong>
-                        <br />
-                        {trackingData.vetsVanCode}
-                        <br />
-                        {trackingData.carModel} - {trackingData.carColor}
-                      </div>
-                    </Popup>
-                  </Marker>
-                </MapContainer>
-              </div>
-              
-              {/* Distance and Status Info */}
-              <div className="mt-3 text-sm text-gray-600 space-y-1">
-                <div className="flex justify-between">
-                  <span>{language === 'ar' ? 'المسافة:' : 'Distance:'}</span>
-                  <span className="font-medium">{trackingData.distance?.toFixed(1)} كم</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>{language === 'ar' ? 'آخر تحديث:' : 'Last updated:'}</span>
-                  <span className="font-medium">{trackingData.lastUpdated}</span>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

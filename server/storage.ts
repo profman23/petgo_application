@@ -539,7 +539,10 @@ export class DatabaseStorage implements IStorage {
 
     return {
       ...booking,
-      user,
+      customerName: user.name || 'غير معروف',
+      customerPhone: user.phone || 'غير محدد',
+      customerEmail: user.email || 'غير محدد',
+      pets: selectedPetObjects,
       selectedPets: selectedPetObjects
     };
   }

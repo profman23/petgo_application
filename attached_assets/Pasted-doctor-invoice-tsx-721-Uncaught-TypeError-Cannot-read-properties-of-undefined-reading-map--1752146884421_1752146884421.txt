@@ -1,0 +1,23 @@
+doctor-invoice.tsx:721 Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at DoctorInvoice (doctor-invoice.tsx:721:25)
+
+doctor-invoice.tsx:721 Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at DoctorInvoice (doctor-invoice.tsx:721:25)
+chunk-RPCDYKBN.js?v=beb9efb6:14032 The above error occurred in the <DoctorInvoice> component:
+
+    at DoctorInvoice (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/doctor-invoice.tsx:37:22)
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=beb9efb6:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=beb9efb6:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=uxf8I3XBCiXuZRek_mmyr:118:22)
+    at Provider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-VURBQQ4S.js?v=beb9efb6:48:15)
+    at TooltipProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=beb9efb6:56:5)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=beb9efb6:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=uxf8I3XBCiXuZRek_mmyr:348:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-RPCDYKBN.js?v=beb9efb6:9129 Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at DoctorInvoice (doctor-invoice.tsx:721:25)
+﻿
