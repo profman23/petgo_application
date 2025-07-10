@@ -27,7 +27,7 @@ import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
-import { LoadingScreen } from "@/components/loading-screen";
+import LoadingScreen from "@/components/LoadingScreen";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -159,7 +159,7 @@ function App() {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <LoadingScreen onLoadingComplete={handleLoadingComplete} />
+          <LoadingScreen onComplete={handleLoadingComplete} />
         </TooltipProvider>
       </QueryClientProvider>
     );
