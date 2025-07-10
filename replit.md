@@ -744,6 +744,8 @@ Changelog:
 - July 10, 2025. IMPROVED: Contact icons now rotate more noticeably while maintaining smooth animation
 - July 10, 2025. UPDATED: Phone number changed from 05335152250 to 920011626 (966920011626 for WhatsApp and +966920011626 for calls)
 - July 10, 2025. COMPLETED: All contact links updated with new phone number across the application
+- July 10, 2025. REFINED: WhatsApp number updated to 0535152250 (no country code), Phone call number updated to 920011626 (no country code)
+- July 10, 2025. SIMPLIFIED: Removed all country code prefixes as requested - clean local numbers only
 ```
 
 ## User Preferences
