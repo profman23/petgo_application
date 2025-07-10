@@ -25,7 +25,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
     return () => clearInterval(interval);
   }, [onComplete]);
 
-  const circumference = 2 * Math.PI * 50; // radius = 50
+  const circumference = 2 * Math.PI * 35; // radius = 35
   const strokeDashoffset = circumference - (progress / 100) * circumference;
 
   return (
@@ -33,25 +33,25 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
       <div className="relative">
         {/* Circular Progress Ring */}
         <svg 
-          className="w-40 h-40 transform -rotate-90 absolute inset-0" 
-          viewBox="0 0 120 120"
+          className="w-24 h-24 transform -rotate-90 absolute inset-0" 
+          viewBox="0 0 80 80"
         >
           {/* Background circle */}
           <circle
-            cx="60"
-            cy="60"
-            r="50"
+            cx="40"
+            cy="40"
+            r="35"
             stroke="#f3e8ff"
-            strokeWidth="6"
+            strokeWidth="3"
             fill="transparent"
           />
           {/* Progress circle */}
           <circle
-            cx="60"
-            cy="60"
-            r="50"
+            cx="40"
+            cy="40"
+            r="35"
             stroke="#852085"
-            strokeWidth="6"
+            strokeWidth="3"
             fill="transparent"
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -61,7 +61,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         </svg>
         
         {/* Logo in center */}
-        <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-xl">
+        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-lg">
           <img 
             src={logoImage} 
             alt="VetsVan Logo" 
