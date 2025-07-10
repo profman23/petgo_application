@@ -15,6 +15,8 @@ import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753
 import newClinicImage from "@assets/freepik_assistant_1751363666289_1751363695395.png";
 import newestHouseImage from "@assets/freepik_assistant_1751364682430_1751364706224.png";
 import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png";
+import whatsappIcon from "@assets/freepik__a-3d-cartoon-style-whatsapp-icon-with-a-black-back__45613_1752162916171.png";
+import phoneIcon from "@assets/freepik__a-colorful-3d-cartoon-style-smartphone-viewed-from__45612_1752162916171.png";
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
@@ -757,6 +759,59 @@ export default function Home() {
               </span>
             </div>
           </button>
+
+          {/* Contact Section */}
+          <div className="mt-4 p-4 bg-white rounded-xl shadow-sm border border-purple-100">
+            <div className="text-center mb-3">
+              <h3 className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
+                {language === 'ar' ? 'تواصل معنا' : 'Contact Us'}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1" style={{ textAlign }}>
+                {language === 'ar' ? 'للاستفسارات والطوارئ' : 'For inquiries and emergencies'}
+              </p>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
+              {/* Phone Number Display */}
+              <div className="flex items-center bg-gray-50 px-3 py-2 rounded-lg">
+                <span className="text-lg font-bold text-gray-800 mr-2" dir="ltr">
+                  009665335152250
+                </span>
+              </div>
+              
+              {/* WhatsApp Button */}
+              <a
+                href="https://wa.me/9665335152250"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-12 h-12 bg-white rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 border border-green-200 hover:border-green-300"
+              >
+                <img 
+                  src={whatsappIcon}
+                  alt="WhatsApp"
+                  className="w-8 h-8 object-contain"
+                />
+              </a>
+              
+              {/* Phone Call Button */}
+              <a
+                href="tel:+9665335152250"
+                className="flex items-center justify-center w-12 h-12 bg-white rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 border border-blue-200 hover:border-blue-300"
+              >
+                <img 
+                  src={phoneIcon}
+                  alt="Phone Call"
+                  className="w-8 h-8 object-contain"
+                />
+              </a>
+            </div>
+            
+            <div className="text-center mt-3">
+              <p className="text-xs text-gray-500" style={{ textAlign }}>
+                {language === 'ar' ? 'متاح 24/7 لخدمتكم' : 'Available 24/7 to serve you'}
+              </p>
+            </div>
+          </div>
         </div>
 
 
