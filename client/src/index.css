@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Leaflet map styling fixes */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+.leaflet-popup-content-wrapper {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
 /* Custom button override to remove shadcn/ui styling */
 .custom-purple-button {
   background: linear-gradient(to right, #7c3aed, #6b21a8) !important;

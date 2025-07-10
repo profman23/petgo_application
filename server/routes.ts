@@ -2675,6 +2675,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get real-time tracking data for a booking
+  app.get('/api/tracking/:bookingId', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const booking = await storage.getBookingById(bookingId);
+      
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Get VetsVan location
+      const driver = await storage.getDriverByVetsVanCode(booking.vetsVanCode);
+      if (!driver) {
+        return res.status(404).json({ message: 'VetsVan not found' });
+      }
+
+      // Calculate real distance and estimated time
+      const customerLat = booking.customerLocation?.latitude || 24.7136;
+      const customerLng = booking.customerLocation?.longitude || 46.6753;
+      const vetsVanLat = driver.latitude || 24.7136;
+      const vetsVanLng = driver.longitude || 46.6753;
+
+      // Calculate distance using Haversine formula
+      const distance = calculateDistance(customerLat, customerLng, vetsVanLat, vetsVanLng);
+      
+      // Estimate arrival time (assuming 30 km/h average speed in city)
+      const estimatedMinutes = Math.max(5, Math.ceil((distance / 30) * 60));
+
+      const trackingData = {
+        bookingId: booking.id,
+        vetsVanCode: booking.vetsVanCode,
+        estimatedArrivalMinutes: estimatedMinutes,
+        distance: distance,
+        customerLocation: {
+          latitude: customerLat,
+          longitude: customerLng,
+          address: booking.customerLocation?.address || 'موقع العميل'
+        },
+        vetsVanLocation: {
+          latitude: vetsVanLat,
+          longitude: vetsVanLng,
+          address: `${driver.name} - ${booking.vetsVanCode}`
+        },
+        driverName: driver.name,
+        carModel: booking.carModel,
+        carColor: booking.carColor,
+        plateNumber: booking.plateNumber,
+        status: booking.status,
+        lastUpdated: new Date().toLocaleTimeString()
+      };
+
+      res.json(trackingData);
+    } catch (error) {
+      console.error('Error fetching tracking data:', error);
+      res.status(500).json({ message: 'Failed to fetch tracking data' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

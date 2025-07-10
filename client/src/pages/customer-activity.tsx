@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FixedFooter } from '@/components/fixed-footer';
@@ -170,20 +173,14 @@ export default function CustomerActivity() {
   // Open tracking dialog
   const openTrackingDialog = async (booking: Booking) => {
     try {
-      // Simulate fetching tracking data (in real app, get from API)
-      const fakeTrackingData = {
-        estimatedArrivalMinutes: Math.floor(Math.random() * 30) + 15, // 15-45 minutes
-        vetsVanCode: booking.vetsVanCode,
-        driverName: "د. أحمد محمد",
-        currentLocation: "في الطريق إليك",
-        lastUpdated: new Date().toLocaleTimeString(),
-        status: "on_the_way"
-      };
+      // Fetch real tracking data from API
+      const realTrackingData = await apiRequest(`/api/tracking/${booking.id}`);
       
-      setTrackingData(fakeTrackingData);
+      setTrackingData(realTrackingData);
       setSelectedTrackingBooking(booking);
       setShowTrackingDialog(true);
     } catch (error) {
+      console.error('Tracking error:', error);
       toast({
         title: language === 'ar' ? 'خطأ' : 'Error',
         description: language === 'ar' ? 'فشل في تحميل بيانات التتبع' : 'Failed to load tracking data',
@@ -566,15 +563,53 @@ export default function CustomerActivity() {
   );
 }
 
-// Tracking Modal Component with Live Countdown
-function TrackingModal({ booking, trackingData, language, onClose }: {
+// Custom icons for map markers
+const customerIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+const vetsVanIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+// Tracking Modal Component with Live Countdown and Interactive Map
+function TrackingModal({ booking, trackingData: initialTrackingData, language, onClose }: {
   booking: Booking;
   trackingData: any;
   language: string;
   onClose: () => void;
 }) {
-  const [remainingMinutes, setRemainingMinutes] = useState(trackingData.estimatedArrivalMinutes);
+  const [remainingMinutes, setRemainingMinutes] = useState(initialTrackingData?.estimatedArrivalMinutes || 0);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+  // Fetch real-time tracking data
+  const { data: liveTrackingData } = useQuery({
+    queryKey: ['/api/tracking', booking.id],
+    queryFn: () => apiRequest(`/api/tracking/${booking.id}`),
+    refetchInterval: 5000, // Update every 5 seconds
+    enabled: !!booking.id,
+    initialData: initialTrackingData
+  });
+
+  const trackingData = liveTrackingData || initialTrackingData;
+
+  // Update countdown when tracking data changes
+  useEffect(() => {
+    if (trackingData?.estimatedArrivalMinutes) {
+      setRemainingMinutes(trackingData.estimatedArrivalMinutes);
+      setRemainingSeconds(0);
+    }
+  }, [trackingData]);
 
   // Countdown effect
   useEffect(() => {
@@ -605,9 +640,10 @@ function TrackingModal({ booking, trackingData, language, onClose }: {
   };
 
   const getProgressPercentage = () => {
+    if (!trackingData?.estimatedArrivalMinutes) return 0;
     const totalSeconds = trackingData.estimatedArrivalMinutes * 60;
     const currentSeconds = remainingMinutes * 60 + remainingSeconds;
-    return ((totalSeconds - currentSeconds) / totalSeconds) * 100;
+    return Math.max(0, ((totalSeconds - currentSeconds) / totalSeconds) * 100);
   };
 
   return (
@@ -637,58 +673,107 @@ function TrackingModal({ booking, trackingData, language, onClose }: {
           </div>
         </div>
 
-        <div className="p-6">
-          {/* Countdown Display Only */}
-          <div className="text-center">
-            <div className="relative w-40 h-40 mx-auto mb-6">
+        <div className="p-6 max-h-96 overflow-y-auto">
+          {/* Countdown Display */}
+          <div className="text-center mb-6">
+            <div className="relative w-32 h-32 mx-auto mb-4">
               {/* Progress Circle */}
-              <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
+              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128">
                 <circle
-                  cx="80" cy="80" r="70"
+                  cx="64" cy="64" r="56"
                   fill="none"
                   stroke="#e5e7eb"
-                  strokeWidth="12"
+                  strokeWidth="8"
                 />
                 <circle
-                  cx="80" cy="80" r="70"
+                  cx="64" cy="64" r="56"
                   fill="none"
                   stroke="#852085"
-                  strokeWidth="12"
+                  strokeWidth="8"
                   strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 70}`}
-                  strokeDashoffset={`${2 * Math.PI * 70 * (1 - getProgressPercentage() / 100)}`}
+                  strokeDasharray={`${2 * Math.PI * 56}`}
+                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - getProgressPercentage() / 100)}`}
                   className="transition-all duration-1000"
                 />
               </svg>
               
               {/* Countdown Text */}
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-3xl font-bold" style={{ color: '#852085' }}>
+                <div className="text-2xl font-bold" style={{ color: '#852085' }}>
                   {formatCountdown()}
                 </div>
-                <div className="text-sm text-gray-500 mt-2">
-                  {remainingMinutes === 0 && remainingSeconds === 0 
-                    ? '' 
-                    : (language === 'ar' ? 'متبقي' : 'remaining')
-                  }
+                <div className="text-xs text-gray-600 mt-1">
+                  {language === 'ar' ? 'الوقت المتبقي' : 'Estimated time'}
                 </div>
               </div>
             </div>
-            
-            <h3 className="text-xl font-semibold mb-2" style={{ color: '#852085' }}>
-              {language === 'ar' 
-                ? 'الوقت المقدر للوصول' 
-                : 'Estimated Arrival Time'
-              }
-            </h3>
-            
-            <p className="text-gray-600 text-sm">
-              {language === 'ar' 
-                ? 'سيصل الطبيب البيطري قريباً إلى موقعك' 
-                : 'The veterinary doctor will arrive at your location soon'
-              }
-            </p>
           </div>
+
+          {/* Interactive Map */}
+          {trackingData?.customerLocation && trackingData?.vetsVanLocation && (
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-3" style={{ color: '#852085' }}>
+                {language === 'ar' ? 'الخريطة التفاعلية' : 'Live Map'}
+              </h3>
+              <div className="h-48 rounded-lg overflow-hidden border-2" style={{ borderColor: '#852085' }}>
+                <MapContainer
+                  center={[
+                    (trackingData.customerLocation.latitude + trackingData.vetsVanLocation.latitude) / 2,
+                    (trackingData.customerLocation.longitude + trackingData.vetsVanLocation.longitude) / 2
+                  ]}
+                  zoom={13}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; OpenStreetMap contributors'
+                  />
+                  
+                  {/* Customer Location Marker */}
+                  <Marker 
+                    position={[trackingData.customerLocation.latitude, trackingData.customerLocation.longitude]}
+                    icon={customerIcon}
+                  >
+                    <Popup>
+                      <div className="text-center">
+                        <strong>{language === 'ar' ? 'موقعك' : 'Your Location'}</strong>
+                        <br />
+                        {trackingData.customerLocation.address}
+                      </div>
+                    </Popup>
+                  </Marker>
+
+                  {/* VetsVan Location Marker */}
+                  <Marker 
+                    position={[trackingData.vetsVanLocation.latitude, trackingData.vetsVanLocation.longitude]}
+                    icon={vetsVanIcon}
+                  >
+                    <Popup>
+                      <div className="text-center">
+                        <strong>{trackingData.driverName}</strong>
+                        <br />
+                        {trackingData.vetsVanCode}
+                        <br />
+                        {trackingData.carModel} - {trackingData.carColor}
+                      </div>
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+              
+              {/* Distance and Status Info */}
+              <div className="mt-3 text-sm text-gray-600 space-y-1">
+                <div className="flex justify-between">
+                  <span>{language === 'ar' ? 'المسافة:' : 'Distance:'}</span>
+                  <span className="font-medium">{trackingData.distance?.toFixed(1)} كم</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{language === 'ar' ? 'آخر تحديث:' : 'Last updated:'}</span>
+                  <span className="font-medium">{trackingData.lastUpdated}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
