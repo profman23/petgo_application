@@ -17,7 +17,7 @@ import newestHouseImage from "@assets/freepik_assistant_1751364682430_1751364706
 import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png";
 // SVG icons without background
 const whatsappIcon = '/icons/whatsapp-3d.svg';
-const phoneIcon = '/icons/phone-3d.svg';
+import phoneIcon from '@assets/freepik__background__45618_1752165541475.png';
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
