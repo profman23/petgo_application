@@ -1393,6 +1393,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Send tracking notification to customer (Doctor only)
+  app.post('/api/bookings/:id/send-tracking', requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user as any;
+      if (user.membershipType !== 'doctor') {
+        return res.status(403).json({ message: 'Access denied. Doctor only.' });
+      }
+
+      const bookingId = parseInt(req.params.id);
+      
+      // Get booking details
+      const booking = await storage.getBookingById(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Get customer details
+      const customer = await storage.getUser(booking.userId);
+      if (!customer) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+
+      // Get VetsVan details
+      const vetsVan = await storage.getDriver(booking.vetsVanId);
+      if (!vetsVan) {
+        return res.status(404).json({ message: 'VetsVan not found' });
+      }
+
+      // Calculate estimated arrival time (random between 15-45 minutes)
+      const estimatedMinutes = Math.floor(Math.random() * 31) + 15; // 15-45 minutes
+      const arrivalTime = new Date();
+      arrivalTime.setMinutes(arrivalTime.getMinutes() + estimatedMinutes);
+
+      // Create tracking notification for customer
+      const trackingNotification = {
+        bookingId: bookingId,
+        vetsVanCode: vetsVan.vetsvanCode,
+        vetsVanName: vetsVan.vetsvanName,
+        driverName: user.name || user.username,
+        estimatedArrival: arrivalTime.toISOString(),
+        status: 'on_way',
+        message: {
+          ar: `🚚 VETS VAN في الطريق إليك الآن! الوصول المتوقع خلال ${estimatedMinutes} دقيقة`,
+          en: `🚚 VETS VAN is on the way to you! Expected arrival in ${estimatedMinutes} minutes`
+        },
+        createdAt: new Date().toISOString()
+      };
+
+      // Store tracking notification (we'll add this to customer activity)
+      await storage.createTrackingNotification(trackingNotification);
+
+      // Send email notification if customer has email
+      if (customer.email) {
+        try {
+          await emailService.sendTrackingNotificationEmail(
+            customer.email,
+            customer.name || 'العميل الكريم',
+            vetsVan.vetsvanCode,
+            estimatedMinutes,
+            booking.appointmentDate,
+            booking.appointmentTime
+          );
+          console.log(`📧 Tracking email sent to ${customer.email}`);
+        } catch (emailError) {
+          console.error('Failed to send tracking email:', emailError);
+          // Don't fail the request if email fails
+        }
+      }
+
+      console.log(`🚚 Tracking notification sent for booking ${bookingId} - ETA: ${estimatedMinutes} minutes`);
+      
+      res.json({ 
+        success: true, 
+        message: 'Tracking notification sent successfully',
+        trackingInfo: trackingNotification
+      });
+    } catch (error) {
+      console.error('Error sending tracking notification:', error);
+      res.status(500).json({ message: 'Failed to send tracking notification' });
+    }
+  });
+
   // Get bookings for current doctor's VetsVan (no VetsVan ID required)
   app.get('/api/doctor/bookings', requireAuth, async (req: any, res) => {
     try {

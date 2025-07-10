@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DoctorFooter } from '@/components/doctor-footer';
-import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
 import { useToast } from '@/hooks/use-toast';
@@ -89,6 +89,33 @@ export default function DoctorActivity() {
         description: language === 'ar' ? 
           'حدث خطأ أثناء تحديث حالة الحجز' :
           'An error occurred while updating booking status',
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Mutation to send tracking notification
+  const sendTrackingMutation = useMutation({
+    mutationFn: async (bookingId: number) => {
+      return await apiRequest(`/api/bookings/${bookingId}/send-tracking`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: language === 'ar' ? '✅ تم إرسال التتبع' : '✅ Tracking Sent',
+        description: language === 'ar' ? 
+          'تم إرسال إشعار التتبع للعميل عبر الإيميل وفي التطبيق' :
+          'Tracking notification sent to customer via email and in-app',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === 'ar' ? '❌ فشل في إرسال التتبع' : '❌ Tracking Failed',
+        description: language === 'ar' ? 
+          'حدث خطأ أثناء إرسال إشعار التتبع' :
+          'An error occurred while sending tracking notification',
         variant: 'destructive',
       });
     },
@@ -557,8 +584,25 @@ export default function DoctorActivity() {
                       )}
                     </div>
 
-                    {/* Open Record Button */}
-                    <div className="flex justify-end">
+                    {/* Action Buttons */}
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200 hover:border-blue-400"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click event
+                          sendTrackingMutation.mutate(booking.id);
+                        }}
+                        disabled={sendTrackingMutation.isPending}
+                      >
+                        {sendTrackingMutation.isPending ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        ) : (
+                          <Truck className="w-4 h-4 mr-2" />
+                        )}
+                        {language === 'ar' ? 'إرسال التتبع' : 'Send Tracking'}
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

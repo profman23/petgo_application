@@ -774,6 +774,142 @@ VETS VAN - رعاية بيطرية محترفة في منزلك
     `;
   }
 
+  async sendTrackingNotificationEmail(
+    userEmail: string,
+    userName: string,
+    vetsVanCode: string,
+    estimatedMinutes: number,
+    appointmentDate: string,
+    appointmentTime: string
+  ): Promise<boolean> {
+    if (!userEmail) {
+      console.log('Email not provided, skipping tracking notification email');
+      return false;
+    }
+
+    const template: EmailTemplate = {
+      to: userEmail,
+      subject: '🚚 VETS VAN في الطريق إليك الآن! - On the way to you!',
+      html: this.generateTrackingNotificationHTML(userName, vetsVanCode, estimatedMinutes, appointmentDate, appointmentTime),
+      text: this.generateTrackingNotificationText(userName, vetsVanCode, estimatedMinutes, appointmentDate, appointmentTime)
+    };
+
+    return await this.sendEmail(template);
+  }
+
+  private generateTrackingNotificationHTML(
+    userName: string,
+    vetsVanCode: string,
+    estimatedMinutes: number,
+    appointmentDate: string,
+    appointmentTime: string
+  ): string {
+    return `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>VETS VAN في الطريق إليك</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+          .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .header { background: linear-gradient(135deg, #059669, #10B981); color: white; padding: 30px; text-align: center; }
+          .content { padding: 30px; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+          .tracking-card { background-color: #f0f9ff; border: 2px solid #059669; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+          .eta-time { font-size: 24px; font-weight: bold; color: #059669; background-color: #ecfdf5; padding: 15px; border-radius: 8px; margin: 15px 0; }
+          h1 { margin: 0; font-size: 28px; }
+          h2 { color: #059669; margin-top: 0; }
+          .van-info { background-color: #f9fafb; padding: 15px; border-radius: 8px; margin: 15px 0; }
+          .preparation-list { background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 15px; margin: 15px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>🚚 في الطريق إليك!</h1>
+            <p>VETS VAN - العيادة البيطرية المتنقلة</p>
+          </div>
+          <div class="content">
+            <h2>عزيزي ${userName},</h2>
+            <p>نحن سعداء لإبلاغك أن فريقنا البيطري في الطريق إليك الآن!</p>
+            
+            <div class="tracking-card">
+              <h3>📍 معلومات الوصول</h3>
+              <div class="van-info">
+                <p><strong>🚐 العيادة المتنقلة:</strong> ${vetsVanCode}</p>
+                <p><strong>📅 موعدك:</strong> ${appointmentDate}</p>
+                <p><strong>🕐 الوقت:</strong> ${appointmentTime}</p>
+              </div>
+              
+              <div class="eta-time">
+                ⏰ الوصول المتوقع خلال ${estimatedMinutes} دقيقة
+              </div>
+            </div>
+
+            <div class="preparation-list">
+              <h4>🎯 يرجى التحضير للزيارة:</h4>
+              <ul style="text-align: right;">
+                <li>📱 تأكد من تفعيل الهاتف لاستقبال اتصال الطبيب</li>
+                <li>🏠 كن متواجداً في الموقع المحدد</li>
+                <li>🐾 جهز حيوانك الأليف وأبقه في مكان آمن</li>
+                <li>📋 أحضر أي تقارير طبية أو أدوية سابقة</li>
+                <li>🗝️ تأكد من سهولة الوصول إلى المكان</li>
+              </ul>
+            </div>
+
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
+              <p><strong>📞 ملاحظة مهمة:</strong></p>
+              <p>سيتصل بك الطبيب البيطري قبل الوصول مباشرة للتأكيد والتنسيق</p>
+            </div>
+          </div>
+          <div class="footer">
+            <p>🐾 VETS VAN - نحن في طريقنا إليك 🐾</p>
+            <p>لأي استفسار عاجل، تواصل معنا عبر التطبيق</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  private generateTrackingNotificationText(
+    userName: string,
+    vetsVanCode: string,
+    estimatedMinutes: number,
+    appointmentDate: string,
+    appointmentTime: string
+  ): string {
+    return `
+🚚 VETS VAN في الطريق إليك الآن!
+
+عزيزي ${userName},
+
+نحن سعداء لإبلاغك أن فريقنا البيطري في الطريق إليك الآن!
+
+📍 معلومات الوصول:
+🚐 العيادة المتنقلة: ${vetsVanCode}
+📅 موعدك: ${appointmentDate}
+🕐 الوقت: ${appointmentTime}
+
+⏰ الوصول المتوقع خلال ${estimatedMinutes} دقيقة
+
+🎯 يرجى التحضير للزيارة:
+- تأكد من تفعيل الهاتف لاستقبال اتصال الطبيب
+- كن متواجداً في الموقع المحدد
+- جهز حيوانك الأليف وأبقه في مكان آمن
+- أحضر أي تقارير طبية أو أدوية سابقة
+- تأكد من سهولة الوصول إلى المكان
+
+📞 ملاحظة مهمة:
+سيتصل بك الطبيب البيطري قبل الوصول مباشرة للتأكيد والتنسيق
+
+VETS VAN - نحن في طريقنا إليك
+لأي استفسار عاجل، تواصل معنا عبر التطبيق
+    `;
+  }
+
 }
 
 export const emailService = new EmailService();

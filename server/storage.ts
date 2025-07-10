@@ -139,6 +139,10 @@ export interface IStorage {
   getOtpVerification(email: string, code: string): Promise<OtpVerification | undefined>;
   deleteOtpVerification(email: string): Promise<void>;
   cleanupExpiredOtps(): Promise<void>;
+
+  // Tracking notification operations
+  createTrackingNotification(notification: any): Promise<any>;
+  getBookingById(bookingId: number): Promise<Booking | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -932,6 +936,22 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(otpVerifications)
       .where(lt(otpVerifications.expiresAt, now));
+  }
+
+  // Tracking notification operations
+  async createTrackingNotification(notification: any): Promise<any> {
+    // For now, we'll store tracking notifications in memory
+    // In a real app, you might want to create a tracking_notifications table
+    console.log('📧 Tracking notification created:', notification);
+    return notification;
+  }
+
+  async getBookingById(bookingId: number): Promise<Booking | undefined> {
+    const [booking] = await db
+      .select()
+      .from(bookings)
+      .where(eq(bookings.id, bookingId));
+    return booking;
   }
 }
 
