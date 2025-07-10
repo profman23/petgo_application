@@ -774,7 +774,7 @@ export default function Home() {
                 <img 
                   src={whatsappIcon}
                   alt="WhatsApp"
-                  className="w-12 h-12 object-contain"
+                  className="w-14 h-14 object-contain"
                   style={{
                     filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
                   }}

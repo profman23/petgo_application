@@ -734,6 +734,7 @@ Changelog:
 - July 10, 2025. ENHANCED: Phone icon now displays colorful 3D smartphone with transparent background
 - July 10, 2025. REPLACED: WhatsApp icon with new 3D green WhatsApp logo (freepik__background__45619_1752165729974.png)
 - July 10, 2025. COMPLETED: Both contact icons now use high-quality 3D images with transparent backgrounds
+- July 10, 2025. ENLARGED: WhatsApp icon size increased from w-12 h-12 to w-14 h-14 for better visibility
 ```
 
 ## User Preferences
