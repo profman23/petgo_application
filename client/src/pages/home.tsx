@@ -713,7 +713,7 @@ export default function Home() {
           <button
             className="w-full font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer"
             style={{ 
-              background: 'linear-gradient(to right, #7c3aed, #6b21a8)',
+              background: 'linear-gradient(to right, #852085, #6d1a6d)',
               color: 'white',
               border: 'none',
               outline: 'none'
