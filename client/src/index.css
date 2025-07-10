@@ -353,4 +353,70 @@
   .to-purple-700 { --tw-gradient-to: var(--purple-700) !important; }
   .to-purple-800 { --tw-gradient-to: var(--purple-800) !important; }
   .to-purple-900 { --tw-gradient-to: var(--purple-900) !important; }
+
+  /* Fix button text visibility - ensure white text on purple backgrounds */
+  .bg-purple-600.text-purple-600,
+  .bg-purple-700.text-purple-700,
+  .bg-purple-800.text-purple-800 {
+    color: white !important;
+  }
+
+  .hover\\:bg-purple-600:hover.text-purple-600,
+  .hover\\:bg-purple-700:hover.text-purple-700,
+  .hover\\:bg-purple-800:hover.text-purple-800 {
+    color: white !important;
+  }
+
+  /* Ensure all purple background buttons have white text */
+  .bg-purple-100,
+  .bg-purple-200,
+  .bg-purple-300,
+  .bg-purple-400,
+  .bg-purple-500,
+  .bg-purple-600,
+  .bg-purple-700,
+  .bg-purple-800,
+  .bg-purple-900 {
+    color: white !important;
+  }
+
+  /* Fix specific button combinations that cause text visibility issues */
+  button.bg-purple-600.text-purple-600,
+  button.bg-purple-700.text-purple-700,
+  button.bg-purple-800.text-purple-800,
+  .bg-purple-600.border-purple-600.text-purple-600,
+  .bg-purple-700.border-purple-700.text-purple-700,
+  .bg-purple-800.border-purple-800.text-purple-800 {
+    color: white !important;
+  }
+
+  button.bg-purple-600.text-purple-600 svg,
+  button.bg-purple-700.text-purple-700 svg,
+  button.bg-purple-800.text-purple-800 svg,
+  .bg-purple-600.border-purple-600.text-purple-600 svg,
+  .bg-purple-700.border-purple-700.text-purple-700 svg,
+  .bg-purple-800.border-purple-800.text-purple-800 svg {
+    color: white !important;
+    stroke: white !important;
+  }
+
+  /* Additional specific fixes for button text visibility */
+  button.bg-purple-600,
+  button.bg-purple-700,
+  button.bg-purple-800,
+  .bg-purple-600.border-purple-600,
+  .bg-purple-700.border-purple-700,
+  .bg-purple-800.border-purple-800 {
+    color: white !important;
+  }
+
+  button.bg-purple-600 *,
+  button.bg-purple-700 *,
+  button.bg-purple-800 *,
+  .bg-purple-600.border-purple-600 *,
+  .bg-purple-700.border-purple-700 *,
+  .bg-purple-800.border-purple-800 * {
+    color: white !important;
+    stroke: white !important;
+  }
 }

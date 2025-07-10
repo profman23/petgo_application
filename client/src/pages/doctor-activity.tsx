@@ -606,7 +606,7 @@ export default function DoctorActivity() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-purple-600 border-purple-600 text-purple-600 hover:bg-purple-600 hover:border-purple-600"
+                        className="bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent card click event
                           setLocation(`/doctor-invoice/${booking.id}`);
