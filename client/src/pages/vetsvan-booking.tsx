@@ -367,7 +367,6 @@ export default function VetsVanBooking() {
       const result = await apiRequest('POST', '/api/bookings', bookingData);
 
       console.log('Booking successful:', result);
-      console.log('✅ About to start payment redirection process...');
       
       toast({
         title: language === 'ar' ? '✅ تم تأكيد الحجز' : '✅ Booking Confirmed',
@@ -375,9 +374,6 @@ export default function VetsVanBooking() {
           `تم حجز موعدك بنجاح في ${selectedTime} يوم ${selectedDate}` :
           `Your appointment has been booked successfully at ${selectedTime} on ${selectedDate}`,
       });
-
-      // حفظ معرف الحجز في localStorage للعودة إليه بعد الدفع
-      localStorage.setItem('pendingPaymentBooking', result.id.toString());
       
       // مسح البيانات المؤقتة
       localStorage.removeItem('pendingRequest');
@@ -385,33 +381,9 @@ export default function VetsVanBooking() {
       // تحديث الاستعلامات
       queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/availability'] });
 
-      // توجيه للدفع فوراً بعد تأكيد الحجز
-      console.log('🔄 Redirecting to payment...');
-      console.log('📋 Booking ID saved:', result.id);
-      
-      // إضافة delay قصير لضمان ظهور رسالة التأكيد ثم التوجيه
+      // التوجيه لصفحة الحجوزات بدلاً من الدفع
       setTimeout(() => {
-        console.log('🌐 Opening MyFatoorah payment link...');
-        const paymentUrl = 'https://sa.myfatoorah.com/SAU/la/05069707813916358';
-        
-        try {
-          // محاولة فتح الرابط بطرق مختلفة لضمان العمل
-          window.location.href = paymentUrl;
-          
-          // طريقة بديلة في حالة فشل الأولى
-          setTimeout(() => {
-            if (window.location.href !== paymentUrl) {
-              window.location.replace(paymentUrl);
-            }
-          }, 500);
-          
-        } catch (error) {
-          console.error('Failed to redirect to payment:', error);
-          // كـ backup، إنشاء رابط مخفي والنقر عليه
-          const link = document.createElement('a');
-          link.href = paymentUrl;
-          link.click();
-        }
+        setLocation('/customer-activity');
       }, 2000);
     } catch (error: any) {
       console.error('Booking failed:', error);

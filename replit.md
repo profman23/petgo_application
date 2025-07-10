@@ -676,6 +676,11 @@ Changelog:
 - July 9, 2025. SUCCESS: Complete OTP verification system tested and confirmed working with real email delivery
 - July 9, 2025. VERIFIED: OTP workflow includes automatic account creation, welcome email, and auto-login after verification
 - July 9, 2025. COMPLETED: Fixed frontend API communication issues for OTP verification functionality
+- July 10, 2025. ENHANCED: Patient form text formatting improved with proper spacing in labels like "Patient Name" instead of "PatientName"
+- July 10, 2025. UPDATED: Added comprehensive bilingual translations for patient form fields with correct word spacing
+- July 10, 2025. FIXED: Removed duplicate translation keys to eliminate build warnings
+- July 10, 2025. DISABLED: Payment system integration in vetsvan-booking flow - customers no longer redirected to MyFatoorah payment links
+- July 10, 2025. MODIFIED: VetsVan booking system now redirects to customer activity page instead of payment gateway after successful booking
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
