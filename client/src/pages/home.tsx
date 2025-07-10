@@ -652,9 +652,9 @@ export default function Home() {
           
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
-            <div className="mb-3 p-3 bg-gradient-to-r from-purple-600 via-blue-100 to-purple-600 rounded-2xl border-2 border-purple-600 shadow-lg">
+            <div className="mb-3 p-3 bg-white rounded-2xl border-2 border-purple-600 shadow-lg">
               <div className="text-center">
-                <div className="text-sm font-semibold text-white mb-2" style={{ textAlign }}>
+                <div className="text-sm font-semibold text-gray-800 mb-2" style={{ textAlign }}>
                   {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
                 </div>
                 
