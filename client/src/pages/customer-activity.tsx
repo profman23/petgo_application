@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FixedFooter } from '@/components/fixed-footer';
@@ -13,6 +13,7 @@ import { Bell } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Booking {
   id: number;
@@ -46,6 +47,11 @@ export default function CustomerActivity() {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+
+  // Tracking dialog states
+  const [showTrackingDialog, setShowTrackingDialog] = useState(false);
+  const [selectedTrackingBooking, setSelectedTrackingBooking] = useState<Booking | null>(null);
+  const [trackingData, setTrackingData] = useState<any>(null);
 
   // Check authentication
   useEffect(() => {
@@ -159,6 +165,31 @@ export default function CustomerActivity() {
   // Check if booking has been reviewed
   const isBookingReviewed = (bookingId: number) => {
     return userReviews.some((review: any) => review.bookingId === bookingId);
+  };
+
+  // Open tracking dialog
+  const openTrackingDialog = async (booking: Booking) => {
+    try {
+      // Simulate fetching tracking data (in real app, get from API)
+      const fakeTrackingData = {
+        estimatedArrivalMinutes: Math.floor(Math.random() * 30) + 15, // 15-45 minutes
+        vetsVanCode: booking.vetsVanCode,
+        driverName: "د. أحمد محمد",
+        currentLocation: "في الطريق إليك",
+        lastUpdated: new Date().toLocaleTimeString(),
+        status: "on_the_way"
+      };
+      
+      setTrackingData(fakeTrackingData);
+      setSelectedTrackingBooking(booking);
+      setShowTrackingDialog(true);
+    } catch (error) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في تحميل بيانات التتبع' : 'Failed to load tracking data',
+        variant: 'destructive',
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -402,9 +433,22 @@ export default function CustomerActivity() {
 
                             {/* Payment sections removed per user request */}
 
-                            {/* Rate Service Button for Completed Services */}
-                            {booking.status === 'completed' && (
-                              <div className="pt-3 border-t border-purple-100">
+                            {/* Action Buttons */}
+                            <div className="pt-3 border-t border-purple-100 space-y-2">
+                              {/* Tracking Button for Active Bookings */}
+                              {(booking.status === 'confirmed' || booking.status === 'booked' || booking.status === 'in_progress') && (
+                                <Button
+                                  onClick={() => openTrackingDialog(booking)}
+                                  variant="outline"
+                                  className="w-full font-semibold py-2 px-4 text-blue-600 border-blue-200 hover:bg-blue-50"
+                                >
+                                  <Navigation className="w-4 h-4 mr-2" />
+                                  {language === 'ar' ? 'تتبع الوصول' : 'Track Arrival'}
+                                </Button>
+                              )}
+
+                              {/* Rate Service Button for Completed Services */}
+                              {booking.status === 'completed' && (
                                 <Button
                                   onClick={() => openReviewDialog(booking)}
                                   variant="outline"
@@ -423,8 +467,8 @@ export default function CustomerActivity() {
                                     : (language === 'ar' ? 'تقييم الخدمة' : 'Rate Service')
                                   }
                                 </Button>
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -503,7 +547,223 @@ export default function CustomerActivity() {
         </div>
       )}
 
+      {/* Tracking Dialog */}
+      {showTrackingDialog && trackingData && selectedTrackingBooking && (
+        <TrackingModal 
+          booking={selectedTrackingBooking}
+          trackingData={trackingData}
+          language={language}
+          onClose={() => {
+            setShowTrackingDialog(false);
+            setTrackingData(null);
+            setSelectedTrackingBooking(null);
+          }}
+        />
+      )}
+
       <FixedFooter />
+    </div>
+  );
+}
+
+// Tracking Modal Component with Live Countdown
+function TrackingModal({ booking, trackingData, language, onClose }: {
+  booking: Booking;
+  trackingData: any;
+  language: string;
+  onClose: () => void;
+}) {
+  const [remainingMinutes, setRemainingMinutes] = useState(trackingData.estimatedArrivalMinutes);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+  // Countdown effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemainingSeconds(prev => {
+        if (prev > 0) {
+          return prev - 1;
+        } else {
+          setRemainingMinutes(prevMin => {
+            if (prevMin > 0) {
+              return prevMin - 1;
+            }
+            return 0;
+          });
+          return 59;
+        }
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatCountdown = () => {
+    if (remainingMinutes === 0 && remainingSeconds === 0) {
+      return language === 'ar' ? 'وصل الطبيب!' : 'Doctor Arrived!';
+    }
+    return `${remainingMinutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const getProgressPercentage = () => {
+    const totalSeconds = trackingData.estimatedArrivalMinutes * 60;
+    const currentSeconds = remainingMinutes * 60 + remainingSeconds;
+    return ((totalSeconds - currentSeconds) / totalSeconds) * 100;
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+      <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-white/80 hover:text-white"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+              <TruckIcon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">
+                {language === 'ar' ? 'تتبع الوصول' : 'Track Arrival'}
+              </h2>
+              <p className="text-blue-100">
+                {language === 'ar' ? 'VETS VAN في الطريق إليك' : 'VETS VAN is on the way'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 space-y-6">
+          {/* Countdown Display */}
+          <div className="text-center">
+            <div className="relative w-32 h-32 mx-auto mb-4">
+              {/* Progress Circle */}
+              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128">
+                <circle
+                  cx="64" cy="64" r="56"
+                  fill="none"
+                  stroke="#e5e7eb"
+                  strokeWidth="8"
+                />
+                <circle
+                  cx="64" cy="64" r="56"
+                  fill="none"
+                  stroke="#3b82f6"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 56}`}
+                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - getProgressPercentage() / 100)}`}
+                  className="transition-all duration-1000"
+                />
+              </svg>
+              
+              {/* Countdown Text */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="text-2xl font-bold text-blue-600">
+                  {formatCountdown()}
+                </div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {remainingMinutes === 0 && remainingSeconds === 0 
+                    ? '' 
+                    : (language === 'ar' ? 'متبقي' : 'remaining')
+                  }
+                </div>
+              </div>
+            </div>
+            
+            <p className="text-gray-600">
+              {language === 'ar' 
+                ? 'الوقت المقدر للوصول' 
+                : 'Estimated arrival time'
+              }
+            </p>
+          </div>
+
+          {/* VetsVan Info */}
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <div className="font-semibold text-gray-800">
+                  {trackingData.driverName}
+                </div>
+                <div className="text-sm text-gray-600">
+                  {booking.vetsVanCode} - {booking.carModel}
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <div className="text-gray-500 mb-1">
+                  {language === 'ar' ? 'اللون:' : 'Color:'}
+                </div>
+                <div className="font-medium">{booking.carColor}</div>
+              </div>
+              <div>
+                <div className="text-gray-500 mb-1">
+                  {language === 'ar' ? 'رقم اللوحة:' : 'Plate:'}
+                </div>
+                <div className="font-medium">{booking.plateNumber}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Updates */}
+          <div className="bg-blue-50 rounded-lg p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="font-medium text-blue-800">
+                {language === 'ar' ? 'الحالة الحالية' : 'Current Status'}
+              </span>
+            </div>
+            <p className="text-blue-700">
+              {language === 'ar' ? trackingData.currentLocation : 'On the way to your location'}
+            </p>
+            <div className="text-xs text-blue-600 mt-2">
+              {language === 'ar' ? 'آخر تحديث:' : 'Last updated:'} {trackingData.lastUpdated}
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <Timer className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm">
+                <div className="font-medium text-yellow-800 mb-1">
+                  {language === 'ar' ? 'تعليمات مهمة:' : 'Important Instructions:'}
+                </div>
+                <ul className="text-yellow-700 space-y-1">
+                  <li>
+                    {language === 'ar' 
+                      ? '• كن متواجداً في الموقع المحدد' 
+                      : '• Be available at the specified location'
+                    }
+                  </li>
+                  <li>
+                    {language === 'ar' 
+                      ? '• سيتصل بك الطبيب قبل الوصول' 
+                      : '• The doctor will call you before arrival'
+                    }
+                  </li>
+                  <li>
+                    {language === 'ar' 
+                      ? '• جهز حيوانك الأليف للفحص' 
+                      : '• Prepare your pet for examination'
+                    }
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
