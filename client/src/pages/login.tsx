@@ -174,7 +174,7 @@ export default function Login() {
                 alt="Vets Van - Mobile Veterinary Clinic" 
                 className="h-24 w-auto max-w-[280px] object-contain mx-auto transition-all duration-300 hover:scale-105"
                 style={{ 
-                  filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1)) contrast(1.05)',
+                  filter: 'contrast(1.05)',
                 }}
               />
             </div>
