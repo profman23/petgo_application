@@ -612,9 +612,9 @@ function TrackingModal({ booking, trackingData, language, onClose }: {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 relative">
+        <div style={{ backgroundColor: '#852085' }} className="text-white p-6 relative">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-white/80 hover:text-white"
@@ -630,43 +630,43 @@ function TrackingModal({ booking, trackingData, language, onClose }: {
               <h2 className="text-xl font-bold">
                 {language === 'ar' ? 'تتبع الوصول' : 'Track Arrival'}
               </h2>
-              <p className="text-blue-100">
+              <p className="text-white/80">
                 {language === 'ar' ? 'VETS VAN في الطريق إليك' : 'VETS VAN is on the way'}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Countdown Display */}
+        <div className="p-6">
+          {/* Countdown Display Only */}
           <div className="text-center">
-            <div className="relative w-32 h-32 mx-auto mb-4">
+            <div className="relative w-40 h-40 mx-auto mb-6">
               {/* Progress Circle */}
-              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 128 128">
+              <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
                 <circle
-                  cx="64" cy="64" r="56"
+                  cx="80" cy="80" r="70"
                   fill="none"
                   stroke="#e5e7eb"
-                  strokeWidth="8"
+                  strokeWidth="12"
                 />
                 <circle
-                  cx="64" cy="64" r="56"
+                  cx="80" cy="80" r="70"
                   fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="8"
+                  stroke="#852085"
+                  strokeWidth="12"
                   strokeLinecap="round"
-                  strokeDasharray={`${2 * Math.PI * 56}`}
-                  strokeDashoffset={`${2 * Math.PI * 56 * (1 - getProgressPercentage() / 100)}`}
+                  strokeDasharray={`${2 * Math.PI * 70}`}
+                  strokeDashoffset={`${2 * Math.PI * 70 * (1 - getProgressPercentage() / 100)}`}
                   className="transition-all duration-1000"
                 />
               </svg>
               
               {/* Countdown Text */}
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-3xl font-bold" style={{ color: '#852085' }}>
                   {formatCountdown()}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-sm text-gray-500 mt-2">
                   {remainingMinutes === 0 && remainingSeconds === 0 
                     ? '' 
                     : (language === 'ar' ? 'متبقي' : 'remaining')
@@ -675,92 +675,19 @@ function TrackingModal({ booking, trackingData, language, onClose }: {
               </div>
             </div>
             
-            <p className="text-gray-600">
+            <h3 className="text-xl font-semibold mb-2" style={{ color: '#852085' }}>
               {language === 'ar' 
                 ? 'الوقت المقدر للوصول' 
-                : 'Estimated arrival time'
+                : 'Estimated Arrival Time'
+              }
+            </h3>
+            
+            <p className="text-gray-600 text-sm">
+              {language === 'ar' 
+                ? 'سيصل الطبيب البيطري قريباً إلى موقعك' 
+                : 'The veterinary doctor will arrive at your location soon'
               }
             </p>
-          </div>
-
-          {/* VetsVan Info */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <div className="font-semibold text-gray-800">
-                  {trackingData.driverName}
-                </div>
-                <div className="text-sm text-gray-600">
-                  {booking.vetsVanCode} - {booking.carModel}
-                </div>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <div className="text-gray-500 mb-1">
-                  {language === 'ar' ? 'اللون:' : 'Color:'}
-                </div>
-                <div className="font-medium">{booking.carColor}</div>
-              </div>
-              <div>
-                <div className="text-gray-500 mb-1">
-                  {language === 'ar' ? 'رقم اللوحة:' : 'Plate:'}
-                </div>
-                <div className="font-medium">{booking.plateNumber}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Status Updates */}
-          <div className="bg-blue-50 rounded-lg p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="font-medium text-blue-800">
-                {language === 'ar' ? 'الحالة الحالية' : 'Current Status'}
-              </span>
-            </div>
-            <p className="text-blue-700">
-              {language === 'ar' ? trackingData.currentLocation : 'On the way to your location'}
-            </p>
-            <div className="text-xs text-blue-600 mt-2">
-              {language === 'ar' ? 'آخر تحديث:' : 'Last updated:'} {trackingData.lastUpdated}
-            </div>
-          </div>
-
-          {/* Instructions */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex items-start gap-2">
-              <Timer className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm">
-                <div className="font-medium text-yellow-800 mb-1">
-                  {language === 'ar' ? 'تعليمات مهمة:' : 'Important Instructions:'}
-                </div>
-                <ul className="text-yellow-700 space-y-1">
-                  <li>
-                    {language === 'ar' 
-                      ? '• كن متواجداً في الموقع المحدد' 
-                      : '• Be available at the specified location'
-                    }
-                  </li>
-                  <li>
-                    {language === 'ar' 
-                      ? '• سيتصل بك الطبيب قبل الوصول' 
-                      : '• The doctor will call you before arrival'
-                    }
-                  </li>
-                  <li>
-                    {language === 'ar' 
-                      ? '• جهز حيوانك الأليف للفحص' 
-                      : '• Prepare your pet for examination'
-                    }
-                  </li>
-                </ul>
-              </div>
-            </div>
           </div>
         </div>
       </div>

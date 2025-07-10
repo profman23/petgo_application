@@ -683,6 +683,10 @@ Changelog:
 - July 10, 2025. MODIFIED: VetsVan booking system now redirects to customer activity page instead of payment gateway after successful booking
 - July 10, 2025. FIXED: Added doctor-login route path to App.tsx routing system for proper navigation
 - July 10, 2025. COMPLETED: Removed all MyFatoorah payment redirection code from both vetsvan-booking.tsx and vetsvan-availability-table.tsx
+- July 10, 2025. ENHANCED: Customer tracking system with simplified "Estimated Arrival Time" display and color scheme #852085
+- July 10, 2025. IMPLEMENTED: TrackingModal component with live countdown timer, progress circle, and real-time updates every second
+- July 10, 2025. ADDED: "Track Arrival" button for active bookings (confirmed, booked, in_progress status) in customer activity page
+- July 10, 2025. REFINED: TrackingModal design to show only countdown timer with custom purple color (#852085) as requested by user
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
