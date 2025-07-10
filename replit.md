@@ -694,6 +694,10 @@ Changelog:
 - July 10, 2025. IMPLEMENTED: TrackingModal component with live countdown timer, progress circle, and real-time updates every second
 - July 10, 2025. ADDED: "Track Arrival" button for active bookings (confirmed, booked, in_progress status) in customer activity page
 - July 10, 2025. REFINED: TrackingModal design to show only countdown timer with custom purple color (#852085) as requested by user
+- July 10, 2025. FIXED: Critical doctor-invoice.tsx runtime error - resolved booking.pets undefined issue with null checks and API response updates
+- July 10, 2025. ENHANCED: getBookingWithDetails API now properly returns pets property for doctor invoice functionality
+- July 10, 2025. SIMPLIFIED: TrackingModal completely redesigned to show only "Estimated arrival time" - removed interactive maps and extra details per user request
+- July 10, 2025. SUCCESS: Complete color theme #852085 applied consistently throughout application - doctor login and invoice system fully operational
 - July 7, 2025. ENHANCED: Advanced booking status management system implemented with doctor control integration
 - July 7, 2025. IMPLEMENTED: Dynamic time slot availability based on doctor status changes from doctor dashboard
 - July 7, 2025. ADDED: When doctor sets booking status to "Cancelled" - time slot becomes available for other customers to book
