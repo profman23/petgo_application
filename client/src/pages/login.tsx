@@ -175,9 +175,9 @@ export default function Login() {
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
             
-            {/* Logo Container - White Background Enlarged */}
+            {/* Logo Container - Clean White Background */}
             <div className="mb-6 flex justify-center">
-              <div className="bg-white rounded-2xl p-4 shadow-lg border-2 border-purple-600/20 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+              <div className="bg-white rounded-2xl p-4 transition-all duration-300 hover:scale-105">
                 <img 
                   src={logoImage} 
                   alt="Vets Van - Mobile Veterinary Clinic" 
