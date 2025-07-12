@@ -1,0 +1,79 @@
+/* CSS to forcefully hide any GPS technical information */
+
+/* Hide any element containing GPS technical text */
+*:has-text("System Info") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+*:has-text("معلومات النظام") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+*:has-text("Precise location system active") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+*:has-text("Shows detailed streets") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+*:has-text("Supports Saudi cities") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+*:has-text("Coordinates:") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+*:has-text("Accuracy:") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Hide any element containing coordinate numbers (latitude,longitude pattern) */
+*[class*="coordinates"],
+*[id*="coordinates"],
+*[class*="gps"],
+*[id*="gps"],
+*[class*="location-info"],
+*[id*="location-info"] {
+  display: none !important;
+}
+
+/* Cover any remaining GPS info with white background */
+.gps-overlay {
+  position: absolute;
+  background: white;
+  z-index: 9999;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}

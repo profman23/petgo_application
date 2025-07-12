@@ -26,6 +26,7 @@ import { InstallButton } from '@/components/InstallButton';
 import { CacheClearButton } from '@/components/CacheClearButton';
 import { LocationHider } from '@/components/LocationHider';
 import '@/utils/removeGpsInfo';
+import '@/styles/hide-gps-info.css';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
