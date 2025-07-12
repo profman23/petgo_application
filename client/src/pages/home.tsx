@@ -386,7 +386,7 @@ export default function Home() {
         </div>
 
         {/* Current Location */}
-        <div className="p-3 bg-white border-b">
+        <div className="p-3 bg-white border-b hidden">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-semibold text-white text-sm" style={{ textAlign }}>
               {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
