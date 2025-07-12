@@ -24,6 +24,7 @@ import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import { InstallButton } from '@/components/InstallButton';
 import { CacheClearButton } from '@/components/CacheClearButton';
+import '@/utils/removeGpsInfo';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
