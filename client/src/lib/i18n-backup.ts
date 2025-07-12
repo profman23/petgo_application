@@ -88,7 +88,11 @@ export const translations = {
     doctorDashboard: 'لوحة تحكم الطبيب البيطري',
     sessionExpired: 'انتهت جلسة العمل',
     loginAgain: 'يرجى تسجيل الدخول مرة أخرى',
-
+    gpsStatus: 'حالة GPS',
+    accuracy: 'دقة الموقع',
+    meters: 'متر',
+    enableGps: 'تفعيل GPS',
+    stopGps: 'إيقاف GPS',
     pendingRequests: 'الطلبات المعلقة',
     noPendingRequests: 'لا توجد طلبات معلقة حالياً',
     customerLocation: 'موقع العميل',
@@ -363,7 +367,11 @@ export const translations = {
     doctorDashboard: 'Veterinary Doctor Dashboard',
     sessionExpired: 'Session Expired',
     loginAgain: 'Please login again',
-
+    gpsStatus: 'GPS Status',
+    accuracy: 'Location Accuracy',
+    meters: 'meters',
+    enableGps: 'Enable GPS',
+    stopGps: 'Stop GPS',
     pendingRequests: 'Pending Requests',
     noPendingRequests: 'No pending requests at the moment',
     customerLocation: 'Customer Location',
@@ -439,13 +447,15 @@ export const translations = {
     arrivedDesc: 'Doctor has arrived at your location',
     completed: 'Completed',
     completedDesc: 'Service completed successfully',
-
+    locationAccuracy: 'Location detected with accuracy',
+    meters: 'meters',
     
     // Doctor Dashboard
     doctorDashboard: 'Veterinary Doctor Dashboard',
     locationTracking: 'Location Tracking Status',
     locationDetectedSuccessfully: 'Location detected successfully',
-
+    latitude: 'Latitude',
+    longitude: 'Longitude',
     pendingRequests: 'Pending Requests',
     noPendingRequests: 'No pending requests currently',
     newRequestReceived: 'New request received!',
@@ -457,6 +467,9 @@ export const translations = {
     reject: 'Reject',
     
     // Doctor Ride Tracking
+    gpsStatus: 'GPS Status',
+    connected: 'Connected',
+    disconnected: 'Disconnected',
     customerInfo: 'Customer Information',
     rideDetails: 'Ride Details',
     currentStatus: 'Current Status',

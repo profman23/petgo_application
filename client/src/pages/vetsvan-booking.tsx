@@ -318,7 +318,7 @@ export default function VetsVanBooking() {
           customerLocation = {
             latitude: lat,
             longitude: lng,
-            address: address || (language === 'ar' ? 'موقع العميل' : 'Customer Location')
+            address: address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`
           };
           console.log('✅ Got fresh GPS location with address:', customerLocation);
         } catch (gpsError) {

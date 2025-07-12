@@ -23,14 +23,6 @@ import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import { InstallButton } from '@/components/InstallButton';
-import { CacheClearButton } from '@/components/CacheClearButton';
-import { LocationHider } from '@/components/LocationHider';
-import '@/utils/removeGpsInfo';
-import '@/styles/hide-gps-info.css';
-import '@/styles/global-gps-hide.css';
-import '@/utils/aggressiveGPSCleaner';
-import '@/utils/finalGPSCleaner';
-import '@/utils/superGPSCleaner';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -113,10 +105,10 @@ export default function Home() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
 
-  // Simple location state management - NO technical details
+  // Simple location state management
   const [locationInfo, setLocationInfo] = useState({
-    isLoading: false,
-    address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
+    isLoading: true,
+    address: language === 'ar' ? 'جاري تحديد موقعك...' : 'Detecting your location...',
     error: null as string | null,
     coordinates: null as { lat: number, lon: number } | null,
     accuracy: null as number | null
@@ -156,16 +148,14 @@ export default function Home() {
     return { city: closestCity, distance: minDistance };
   };
 
-  // Disabled location detection - always shows simple location
+  // Get user location and detailed address
   const getCurrentLocation = () => {
-    setLocationInfo({
-      isLoading: false,
-      address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
-      error: null,
-      coordinates: null,
-      accuracy: null
-    });
-    return;
+    setLocationInfo(prev => ({
+      ...prev,
+      isLoading: true,
+      address: language === 'ar' ? 'جاري تحديد موقعك...' : 'Detecting your location...',
+      error: null
+    }));
 
     if (!navigator.geolocation) {
       setLocationInfo({
@@ -215,15 +205,16 @@ export default function Home() {
               }
             }
             
-            // Always use simple location instead of detailed address
-            setLocationInfo({
-              isLoading: false,
-              address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
-              error: null,
-              coordinates: null,
-              accuracy: null
-            });
-            return;
+            if (address) {
+              setLocationInfo({
+                isLoading: false,
+                address: address,
+                error: null,
+                coordinates: { lat: latitude, lon: longitude },
+                accuracy: accuracy
+              });
+              return;
+            }
           }
         } catch (error) {
           console.warn('Geocoding failed, using fallback:', error);
@@ -234,20 +225,19 @@ export default function Home() {
         let fallbackAddress;
         
         if (distance < 5) {
-          fallbackAddress = language === 'ar' ? `${cityName}` : `${cityName}`;
+          fallbackAddress = language === 'ar' ? `${cityName} - موقعك الحالي` : `${cityName} - Your Current Location`;
         } else if (distance < 20) {
           fallbackAddress = language === 'ar' ? `بالقرب من ${cityName}` : `Near ${cityName}`;
         } else {
           fallbackAddress = language === 'ar' ? `${cityName} - المملكة العربية السعودية` : `${cityName} - Saudi Arabia`;
         }
         
-        // Always use simple location instead of fallback
         setLocationInfo({
           isLoading: false,
-          address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
+          address: fallbackAddress,
           error: null,
-          coordinates: null,
-          accuracy: null
+          coordinates: { lat: latitude, lon: longitude },
+          accuracy: accuracy
         });
       },
       (error) => {
@@ -266,11 +256,10 @@ export default function Home() {
             break;
         }
         
-        // Always use simple location instead of error handling
         setLocationInfo({
           isLoading: false,
-          address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
-          error: null,
+          address: fallbackAddress,
+          error: errorMessage,
           coordinates: null,
           accuracy: null
         });
@@ -285,29 +274,7 @@ export default function Home() {
 
   // Initialize location detection on component mount
   useEffect(() => {
-    // Ultra-aggressive GPS cleaning
-    const { GPSInfoCleaner } = require('@/utils/removeGpsInfo');
-    const { cleanAllGPSInfo } = require('@/utils/aggressiveGPSCleaner');
-    
-    const cleaner = GPSInfoCleaner.getInstance();
-    cleaner.clearGPSTechnicalInfo();
-    cleaner.clearSessionGPSInfo();
-    
-    // Run aggressive cleaner
-    cleanAllGPSInfo();
-    
     getCurrentLocation();
-    
-    // Continue cleaning every second
-    const cleaningInterval = setInterval(() => {
-      cleanAllGPSInfo();
-      
-      // Also run final cleaner
-      const { finalGPSCleaner } = require('@/utils/finalGPSCleaner');
-      finalGPSCleaner();
-    }, 1000);
-    
-    return () => clearInterval(cleaningInterval);
   }, [language]); // Re-run when language changes
 
   // Get active ride info
@@ -523,7 +490,7 @@ export default function Home() {
                       {language === 'ar' ? 'الموقع:' : 'Location:'}
                     </span>
                     <div className="text-gray-800 truncate">
-                      {actualActiveRide.pickupLocation || (language === 'ar' ? 'المنزل' : 'Home')}
+                      {actualActiveRide.pickupLocation || (language === 'ar' ? 'موقعك الحالي' : 'Your current location')}
                     </div>
                   </div>
                   <div className="text-right">
@@ -801,20 +768,6 @@ export default function Home() {
               </a>
             </div>
           </div>
-          
-          {/* Cache Clear Button - Developer Tool */}
-          <div className="mt-3 p-3 bg-gray-50 rounded-xl shadow-sm border">
-            <div className="text-center">
-              <p className="text-xs text-gray-500 mb-2" style={{ textAlign }}>
-                {language === 'ar' ? 'في حالة ظهور معلومات قديمة:' : 'If old information appears:'}
-              </p>
-              <CacheClearButton 
-                variant="outline" 
-                size="sm"
-                className="border-gray-300 text-gray-600 hover:bg-gray-100"
-              />
-            </div>
-          </div>
         </div>
 
 
@@ -829,9 +782,6 @@ export default function Home() {
       
       {/* PWA Install Banner */}
       <PWAInstallBanner />
-      
-      {/* Location Hider - prevents any GPS technical info from showing */}
-      <LocationHider />
     </div>
   );
 }
