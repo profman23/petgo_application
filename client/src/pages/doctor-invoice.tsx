@@ -136,6 +136,8 @@ export default function DoctorInvoice() {
     enabled: !!params?.bookingId,
     staleTime: 0, // Always fetch fresh data
     cacheTime: 0, // Don't cache to avoid stale data
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: false
   });
 
   // Fetch invoice status
@@ -157,6 +159,8 @@ export default function DoctorInvoice() {
     enabled: !!params?.bookingId,
     staleTime: 0, // Always fetch fresh data
     cacheTime: 0, // Don't cache to avoid stale lock state
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
   // Fetch products for invoice item selection
@@ -251,9 +255,18 @@ export default function DoctorInvoice() {
       }
     } else {
       console.log('No invoice status data available');
+      // Set default discount type when no status available
+      setDiscountType('none');
     }
   }, [invoiceStatus]);
 
+  // Initialize discount type on component mount
+  useEffect(() => {
+    if (!invoiceStatus && discountType === '') {
+      console.log('Initializing discount type to none on mount');
+      setDiscountType('none');
+    }
+  }, [discountType, invoiceStatus]);
 
 
   const getDirection = (lang: string) => lang === 'ar' ? 'rtl' : 'ltr';
