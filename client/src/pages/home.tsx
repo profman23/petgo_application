@@ -23,6 +23,7 @@ import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import { InstallButton } from '@/components/InstallButton';
+import { CacheClearButton } from '@/components/CacheClearButton';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -766,6 +767,20 @@ export default function Home() {
                   }}
                 />
               </a>
+            </div>
+          </div>
+          
+          {/* Cache Clear Button - Developer Tool */}
+          <div className="mt-3 p-3 bg-gray-50 rounded-xl shadow-sm border">
+            <div className="text-center">
+              <p className="text-xs text-gray-500 mb-2" style={{ textAlign }}>
+                {language === 'ar' ? 'في حالة ظهور معلومات قديمة:' : 'If old information appears:'}
+              </p>
+              <CacheClearButton 
+                variant="outline" 
+                size="sm"
+                className="border-gray-300 text-gray-600 hover:bg-gray-100"
+              />
             </div>
           </div>
         </div>
