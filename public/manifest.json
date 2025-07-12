@@ -13,51 +13,51 @@
   "categories": ["medical", "lifestyle", "utilities"],
   "icons": [
     {
-      "src": "/icons/icon-cropped.svg",
+      "src": "app-icon-original.jpeg",
       "sizes": "72x72",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-cropped.svg",
+      "src": "app-icon-original.jpeg",
       "sizes": "96x96",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-cropped.svg",
+      "src": "app-icon-original.jpeg",
       "sizes": "128x128",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-cropped.svg",
+      "src": "app-icon-original.jpeg",
       "sizes": "144x144",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-cropped.svg",
+      "src": "app-icon-original.jpeg",
       "sizes": "152x152",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-192x192-complete.svg",
+      "src": "app-icon-original.jpeg",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-cropped.svg",
+      "src": "app-icon-original.jpeg",
       "sizes": "384x384",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512x512-complete.svg",
+      "src": "app-icon-original.jpeg",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ],
@@ -78,8 +78,9 @@
       "url": "/ride-request",
       "icons": [
         {
-          "src": "/icons/icon-96x96.png",
-          "sizes": "96x96"
+          "src": "app-icon-original.jpeg",
+          "sizes": "96x96",
+          "type": "image/jpeg"
         }
       ]
     }
