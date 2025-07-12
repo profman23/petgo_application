@@ -109,7 +109,7 @@ if (!window.location.pathname.includes('admin')) {
 // Clear manifest cache and test icons on app start
 clearManifestCache();
 // Initialize simple cache manager (runs once on PWA launch only)
-SimpleCacheManager.initializeOnLoad();
+// SimpleCacheManager.initializeOnLoad(); // Disabled to prevent cache spam
 // Test icons in development
 if (!import.meta.env.PROD) {
   setTimeout(testIconAvailability, 1000);

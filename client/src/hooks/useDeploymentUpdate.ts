@@ -94,8 +94,8 @@ export const useDeploymentUpdate = () => {
     // Initial check
     checkForUpdate();
 
-    // Set up periodic checks every 5 minutes (reduced frequency)
-    checkInterval = setInterval(checkForUpdate, 5 * 60 * 1000);
+    // Disabled automatic checks to prevent spam
+    // checkInterval = setInterval(checkForUpdate, 5 * 60 * 1000);
 
     // Check when app becomes visible
     const handleVisibilityChange = () => {
