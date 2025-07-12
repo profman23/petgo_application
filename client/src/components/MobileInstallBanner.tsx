@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X, Smartphone, Apple } from 'lucide-react';
 import customShareIcon from '@assets/freepik_assistant_1752317793556_1752317800669.png';
-import { getDeviceLanguage, installMessages } from '@/utils/device-language';
+import { getDeviceLanguageWithLogging, installMessages } from '@/utils/device-language';
 
 export function MobileInstallBanner() {
   const [showBanner, setShowBanner] = useState(false);
@@ -41,7 +41,7 @@ export function MobileInstallBanner() {
   };
 
   const getInstallInstructions = () => {
-    const deviceLang = getDeviceLanguage();
+    const deviceLang = getDeviceLanguageWithLogging();
     const messages = installMessages[deviceLang];
     
     if (isIOS) {
@@ -80,7 +80,7 @@ export function MobileInstallBanner() {
   const instructions = getInstallInstructions();
   if (!instructions) return null;
 
-  const deviceLang = getDeviceLanguage();
+  const deviceLang = getDeviceLanguageWithLogging();
   const isRTL = deviceLang === 'ar';
 
   return (

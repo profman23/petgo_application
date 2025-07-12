@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Download, Smartphone, Monitor, X } from 'lucide-react';
 import { showInstallNotification } from '@/utils/install-notification';
 import customShareIcon from '@assets/freepik_assistant_1752317793556_1752317800669.png';
-import { getDeviceLanguage, installMessages, safariInstructions } from '@/utils/device-language';
+import { getDeviceLanguageWithLogging, installMessages, safariInstructions } from '@/utils/device-language';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -131,7 +131,7 @@ export function PWAInstaller() {
 
   const getBrowserInstructions = () => {
     const userAgent = navigator.userAgent.toLowerCase();
-    const deviceLang = getDeviceLanguage();
+    const deviceLang = getDeviceLanguageWithLogging();
     const isArabic = deviceLang === 'ar';
     
     if (userAgent.includes('chrome') && !userAgent.includes('edg')) {
@@ -265,19 +265,19 @@ export function PWAInstaller() {
             
             {/* Title and Description */}
             <h3 className="text-xl font-bold text-gray-900 mb-2">
-              {getDeviceLanguage() === 'ar' ? 'تثبيت تطبيق VetsVan' : 'Install VetsVan App'}
+              {getDeviceLanguageWithLogging() === 'ar' ? 'تثبيت تطبيق VetsVan' : 'Install VetsVan App'}
             </h3>
             <p className="text-gray-600 mb-6 leading-relaxed">
-              {getDeviceLanguage() === 'ar' 
+              {getDeviceLanguageWithLogging() === 'ar' 
                 ? 'ثبت التطبيق على جهازك للوصول السريع إلى خدمات العيادة البيطرية المتنقلة'
                 : 'Install the app on your device for quick access to mobile veterinary services'
               }
             </p>
             
             {/* Benefits */}
-            <div className={`bg-purple-50 rounded-lg p-4 mb-6 ${getDeviceLanguage() === 'ar' ? 'text-right' : 'text-left'}`}>
+            <div className={`bg-purple-50 rounded-lg p-4 mb-6 ${getDeviceLanguageWithLogging() === 'ar' ? 'text-right' : 'text-left'}`}>
               <ul className="text-sm text-purple-800 space-y-2">
-                {getDeviceLanguage() === 'ar' ? [
+                {getDeviceLanguageWithLogging() === 'ar' ? [
                   <li key="benefit1" className="flex items-center justify-end space-x-2 space-x-reverse">
                     <span>وصول سريع من الشاشة الرئيسية</span>
                     <span className="text-purple-600">✓</span>
@@ -314,23 +314,23 @@ export function PWAInstaller() {
                 className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg"
               >
                 {deferredPrompt 
-                  ? (getDeviceLanguage() === 'ar' ? 'تثبيت الآن' : 'Install Now')
-                  : (getDeviceLanguage() === 'ar' ? 'عرض التعليمات' : 'Show Instructions')
+                  ? (getDeviceLanguageWithLogging() === 'ar' ? 'تثبيت الآن' : 'Install Now')
+                  : (getDeviceLanguageWithLogging() === 'ar' ? 'عرض التعليمات' : 'Show Instructions')
                 }
               </button>
               
-              <div className={`flex ${getDeviceLanguage() === 'ar' ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
+              <div className={`flex ${getDeviceLanguageWithLogging() === 'ar' ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
                 <button
                   onClick={handleNotNow}
                   className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
                 >
-                  {getDeviceLanguage() === 'ar' ? 'ليس الآن' : 'Not Now'}
+                  {getDeviceLanguageWithLogging() === 'ar' ? 'ليس الآن' : 'Not Now'}
                 </button>
                 <button
                   onClick={handleDismiss}
                   className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
                 >
-                  {getDeviceLanguage() === 'ar' ? 'لا أريد' : 'No Thanks'}
+                  {getDeviceLanguageWithLogging() === 'ar' ? 'لا أريد' : 'No Thanks'}
                 </button>
               </div>
             </div>
@@ -344,7 +344,7 @@ export function PWAInstaller() {
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                {getDeviceLanguage() === 'ar' ? 'تثبيت التطبيق' : 'Install App'}
+                {getDeviceLanguageWithLogging() === 'ar' ? 'تثبيت التطبيق' : 'Install App'}
               </h3>
               <button
                 onClick={() => setShowInstructions(false)}
@@ -355,10 +355,10 @@ export function PWAInstaller() {
             </div>
             
             <div className="mb-4">
-              <div className={`flex items-center mb-3 ${getDeviceLanguage() === 'ar' ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
+              <div className={`flex items-center mb-3 ${getDeviceLanguageWithLogging() === 'ar' ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
                 <Smartphone className="h-5 w-5 text-purple-600" />
                 <span className="font-medium text-gray-900">
-                  {getDeviceLanguage() === 'ar' 
+                  {getDeviceLanguageWithLogging() === 'ar' 
                     ? `تعليمات التثبيت - ${getBrowserInstructions().browser}`
                     : `Installation Guide - ${getBrowserInstructions().browser}`
                   }
@@ -376,7 +376,7 @@ export function PWAInstaller() {
 
             <div className="bg-purple-50 p-3 rounded-md">
               <p className="text-xs text-purple-700">
-                {getDeviceLanguage() === 'ar' 
+                {getDeviceLanguageWithLogging() === 'ar' 
                   ? '💡 بعد التثبيت، ستجد أيقونة VetsVan في الشاشة الرئيسية لجهازك'
                   : '💡 After installation, you will find the VetsVan icon on your device home screen'
                 }
@@ -387,7 +387,7 @@ export function PWAInstaller() {
               onClick={() => setShowInstructions(false)}
               className="w-full mt-4 bg-purple-600 text-white py-2 rounded-md font-medium hover:bg-purple-700 transition-colors"
             >
-              {getDeviceLanguage() === 'ar' ? 'فهمت' : 'Got it'}
+              {getDeviceLanguageWithLogging() === 'ar' ? 'فهمت' : 'Got it'}
             </button>
           </div>
         </div>

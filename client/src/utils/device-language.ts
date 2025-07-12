@@ -12,6 +12,25 @@ export function getDeviceLanguage(): 'ar' | 'en' {
   return 'en';
 }
 
+// Enhanced function that also logs detection for testing
+export function getDeviceLanguageWithLogging(): 'ar' | 'en' {
+  const browserLang = navigator.language || navigator.languages?.[0] || 'en';
+  const allLangs = navigator.languages || [browserLang];
+  const detected = getDeviceLanguage();
+  
+  // Log for development testing
+  if (!import.meta.env.PROD) {
+    console.log('🌐 Language Detection:', {
+      primaryLanguage: browserLang,
+      allLanguages: allLangs,
+      detectedUILanguage: detected,
+      timestamp: new Date().toLocaleTimeString()
+    });
+  }
+  
+  return detected;
+}
+
 // Installation messages in both languages
 export const installMessages = {
   ar: {

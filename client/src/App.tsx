@@ -31,6 +31,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { PWAInstaller } from "@/components/PWAInstaller";
 import { MobileInstallBanner } from "@/components/MobileInstallBanner";
+import { LanguageTestingPanel } from "@/components/LanguageTestingPanel";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -175,6 +176,7 @@ function Router() {
       <InstallPrompt />
       <PWAInstaller />
       <MobileInstallBanner />
+      <LanguageTestingPanel />
     </div>
   );
 }
@@ -201,6 +203,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <LanguageTestingPanel />
       </TooltipProvider>
     </QueryClientProvider>
   );
