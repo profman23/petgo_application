@@ -1,7 +1,7 @@
 // Deployment detection and automatic cache clearing
 export class DeploymentDetector {
   private static readonly DEPLOYMENT_CHECK_KEY = 'last_deployment_check';
-  private static readonly CHECK_INTERVAL = 30000; // 30 seconds
+  private static readonly CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
   
   static async startMonitoring(): Promise<void> {
     // Initial check

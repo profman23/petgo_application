@@ -41,20 +41,11 @@ export const CacheManagerComponent = () => {
       });
     }
 
-    // Check for updates periodically
-    const updateInterval = setInterval(async () => {
-      const updateAvailable = await CacheManager.checkForUpdates();
-      if (updateAvailable) {
-        toast({
-          title: "تحديث جديد",
-          description: "تم اكتشاف تحديث جديد وتنظيف الكاش تلقائياً",
-          duration: 4000,
-        });
-      }
-    }, 5 * 60 * 1000); // Check every 5 minutes
+    // Disable periodic update checks to prevent spam
+    // Only check on app focus/visibility change
 
     return () => {
-      clearInterval(updateInterval);
+      // Cleanup function
     };
   }, [toast]);
 

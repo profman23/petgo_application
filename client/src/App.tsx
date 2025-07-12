@@ -34,9 +34,7 @@ import { MobileInstallBanner } from "@/components/MobileInstallBanner";
 import { LanguageTestingPanel } from "@/components/LanguageTestingPanel";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { initializeCacheManager } from "@/utils/cacheManager";
-import { DeploymentDetector } from "@/utils/deploymentDetector";
-import { CacheManagerComponent } from "@/components/CacheManager";
+import { SimpleCacheManager } from "@/utils/simpleCacheManager";
 
 // Clear manifest cache on app start to ensure fresh icons
 const clearManifestCache = async () => {
@@ -110,10 +108,8 @@ if (!window.location.pathname.includes('admin')) {
 
 // Clear manifest cache and test icons on app start
 clearManifestCache();
-// Initialize advanced cache manager
-initializeCacheManager();
-// Start deployment monitoring
-DeploymentDetector.startMonitoring();
+// Initialize simple cache manager (runs once on PWA launch only)
+SimpleCacheManager.initializeOnLoad();
 // Test icons in development
 if (!import.meta.env.PROD) {
   setTimeout(testIconAvailability, 1000);
@@ -205,7 +201,6 @@ function Router() {
       <InstallPrompt />
       <PWAInstaller />
       <MobileInstallBanner />
-      <CacheManagerComponent />
       <LanguageTestingPanel />
     </div>
   );
@@ -233,7 +228,6 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
-        <CacheManagerComponent />
         <LanguageTestingPanel />
       </TooltipProvider>
     </QueryClientProvider>

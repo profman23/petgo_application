@@ -108,12 +108,12 @@ export const initializeCacheManager = async (): Promise<void> => {
     console.log('تم تحديث التطبيق وتنظيف الكاش تلقائياً');
   }
   
-  // Check for updates every 5 minutes
+  // Check for updates every 10 minutes (reduced frequency)
   setInterval(async () => {
     const updateAvailable = await CacheManager.checkForUpdates();
     if (updateAvailable) {
       // Optionally show update notification to user
       console.log('تحديث جديد متوفر - تم تنظيف الكاش');
     }
-  }, 5 * 60 * 1000);
+  }, 10 * 60 * 1000);
 };
