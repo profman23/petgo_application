@@ -2469,6 +2469,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Auth middleware for file download/view that accepts token from query params
+  function fileAccessAuth(req: any, res: any, next: any) {
+    const token = req.query.token || req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
+    }
+
+    // Check if token exists in sessions
+    const sessionKeys = Object.keys(sessions);
+    let foundSession = null;
+    
+    for (const sessionId of sessionKeys) {
+      if (sessions[sessionId].token === token) {
+        foundSession = sessions[sessionId];
+        break;
+      }
+    }
+    
+    if (!foundSession) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+
+    req.user = foundSession.user;
+    next();
+  }
+
   // Download attachment endpoint - serves file data from database
   app.get('/api/pet-attachments/download/:id', requireAuth, async (req, res) => {
     try {

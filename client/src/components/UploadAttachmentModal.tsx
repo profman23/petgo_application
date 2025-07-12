@@ -174,20 +174,53 @@ export default function UploadAttachmentModal({
   };
 
   // View file in browser (for images, PDFs)
-  const handleViewFile = (attachmentId: number) => {
-    const viewUrl = `/api/pet-attachments/view/${attachmentId}`;
-    window.open(viewUrl, '_blank');
+  const handleViewFile = async (attachmentId: number) => {
+    try {
+      const token = localStorage.getItem('doctorToken');
+      const response = await fetch(`/api/pet-attachments/view/${attachmentId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } else {
+        console.error('Failed to view file');
+      }
+    } catch (error) {
+      console.error('Error viewing file:', error);
+    }
   };
 
   // Download file to device
-  const handleDownloadFile = (attachmentId: number, fileName: string) => {
-    const downloadUrl = `/api/pet-attachments/download/${attachmentId}`;
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadFile = async (attachmentId: number, fileName: string) => {
+    try {
+      const token = localStorage.getItem('doctorToken');
+      const response = await fetch(`/api/pet-attachments/download/${attachmentId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } else {
+        console.error('Failed to download file');
+      }
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -270,29 +303,32 @@ export default function UploadAttachmentModal({
             ) : (
               <div className="space-y-2">
                 {attachments.map((attachment: any) => (
-                  <div key={attachment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <div key={attachment.id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
                     <div className="flex items-center flex-1">
-                      <File className="h-5 w-5 mr-3 text-gray-600" />
-                      <div>
-                        <p className="font-medium text-gray-800">{attachment.fileName}</p>
-                        <p className="text-sm text-gray-600">{attachment.description}</p>
-                        <p className="text-xs text-gray-500">
+                      <div className="flex-shrink-0">
+                        <File className="h-8 w-8 text-gray-400" />
+                      </div>
+                      <div className="ml-4">
+                        <p className="font-semibold text-gray-900">{attachment.fileName}</p>
+                        <p className="text-sm text-gray-600 mt-1">{attachment.description}</p>
+                        <p className="text-xs text-gray-500 mt-1">
                           {formatFileSize(attachment.fileSize)} • {new Date(attachment.uploadedAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
                     
                     {/* Action buttons */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 ml-4">
                       {/* View button */}
                       <Button
                         onClick={() => handleViewFile(attachment.id)}
                         variant="outline"
                         size="sm"
-                        className="text-blue-600 hover:text-blue-700"
+                        className="text-blue-600 hover:text-blue-700 border-blue-300 bg-blue-50 hover:bg-blue-100 px-3 py-2 text-sm font-medium"
                         title={t('view')}
                       >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4 mr-1" />
+                        {t('view')}
                       </Button>
                       
                       {/* Download button */}
@@ -300,10 +336,11 @@ export default function UploadAttachmentModal({
                         onClick={() => handleDownloadFile(attachment.id, attachment.fileName)}
                         variant="outline"
                         size="sm"
-                        className="text-green-600 hover:text-green-700"
+                        className="text-green-600 hover:text-green-700 border-green-300 bg-green-50 hover:bg-green-100 px-3 py-2 text-sm font-medium"
                         title={t('download')}
                       >
-                        <Download className="h-4 w-4" />
+                        <Download className="h-4 w-4 mr-1" />
+                        {t('download')}
                       </Button>
                       
                       {/* Delete button */}
@@ -312,10 +349,11 @@ export default function UploadAttachmentModal({
                         disabled={deleteMutation.isPending}
                         variant="outline"
                         size="sm"
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 border-red-300 bg-red-50 hover:bg-red-100 px-3 py-2 text-sm font-medium"
                         title={t('delete')}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        {t('delete')}
                       </Button>
                     </div>
                   </div>
