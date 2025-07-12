@@ -17,6 +17,7 @@ import DoctorInvoiceV2 from "@/pages/doctor-invoice-v2";
 import DoctorInvoiceV3 from "@/pages/doctor-invoice-v3";
 import DoctorInvoiceSimple from "@/pages/doctor-invoice-simple";
 import DoctorInvoiceFresh from "@/pages/doctor-invoice-fresh";
+import DoctorInvoiceUltimate from "@/pages/doctor-invoice-ultimate";
 import InvoiceView from "@/pages/invoice-view";
 import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
@@ -186,6 +187,7 @@ function Router() {
           <Route path="/doctor-invoice-v3/:bookingId" component={DoctorInvoiceV3} />
           <Route path="/doctor-invoice-simple/:bookingId" component={DoctorInvoiceSimple} />
           <Route path="/doctor-invoice-fresh/:bookingId" component={DoctorInvoiceFresh} />
+          <Route path="/doctor-invoice-ultimate/:bookingId" component={DoctorInvoiceUltimate} />
           <Route path="/invoice-view" component={InvoiceView} />
           <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
           <Route path="/ride-request" component={() => <AuthCheck><RideRequest /></AuthCheck>} />
