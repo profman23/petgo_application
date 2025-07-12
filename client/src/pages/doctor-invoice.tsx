@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
 import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -72,6 +72,7 @@ export default function DoctorInvoice() {
   const [, setLocation] = useLocation();
   const { language } = useLanguage();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([
     { id: '1', description: '', quantity: 1, unitPrice: 0, total: 0 }
@@ -286,21 +287,46 @@ export default function DoctorInvoice() {
     }
   }, [invoiceStatus]);
 
-  // Initialize discount type on component mount
+  // Initialize and force refresh on component mount
   useEffect(() => {
-    if (!invoiceStatus && discountType === '') {
-      console.log('Initializing discount type to none on mount');
+    console.log('Component mounted, clearing cache and initializing...');
+    
+    // Clear any existing cache for this booking
+    queryClient.removeQueries({ queryKey: [`/api/invoice-status/${params?.bookingId}`] });
+    queryClient.removeQueries({ queryKey: [`/api/invoice-items/${params?.bookingId}`] });
+    
+    // Set initial discount type
+    if (discountType === '') {
+      console.log('Discount type is empty, setting to none immediately');
       setDiscountType('none');
     }
-  }, [discountType, invoiceStatus]);
+  }, [params?.bookingId]); // Run when bookingId changes
 
-  // Force refresh function
+  // Separate effect for invoice status updates
+  useEffect(() => {
+    if (!invoiceStatus && discountType === '') {
+      console.log('No invoice status and empty discount, setting to none');
+      setDiscountType('none');
+    }
+  }, [invoiceStatus]);
+
+  // Force refresh function with cache invalidation
   const forceRefresh = async () => {
-    console.log('Force refreshing all data...');
+    console.log('Force refreshing all data with cache invalidation...');
+    
+    // Clear all React Query cache for this booking
+    queryClient.removeQueries({ queryKey: [`/api/invoice-status/${params?.bookingId}`] });
+    queryClient.removeQueries({ queryKey: [`/api/invoice-items/${params?.bookingId}`] });
+    
+    // Reset discount type before refetch
+    setDiscountType('none');
+    
+    // Force refetch with new requests
     await Promise.all([
       refetchInvoiceStatus(),
       refetchInvoiceItems()
     ]);
+    
     toast({
       title: language === 'ar' ? 'تم تحديث البيانات' : 'Data refreshed',
       description: language === 'ar' ? 'تم تحديث جميع البيانات بنجاح' : 'All data has been refreshed successfully'

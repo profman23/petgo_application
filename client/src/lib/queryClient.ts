@@ -36,8 +36,9 @@ export async function apiRequest(
     body?: string;
   },
 ): Promise<any> {
-  // Check for admin token first (for admin endpoints), then regular token
+  // Check for tokens: admin, doctor, then regular token
   const adminToken = localStorage.getItem('adminToken');
+  const doctorToken = localStorage.getItem('doctorToken');
   const token = localStorage.getItem('token');
   const headers: Record<string, string> = {};
   
@@ -45,9 +46,15 @@ export async function apiRequest(
     headers["Content-Type"] = "application/json";
   }
   
-  // Use admin token for admin endpoints, regular token for others
+  // Use appropriate token based on endpoint
   if (url.includes('/api/admin/') && adminToken) {
     headers["Authorization"] = `Bearer ${adminToken}`;
+  } else if (url.includes('/api/doctor/') && doctorToken) {
+    headers["Authorization"] = `Bearer ${doctorToken}`;
+  } else if (url.includes('/api/invoice-') && doctorToken) {
+    headers["Authorization"] = `Bearer ${doctorToken}`;
+  } else if (url.includes('/api/pet-') && doctorToken) {
+    headers["Authorization"] = `Bearer ${doctorToken}`;
   } else if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
@@ -69,10 +76,23 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
+    const adminToken = localStorage.getItem('adminToken');
+    const doctorToken = localStorage.getItem('doctorToken');
     const token = localStorage.getItem('token');
     const headers: Record<string, string> = {};
     
-    if (token) {
+    const url = queryKey[0] as string;
+    
+    // Use appropriate token based on endpoint
+    if (url.includes('/api/admin/') && adminToken) {
+      headers["Authorization"] = `Bearer ${adminToken}`;
+    } else if (url.includes('/api/doctor/') && doctorToken) {
+      headers["Authorization"] = `Bearer ${doctorToken}`;
+    } else if (url.includes('/api/invoice-') && doctorToken) {
+      headers["Authorization"] = `Bearer ${doctorToken}`;
+    } else if (url.includes('/api/pet-') && doctorToken) {
+      headers["Authorization"] = `Bearer ${doctorToken}`;
+    } else if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
 
