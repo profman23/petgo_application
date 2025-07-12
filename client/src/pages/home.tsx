@@ -225,7 +225,7 @@ export default function Home() {
         let fallbackAddress;
         
         if (distance < 5) {
-          fallbackAddress = language === 'ar' ? `${cityName} - موقعك الحالي` : `${cityName} - Your Current Location`;
+          fallbackAddress = language === 'ar' ? `${cityName}` : `${cityName}`;
         } else if (distance < 20) {
           fallbackAddress = language === 'ar' ? `بالقرب من ${cityName}` : `Near ${cityName}`;
         } else {
@@ -490,7 +490,7 @@ export default function Home() {
                       {language === 'ar' ? 'الموقع:' : 'Location:'}
                     </span>
                     <div className="text-gray-800 truncate">
-                      {actualActiveRide.pickupLocation || (language === 'ar' ? 'موقعك الحالي' : 'Your current location')}
+                      {actualActiveRide.pickupLocation || (language === 'ar' ? 'المنزل' : 'Home')}
                     </div>
                   </div>
                   <div className="text-right">
