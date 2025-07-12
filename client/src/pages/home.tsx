@@ -15,9 +15,9 @@ import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753
 import newClinicImage from "@assets/freepik_assistant_1751363666289_1751363695395.png";
 import newestHouseImage from "@assets/freepik_assistant_1751364682430_1751364706224.png";
 import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png";
-// 3D Icons without background
-import whatsappIcon from '@assets/freepik__background__45619_1752165729974.png';
-import phoneIcon from '@assets/freepik__background__45618_1752165541475.png';
+// New Custom Purple Icons
+import whatsappIcon from '@assets/freepik__background__20710_1752333859889.png';
+import phoneIcon from '@assets/freepik__a-modern-and-sleek-smartphone-icon-in-dark-mauve-c__20709_1752333859889.png';
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
@@ -385,8 +385,56 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Current Location Section - Hidden for better UX */}
-        {/* Location tracking is handled in the background */}
+        {/* Current Location */}
+        <div className="p-3 bg-blue-50 border-b">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="font-semibold text-gray-800 text-sm" style={{ textAlign }}>
+              {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
+            </h3>
+            {locationInfo.isLoading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
+          </div>
+          <div className="flex items-center">
+            <MapPin className="w-4 h-4 text-blue-600 mr-2" />
+            <span className="text-gray-700 text-sm flex-1">
+              {locationInfo.address}
+            </span>
+            {locationInfo.error && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={getCurrentLocation}
+                className="text-xs text-blue-600 p-1 h-auto"
+              >
+                {language === 'ar' ? 'إعادة تحديد' : 'Refresh'}
+              </Button>
+            )}
+          </div>
+          {/* Debug location info */}
+          <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+            <div className="text-gray-600">
+              <strong>{language === 'ar' ? 'معلومات النظام:' : 'System Info:'}</strong>
+            </div>
+            <div className="text-gray-700 mt-1">
+              {language === 'ar' ? 'نظام تحديد الموقع الدقيق مفعل' : 'Precise location system active'}
+            </div>
+            <div className="text-gray-700">
+              {language === 'ar' ? 'يعرض الشوارع والأحياء التفصيلية' : 'Shows detailed streets and neighborhoods'}
+            </div>
+            <div className="text-gray-700">
+              {language === 'ar' ? 'يدعم المدن السعودية مع نظام احتياطي' : 'Supports Saudi cities with fallback system'}
+            </div>
+            {locationInfo.coordinates && (
+              <div className="text-gray-600 mt-1 text-xs">
+                <strong>{language === 'ar' ? 'الإحداثيات:' : 'Coordinates:'}</strong> {locationInfo.coordinates.lat.toFixed(6)}, {locationInfo.coordinates.lon.toFixed(6)}
+                {locationInfo.accuracy && (
+                  <span className="ml-2">
+                    {language === 'ar' ? 'الدقة:' : 'Accuracy:'} {locationInfo.accuracy.toFixed(0)}m
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Enhanced Progress Animation for Active Ride */}
         {actualActiveRide && (
