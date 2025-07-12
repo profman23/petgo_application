@@ -58,6 +58,7 @@ export default function DoctorLogin() {
     },
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
+      localStorage.setItem('doctorToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast({
         title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Login Successful',

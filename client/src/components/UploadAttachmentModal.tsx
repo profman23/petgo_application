@@ -176,10 +176,21 @@ export default function UploadAttachmentModal({
   // View file in browser (for images, PDFs)
   const handleViewFile = async (attachmentId: number) => {
     try {
-      const token = localStorage.getItem('doctorToken');
+      // Get current token from localStorage
+      const token = localStorage.getItem('doctorToken') || localStorage.getItem('userToken');
+      
+      if (!token) {
+        console.error('No authentication token found');
+        return;
+      }
+
+      console.log('Attempting to view file with token:', token);
+      
       const response = await fetch(`/api/pet-attachments/view/${attachmentId}`, {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
       
@@ -188,7 +199,8 @@ export default function UploadAttachmentModal({
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
       } else {
-        console.error('Failed to view file');
+        const errorText = await response.text();
+        console.error('Failed to view file:', response.status, errorText);
       }
     } catch (error) {
       console.error('Error viewing file:', error);
@@ -198,10 +210,21 @@ export default function UploadAttachmentModal({
   // Download file to device
   const handleDownloadFile = async (attachmentId: number, fileName: string) => {
     try {
-      const token = localStorage.getItem('doctorToken');
+      // Get current token from localStorage
+      const token = localStorage.getItem('doctorToken') || localStorage.getItem('userToken');
+      
+      if (!token) {
+        console.error('No authentication token found');
+        return;
+      }
+
+      console.log('Attempting to download file with token:', token);
+      
       const response = await fetch(`/api/pet-attachments/download/${attachmentId}`, {
+        method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
       
@@ -216,7 +239,8 @@ export default function UploadAttachmentModal({
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       } else {
-        console.error('Failed to download file');
+        const errorText = await response.text();
+        console.error('Failed to download file:', response.status, errorText);
       }
     } catch (error) {
       console.error('Error downloading file:', error);
