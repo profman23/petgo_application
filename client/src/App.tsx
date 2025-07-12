@@ -32,6 +32,28 @@ import { InstallPrompt } from "@/components/InstallPrompt";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
+// Clear manifest cache on app start to ensure fresh icons
+const clearManifestCache = async () => {
+  if ('caches' in window) {
+    try {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map(async (cacheName) => {
+          const cache = await caches.open(cacheName);
+          await cache.delete('/manifest.json');
+          await cache.delete('/app-icon.png');
+          // Clear all icon variations
+          const iconSizes = ['72x72', '96x96', '128x128', '144x144', '152x152', '192x192', '384x384', '512x512'];
+          await Promise.all(iconSizes.map(size => cache.delete(`/icons/icon-${size}.png`)));
+        })
+      );
+      console.log('✅ Manifest and icon cache cleared');
+    } catch (error) {
+      console.log('Cache clear failed:', error);
+    }
+  }
+};
+
 // Check for expired tokens on app start (skip for admin routes)
 const checkAndClearExpiredTokens = async () => {
   // Don't check tokens for admin routes
@@ -61,6 +83,9 @@ const checkAndClearExpiredTokens = async () => {
 if (!window.location.pathname.includes('admin')) {
   checkAndClearExpiredTokens();
 }
+
+// Clear manifest cache on app start to ensure fresh icons
+clearManifestCache();
 
 // Configure default authorization header for API requests
 const token = localStorage.getItem('token');

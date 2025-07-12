@@ -1,20 +1,27 @@
-const CACHE_NAME = 'vetsvan-v1.0.0';
+const CACHE_NAME = 'vetsvan-v2.0.0';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
   '/static/css/main.css',
-  '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/manifest.json?v=2.0',
+  '/app-icon.png?v=2.0',
+  '/icons/icon-192x192.png?v=2.0',
+  '/icons/icon-512x512.png?v=2.0'
 ];
 
 // Install service worker
 self.addEventListener('install', event => {
+  // Force immediate activation
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened cache:', CACHE_NAME);
         return cache.addAll(urlsToCache);
+      })
+      .catch(err => {
+        console.log('Cache installation failed:', err);
       })
   );
 });
@@ -32,8 +39,12 @@ self.addEventListener('fetch', event => {
 
 // Activate service worker
 self.addEventListener('activate', event => {
+  // Take control immediately
+  self.clients.claim();
+  
   event.waitUntil(
     caches.keys().then(cacheNames => {
+      console.log('All caches:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
@@ -42,6 +53,14 @@ self.addEventListener('activate', event => {
           }
         })
       );
+    }).then(() => {
+      console.log('Service Worker activated and cache cleaned');
+      // Force page reload to ensure fresh icons
+      self.clients.matchAll().then(clients => {
+        clients.forEach(client => {
+          client.postMessage({ type: 'CACHE_UPDATED' });
+        });
+      });
     })
   );
 });
