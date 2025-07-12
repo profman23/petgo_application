@@ -893,10 +893,17 @@ export default function AdminDashboard() {
                     <div className="px-4 py-5 sm:px-6">
                       <h3 className="text-lg leading-6 font-medium text-gray-900">{t('currentVetsVans')}</h3>
                       <p className="mt-1 max-w-2xl text-sm text-gray-500">{t('totalVetsVans')}: {drivers?.length || 0}</p>
-                      <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-                        <p className="text-sm text-yellow-800">
-                          <strong>{language === 'ar' ? 'ميزة جديدة:' : 'New Feature:'}</strong> 
-                          {language === 'ar' ? ' يمكنك الآن تعطيل/تفعيل المواعيد لكل سيارة منفصلة' : ' You can now disable/enable appointments for each vehicle'}
+                      <div className="mt-3 p-4 bg-gradient-to-r from-purple-100 to-blue-100 border-2 border-purple-300 rounded-lg shadow-md">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
+                          <h4 className="text-lg font-bold text-purple-800">
+                            {language === 'ar' ? '🎉 ميزة جديدة متاحة الآن!' : '🎉 New Feature Available!'}
+                          </h4>
+                        </div>
+                        <p className="text-sm text-purple-700 font-medium">
+                          {language === 'ar' ? 
+                            'يمكنك الآن تعطيل أو تفعيل المواعيد لكل سيارة VETS VAN بشكل منفصل باستخدام الزر الجديد 🕐' : 
+                            'You can now disable or enable appointments for each VETS VAN separately using the new button 🕐'}
                         </p>
                       </div>
                     </div>
@@ -960,21 +967,23 @@ export default function AdminDashboard() {
                                       appointmentsDisabled: !driver.appointmentsDisabled,
                                     })
                                   }
-                                  className={`text-sm inline-flex items-center gap-2 px-3 py-2 rounded-md font-medium transition-all duration-200 shadow-sm ${
+                                  className={`text-sm inline-flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-lg transform hover:scale-105 ${
                                     driver.appointmentsDisabled
-                                      ? "bg-orange-500 text-white hover:bg-orange-600 border border-orange-600"
-                                      : "bg-blue-500 text-white hover:bg-blue-600 border border-blue-600"
+                                      ? "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 border-2 border-orange-400"
+                                      : "bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-2 border-blue-400"
                                   }`}
                                   title={driver.appointmentsDisabled 
                                     ? (language === 'ar' ? 'اضغط لتفعيل المواعيد' : 'Click to enable appointments')
                                     : (language === 'ar' ? 'اضغط لتعطيل المواعيد' : 'Click to disable appointments')
                                   }
                                 >
-                                  <Clock className="w-4 h-4" />
-                                  {driver.appointmentsDisabled 
-                                    ? (language === 'ar' ? 'تفعيل المواعيد' : 'Enable Appointments')
-                                    : (language === 'ar' ? 'تعطيل المواعيد' : 'Disable Appointments')
-                                  }
+                                  <Clock className="w-5 h-5" />
+                                  <span className="font-extrabold text-lg">
+                                    {driver.appointmentsDisabled 
+                                      ? (language === 'ar' ? '🟢 تفعيل المواعيد' : '🟢 Enable Appointments')
+                                      : (language === 'ar' ? '🔴 تعطيل المواعيد' : '🔴 Disable Appointments')
+                                    }
+                                  </span>
                                 </button>
                               </div>
                               <button
