@@ -35,10 +35,9 @@ export async function initDatabase() {
       );
     `);
 
-    // Drop and recreate products table with correct schema
-    await pool.query(`DROP TABLE IF EXISTS products CASCADE`);
+    // Create products table if it doesn't exist
     await pool.query(`
-      CREATE TABLE products (
+      CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         name_ar VARCHAR(255),
@@ -56,10 +55,9 @@ export async function initDatabase() {
       );
     `);
 
-    // Drop and recreate services table with correct schema
-    await pool.query(`DROP TABLE IF EXISTS services CASCADE`);
+    // Create services table if it doesn't exist
     await pool.query(`
-      CREATE TABLE services (
+      CREATE TABLE IF NOT EXISTS services (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         name_ar VARCHAR(255),
@@ -75,10 +73,9 @@ export async function initDatabase() {
       );
     `);
 
-    // Drop and recreate import_history table with correct schema
-    await pool.query(`DROP TABLE IF EXISTS import_history CASCADE`);
+    // Create import_history table if it doesn't exist
     await pool.query(`
-      CREATE TABLE import_history (
+      CREATE TABLE IF NOT EXISTS import_history (
         id SERIAL PRIMARY KEY,
         file_name VARCHAR(255) NOT NULL,
         file_type VARCHAR(20) NOT NULL,
