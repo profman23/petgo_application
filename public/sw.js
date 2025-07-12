@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vetsvan-v3.0.0';
+const CACHE_NAME = 'vetsvan-v5.0.0';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -33,14 +33,18 @@ self.addEventListener('fetch', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
+      // Delete ALL old caches to ensure fresh icon loading
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+          console.log('Force deleting cache:', cacheName);
+          return caches.delete(cacheName);
         })
       );
+    }).then(() => {
+      // Clear all caches and reload the new icon
+      return caches.open(CACHE_NAME).then(cache => {
+        return cache.addAll(urlsToCache);
+      });
     }).then(() => {
       // Take control of all clients
       return self.clients.claim();

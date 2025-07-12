@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/lib/i18n';
+import { forceIconRefresh } from '@/utils/iconRefresh';
 
 const translations = {
   en: {
@@ -48,7 +49,10 @@ export function UpdateNotification() {
           </Button>
           <Button 
             size="sm" 
-            onClick={updateApp}
+            onClick={() => {
+              forceIconRefresh();
+              updateApp();
+            }}
             className="bg-purple-600 hover:bg-purple-700"
           >
             {t.updateNow}
