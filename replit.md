@@ -672,6 +672,8 @@ Changelog:
 - July 12, 2025. ENHANCED: All PWA components (PWAInstaller, PWAInstallBanner, InstallPrompt, MobileInstallBanner) now use new VetsVan logo
 - July 12, 2025. UPGRADED: PWA installation image updated to latest high-quality version (Screenshot 2025-07-12 145346_1752323089078.png)
 - July 12, 2025. COMPLETED: All PWA components, manifest.json, and index.html updated with new professional veterinary logo featuring purple medical cross with dog and cat silhouettes
+- July 12, 2025. RESOLVED: PWA installation image loading issue - moved image to public directory and added dedicated server route with proper MIME type
+- July 12, 2025. VERIFIED: User confirmed successful PWA installation with high-quality veterinary logo display on Android devices
 - July 12, 2025. CONFIGURED: Manifest.json and index.html updated to use new logo for all device types (Android, iOS, PC)
 - July 12, 2025. COMPLETED: Border removal from all customer interface pages - replaced purple borders with clean gray borders
 - July 9, 2025. ENHANCED: Database schema with otp_verifications table including email, code, expiration, and user_data fields
