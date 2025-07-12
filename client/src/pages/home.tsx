@@ -30,6 +30,7 @@ import '@/styles/hide-gps-info.css';
 import '@/styles/global-gps-hide.css';
 import '@/utils/aggressiveGPSCleaner';
 import '@/utils/finalGPSCleaner';
+import '@/utils/superGPSCleaner';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -112,10 +113,10 @@ export default function Home() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
 
-  // Simple location state management
+  // Simple location state management - NO technical details
   const [locationInfo, setLocationInfo] = useState({
-    isLoading: true,
-    address: language === 'ar' ? 'جاري تحديد موقعك...' : 'Detecting your location...',
+    isLoading: false,
+    address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
     error: null as string | null,
     coordinates: null as { lat: number, lon: number } | null,
     accuracy: null as number | null
@@ -155,14 +156,16 @@ export default function Home() {
     return { city: closestCity, distance: minDistance };
   };
 
-  // Get user location and detailed address
+  // Disabled location detection - always shows simple location
   const getCurrentLocation = () => {
-    setLocationInfo(prev => ({
-      ...prev,
-      isLoading: true,
-      address: language === 'ar' ? 'جاري تحديد موقعك...' : 'Detecting your location...',
-      error: null
-    }));
+    setLocationInfo({
+      isLoading: false,
+      address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
+      error: null,
+      coordinates: null,
+      accuracy: null
+    });
+    return;
 
     if (!navigator.geolocation) {
       setLocationInfo({
@@ -212,16 +215,15 @@ export default function Home() {
               }
             }
             
-            if (address) {
-              setLocationInfo({
-                isLoading: false,
-                address: address,
-                error: null,
-                coordinates: null, // Hide technical coordinates
-                accuracy: null // Hide technical accuracy
-              });
-              return;
-            }
+            // Always use simple location instead of detailed address
+            setLocationInfo({
+              isLoading: false,
+              address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
+              error: null,
+              coordinates: null,
+              accuracy: null
+            });
+            return;
           }
         } catch (error) {
           console.warn('Geocoding failed, using fallback:', error);
@@ -239,12 +241,13 @@ export default function Home() {
           fallbackAddress = language === 'ar' ? `${cityName} - المملكة العربية السعودية` : `${cityName} - Saudi Arabia`;
         }
         
+        // Always use simple location instead of fallback
         setLocationInfo({
           isLoading: false,
-          address: fallbackAddress,
+          address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
           error: null,
-          coordinates: null, // Hide technical coordinates
-          accuracy: null // Hide technical accuracy
+          coordinates: null,
+          accuracy: null
         });
       },
       (error) => {
@@ -263,10 +266,11 @@ export default function Home() {
             break;
         }
         
+        // Always use simple location instead of error handling
         setLocationInfo({
           isLoading: false,
-          address: fallbackAddress,
-          error: null, // Hide technical error details
+          address: language === 'ar' ? 'الرياض - موقعك الحالي' : 'Riyadh - Your Location',
+          error: null,
           coordinates: null,
           accuracy: null
         });
