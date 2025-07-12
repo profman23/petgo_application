@@ -675,6 +675,7 @@ Changelog:
 - July 12, 2025. RESOLVED: PWA installation image loading issue - moved image to public directory and added dedicated server route with proper MIME type
 - July 12, 2025. VERIFIED: User confirmed successful PWA installation with high-quality veterinary logo display on Android devices
 - July 12, 2025. UPDATED: PWA icon replaced with user's preferred image (Screenshot 2025-07-12 160205_1752325335646.png) - cleaner version of veterinary logo with dog and cat silhouettes
+- July 12, 2025. ENHANCED: PWA icon with thick white border (120px) around purple veterinary logo for better visual appearance on all devices
 - July 12, 2025. CONFIGURED: Manifest.json and index.html updated to use new logo for all device types (Android, iOS, PC)
 - July 12, 2025. COMPLETED: Border removal from all customer interface pages - replaced purple borders with clean gray borders
 - July 9, 2025. ENHANCED: Database schema with otp_verifications table including email, code, expiration, and user_data fields
