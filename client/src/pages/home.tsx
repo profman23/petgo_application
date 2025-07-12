@@ -712,7 +712,7 @@ export default function Home() {
                     <img 
                       src={newVetClinicImage}
                       alt="Veterinary Clinic" 
-                      className="w-18 h-18 drop-shadow-xl"
+                      className="w-16 h-16 drop-shadow-xl"
                     />
                   </div>
                   
