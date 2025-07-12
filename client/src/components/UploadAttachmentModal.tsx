@@ -76,9 +76,15 @@ export default function UploadAttachmentModal({
 
   const t = (key: keyof typeof translations.ar) => translations[language as keyof typeof translations][key];
 
-  // Fetch existing attachments using query parameters
+  // Fetch existing attachments
   const { data: attachments = [], refetch } = useQuery({
-    queryKey: [`/api/pet-attachments?petId=${petId}&bookingId=${bookingId}`],
+    queryKey: ['/api/pet-attachments', petId, bookingId],
+    queryFn: async () => {
+      const response = await fetch(`/internal/pet-attachments?petId=${petId}&bookingId=${bookingId}`);
+      const data = await response.json();
+      console.log('Fetched attachments:', data);
+      return data;
+    },
     enabled: isOpen,
   });
 

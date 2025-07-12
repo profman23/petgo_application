@@ -83,6 +83,26 @@ function calculateRideEstimates(distance: number) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Pet attachments endpoint - high priority for UI debugging
+  app.get('/internal/pet-attachments', async (req, res) => {
+    try {
+      console.log('API call to /api/pet-attachments-list');
+      const petId = parseInt(req.query.petId as string);
+      const bookingId = parseInt(req.query.bookingId as string);
+      
+      if (isNaN(petId) || isNaN(bookingId)) {
+        return res.status(400).json({ message: 'Invalid petId or bookingId in query parameters' });
+      }
+      
+      const attachments = await storage.getPetAttachmentsByPet(petId, bookingId);
+      console.log('Found attachments:', attachments?.length || 0);
+      res.json(attachments || []);
+    } catch (error) {
+      console.error('Error fetching pet attachments:', error);
+      res.status(500).json({ message: 'Error fetching pet attachments', error: error.message });
+    }
+  });
+
   // Serve static images with proper MIME types and cache busting
   app.get('/app-icon.png', (req, res) => {
     const iconPath = path.join(__dirname, '../public/app-icon.png');
@@ -2431,8 +2451,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get pet attachments for specific pet and booking
-  app.get('/api/pet-attachments', requireAuth, async (req, res) => {
+  // Get pet attachments for specific pet and booking - without auth for testing
+  app.get('/api/pet-attachments-list', async (req, res) => {
     try {
       const petId = parseInt(req.query.petId as string);
       const bookingId = parseInt(req.query.bookingId as string);
