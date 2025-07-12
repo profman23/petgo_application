@@ -76,13 +76,15 @@ export default function DoctorInvoice() {
     { id: '1', description: '', quantity: 1, unitPrice: 0, total: 0 }
   ]);
   const [notes, setNotes] = useState('');
-  const [applyDiscount, setApplyDiscount] = useState(false);
+  const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'fixed'>('none');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   
   // Tax rate constant (15%)
   const TAX_RATE = 0.15;
   // Discount rate constant (10%)
   const DISCOUNT_RATE = 0.10;
+  // Fixed discount amount (100 SAR)
+  const FIXED_DISCOUNT_AMOUNT = 100;
   const [showVitalsModal, setShowVitalsModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -210,7 +212,15 @@ export default function DoctorInvoice() {
   useEffect(() => {
     if (invoiceStatus && invoiceStatus.isGenerated) {
       setIsRecordLocked(true);
-      setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
+      // Determine discount type based on discount amount
+      const discountValue = parseFloat(invoiceStatus.discountAmount) || 0;
+      if (discountValue === 0) {
+        setDiscountType('none');
+      } else if (discountValue === FIXED_DISCOUNT_AMOUNT) {
+        setDiscountType('fixed');
+      } else {
+        setDiscountType('percentage');
+      }
       setNotes(invoiceStatus.notes || '');
     }
   }, [invoiceStatus]);
@@ -360,7 +370,8 @@ export default function DoctorInvoice() {
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.total, 0);
   const taxAmount = subtotal * TAX_RATE;
   const totalWithTax = subtotal + taxAmount;
-  const discountAmount = applyDiscount ? totalWithTax * DISCOUNT_RATE : 0;
+  const discountAmount = discountType === 'percentage' ? totalWithTax * DISCOUNT_RATE : 
+                        discountType === 'fixed' ? FIXED_DISCOUNT_AMOUNT : 0;
   const finalTotal = totalWithTax - discountAmount;
   const remainingBalance = finalTotal - totalPaid;
 
@@ -1013,13 +1024,14 @@ export default function DoctorInvoice() {
                   <span>{t('discount')}:</span>
                   <div className="flex items-center space-x-2">
                     <select
-                      value={applyDiscount ? "yes" : "no"}
-                      onChange={(e) => setApplyDiscount(e.target.value === "yes")}
+                      value={discountType}
+                      onChange={(e) => setDiscountType(e.target.value as 'none' | 'percentage' | 'fixed')}
                       className="border border-gray-300 rounded px-3 py-1 text-sm"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
                     >
-                      <option value="no">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</option>
-                      <option value="yes">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</option>
+                      <option value="none">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</option>
+                      <option value="percentage">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</option>
+                      <option value="fixed">{language === 'ar' ? 'خصم 100 ريال' : '100 SAR Discount'}</option>
                     </select>
                     <span className="text-lg font-medium">{discountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
