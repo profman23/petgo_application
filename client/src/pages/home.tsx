@@ -771,7 +771,7 @@ export default function Home() {
                 href="https://wa.me/966535152250"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
+                className="flex items-center justify-center transform hover:scale-110 transition-all duration-300 active:animate-pulse"
                 style={{
                   animation: 'shake 2s ease-in-out infinite'
                 }}
@@ -785,7 +785,7 @@ export default function Home() {
                 <img 
                   src={whatsappIcon}
                   alt="WhatsApp"
-                  className="w-14 h-14 object-contain"
+                  className="w-20 h-20 object-contain"
                   style={{
                     filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
                   }}
@@ -795,7 +795,7 @@ export default function Home() {
               {/* Phone Call Button */}
               <a
                 href="tel:920011626"
-                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
+                className="flex items-center justify-center transform hover:scale-110 transition-all duration-300 active:animate-pulse"
                 style={{
                   animation: 'shake 2s ease-in-out infinite'
                 }}
@@ -809,7 +809,7 @@ export default function Home() {
                 <img 
                   src={phoneIcon}
                   alt="Phone Call"
-                  className="w-12 h-12 object-contain"
+                  className="w-16 h-16 object-contain"
                   style={{
                     filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
                   }}
