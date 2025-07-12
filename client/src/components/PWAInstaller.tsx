@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Smartphone, Monitor, X } from 'lucide-react';
 import { showInstallNotification } from '@/utils/install-notification';
-import customShareIcon from '@assets/Screenshot 2025-07-12 145346_1752323089078.png';
+import customShareIcon from '@assets/Screenshot 2025-07-12 160205_1752325335646.png';
 import { getDeviceLanguageWithLogging, installMessages, safariInstructions } from '@/utils/device-language';
 
 interface BeforeInstallPromptEvent extends Event {

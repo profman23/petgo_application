@@ -83,18 +83,24 @@ function calculateRideEstimates(distance: number) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Serve static images with proper MIME types
+  // Serve static images with proper MIME types and cache busting
   app.get('/app-icon.png', (req, res) => {
     const iconPath = path.join(__dirname, '../public/app-icon.png');
     res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // Force refresh
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('ETag', Date.now().toString()); // Force browser refresh
     res.sendFile(iconPath);
   });
 
   app.get('/app-icon-maskable.png', (req, res) => {
     const iconPath = path.join(__dirname, '../public/app-icon-maskable.png');
     res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // Force refresh
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('ETag', Date.now().toString()); // Force browser refresh
     res.sendFile(iconPath);
   });
 
