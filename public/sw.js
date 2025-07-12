@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vetsvan-v5.0.0';
+const CACHE_NAME = 'vetsvan-v6.0.0';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
