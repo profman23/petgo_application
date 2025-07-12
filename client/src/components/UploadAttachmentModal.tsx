@@ -107,13 +107,22 @@ export default function UploadAttachmentModal({
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async (attachmentData: any) => {
-      return apiRequest(`/api/pet-attachments`, {
+      const token = localStorage.getItem('doctorToken');
+      const response = await fetch('/api/pet-attachments', {
         method: 'POST',
-        body: JSON.stringify(attachmentData),
         headers: {
-          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
+        body: JSON.stringify(attachmentData)
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Upload failed: ${response.status} - ${errorText}`);
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       alert(t('uploadSuccess'));
@@ -130,9 +139,20 @@ export default function UploadAttachmentModal({
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (attachmentId: number) => {
-      return apiRequest(`/api/pet-attachments/${attachmentId}`, {
+      const token = localStorage.getItem('doctorToken');
+      const response = await fetch(`/api/pet-attachments/${attachmentId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+      
+      if (!response.ok) {
+        throw new Error(`Delete failed: ${response.status}`);
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       alert(t('deleteSuccess'));

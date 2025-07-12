@@ -196,6 +196,16 @@ export default function DoctorInvoice() {
     }
   }, [savedInvoiceItems]);
 
+  // Update lock status when invoice status is loaded
+  useEffect(() => {
+    if (invoiceStatus) {
+      console.log('Invoice status loaded:', invoiceStatus);
+      const isGenerated = invoiceStatus.isGenerated || invoiceStatus.is_generated;
+      setIsRecordLocked(Boolean(isGenerated));
+      console.log('Record lock status set to:', Boolean(isGenerated));
+    }
+  }, [invoiceStatus]);
+
   // Auto-save when items are modified
   useEffect(() => {
     if (invoiceItems.length > 0 && booking && !isRecordLocked) {

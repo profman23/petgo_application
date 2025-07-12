@@ -2419,6 +2419,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Pet Attachments endpoints
+  // Get pet attachments with query params (with auth)
+  app.get('/api/pet-attachments', requireAuth, async (req, res) => {
+    try {
+      const petId = parseInt(req.query.petId as string);
+      const bookingId = parseInt(req.query.bookingId as string);
+      
+      if (isNaN(petId) || isNaN(bookingId)) {
+        return res.status(400).json({ message: 'Invalid petId or bookingId in query parameters' });
+      }
+      
+      const attachments = await storage.getPetAttachmentsByPet(petId, bookingId);
+      console.log(`Found ${attachments?.length || 0} attachments for pet ${petId}, booking ${bookingId}`);
+      res.json(attachments || []);
+    } catch (error) {
+      console.error('Error fetching pet attachments:', error);
+      res.status(500).json({ message: 'Error fetching pet attachments' });
+    }
+  });
+
   app.post('/api/pet-attachments', requireAuth, async (req: any, res) => {
     try {
       const doctorId = req.user?.id;
@@ -2516,7 +2535,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // Download attachment endpoint - serves file data from database
-  app.get('/api/pet-attachments/download/:id', async (req, res) => {
+  app.get('/api/pet-attachments/download/:id', requireAuth, async (req, res) => {
     try {
       const attachmentId = parseInt(req.params.id);
       console.log('Downloading attachment ID:', attachmentId);
@@ -2553,7 +2572,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // View attachment endpoint - for inline viewing (images, PDFs)
-  app.get('/api/pet-attachments/view/:id', async (req, res) => {
+  app.get('/api/pet-attachments/view/:id', requireAuth, async (req, res) => {
     try {
       const attachmentId = parseInt(req.params.id);
       console.log('Viewing attachment ID:', attachmentId);
