@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
@@ -102,6 +102,22 @@ export default function DoctorInvoice() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isRecordLocked, setIsRecordLocked] = useState(false);
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
+
+  // Force refresh function
+  const forceRefresh = useCallback(async () => {
+    console.log('Force refreshing all data with cache invalidation...');
+    queryClient.clear();
+    setForceRender(Date.now());
+    setDiscountType('none');
+    
+    toast({
+      title: language === 'ar' ? 'تم تحديث البيانات' : 'Data refreshed',
+      description: language === 'ar' ? 'تم تحديث جميع البيانات بنجاح' : 'All data has been refreshed successfully'
+    });
+    
+    // Complete page refresh
+    window.location.reload();
+  }, [queryClient, language, toast]);
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -317,34 +333,7 @@ export default function DoctorInvoice() {
     }
   }, [invoiceStatus]);
 
-  // Force refresh function with complete cache invalidation and re-render
-  const forceRefresh = async () => {
-    console.log('Force refreshing all data with cache invalidation...');
-    
-    // Clear all React Query cache for this booking
-    queryClient.removeQueries({ queryKey: [`/api/invoice-status/${params?.bookingId}`] });
-    queryClient.removeQueries({ queryKey: [`/api/invoice-items/${params?.bookingId}`] });
-    
-    // Force component re-render
-    setForceRender(prev => prev + 1);
-    
-    // Reset discount type before refetch
-    setDiscountType('none');
-    
-    // Force refetch with new requests
-    await Promise.all([
-      refetchInvoiceStatus(),
-      refetchInvoiceItems()
-    ]);
-    
-    // Force another re-render after data loads
-    setTimeout(() => setForceRender(prev => prev + 1), 100);
-    
-    toast({
-      title: language === 'ar' ? 'تم تحديث البيانات' : 'Data refreshed',
-      description: language === 'ar' ? 'تم تحديث جميع البيانات بنجاح' : 'All data has been refreshed successfully'
-    });
-  };
+
 
 
   const getDirection = (lang: string) => lang === 'ar' ? 'rtl' : 'ltr';
