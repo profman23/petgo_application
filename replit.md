@@ -695,6 +695,7 @@ Changelog:
 - July 12, 2025. CREATED: LanguageTestingPanel component for development testing of language detection system
 - July 12, 2025. ENHANCED: Development tools with browser language override functionality and real-time testing capabilities
 - July 12, 2025. ADDED: Console logging for language detection debugging and comprehensive test mode for developers
+- July 12, 2025. FIXED: Loading screen circular progress positioning - centered perfectly for both Android and iOS devices
 - July 10, 2025. FIXED: Removed duplicate translation keys to eliminate build warnings
 - July 10, 2025. DISABLED: Payment system integration in vetsvan-booking flow - customers no longer redirected to MyFatoorah payment links
 - July 10, 2025. MODIFIED: VetsVan booking system now redirects to customer activity page instead of payment gateway after successful booking

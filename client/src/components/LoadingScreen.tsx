@@ -29,12 +29,14 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
 
   return (
     <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
-      <div className="relative">
-        {/* Circular Progress Ring */}
-        <svg 
-          className="w-24 h-24 transform -rotate-90 absolute inset-0" 
-          viewBox="0 0 80 80"
-        >
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="flex items-center justify-center">
+          {/* Circular Progress Ring */}
+          <svg 
+            className="w-24 h-24 transform -rotate-90" 
+            viewBox="0 0 80 80"
+            style={{ display: 'block', margin: '0 auto' }}
+          >
           {/* Background circle */}
           <circle
             cx="40"
@@ -57,7 +59,8 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
             strokeDashoffset={strokeDashoffset}
             className="transition-all duration-300 ease-out"
           />
-        </svg>
+          </svg>
+        </div>
       </div>
     </div>
   );
