@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2, Home as HomeIcon, Activity } from 'lucide-react';
+import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2 } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import vetsVanImage from "@assets/image_1751292329902.png";
@@ -348,45 +348,36 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 via-blue-50 to-purple-100 overflow-x-hidden" dir={direction}>
-      {/* Full Screen Mobile Container */}
-      <div className="w-full min-h-screen bg-white/95 backdrop-blur-sm flex flex-col">
-        {/* Enhanced Header - Full Width */}
-        <div className="w-full bg-gradient-to-r from-purple-600 via-purple-700 to-purple-800 text-white px-4 py-4 shadow-lg border-b">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent_50%)]"></div>
-          </div>
-          <div className="relative z-10 flex items-center justify-between">
-            {/* Logo and Welcome */}
-            <div className="flex items-center space-x-3 rtl:space-x-reverse">
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl shadow-lg flex items-center justify-center p-2 hover:scale-105 transition-all duration-300">
+    <div className="min-h-screen bg-gray-50" dir={direction}>
+      <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
+        {/* Header */}
+        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
+          <div className="flex items-center justify-between h-full">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 bg-white rounded-lg border-2 border-gray-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
-                  alt="VetsVan Logo" 
-                  className="w-full h-full object-contain"
+                  alt="VETS VAN Logo" 
+                  className="h-full w-auto object-contain"
+                  style={{ 
+                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
+                    maxWidth: '120px'
+                  }}
                 />
               </div>
-              <div className="text-white">
-                <div className="text-lg font-bold">
-                  {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
-                </div>
-                <div className="text-purple-100 text-sm opacity-90">
-                  {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
-                </div>
+              <div className="text-lg font-bold text-gray-800">
+                {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
               </div>
             </div>
-            
-            {/* Header Controls */}
-            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+            <div className="flex items-center space-x-2">
               <LanguageSelector />
               <InstallButton />
-              <Bell className="w-5 h-5 cursor-pointer text-white/80 hover:text-white transition-colors" />
+              <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border border-white/30 px-3 py-1 h-8 rounded-lg font-medium transition-all duration-300"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -394,42 +385,55 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Current Location - Enhanced */}
-        <div className="w-full px-4 py-6 bg-gradient-to-r from-blue-50 via-purple-50 to-blue-50 border-b">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-gray-800 text-lg" style={{ textAlign }}>
+        {/* Current Location */}
+        <div className="p-3 bg-blue-50 border-b">
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="font-semibold text-gray-800 text-sm" style={{ textAlign }}>
               {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
             </h3>
-            {locationInfo.isLoading && <Loader2 className="w-5 h-5 animate-spin text-purple-600" />}
+            {locationInfo.isLoading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
           </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-purple-100">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mr-3">
-                <MapPin className="w-5 h-5 text-purple-600" />
-              </div>
-              <div className="flex-1">
-                <span className="text-gray-800 font-medium block">
-                  {locationInfo.address}
-                </span>
+          <div className="flex items-center">
+            <MapPin className="w-4 h-4 text-blue-600 mr-2" />
+            <span className="text-gray-700 text-sm flex-1">
+              {locationInfo.address}
+            </span>
+            {locationInfo.error && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={getCurrentLocation}
+                className="text-xs text-blue-600 p-1 h-auto"
+              >
+                {language === 'ar' ? 'إعادة تحديد' : 'Refresh'}
+              </Button>
+            )}
+          </div>
+          {/* Debug location info */}
+          <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+            <div className="text-gray-600">
+              <strong>{language === 'ar' ? 'معلومات النظام:' : 'System Info:'}</strong>
+            </div>
+            <div className="text-gray-700 mt-1">
+              {language === 'ar' ? 'نظام تحديد الموقع الدقيق مفعل' : 'Precise location system active'}
+            </div>
+            <div className="text-gray-700">
+              {language === 'ar' ? 'يعرض الشوارع والأحياء التفصيلية' : 'Shows detailed streets and neighborhoods'}
+            </div>
+            <div className="text-gray-700">
+              {language === 'ar' ? 'يدعم المدن السعودية مع نظام احتياطي' : 'Supports Saudi cities with fallback system'}
+            </div>
+            {locationInfo.coordinates && (
+              <div className="text-gray-600 mt-1 text-xs">
+                <strong>{language === 'ar' ? 'الإحداثيات:' : 'Coordinates:'}</strong> {locationInfo.coordinates.lat.toFixed(6)}, {locationInfo.coordinates.lon.toFixed(6)}
                 {locationInfo.accuracy && (
-                  <span className="text-purple-600 text-sm">
-                    {language === 'ar' ? 'دقة التحديد:' : 'Accuracy:'} {locationInfo.accuracy.toFixed(0)}m
+                  <span className="ml-2">
+                    {language === 'ar' ? 'الدقة:' : 'Accuracy:'} {locationInfo.accuracy.toFixed(0)}m
                   </span>
                 )}
               </div>
-              {locationInfo.error && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={getCurrentLocation}
-                  className="text-xs text-purple-600 border-purple-200 hover:bg-purple-50"
-                >
-                  {language === 'ar' ? 'إعادة تحديد' : 'Refresh'}
-                </Button>
-              )}
-            </div>
+            )}
           </div>
-
         </div>
 
         {/* Enhanced Progress Animation for Active Ride */}
@@ -671,9 +675,9 @@ export default function Home() {
           </div>
         )}
 
-        {/* Main Content Area - Full Screen */}
-        <div className="flex-1 px-4 py-6 flex flex-col">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center" style={{ textAlign }}>
+        {/* Request Status and Actions */}
+        <div className="p-3">
+          <h2 className="text-lg font-bold text-gray-900 mb-2" style={{ textAlign }}>
             {language === 'ar' ? 'طلب العيادة البيطرية المتنقلة' : 'Request Mobile Veterinary Clinic'}
           </h2>
           
@@ -725,136 +729,96 @@ export default function Home() {
             </div>
           )}
 
-          {/* Pet Image Section - Enhanced Full Width */}
-          <div className="flex justify-center mb-8">
-            <div className="relative w-full max-w-sm h-48 bg-gradient-to-br from-purple-600 via-purple-700 to-blue-600 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/90 to-blue-600/90"></div>
+          {/* Custom Dog and Cat Image */}
+          <div className="flex justify-center mb-3">
+            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-600 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm">
               <img 
                 src={petsImage}
                 alt="Dogs and Cats" 
-                className="w-full h-full object-cover hover:scale-110 transition-transform duration-500 relative z-10"
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 drop-shadow-lg"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent z-20"></div>
-              
-              {/* Floating Title */}
-              <div className="absolute bottom-4 left-4 right-4 z-30">
-                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-3">
-                  <h3 className="text-white font-bold text-center" style={{ textAlign }}>
-                    {language === 'ar' ? 'رعاية شاملة لحيواناتك الأليفة' : 'Complete Care for Your Pets'}
-                  </h3>
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Enhanced Request Button - Larger */}
-          <div className="mb-8">
-            <button
-              className="w-full font-bold py-8 px-8 rounded-3xl shadow-2xl transform hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer relative overflow-hidden"
-              style={{ 
-                background: 'linear-gradient(135deg, #852085, #6d1a6d, #852085)',
-                color: 'white',
-                border: 'none',
-                outline: 'none'
-              }}
-              onClick={() => setLocation('/ride-request')}
-              disabled={!!actualActiveRide}
-            >
-              {/* Animated background pattern */}
-              <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent animate-pulse"></div>
-              
-              <div className="relative z-10 flex flex-col items-center">
-                <Truck className="w-10 h-10 mb-4 text-white" />
-                <span className="text-2xl font-bold text-white mb-2" style={{ textAlign }}>
-                  {language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request'}
-                </span>
-                <span className="text-lg opacity-90 text-white" style={{ textAlign }}>
-                  {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Vetsvan Mobile Clinic'}
-                </span>
-              </div>
-            </button>
-          </div>
+          {/* Request Button */}
+          <button
+            className="w-full font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer"
+            style={{ 
+              background: 'linear-gradient(to right, #852085, #6d1a6d)',
+              color: 'white',
+              border: 'none',
+              outline: 'none'
+            }}
+            onClick={() => setLocation('/ride-request')}
+            disabled={!!actualActiveRide}
+          >
+            <div className="flex flex-col items-center">
+              <Truck className="w-6 h-6 mb-1 !text-white" style={{ color: 'white' }} />
+              <span className="text-lg !text-white" style={{ textAlign, color: 'white' }}>
+                {language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request'}
+              </span>
+              <span className="text-sm opacity-90 !text-white" style={{ textAlign, color: 'white' }}>
+                {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Vetsvan Mobile Clinic'}
+              </span>
+            </div>
+          </button>
 
-          {/* Contact Section - Enhanced Full Width */}
-          <div className="mt-auto">
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-purple-100">
-              <h3 className="text-center text-gray-700 font-bold text-lg mb-6" style={{ textAlign }}>
-                {language === 'ar' ? 'تواصل معنا' : 'Contact Us'}
-              </h3>
-              <div className="flex items-center justify-center space-x-12 rtl:space-x-reverse">
-                {/* Enhanced WhatsApp Button */}
-                <a
-                  href="https://wa.me/966535152250"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center justify-center w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-3xl shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 active:scale-95"
-                >
-                  <img 
-                    src={whatsappIcon}
-                    alt="WhatsApp"
-                    className="w-12 h-12 object-contain filter brightness-0 invert mb-1"
-                  />
-                  <span className="text-xs text-white font-bold">WhatsApp</span>
-                  <span className="text-xs text-white/80">0535152250</span>
-                </a>
-                
-                {/* Enhanced Phone Call Button */}
-                <a
-                  href="tel:920011626"
-                  className="flex flex-col items-center justify-center w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl shadow-xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 active:scale-95"
-                >
-                  <img 
-                    src={phoneIcon}
-                    alt="Phone Call"
-                    className="w-10 h-10 object-contain filter brightness-0 invert mb-1"
-                  />
-                  <span className="text-xs text-white font-bold">
-                    {language === 'ar' ? 'اتصال' : 'Call'}
-                  </span>
-                  <span className="text-xs text-white/80">920011626</span>
-                </a>
-              </div>
+          {/* Contact Section - Icons Only */}
+          <div className="mt-4 p-4 bg-white rounded-xl shadow-sm">
+            <div className="flex items-center justify-center space-x-6 rtl:space-x-reverse">
+              {/* WhatsApp Button */}
+              <a
+                href="https://wa.me/966535152250"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
+                style={{
+                  animation: 'shake 2s ease-in-out infinite'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.animation = 'shake 1s ease-in-out infinite';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.animation = 'shake 2s ease-in-out infinite';
+                }}
+              >
+                <img 
+                  src={whatsappIcon}
+                  alt="WhatsApp"
+                  className="w-14 h-14 object-contain"
+                  style={{
+                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
+                  }}
+                />
+              </a>
+              
+              {/* Phone Call Button */}
+              <a
+                href="tel:920011626"
+                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300 active:animate-pulse"
+                style={{
+                  animation: 'shake 2s ease-in-out infinite'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.animation = 'shake 1s ease-in-out infinite';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.animation = 'shake 2s ease-in-out infinite';
+                }}
+              >
+                <img 
+                  src={phoneIcon}
+                  alt="Phone Call"
+                  className="w-12 h-12 object-contain"
+                  style={{
+                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
+                  }}
+                />
+              </a>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Footer Navigation */}
-        <div className="w-full bg-white/95 backdrop-blur-sm border-t border-purple-100 px-4 py-4 shadow-lg">
-          <div className="flex items-center justify-center space-x-8 rtl:space-x-reverse">
-            {/* Home Button */}
-            <button 
-              onClick={() => setLocation('/home')}
-              className="flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 active:scale-95"
-            >
-              <HomeIcon className="w-6 h-6 text-white mb-1" />
-              <span className="text-xs text-white font-medium">
-                {language === 'ar' ? 'الرئيسية' : 'Home'}
-              </span>
-            </button>
-
-            {/* Activity Button */}
-            <button 
-              onClick={() => setLocation('/customer-activity')}
-              className="flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 active:scale-95"
-            >
-              <Activity className="w-6 h-6 text-white mb-1" />
-              <span className="text-xs text-white font-medium">
-                {language === 'ar' ? 'النشاط' : 'Activity'}
-              </span>
-            </button>
-
-            {/* Account Button */}
-            <button 
-              onClick={() => setLocation('/account')}
-              className="flex flex-col items-center justify-center w-16 h-16 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 active:scale-95"
-            >
-              <User className="w-6 h-6 text-white mb-1" />
-              <span className="text-xs text-white font-medium">
-                {language === 'ar' ? 'الحساب' : 'Account'}
-              </span>
-            </button>
-          </div>
-        </div>
 
       </div>
       
