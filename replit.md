@@ -589,6 +589,12 @@ Changelog:
 - July 12, 2025. RESOLVED: Doctor login endpoint now saves sessions in doctorSessions instead of regular sessions Map
 - July 12, 2025. COMPLETED: Frontend file view/download operations fully functional with proper authentication
 - July 12, 2025. TESTED: File endpoints return 200 OK responses with correct Content-Type and Content-Disposition headers
+- July 12, 2025. ENHANCED: Browser cache-busting system implemented for invoice data to prevent refresh issues
+- July 12, 2025. ADDED: Cache-Control headers (no-cache, no-store, must-revalidate) to prevent browser caching of invoice data
+- July 12, 2025. IMPLEMENTED: Timestamp-based query parameters (?t=Date.now()) for forced data refresh
+- July 12, 2025. CREATED: Manual refresh button in invoice header for immediate data refresh
+- July 12, 2025. OPTIMIZED: Discount loading system with forced state updates to prevent delayed appearance
+- July 12, 2025. RESOLVED: Multiple browser refresh requirement - system now loads discount immediately on first page load
 - July 8, 2025. FIXED: Pet vitals field mapping issue - resolved pet_id null constraint error by mapping frontend field names (petId, bookingId, heartRate) to database field names (pet_id, booking_id, heart_rate)
 - July 8, 2025. VERIFIED: Complete pet vitals system working perfectly - all CRUD operations functional with correct data persistence
 - July 8, 2025. RESOLVED: Schema field name mismatch - updated server routes to use camelCase field names (bookingId, petId, heartRate) matching shared/schema.ts definitions

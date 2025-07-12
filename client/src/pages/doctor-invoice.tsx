@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -118,13 +118,16 @@ export default function DoctorInvoice() {
   });
 
   // Fetch saved invoice items
-  const { data: savedInvoiceItems } = useQuery({
+  const { data: savedInvoiceItems, refetch: refetchInvoiceItems } = useQuery({
     queryKey: [`/api/invoice-items/${params?.bookingId}`],
     queryFn: async () => {
       const token = localStorage.getItem('doctorToken');
-      const response = await fetch(`/api/invoice-items/${params?.bookingId}`, {
+      const response = await fetch(`/api/invoice-items/${params?.bookingId}?t=${Date.now()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         },
       });
       if (!response.ok) {
@@ -137,17 +140,21 @@ export default function DoctorInvoice() {
     staleTime: 0, // Always fetch fresh data
     cacheTime: 0, // Don't cache to avoid stale data
     refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    retry: false
   });
 
   // Fetch invoice status
-  const { data: invoiceStatus } = useQuery({
+  const { data: invoiceStatus, refetch: refetchInvoiceStatus } = useQuery({
     queryKey: [`/api/invoice-status/${params?.bookingId}`],
     queryFn: async () => {
       const token = localStorage.getItem('doctorToken');
-      const response = await fetch(`/api/invoice-status/${params?.bookingId}`, {
+      const response = await fetch(`/api/invoice-status/${params?.bookingId}?t=${Date.now()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         },
       });
       if (!response.ok) {
@@ -161,6 +168,7 @@ export default function DoctorInvoice() {
     cacheTime: 0, // Don't cache to avoid stale lock state
     refetchOnMount: true, // Always refetch when component mounts
     refetchOnWindowFocus: false, // Don't refetch on window focus
+    retry: false, // Don't retry failed requests
   });
 
   // Fetch products for invoice item selection
@@ -237,26 +245,44 @@ export default function DoctorInvoice() {
           subtotal: invoiceStatus.subtotal 
         });
         
+        // Force update discount type with immediate state change
         if (discountValue === 0) {
           console.log('Setting discount type to: none');
-          setDiscountType('none');
+          setDiscountType(prev => {
+            console.log('Discount type changed from', prev, 'to none');
+            return 'none';
+          });
         } else if (Math.abs(discountValue - totalWithTaxValue) < 0.01) {
           console.log('Setting discount type to: full');
-          setDiscountType('full'); // 100% discount
+          setDiscountType(prev => {
+            console.log('Discount type changed from', prev, 'to full');
+            return 'full';
+          });
         } else {
           console.log('Setting discount type to: percentage');
-          setDiscountType('percentage'); // 10% discount
+          setDiscountType(prev => {
+            console.log('Discount type changed from', prev, 'to percentage');
+            return 'percentage';
+          });
         }
         setNotes(invoiceStatus.notes || '');
-        console.log('Final discount type set to:', discountType);
       } else {
         console.log('Invoice not generated, resetting discount type to none');
-        setDiscountType('none');
+        setDiscountType(prev => {
+          console.log('Discount type reset from', prev, 'to none');
+          return 'none';
+        });
       }
     } else {
       console.log('No invoice status data available');
       // Set default discount type when no status available
-      setDiscountType('none');
+      setDiscountType(prev => {
+        if (prev !== 'none') {
+          console.log('Default discount type set from', prev, 'to none');
+          return 'none';
+        }
+        return prev;
+      });
     }
   }, [invoiceStatus]);
 
@@ -267,6 +293,19 @@ export default function DoctorInvoice() {
       setDiscountType('none');
     }
   }, [discountType, invoiceStatus]);
+
+  // Force refresh function
+  const forceRefresh = async () => {
+    console.log('Force refreshing all data...');
+    await Promise.all([
+      refetchInvoiceStatus(),
+      refetchInvoiceItems()
+    ]);
+    toast({
+      title: language === 'ar' ? 'تم تحديث البيانات' : 'Data refreshed',
+      description: language === 'ar' ? 'تم تحديث جميع البيانات بنجاح' : 'All data has been refreshed successfully'
+    });
+  };
 
 
   const getDirection = (lang: string) => lang === 'ar' ? 'rtl' : 'ltr';
@@ -735,6 +774,14 @@ export default function DoctorInvoice() {
             <div className="flex items-center">
               <FileText className="h-8 w-8 text-purple-600 ml-3" />
               <h1 className="text-2xl font-bold text-gray-900">{t('invoiceTitle')}</h1>
+              <Button
+                onClick={forceRefresh}
+                variant="outline"
+                size="sm"
+                className="mr-3 text-purple-600 border-purple-600 hover:bg-purple-50"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
