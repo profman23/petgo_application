@@ -83,6 +83,15 @@ function calculateRideEstimates(distance: number) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static images with proper MIME types
+  app.get('/app-icon.png', (req, res) => {
+    const iconPath = path.join(__dirname, '../public/app-icon.png');
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    res.sendFile(iconPath);
+  });
+
+
   // PWA Routes - Serve Service Worker and Manifest
   app.get('/sw.js', (req, res) => {
     res.setHeader('Content-Type', 'application/javascript');

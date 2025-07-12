@@ -123,7 +123,7 @@ export function InstallPrompt() {
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center p-1">
               <img 
-                src="/attached_assets/Screenshot 2025-07-12 145346_1752323089078.png" 
+                src="/app-icon.png" 
                 alt="VetsVan Logo" 
                 className="w-full h-full object-contain"
               />

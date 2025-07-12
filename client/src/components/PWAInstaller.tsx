@@ -258,11 +258,11 @@ export function PWAInstaller() {
             <div className="flex justify-center mb-4">
               <div className="bg-gradient-to-br from-purple-100 to-purple-50 p-4 rounded-2xl">
                 <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center p-2">
-                  <img 
-                    src="/attached_assets/Screenshot 2025-07-12 145346_1752323089078.png" 
-                    alt="VetsVan Logo" 
-                    className="w-full h-full object-contain"
-                  />
+              <img 
+                src="/app-icon.png" 
+                alt="VetsVan Logo" 
+                className="w-full h-full object-contain"
+              />
                 </div>
               </div>
             </div>
