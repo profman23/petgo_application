@@ -398,48 +398,7 @@ export default function DoctorDashboard() {
       </header>
 
       <div className="p-4">
-        {/* GPS Status Card */}
-        <Card className="mb-6 bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold flex items-center gap-2 text-blue-900" style={{ textAlign }}>
-                <Satellite className="w-5 h-5" />
-                {t.locationTracking}
-              </h3>
-              {isLoadingGPS && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
-            </div>
-            
-            {latitude && longitude ? (
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-green-600" />
-                  <span className="text-green-600" style={{ textAlign }}>{t.locationDetectedSuccessfully}</span>
-                </div>
-                <div className="text-gray-600" style={{ textAlign }}>
-                  {t.latitude}: {latitude.toFixed(6)}
-                </div>
-                <div className="text-gray-600" style={{ textAlign }}>
-                  {t.longitude}: {longitude.toFixed(6)}
-                </div>
-                {accuracy && (
-                  <div className="text-gray-600" style={{ textAlign }}>
-                    {t.accuracy}: {Math.round(accuracy)} {t.meters}
-                  </div>
-                )}
-              </div>
-            ) : gpsError ? (
-              <div className="flex items-center gap-2 text-red-600">
-                <X className="w-4 h-4" />
-                <span style={{ textAlign }}>{t.error}: {gpsError}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 text-yellow-600">
-                <Navigation className="w-4 h-4" />
-                <span style={{ textAlign }}>{t.loading}</span>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+
 
         {/* Stats Card */}
         <Card className="mb-6 bg-green-50 border-green-200">

@@ -436,10 +436,7 @@ export default function DoctorActivity() {
                 </div>
                 <div className="text-right">
                   <div className="text-xs text-blue-600 mb-1" style={{ textAlign }}>
-                    {language === 'ar' ? 'الموقع المحدد:' : 'Set Location:'}
-                  </div>
-                  <div className="text-sm font-mono text-blue-800" style={{ textAlign }}>
-                    {vetsVanInfo.latitude?.toFixed(6)}, {vetsVanInfo.longitude?.toFixed(6)}
+                    {language === 'ar' ? 'الموقع المحدد' : 'Location Set'}
                   </div>
                   <Button
                     variant="outline"
@@ -663,47 +660,13 @@ export default function DoctorActivity() {
                   {language === 'ar' ? 'موقع العميل على الخريطة' : 'Customer Location on Map'}
                 </h3>
                 
-                {/* Detailed Location Info */}
+                {/* Location Display */}
                 <div className="bg-white rounded-lg p-4 mb-4 border border-blue-200">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="font-semibold text-gray-700">
-                        {language === 'ar' ? 'خط العرض:' : 'Latitude:'}
-                      </span>
-                      <br />
-                      <span className="font-mono text-blue-600">
-                        {selectedBooking.customerLocation.latitude.toFixed(6)}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="font-semibold text-gray-700">
-                        {language === 'ar' ? 'خط الطول:' : 'Longitude:'}
-                      </span>
-                      <br />
-                      <span className="font-mono text-blue-600">
-                        {selectedBooking.customerLocation.longitude.toFixed(6)}
-                      </span>
-                    </div>
+                  <div className="text-center">
+                    <span className="font-semibold text-gray-700">
+                      {language === 'ar' ? 'موقع العميل جاهز للعرض على الخريطة' : 'Customer location ready for map display'}
+                    </span>
                   </div>
-                  
-                  {/* Copy Coordinates Button */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-3 text-xs"
-                    onClick={() => {
-                      if (selectedBooking?.customerLocation) {
-                        const coords = `${selectedBooking.customerLocation.latitude},${selectedBooking.customerLocation.longitude}`;
-                        navigator.clipboard.writeText(coords);
-                        toast({
-                          title: language === 'ar' ? 'تم النسخ' : 'Copied',
-                          description: language === 'ar' ? 'تم نسخ الإحداثيات' : 'Coordinates copied to clipboard',
-                        });
-                      }
-                    }}
-                  >
-                    📋 {language === 'ar' ? 'نسخ الإحداثيات' : 'Copy Coordinates'}
-                  </Button>
                 </div>
                 
                 {/* Action Buttons */}
@@ -716,19 +679,7 @@ export default function DoctorActivity() {
                     {language === 'ar' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'}
                   </Button>
                   
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      const { latitude, longitude } = selectedBooking.customerLocation!;
-                      navigator.clipboard.writeText(`${latitude}, ${longitude}`);
-                      toast({
-                        title: language === 'ar' ? 'تم النسخ' : 'Copied',
-                        description: language === 'ar' ? 'تم نسخ الإحداثيات' : 'Coordinates copied to clipboard',
-                      });
-                    }}
-                  >
-                    {language === 'ar' ? 'نسخ الإحداثيات' : 'Copy Coordinates'}
-                  </Button>
+
                 </div>
               </div>
 

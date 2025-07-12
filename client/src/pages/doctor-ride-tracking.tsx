@@ -210,30 +210,7 @@ export default function DoctorRideTracking() {
       </header>
 
       <div className="p-4 space-y-6">
-        {/* GPS Status */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-green-600" />
-                <span className="font-medium" style={{ textAlign }}>
-                  {language === 'ar' ? 'حالة GPS' : 'GPS Status'}
-                </span>
-              </div>
-              <Badge variant={doctorLat && doctorLng ? "default" : "destructive"}>
-                {language === 'ar' ? (doctorLat && doctorLng ? "متصل" : "غير متصل") : (doctorLat && doctorLng ? "Connected" : "Disconnected")}
-              </Badge>
-            </div>
-            {accuracy && (
-              <p className="text-sm text-gray-600 mt-2" style={{ textAlign }}>
-                {language === 'ar' ? `دقة الموقع: ${Math.round(accuracy)} متر` : `Location Accuracy: ${Math.round(accuracy)} meters`}
-              </p>
-            )}
-            {error && (
-              <p className="text-sm text-red-600 mt-2">{error}</p>
-            )}
-          </CardContent>
-        </Card>
+
 
         {/* Map with both locations */}
         <Card>

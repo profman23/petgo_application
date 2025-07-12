@@ -268,7 +268,7 @@ export default function CustomerActivity() {
                                 <MapPin className="w-4 h-4 text-blue-600" />
                                 <span className="text-sm text-gray-600" style={{ textAlign }}>
                                   {booking.customerLocation.address || 
-                                    `${booking.customerLocation.latitude.toFixed(6)}, ${booking.customerLocation.longitude.toFixed(6)}`
+                                    (language === 'ar' ? 'موقع العميل' : 'Customer Location')
                                   }
                                 </span>
                               </div>
