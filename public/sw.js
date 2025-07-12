@@ -1,11 +1,10 @@
-const CACHE_NAME = 'vetsvan-v1.0.0';
+const CACHE_NAME = 'vetsvan-v2.0.0';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
   '/static/css/main.css',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/app-icon-new.jpeg'
 ];
 
 // Install service worker

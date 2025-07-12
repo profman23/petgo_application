@@ -1,6 +1,7 @@
 {
   "name": "VetsVan - العيادة البيطرية المتنقلة",
   "short_name": "VetsVan",
+  "version": "2.0",
   "description": "خدمة العيادة البيطرية المتنقلة - رعاية شاملة لحيواناتك الأليفة",
   "start_url": "/",
   "display": "standalone",
@@ -13,49 +14,49 @@
   "categories": ["medical", "lifestyle", "utilities"],
   "icons": [
     {
-      "src": "app-icon-original.jpeg",
+      "src": "app-icon-new.jpeg?v=2",
       "sizes": "72x72",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-original.jpeg",
+      "src": "app-icon-new.jpeg?v=2",
       "sizes": "96x96",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-original.jpeg",
+      "src": "app-icon-new.jpeg?v=2",
       "sizes": "128x128",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-original.jpeg",
+      "src": "app-icon-new.jpeg?v=2",
       "sizes": "144x144",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-original.jpeg",
+      "src": "app-icon-new.jpeg?v=2",
       "sizes": "152x152",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-original.jpeg",
+      "src": "app-icon-new.jpeg?v=2",
       "sizes": "192x192",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-original.jpeg",
+      "src": "app-icon-new.jpeg?v=2",
       "sizes": "384x384",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-original.jpeg",
+      "src": "app-icon-new.jpeg?v=2",
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
@@ -78,7 +79,7 @@
       "url": "/ride-request",
       "icons": [
         {
-          "src": "app-icon-original.jpeg",
+          "src": "app-icon-new.jpeg?v=2",
           "sizes": "96x96",
           "type": "image/jpeg"
         }

@@ -756,6 +756,9 @@ Changelog:
 - July 12, 2025. IMPLEMENTED: Custom PWA app icon using user-uploaded image (freepik_assistant_1752308224481_1752308241988.jpeg)
 - July 12, 2025. UPDATED: All PWA manifest icons and HTML meta tags to use new custom app icon for iOS, Android, and desktop installation
 - July 12, 2025. CONFIGURED: Complete PWA icon support with all required sizes (72x72 to 512x512) for device compatibility
+- July 12, 2025. UPDATED: PWA app icon replaced with newer version (freepik_assistant_1752308224481_1752309146303.jpeg)
+- July 12, 2025. ENHANCED: Added cache-busting parameters (?v=2) and version 2.0 to force icon updates on installed apps
+- July 12, 2025. OPTIMIZED: Service Worker updated to clear old cache and force app icon refresh
 ```
 
 ## User Preferences
