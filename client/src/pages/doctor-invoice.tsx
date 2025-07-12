@@ -588,7 +588,7 @@ export default function DoctorInvoice() {
         body: { items: invoiceItems }
       });
 
-      // Save invoice status to database
+      // Save invoice status to database with lock flag
       await apiRequest(`/api/invoice-status/${booking.id}`, {
         method: 'POST',
         body: {
@@ -596,7 +596,8 @@ export default function DoctorInvoice() {
           taxAmount,
           discountAmount,
           finalTotal,
-          notes
+          notes,
+          isGenerated: true // Mark as generated and locked
         }
       });
 
@@ -1024,16 +1025,24 @@ export default function DoctorInvoice() {
                 <div className="flex justify-between items-center mb-2">
                   <span>{t('discount')}:</span>
                   <div className="flex items-center space-x-2">
-                    <select
-                      value={discountType}
-                      onChange={(e) => setDiscountType(e.target.value as 'none' | 'percentage' | 'full')}
-                      className="border border-gray-300 rounded px-3 py-1 text-sm"
-                      dir={language === 'ar' ? 'rtl' : 'ltr'}
-                    >
-                      <option value="none">{language === 'ar' ? 'بدون خصم ✘' : 'No Discount ✘'}</option>
-                      <option value="percentage">{language === 'ar' ? 'خصم 10% ✓' : '10% Discount ✓'}</option>
-                      <option value="full">{language === 'ar' ? 'خصم 100% مجاني ✓' : '100% FREE Discount ✓'}</option>
-                    </select>
+                    {isRecordLocked ? (
+                      <div className="bg-gray-100 p-2 rounded text-gray-700">
+                        {discountType === 'none' && (language === 'ar' ? 'بدون خصم ✘' : 'No Discount ✘')}
+                        {discountType === 'percentage' && (language === 'ar' ? 'خصم 10% ✓' : '10% Discount ✓')}
+                        {discountType === 'full' && (language === 'ar' ? 'خصم 100% مجاني ✓' : '100% FREE Discount ✓')}
+                      </div>
+                    ) : (
+                      <select
+                        value={discountType}
+                        onChange={(e) => setDiscountType(e.target.value as 'none' | 'percentage' | 'full')}
+                        className="border border-gray-300 rounded px-3 py-1 text-sm"
+                        dir={language === 'ar' ? 'rtl' : 'ltr'}
+                      >
+                        <option value="none">{language === 'ar' ? 'بدون خصم ✘' : 'No Discount ✘'}</option>
+                        <option value="percentage">{language === 'ar' ? 'خصم 10% ✓' : '10% Discount ✓'}</option>
+                        <option value="full">{language === 'ar' ? 'خصم 100% مجاني ✓' : '100% FREE Discount ✓'}</option>
+                      </select>
+                    )}
                     <span className="text-lg font-medium">{discountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
                 </div>
@@ -1058,9 +1067,9 @@ export default function DoctorInvoice() {
                 <div className="flex justify-end">
                   <button
                     onClick={() => setShowPaymentModal(true)}
-                    disabled={remainingBalance <= 0}
+                    disabled={remainingBalance <= 0 || isRecordLocked}
                     className={`px-6 py-2 rounded-lg flex items-center transition-colors ${
-                      remainingBalance <= 0 
+                      (remainingBalance <= 0 || isRecordLocked)
                         ? 'bg-gray-400 cursor-not-allowed text-white' 
                         : 'bg-green-600 hover:bg-green-700 text-white'
                     }`}
@@ -1068,7 +1077,8 @@ export default function DoctorInvoice() {
                     <svg className="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    {remainingBalance <= 0 ? `${t('paymentAdded')} ✓` : t('addPayment')}
+                    {isRecordLocked ? (language === 'ar' ? 'مؤمن - للمشاهدة فقط' : 'Locked - View Only') : 
+                     (remainingBalance <= 0 ? `${t('paymentAdded')} ✓` : t('addPayment'))}
                   </button>
                 </div>
               </div>
@@ -1127,13 +1137,22 @@ export default function DoctorInvoice() {
 
         {/* Actions */}
         <div className="flex justify-center mb-6">
-          <Button
-            onClick={handleGenerateInvoiceClick}
-            className="bg-purple-600 hover:bg-purple-600 text-white px-8 py-3 text-lg"
-          >
-            <Receipt className="h-6 w-6 ml-2" />
-            {t('generateInvoice')}
-          </Button>
+          {isRecordLocked ? (
+            <div className="flex items-center bg-green-100 text-green-700 px-8 py-3 rounded-lg text-lg font-semibold">
+              <svg className="h-6 w-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {language === 'ar' ? 'تم إنشاء الفاتورة ✓' : 'Invoice Generated ✓'}
+            </div>
+          ) : (
+            <Button
+              onClick={handleGenerateInvoiceClick}
+              className="bg-purple-600 hover:bg-purple-600 text-white px-8 py-3 text-lg"
+            >
+              <Receipt className="h-6 w-6 ml-2" />
+              {t('generateInvoice')}
+            </Button>
+          )}
         </div>
       </div>
 
