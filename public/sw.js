@@ -1,175 +1,208 @@
-const CACHE_NAME = 'vetsvan-v2.0.1';
-const urlsToCache = [
+// Enhanced Service Worker with automatic cache management
+const CACHE_NAME = 'vetsvan-cache-v' + Date.now();
+const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
-  '/app-icon.png'
+  '/app-icon.png',
+  '/app-icon-maskable.png'
 ];
 
-// Install service worker
-self.addEventListener('install', event => {
-  console.log('🎯 Service Worker installing...');
-  self.skipWaiting();
+// Install event - cache essential assets
+self.addEventListener('install', (event) => {
+  console.log('Service Worker installing with cache:', CACHE_NAME);
   
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('✅ Cache opened:', CACHE_NAME);
-        return cache.addAll(urlsToCache).catch(err => {
-          console.log('⚠️ Cache add failed:', err);
-          // Don't fail installation if cache fails
-          return Promise.resolve();
-        });
-      })
-  );
-});
-
-// Fetch resources
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-  );
-});
-
-// Activate service worker
-self.addEventListener('activate', event => {
-  console.log('🎯 Service Worker activating...');
-  self.clients.claim();
-  
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      console.log('📦 All caches:', cacheNames);
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('🗑️ Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
+    (async () => {
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        
+        // Cache essential assets with cache-busting
+        const cachePromises = ASSETS_TO_CACHE.map(async (url) => {
+          try {
+            const cacheBustUrl = url + (url.includes('?') ? '&' : '?') + '_sw=' + Date.now();
+            const response = await fetch(cacheBustUrl, { cache: 'no-cache' });
+            if (response.ok) {
+              await cache.put(url, response);
+              console.log('Cached:', url);
+            }
+          } catch (error) {
+            console.warn('Failed to cache:', url, error);
           }
-        })
-      );
-    }).then(() => {
-      console.log('✅ Service Worker activated successfully');
-      
-      // Notify clients that SW is ready
-      self.clients.matchAll().then(clients => {
-        clients.forEach(client => {
-          client.postMessage({ 
-            type: 'SW_ACTIVATED',
-            cacheName: CACHE_NAME 
-          });
         });
-      });
-
-      // Don't auto-show notifications - let the app handle it
-      console.log('📱 Service Worker ready for install notifications');
-    })
+        
+        await Promise.all(cachePromises);
+        
+        // Force immediate activation
+        await self.skipWaiting();
+      } catch (error) {
+        console.error('Service Worker install failed:', error);
+      }
+    })()
   );
 });
 
-// Handle messages from main thread
-self.addEventListener('message', event => {
-  console.log('📩 SW received message:', event.data);
+// Activate event - clean old caches
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker activating, cleaning old caches');
   
-  if (event.data && event.data.type === 'SHOW_INSTALL_NOTIFICATION') {
-    const options = {
-      body: event.data.body || 'ثبت التطبيق على جهازك للوصول السريع إلى خدمات العيادة البيطرية',
-      icon: '/app-icon.png',
-      badge: '/app-icon.png',
-      tag: 'pwa-install',
-      requireInteraction: true,
-      actions: [
-        {
-          action: 'install',
-          title: 'تثبيت'
-        },
-        {
-          action: 'close',
-          title: 'إغلاق'
-        }
-      ]
-    };
+  event.waitUntil(
+    (async () => {
+      try {
+        const cacheNames = await caches.keys();
+        
+        // Delete all old caches
+        const deletePromises = cacheNames
+          .filter(cacheName => cacheName !== CACHE_NAME)
+          .map(cacheName => {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          });
+        
+        await Promise.all(deletePromises);
+        
+        // Claim all clients immediately
+        await self.clients.claim();
+        
+        console.log('Service Worker activated with cache:', CACHE_NAME);
+      } catch (error) {
+        console.error('Service Worker activation failed:', error);
+      }
+    })()
+  );
+});
 
+// Fetch event - serve from cache with fallback
+self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
+  // Skip API requests (let them go to network)
+  if (event.request.url.includes('/api/')) {
+    return;
+  }
+  
+  event.respondWith(
+    (async () => {
+      try {
+        // Try network first for critical resources
+        if (event.request.url.includes('manifest.json') || 
+            event.request.url.includes('app-icon')) {
+          
+          try {
+            const networkResponse = await fetch(event.request, {
+              cache: 'no-cache',
+              headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+              }
+            });
+            
+            if (networkResponse.ok) {
+              // Update cache with fresh version
+              const cache = await caches.open(CACHE_NAME);
+              await cache.put(event.request, networkResponse.clone());
+              return networkResponse;
+            }
+          } catch (error) {
+            console.log('Network failed, trying cache for:', event.request.url);
+          }
+        }
+        
+        // Try cache first for other resources
+        const cachedResponse = await caches.match(event.request);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        
+        // Fallback to network
+        const networkResponse = await fetch(event.request);
+        
+        // Cache successful responses
+        if (networkResponse.ok && networkResponse.type === 'basic') {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(event.request, networkResponse.clone());
+        }
+        
+        return networkResponse;
+        
+      } catch (error) {
+        console.error('Fetch failed:', error);
+        
+        // Return cached version if available
+        const cachedResponse = await caches.match(event.request);
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        
+        // Return error response
+        return new Response('Network error occurred', {
+          status: 408,
+          statusText: 'Network Error'
+        });
+      }
+    })()
+  );
+});
+
+// Message event - handle cache clearing commands
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
     event.waitUntil(
-      self.registration.showNotification(
-        event.data.title || 'تطبيق VetsVan متاح للتثبيت', 
-        options
-      )
+      (async () => {
+        try {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+          console.log('All caches cleared via message');
+          
+          // Notify client
+          event.ports[0]?.postMessage({ success: true });
+        } catch (error) {
+          console.error('Failed to clear caches:', error);
+          event.ports[0]?.postMessage({ success: false, error: error.message });
+        }
+      })()
+    );
+  }
+  
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+// Push event - handle push notifications
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    const data = event.data.json();
+    
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'VetsVan Update', {
+        body: data.body || 'التطبيق محدث ومتاح الآن',
+        icon: '/app-icon.png',
+        badge: '/app-icon.png',
+        tag: 'app-update',
+        requireInteraction: true,
+        actions: [
+          {
+            action: 'open',
+            title: 'فتح التطبيق'
+          }
+        ]
+      })
     );
   }
 });
 
-// Push notification handler (for future use)
-self.addEventListener('push', event => {
-  const options = {
-    body: event.data ? event.data.text() : 'رسالة جديدة من VetsVan',
-    icon: '/app-icon.png',
-    badge: '/app-icon.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'explore',
-        title: 'عرض التطبيق'
-      },
-      {
-        action: 'close',
-        title: 'إغلاق'
-      }
-    ]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification('VetsVan - العيادة البيطرية المتنقلة', options)
-  );
-});
-
-// Handle notification actions for install prompts
-self.addEventListener('notificationclick', event => {
-  console.log('🔔 Notification clicked:', event.action);
-  
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   
-  if (event.action === 'install' || event.action === 'explore') {
-    // Open app and trigger install prompt
+  if (event.action === 'open' || !event.action) {
     event.waitUntil(
-      clients.matchAll().then(clientList => {
-        // Focus existing tab if available
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            client.postMessage({ type: 'TRIGGER_INSTALL' });
-            return client.focus();
-          }
-        }
-        // Open new window if no existing tab
-        if (clients.openWindow) {
-          return clients.openWindow('/').then(client => {
-            if (client) {
-              setTimeout(() => {
-                client.postMessage({ type: 'TRIGGER_INSTALL' });
-              }, 1000);
-            }
-          });
-        }
-      })
-    );
-  } else if (event.action === 'close') {
-    console.log('📱 Install notification dismissed by user');
-  } else {
-    // Default action - open app and show install prompt
-    event.waitUntil(
-      clients.openWindow('/').then(client => {
-        if (client) {
-          setTimeout(() => {
-            client.postMessage({ type: 'TRIGGER_INSTALL' });
-          }, 1000);
-        }
-      })
+      self.clients.openWindow('/')
     );
   }
 });
+
+console.log('Enhanced Service Worker loaded with version:', CACHE_NAME);

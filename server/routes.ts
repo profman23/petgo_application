@@ -2783,6 +2783,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Add version endpoint for cache management
+  app.get('/api/version', (req, res) => {
+    // Return current deployment timestamp as version
+    const version = process.env.DEPLOYMENT_TIME || Date.now().toString();
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    res.send(version);
+  });
+
+  // Add cache clear endpoint
+  app.post('/api/clear-cache', (req, res) => {
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    res.json({ 
+      success: true, 
+      message: 'Cache cleared',
+      timestamp: Date.now()
+    });
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
