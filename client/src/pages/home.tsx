@@ -388,14 +388,14 @@ export default function Home() {
         {/* Current Location */}
         <div className="p-3 bg-blue-50 border-b">
           <div className="flex items-center justify-between mb-1">
-            <h3 className="font-semibold text-gray-800 text-sm" style={{ textAlign }}>
+            <h3 className="font-semibold text-white text-sm" style={{ textAlign }}>
               {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
             </h3>
-            {locationInfo.isLoading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
+            {locationInfo.isLoading && <Loader2 className="w-4 h-4 animate-spin text-white" />}
           </div>
           <div className="flex items-center">
-            <MapPin className="w-4 h-4 text-blue-600 mr-2" />
-            <span className="text-gray-700 text-sm flex-1">
+            <MapPin className="w-4 h-4 text-white mr-2" />
+            <span className="text-white text-sm flex-1">
               {locationInfo.address}
             </span>
             {locationInfo.error && (
@@ -403,7 +403,7 @@ export default function Home() {
                 variant="ghost" 
                 size="sm" 
                 onClick={getCurrentLocation}
-                className="text-xs text-blue-600 p-1 h-auto"
+                className="text-xs text-white p-1 h-auto"
               >
                 {language === 'ar' ? 'إعادة تحديد' : 'Refresh'}
               </Button>
@@ -411,20 +411,20 @@ export default function Home() {
           </div>
           {/* Debug location info */}
           <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
-            <div className="text-gray-600">
+            <div className="text-white">
               <strong>{language === 'ar' ? 'معلومات النظام:' : 'System Info:'}</strong>
             </div>
-            <div className="text-gray-700 mt-1">
+            <div className="text-white mt-1">
               {language === 'ar' ? 'نظام تحديد الموقع الدقيق مفعل' : 'Precise location system active'}
             </div>
-            <div className="text-gray-700">
+            <div className="text-white">
               {language === 'ar' ? 'يعرض الشوارع والأحياء التفصيلية' : 'Shows detailed streets and neighborhoods'}
             </div>
-            <div className="text-gray-700">
+            <div className="text-white">
               {language === 'ar' ? 'يدعم المدن السعودية مع نظام احتياطي' : 'Supports Saudi cities with fallback system'}
             </div>
             {locationInfo.coordinates && (
-              <div className="text-gray-600 mt-1 text-xs">
+              <div className="text-white mt-1 text-xs">
                 <strong>{language === 'ar' ? 'الإحداثيات:' : 'Coordinates:'}</strong> {locationInfo.coordinates.lat.toFixed(6)}, {locationInfo.coordinates.lon.toFixed(6)}
                 {locationInfo.accuracy && (
                   <span className="ml-2">
