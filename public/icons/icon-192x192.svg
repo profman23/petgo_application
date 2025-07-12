@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#852085;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Medical cross background -->
+  <rect width="192" height="192" fill="url(#grad)" rx="38.400000000000006"/>
+  
+  <!-- Cross shape -->
+  <rect x="67.19999999999999" y="28.799999999999997" width="57.599999999999994" height="134.39999999999998" fill="white" rx="9.600000000000001"/>
+  <rect x="28.799999999999997" y="67.19999999999999" width="134.39999999999998" height="57.599999999999994" fill="white" rx="9.600000000000001"/>
+  
+  <!-- Pet silhouettes -->
+  <g fill="#852085" opacity="0.8">
+    <!-- Dog silhouette -->
+    <ellipse cx="67.19999999999999" cy="86.4" rx="15.36" ry="23.04"/>
+    <ellipse cx="76.80000000000001" cy="72.96000000000001" rx="11.52" ry="15.36"/>
+    <ellipse cx="57.599999999999994" cy="67.19999999999999" rx="5.76" ry="7.68"/>
+    
+    <!-- Cat silhouette -->
+    <ellipse cx="124.80000000000001" cy="105.60000000000001" rx="13.440000000000001" ry="19.200000000000003"/>
+    <ellipse cx="115.19999999999999" cy="92.16" rx="9.600000000000001" ry="13.440000000000001"/>
+    <ellipse cx="111.35999999999999" cy="80.64" rx="3.84" ry="5.76"/>
+    <ellipse cx="119.03999999999999" cy="80.64" rx="3.84" ry="5.76"/>
+  </g>
+</svg>

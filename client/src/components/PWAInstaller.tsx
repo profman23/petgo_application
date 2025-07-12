@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Smartphone, Monitor, X } from 'lucide-react';
 import { showInstallNotification } from '@/utils/install-notification';
-import customShareIcon from '@assets/freepik_assistant_1752317793556_1752317800669.png';
+import customShareIcon from '@assets/Screenshot 2025-07-12 145346_1752321286791.png';
 import { getDeviceLanguageWithLogging, installMessages, safariInstructions } from '@/utils/device-language';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -257,8 +257,12 @@ export function PWAInstaller() {
             {/* App Icon */}
             <div className="flex justify-center mb-4">
               <div className="bg-gradient-to-br from-purple-100 to-purple-50 p-4 rounded-2xl">
-                <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center">
-                  <Smartphone className="h-8 w-8 text-white" />
+                <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center p-2">
+                  <img 
+                    src="/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png" 
+                    alt="VetsVan Logo" 
+                    className="w-full h-full object-contain"
+                  />
                 </div>
               </div>
             </div>

@@ -121,8 +121,12 @@ export function InstallPrompt() {
       <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center">
-              <Download className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-lg flex items-center justify-center p-1">
+              <img 
+                src="/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png" 
+                alt="VetsVan Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900 text-sm">
