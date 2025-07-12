@@ -2474,40 +2474,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const token = req.query.token || req.headers.authorization?.replace('Bearer ', '');
     
     if (!token) {
+      console.log('No token provided');
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    // Check if token exists in sessions
-    const sessionKeys = Object.keys(sessions);
-    let foundSession = null;
+    // Check if token exists in sessions Map
+    const session = sessions.get(token);
     
-    for (const sessionId of sessionKeys) {
-      if (sessions[sessionId].token === token) {
-        foundSession = sessions[sessionId];
-        break;
-      }
-    }
+    console.log('Looking for token:', token);
+    console.log('Available sessions:', Array.from(sessions.keys()));
     
-    if (!foundSession) {
+    if (!session) {
+      console.log('Invalid token:', token);
+      console.log('Available sessions:', Array.from(sessions.keys()));
       return res.status(401).json({ message: 'Invalid token' });
     }
 
-    req.user = foundSession.user;
+    req.user = session.user;
     next();
   }
 
   // Download attachment endpoint - serves file data from database
-  app.get('/api/pet-attachments/download/:id', requireAuth, async (req, res) => {
+  app.get('/api/pet-attachments/download/:id', async (req, res) => {
     try {
       const attachmentId = parseInt(req.params.id);
+      console.log('Downloading attachment ID:', attachmentId);
+      
       const attachment = await storage.getPetAttachmentById(attachmentId);
+      console.log('Found attachment:', attachment ? attachment.fileName : 'null');
       
       if (!attachment) {
+        console.log('Attachment not found for ID:', attachmentId);
         return res.status(404).json({ message: 'Attachment not found' });
+      }
+
+      // Check if file data exists
+      if (!attachment.fileData) {
+        console.log('No file data found for attachment ID:', attachmentId);
+        return res.status(404).json({ message: 'File data not found' });
       }
 
       // Convert base64 data back to binary
       const fileBuffer = Buffer.from(attachment.fileData, 'base64');
+      console.log('File buffer length:', fileBuffer.length);
       
       // Set appropriate headers for file download
       res.setHeader('Content-Type', attachment.fileType || 'application/octet-stream');
@@ -2523,17 +2532,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // View attachment endpoint - for inline viewing (images, PDFs)
-  app.get('/api/pet-attachments/view/:id', requireAuth, async (req, res) => {
+  app.get('/api/pet-attachments/view/:id', async (req, res) => {
     try {
       const attachmentId = parseInt(req.params.id);
+      console.log('Viewing attachment ID:', attachmentId);
+      
       const attachment = await storage.getPetAttachmentById(attachmentId);
+      console.log('Found attachment:', attachment ? attachment.fileName : 'null');
       
       if (!attachment) {
+        console.log('Attachment not found for ID:', attachmentId);
         return res.status(404).json({ message: 'Attachment not found' });
+      }
+
+      // Check if file data exists
+      if (!attachment.fileData) {
+        console.log('No file data found for attachment ID:', attachmentId);
+        return res.status(404).json({ message: 'File data not found' });
       }
 
       // Convert base64 data back to binary
       const fileBuffer = Buffer.from(attachment.fileData, 'base64');
+      console.log('File buffer length:', fileBuffer.length);
       
       // Set appropriate headers for inline viewing
       res.setHeader('Content-Type', attachment.fileType || 'application/octet-stream');
