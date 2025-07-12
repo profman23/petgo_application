@@ -1,79 +1,66 @@
-/* CSS to forcefully hide any GPS technical information */
+/* Ultra-aggressive CSS to hide GPS technical information */
 
-/* Hide any element containing GPS technical text */
-*:has-text("System Info") {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
-*:has-text("معلومات النظام") {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
-*:has-text("Precise location system active") {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
-*:has-text("Shows detailed streets") {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
-*:has-text("Supports Saudi cities") {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
-*:has-text("Coordinates:") {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
-*:has-text("Accuracy:") {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  overflow: hidden !important;
-}
-
-/* Hide any element containing coordinate numbers (latitude,longitude pattern) */
-*[class*="coordinates"],
-*[id*="coordinates"],
+/* Nuclear option: Hide anything that might contain GPS info */
+*[class*="location"],
+*[id*="location"],
 *[class*="gps"],
 *[id*="gps"],
-*[class*="location-info"],
-*[id*="location-info"] {
+*[class*="coordinates"],
+*[id*="coordinates"],
+*[class*="system"],
+*[id*="system"] {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  z-index: -999 !important;
 }
 
-/* Cover any remaining GPS info with white background */
-.gps-overlay {
+/* Hide any div that might contain location info in the location section */
+div:has(> *:contains("Al Thumaama")),
+div:has(> *:contains("System Info")),
+div:has(> *:contains("Coordinates")),
+div:has(> *:contains("Accuracy")),
+p:has(> *:contains("Al Thumaama")),
+p:has(> *:contains("System Info")),
+span:has(> *:contains("Al Thumaama")),
+span:has(> *:contains("System Info")) {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+}
+
+/* White overlay for any remaining elements */
+.location-section {
+  position: relative;
+}
+
+.location-section::after {
+  content: "";
   position: absolute;
-  background: white;
-  z-index: 9999;
-  width: 100%;
-  height: 100%;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 999;
+  pointer-events: none;
+}
+
+/* Hide the entire location display area if it contains technical info */
+.location-display,
+.location-info,
+.gps-info,
+.system-info {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }

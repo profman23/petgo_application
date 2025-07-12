@@ -27,6 +27,9 @@ import { CacheClearButton } from '@/components/CacheClearButton';
 import { LocationHider } from '@/components/LocationHider';
 import '@/utils/removeGpsInfo';
 import '@/styles/hide-gps-info.css';
+import '@/styles/global-gps-hide.css';
+import '@/utils/aggressiveGPSCleaner';
+import '@/utils/finalGPSCleaner';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -278,13 +281,29 @@ export default function Home() {
 
   // Initialize location detection on component mount
   useEffect(() => {
-    // Force clear any cached technical GPS info
+    // Ultra-aggressive GPS cleaning
     const { GPSInfoCleaner } = require('@/utils/removeGpsInfo');
+    const { cleanAllGPSInfo } = require('@/utils/aggressiveGPSCleaner');
+    
     const cleaner = GPSInfoCleaner.getInstance();
     cleaner.clearGPSTechnicalInfo();
     cleaner.clearSessionGPSInfo();
     
+    // Run aggressive cleaner
+    cleanAllGPSInfo();
+    
     getCurrentLocation();
+    
+    // Continue cleaning every second
+    const cleaningInterval = setInterval(() => {
+      cleanAllGPSInfo();
+      
+      // Also run final cleaner
+      const { finalGPSCleaner } = require('@/utils/finalGPSCleaner');
+      finalGPSCleaner();
+    }, 1000);
+    
+    return () => clearInterval(cleaningInterval);
   }, [language]); // Re-run when language changes
 
   // Get active ride info
