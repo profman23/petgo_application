@@ -1,0 +1,81 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Square background -->
+  <rect width="512" height="512" rx="80" ry="80" fill="#852085"/>
+  
+  <!-- Medical Cross -->
+  <g transform="translate(256, 256)">
+    <!-- Vertical bar of cross -->
+    <rect x="-35" y="-180" width="70" height="360" rx="35" ry="35" fill="#A855F7"/>
+    <!-- Horizontal bar of cross -->
+    <rect x="-180" y="-35" width="360" height="70" rx="35" ry="35" fill="#A855F7"/>
+  </g>
+  
+  <!-- Dog silhouette -->
+  <g transform="translate(200, 300) scale(1)" fill="white">
+    <!-- Dog head -->
+    <ellipse cx="0" cy="-40" rx="40" ry="35"/>
+    <!-- Dog ears -->
+    <ellipse cx="-30" cy="-65" rx="18" ry="30" transform="rotate(-20)"/>
+    <ellipse cx="30" cy="-65" rx="18" ry="30" transform="rotate(20)"/>
+    <!-- Dog snout -->
+    <ellipse cx="0" cy="-20" rx="18" ry="15"/>
+    <!-- Dog nose -->
+    <ellipse cx="0" cy="-25" rx="6" ry="4" fill="#852085"/>
+    <!-- Dog body -->
+    <ellipse cx="0" cy="25" rx="50" ry="40"/>
+    <!-- Dog legs -->
+    <rect x="-40" y="55" width="15" height="30" rx="7"/>
+    <rect x="-15" y="55" width="15" height="30" rx="7"/>
+    <rect x="8" y="55" width="15" height="30" rx="7"/>
+    <rect x="33" y="55" width="15" height="30" rx="7"/>
+    <!-- Dog tail -->
+    <ellipse cx="40" cy="15" rx="10" ry="25" transform="rotate(30)"/>
+  </g>
+  
+  <!-- Cat silhouette -->
+  <g transform="translate(320, 300) scale(0.85)" fill="white">
+    <!-- Cat head -->
+    <ellipse cx="0" cy="-35" rx="30" ry="28"/>
+    <!-- Cat ears (triangular) -->
+    <polygon points="-25,-55 -15,-75 -8,-50" fill="white"/>
+    <polygon points="25,-55 15,-75 8,-50" fill="white"/>
+    <!-- Cat inner ears -->
+    <polygon points="-20,-55 -15,-65 -12,-52" fill="#A855F7"/>
+    <polygon points="20,-55 15,-65 12,-52" fill="#A855F7"/>
+    <!-- Cat body -->
+    <ellipse cx="0" cy="20" rx="35" ry="30"/>
+    <!-- Cat legs -->
+    <rect x="-28" y="45" width="10" height="25" rx="5"/>
+    <rect x="-10" y="45" width="10" height="25" rx="5"/>
+    <rect x="8" y="45" width="10" height="25" rx="5"/>
+    <rect x="26" y="45" width="10" height="25" rx="5"/>
+    <!-- Cat tail (curved) -->
+    <path d="M 30 25 Q 55 15 50 -15 Q 45 -30 38 -20 Q 42 -10 35 0" stroke="white" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <!-- Cat eyes -->
+    <ellipse cx="-10" cy="-40" rx="3" ry="5" fill="#852085"/>
+    <ellipse cx="10" cy="-40" rx="3" ry="5" fill="#852085"/>
+  </g>
+  
+  <!-- VetsVan text -->
+  <text x="256" y="470" font-family="Arial, sans-serif" font-size="36" font-weight="bold" text-anchor="middle" fill="white">VetsVan</text>
+  
+  <!-- Small medical plus symbols in corners -->
+  <g fill="rgba(255,255,255,0.2)">
+    <g transform="translate(80, 80) scale(0.5)">
+      <rect x="-15" y="-5" width="30" height="10" rx="5"/>
+      <rect x="-5" y="-15" width="10" height="30" rx="5"/>
+    </g>
+    <g transform="translate(432, 80) scale(0.5)">
+      <rect x="-15" y="-5" width="30" height="10" rx="5"/>
+      <rect x="-5" y="-15" width="10" height="30" rx="5"/>
+    </g>
+    <g transform="translate(80, 432) scale(0.5)">
+      <rect x="-15" y="-5" width="30" height="10" rx="5"/>
+      <rect x="-5" y="-15" width="10" height="30" rx="5"/>
+    </g>
+    <g transform="translate(432, 432) scale(0.5)">
+      <rect x="-15" y="-5" width="30" height="10" rx="5"/>
+      <rect x="-5" y="-15" width="10" height="30" rx="5"/>
+    </g>
+  </g>
+</svg>
