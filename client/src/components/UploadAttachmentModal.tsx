@@ -143,12 +143,17 @@ export default function UploadAttachmentModal({
   const handleUpload = async () => {
     if (!selectedFile || !description.trim()) return;
 
+    console.log('Starting file upload for:', selectedFile.name, 'Size:', selectedFile.size);
+
     // Convert file to base64
     const reader = new FileReader();
     reader.onload = () => {
       const base64String = reader.result as string;
+      console.log('FileReader result length:', base64String.length);
+      
       // Remove the data URL prefix to get only the base64 data
       const base64Data = base64String.split(',')[1];
+      console.log('Base64 data length after split:', base64Data?.length || 0);
       
       const attachmentData = {
         petId,
@@ -160,8 +165,19 @@ export default function UploadAttachmentModal({
         description: description.trim(),
       };
 
+      console.log('Attachment data to send:', {
+        ...attachmentData,
+        fileData: `${attachmentData.fileData?.substring(0, 50)}...` || 'EMPTY'
+      });
+
       uploadMutation.mutate(attachmentData);
     };
+    
+    reader.onerror = (error) => {
+      console.error('FileReader error:', error);
+      alert('خطأ في قراءة الملف');
+    };
+    
     reader.readAsDataURL(selectedFile);
   };
 
@@ -182,57 +198,32 @@ export default function UploadAttachmentModal({
   // View file in browser (for images, PDFs)
   const handleViewFile = async (attachmentId: number) => {
     try {
-      // Get current token from localStorage
-      const token = localStorage.getItem('doctorToken') || localStorage.getItem('userToken');
+      console.log('Opening file view for attachment ID:', attachmentId);
       
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-
-      console.log('Attempting to view file with token:', token);
-      
-      const response = await fetch(`/api/pet-attachments/view/${attachmentId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await fetch(`/api/pet-attachments/view/${attachmentId}`);
       
       if (response.ok) {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
       } else {
         const errorText = await response.text();
         console.error('Failed to view file:', response.status, errorText);
+        alert('خطأ في عرض الملف');
       }
     } catch (error) {
       console.error('Error viewing file:', error);
+      alert('خطأ في عرض الملف');
     }
   };
 
   // Download file to device
   const handleDownloadFile = async (attachmentId: number, fileName: string) => {
     try {
-      // Get current token from localStorage
-      const token = localStorage.getItem('doctorToken') || localStorage.getItem('userToken');
+      console.log('Downloading file for attachment ID:', attachmentId);
       
-      if (!token) {
-        console.error('No authentication token found');
-        return;
-      }
-
-      console.log('Attempting to download file with token:', token);
-      
-      const response = await fetch(`/api/pet-attachments/download/${attachmentId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await fetch(`/api/pet-attachments/download/${attachmentId}`);
       
       if (response.ok) {
         const blob = await response.blob();
@@ -247,9 +238,11 @@ export default function UploadAttachmentModal({
       } else {
         const errorText = await response.text();
         console.error('Failed to download file:', response.status, errorText);
+        alert('خطأ في تحميل الملف');
       }
     } catch (error) {
       console.error('Error downloading file:', error);
+      alert('خطأ في تحميل الملف');
     }
   };
 
