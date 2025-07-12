@@ -690,14 +690,14 @@ export default function Home() {
                 </div>
                 
                 {/* Enhanced Road Animation */}
-                <div className="relative h-16 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2 overflow-hidden shadow-inner">
+                <div className="relative h-20 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2 overflow-hidden shadow-inner">
                   {/* Road markings */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-full h-2 bg-purple-600 opacity-50 animate-pulse rounded-full"></div>
                   </div>
                   
                   {/* New Veterinary Van Image */}
-                  <div className={`absolute top-1 h-12 w-16 transform transition-all duration-4000 ease-in-out ${
+                  <div className={`absolute top-2 h-14 w-18 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
                     <img 
@@ -708,20 +708,20 @@ export default function Home() {
                   </div>
                   
                   {/* 3D Veterinary Clinic - Start Position */}
-                  <div className={`absolute top-0 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
+                  <div className={`absolute -top-4 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
                     <img 
                       src={newVetClinicImage}
                       alt="Veterinary Clinic" 
-                      className="w-16 h-16 drop-shadow-xl"
+                      className="w-18 h-18 drop-shadow-xl"
                     />
                   </div>
                   
-                  {/* Custom House - End Position - Same Level as Clinic */}
-                  <div className={`absolute top-0 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
+                  {/* Custom House - End Position - Raised Higher */}
+                  <div className={`absolute -top-6 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
                     <img 
                       src={newestHouseImage}
                       alt="House" 
-                      className="w-20 h-20 drop-shadow-xl"
+                      className="w-24 h-24 drop-shadow-xl"
                     />
                   </div>
                 </div>
