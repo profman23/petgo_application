@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Smartphone, Monitor, X } from 'lucide-react';
 import { showInstallNotification } from '@/utils/install-notification';
+import customShareIcon from '@assets/freepik_assistant_1752317793556_1752317800669.png';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -152,7 +153,20 @@ export function PWAInstaller() {
       return {
         browser: 'Safari',
         steps: [
-          'اضغط على أيقونة المشاركة (□↗) في الأسفل',
+          <div key="safari-step1" className="flex items-center gap-2">
+            <span>اضغط على أيقونة المشاركة</span>
+            <div className="flex items-center gap-1">
+              <img 
+                src={customShareIcon} 
+                alt="Share Icon" 
+                className="w-6 h-6 bg-gray-100 rounded-sm p-0.5"
+              />
+              <div className="animate-bounce text-yellow-500">
+                👇
+              </div>
+            </div>
+            <span>في الأسفل</span>
+          </div>,
           'مرر لأسفل واختر "إضافة إلى الشاشة الرئيسية"',
           'اضغط "إضافة" للتأكيد'
         ]
@@ -287,7 +301,9 @@ export function PWAInstaller() {
               
               <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
                 {getBrowserInstructions().steps.map((step, index) => (
-                  <li key={index}>{step}</li>
+                  <li key={index} className="leading-relaxed">
+                    {typeof step === 'string' ? step : step}
+                  </li>
                 ))}
               </ol>
             </div>

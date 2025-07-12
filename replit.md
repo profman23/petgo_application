@@ -684,6 +684,10 @@ Changelog:
 - July 12, 2025. ADDED: install-notification.ts utility with browser notification support and push notification integration
 - July 12, 2025. UPGRADED: Service Worker with notification click handlers and automatic install prompt scheduling
 - July 12, 2025. INTEGRATED: Cross-platform installation experience with LocalStorage-based dismissal tracking and timed reminders
+- July 12, 2025. CUSTOMIZED: iOS installation instructions with user's custom share icon and animated pointing hand gesture
+- July 12, 2025. ENHANCED: PWA installer components now use custom share icon (freepik_assistant_1752317793556_1752317800669.png) for iOS devices
+- July 12, 2025. FIXED: Notification API actions error by implementing proper Service Worker message handling
+- July 12, 2025. OPTIMIZED: Reduced installation prompt timing for faster display (1s iOS, 1.5s general, 2.5s mobile)
 - July 10, 2025. FIXED: Removed duplicate translation keys to eliminate build warnings
 - July 10, 2025. DISABLED: Payment system integration in vetsvan-booking flow - customers no longer redirected to MyFatoorah payment links
 - July 10, 2025. MODIFIED: VetsVan booking system now redirects to customer activity page instead of payment gateway after successful booking

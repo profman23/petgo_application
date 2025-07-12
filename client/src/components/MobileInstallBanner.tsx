@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X, Smartphone, Apple } from 'lucide-react';
+import customShareIcon from '@assets/freepik_assistant_1752317793556_1752317800669.png';
 
 export function MobileInstallBanner() {
   const [showBanner, setShowBanner] = useState(false);
@@ -43,7 +44,22 @@ export function MobileInstallBanner() {
       return {
         icon: <Apple className="h-5 w-5" />,
         title: 'أضف VetsVan للشاشة الرئيسية',
-        steps: 'اضغط على أيقونة المشاركة (□↗) ثم "إضافة إلى الشاشة الرئيسية"'
+        steps: (
+          <div className="flex items-center gap-2">
+            <span>اضغط على أيقونة المشاركة</span>
+            <div className="flex items-center gap-1">
+              <img 
+                src={customShareIcon} 
+                alt="Share Icon" 
+                className="w-6 h-6 bg-white rounded-sm p-0.5"
+              />
+              <div className="animate-bounce text-yellow-300">
+                👇
+              </div>
+            </div>
+            <span>ثم "إضافة إلى الشاشة الرئيسية"</span>
+          </div>
+        )
       };
     } else if (isAndroid) {
       return {
@@ -69,7 +85,9 @@ export function MobileInstallBanner() {
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-sm mb-1">{instructions.title}</h3>
-            <p className="text-xs opacity-90 leading-relaxed">{instructions.steps}</p>
+            <div className="text-xs opacity-90 leading-relaxed">
+              {instructions.steps}
+            </div>
           </div>
         </div>
         <button
