@@ -24,6 +24,7 @@ import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
 import { InstallButton } from '@/components/InstallButton';
 import { CacheClearButton } from '@/components/CacheClearButton';
+import { LocationHider } from '@/components/LocationHider';
 import '@/utils/removeGpsInfo';
 
 // Helper functions for status handling
@@ -212,8 +213,8 @@ export default function Home() {
                 isLoading: false,
                 address: address,
                 error: null,
-                coordinates: { lat: latitude, lon: longitude },
-                accuracy: accuracy
+                coordinates: null, // Hide technical coordinates
+                accuracy: null // Hide technical accuracy
               });
               return;
             }
@@ -238,8 +239,8 @@ export default function Home() {
           isLoading: false,
           address: fallbackAddress,
           error: null,
-          coordinates: { lat: latitude, lon: longitude },
-          accuracy: accuracy
+          coordinates: null, // Hide technical coordinates
+          accuracy: null // Hide technical accuracy
         });
       },
       (error) => {
@@ -261,7 +262,7 @@ export default function Home() {
         setLocationInfo({
           isLoading: false,
           address: fallbackAddress,
-          error: errorMessage,
+          error: null, // Hide technical error details
           coordinates: null,
           accuracy: null
         });
@@ -276,6 +277,12 @@ export default function Home() {
 
   // Initialize location detection on component mount
   useEffect(() => {
+    // Force clear any cached technical GPS info
+    const { GPSInfoCleaner } = require('@/utils/removeGpsInfo');
+    const cleaner = GPSInfoCleaner.getInstance();
+    cleaner.clearGPSTechnicalInfo();
+    cleaner.clearSessionGPSInfo();
+    
     getCurrentLocation();
   }, [language]); // Re-run when language changes
 
@@ -798,6 +805,9 @@ export default function Home() {
       
       {/* PWA Install Banner */}
       <PWAInstallBanner />
+      
+      {/* Location Hider - prevents any GPS technical info from showing */}
+      <LocationHider />
     </div>
   );
 }
