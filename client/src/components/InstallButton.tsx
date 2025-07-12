@@ -54,7 +54,7 @@ export function InstallButton() {
       setInstallStatus('مثبت بالفعل');
     } else {
       console.log('📱 App not installed, checking for install support...');
-      setInstallStatus('في انتظار الدعم');
+      setInstallStatus('');
       
       // Show button after a delay if no beforeinstallprompt event
       setTimeout(() => {
