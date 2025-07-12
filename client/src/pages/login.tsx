@@ -1,23 +1,28 @@
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
+import { User, Lock, Mail, Phone, ArrowLeft, RefreshCw } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
-import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart, Mail } from 'lucide-react';
-import { useLocation } from 'wouter';
-import logoImage from "@assets/Screenshot 2025-07-10 182605_1752161515777.png";
-import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
+import logoImage from "@assets/IMG-20250415-WA0047_1751986059751.jpg";
+import { useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
+import { LanguageSelector } from '@/components/language-selector';
 
 interface LoginFormData {
   identifier: string;
   password: string;
+}
+
+interface RegisterFormData {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  password: string;
+  captcha: string;
 }
 
 interface AuthResponse {
@@ -31,124 +36,123 @@ interface AuthResponse {
 }
 
 export default function Login() {
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [captcha, setCaptcha] = useState({ question: '', answer: 0 });
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
-    captcha: '',
-  });
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { t, language } = useTranslation();
-
-  const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      identifier: '',
-      password: '',
-    },
+  const { language } = useLanguage();
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [loginData, setLoginData] = useState<LoginFormData>({ identifier: '', password: '' });
+  const [formData, setFormData] = useState<RegisterFormData>({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    email: '',
+    password: '',
+    captcha: ''
   });
+
+  const [captcha, setCaptcha] = useState({ question: '', answer: 0 });
 
   const generateCaptcha = () => {
     const num1 = Math.floor(Math.random() * 10) + 1;
     const num2 = Math.floor(Math.random() * 10) + 1;
-    const operation = Math.random() > 0.5 ? '+' : '-';
-    
-    let question, answer;
-    if (operation === '+') {
-      question = `${num1} + ${num2} = ؟`;
-      answer = num1 + num2;
-    } else {
-      const larger = Math.max(num1, num2);
-      const smaller = Math.min(num1, num2);
-      question = `${larger} - ${smaller} = ؟`;
-      answer = larger - smaller;
-    }
-    
-    setCaptcha({ question, answer });
+    setCaptcha({
+      question: `${num1} + ${num2} = ?`,
+      answer: num1 + num2
+    });
   };
 
   useEffect(() => {
     generateCaptcha();
   }, []);
 
+  const updateFormData = (field: keyof RegisterFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
   const loginMutation = useMutation({
     mutationFn: async (data: LoginFormData) => {
       const response = await apiRequest('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
-      return response as AuthResponse;
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      return response.json() as Promise<AuthResponse>;
     },
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast({
-        title: t('loginSuccess'),
-        description: `${t('welcomeNewUser')} ${data.user.name}`,
-        variant: "default",
+        title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Login Successful',
+        description: language === 'ar' ? 'مرحباً بك في التطبيق' : 'Welcome to the app'
       });
       setLocation('/home');
     },
     onError: (error: Error) => {
       toast({
-        title: t('errorOccurred'),
+        title: language === 'ar' ? 'خطأ في تسجيل الدخول' : 'Login Error',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive'
       });
-    },
+    }
   });
 
   const registerMutation = useMutation({
-    mutationFn: async (data: any) => {
-      // Validate captcha first
+    mutationFn: async (data: RegisterFormData) => {
       if (parseInt(data.captcha) !== captcha.answer) {
-        throw new Error(language === 'ar' ? 'رمز التحقق غير صحيح' : 'Invalid verification code');
+        throw new Error(language === 'ar' ? 'إجابة خاطئة للسؤال الأمني' : 'Incorrect security answer');
       }
-      
-      // Add language to registration data
-      const dataWithLanguage = {
-        ...data,
-        preferredLanguage: language
-      };
-      
+
       const response = await apiRequest('/api/auth/register', {
         method: 'POST',
-        body: JSON.stringify(dataWithLanguage)
+        body: JSON.stringify(data),
       });
-      return response;
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Registration failed');
+      }
+
+      return response.json();
     },
-    onSuccess: (data) => {
-      // Store email for OTP verification
-      localStorage.setItem('otpEmail', formData.email);
-      localStorage.setItem('otpUserName', formData.firstName);
-      
+    onSuccess: () => {
       toast({
-        title: language === 'ar' ? 'تم إرسال رمز التحقق' : 'Verification Code Sent',
-        description: language === 'ar' ? 
-          `تم إرسال رمز التحقق إلى ${formData.email}. يرجى التحقق من بريدك الإلكتروني.` :
-          `Verification code sent to ${formData.email}. Please check your email.`,
-        variant: "default",
+        title: language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account Created Successfully',
+        description: language === 'ar' ? 'يرجى تسجيل الدخول الآن' : 'Please login now'
       });
-      
-      // Redirect to OTP verification page
-      setLocation('/otp-verification');
+      setIsRegistering(false);
+      generateCaptcha();
+      setFormData({
+        firstName: '',
+        lastName: '',
+        phone: '',
+        email: '',
+        password: '',
+        captcha: ''
+      });
     },
     onError: (error: Error) => {
+      let errorMessage = error.message;
+      if (errorMessage.includes(':400')) {
+        errorMessage = errorMessage.replace(':400', '');
+      }
+      
       toast({
-        title: t('errorOccurred'),
-        description: error.message,
-        variant: "destructive",
+        title: language === 'ar' ? 'خطأ في إنشاء الحساب' : 'Registration Error',
+        description: errorMessage,
+        variant: 'destructive'
       });
-    },
+      generateCaptcha();
+    }
   });
 
-  const onLoginSubmit = (data: LoginFormData) => {
-    loginMutation.mutate(data);
+  const handleLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    loginMutation.mutate(loginData);
   };
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
@@ -156,284 +160,240 @@ export default function Login() {
     registerMutation.mutate(formData);
   };
 
-  const updateFormData = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const textAlign = getTextAlign(language);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
-      <div className="w-full max-w-lg">
-        <Card className="shadow-xl" style={{ boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
-          {/* Header with back button and improved logo design */}
-          <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
-            
-            {/* Logo Container - Clean White Background */}
-            <div className="mb-6 flex justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <div className="w-24 h-24 bg-white/90 backdrop-blur-sm rounded-3xl p-4 shadow-2xl border border-white/20">
               <img 
-                src={logoImage} 
-                alt="VETS VAN - Mobile Veterinary Clinic" 
-                className="h-20 w-auto max-w-[320px] object-contain mx-auto transition-all duration-300 hover:scale-105"
-                style={{ 
-                  filter: 'brightness(1.02) contrast(1.1)',
-                }}
+                src={logoImage}
+                alt="VetsVan Logo" 
+                className="w-full h-full object-contain"
               />
             </div>
-
           </div>
+          <h1 className="text-3xl font-bold text-white mb-2" style={{ textAlign }}>
+            {language === 'ar' ? 'مرحباً بك' : 'Welcome'}
+          </h1>
+          <p className="text-white/80 text-lg" style={{ textAlign }}>
+            {isRegistering 
+              ? (language === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account')
+              : (language === 'ar' ? 'تسجيل دخول العملاء' : 'Customer Login')
+            }
+          </p>
+        </div>
 
-        <CardContent className="p-8 bg-white/95 backdrop-blur-sm">
+        <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0 rounded-3xl overflow-hidden">
+          <CardContent className="p-8">
+            <div className="flex justify-center mb-6">
+              <LanguageSelector />
+            </div>
 
-          {!isRegistering ? (
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
-                <FormField
-                  control={loginForm.control}
-                  name="identifier"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-700 font-semibold">
-                        {language === 'ar' ? 'رقم الهاتف أو الإيميل' : 'Phone Number or Email'}
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative group">
-                          <Input
-                            {...field}
-                            type="text"
-                            placeholder={language === 'ar' ? 'أدخل رقم الهاتف أو الإيميل' : 'Enter phone number or email'}
-                            className={`pr-4 pl-16 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
-                              focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
-                              ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                            style={{ 
-                              borderColor: '#d1d5db', 
-                              '--tw-ring-color': '#9ca3af',
-                              fontSize: '16px'
-                            } as any}
-                          />
-                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-                            <Phone className="text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
-                            <div className="w-px h-4 bg-gray-300"></div>
-                            <Mail className="text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
-                          </div>
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+            {!isRegistering ? (
+              <form onSubmit={handleLoginSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium mb-3" style={{ textAlign }}>
+                    {language === 'ar' ? 'رقم الهاتف أو البريد الإلكتروني' : 'Phone or Email'} *
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      placeholder={language === 'ar' ? '0501234567 أو user@example.com' : '0501234567 or user@example.com'}
+                      className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                      value={loginData.identifier}
+                      onChange={(e) => setLoginData({...loginData, identifier: e.target.value})}
+                      required
+                    />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  </div>
+                </div>
 
-                <FormField
-                  control={loginForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-700 font-semibold">{t('password')}</FormLabel>
-                      <FormControl>
-                        <div className="relative group">
-                          <Input
-                            {...field}
-                            type="password"
-                            placeholder={t('enterPassword')}
-                            className={`pr-4 pl-12 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
-                              focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
-                              ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                            style={{ 
-                              borderColor: '#d1d5db', 
-                              '--tw-ring-color': '#9ca3af',
-                              fontSize: '16px'
-                            } as any}
-                          />
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div>
+                  <label className="block text-sm font-medium mb-3" style={{ textAlign }}>
+                    {language === 'ar' ? 'كلمة المرور' : 'Password'} *
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="password"
+                      placeholder={language === 'ar' ? 'أدخل كلمة المرور' : 'Enter password'}
+                      className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                      value={loginData.password}
+                      onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                      required
+                    />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  </div>
+                </div>
 
                 <Button 
                   type="submit" 
-                  className="w-full text-white py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 
-                    hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
-                    bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:#852085950" 
+                  className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
                   disabled={loginMutation.isPending}
-                  style={{ 
-                    background: loginMutation.isPending ? '#6B21A8' : undefined,
-                    boxShadow: '0 8px 25px rgba(107, 33, 168, 0.4)'
-                  }}
                 >
-                  <div className="flex items-center justify-center space-x-2">
-                    {loginMutation.isPending && <RefreshCw className="w-4 h-4 animate-spin" />}
-                    <span>{loginMutation.isPending ? t('loading') : t('login')}</span>
-                  </div>
+                  {loginMutation.isPending ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      {language === 'ar' ? 'جاري تسجيل الدخول...' : 'Logging in...'}
+                    </div>
+                  ) : (
+                    language === 'ar' ? 'تسجيل الدخول' : 'Login'
+                  )}
                 </Button>
 
                 <div className="text-center">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <button
+                    type="button"
                     onClick={() => setIsRegistering(true)}
-                    className="w-full py-3 rounded-xl font-semibold border-2 transition-all duration-300 
-                      hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
-                      bg-white hover:bg-gray-100 text-gray-600 border-gray-300 hover:border-gray-400"
+                    className="text-purple-600 hover:text-purple-700 font-medium underline"
                   >
-                    <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                      <UserPlus className="w-5 h-5" />
-                      <span>Create New Account</span>
-                    </div>
-                  </Button>
-                  
-                  <div className="mt-6 pt-4 border-t border-gray-200">
-                    <p className="text-sm text-gray-500 font-medium tracking-wide">
-                      Powered By Ghazala Software
-                    </p>
-                  </div>
+                    {language === 'ar' ? 'ليس لديك حساب؟ إنشاء حساب جديد' : "Don't have an account? Create one"}
+                  </button>
                 </div>
               </form>
-            </Form>
-          ) : (
-            <form onSubmit={handleRegisterSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 gap-6">
-                <div>
-                  <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
-                    {language === 'ar' ? 'الاسم الأول' : 'First Name'} *
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder={language === 'ar' ? 'أدخل الاسم الأول' : 'Enter first name'}
-                    className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                    value={formData.firstName}
-                    onChange={(e) => updateFormData('firstName', e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
-                    {language === 'ar' ? 'الاسم الأخير' : 'Last Name'} *
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder={language === 'ar' ? 'أدخل الاسم الأخير' : 'Enter last name'}
-                    className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                    value={formData.lastName}
-                    onChange={(e) => updateFormData('lastName', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
-                  {language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'} *
-                </label>
-                <div className="relative">
-                  <Input
-                    type="email"
-                    placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter your email address'}
-                    className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                    value={formData.email || ''}
-                    onChange={(e) => updateFormData('email', e.target.value)}
-                    required
-                  />
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
-                  {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
-                </label>
-                <div className="relative">
-                  <Input
-                    type="tel"
-                    placeholder={language === 'ar' ? 'أدخل رقم الهاتف' : 'Enter your phone number'}
-                    className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                    value={formData.phone}
-                    onChange={(e) => updateFormData('phone', e.target.value)}
-                    required
-                  />
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
-                  {language === 'ar' ? 'كلمة المرور' : 'Password'} *
-                </label>
-                <div className="relative">
-                  <Input
-                    type="password"
-                    placeholder={language === 'ar' ? 'أدخل كلمة المرور (6 أحرف على الأقل)' : 'Enter password (minimum 6 characters)'}
-                    className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                    value={formData.password}
-                    onChange={(e) => updateFormData('password', e.target.value)}
-                    required
-                    minLength={6}
-                  />
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-blue-50 #85208550 p-6 rounded-xl border-2 border-blue-200">
-                <h3 className="text-center text-lg font-semibold text-blue-800 mb-4" style={{ textAlign: getTextAlign(language) }}>
-                  {language === 'ar' ? 'التحقق الأمني' : 'Security Verification'} *
-                </h3>
-                <div className="flex justify-center mb-4">
-                  <div className="inline-block bg-white border-3 border-blue-300 px-6 py-3 rounded-xl text-2xl font-bold text-blue-900 shadow-lg">
-                    {captcha.question}
+            ) : (
+              <form onSubmit={handleRegisterSubmit} className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ textAlign }}>
+                      {language === 'ar' ? 'الاسم الأول' : 'First Name'} *
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder={language === 'ar' ? 'أدخل الاسم الأول' : 'Enter first name'}
+                      className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                      value={formData.firstName}
+                      onChange={(e) => updateFormData('firstName', e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ textAlign }}>
+                      {language === 'ar' ? 'الاسم الأخير' : 'Last Name'} *
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder={language === 'ar' ? 'أدخل الاسم الأخير' : 'Enter last name'}
+                      className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                      value={formData.lastName}
+                      onChange={(e) => updateFormData('lastName', e.target.value)}
+                      required
+                    />
                   </div>
                 </div>
-                <Input
-                  type="number"
-                  placeholder={language === 'ar' ? 'أدخل الإجابة' : 'Enter your answer'}
-                  className="text-center text-xl mb-4 h-12 border-2 border-blue-300"
-                  value={formData.captcha}
-                  onChange={(e) => updateFormData('captcha', e.target.value)}
-                  required
-                />
-                <div className="flex justify-center">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="lg" 
-                    onClick={generateCaptcha}
-                    className="flex items-center gap-3 border-2 border-blue-300 hover:bg-blue-100"
-                  >
-                    <RefreshCw className="w-5 h-5" />
-                    {language === 'ar' ? 'تجديد السؤال' : 'Refresh Question'}
-                  </Button>
-                </div>
-              </div>
 
-              <Button 
-                type="submit" 
-                className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
-                disabled={registerMutation.isPending}
-              >
-                {registerMutation.isPending ? (
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    {language === 'ar' ? 'جاري إنشاء الحساب...' : 'Creating Account...'}
+                <div>
+                  <label className="block text-sm font-medium mb-3" style={{ textAlign }}>
+                    {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="tel"
+                      placeholder={language === 'ar' ? '0501234567' : '0501234567'}
+                      className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                      value={formData.phone}
+                      onChange={(e) => updateFormData('phone', e.target.value)}
+                      required
+                    />
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   </div>
-                ) : (
-                  language === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'
-                )}
-              </Button>
+                </div>
 
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsRegistering(false)}
-                className="w-full h-12 border-2 border-gray-300 hover:border-purple-600 hover:bg-purple-100 text-gray-700 hover:text-purple-600 font-medium rounded-xl transition-all duration-300"
-              >
-                <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'ml-3 rotate-180' : 'mr-3'}`} />
-                {language === 'ar' ? 'العودة إلى تسجيل الدخول' : 'Back to Login'}
-              </Button>
-            </form>
-          )}
-        </CardContent>
+                <div>
+                  <label className="block text-sm font-medium mb-3" style={{ textAlign }}>
+                    {language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'} *
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="email"
+                      placeholder={language === 'ar' ? 'user@example.com' : 'user@example.com'}
+                      className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                      value={formData.email}
+                      onChange={(e) => updateFormData('email', e.target.value)}
+                      required
+                    />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-3" style={{ textAlign }}>
+                    {language === 'ar' ? 'كلمة المرور' : 'Password'} *
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="password"
+                      placeholder={language === 'ar' ? 'أدخل كلمة المرور (6 أحرف على الأقل)' : 'Enter password (minimum 6 characters)'}
+                      className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                      value={formData.password}
+                      onChange={(e) => updateFormData('password', e.target.value)}
+                      required
+                      minLength={6}
+                    />
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-2 border-blue-200">
+                  <h3 className="text-center text-lg font-semibold text-blue-800 mb-4" style={{ textAlign }}>
+                    {language === 'ar' ? 'التحقق الأمني' : 'Security Verification'} *
+                  </h3>
+                  <div className="flex justify-center mb-4">
+                    <div className="inline-block bg-white border-3 border-blue-300 px-6 py-3 rounded-xl text-2xl font-bold text-blue-900 shadow-lg">
+                      {captcha.question}
+                    </div>
+                  </div>
+                  <Input
+                    type="number"
+                    placeholder={language === 'ar' ? 'أدخل الإجابة' : 'Enter your answer'}
+                    className="text-center text-xl mb-4 h-12 border-2 border-blue-300"
+                    value={formData.captcha}
+                    onChange={(e) => updateFormData('captcha', e.target.value)}
+                    required
+                  />
+                  <div className="flex justify-center">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="lg" 
+                      onClick={generateCaptcha}
+                      className="flex items-center gap-3 border-2 border-blue-300 hover:bg-blue-100"
+                    >
+                      <RefreshCw className="w-5 h-5" />
+                      {language === 'ar' ? 'تجديد السؤال' : 'Refresh Question'}
+                    </Button>
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
+                  disabled={registerMutation.isPending}
+                >
+                  {registerMutation.isPending ? (
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      {language === 'ar' ? 'جاري إنشاء الحساب...' : 'Creating Account...'}
+                    </div>
+                  ) : (
+                    language === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'
+                  )}
+                </Button>
+
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsRegistering(false)}
+                  className="w-full h-12 border-2 border-gray-300 hover:border-purple-600 hover:bg-purple-100 text-gray-700 hover:text-purple-600 font-medium rounded-xl transition-all duration-300"
+                >
+                  <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'ml-3 rotate-180' : 'mr-3'}`} />
+                  {language === 'ar' ? 'العودة إلى تسجيل الدخول' : 'Back to Login'}
+                </Button>
+              </form>
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>
