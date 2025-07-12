@@ -163,7 +163,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
       <div className="w-full max-w-lg">
-        <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
+        <Card className="shadow-xl" style={{ boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
             
@@ -204,8 +204,8 @@ export default function Login() {
                               focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
                               ${language === 'ar' ? 'text-right' : 'text-left'}`}
                             style={{ 
-                              borderColor: 'var(--purple-primary)', 
-                              '--tw-ring-color': 'var(--purple-primary)',
+                              borderColor: '#d1d5db', 
+                              '--tw-ring-color': '#9ca3af',
                               fontSize: '16px'
                             } as any}
                           />
@@ -238,8 +238,8 @@ export default function Login() {
                               focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
                               ${language === 'ar' ? 'text-right' : 'text-left'}`}
                             style={{ 
-                              borderColor: 'var(--purple-primary)', 
-                              '--tw-ring-color': 'var(--purple-primary)',
+                              borderColor: '#d1d5db', 
+                              '--tw-ring-color': '#9ca3af',
                               fontSize: '16px'
                             } as any}
                           />
@@ -276,7 +276,7 @@ export default function Login() {
                     onClick={() => setIsRegistering(true)}
                     className="w-full py-3 rounded-xl font-semibold border-2 transition-all duration-300 
                       hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
-                      bg-white hover:bg-purple-100 text-purple-600 border-purple-600 hover:border-purple-600"
+                      bg-white hover:bg-gray-100 text-gray-600 border-gray-300 hover:border-gray-400"
                   >
                     <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
                       <UserPlus className="w-5 h-5" />

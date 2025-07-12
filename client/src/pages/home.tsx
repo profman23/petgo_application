@@ -342,7 +342,7 @@ export default function Home() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"></div>
       </div>
     );
   }
@@ -354,7 +354,7 @@ export default function Home() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-gray-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -683,7 +683,7 @@ export default function Home() {
           
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
-            <div className="mb-3 p-3 bg-white rounded-2xl border-2 border-purple-600 shadow-lg">
+            <div className="mb-3 p-3 bg-white rounded-2xl shadow-lg">
               <div className="text-center">
                 <div className="text-sm font-semibold text-gray-800 mb-2" style={{ textAlign }}>
                   {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
@@ -731,7 +731,7 @@ export default function Home() {
 
           {/* Custom Dog and Cat Image */}
           <div className="flex justify-center mb-3">
-            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-600 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm border border-purple-600">
+            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-600 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm">
               <img 
                 src={petsImage}
                 alt="Dogs and Cats" 
@@ -764,7 +764,7 @@ export default function Home() {
           </button>
 
           {/* Contact Section - Icons Only */}
-          <div className="mt-4 p-4 bg-white rounded-xl shadow-sm border border-purple-100">
+          <div className="mt-4 p-4 bg-white rounded-xl shadow-sm">
             <div className="flex items-center justify-center space-x-6 rtl:space-x-reverse">
               {/* WhatsApp Button */}
               <a

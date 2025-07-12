@@ -111,7 +111,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
   return (
     <div className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
       <div className="max-w-lg mx-auto">
-        <Card className="border-2 border-purple-600 shadow-lg">
+        <Card className="shadow-lg">
           <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-600 text-white rounded-t-lg">
             <div className="flex items-center gap-3">
               <Button
@@ -137,7 +137,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 <Input
                   id="name"
                   {...form.register('name')}
-                  className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
+                  className="border-2 border-gray-300 focus:border-gray-400 rounded-lg"
                   placeholder={t('patientName')}
                   autoFocus
                 />
@@ -155,7 +155,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   onValueChange={(value) => form.setValue('type', value as 'Cat' | 'Dog' | 'Bird')}
                   defaultValue={form.watch('type')}
                 >
-                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
+                  <SelectTrigger className="border-2 border-gray-300 focus:border-gray-400 rounded-lg">
                     <SelectValue placeholder={t('selectPatientType')} />
                   </SelectTrigger>
                   <SelectContent>

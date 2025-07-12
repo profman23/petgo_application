@@ -700,6 +700,8 @@ Changelog:
 - July 12, 2025. ADDED: Icon availability testing system for development debugging
 - July 12, 2025. OPTIMIZED: Icon sizing and scaling to ensure complete visibility across all device sizes
 - July 12, 2025. CREATED: SVG icon generator with proper aspect ratios and responsive scaling
+- July 12, 2025. REMOVED: All border styling from Customer interface pages for cleaner design
+- July 12, 2025. UPDATED: Replaced purple borders with neutral gray borders on form inputs
 - July 10, 2025. FIXED: Removed duplicate translation keys to eliminate build warnings
 - July 10, 2025. DISABLED: Payment system integration in vetsvan-booking flow - customers no longer redirected to MyFatoorah payment links
 - July 10, 2025. MODIFIED: VetsVan booking system now redirects to customer activity page instead of payment gateway after successful booking

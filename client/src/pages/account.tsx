@@ -161,7 +161,7 @@ export default function Account() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-gray-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoPath} 
                   alt="VETS VAN Logo" 
@@ -272,7 +272,7 @@ export default function Account() {
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                className={`w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('firstNamePlaceholder')}
               />
             </div>
@@ -289,7 +289,7 @@ export default function Account() {
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                className={`w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('lastNamePlaceholder')}
               />
             </div>
@@ -317,7 +317,7 @@ export default function Account() {
           {/* Reset Password Button */}
           <button 
             onClick={() => setShowPasswordDialog(true)}
-            className="w-full border border-purple-600 text-purple-600 hover:bg-purple-100 hover:border-purple-600 flex items-center justify-center gap-2 py-3 rounded-md transition-colors"
+            className="w-full border border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400 flex items-center justify-center gap-2 py-3 rounded-md transition-colors"
           >
             <Lock size={16} />
             {t('resetPassword')}
@@ -355,7 +355,7 @@ export default function Account() {
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('currentPassword')}
                 />
               </div>
@@ -372,7 +372,7 @@ export default function Account() {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('newPassword')}
                 />
               </div>
@@ -389,7 +389,7 @@ export default function Account() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('confirmNewPassword')}
                 />
               </div>
