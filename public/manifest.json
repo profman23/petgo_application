@@ -14,49 +14,49 @@
   "categories": ["medical", "lifestyle", "utilities"],
   "icons": [
     {
-      "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+      "src": "app-icon-final.jpeg?v=5&t=1752310489",
       "sizes": "72x72",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+      "src": "app-icon-final.jpeg?v=5&t=1752310489",
       "sizes": "96x96",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+      "src": "app-icon-final.jpeg?v=5&t=1752310489",
       "sizes": "128x128",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+      "src": "app-icon-final.jpeg?v=5&t=1752310489",
       "sizes": "144x144",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+      "src": "app-icon-final.jpeg?v=5&t=1752310489",
       "sizes": "152x152",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+      "src": "app-icon-final.jpeg?v=5&t=1752310489",
       "sizes": "192x192",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+      "src": "app-icon-final.jpeg?v=5&t=1752310489",
       "sizes": "384x384",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+      "src": "app-icon-final.jpeg?v=5&t=1752310489",
       "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
@@ -70,7 +70,7 @@
       "url": "/ride-request",
       "icons": [
         {
-          "src": "app-icon-final.jpeg?v=4app-icon-final.jpeg?v=4t=1752310489",
+          "src": "app-icon-final.jpeg?v=5&t=1752310489",
           "sizes": "96x96",
           "type": "image/jpeg"
         }
