@@ -893,6 +893,12 @@ export default function AdminDashboard() {
                     <div className="px-4 py-5 sm:px-6">
                       <h3 className="text-lg leading-6 font-medium text-gray-900">{t('currentVetsVans')}</h3>
                       <p className="mt-1 max-w-2xl text-sm text-gray-500">{t('totalVetsVans')}: {drivers?.length || 0}</p>
+                      <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <p className="text-sm text-yellow-800">
+                          <strong>{language === 'ar' ? 'ميزة جديدة:' : 'New Feature:'}</strong> 
+                          {language === 'ar' ? ' يمكنك الآن تعطيل/تفعيل المواعيد لكل سيارة منفصلة' : ' You can now disable/enable appointments for each vehicle'}
+                        </p>
+                      </div>
                     </div>
                     <ul className="divide-y divide-gray-200">
                       {drivers?.map((driver) => (
@@ -922,36 +928,55 @@ export default function AdminDashboard() {
                               >
                                 {driver.isAvailable ? t('available') : t('notAvailable')}
                               </span>
-                              <button
-                                onClick={() =>
-                                  toggleAvailabilityMutation.mutate({
-                                    driverId: driver.id,
-                                    isAvailable: !driver.isAvailable,
-                                  })
-                                }
-                                className="text-sm text-purple-600 hover:text-purple-600"
-                              >
-                                {t('changeStatus')}
-                              </button>
-                              <button
-                                onClick={() =>
-                                  toggleAppointmentsMutation.mutate({
-                                    driverId: driver.id,
-                                    appointmentsDisabled: !driver.appointmentsDisabled,
-                                  })
-                                }
-                                className={`text-sm inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                   driver.appointmentsDisabled
-                                    ? "bg-orange-100 text-orange-800 hover:bg-orange-200"
-                                    : "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                    ? "bg-orange-100 text-orange-800"
+                                    : "bg-blue-100 text-blue-800"
                                 }`}
                               >
-                                <Clock className="w-3 h-3" />
+                                <Clock className="w-3 h-3 mr-1" />
                                 {driver.appointmentsDisabled 
-                                  ? (language === 'ar' ? 'تفعيل المواعيد' : 'Enable Appointments')
-                                  : (language === 'ar' ? 'تعطيل المواعيد' : 'Disable Appointments')
+                                  ? (language === 'ar' ? 'المواعيد معطلة' : 'Appointments OFF')
+                                  : (language === 'ar' ? 'المواعيد مفعلة' : 'Appointments ON')
                                 }
-                              </button>
+                              </span>
+                              <div className="flex flex-wrap gap-2">
+                                <button
+                                  onClick={() =>
+                                    toggleAvailabilityMutation.mutate({
+                                      driverId: driver.id,
+                                      isAvailable: !driver.isAvailable,
+                                    })
+                                  }
+                                  className="text-sm text-purple-600 hover:text-purple-800 px-2 py-1 rounded border border-purple-300 hover:bg-purple-50"
+                                >
+                                  {t('changeStatus')}
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    toggleAppointmentsMutation.mutate({
+                                      driverId: driver.id,
+                                      appointmentsDisabled: !driver.appointmentsDisabled,
+                                    })
+                                  }
+                                  className={`text-sm inline-flex items-center gap-2 px-3 py-2 rounded-md font-medium transition-all duration-200 shadow-sm ${
+                                    driver.appointmentsDisabled
+                                      ? "bg-orange-500 text-white hover:bg-orange-600 border border-orange-600"
+                                      : "bg-blue-500 text-white hover:bg-blue-600 border border-blue-600"
+                                  }`}
+                                  title={driver.appointmentsDisabled 
+                                    ? (language === 'ar' ? 'اضغط لتفعيل المواعيد' : 'Click to enable appointments')
+                                    : (language === 'ar' ? 'اضغط لتعطيل المواعيد' : 'Click to disable appointments')
+                                  }
+                                >
+                                  <Clock className="w-4 h-4" />
+                                  {driver.appointmentsDisabled 
+                                    ? (language === 'ar' ? 'تفعيل المواعيد' : 'Enable Appointments')
+                                    : (language === 'ar' ? 'تعطيل المواعيد' : 'Disable Appointments')
+                                  }
+                                </button>
+                              </div>
                               <button
                                 onClick={() => handleLocationClick(driver)}
                                 className="text-sm text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
