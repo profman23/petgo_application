@@ -2548,15 +2548,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Attachment not found' });
       }
 
-      // Check if file data exists
-      if (!attachment.fileData) {
+      let fileBuffer: Buffer;
+      
+      // Handle both new format (fileData) and old format (fileUrl)
+      if (attachment.fileData) {
+        // New format: direct base64 data
+        fileBuffer = Buffer.from(attachment.fileData, 'base64');
+        console.log('Using fileData, buffer length:', fileBuffer.length);
+      } else if (attachment.fileUrl) {
+        // Old format: data URL (data:type;base64,data)
+        const base64Data = attachment.fileUrl.split(',')[1];
+        if (!base64Data) {
+          console.log('Invalid fileUrl format for attachment ID:', attachmentId);
+          return res.status(404).json({ message: 'Invalid file data format' });
+        }
+        fileBuffer = Buffer.from(base64Data, 'base64');
+        console.log('Using fileUrl, buffer length:', fileBuffer.length);
+      } else {
         console.log('No file data found for attachment ID:', attachmentId);
         return res.status(404).json({ message: 'File data not found' });
       }
-
-      // Convert base64 data back to binary
-      const fileBuffer = Buffer.from(attachment.fileData, 'base64');
-      console.log('File buffer length:', fileBuffer.length);
       
       // Set appropriate headers for file download
       res.setHeader('Content-Type', attachment.fileType || 'application/octet-stream');
@@ -2585,15 +2596,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Attachment not found' });
       }
 
-      // Check if file data exists
-      if (!attachment.fileData) {
+      let fileBuffer: Buffer;
+      
+      // Handle both new format (fileData) and old format (fileUrl)
+      if (attachment.fileData) {
+        // New format: direct base64 data
+        fileBuffer = Buffer.from(attachment.fileData, 'base64');
+        console.log('Using fileData, buffer length:', fileBuffer.length);
+      } else if (attachment.fileUrl) {
+        // Old format: data URL (data:type;base64,data)
+        const base64Data = attachment.fileUrl.split(',')[1];
+        if (!base64Data) {
+          console.log('Invalid fileUrl format for attachment ID:', attachmentId);
+          return res.status(404).json({ message: 'Invalid file data format' });
+        }
+        fileBuffer = Buffer.from(base64Data, 'base64');
+        console.log('Using fileUrl, buffer length:', fileBuffer.length);
+      } else {
         console.log('No file data found for attachment ID:', attachmentId);
         return res.status(404).json({ message: 'File data not found' });
       }
-
-      // Convert base64 data back to binary
-      const fileBuffer = Buffer.from(attachment.fileData, 'base64');
-      console.log('File buffer length:', fileBuffer.length);
       
       // Set appropriate headers for inline viewing
       res.setHeader('Content-Type', attachment.fileType || 'application/octet-stream');

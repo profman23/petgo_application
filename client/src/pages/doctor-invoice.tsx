@@ -121,7 +121,7 @@ export default function DoctorInvoice() {
   const { data: savedInvoiceItems } = useQuery({
     queryKey: [`/api/invoice-items/${params?.bookingId}`],
     queryFn: async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('doctorToken');
       const response = await fetch(`/api/invoice-items/${params?.bookingId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -134,13 +134,15 @@ export default function DoctorInvoice() {
       return await response.json();
     },
     enabled: !!params?.bookingId,
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0, // Don't cache to avoid stale data
   });
 
   // Fetch invoice status
   const { data: invoiceStatus } = useQuery({
     queryKey: [`/api/invoice-status/${params?.bookingId}`],
     queryFn: async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('doctorToken');
       const response = await fetch(`/api/invoice-status/${params?.bookingId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -153,6 +155,8 @@ export default function DoctorInvoice() {
       return await response.json();
     },
     enabled: !!params?.bookingId,
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0, // Don't cache to avoid stale lock state
   });
 
   // Fetch products for invoice item selection
@@ -196,16 +200,6 @@ export default function DoctorInvoice() {
     }
   }, [savedInvoiceItems]);
 
-  // Update lock status when invoice status is loaded
-  useEffect(() => {
-    if (invoiceStatus) {
-      console.log('Invoice status loaded:', invoiceStatus);
-      const isGenerated = invoiceStatus.isGenerated || invoiceStatus.is_generated;
-      setIsRecordLocked(Boolean(isGenerated));
-      console.log('Record lock status set to:', Boolean(isGenerated));
-    }
-  }, [invoiceStatus]);
-
   // Auto-save when items are modified
   useEffect(() => {
     if (invoiceItems.length > 0 && booking && !isRecordLocked) {
@@ -219,20 +213,44 @@ export default function DoctorInvoice() {
 
   // Load invoice status when data is available
   useEffect(() => {
-    if (invoiceStatus && invoiceStatus.isGenerated) {
-      setIsRecordLocked(true);
-      // Determine discount type based on discount amount
-      const discountValue = parseFloat(invoiceStatus.discountAmount) || 0;
-      const totalWithTaxValue = parseFloat(invoiceStatus.subtotal) * (1 + TAX_RATE);
+    if (invoiceStatus) {
+      console.log('Invoice status loaded:', invoiceStatus);
+      const isGenerated = invoiceStatus.isGenerated || invoiceStatus.is_generated;
+      setIsRecordLocked(Boolean(isGenerated));
+      console.log('Record lock status set to:', Boolean(isGenerated));
       
-      if (discountValue === 0) {
-        setDiscountType('none');
-      } else if (Math.abs(discountValue - totalWithTaxValue) < 0.01) {
-        setDiscountType('full'); // 100% discount
+      if (isGenerated) {
+        // Determine discount type based on discount amount
+        const discountValue = parseFloat(invoiceStatus.discountAmount) || 0;
+        const subtotalValue = parseFloat(invoiceStatus.subtotal) || 0;
+        const totalWithTaxValue = subtotalValue * (1 + TAX_RATE);
+        
+        console.log('Discount analysis:', { 
+          discountValue, 
+          subtotalValue, 
+          totalWithTaxValue,
+          discountAmount: invoiceStatus.discountAmount,
+          subtotal: invoiceStatus.subtotal 
+        });
+        
+        if (discountValue === 0) {
+          console.log('Setting discount type to: none');
+          setDiscountType('none');
+        } else if (Math.abs(discountValue - totalWithTaxValue) < 0.01) {
+          console.log('Setting discount type to: full');
+          setDiscountType('full'); // 100% discount
+        } else {
+          console.log('Setting discount type to: percentage');
+          setDiscountType('percentage'); // 10% discount
+        }
+        setNotes(invoiceStatus.notes || '');
+        console.log('Final discount type set to:', discountType);
       } else {
-        setDiscountType('percentage'); // 10% discount
+        console.log('Invoice not generated, resetting discount type to none');
+        setDiscountType('none');
       }
-      setNotes(invoiceStatus.notes || '');
+    } else {
+      console.log('No invoice status data available');
     }
   }, [invoiceStatus]);
 
