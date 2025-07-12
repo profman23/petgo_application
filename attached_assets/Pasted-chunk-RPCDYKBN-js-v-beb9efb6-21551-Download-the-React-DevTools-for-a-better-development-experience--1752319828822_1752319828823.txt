@@ -1,0 +1,31 @@
+chunk-RPCDYKBN.js?v=beb9efb6:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+App.tsx:52 ✅ Manifest and icon cache cleared
+main.tsx:16 SW registered:  ServiceWorkerRegistration {installing: null, waiting: null, active: ServiceWorker, navigationPreload: NavigationPreloadManager, scope: 'https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/', …}
+587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/:1 <meta name="apple-mobile-web-app-capable" content="yes"> is deprecated. Please include <meta name="mobile-web-app-capable" content="yes">
+pwa-diagnostics.ts:3 🔍 PWA Diagnostics Starting...
+pwa-diagnostics.ts:9 📱 Standalone mode: false
+pwa-diagnostics.ts:53 📄 Manifest found: https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/manifest.json
+pwa-diagnostics.ts:94 🔒 HTTPS requirement met
+pwa-diagnostics.ts:99 🔍 PWA Diagnostics Complete
+pwa-diagnostics.ts:14 🔧 Service Worker registrations: 1
+pwa-diagnostics.ts:16    Registration 1: {scope: 'https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/', state: 'activated', scriptURL: 'https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/sw.js'}
+pwa-diagnostics.ts:58 📝 Manifest content: {name: 'VetsVan - العيادة البيطرية المتنقلة', short_name: 'VetsVan', description: 'خدمة العيادة البيطرية المتنقلة - رعاية شاملة لحيواناتك الأليفة', start_url: '/', display: 'standalone', …}
+pwa-diagnostics.ts:65 ✅ All required manifest fields present
+pwa-diagnostics.ts:72 🖼️ Icons found: 4
+pwa-diagnostics.ts:74    Icon 1: {src: '/app-icon.png', sizes: '192x192', type: 'image/png', purpose: 'any'}
+pwa-diagnostics.ts:74    Icon 2: {src: '/app-icon.png', sizes: '192x192', type: 'image/png', purpose: 'maskable'}
+pwa-diagnostics.ts:74    Icon 3: {src: '/app-icon.png', sizes: '512x512', type: 'image/png', purpose: 'any'}
+pwa-diagnostics.ts:74    Icon 4: {src: '/app-icon.png', sizes: '512x512', type: 'image/png', purpose: 'maskable'}
+587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/:1 Error while trying to use the following icon from the Manifest: https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/app-icon.png (Download error or resource isn't a valid image)
+pwa-diagnostics.ts:39 ⚠️ beforeinstallprompt event did not fire
+pwa-diagnostics.ts:40    This could mean:
+pwa-diagnostics.ts:41    - App is already installed
+pwa-diagnostics.ts:42    - Browser doesn't support PWA installation
+pwa-diagnostics.ts:43    - PWA criteria not met
+pwa-diagnostics.ts:103 🧪 Checking PWA Installation Criteria:
+pwa-diagnostics.ts:107    ✓ HTTPS: true
+pwa-diagnostics.ts:111    ✓ Service Worker support: true
+pwa-diagnostics.ts:115    ✓ Manifest link: true
+pwa-diagnostics.ts:126    ✓ Has icons: true
+pwa-diagnostics.ts:127    ✓ Has large icon (192x192 or 512x512): true
+pwa-diagnostics.ts:133 ✅ All PWA criteria met - install should be available

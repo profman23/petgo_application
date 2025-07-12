@@ -57,6 +57,24 @@ const clearManifestCache = async () => {
   }
 };
 
+// Test icon availability
+const testIconAvailability = async () => {
+  const iconSizes = ['72x72', '96x96', '128x128', '144x144', '152x152', '192x192', '384x384', '512x512'];
+  
+  for (const size of iconSizes) {
+    try {
+      const response = await fetch(`/icons/icon-${size}.png`);
+      if (!response.ok) {
+        console.warn(`❌ Icon not available: icon-${size}.png (${response.status})`);
+      } else {
+        console.log(`✅ Icon available: icon-${size}.png`);
+      }
+    } catch (error) {
+      console.warn(`❌ Icon test failed: icon-${size}.png`, error);
+    }
+  }
+};
+
 // Check for expired tokens on app start (skip for admin routes)
 const checkAndClearExpiredTokens = async () => {
   // Don't check tokens for admin routes
@@ -87,8 +105,12 @@ if (!window.location.pathname.includes('admin')) {
   checkAndClearExpiredTokens();
 }
 
-// Clear manifest cache on app start to ensure fresh icons
+// Clear manifest cache and test icons on app start
 clearManifestCache();
+// Test icons in development
+if (!import.meta.env.PROD) {
+  setTimeout(testIconAvailability, 1000);
+}
 
 // Configure default authorization header for API requests
 const token = localStorage.getItem('token');
