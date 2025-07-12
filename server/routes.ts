@@ -2406,18 +2406,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Unauthorized - Doctor ID required' });
       }
 
-      console.log('Received attachment data:', {
-        ...req.body,
-        fileData: req.body.fileData ? `${req.body.fileData.substring(0, 50)}...` : 'null'
-      });
-
       const attachmentData = {
         ...req.body,
         uploadedBy: doctorId.toString()
       };
 
+      console.log('Creating attachment with fileData length:', req.body.fileData?.length || 0);
       const newAttachment = await storage.createPetAttachment(attachmentData);
-      console.log('Created attachment with ID:', newAttachment.id);
       res.status(201).json(newAttachment);
     } catch (error) {
       console.error('Error creating pet attachment:', error);
