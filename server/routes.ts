@@ -1195,6 +1195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           vetsvanCode: driver.vetsvanCode,
           vetsvanName: driver.vetsvanName,
           isAvailable: driver.isAvailable,
+          appointmentsDisabled: driver.appointmentsDisabled,
           latitude: driver.latitude,
           longitude: driver.longitude,
           shifts: shiftsWithBookingStatus,
@@ -1925,6 +1926,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error updating driver location:', error);
       res.status(500).json({ message: 'Failed to update location' });
+    }
+  });
+
+  // Toggle driver appointments status
+  app.put('/api/admin/drivers/:id/appointments', requireAdminAuth, async (req, res) => {
+    try {
+      const driverId = parseInt(req.params.id);
+      const { appointmentsDisabled } = req.body;
+      
+      if (typeof appointmentsDisabled !== 'boolean') {
+        return res.status(400).json({ message: 'Valid appointmentsDisabled boolean is required' });
+      }
+      
+      await storage.updateDriverAppointmentsStatus(driverId, appointmentsDisabled);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating driver appointments status:', error);
+      res.status(500).json({ message: 'Failed to update appointments status' });
     }
   });
 

@@ -15,11 +15,13 @@ export interface IStorage {
   // Driver operations
   getAllDrivers(): Promise<Driver[]>;
   getAvailableDrivers(): Promise<Driver[]>;
+  getAvailableDriversForAppointments(): Promise<Driver[]>;
   getDriver(id: number): Promise<Driver | undefined>;
   getDriverByUsername(username: string): Promise<Driver | undefined>;
   getDriverByVetsVanCode(vetsVanCode: string): Promise<Driver | undefined>;
   updateDriverLocation(id: number, latitude: number, longitude: number): Promise<void>;
   updateDriverAvailability(id: number, isAvailable: boolean): Promise<void>;
+  updateDriverAppointmentsStatus(id: number, appointmentsDisabled: boolean): Promise<void>;
   
   // Ride operations
   createRide(ride: RideRequest): Promise<Ride>;
@@ -332,6 +334,15 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(drivers).where(eq(drivers.isAvailable, true));
   }
 
+  async getAvailableDriversForAppointments(): Promise<Driver[]> {
+    return await db.select().from(drivers).where(
+      and(
+        eq(drivers.isAvailable, true),
+        eq(drivers.appointmentsDisabled, false)
+      )
+    );
+  }
+
   async getDriver(id: number): Promise<Driver | undefined> {
     const [driver] = await db.select().from(drivers).where(eq(drivers.id, id));
     return driver;
@@ -358,6 +369,13 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(drivers)
       .set({ isAvailable })
+      .where(eq(drivers.id, id));
+  }
+
+  async updateDriverAppointmentsStatus(id: number, appointmentsDisabled: boolean): Promise<void> {
+    await db
+      .update(drivers)
+      .set({ appointmentsDisabled })
       .where(eq(drivers.id, id));
   }
 

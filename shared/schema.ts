@@ -31,6 +31,7 @@ export const drivers = pgTable("drivers", {
   latitude: real("latitude").default(24.7136),
   longitude: real("longitude").default(46.6753),
   isAvailable: boolean("is_available").notNull().default(true),
+  appointmentsDisabled: boolean("appointments_disabled").notNull().default(false),
   profileImageUrl: text("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -160,6 +161,7 @@ export const insertDriverSchema = createInsertSchema(drivers).pick({
   latitude: true,
   longitude: true,
   isAvailable: true,
+  appointmentsDisabled: true,
 });
 
 export const insertAdminSchema = createInsertSchema(admins).pick({

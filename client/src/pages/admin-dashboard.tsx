@@ -31,6 +31,7 @@ interface Driver {
   latitude: number;
   longitude: number;
   isAvailable: boolean;
+  appointmentsDisabled: boolean;
   createdAt: string;
   vetsvanCode: string;
   vetsvanName: string;
@@ -472,6 +473,30 @@ export default function AdminDashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
       toast({
         title: t('statusUpdated'),
+        description: t('availabilityStatusUpdated'),
+      });
+    },
+    onError: () => {
+      toast({
+        title: t('error'),
+        description: t('failedToUpdateStatus'),
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Toggle appointments status mutation
+  const toggleAppointmentsMutation = useMutation({
+    mutationFn: async ({ driverId, appointmentsDisabled }: { driverId: number; appointmentsDisabled: boolean }) => {
+      await apiRequest(`/api/admin/drivers/${driverId}/appointments`, {
+        method: "PUT",
+        body: JSON.stringify({ appointmentsDisabled }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
+      toast({
+        title: t('statusUpdated'),
         description: t('driverStatusChanged'),
       });
     },
@@ -907,6 +932,25 @@ export default function AdminDashboard() {
                                 className="text-sm text-purple-600 hover:text-purple-600"
                               >
                                 {t('changeStatus')}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  toggleAppointmentsMutation.mutate({
+                                    driverId: driver.id,
+                                    appointmentsDisabled: !driver.appointmentsDisabled,
+                                  })
+                                }
+                                className={`text-sm inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
+                                  driver.appointmentsDisabled
+                                    ? "bg-orange-100 text-orange-800 hover:bg-orange-200"
+                                    : "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                }`}
+                              >
+                                <Clock className="w-3 h-3" />
+                                {driver.appointmentsDisabled 
+                                  ? (language === 'ar' ? 'تفعيل المواعيد' : 'Enable Appointments')
+                                  : (language === 'ar' ? 'تعطيل المواعيد' : 'Disable Appointments')
+                                }
                               </button>
                               <button
                                 onClick={() => handleLocationClick(driver)}

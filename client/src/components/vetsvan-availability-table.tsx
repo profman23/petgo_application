@@ -44,6 +44,7 @@ interface VetsVanWithShifts {
   vetsvanCode: string;
   vetsvanName: string;
   isAvailable: boolean;
+  appointmentsDisabled?: boolean;
   shifts: Shift[];
   distanceFromCustomer?: string;
   isClosest?: boolean;
@@ -423,6 +424,11 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   const getTimeSlotStatus = (vetsvan: VetsVanWithShifts, time: string) => {
     if (!vetsvan.isAvailable) return 'unavailable';
     
+    // Check if appointments are disabled for this VetsVan
+    if (vetsvan.appointmentsDisabled) {
+      return 'appointments_disabled';
+    }
+    
     // Check if the time slot is in the past
     if (isTimeSlotInPast(selectedDate, time)) {
       return 'past_time';
@@ -478,6 +484,18 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         description: language === 'ar' 
           ? 'لا يمكن حجز موعد في وقت سابق للوقت الحالي'
           : 'Cannot book appointment for past time',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    // منع النقر على المواعيد المعطلة
+    if (status === 'appointments_disabled') {
+      toast({
+        title: language === 'ar' ? 'المواعيد معطلة' : 'Appointments Disabled',
+        description: language === 'ar' 
+          ? 'المواعيد معطلة حاليًا لهذه السيارة'
+          : 'Appointments are currently disabled for this VetsVan',
         variant: 'destructive',
       });
       return;
@@ -687,6 +705,8 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                                 ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
                                 : status === 'booked'
                                 ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
+                                : status === 'appointments_disabled'
+                                ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
                                 : status === 'past_time'
                                 ? 'bg-red-100 text-red-600 cursor-not-allowed opacity-60'
                                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
@@ -699,6 +719,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                             ) : (
                               status === 'available' ? '✓' : 
                               status === 'booked' ? (language === 'ar' ? 'محجوز' : 'Booked') :
+                              status === 'appointments_disabled' ? (language === 'ar' ? 'محجوز' : 'Booked') :
                               status === 'past_time' ? (language === 'ar' ? 'منتهي' : 'Past') : '✗'
                             )}
                           </button>
