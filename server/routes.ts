@@ -14,6 +14,7 @@ import bcrypt from 'bcrypt';
 
 // Simple session middleware
 const sessions = new Map();
+const doctorSessions = new Map();
 
 function generateSessionId() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -27,11 +28,18 @@ function requireAuth(req: any, res: any, next: any) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
-  const session = sessions.get(sessionId);
+  // Check if token exists in regular sessions Map
+  let session = sessions.get(sessionId);
+  
+  // If not found in regular sessions, check doctor sessions
+  if (!session) {
+    session = doctorSessions.get(sessionId);
+  }
   
   if (!session) {
     console.log('Invalid token:', sessionId);
     console.log('Available sessions:', Array.from(sessions.keys()));
+    console.log('Available doctor sessions:', Array.from(doctorSessions.keys()));
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
@@ -462,7 +470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const sessionId = generateSessionId();
-      sessions.set(sessionId, { 
+      doctorSessions.set(sessionId, { 
         user: { 
           id: driver.id, 
           phone: driver.phone, 
