@@ -385,7 +385,8 @@ export default function Home() {
           </div>
         </div>
 
-
+        {/* Current Location Section - Hidden for better UX */}
+        {/* Location tracking is handled in the background */}
 
         {/* Enhanced Progress Animation for Active Ride */}
         {actualActiveRide && (
