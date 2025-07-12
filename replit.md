@@ -706,6 +706,7 @@ Changelog:
 - July 12, 2025. CRITICAL FIX: Resolved PostgreSQL data persistence issue - changed database initialization from DROP/CREATE to CREATE IF NOT EXISTS to prevent data loss on server restart
 - July 12, 2025. DATABASE POPULATED: Successfully added 10 veterinary products and 8 medical services with bilingual support (Arabic/English) to PostgreSQL database
 - July 12, 2025. VERIFIED: All data now permanently stored in PostgreSQL - products, services, users, bookings, and import history tables fully functional
+- July 12, 2025. UPDATED: Doctor invoice discount options - added 100% discount and removed 100 SAR fixed discount from Invoice Items section
 - July 12, 2025. ENHANCED: PWA installer components now use custom share icon (freepik_assistant_1752317793556_1752317800669.png) for iOS devices
 - July 12, 2025. FIXED: Notification API actions error by implementing proper Service Worker message handling
 - July 12, 2025. OPTIMIZED: Reduced installation prompt timing for faster display (1s iOS, 1.5s general, 2.5s mobile)
