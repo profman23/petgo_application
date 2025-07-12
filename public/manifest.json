@@ -13,61 +13,61 @@
   "categories": ["medical", "lifestyle", "utilities"],
   "icons": [
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png",
+      "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -90,7 +90,7 @@
       "url": "/ride-request",
       "icons": [
         {
-          "src": "/app-icon.png",
+          "src": "/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png",
           "sizes": "96x96",
           "type": "image/png"
         }
