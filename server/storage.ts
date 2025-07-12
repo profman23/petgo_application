@@ -774,8 +774,29 @@ export class DatabaseStorage implements IStorage {
 
   // Invoice Status operations
   async saveInvoiceStatus(status: InsertInvoiceStatus): Promise<InvoiceStatus> {
-    const [newStatus] = await db.insert(invoiceStatus).values(status).returning();
-    return newStatus;
+    // Check if status already exists
+    const existing = await this.getInvoiceStatus(status.bookingId);
+    
+    if (existing) {
+      // Update existing status
+      const [updatedStatus] = await db
+        .update(invoiceStatus)
+        .set({
+          ...status,
+          updatedAt: new Date()
+        })
+        .where(eq(invoiceStatus.bookingId, status.bookingId))
+        .returning();
+      return updatedStatus;
+    } else {
+      // Insert new status
+      const [newStatus] = await db.insert(invoiceStatus).values({
+        ...status,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }).returning();
+      return newStatus;
+    }
   }
 
   async getInvoiceStatus(bookingId: number): Promise<InvoiceStatus | undefined> {

@@ -80,10 +80,26 @@ export default function UploadAttachmentModal({
   const { data: attachments = [], refetch } = useQuery({
     queryKey: ['/api/pet-attachments', petId, bookingId],
     queryFn: async () => {
-      const response = await fetch(`/internal/pet-attachments?petId=${petId}&bookingId=${bookingId}`);
-      const data = await response.json();
-      console.log('Fetched attachments:', data);
-      return data;
+      try {
+        const token = localStorage.getItem('doctorToken');
+        const response = await fetch(`/api/pet-attachments?petId=${petId}&bookingId=${bookingId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('Fetched attachments:', data);
+        return data;
+      } catch (error) {
+        console.error('Error fetching attachments:', error);
+        return [];
+      }
     },
     enabled: isOpen,
   });
@@ -200,7 +216,12 @@ export default function UploadAttachmentModal({
     try {
       console.log('Opening file view for attachment ID:', attachmentId);
       
-      const response = await fetch(`/api/pet-attachments/view/${attachmentId}`);
+      const token = localStorage.getItem('doctorToken');
+      const response = await fetch(`/api/pet-attachments/view/${attachmentId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
       if (response.ok) {
         const blob = await response.blob();
@@ -223,7 +244,12 @@ export default function UploadAttachmentModal({
     try {
       console.log('Downloading file for attachment ID:', attachmentId);
       
-      const response = await fetch(`/api/pet-attachments/download/${attachmentId}`);
+      const token = localStorage.getItem('doctorToken');
+      const response = await fetch(`/api/pet-attachments/download/${attachmentId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
       if (response.ok) {
         const blob = await response.blob();
