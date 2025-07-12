@@ -1,27 +1,24 @@
-const CACHE_NAME = 'vetsvan-v2.0.0';
+const CACHE_NAME = 'vetsvan-v2.0.1';
 const urlsToCache = [
   '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
-  '/manifest.json?v=2.0',
-  '/app-icon.png?v=2.0',
-  '/icons/icon-192x192.png?v=2.0',
-  '/icons/icon-512x512.png?v=2.0'
+  '/manifest.json',
+  '/app-icon.png'
 ];
 
 // Install service worker
 self.addEventListener('install', event => {
-  // Force immediate activation
+  console.log('🎯 Service Worker installing...');
   self.skipWaiting();
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache:', CACHE_NAME);
-        return cache.addAll(urlsToCache);
-      })
-      .catch(err => {
-        console.log('Cache installation failed:', err);
+        console.log('✅ Cache opened:', CACHE_NAME);
+        return cache.addAll(urlsToCache).catch(err => {
+          console.log('⚠️ Cache add failed:', err);
+          // Don't fail installation if cache fails
+          return Promise.resolve();
+        });
       })
   );
 });
@@ -39,26 +36,30 @@ self.addEventListener('fetch', event => {
 
 // Activate service worker
 self.addEventListener('activate', event => {
-  // Take control immediately
+  console.log('🎯 Service Worker activating...');
   self.clients.claim();
   
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('All caches:', cacheNames);
+      console.log('📦 All caches:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
+            console.log('🗑️ Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('Service Worker activated and cache cleaned');
-      // Force page reload to ensure fresh icons
+      console.log('✅ Service Worker activated successfully');
+      
+      // Notify clients that SW is ready
       self.clients.matchAll().then(clients => {
         clients.forEach(client => {
-          client.postMessage({ type: 'CACHE_UPDATED' });
+          client.postMessage({ 
+            type: 'SW_ACTIVATED',
+            cacheName: CACHE_NAME 
+          });
         });
       });
     })

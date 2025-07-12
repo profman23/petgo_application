@@ -42,6 +42,21 @@ export function InstallPrompt() {
   const getCurrentTranslations = () => translations[currentLanguage] || translations.en;
 
   useEffect(() => {
+    // Check if app is already installed
+    const checkInstallState = () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+      const isInstalled = (window.navigator as any).standalone === true || isStandalone;
+      setIsInstalled(isInstalled);
+      
+      // Hide install button if already installed
+      if (isInstalled) {
+        setShowInstallButton(false);
+        return;
+      }
+    };
+
+    checkInstallState();
+
     // Get language from localStorage
     const savedLanguage = localStorage.getItem('language') || 'ar';
     setCurrentLanguage(savedLanguage);

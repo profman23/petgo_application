@@ -29,6 +29,7 @@ import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
 import LoadingScreen from "@/components/LoadingScreen";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { PWAInstaller } from "@/components/PWAInstaller";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -171,6 +172,7 @@ function Router() {
       </div>
       {shouldShowFooter && <FixedFooter />}
       <InstallPrompt />
+      <PWAInstaller />
     </div>
   );
 }
