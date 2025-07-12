@@ -11,40 +11,40 @@
   <!-- Background -->
   <rect width="512" height="512" rx="64" fill="url(#bgGradient)"/>
   
-  <!-- Complete VetsVan Logo - centered -->
-  <g transform="translate(256, 256) scale(0.8)">
+  <!-- Complete VetsVan Logo - centered and properly sized -->
+  <g transform="translate(256, 256) scale(1.2)">
     <!-- Van Body -->
-    <rect x="-120" y="-40" width="240" height="80" rx="12" fill="white" opacity="0.95"/>
+    <rect x="-80" y="-25" width="160" height="50" rx="8" fill="white" opacity="0.95"/>
     
     <!-- Van Front -->
-    <rect x="-130" y="-30" width="15" height="60" rx="8" fill="white" opacity="0.9"/>
+    <rect x="-88" y="-18" width="10" height="36" rx="5" fill="white" opacity="0.9"/>
     
     <!-- Van Back -->
-    <rect x="115" y="-30" width="15" height="60" rx="8" fill="white" opacity="0.9"/>
+    <rect x="78" y="-18" width="10" height="36" rx="5" fill="white" opacity="0.9"/>
     
     <!-- VETS Text -->
-    <text x="0" y="-15" font-family="Arial, sans-serif" font-size="24" font-weight="bold" 
+    <text x="0" y="-8" font-family="Arial, sans-serif" font-size="16" font-weight="bold" 
           text-anchor="middle" fill="#852085">VETS</text>
     
     <!-- VAN Text -->
-    <text x="0" y="5" font-family="Arial, sans-serif" font-size="20" font-weight="bold" 
+    <text x="0" y="6" font-family="Arial, sans-serif" font-size="12" font-weight="bold" 
           text-anchor="middle" fill="#7c3aed">VAN</text>
     
     <!-- Pet Icons -->
-    <circle cx="-60" cy="-5" r="8" fill="#852085"/>
-    <circle cx="-60" cy="-8" r="5" fill="white"/>
+    <circle cx="-40" cy="-2" r="6" fill="#852085"/>
+    <circle cx="-40" cy="-3" r="4" fill="white"/>
     
-    <circle cx="60" cy="-5" r="8" fill="#852085"/>
-    <path d="M56 -8 L60 -12 L64 -8 L61 -3 L59 -3 Z" fill="white"/>
+    <circle cx="40" cy="-2" r="6" fill="#852085"/>
+    <path d="M37 -4 L40 -7 L43 -4 L41 0 L39 0 Z" fill="white"/>
     
     <!-- Medical Cross -->
-    <rect x="-4" y="15" width="8" height="16" fill="#852085"/>
-    <rect x="-8" y="19" width="16" height="8" fill="#852085"/>
+    <rect x="-3" y="12" width="6" height="12" fill="#852085"/>
+    <rect x="-6" y="15" width="12" height="6" fill="#852085"/>
     
     <!-- Van wheels -->
-    <circle cx="-80" cy="35" r="12" fill="#444" opacity="0.8"/>
-    <circle cx="80" cy="35" r="12" fill="#444" opacity="0.8"/>
-    <circle cx="-80" cy="35" r="6" fill="#666"/>
-    <circle cx="80" cy="35" r="6" fill="#666"/>
+    <circle cx="-50" cy="28" r="8" fill="#444" opacity="0.8"/>
+    <circle cx="50" cy="28" r="8" fill="#444" opacity="0.8"/>
+    <circle cx="-50" cy="28" r="4" fill="#666"/>
+    <circle cx="50" cy="28" r="4" fill="#666"/>
   </g>
 </svg>
