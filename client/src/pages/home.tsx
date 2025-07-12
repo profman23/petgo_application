@@ -708,7 +708,7 @@ export default function Home() {
                   </div>
                   
                   {/* 3D Veterinary Clinic - Start Position */}
-                  <div className={`absolute -top-4 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
+                  <div className={`absolute -top-2 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
                     <img 
                       src={newVetClinicImage}
                       alt="Veterinary Clinic" 
