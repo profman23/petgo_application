@@ -716,8 +716,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Custom House - End Position - Same Level as Clinic */}
-                  <div className={`absolute -top-4 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
+                  {/* Custom House - End Position - Raised Higher */}
+                  <div className={`absolute -top-6 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
                     <img 
                       src={newestHouseImage}
                       alt="House" 
