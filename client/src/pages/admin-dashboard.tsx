@@ -31,7 +31,6 @@ interface Driver {
   latitude: number;
   longitude: number;
   isAvailable: boolean;
-  appointmentsDisabled: boolean;
   createdAt: string;
   vetsvanCode: string;
   vetsvanName: string;
@@ -473,30 +472,6 @@ export default function AdminDashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
       toast({
         title: t('statusUpdated'),
-        description: t('availabilityStatusUpdated'),
-      });
-    },
-    onError: () => {
-      toast({
-        title: t('error'),
-        description: t('failedToUpdateStatus'),
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Toggle appointments status mutation
-  const toggleAppointmentsMutation = useMutation({
-    mutationFn: async ({ driverId, appointmentsDisabled }: { driverId: number; appointmentsDisabled: boolean }) => {
-      await apiRequest(`/api/admin/drivers/${driverId}/appointments`, {
-        method: "PUT",
-        body: JSON.stringify({ appointmentsDisabled }),
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
-      toast({
-        title: t('statusUpdated'),
         description: t('driverStatusChanged'),
       });
     },
@@ -893,19 +868,6 @@ export default function AdminDashboard() {
                     <div className="px-4 py-5 sm:px-6">
                       <h3 className="text-lg leading-6 font-medium text-gray-900">{t('currentVetsVans')}</h3>
                       <p className="mt-1 max-w-2xl text-sm text-gray-500">{t('totalVetsVans')}: {drivers?.length || 0}</p>
-                      <div className="mt-3 p-4 bg-gradient-to-r from-purple-100 to-blue-100 border-2 border-purple-300 rounded-lg shadow-md">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                          <h4 className="text-lg font-bold text-purple-800">
-                            {language === 'ar' ? '🎉 ميزة جديدة متاحة الآن!' : '🎉 New Feature Available!'}
-                          </h4>
-                        </div>
-                        <p className="text-sm text-purple-700 font-medium">
-                          {language === 'ar' ? 
-                            'يمكنك الآن تعطيل أو تفعيل المواعيد لكل سيارة VETS VAN بشكل منفصل باستخدام الزر الجديد 🕐' : 
-                            'You can now disable or enable appointments for each VETS VAN separately using the new button 🕐'}
-                        </p>
-                      </div>
                     </div>
                     <ul className="divide-y divide-gray-200">
                       {drivers?.map((driver) => (
@@ -935,57 +897,17 @@ export default function AdminDashboard() {
                               >
                                 {driver.isAvailable ? t('available') : t('notAvailable')}
                               </span>
-                              <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  driver.appointmentsDisabled
-                                    ? "bg-orange-100 text-orange-800"
-                                    : "bg-blue-100 text-blue-800"
-                                }`}
-                              >
-                                <Clock className="w-3 h-3 mr-1" />
-                                {driver.appointmentsDisabled 
-                                  ? (language === 'ar' ? 'المواعيد معطلة' : 'Appointments OFF')
-                                  : (language === 'ar' ? 'المواعيد مفعلة' : 'Appointments ON')
+                              <button
+                                onClick={() =>
+                                  toggleAvailabilityMutation.mutate({
+                                    driverId: driver.id,
+                                    isAvailable: !driver.isAvailable,
+                                  })
                                 }
-                              </span>
-                              <div className="flex flex-wrap gap-2">
-                                <button
-                                  onClick={() =>
-                                    toggleAvailabilityMutation.mutate({
-                                      driverId: driver.id,
-                                      isAvailable: !driver.isAvailable,
-                                    })
-                                  }
-                                  className="text-sm text-purple-600 hover:text-purple-800 px-2 py-1 rounded border border-purple-300 hover:bg-purple-50"
-                                >
-                                  {t('changeStatus')}
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    toggleAppointmentsMutation.mutate({
-                                      driverId: driver.id,
-                                      appointmentsDisabled: !driver.appointmentsDisabled,
-                                    })
-                                  }
-                                  className={`text-sm inline-flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition-all duration-200 shadow-lg transform hover:scale-105 ${
-                                    driver.appointmentsDisabled
-                                      ? "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 border-2 border-orange-400"
-                                      : "bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 border-2 border-blue-400"
-                                  }`}
-                                  title={driver.appointmentsDisabled 
-                                    ? (language === 'ar' ? 'اضغط لتفعيل المواعيد' : 'Click to enable appointments')
-                                    : (language === 'ar' ? 'اضغط لتعطيل المواعيد' : 'Click to disable appointments')
-                                  }
-                                >
-                                  <Clock className="w-5 h-5" />
-                                  <span className="font-extrabold text-lg">
-                                    {driver.appointmentsDisabled 
-                                      ? (language === 'ar' ? '🟢 تفعيل المواعيد' : '🟢 Enable Appointments')
-                                      : (language === 'ar' ? '🔴 تعطيل المواعيد' : '🔴 Disable Appointments')
-                                    }
-                                  </span>
-                                </button>
-                              </div>
+                                className="text-sm text-purple-600 hover:text-purple-600"
+                              >
+                                {t('changeStatus')}
+                              </button>
                               <button
                                 onClick={() => handleLocationClick(driver)}
                                 className="text-sm text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
