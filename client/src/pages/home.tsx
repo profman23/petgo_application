@@ -708,11 +708,11 @@ export default function Home() {
                   </div>
                   
                   {/* 3D Veterinary Clinic - Start Position */}
-                  <div className={`absolute -top-2 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
+                  <div className={`absolute -top-[9px] ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
                     <img 
                       src={newVetClinicImage}
                       alt="Veterinary Clinic" 
-                      className="w-24 h-24 drop-shadow-xl"
+                      className="w-[90px] h-[94px] drop-shadow-xl"
                     />
                   </div>
                   
