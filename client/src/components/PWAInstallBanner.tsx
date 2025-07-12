@@ -83,7 +83,7 @@ export default function PWAInstallBanner() {
           <div className="flex items-center space-x-3">
             <div className="bg-white rounded-full p-2">
               <img 
-                src="/attached_assets/Screenshot 2025-07-12 145346_1752321286791.png" 
+                src="/attached_assets/Screenshot 2025-07-12 145346_1752323089078.png" 
                 alt="VetsVan Logo" 
                 className="w-6 h-6 object-contain"
               />
