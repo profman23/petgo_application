@@ -91,6 +91,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.sendFile(iconPath);
   });
 
+  app.get('/app-icon-maskable.png', (req, res) => {
+    const iconPath = path.join(__dirname, '../public/app-icon-maskable.png');
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+    res.sendFile(iconPath);
+  });
+
 
   // PWA Routes - Serve Service Worker and Manifest
   app.get('/sw.js', (req, res) => {
