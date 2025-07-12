@@ -351,7 +351,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-white text-gray-800 px-3 py-3 h-14 border-b shadow-sm">
+        <div className="bg-white text-gray-800 px-3 py-3 h-14 border-b shadow-sm" style={{ borderBottomColor: '#852085', borderBottomWidth: '3px' }}>
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
               <div className="h-8 bg-white rounded-lg border-2 border-gray-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
