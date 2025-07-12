@@ -1031,7 +1031,7 @@ export default function DoctorInvoice() {
                     >
                       <option value="none">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</option>
                       <option value="percentage">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</option>
-                      <option value="full">{language === 'ar' ? 'خصم 100%' : '100% Discount'}</option>
+                      <option value="full">{language === 'ar' ? 'خصم 100% كامل' : '100% Full Discount'}</option>
                     </select>
                     <span className="text-lg font-medium">{discountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
