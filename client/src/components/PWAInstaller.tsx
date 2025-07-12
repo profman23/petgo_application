@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Smartphone, Monitor, X } from 'lucide-react';
+import { showInstallNotification } from '@/utils/install-notification';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -32,30 +33,78 @@ export function PWAInstaller() {
       return;
     }
 
+    // Check if user has dismissed install prompt before
+    const dismissedTimeStr = localStorage.getItem('pwa-install-dismissed');
+    const hasUserDismissed = dismissedTimeStr && new Date().getTime() < parseInt(dismissedTimeStr);
+    
     // Listen for beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
       console.log('🎯 beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e);
-      setShowInstallPrompt(true);
+      
+      // Show prompt after a short delay if user hasn't dismissed it
+      if (!hasUserDismissed) {
+        setTimeout(() => {
+          setShowInstallPrompt(true);
+        }, 2000);
+      }
     };
 
     // Add event listener
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // For browsers that don't support beforeinstallprompt, show after delay
+    // For mobile browsers (iOS Safari, Android browsers without beforeinstallprompt)
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    
+    // Show install prompt for mobile devices after delay
     const timer = setTimeout(() => {
-      if (!deferredPrompt && !isStandalone) {
-        console.log('🎯 No beforeinstallprompt, showing manual instructions');
+      if (!isStandalone && !hasUserDismissed && isMobile) {
+        console.log('🎯 Showing mobile install prompt');
         setShowInstallPrompt(true);
       }
     }, 3000);
 
+    // Show immediate prompt for iOS devices that don't get beforeinstallprompt
+    if (isIOS && !hasUserDismissed && !isStandalone) {
+      setTimeout(() => {
+        setShowInstallPrompt(true);
+      }, 1500);
+    }
+
+    // Listen for custom install prompt event
+    const handleShowInstallPrompt = () => {
+      if (!isStandalone && !hasUserDismissed) {
+        setShowInstallPrompt(true);
+      }
+    };
+
+    // Listen for service worker messages
+    const handleServiceWorkerMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'TRIGGER_INSTALL') {
+        handleShowInstallPrompt();
+      }
+    };
+
+    window.addEventListener('show-install-prompt', handleShowInstallPrompt);
+    navigator.serviceWorker?.addEventListener('message', handleServiceWorkerMessage);
+
+    // Show notification after delay for supported browsers
+    setTimeout(() => {
+      if (!isStandalone && !hasUserDismissed && !deferredPrompt) {
+        showInstallNotification();
+      }
+    }, 5000);
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('show-install-prompt', handleShowInstallPrompt);
+      navigator.serviceWorker?.removeEventListener('message', handleServiceWorkerMessage);
       clearTimeout(timer);
     };
-  }, [deferredPrompt, isInstalled]);
+  }, []);
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {
@@ -133,34 +182,82 @@ export function PWAInstaller() {
     return null;
   }
 
+  const handleDismiss = () => {
+    setShowInstallPrompt(false);
+    // Remember user's choice for 7 days
+    const dismissTime = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
+    localStorage.setItem('pwa-install-dismissed', dismissTime.toString());
+  };
+
+  const handleNotNow = () => {
+    setShowInstallPrompt(false);
+    // Remember user's choice for 1 day only
+    const dismissTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+    localStorage.setItem('pwa-install-dismissed', dismissTime.toString());
+  };
+
   return (
     <>
-      {/* Install Button */}
+      {/* Enhanced Install Popup */}
       {showInstallPrompt && !showInstructions && (
-        <div className="fixed top-4 left-4 right-4 z-50 bg-white border border-purple-200 rounded-lg shadow-lg p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3 space-x-reverse">
-              <div className="bg-purple-100 p-2 rounded-full">
-                <Download className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">تثبيت تطبيق VetsVan</h3>
-                <p className="text-sm text-gray-600">للوصول السريع من الشاشة الرئيسية</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center transform animate-in zoom-in-95 duration-200">
+            {/* App Icon */}
+            <div className="flex justify-center mb-4">
+              <div className="bg-gradient-to-br from-purple-100 to-purple-50 p-4 rounded-2xl">
+                <div className="w-16 h-16 bg-purple-600 rounded-xl flex items-center justify-center">
+                  <Smartphone className="h-8 w-8 text-white" />
+                </div>
               </div>
             </div>
-            <div className="flex items-center space-x-2 space-x-reverse">
+            
+            {/* Title and Description */}
+            <h3 className="text-xl font-bold text-gray-900 mb-2">تثبيت تطبيق VetsVan</h3>
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              ثبت التطبيق على جهازك للوصول السريع إلى خدمات العيادة البيطرية المتنقلة
+            </p>
+            
+            {/* Benefits */}
+            <div className="bg-purple-50 rounded-lg p-4 mb-6 text-right">
+              <ul className="text-sm text-purple-800 space-y-2">
+                <li className="flex items-center justify-end space-x-2 space-x-reverse">
+                  <span>وصول سريع من الشاشة الرئيسية</span>
+                  <span className="text-purple-600">✓</span>
+                </li>
+                <li className="flex items-center justify-end space-x-2 space-x-reverse">
+                  <span>يعمل بدون إنترنت</span>
+                  <span className="text-purple-600">✓</span>
+                </li>
+                <li className="flex items-center justify-end space-x-2 space-x-reverse">
+                  <span>تحديثات تلقائية</span>
+                  <span className="text-purple-600">✓</span>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="space-y-3">
               <button
                 onClick={handleInstallClick}
-                className="bg-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors"
+                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg"
               >
-                تثبيت
+                {deferredPrompt ? 'تثبيت الآن' : 'عرض التعليمات'}
               </button>
-              <button
-                onClick={() => setShowInstallPrompt(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              
+              <div className="flex space-x-2 space-x-reverse">
+                <button
+                  onClick={handleNotNow}
+                  className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                >
+                  ليس الآن
+                </button>
+                <button
+                  onClick={handleDismiss}
+                  className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                >
+                  لا أريد
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -30,6 +30,7 @@ import { FixedFooter } from "@/components/fixed-footer";
 import LoadingScreen from "@/components/LoadingScreen";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { PWAInstaller } from "@/components/PWAInstaller";
+import { MobileInstallBanner } from "@/components/MobileInstallBanner";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -173,6 +174,7 @@ function Router() {
       {shouldShowFooter && <FixedFooter />}
       <InstallPrompt />
       <PWAInstaller />
+      <MobileInstallBanner />
     </div>
   );
 }

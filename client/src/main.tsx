@@ -3,6 +3,10 @@ import App from "./App";
 import "./index.css";
 import "./styles/map-override.css";
 import "./utils/pwa-diagnostics";
+import { setupInstallNotificationHandler } from "./utils/install-notification";
+
+// Setup install notification handler
+setupInstallNotificationHandler();
 
 // Register Service Worker for PWA
 if ('serviceWorker' in navigator) {

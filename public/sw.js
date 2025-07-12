@@ -62,6 +62,17 @@ self.addEventListener('activate', event => {
           });
         });
       });
+
+      // Schedule install notification after activation
+      setTimeout(() => {
+        self.clients.matchAll().then(clients => {
+          clients.forEach(client => {
+            client.postMessage({ 
+              type: 'SHOW_INSTALL_NOTIFICATION'
+            });
+          });
+        });
+      }, 10000); // Show after 10 seconds
     })
   );
 });
@@ -96,24 +107,47 @@ self.addEventListener('push', event => {
   );
 });
 
-// Notification click handler
+// Handle notification actions for install prompts
 self.addEventListener('notificationclick', event => {
-  console.log('Notification click received.');
-
+  console.log('🔔 Notification clicked:', event.action);
+  
   event.notification.close();
-
-  if (event.action === 'explore') {
-    // Open the app
+  
+  if (event.action === 'install' || event.action === 'explore') {
+    // Open app and trigger install prompt
     event.waitUntil(
-      clients.openWindow('/')
+      clients.matchAll().then(clientList => {
+        // Focus existing tab if available
+        for (const client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            client.postMessage({ type: 'TRIGGER_INSTALL' });
+            return client.focus();
+          }
+        }
+        // Open new window if no existing tab
+        if (clients.openWindow) {
+          return clients.openWindow('/').then(client => {
+            if (client) {
+              setTimeout(() => {
+                client.postMessage({ type: 'TRIGGER_INSTALL' });
+              }, 1000);
+            }
+          });
+        }
+      })
     );
   } else if (event.action === 'close') {
-    // Close notification
-    event.notification.close();
+    console.log('📱 Install notification dismissed by user');
   } else {
-    // Default action - open app
+    // Default action - open app and show install prompt
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow('/').then(client => {
+        if (client) {
+          setTimeout(() => {
+            client.postMessage({ type: 'TRIGGER_INSTALL' });
+          }, 1000);
+        }
+      })
     );
   }
 });
