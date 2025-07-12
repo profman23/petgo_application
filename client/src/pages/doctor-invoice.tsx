@@ -66,6 +66,7 @@ interface BookingDetails {
   status: string;
 }
 
+// UPDATED: Added 100% discount option - V2.1 with cache fixes
 export default function DoctorInvoice() {
   const [, params] = useRoute('/doctor-invoice/:bookingId');
   const [, setLocation] = useLocation();
@@ -1029,9 +1030,9 @@ export default function DoctorInvoice() {
                       className="border border-gray-300 rounded px-3 py-1 text-sm"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
                     >
-                      <option value="none">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</option>
-                      <option value="percentage">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</option>
-                      <option value="full">{language === 'ar' ? 'خصم 100% كامل' : '100% Full Discount'}</option>
+                      <option value="none">{language === 'ar' ? 'بدون خصم ✘' : 'No Discount ✘'}</option>
+                      <option value="percentage">{language === 'ar' ? 'خصم 10% ✓' : '10% Discount ✓'}</option>
+                      <option value="full">{language === 'ar' ? 'خصم 100% مجاني ✓' : '100% FREE Discount ✓'}</option>
                     </select>
                     <span className="text-lg font-medium">{discountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
