@@ -106,6 +106,7 @@ export interface IStorage {
   getPetAttachmentsByBooking(bookingId: number): Promise<PetAttachment[]>;
   getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]>;
   deletePetAttachment(id: number, uploadedBy: string): Promise<boolean>;
+  getPetAttachmentById(id: number): Promise<PetAttachment | undefined>;
 
   // Invoice Items operations
   saveInvoiceItems(bookingId: number, items: any[]): Promise<InvoiceItem[]>;
@@ -735,6 +736,11 @@ export class DatabaseStorage implements IStorage {
       )
     );
     return true;
+  }
+
+  async getPetAttachmentById(id: number): Promise<PetAttachment | undefined> {
+    const [attachment] = await db.select().from(petAttachments).where(eq(petAttachments.id, id));
+    return attachment;
   }
 
   // Invoice Items operations

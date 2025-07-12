@@ -307,7 +307,8 @@ export const petAttachments = pgTable("pet_attachments", {
   fileName: varchar("file_name").notNull(),
   fileType: varchar("file_type").notNull(),
   fileSize: integer("file_size").notNull(),
-  fileUrl: text("file_url").notNull(),
+  fileData: text("file_data").notNull(), // Base64 encoded file content
+  fileUrl: text("file_url"), // Optional: for backward compatibility
   uploadedBy: varchar("uploaded_by").notNull(), // doctor ID
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
   description: text("description"),
@@ -319,6 +320,7 @@ export const insertPetAttachmentSchema = createInsertSchema(petAttachments).pick
   fileName: true,
   fileType: true,
   fileSize: true,
+  fileData: true,
   fileUrl: true,
   uploadedBy: true,
   description: true,

@@ -19,7 +19,7 @@ export async function initDatabase() {
   try {
     console.log('Initializing database schema...');
     
-    // Create pet_attachments table if it doesn't exist
+    // Create pet_attachments table if it doesn't exist  
     await pool.query(`
       CREATE TABLE IF NOT EXISTS pet_attachments (
         id SERIAL PRIMARY KEY,
@@ -28,11 +28,18 @@ export async function initDatabase() {
         file_name VARCHAR(255) NOT NULL,
         file_type VARCHAR(100),
         file_size INTEGER,
+        file_data TEXT NOT NULL,
         file_url TEXT,
         description TEXT,
         uploaded_by VARCHAR(100) NOT NULL,
         uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `);
+    
+    // Add file_data column if it doesn't exist (for existing databases)
+    await pool.query(`
+      ALTER TABLE pet_attachments 
+      ADD COLUMN IF NOT EXISTS file_data TEXT;
     `);
 
     // Create products table if it doesn't exist

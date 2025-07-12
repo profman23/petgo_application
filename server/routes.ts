@@ -2469,6 +2469,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download attachment endpoint - serves file data from database
+  app.get('/api/pet-attachments/download/:id', requireAuth, async (req, res) => {
+    try {
+      const attachmentId = parseInt(req.params.id);
+      const attachment = await storage.getPetAttachmentById(attachmentId);
+      
+      if (!attachment) {
+        return res.status(404).json({ message: 'Attachment not found' });
+      }
+
+      // Convert base64 data back to binary
+      const fileBuffer = Buffer.from(attachment.fileData, 'base64');
+      
+      // Set appropriate headers for file download
+      res.setHeader('Content-Type', attachment.fileType || 'application/octet-stream');
+      res.setHeader('Content-Disposition', `attachment; filename="${attachment.fileName}"`);
+      res.setHeader('Content-Length', fileBuffer.length);
+      
+      // Send file data
+      res.send(fileBuffer);
+    } catch (error) {
+      console.error('Error downloading attachment:', error);
+      res.status(500).json({ message: 'Error downloading attachment' });
+    }
+  });
+
+  // View attachment endpoint - for inline viewing (images, PDFs)
+  app.get('/api/pet-attachments/view/:id', requireAuth, async (req, res) => {
+    try {
+      const attachmentId = parseInt(req.params.id);
+      const attachment = await storage.getPetAttachmentById(attachmentId);
+      
+      if (!attachment) {
+        return res.status(404).json({ message: 'Attachment not found' });
+      }
+
+      // Convert base64 data back to binary
+      const fileBuffer = Buffer.from(attachment.fileData, 'base64');
+      
+      // Set appropriate headers for inline viewing
+      res.setHeader('Content-Type', attachment.fileType || 'application/octet-stream');
+      res.setHeader('Content-Disposition', `inline; filename="${attachment.fileName}"`);
+      res.setHeader('Content-Length', fileBuffer.length);
+      
+      // Send file data
+      res.send(fileBuffer);
+    } catch (error) {
+      console.error('Error viewing attachment:', error);
+      res.status(500).json({ message: 'Error viewing attachment' });
+    }
+  });
+
   // Invoice Items endpoints
   app.post('/api/invoice-items/:bookingId', requireAuth, async (req: any, res) => {
     try {

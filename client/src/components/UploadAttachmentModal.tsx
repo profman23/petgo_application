@@ -3,7 +3,7 @@ import { useLanguage } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { X, Upload, File, Trash2 } from 'lucide-react';
+import { X, Upload, File, Trash2, Eye, Download } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -25,6 +25,8 @@ const translations = {
     fileSize: 'حجم الملف',
     uploadedAt: 'تاريخ الرفع',
     delete: 'حذف',
+    view: 'عرض',
+    download: 'تحميل',
     maxFileSize: 'الحد الأقصى لحجم الملف 10 ميجابايت',
     fileTooBig: 'حجم الملف كبير جداً. الحد الأقصى 10 ميجابايت'
   },
@@ -45,6 +47,8 @@ const translations = {
     fileSize: 'File Size',
     uploadedAt: 'Uploaded At',
     delete: 'Delete',
+    view: 'View',
+    download: 'Download',
     maxFileSize: 'Maximum file size 10MB',
     fileTooBig: 'File is too large. Maximum size is 10MB'
   }
@@ -137,6 +141,8 @@ export default function UploadAttachmentModal({
     const reader = new FileReader();
     reader.onload = () => {
       const base64String = reader.result as string;
+      // Remove the data URL prefix to get only the base64 data
+      const base64Data = base64String.split(',')[1];
       
       const attachmentData = {
         petId,
@@ -144,7 +150,7 @@ export default function UploadAttachmentModal({
         fileName: selectedFile.name,
         fileType: selectedFile.type,
         fileSize: selectedFile.size,
-        fileUrl: base64String, // Store as base64 for simplicity
+        fileData: base64Data, // Store only base64 data without prefix
         description: description.trim(),
       };
 
@@ -165,6 +171,23 @@ export default function UploadAttachmentModal({
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  // View file in browser (for images, PDFs)
+  const handleViewFile = (attachmentId: number) => {
+    const viewUrl = `/api/pet-attachments/view/${attachmentId}`;
+    window.open(viewUrl, '_blank');
+  };
+
+  // Download file to device
+  const handleDownloadFile = (attachmentId: number, fileName: string) => {
+    const downloadUrl = `/api/pet-attachments/download/${attachmentId}`;
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (!isOpen) return null;
@@ -258,15 +281,43 @@ export default function UploadAttachmentModal({
                         </p>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => handleDelete(attachment.id)}
-                      disabled={deleteMutation.isPending}
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    
+                    {/* Action buttons */}
+                    <div className="flex items-center space-x-2">
+                      {/* View button */}
+                      <Button
+                        onClick={() => handleViewFile(attachment.id)}
+                        variant="outline"
+                        size="sm"
+                        className="text-blue-600 hover:text-blue-700"
+                        title={t('view')}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      
+                      {/* Download button */}
+                      <Button
+                        onClick={() => handleDownloadFile(attachment.id, attachment.fileName)}
+                        variant="outline"
+                        size="sm"
+                        className="text-green-600 hover:text-green-700"
+                        title={t('download')}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      
+                      {/* Delete button */}
+                      <Button
+                        onClick={() => handleDelete(attachment.id)}
+                        disabled={deleteMutation.isPending}
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700"
+                        title={t('delete')}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
