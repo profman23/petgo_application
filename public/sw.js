@@ -1,10 +1,11 @@
-const CACHE_NAME = 'vetsvan-v6.0.0';
+const CACHE_NAME = 'vetsvan-v1.0.0';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
   '/static/css/main.css',
   '/manifest.json',
-  '/app-icon-final.jpeg'
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
 ];
 
 // Install service worker
@@ -33,52 +34,15 @@ self.addEventListener('fetch', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      // Delete ALL old caches to ensure fresh icon loading
       return Promise.all(
         cacheNames.map(cacheName => {
-          console.log('Force deleting cache:', cacheName);
-          return caches.delete(cacheName);
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
         })
       );
-    }).then(() => {
-      // Clear all caches and reload the new icon
-      return caches.open(CACHE_NAME).then(cache => {
-        return cache.addAll(urlsToCache);
-      });
-    }).then(() => {
-      // Take control of all clients
-      return self.clients.claim();
     })
-  );
-});
-
-// Handle messages from main thread
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
-
-// Notify clients when update is available
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-      .then(() => {
-        // Notify all clients that update is available
-        return self.clients.matchAll();
-      })
-      .then(clients => {
-        clients.forEach(client => {
-          client.postMessage({
-            type: 'UPDATE_AVAILABLE',
-            version: CACHE_NAME
-          });
-        });
-      })
   );
 });
 

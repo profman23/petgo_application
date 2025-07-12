@@ -28,7 +28,6 @@ import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
 import LoadingScreen from "@/components/LoadingScreen";
-import { UpdateNotification } from "@/components/UpdateNotification";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -113,7 +112,6 @@ function Router() {
 
   return (
     <div className="min-h-screen flex flex-col screen-border">
-      <UpdateNotification />
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
           <Route path="/user-type-selection" component={UserTypeSelection} />

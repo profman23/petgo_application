@@ -1,7 +1,6 @@
 {
   "name": "VetsVan - العيادة البيطرية المتنقلة",
   "short_name": "VetsVan",
-  "version": "6.0",
   "description": "خدمة العيادة البيطرية المتنقلة - رعاية شاملة لحيواناتك الأليفة",
   "start_url": "/",
   "display": "standalone",
@@ -14,65 +13,73 @@
   "categories": ["medical", "lifestyle", "utilities"],
   "icons": [
     {
-      "src": "app-icon-v6.jpeg",
+      "src": "/icons/icon-cropped.svg",
       "sizes": "72x72",
-      "type": "image/jpeg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-v6.jpeg",
+      "src": "/icons/icon-cropped.svg",
       "sizes": "96x96",
-      "type": "image/jpeg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-v6.jpeg",
+      "src": "/icons/icon-cropped.svg",
       "sizes": "128x128",
-      "type": "image/jpeg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-v6.jpeg",
+      "src": "/icons/icon-cropped.svg",
       "sizes": "144x144",
-      "type": "image/jpeg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-v6.jpeg",
+      "src": "/icons/icon-cropped.svg",
       "sizes": "152x152",
-      "type": "image/jpeg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-v6.jpeg",
+      "src": "/icons/icon-192x192-complete.svg",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-v6.jpeg",
+      "src": "/icons/icon-cropped.svg",
       "sizes": "384x384",
-      "type": "image/jpeg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "app-icon-v6.jpeg",
+      "src": "/icons/icon-512x512-complete.svg",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home-screenshot.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "الصفحة الرئيسية لتطبيق VetsVan"
     }
   ],
   "shortcuts": [
     {
-      "name": "طلب العيادة البيطرية المتنقلة",
+      "name": "طلب العيادة",
       "short_name": "طلب",
       "description": "طلب العيادة البيطرية المتنقلة",
       "url": "/ride-request",
       "icons": [
         {
-          "src": "app-icon-v6.jpeg",
-          "sizes": "96x96",
-          "type": "image/jpeg"
+          "src": "/icons/icon-96x96.png",
+          "sizes": "96x96"
         }
       ]
     }
