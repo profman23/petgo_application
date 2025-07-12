@@ -13,6 +13,7 @@ import DoctorDashboard from "@/pages/doctor-dashboard";
 import DoctorActivity from "@/pages/doctor-activity";
 import DoctorAccount from "@/pages/doctor-account";
 import DoctorInvoice from "@/pages/doctor-invoice";
+import DoctorInvoiceV2 from "@/pages/doctor-invoice-v2";
 import InvoiceView from "@/pages/invoice-view";
 import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
@@ -178,6 +179,7 @@ function Router() {
           <Route path="/doctor-activity" component={DoctorActivity} />
           <Route path="/doctor-account" component={DoctorAccount} />
           <Route path="/doctor-invoice/:bookingId" component={DoctorInvoice} />
+          <Route path="/doctor-invoice-v2/:bookingId" component={DoctorInvoiceV2} />
           <Route path="/invoice-view" component={InvoiceView} />
           <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
           <Route path="/ride-request" component={() => <AuthCheck><RideRequest /></AuthCheck>} />
