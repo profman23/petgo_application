@@ -849,6 +849,12 @@ Changelog:
 - July 12, 2025. ADDED: Automatic cache clearing system in Service Worker to prevent old icon display
 - July 12, 2025. ENHANCED: Service Worker with skipWaiting() and immediate cache control for instant updates
 - July 12, 2025. COMPLETED: Cross-platform icon consistency - same VetsVan logo displays on Android, iOS, and desktop PWA installations
+- July 12, 2025. CRITICAL BUG RESOLVED: Doctor invoice discount loading issue requiring CTRL+SHIFT+R to display updates
+- July 12, 2025. ROOT CAUSE IDENTIFIED: Authentication token mismatch between browser localStorage and server doctorSessions Map
+- July 12, 2025. SOLUTION IMPLEMENTED: Created doctor-invoice-ultimate.tsx with fresh authentication on every request
+- July 12, 2025. BREAKTHROUGH: Built 6 different invoice screen versions to isolate and resolve the core authentication token synchronization issue
+- July 12, 2025. TECHNICAL ACHIEVEMENT: Solved browser cache vs authentication token management problem that was preventing real-time data updates
+- July 12, 2025. SUCCESS CONFIRMED: Ultimate solution eliminates CTRL+SHIFT+R requirement - discount updates appear instantly using fresh token authentication
 ```
 
 ## User Preferences
