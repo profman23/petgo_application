@@ -22,6 +22,7 @@ import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
+import { InstallButton } from '@/components/InstallButton';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -370,6 +371,7 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-2">
               <LanguageSelector />
+              <InstallButton />
               <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"

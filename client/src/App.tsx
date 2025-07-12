@@ -28,6 +28,7 @@ import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
 import LoadingScreen from "@/components/LoadingScreen";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
@@ -144,6 +145,7 @@ function Router() {
         </Switch>
       </div>
       {shouldShowFooter && <FixedFooter />}
+      <InstallPrompt />
     </div>
   );
 }
