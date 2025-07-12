@@ -13,61 +13,61 @@
   "categories": ["medical", "lifestyle", "utilities"],
   "icons": [
     {
-      "src": "/app-icon.png?v=2025071215",
+      "src": "/app-icon.png?v=2025071216",
       "sizes": "72x72",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png?v=2025071215",
+      "src": "/app-icon.png?v=2025071216",
       "sizes": "96x96",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png?v=2025071215",
+      "src": "/app-icon.png?v=2025071216",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png?v=2025071215",
+      "src": "/app-icon.png?v=2025071216",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png?v=2025071215",
+      "src": "/app-icon.png?v=2025071216",
       "sizes": "152x152",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png?v=2025071215",
+      "src": "/app-icon.png?v=2025071216",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon-maskable.png?v=2025071215",
+      "src": "/app-icon-maskable.png?v=2025071216",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/app-icon.png?v=2025071215",
+      "src": "/app-icon.png?v=2025071216",
       "sizes": "384x384",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon.png?v=2025071215",
+      "src": "/app-icon.png?v=2025071216",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/app-icon-maskable.png?v=2025071215",
+      "src": "/app-icon-maskable.png?v=2025071216",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
