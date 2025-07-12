@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Download, Smartphone, Monitor, X } from 'lucide-react';
 import { showInstallNotification } from '@/utils/install-notification';
 import customShareIcon from '@assets/freepik_assistant_1752317793556_1752317800669.png';
+import { getDeviceLanguage, installMessages, safariInstructions } from '@/utils/device-language';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -130,64 +131,101 @@ export function PWAInstaller() {
 
   const getBrowserInstructions = () => {
     const userAgent = navigator.userAgent.toLowerCase();
+    const deviceLang = getDeviceLanguage();
+    const isArabic = deviceLang === 'ar';
     
     if (userAgent.includes('chrome') && !userAgent.includes('edg')) {
       return {
         browser: 'Chrome',
-        steps: [
+        steps: isArabic ? [
           'اضغط على الثلاث نقاط (⋮) في أعلى المتصفح',
           'اختر "إضافة إلى الشاشة الرئيسية" أو "تثبيت التطبيق"',
           'اضغط "إضافة" للتأكيد'
+        ] : [
+          'Tap the three dots (⋮) at the top of the browser',
+          'Select "Add to Home screen" or "Install app"',
+          'Tap "Add" to confirm'
         ]
       };
     } else if (userAgent.includes('firefox')) {
       return {
         browser: 'Firefox',
-        steps: [
+        steps: isArabic ? [
           'اضغط على أيقونة المنزل (+) في شريط العنوان',
           'اختر "إضافة إلى الشاشة الرئيسية"',
           'اضغط "إضافة" للتأكيد'
+        ] : [
+          'Tap the home icon (+) in the address bar',
+          'Select "Add to Home screen"',
+          'Tap "Add" to confirm'
         ]
       };
     } else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+      const steps = isArabic ? [
+        <div key="safari-step1" className="flex items-center gap-2 flex-row-reverse">
+          <span>اضغط على أيقونة المشاركة</span>
+          <div className="flex items-center gap-1">
+            <img 
+              src={customShareIcon} 
+              alt="Share Icon" 
+              className="w-6 h-6 bg-gray-100 rounded-sm p-0.5"
+            />
+            <div className="animate-bounce text-yellow-500">
+              👇
+            </div>
+          </div>
+          <span>في الأسفل</span>
+        </div>,
+        safariInstructions.ar[1],
+        safariInstructions.ar[2]
+      ] : [
+        <div key="safari-step1" className="flex items-center gap-2">
+          <span>Tap the Share icon</span>
+          <div className="flex items-center gap-1">
+            <img 
+              src={customShareIcon} 
+              alt="Share Icon" 
+              className="w-6 h-6 bg-gray-100 rounded-sm p-0.5"
+            />
+            <div className="animate-bounce text-yellow-500">
+              👇
+            </div>
+          </div>
+          <span>at the bottom</span>
+        </div>,
+        safariInstructions.en[1],
+        safariInstructions.en[2]
+      ];
+      
       return {
         browser: 'Safari',
-        steps: [
-          <div key="safari-step1" className="flex items-center gap-2">
-            <span>اضغط على أيقونة المشاركة</span>
-            <div className="flex items-center gap-1">
-              <img 
-                src={customShareIcon} 
-                alt="Share Icon" 
-                className="w-6 h-6 bg-gray-100 rounded-sm p-0.5"
-              />
-              <div className="animate-bounce text-yellow-500">
-                👇
-              </div>
-            </div>
-            <span>في الأسفل</span>
-          </div>,
-          'مرر لأسفل واختر "إضافة إلى الشاشة الرئيسية"',
-          'اضغط "إضافة" للتأكيد'
-        ]
+        steps
       };
     } else if (userAgent.includes('edg')) {
       return {
         browser: 'Edge',
-        steps: [
+        steps: isArabic ? [
           'اضغط على الثلاث نقاط (...) في أعلى المتصفح',
           'اختر "التطبيقات" ثم "تثبيت التطبيق"',
           'اضغط "تثبيت" للتأكيد'
+        ] : [
+          'Tap the three dots (...) at the top of the browser',
+          'Select "Apps" then "Install this site as an app"',
+          'Tap "Install" to confirm'
         ]
       };
     }
     
     return {
-      browser: 'المتصفح',
-      steps: [
+      browser: isArabic ? 'المتصفح' : 'Browser',
+      steps: isArabic ? [
         'ابحث عن خيار "إضافة إلى الشاشة الرئيسية" في قائمة المتصفح',
         'أو ابحث عن أيقونة التثبيت في شريط العنوان',
         'اتبع التعليمات لإكمال التثبيت'
+      ] : [
+        'Look for "Add to Home screen" option in browser menu',
+        'Or look for install icon in the address bar',
+        'Follow the instructions to complete installation'
       ]
     };
   };
@@ -226,26 +264,46 @@ export function PWAInstaller() {
             </div>
             
             {/* Title and Description */}
-            <h3 className="text-xl font-bold text-gray-900 mb-2">تثبيت تطبيق VetsVan</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {getDeviceLanguage() === 'ar' ? 'تثبيت تطبيق VetsVan' : 'Install VetsVan App'}
+            </h3>
             <p className="text-gray-600 mb-6 leading-relaxed">
-              ثبت التطبيق على جهازك للوصول السريع إلى خدمات العيادة البيطرية المتنقلة
+              {getDeviceLanguage() === 'ar' 
+                ? 'ثبت التطبيق على جهازك للوصول السريع إلى خدمات العيادة البيطرية المتنقلة'
+                : 'Install the app on your device for quick access to mobile veterinary services'
+              }
             </p>
             
             {/* Benefits */}
-            <div className="bg-purple-50 rounded-lg p-4 mb-6 text-right">
+            <div className={`bg-purple-50 rounded-lg p-4 mb-6 ${getDeviceLanguage() === 'ar' ? 'text-right' : 'text-left'}`}>
               <ul className="text-sm text-purple-800 space-y-2">
-                <li className="flex items-center justify-end space-x-2 space-x-reverse">
-                  <span>وصول سريع من الشاشة الرئيسية</span>
-                  <span className="text-purple-600">✓</span>
-                </li>
-                <li className="flex items-center justify-end space-x-2 space-x-reverse">
-                  <span>يعمل بدون إنترنت</span>
-                  <span className="text-purple-600">✓</span>
-                </li>
-                <li className="flex items-center justify-end space-x-2 space-x-reverse">
-                  <span>تحديثات تلقائية</span>
-                  <span className="text-purple-600">✓</span>
-                </li>
+                {getDeviceLanguage() === 'ar' ? [
+                  <li key="benefit1" className="flex items-center justify-end space-x-2 space-x-reverse">
+                    <span>وصول سريع من الشاشة الرئيسية</span>
+                    <span className="text-purple-600">✓</span>
+                  </li>,
+                  <li key="benefit2" className="flex items-center justify-end space-x-2 space-x-reverse">
+                    <span>يعمل بدون إنترنت</span>
+                    <span className="text-purple-600">✓</span>
+                  </li>,
+                  <li key="benefit3" className="flex items-center justify-end space-x-2 space-x-reverse">
+                    <span>تحديثات تلقائية</span>
+                    <span className="text-purple-600">✓</span>
+                  </li>
+                ] : [
+                  <li key="benefit1" className="flex items-center justify-start space-x-2">
+                    <span className="text-purple-600">✓</span>
+                    <span>Quick access from home screen</span>
+                  </li>,
+                  <li key="benefit2" className="flex items-center justify-start space-x-2">
+                    <span className="text-purple-600">✓</span>
+                    <span>Works offline</span>
+                  </li>,
+                  <li key="benefit3" className="flex items-center justify-start space-x-2">
+                    <span className="text-purple-600">✓</span>
+                    <span>Automatic updates</span>
+                  </li>
+                ]}
               </ul>
             </div>
             
@@ -255,21 +313,24 @@ export function PWAInstaller() {
                 onClick={handleInstallClick}
                 className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-6 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 shadow-lg"
               >
-                {deferredPrompt ? 'تثبيت الآن' : 'عرض التعليمات'}
+                {deferredPrompt 
+                  ? (getDeviceLanguage() === 'ar' ? 'تثبيت الآن' : 'Install Now')
+                  : (getDeviceLanguage() === 'ar' ? 'عرض التعليمات' : 'Show Instructions')
+                }
               </button>
               
-              <div className="flex space-x-2 space-x-reverse">
+              <div className={`flex ${getDeviceLanguage() === 'ar' ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
                 <button
                   onClick={handleNotNow}
                   className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
                 >
-                  ليس الآن
+                  {getDeviceLanguage() === 'ar' ? 'ليس الآن' : 'Not Now'}
                 </button>
                 <button
                   onClick={handleDismiss}
                   className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors"
                 >
-                  لا أريد
+                  {getDeviceLanguage() === 'ar' ? 'لا أريد' : 'No Thanks'}
                 </button>
               </div>
             </div>
@@ -282,7 +343,9 @@ export function PWAInstaller() {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">تثبيت التطبيق</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {getDeviceLanguage() === 'ar' ? 'تثبيت التطبيق' : 'Install App'}
+              </h3>
               <button
                 onClick={() => setShowInstructions(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -292,10 +355,13 @@ export function PWAInstaller() {
             </div>
             
             <div className="mb-4">
-              <div className="flex items-center space-x-2 space-x-reverse mb-3">
+              <div className={`flex items-center mb-3 ${getDeviceLanguage() === 'ar' ? 'space-x-2 space-x-reverse' : 'space-x-2'}`}>
                 <Smartphone className="h-5 w-5 text-purple-600" />
                 <span className="font-medium text-gray-900">
-                  تعليمات التثبيت - {getBrowserInstructions().browser}
+                  {getDeviceLanguage() === 'ar' 
+                    ? `تعليمات التثبيت - ${getBrowserInstructions().browser}`
+                    : `Installation Guide - ${getBrowserInstructions().browser}`
+                  }
                 </span>
               </div>
               
@@ -310,7 +376,10 @@ export function PWAInstaller() {
 
             <div className="bg-purple-50 p-3 rounded-md">
               <p className="text-xs text-purple-700">
-                💡 بعد التثبيت، ستجد أيقونة VetsVan في الشاشة الرئيسية لجهازك
+                {getDeviceLanguage() === 'ar' 
+                  ? '💡 بعد التثبيت، ستجد أيقونة VetsVan في الشاشة الرئيسية لجهازك'
+                  : '💡 After installation, you will find the VetsVan icon on your device home screen'
+                }
               </p>
             </div>
 
@@ -318,7 +387,7 @@ export function PWAInstaller() {
               onClick={() => setShowInstructions(false)}
               className="w-full mt-4 bg-purple-600 text-white py-2 rounded-md font-medium hover:bg-purple-700 transition-colors"
             >
-              فهمت
+              {getDeviceLanguage() === 'ar' ? 'فهمت' : 'Got it'}
             </button>
           </div>
         </div>

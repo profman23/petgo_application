@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X, Smartphone, Apple } from 'lucide-react';
 import customShareIcon from '@assets/freepik_assistant_1752317793556_1752317800669.png';
+import { getDeviceLanguage, installMessages } from '@/utils/device-language';
 
 export function MobileInstallBanner() {
   const [showBanner, setShowBanner] = useState(false);
@@ -40,13 +41,16 @@ export function MobileInstallBanner() {
   };
 
   const getInstallInstructions = () => {
+    const deviceLang = getDeviceLanguage();
+    const messages = installMessages[deviceLang];
+    
     if (isIOS) {
       return {
         icon: <Apple className="h-5 w-5" />,
-        title: 'أضف VetsVan للشاشة الرئيسية',
+        title: messages.ios.title,
         steps: (
-          <div className="flex items-center gap-2">
-            <span>اضغط على أيقونة المشاركة</span>
+          <div className={`flex items-center gap-2 ${deviceLang === 'ar' ? 'flex-row-reverse' : ''}`}>
+            <span>{messages.ios.shareText}</span>
             <div className="flex items-center gap-1">
               <img 
                 src={customShareIcon} 
@@ -57,15 +61,15 @@ export function MobileInstallBanner() {
                 👇
               </div>
             </div>
-            <span>ثم "إضافة إلى الشاشة الرئيسية"</span>
+            <span>{messages.ios.thenText}</span>
           </div>
         )
       };
     } else if (isAndroid) {
       return {
         icon: <Smartphone className="h-5 w-5" />,
-        title: 'ثبت تطبيق VetsVan',
-        steps: 'اضغط على القائمة (⋮) ثم "إضافة إلى الشاشة الرئيسية"'
+        title: messages.android.title,
+        steps: messages.android.steps
       };
     }
     return null;
@@ -76,10 +80,13 @@ export function MobileInstallBanner() {
   const instructions = getInstallInstructions();
   if (!instructions) return null;
 
+  const deviceLang = getDeviceLanguage();
+  const isRTL = deviceLang === 'ar';
+
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg shadow-2xl p-4 animate-in slide-in-from-bottom-5 duration-300">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start space-x-3 space-x-reverse flex-1">
+    <div className={`fixed bottom-4 left-4 right-4 z-50 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg shadow-2xl p-4 animate-in slide-in-from-bottom-5 duration-300 ${isRTL ? 'text-right' : 'text-left'}`}>
+      <div className={`flex items-start justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex items-start ${isRTL ? 'space-x-3 space-x-reverse' : 'space-x-3'} flex-1`}>
           <div className="bg-white bg-opacity-20 p-2 rounded-lg mt-1">
             {instructions.icon}
           </div>
