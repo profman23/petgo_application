@@ -80,6 +80,7 @@ export default function DoctorInvoice() {
   const [notes, setNotes] = useState('');
   const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'full'>('none');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [forceRender, setForceRender] = useState(0);
   
   // Tax rate constant (15%)
   const TAX_RATE = 0.15;
@@ -295,11 +296,17 @@ export default function DoctorInvoice() {
     queryClient.removeQueries({ queryKey: [`/api/invoice-status/${params?.bookingId}`] });
     queryClient.removeQueries({ queryKey: [`/api/invoice-items/${params?.bookingId}`] });
     
-    // Set initial discount type
-    if (discountType === '') {
-      console.log('Discount type is empty, setting to none immediately');
-      setDiscountType('none');
-    }
+    // Force component re-render
+    setForceRender(prev => prev + 1);
+    
+    // Set initial discount type with force
+    setDiscountType('none');
+    
+    // Force another render after a short delay to ensure state is updated
+    setTimeout(() => {
+      setForceRender(prev => prev + 1);
+      console.log('Force render triggered with counter:', forceRender + 1);
+    }, 50);
   }, [params?.bookingId]); // Run when bookingId changes
 
   // Separate effect for invoice status updates
@@ -310,13 +317,16 @@ export default function DoctorInvoice() {
     }
   }, [invoiceStatus]);
 
-  // Force refresh function with cache invalidation
+  // Force refresh function with complete cache invalidation and re-render
   const forceRefresh = async () => {
     console.log('Force refreshing all data with cache invalidation...');
     
     // Clear all React Query cache for this booking
     queryClient.removeQueries({ queryKey: [`/api/invoice-status/${params?.bookingId}`] });
     queryClient.removeQueries({ queryKey: [`/api/invoice-items/${params?.bookingId}`] });
+    
+    // Force component re-render
+    setForceRender(prev => prev + 1);
     
     // Reset discount type before refetch
     setDiscountType('none');
@@ -326,6 +336,9 @@ export default function DoctorInvoice() {
       refetchInvoiceStatus(),
       refetchInvoiceItems()
     ]);
+    
+    // Force another re-render after data loads
+    setTimeout(() => setForceRender(prev => prev + 1), 100);
     
     toast({
       title: language === 'ar' ? 'تم تحديث البيانات' : 'Data refreshed',
@@ -785,7 +798,7 @@ export default function DoctorInvoice() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
+    <div key={`invoice-${params?.bookingId}-${forceRender}`} className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -1136,7 +1149,7 @@ export default function DoctorInvoice() {
                   <span>{t('tax')}:</span>
                   <span>{taxAmount.toFixed(2)} {t('sar')}</span>
                 </div>
-                <div className="flex justify-between items-center mb-2">
+                <div key={`discount-${discountType}-${forceRender}`} className="flex justify-between items-center mb-2">
                   <span>{t('discount')}:</span>
                   <div className="flex items-center space-x-2">
                     {isRecordLocked ? (
@@ -1147,6 +1160,7 @@ export default function DoctorInvoice() {
                       </div>
                     ) : (
                       <select
+                        key={`discount-select-${discountType}-${forceRender}`}
                         value={discountType}
                         onChange={(e) => setDiscountType(e.target.value as 'none' | 'percentage' | 'full')}
                         className="border border-gray-300 rounded px-3 py-1 text-sm"

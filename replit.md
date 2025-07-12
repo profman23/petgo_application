@@ -595,6 +595,10 @@ Changelog:
 - July 12, 2025. CREATED: Manual refresh button in invoice header for immediate data refresh
 - July 12, 2025. OPTIMIZED: Discount loading system with forced state updates to prevent delayed appearance
 - July 12, 2025. RESOLVED: Multiple browser refresh requirement - system now loads discount immediately on first page load
+- July 12, 2025. IMPLEMENTED: Complete force re-render system with React key props and forceRender state
+- July 12, 2025. ENHANCED: Component-level cache invalidation on mount with queryClient.removeQueries
+- July 12, 2025. FIXED: Doctor token authentication in queryClient for invoice endpoints
+- July 12, 2025. COMPLETED: Comprehensive solution to eliminate CTRL+SHIFT+R requirement - multiple fallback mechanisms
 - July 8, 2025. FIXED: Pet vitals field mapping issue - resolved pet_id null constraint error by mapping frontend field names (petId, bookingId, heartRate) to database field names (pet_id, booking_id, heart_rate)
 - July 8, 2025. VERIFIED: Complete pet vitals system working perfectly - all CRUD operations functional with correct data persistence
 - July 8, 2025. RESOLVED: Schema field name mismatch - updated server routes to use camelCase field names (bookingId, petId, heartRate) matching shared/schema.ts definitions
