@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X, Smartphone, Apple } from 'lucide-react';
-import customShareIcon from '@assets/Screenshot 2025-07-12 145346_1752321286791.png';
+import customShareIcon from '@assets/app-icon.png';
 import { getDeviceLanguageWithLogging, installMessages } from '@/utils/device-language';
 
 export function MobileInstallBanner() {
