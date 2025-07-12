@@ -212,12 +212,14 @@ export default function DoctorInvoice() {
       setIsRecordLocked(true);
       // Determine discount type based on discount amount
       const discountValue = parseFloat(invoiceStatus.discountAmount) || 0;
+      const totalWithTaxValue = parseFloat(invoiceStatus.subtotal) * (1 + TAX_RATE);
+      
       if (discountValue === 0) {
         setDiscountType('none');
-      } else if (discountValue === FIXED_DISCOUNT_AMOUNT) {
-        setDiscountType('fixed');
+      } else if (Math.abs(discountValue - totalWithTaxValue) < 0.01) {
+        setDiscountType('full'); // 100% discount
       } else {
-        setDiscountType('percentage');
+        setDiscountType('percentage'); // 10% discount
       }
       setNotes(invoiceStatus.notes || '');
     }
