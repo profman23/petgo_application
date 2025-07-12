@@ -63,26 +63,50 @@ self.addEventListener('activate', event => {
         });
       });
 
-      // Schedule install notification after activation
-      setTimeout(() => {
-        self.clients.matchAll().then(clients => {
-          clients.forEach(client => {
-            client.postMessage({ 
-              type: 'SHOW_INSTALL_NOTIFICATION'
-            });
-          });
-        });
-      }, 10000); // Show after 10 seconds
+      // Don't auto-show notifications - let the app handle it
+      console.log('📱 Service Worker ready for install notifications');
     })
   );
 });
 
-// Push notification handler
+// Handle messages from main thread
+self.addEventListener('message', event => {
+  console.log('📩 SW received message:', event.data);
+  
+  if (event.data && event.data.type === 'SHOW_INSTALL_NOTIFICATION') {
+    const options = {
+      body: event.data.body || 'ثبت التطبيق على جهازك للوصول السريع إلى خدمات العيادة البيطرية',
+      icon: '/app-icon.png',
+      badge: '/app-icon.png',
+      tag: 'pwa-install',
+      requireInteraction: true,
+      actions: [
+        {
+          action: 'install',
+          title: 'تثبيت'
+        },
+        {
+          action: 'close',
+          title: 'إغلاق'
+        }
+      ]
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(
+        event.data.title || 'تطبيق VetsVan متاح للتثبيت', 
+        options
+      )
+    );
+  }
+});
+
+// Push notification handler (for future use)
 self.addEventListener('push', event => {
   const options = {
     body: event.data ? event.data.text() : 'رسالة جديدة من VetsVan',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-96x96.png',
+    icon: '/app-icon.png',
+    badge: '/app-icon.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
@@ -91,13 +115,11 @@ self.addEventListener('push', event => {
     actions: [
       {
         action: 'explore',
-        title: 'عرض التطبيق',
-        icon: '/icons/icon-96x96.png'
+        title: 'عرض التطبيق'
       },
       {
         action: 'close',
-        title: 'إغلاق',
-        icon: '/icons/icon-96x96.png'
+        title: 'إغلاق'
       }
     ]
   };

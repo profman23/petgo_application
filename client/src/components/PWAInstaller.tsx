@@ -47,7 +47,7 @@ export function PWAInstaller() {
       if (!hasUserDismissed) {
         setTimeout(() => {
           setShowInstallPrompt(true);
-        }, 2000);
+        }, 1500);
       }
     };
 
@@ -65,13 +65,13 @@ export function PWAInstaller() {
         console.log('🎯 Showing mobile install prompt');
         setShowInstallPrompt(true);
       }
-    }, 3000);
+    }, 2500);
 
     // Show immediate prompt for iOS devices that don't get beforeinstallprompt
     if (isIOS && !hasUserDismissed && !isStandalone) {
       setTimeout(() => {
         setShowInstallPrompt(true);
-      }, 1500);
+      }, 1000);
     }
 
     // Listen for custom install prompt event
@@ -91,12 +91,12 @@ export function PWAInstaller() {
     window.addEventListener('show-install-prompt', handleShowInstallPrompt);
     navigator.serviceWorker?.addEventListener('message', handleServiceWorkerMessage);
 
-    // Show notification after delay for supported browsers
-    setTimeout(() => {
-      if (!isStandalone && !hasUserDismissed && !deferredPrompt) {
-        showInstallNotification();
-      }
-    }, 5000);
+    // Temporarily disable notifications to avoid errors
+    // setTimeout(() => {
+    //   if (!isStandalone && !hasUserDismissed && !deferredPrompt) {
+    //     showInstallNotification();
+    //   }
+    // }, 5000);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
