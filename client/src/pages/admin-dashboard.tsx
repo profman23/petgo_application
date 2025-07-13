@@ -137,6 +137,7 @@ export default function AdminDashboard() {
   // Mutations
   const addDriverMutation = useMutation({
     mutationFn: async (driver: any) => {
+      console.log('Sending driver data:', driver);
       return await apiRequest('/api/admin/drivers', {
         method: 'POST',
         body: JSON.stringify(driver),

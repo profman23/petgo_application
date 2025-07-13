@@ -1925,7 +1925,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Add new driver with doctor account creation
   app.post('/api/admin/drivers', requireAdminAuth, async (req, res) => {
     try {
+      console.log('Received driver data:', req.body);
       const { vetsvanCode, name, username, password, phone, model, color, plateNumber } = req.body;
+      
+      console.log('Extracted fields:', { vetsvanCode, name, username, password: password ? 'PROVIDED' : 'MISSING', phone, model, color, plateNumber });
       
       if (!vetsvanCode || !name || !username || !password || !phone) {
         return res.status(400).json({ message: 'VetsVan Code, Name, Username, Password, and Phone are required' });
