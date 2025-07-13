@@ -97,26 +97,7 @@ export default function Login() {
       return response as AuthResponse;
     },
     onSuccess: (data) => {
-      console.log('🎉 LOGIN SUCCESS - Starting redirect process');
-      
-      // Clear any existing tokens first
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
-      // Set new tokens immediately
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      // Verify storage worked
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
-      
-      console.log('🔐 Token storage verification:', {
-        tokenSaved: !!storedToken,
-        userSaved: !!storedUser,
-        tokenMatch: storedToken === data.token,
-        tokenPreview: data.token.substring(0, 10) + '...'
-      });
+      console.log('🎉 LOGIN SUCCESS:', data.token.substring(0, 10) + '...');
       
       // Show success message
       toast({
@@ -125,12 +106,16 @@ export default function Login() {
         variant: "default",
       });
       
-      // Dispatch custom event for AuthCheck
-      window.dispatchEvent(new CustomEvent('loginSuccess'));
-      
-      // Force immediate redirect
-      console.log('🚀 IMMEDIATE REDIRECT TO /home');
-      window.location.href = '/home';
+      // Use simple auth handler
+      if (window.handleLoginSuccess) {
+        window.handleLoginSuccess(data.token, data.user);
+      } else {
+        // Fallback direct method
+        localStorage.clear();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        window.location.replace('/home');
+      }
     },
     onError: (error: Error) => {
       toast({

@@ -4,7 +4,7 @@ import "./index.css";
 import "./styles/map-override.css";
 import "./utils/pwa-diagnostics";
 import "./utils/nukeCaches"; // Nuclear cache clearing and WebSocket blocking
-import "./utils/authFix"; // Ultimate authentication fix
+import "./utils/simpleAuthFix"; // Simple authentication fix
 import { setupInstallNotificationHandler } from "./utils/install-notification";
 
 // Setup install notification handler

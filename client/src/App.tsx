@@ -37,6 +37,7 @@ import { InstallPrompt } from "@/components/InstallPrompt";
 import { PWAInstaller } from "@/components/PWAInstaller";
 import { MobileInstallBanner } from "@/components/MobileInstallBanner";
 import { LanguageTestingPanel } from "@/components/LanguageTestingPanel";
+import LoginSimple from "@/pages/login-simple";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { SimpleCacheManager } from "@/utils/simpleCacheManager";
@@ -151,72 +152,37 @@ if (token) {
 
 function AuthCheck({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [location, setLocation] = useLocation();
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
-      
-      console.log('🔍 AuthCheck:', {
-        currentLocation: location,
-        hasToken: !!token,
-        hasUser: !!user,
-        tokenPreview: token ? token.substring(0, 10) + '...' : 'none'
-      });
-      
-      const authenticated = !!(token && user);
-      
-      // Only redirect if we're on a protected route and not authenticated
-      if (!authenticated && location !== '/login') {
-        console.log('❌ Not authenticated, redirecting to /login from:', location);
-        setLocation('/login');
-        setIsAuthenticated(false);
-        return;
-      }
-      
-      setIsAuthenticated(authenticated);
-    };
+    // Simple one-time auth check
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    const authenticated = !!(token && user);
+    
+    console.log('🔍 Simple AuthCheck:', {
+      hasToken: !!token,
+      hasUser: !!user,
+      authenticated
+    });
+    
+    setIsAuthenticated(authenticated);
+    
+    // If not authenticated, redirect to login once
+    if (!authenticated) {
+      console.log('❌ Not authenticated, redirecting to login');
+      window.location.replace('/login');
+    }
+  }, []); // Only run once
 
-    checkAuth();
-    
-    // Listen for manual storage events
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'token' || e.key === 'user') {
-        console.log('📢 Storage changed:', e.key);
-        setTimeout(checkAuth, 50); // Small delay for storage to settle
-      }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Listen for custom events from login
-    const handleLoginSuccess = () => {
-      console.log('📢 Login success event received');
-      setTimeout(checkAuth, 100);
-    };
-    
-    window.addEventListener('loginSuccess', handleLoginSuccess);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('loginSuccess', handleLoginSuccess);
-    };
-  }, [location, setLocation]);
-
-  // Don't render anything while checking auth
+  // Show loading while checking
   if (isAuthenticated === null) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">جاري التحميل...</div>
     </div>;
   }
 
-  // If not authenticated, let the router handle showing login page
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  return <>{children}</>;
+  // Show children if authenticated
+  return isAuthenticated ? <>{children}</> : null;
 }
 
 function Router() {
@@ -234,7 +200,8 @@ function Router() {
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
           <Route path="/user-type-selection" component={UserTypeSelection} />
-          <Route path="/login" component={Login} />
+          <Route path="/login" component={LoginSimple} />
+          <Route path="/login-complex" component={Login} />
           <Route path="/login/customer" component={Login} />
           <Route path="/otp-verification" component={OtpVerification} />
           <Route path="/login/doctor" component={DoctorLogin} />
@@ -264,19 +231,15 @@ function Router() {
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
           <Route path="/" component={() => {
-            // Check if user is authenticated and redirect appropriately
+            // Simple root check
             const token = localStorage.getItem('token');
             const user = localStorage.getItem('user');
-            const isAuthenticated = !!(token && user);
             
-            if (isAuthenticated) {
-              console.log('✅ User authenticated on root, redirecting to /home');
-              window.location.href = '/home';
+            if (token && user) {
+              window.location.replace('/home');
               return null;
-            } else {
-              console.log('❌ User not authenticated on root, showing login');
-              return <Login />;
             }
+            return <LoginSimple />;
           }} />
           <Route component={NotFound} />
         </Switch>
