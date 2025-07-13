@@ -78,9 +78,16 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginFormData) => {
+      // Convert phone to identifier for backend compatibility
+      const loginData = {
+        identifier: data.phone,
+        password: data.password
+      };
+      console.log('🔑 Sending login request:', { identifier: loginData.identifier });
+      
       const response = await apiRequest('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(loginData)
       });
       return response as AuthResponse;
     },

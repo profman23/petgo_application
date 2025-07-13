@@ -154,7 +154,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post('/api/auth/login', async (req, res) => {
     try {
-      const { identifier, password } = loginSchema.parse(req.body);
+      // Support both old format (phone) and new format (identifier)
+      const body = req.body;
+      const identifier = body.identifier || body.phone;
+      const password = body.password;
+      
+      if (!identifier || !password) {
+        return res.status(400).json({ message: 'Phone/Email and password are required' });
+      }
       
       const user = await storage.getUserByIdentifier(identifier);
       if (!user) {

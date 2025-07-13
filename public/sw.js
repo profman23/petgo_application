@@ -146,10 +146,16 @@ self.addEventListener('fetch', (event) => {
         // Fallback to network
         const networkResponse = await fetch(event.request);
         
-        // Cache successful responses
-        if (networkResponse.ok && networkResponse.type === 'basic') {
+        // Cache successful responses (but not partial content)
+        if (networkResponse.ok && networkResponse.type === 'basic' && 
+            networkResponse.status !== 206 && 
+            !networkResponse.headers.get('content-range')) {
           const cache = await caches.open(CACHE_NAME);
-          await cache.put(event.request, networkResponse.clone());
+          try {
+            await cache.put(event.request, networkResponse.clone());
+          } catch (cacheError) {
+            console.log('Cache put failed (probably partial content):', cacheError);
+          }
         }
         
         return networkResponse;

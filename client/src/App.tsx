@@ -43,6 +43,7 @@ import { SimpleCacheManager } from "@/utils/simpleCacheManager";
 import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications";
 import "@/utils/cacheBuster"; // Auto-initialize cache busting
 import "@/utils/authFix"; // Auto-preserve authentication tokens
+import "@/utils/authDebug"; // Auto-debug authentication state
 
 // Clear manifest cache on app start to ensure fresh icons
 const clearManifestCache = async () => {

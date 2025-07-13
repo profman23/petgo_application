@@ -2,18 +2,22 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 async function throwIfResNotOk(res: Response, url: string) {
   if (!res.ok) {
-    // If unauthorized, clear local storage and redirect to appropriate login
+    // If unauthorized, clear tokens and redirect
     if (res.status === 401) {
+      console.log('🔐 401 Unauthorized - clearing tokens and redirecting');
+      
       if (url.includes('/api/admin/')) {
-        // Admin endpoint - clear admin tokens and redirect to admin login
         localStorage.removeItem('adminToken');
         localStorage.removeItem('admin');
-        window.location.href = '/admin-login';
+        setTimeout(() => window.location.href = '/admin-login', 100);
+      } else if (url.includes('/api/doctor/')) {
+        localStorage.removeItem('doctorToken');
+        localStorage.removeItem('user');
+        setTimeout(() => window.location.href = '/doctor-login', 100);
       } else {
-        // Regular endpoint - clear user tokens and redirect to regular login
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        setTimeout(() => window.location.href = '/login', 100);
       }
       return;
     }
@@ -46,17 +50,28 @@ export async function apiRequest(
     headers["Content-Type"] = "application/json";
   }
   
-  // Use appropriate token based on endpoint
+  // Use appropriate token based on endpoint with debugging
   if (url.includes('/api/admin/') && adminToken) {
     headers["Authorization"] = `Bearer ${adminToken}`;
+    console.log('🔐 Using admin token for:', url);
   } else if (url.includes('/api/doctor/') && doctorToken) {
     headers["Authorization"] = `Bearer ${doctorToken}`;
+    console.log('🔐 Using doctor token for:', url);
   } else if (url.includes('/api/invoice-') && doctorToken) {
     headers["Authorization"] = `Bearer ${doctorToken}`;
+    console.log('🔐 Using doctor token for invoice:', url);
   } else if (url.includes('/api/pet-') && doctorToken) {
     headers["Authorization"] = `Bearer ${doctorToken}`;
+    console.log('🔐 Using doctor token for pet:', url);
   } else if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+    console.log('🔐 Using customer token for:', url);
+  } else {
+    console.log('⚠️ No token available for:', url, {
+      adminToken: !!adminToken,
+      doctorToken: !!doctorToken,
+      token: !!token
+    });
   }
 
   const res = await fetch(url, {
