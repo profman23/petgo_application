@@ -470,10 +470,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Doctor login endpoint  
-  app.post('/api/doctor/login', async (req, res) => {
+  // Doctor login endpoint (both paths for compatibility)
+  app.post('/api/auth/doctor-login', async (req, res) => {
     try {
       const { username, password } = req.body;
+      
+      console.log('🔐 Doctor login attempt:', { username, password: password ? 'PROVIDED' : 'MISSING' });
       
       if (!username || !password) {
         return res.status(400).json({ message: 'Username and password are required' });
@@ -482,7 +484,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Find driver by username
       const driver = await storage.getDriverByUsername(username);
       
-      if (!driver || driver.password !== password) {
+      console.log('🔐 Found driver:', { 
+        found: !!driver, 
+        driverName: driver?.name,
+        passwordType: driver?.password.startsWith('$2b$') ? 'HASHED' : 'PLAIN'
+      });
+      
+      if (!driver) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+      
+      // Compare password using bcrypt for hashed passwords or direct comparison for plain text
+      let isPasswordValid = false;
+      if (driver.password.startsWith('$2b$')) {
+        isPasswordValid = await bcrypt.compare(password, driver.password);
+        console.log('🔐 Bcrypt comparison result:', isPasswordValid);
+      } else {
+        isPasswordValid = driver.password === password;
+        console.log('🔐 Plain text comparison result:', isPasswordValid);
+      }
+      
+      if (!isPasswordValid) {
+        console.log('🔐 Authentication failed for user:', username);
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
@@ -497,6 +520,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           vetsVanName: driver.vetsvanName
         } 
       });
+      
+      console.log('🔐 Doctor login successful:', { username, sessionId: sessionId.substring(0, 10) + '...' });
       
       res.json({ 
         token: sessionId, 
@@ -2994,6 +3019,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       message: 'Cache cleared',
       timestamp: Date.now()
     });
+  });
+
+  // Add alias endpoint for doctor login (for backward compatibility)
+  app.post('/api/doctor/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+      }
+
+      // Find driver by username
+      const driver = await storage.getDriverByUsername(username);
+      
+      if (!driver) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+      
+      // Compare password using bcrypt
+      const isPasswordValid = await bcrypt.compare(password, driver.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      const sessionId = generateSessionId();
+      doctorSessions.set(sessionId, { 
+        user: { 
+          id: driver.id, 
+          phone: driver.phone, 
+          name: driver.name, 
+          membershipType: 'doctor',
+          vetsVanId: driver.id
+        } 
+      });
+      
+      res.json({
+        token: sessionId,
+        user: {
+          id: driver.id,
+          phone: driver.phone,
+          name: driver.name,
+          membershipType: 'doctor'
+        }
+      });
+    } catch (error) {
+      console.error('Doctor login error:', error);
+      res.status(500).json({ message: 'Login failed' });
+    }
   });
 
   const httpServer = createServer(app);

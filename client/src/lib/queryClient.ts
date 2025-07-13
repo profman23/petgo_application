@@ -51,7 +51,10 @@ export async function apiRequest(
   }
   
   // Use appropriate token based on endpoint with debugging
-  if (url.includes('/api/admin/') && adminToken) {
+  // Skip authorization for login endpoints
+  if (url.includes('/api/auth/login') || url.includes('/api/auth/doctor-login') || url.includes('/api/auth/register') || url.includes('/api/auth/verify-otp')) {
+    console.log('🔓 Login endpoint - no token required:', url);
+  } else if (url.includes('/api/admin/') && adminToken) {
     headers["Authorization"] = `Bearer ${adminToken}`;
     console.log('🔐 Using admin token for:', url);
   } else if (url.includes('/api/doctor/') && doctorToken) {
