@@ -498,14 +498,21 @@ export default function AdminDashboard() {
         body: JSON.stringify(data),
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
+      await queryClient.refetchQueries({ queryKey: ["/api/admin/drivers"] });
       setShowEditDialog(false);
       setEditingDriver(null);
       toast({
-        title: language === 'ar' ? 'تم التحديث' : 'Updated',
-        description: language === 'ar' ? 'تم تحديث بيانات VetsVan بنجاح' : 'VetsVan data updated successfully',
+        title: language === 'ar' ? 'تم التحديث بنجاح' : 'Updated Successfully',
+        description: language === 'ar' ? 'تم تحديث بيانات VetsVan وستظهر التغييرات فوراً في القائمة' : 'VetsVan data updated and changes will appear immediately in the list',
       });
+      // Force a complete re-render by removing the data from cache
+      queryClient.removeQueries({ queryKey: ["/api/admin/drivers"] });
+      // Trigger a fresh fetch
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/admin/drivers"] });
+      }, 100);
     },
     onError: () => {
       toast({
