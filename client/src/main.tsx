@@ -24,7 +24,8 @@ if ('serviceWorker' in navigator) {
                 console.log('New SW available, updating...');
                 // Force update
                 newWorker.postMessage({ type: 'SKIP_WAITING' });
-                window.location.reload();
+                // Disabled window.location.reload() to prevent infinite refresh loops
+                console.log('Main refresh blocked to prevent infinite loops');
               }
             });
           }

@@ -48,7 +48,8 @@ export function DoctorDebugPanel() {
       }
     }
     keysToRemove.forEach(key => localStorage.removeItem(key));
-    window.location.reload();
+    // Disabled window.location.reload() to prevent refresh loops
+    console.log('Refresh request blocked to prevent infinite loop');
   };
 
   const testNotification = async () => {

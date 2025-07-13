@@ -63,7 +63,8 @@ export function useForceRefreshNotifications() {
             }
             
             // Force page refresh to show new data
-            window.location.reload();
+            // Disabled window.location.reload() to prevent infinite refresh loops
+            console.log('Force refresh blocked to prevent infinite loops');
           }
           
           lastCountRef.current = currentCount;

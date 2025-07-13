@@ -72,7 +72,8 @@ export class DeploymentDetector {
       
       // Force reload after a short delay
       setTimeout(() => {
-        window.location.reload();
+        // Disabled window.location.reload() to prevent infinite refresh loops
+        console.log('Deployment refresh blocked to prevent infinite loops');
       }, 2000);
       
     } catch (error) {

@@ -116,10 +116,9 @@ export default function Login() {
         variant: "default",
       });
       
-      // Small delay to ensure tokens are stored
-      setTimeout(() => {
-        setLocation('/home');
-      }, 100);
+      // Force immediate redirect without delay
+      console.log('🚀 Redirecting to /home immediately');
+      setLocation('/home');
     },
     onError: (error: Error) => {
       toast({

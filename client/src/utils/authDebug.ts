@@ -56,8 +56,9 @@ export function reloadAuthState() {
   }
 }
 
-// Auto-debug on load
+// Auto-debug on load (disabled to prevent refresh loops)
 if (typeof window !== 'undefined') {
   setTimeout(debugAuthState, 1000);
-  setTimeout(reloadAuthState, 2000);
+  // Disabled automatic reload to prevent refresh loops
+  // setTimeout(reloadAuthState, 2000);
 }

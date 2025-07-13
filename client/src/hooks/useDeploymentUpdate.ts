@@ -42,10 +42,8 @@ export const useDeploymentUpdate = () => {
               duration: 3000,
             });
 
-            // Force reload after short delay
-            setTimeout(() => {
-              window.location.reload();
-            }, 2000);
+            // Disabled force reload to prevent infinite refresh loops
+            console.log('Auto-reload disabled to prevent infinite loops');
             
           } else if (!clientVersion) {
             // First time setup

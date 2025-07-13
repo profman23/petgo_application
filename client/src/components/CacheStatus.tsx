@@ -39,7 +39,8 @@ export function CacheStatus() {
   }, []);
 
   const forceRefresh = () => {
-    window.location.reload();
+    // Disabled window.location.reload() to prevent refresh loops
+    console.log('Refresh request blocked to prevent infinite loop');
   };
 
   if (isChecking) {
