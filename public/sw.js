@@ -78,8 +78,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // NEVER cache API requests - force fresh fetch every time
-  if (event.request.url.includes('/api/')) {
+  // NEVER cache API requests or WebSocket requests - force fresh fetch every time
+  if (event.request.url.includes('/api/') || 
+      event.request.url.includes('websocket') ||
+      event.request.url.includes('/ws')) {
     event.respondWith(
       fetch(event.request, {
         cache: 'no-store',
