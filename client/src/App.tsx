@@ -40,7 +40,7 @@ import { LanguageTestingPanel } from "@/components/LanguageTestingPanel";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { SimpleCacheManager } from "@/utils/simpleCacheManager";
-import { useGlobalNotifications } from "@/hooks/useGlobalNotifications";
+import { useGlobalNotificationsUltimate } from "@/hooks/useGlobalNotificationsUltimate";
 
 // Clear manifest cache on app start to ensure fresh icons
 const clearManifestCache = async () => {
@@ -166,8 +166,8 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
 function Router() {
   const [location] = useLocation();
   
-  // Global notification system for doctors (works across all pages)
-  useGlobalNotifications();
+  // Global notification system for doctors (works across all pages) - ULTIMATE VERSION
+  useGlobalNotificationsUltimate();
   
   // Pages that should show the footer
   const pagesWithFooter = ['/home', '/account', '/activity', '/customer-activity', '/patients', '/ride-request'];
