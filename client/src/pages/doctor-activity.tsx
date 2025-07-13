@@ -47,9 +47,8 @@ export default function DoctorActivity() {
   // Get current doctor info
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // State for tracking notifications
+  // Audio control state (notifications now handled globally)
   const [audioEnabled, setAudioEnabled] = useState(audioNotification.isAudioEnabled());
-  const previousBookingCount = useRef<number>(0);
 
   // Fetch VetsVan location information
   const { data: vetsVanInfo } = useQuery({
@@ -193,33 +192,7 @@ export default function DoctorActivity() {
     }
   };
 
-  // Audio notification system
-  useEffect(() => {
-    const currentBookingCount = (bookings as Booking[]).length;
-    
-    // Play notification sound when new booking is added
-    if (previousBookingCount.current > 0 && currentBookingCount > previousBookingCount.current) {
-      const playAudioNotification = async () => {
-        try {
-          await playBookingNotification();
-          toast({
-            title: language === 'ar' ? '🔔 طلب جديد!' : '🔔 New Booking!',
-            description: language === 'ar' 
-              ? 'تم إضافة موعد جديد إلى جدولك'
-              : 'A new appointment has been added to your schedule',
-            variant: 'default',
-          });
-        } catch (error) {
-          console.warn('Audio notification failed:', error);
-        }
-      };
-      
-      playAudioNotification();
-    }
-    
-    // Update the previous count
-    previousBookingCount.current = currentBookingCount;
-  }, [bookings, language, toast]);
+  // Note: Audio notifications are now handled globally via useGlobalNotifications hook in App.tsx
 
   // Audio control functions
   const toggleAudio = () => {

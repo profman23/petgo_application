@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/lib/i18n";
-import { useToast } from "@/hooks/use-toast";
 import { Clock, User, Phone, Calendar, Bell } from "lucide-react";
 import { Loader2 } from "lucide-react";
-import { useRef, useEffect } from "react";
 
 interface Booking {
   id: number;
@@ -25,8 +23,6 @@ interface DoctorBookingsTableProps {
 
 export function DoctorBookingsTable({ vetsVanId, vetsVanName }: DoctorBookingsTableProps) {
   const { language } = useLanguage();
-  const { toast } = useToast();
-  const previousBookingsCount = useRef<number>(0);
 
   const { data: bookings = [], isLoading, error } = useQuery({
     queryKey: ['/api/doctor/bookings', vetsVanId],
@@ -35,52 +31,7 @@ export function DoctorBookingsTable({ vetsVanId, vetsVanName }: DoctorBookingsTa
     refetchInterval: 10 * 1000, // Poll every 10 seconds for new bookings
   });
 
-  // Notification system for new bookings
-  useEffect(() => {
-    if (bookings && Array.isArray(bookings)) {
-      const currentCount = bookings.length;
-      
-      // Check if there are new bookings (avoid initial load notification)
-      if (previousBookingsCount.current > 0 && currentCount > previousBookingsCount.current) {
-        const newBookingsCount = currentCount - previousBookingsCount.current;
-        
-        // Show toast notification
-        toast({
-          title: language === 'ar' ? '🔔 حجز جديد!' : '🔔 New Booking!',
-          description: language === 'ar' ? 
-            `تم حجز ${newBookingsCount} موعد جديد على ${vetsVanName}` :
-            `${newBookingsCount} new appointment(s) booked for ${vetsVanName}`,
-          variant: 'default',
-        });
-
-        // Play notification sound
-        try {
-          const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFA==');
-          audio.volume = 0.5;
-          audio.play().catch(() => {
-            // Ignore audio play errors (permission denied, etc.)
-          });
-        } catch (error) {
-          // Ignore audio errors
-        }
-
-        // Browser notification if permission granted
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification(
-            language === 'ar' ? 'حجز جديد على VetsVan' : 'New VetsVan Booking',
-            {
-              body: language === 'ar' ? 
-                `تم حجز موعد جديد على ${vetsVanName}` :
-                `New appointment booked for ${vetsVanName}`,
-              icon: '/favicon.ico'
-            }
-          );
-        }
-      }
-      
-      previousBookingsCount.current = currentCount;
-    }
-  }, [bookings, language, vetsVanName, toast]);
+  // Note: Notifications are now handled globally via useGlobalNotifications hook in App.tsx
 
   if (isLoading) {
     return (
