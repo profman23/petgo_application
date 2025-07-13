@@ -141,3 +141,7 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+// Clear all cached queries on initialization to prevent old admin queries
+console.log('🧹 Clearing all QueryClient cache to prevent admin requests');
+queryClient.clear();

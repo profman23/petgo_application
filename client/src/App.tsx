@@ -27,8 +27,8 @@ import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
 import CustomerActivity from "@/pages/customer-activity";
 import AdminLogin from "@/pages/admin-login";
-import AdminDashboard from "@/pages/admin-dashboard";
-import VetsVanShifts from "@/pages/vets-van-shifts";
+// DISABLED: import AdminDashboard from "@/pages/admin-dashboard"; // Completely removed to prevent unauthorized access
+// DISABLED: import VetsVanShifts from "@/pages/vets-van-shifts"; // Completely removed to prevent unauthorized access
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
@@ -42,7 +42,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 // import { SimpleCacheManager } from "@/utils/simpleCacheManager"; // DISABLED
 // Fixed: Import useForceRefreshNotifications to resolve runtime error
-import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications";
+// DISABLED: import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications"; // Completely removed to prevent admin requests
 // Removed auto-imports that cause refresh loops
 // import "@/utils/cacheBuster"; // Auto-initialize cache busting  
 // import "@/utils/authFix"; // Auto-preserve authentication tokens
@@ -227,8 +227,8 @@ function Router() {
           <Route path="/customer-activity" component={() => <AuthCheck><CustomerActivity /></AuthCheck>} />
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
-          <Route path="/admin-dashboard" component={AdminDashboard} />
-          <Route path="/vets-van-shifts" component={VetsVanShifts} />
+          {/* DISABLED: <Route path="/admin-dashboard" component={AdminDashboard} /> - Completely removed to prevent unauthorized access */}
+          {/* DISABLED: <Route path="/vets-van-shifts" component={VetsVanShifts} /> - Completely removed to prevent unauthorized access */}
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
           <Route path="/" component={() => {
@@ -246,9 +246,11 @@ function Router() {
         </Switch>
       </div>
       {shouldShowFooter && <FixedFooter />}
+      {/* DISABLED PWA COMPONENTS TO FIX LOGIN ISSUES:
       <InstallPrompt />
       <PWAInstaller />
       <MobileInstallBanner />
+      */}
       <LanguageTestingPanel />
     </div>
   );
