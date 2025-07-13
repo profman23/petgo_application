@@ -654,6 +654,8 @@ Changelog:
 - July 13, 2025. RESOLVED: Customer login now works perfectly - successful login redirects to /home immediately
 - July 13, 2025. RESTORED: Original login interface per user request - removed LoginSimple and returned to agreed-upon design
 - July 13, 2025. ENHANCED: Login success handling with immediate localStorage clearing and direct redirect to home page
+- July 13, 2025. FIXED: AuthCheck component causing redirect loops - simplified to only check auth once with proper timing
+- July 13, 2025. RESOLVED: Login success but immediate return to login page - enhanced AuthCheck timing and storage verification
 - July 8, 2025. FIXED: Pet vitals field mapping issue - resolved pet_id null constraint error by mapping frontend field names (petId, bookingId, heartRate) to database field names (pet_id, booking_id, heart_rate)
 - July 8, 2025. VERIFIED: Complete pet vitals system working perfectly - all CRUD operations functional with correct data persistence
 - July 8, 2025. RESOLVED: Schema field name mismatch - updated server routes to use camelCase field names (bookingId, petId, heartRate) matching shared/schema.ts definitions

@@ -151,38 +151,41 @@ if (token) {
 }
 
 function AuthCheck({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
+  const [isReady, setIsReady] = useState(false);
+  
   useEffect(() => {
-    // Simple one-time auth check
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    const authenticated = !!(token && user);
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      console.log('🔍 AuthCheck - Token and User check:', {
+        hasToken: !!token,
+        hasUser: !!user,
+        tokenPreview: token ? token.substring(0, 10) + '...' : 'none'
+      });
+      
+      if (!token || !user) {
+        console.log('❌ Missing auth data, redirecting to login');
+        window.location.href = '/login';
+        return;
+      }
+      
+      console.log('✅ Auth data found, showing protected content');
+      setIsReady(true);
+    };
     
-    console.log('🔍 Simple AuthCheck:', {
-      hasToken: !!token,
-      hasUser: !!user,
-      authenticated
-    });
-    
-    setIsAuthenticated(authenticated);
-    
-    // If not authenticated, redirect to login once
-    if (!authenticated) {
-      console.log('❌ Not authenticated, redirecting to login');
-      window.location.replace('/login');
-    }
-  }, []); // Only run once
-
-  // Show loading while checking
-  if (isAuthenticated === null) {
+    // Small delay to ensure localStorage is ready
+    const timer = setTimeout(checkAuth, 50);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  if (!isReady) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">جاري التحميل...</div>
     </div>;
   }
-
-  // Show children if authenticated
-  return isAuthenticated ? <>{children}</> : null;
+  
+  return <>{children}</>;
 }
 
 function Router() {

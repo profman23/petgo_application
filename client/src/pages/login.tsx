@@ -115,11 +115,19 @@ export default function Login() {
       
       console.log('✅ Auth data stored successfully');
       
+      // Verify storage worked
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+      
+      console.log('🔐 Storage verification:', {
+        tokenStored: !!storedToken,
+        userStored: !!storedUser,
+        tokenMatch: storedToken === data.token
+      });
+      
       // Force immediate redirect to home
-      setTimeout(() => {
-        console.log('🚀 Redirecting to home page...');
-        window.location.href = '/home';
-      }, 100);
+      console.log('🚀 Redirecting to home page immediately...');
+      window.location.href = '/home';
     },
     onError: (error: Error) => {
       toast({
