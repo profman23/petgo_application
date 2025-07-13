@@ -944,9 +944,9 @@ export default function AdminDashboard() {
                                 </div>
                               </div>
                               <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{driver.name}</div>
+                                <div className="text-sm font-medium text-gray-900">{(driver as any).vetsvanName || driver.name}</div>
                                 <div className="text-sm text-gray-500">{driver.phone}</div>
-                                <div className="text-sm text-gray-500">@{driver.username}</div>
+                                <div className="text-sm text-gray-500">@{(driver as any).vetsvanCode || driver.username}</div>
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
