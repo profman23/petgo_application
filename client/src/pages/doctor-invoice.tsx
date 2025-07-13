@@ -15,7 +15,7 @@ import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessio
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Search, X } from "lucide-react";
 
 interface InvoiceItem {
   id: string;
@@ -276,6 +276,17 @@ export default function DoctorInvoice() {
       products: 'المنتجات',
       services: 'الخدمات',
       importedItems: 'عناصر مستوردة',
+      searchPlaceholder: 'ابحث في المنتجات والخدمات...',
+      noResults: 'لا توجد نتائج',
+      searchResults: 'نتائج البحث',
+      exactMatch: 'تطابق تام',
+      partialMatch: 'تطابق جزئي',
+      categoryFilter: 'تصفية حسب الفئة',
+      priceRange: 'نطاق السعر',
+      sortBy: 'ترتيب حسب',
+      sortByName: 'الاسم',
+      sortByPrice: 'السعر',
+      clearFilters: 'مسح الفلاتر',
     },
     en: {
       invoiceTitle: 'VETS VAN Service Invoice',
@@ -331,6 +342,17 @@ export default function DoctorInvoice() {
       products: 'Products',
       services: 'Services',
       importedItems: 'Imported Items',
+      searchPlaceholder: 'Search products and services...',
+      noResults: 'No results found',
+      searchResults: 'Search Results',
+      exactMatch: 'Exact Match',
+      partialMatch: 'Partial Match',
+      categoryFilter: 'Filter by Category',
+      priceRange: 'Price Range',
+      sortBy: 'Sort By',
+      sortByName: 'Name',
+      sortByPrice: 'Price',
+      clearFilters: 'Clear Filters',
     }
   };
 
@@ -409,20 +431,66 @@ export default function DoctorInvoice() {
     saveInvoiceItems(newItems);
   };
 
-  // Smart search filtering function
+  // Advanced smart search filtering function
   const filterItems = (items: any[], query: string) => {
     if (!query.trim()) return items;
     
     const searchTerm = query.toLowerCase().trim();
+    
     return items.filter(item => {
+      // Get all searchable fields
       const name = item.name?.toLowerCase() || '';
+      const nameAr = item.name_ar?.toLowerCase() || '';
       const description = item.description?.toLowerCase() || '';
-      // Support both Arabic and English search
-      return name.includes(searchTerm) || 
-             description.includes(searchTerm) ||
-             // Handle Arabic search with partial matches
-             name.includes(searchTerm.replace(/ي/g, 'ى')) ||
-             name.includes(searchTerm.replace(/ى/g, 'ي'));
+      const descriptionAr = item.description_ar?.toLowerCase() || '';
+      const category = item.category?.toLowerCase() || '';
+      const categoryAr = item.category_ar?.toLowerCase() || '';
+      const sku = item.sku?.toLowerCase() || '';
+      const unit = item.unit?.toLowerCase() || '';
+      const unitAr = item.unit_ar?.toLowerCase() || '';
+      
+      // Create array of all searchable text
+      const searchableFields = [
+        name, nameAr, description, descriptionAr, 
+        category, categoryAr, sku, unit, unitAr
+      ].filter(field => field.length > 0);
+      
+      // Multiple search strategies
+      return searchableFields.some(field => {
+        // Exact match
+        if (field.includes(searchTerm)) return true;
+        
+        // Arabic letter variations
+        const normalizedField = field.replace(/[ي]/g, 'ى').replace(/[ک]/g, 'ك').replace(/[ؤ]/g, 'و');
+        const normalizedSearch = searchTerm.replace(/[ي]/g, 'ى').replace(/[ک]/g, 'ك').replace(/[ؤ]/g, 'و');
+        if (normalizedField.includes(normalizedSearch)) return true;
+        
+        // Word boundary search (each word in search term)
+        const searchWords = searchTerm.split(/\s+/).filter(w => w.length > 0);
+        if (searchWords.length > 1) {
+          return searchWords.every(word => field.includes(word));
+        }
+        
+        // Partial word match for Arabic (minimum 2 characters)
+        if (searchTerm.length >= 2 && /[\u0600-\u06FF]/.test(searchTerm)) {
+          const searchChars = searchTerm.split('');
+          return searchChars.every(char => field.includes(char));
+        }
+        
+        return false;
+      });
+    }).sort((a, b) => {
+      // Smart sorting: exact matches first, then partial matches
+      const aName = a.name?.toLowerCase() || '';
+      const bName = b.name?.toLowerCase() || '';
+      
+      const aExact = aName.startsWith(searchTerm) ? 1 : 0;
+      const bExact = bName.startsWith(searchTerm) ? 1 : 0;
+      
+      if (aExact !== bExact) return bExact - aExact;
+      
+      // Then sort by name length (shorter names first)
+      return aName.length - bName.length;
     });
   };
 
@@ -876,35 +944,64 @@ export default function DoctorInvoice() {
                                 </Button>
                               </PopoverTrigger>
                               <PopoverContent className="w-full p-0">
-                                <Command>
-                                  <CommandInput 
-                                    placeholder={language === 'ar' ? 'ابحث في المنتجات والخدمات...' : 'Search products and services...'} 
-                                    value={searchQuery}
-                                    onValueChange={setSearchQuery}
-                                  />
-                                  {/* Search Results Summary */}
+                                <Command shouldFilter={false}>
+                                  <div className="flex items-center border-b px-3 py-2">
+                                    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                                    <CommandInput 
+                                      placeholder={t('searchPlaceholder')}
+                                      value={searchQuery}
+                                      onValueChange={setSearchQuery}
+                                      className="border-0 focus:ring-0 flex-1"
+                                    />
+                                    {searchQuery && (
+                                      <button
+                                        onClick={() => setSearchQuery('')}
+                                        className="ml-2 p-1 rounded-sm opacity-70 hover:opacity-100 hover:bg-gray-100"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Enhanced Search Results Summary */}
                                   {searchQuery && (
-                                    <div className="px-3 py-2 bg-blue-50 border-b border-blue-200">
-                                      <div className="text-xs text-blue-700 font-medium">
-                                        {language === 'ar' ? 
-                                          `🔍 نتائج البحث: ${filteredProducts.length + filteredServices.length} عنصر` :
-                                          `🔍 Search Results: ${filteredProducts.length + filteredServices.length} items`
-                                        }
+                                    <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
+                                      <div className="flex items-center justify-between">
+                                        <div className="text-xs font-medium text-purple-700">
+                                          {t('searchResults')}: {filteredProducts.length + filteredServices.length} {t('importedItems')}
+                                        </div>
+                                        <div className="text-xs text-purple-600 bg-white px-2 py-1 rounded-full">
+                                          "{searchQuery}"
+                                        </div>
                                       </div>
-                                      <div className="text-xs text-blue-600 mt-1">
-                                        {language === 'ar' ? `"${searchQuery}"` : `"${searchQuery}"`}
-                                      </div>
+                                      {(filteredProducts.length > 0 || filteredServices.length > 0) && (
+                                        <div className="text-xs text-gray-600 mt-1 flex gap-4">
+                                          {filteredProducts.length > 0 && (
+                                            <span>📦 {filteredProducts.length} {t('products')}</span>
+                                          )}
+                                          {filteredServices.length > 0 && (
+                                            <span>🔧 {filteredServices.length} {t('services')}</span>
+                                          )}
+                                        </div>
+                                      )}
                                     </div>
                                   )}
                                   
                                   <CommandEmpty>
-                                    <div className="p-4 text-center">
-                                      <div className="text-sm text-gray-500">
-                                        {language === 'ar' ? 'لا توجد نتائج مطابقة' : 'No matching results'}
+                                    <div className="p-6 text-center">
+                                      <div className="mb-2">🔍</div>
+                                      <div className="text-sm font-medium text-gray-700 mb-1">
+                                        {t('noResults')}
+                                      </div>
+                                      <div className="text-xs text-gray-500">
+                                        {language === 'ar' ? 
+                                          'جرب البحث باستخدام كلمات مختلفة أو أزل بعض الفلاتر' : 
+                                          'Try searching with different keywords or remove some filters'
+                                        }
                                       </div>
                                       {searchQuery && (
-                                        <div className="text-xs text-gray-400 mt-1">
-                                          {language === 'ar' ? `جرب كلمات أخرى للبحث` : `Try different search terms`}
+                                        <div className="mt-2 text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded inline-block">
+                                          {language === 'ar' ? `البحث عن: "${searchQuery}"` : `Searching for: "${searchQuery}"`}
                                         </div>
                                       )}
                                     </div>
@@ -955,31 +1052,55 @@ export default function DoctorInvoice() {
                                         `${t('products')} (${filteredProducts.length}/${products.length})` : 
                                         t('products')
                                     }>
-                                      {filteredProducts.map((product: any) => (
+                                      {filteredProducts.map((product: any, index: number) => (
                                         <CommandItem
                                           key={`product-${product.id}`}
                                           onSelect={() => handleProductServiceSelect(item.id, product.id.toString())}
+                                          className="transition-all duration-200 hover:bg-purple-50 group"
                                         >
-                                          <Check
-                                            className={`mr-2 h-4 w-4 ${
-                                              item.description === product.name ? 'opacity-100' : 'opacity-0'
-                                            }`}
-                                          />
-                                          <div className="flex-1">
-                                            {searchQuery ? (
-                                              <span
-                                                dangerouslySetInnerHTML={{
-                                                  __html: product.name.replace(
-                                                    new RegExp(`(${searchQuery})`, 'gi'),
-                                                    '<mark class="bg-yellow-200 rounded px-1">$1</mark>'
-                                                  )
-                                                }}
-                                              />
-                                            ) : (
-                                              product.name
-                                            )}
-                                            <div className="text-xs text-gray-500">
-                                              {product.price} {language === 'ar' ? 'ريال' : 'SAR'}
+                                          <div className="flex items-center w-full">
+                                            <Check
+                                              className={`mr-3 h-4 w-4 transition-all duration-200 ${
+                                                item.description === product.name 
+                                                  ? 'opacity-100 text-purple-600' 
+                                                  : 'opacity-0 group-hover:opacity-30'
+                                              }`}
+                                            />
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-center justify-between">
+                                                <div className="text-sm font-medium text-gray-900 truncate">
+                                                  {searchQuery ? (
+                                                    <span
+                                                      dangerouslySetInnerHTML={{
+                                                        __html: (product.name || '').replace(
+                                                          new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+                                                          '<mark class="bg-purple-200 text-purple-900 rounded px-1 font-semibold">$1</mark>'
+                                                        )
+                                                      }}
+                                                    />
+                                                  ) : (
+                                                    product.name
+                                                  )}
+                                                </div>
+                                                <div className="text-xs font-bold text-purple-600 ml-2 bg-purple-100 px-2 py-1 rounded-full">
+                                                  {product.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                </div>
+                                              </div>
+                                              <div className="text-xs text-gray-500 mt-1 flex items-center justify-between">
+                                                <span className="flex items-center">
+                                                  {product.category && (
+                                                    <>
+                                                      <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs mr-2">
+                                                        {product.category}
+                                                      </span>
+                                                    </>
+                                                  )}
+                                                  {product.sku && (
+                                                    <span className="text-gray-400">SKU: {product.sku}</span>
+                                                  )}
+                                                </span>
+                                                <span className="text-xs text-purple-500">#{index + 1}</span>
+                                              </div>
                                             </div>
                                           </div>
                                         </CommandItem>
@@ -992,31 +1113,53 @@ export default function DoctorInvoice() {
                                         `${t('services')} (${filteredServices.length}/${services.length})` : 
                                         t('services')
                                     }>
-                                      {filteredServices.map((service: any) => (
+                                      {filteredServices.map((service: any, index: number) => (
                                         <CommandItem
                                           key={`service-${service.id}`}
                                           onSelect={() => handleProductServiceSelect(item.id, service.id.toString())}
+                                          className="transition-all duration-200 hover:bg-blue-50 group"
                                         >
-                                          <Check
-                                            className={`mr-2 h-4 w-4 ${
-                                              item.description === service.name ? 'opacity-100' : 'opacity-0'
-                                            }`}
-                                          />
-                                          <div className="flex-1">
-                                            {searchQuery ? (
-                                              <span
-                                                dangerouslySetInnerHTML={{
-                                                  __html: service.name.replace(
-                                                    new RegExp(`(${searchQuery})`, 'gi'),
-                                                    '<mark class="bg-yellow-200 rounded px-1">$1</mark>'
-                                                  )
-                                                }}
-                                              />
-                                            ) : (
-                                              service.name
-                                            )}
-                                            <div className="text-xs text-gray-500">
-                                              {service.price} {language === 'ar' ? 'ريال' : 'SAR'}
+                                          <div className="flex items-center w-full">
+                                            <Check
+                                              className={`mr-3 h-4 w-4 transition-all duration-200 ${
+                                                item.description === service.name 
+                                                  ? 'opacity-100 text-blue-600' 
+                                                  : 'opacity-0 group-hover:opacity-30'
+                                              }`}
+                                            />
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-center justify-between">
+                                                <div className="text-sm font-medium text-gray-900 truncate">
+                                                  {searchQuery ? (
+                                                    <span
+                                                      dangerouslySetInnerHTML={{
+                                                        __html: (service.name || '').replace(
+                                                          new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+                                                          '<mark class="bg-blue-200 text-blue-900 rounded px-1 font-semibold">$1</mark>'
+                                                        )
+                                                      }}
+                                                    />
+                                                  ) : (
+                                                    service.name
+                                                  )}
+                                                </div>
+                                                <div className="text-xs font-bold text-blue-600 ml-2 bg-blue-100 px-2 py-1 rounded-full">
+                                                  {service.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                </div>
+                                              </div>
+                                              <div className="text-xs text-gray-500 mt-1 flex items-center justify-between">
+                                                <span className="flex items-center">
+                                                  {service.category && (
+                                                    <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-xs mr-2">
+                                                      {service.category}
+                                                    </span>
+                                                  )}
+                                                  {service.duration && (
+                                                    <span className="text-gray-400">{service.duration} {language === 'ar' ? 'دقيقة' : 'min'}</span>
+                                                  )}
+                                                </span>
+                                                <span className="text-xs text-blue-500">#{index + 1}</span>
+                                              </div>
                                             </div>
                                           </div>
                                         </CommandItem>
