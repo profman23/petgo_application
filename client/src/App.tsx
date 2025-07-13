@@ -40,8 +40,8 @@ import { LanguageTestingPanel } from "@/components/LanguageTestingPanel";
 import LoginSimple from "@/pages/login-simple";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { SimpleCacheManager } from "@/utils/simpleCacheManager";
-import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications";
+// import { SimpleCacheManager } from "@/utils/simpleCacheManager"; // DISABLED
+// import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications"; // DISABLED
 // Removed auto-imports that cause refresh loops
 // import "@/utils/cacheBuster"; // Auto-initialize cache busting  
 // import "@/utils/authFix"; // Auto-preserve authentication tokens
@@ -191,8 +191,8 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
 function Router() {
   const [location] = useLocation();
   
-  // Force refresh notification system that bypasses ALL PWA caching
-  useForceRefreshNotifications();
+  // Disabled force refresh that was causing logout loops
+  // useForceRefreshNotifications();
   
   // Pages that should show the footer
   const pagesWithFooter = ['/home', '/account', '/activity', '/customer-activity', '/patients', '/ride-request'];
