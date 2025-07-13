@@ -219,6 +219,16 @@ export default function AdminDashboard() {
       label: language === 'ar' ? 'طلبات VetsVan' : 'VetsVan Requests',
       icon: MessageSquare,
     },
+    {
+      id: 'statistics',
+      label: language === 'ar' ? 'الإحصائيات' : 'Statistics',
+      icon: BarChart3,
+    },
+    {
+      id: 'settings',
+      label: language === 'ar' ? 'الإعدادات' : 'Settings',
+      icon: Settings,
+    },
   ];
 
   // Render sidebar
@@ -287,6 +297,10 @@ export default function AdminDashboard() {
         return renderReports();
       case 'vetsvan-requests':
         return renderVetsVanRequests();
+      case 'statistics':
+        return renderStatistics();
+      case 'settings':
+        return renderSettings();
       default:
         return renderVetsVanManagement();
     }
@@ -597,6 +611,298 @@ export default function AdminDashboard() {
           </Button>
         </CardContent>
       </Card>
+    </div>
+  );
+
+  // Statistics content
+  const renderStatistics = () => (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">
+        {language === 'ar' ? 'الإحصائيات' : 'Statistics'}
+      </h1>
+      
+      {/* Enhanced Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="bg-gradient-to-br from-purple-500 to-purple-700 text-white">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <MessageSquare className="h-5 w-5" />
+              {language === 'ar' ? 'إجمالي الطلبات' : 'Total Requests'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold">{requests.length}</div>
+            <p className="text-sm text-purple-100 mt-1">
+              {language === 'ar' ? 'جميع الطلبات' : 'All requests'}
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-br from-blue-500 to-blue-700 text-white">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <Car className="h-5 w-5" />
+              {language === 'ar' ? 'إجمالي VetsVan' : 'Total VetsVans'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold">{drivers.length}</div>
+            <p className="text-sm text-blue-100 mt-1">
+              {language === 'ar' ? 'مركبات مسجلة' : 'Registered vehicles'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-green-500 to-green-700 text-white">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              {language === 'ar' ? 'معدل النجاح' : 'Success Rate'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold">
+              {requests.length > 0 
+                ? Math.round((requests.filter((r: VetsVanRequest) => r.status === 'confirmed').length / requests.length) * 100)
+                : 0
+              }%
+            </div>
+            <p className="text-sm text-green-100 mt-1">
+              {language === 'ar' ? 'طلبات مؤكدة' : 'Confirmed requests'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-500 to-orange-700 text-white">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              {language === 'ar' ? 'VetsVan متاحة' : 'Available VetsVans'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold">
+              {drivers.filter((d: Driver) => d.isAvailable).length}
+            </div>
+            <p className="text-sm text-orange-100 mt-1">
+              {language === 'ar' ? 'جاهزة للخدمة' : 'Ready for service'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Chart Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>{language === 'ar' ? 'توزيع حالة الطلبات' : 'Request Status Distribution'}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {['confirmed', 'pending', 'cancelled'].map((status) => {
+                const count = requests.filter((r: VetsVanRequest) => r.status === status).length;
+                const percentage = requests.length > 0 ? (count / requests.length) * 100 : 0;
+                const statusLabel = status === 'confirmed' ? 
+                  (language === 'ar' ? 'مؤكد' : 'Confirmed') :
+                  status === 'pending' ? 
+                  (language === 'ar' ? 'قيد الانتظار' : 'Pending') :
+                  (language === 'ar' ? 'ملغي' : 'Cancelled');
+                
+                return (
+                  <div key={status} className="flex items-center justify-between">
+                    <span className="text-sm font-medium">{statusLabel}</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-32 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${
+                            status === 'confirmed' ? 'bg-green-600' :
+                            status === 'pending' ? 'bg-yellow-600' : 'bg-red-600'
+                          }`}
+                          style={{ width: `${percentage}%` }}
+                        />
+                      </div>
+                      <span className="text-sm text-gray-600">{count}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{language === 'ar' ? 'أداء VetsVan' : 'VetsVan Performance'}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {drivers.map((driver: Driver) => {
+                const driverRequests = requests.filter((r: VetsVanRequest) => r.vetsvanCode === driver.vetsvanCode);
+                return (
+                  <div key={driver.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <span className="font-medium">{driver.vetsvanCode}</span>
+                      <p className="text-sm text-gray-600">{driver.name}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-purple-600">{driverRequests.length}</span>
+                      <p className="text-xs text-gray-500">
+                        {language === 'ar' ? 'طلب' : 'requests'}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+
+  // Settings content
+  const renderSettings = () => (
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900">
+        {language === 'ar' ? 'الإعدادات' : 'Settings'}
+      </h1>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Audio Notifications */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              {isAudioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+              {language === 'ar' ? 'إعدادات الصوت' : 'Audio Settings'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span>{language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable Audio Notifications'}</span>
+              <Button
+                variant={isAudioEnabled ? "default" : "outline"}
+                onClick={() => setIsAudioEnabled(!isAudioEnabled)}
+                className={isAudioEnabled ? 'bg-green-600 hover:bg-green-700' : ''}
+              >
+                {isAudioEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+              </Button>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (audioRef.current) {
+                  audioRef.current.play().catch(console.error);
+                }
+              }}
+              className="w-full"
+            >
+              {language === 'ar' ? 'اختبار الصوت' : 'Test Audio'}
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* System Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              {language === 'ar' ? 'معلومات النظام' : 'System Information'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">
+                  {language === 'ar' ? 'إجمالي الطلبات:' : 'Total Requests:'}
+                </span>
+                <span className="font-medium">{requests.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">
+                  {language === 'ar' ? 'إجمالي VetsVan:' : 'Total VetsVans:'}
+                </span>
+                <span className="font-medium">{drivers.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">
+                  {language === 'ar' ? 'الإشعارات المرسلة:' : 'Notifications Sent:'}
+                </span>
+                <span className="font-medium">{notificationCount}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-gray-600">
+                  {language === 'ar' ? 'اللغة الحالية:' : 'Current Language:'}
+                </span>
+                <span className="font-medium">
+                  {language === 'ar' ? 'العربية' : 'English'}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Database Management */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              {language === 'ar' ? 'إدارة البيانات' : 'Data Management'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600">
+              {language === 'ar' 
+                ? 'إدارة البيانات والنسخ الاحتياطية للنظام'
+                : 'Manage system data and backups'
+              }
+            </p>
+            <div className="grid grid-cols-1 gap-2">
+              <Button variant="outline" className="w-full">
+                {language === 'ar' ? 'تصدير البيانات' : 'Export Data'}
+              </Button>
+              <Button variant="outline" className="w-full">
+                {language === 'ar' ? 'نسخة احتياطية' : 'Create Backup'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Send className="h-5 w-5" />
+              {language === 'ar' ? 'إجراءات سريعة' : 'Quick Actions'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button 
+              onClick={() => sendSMSMutation.mutate()}
+              disabled={sendSMSMutation.isPending}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <Send className="h-4 w-4 mr-2" />
+              {sendSMSMutation.isPending 
+                ? (language === 'ar' ? 'جاري الإرسال...' : 'Sending...')
+                : (language === 'ar' ? 'إرسال رسالة تجريبية' : 'Send Test SMS')
+              }
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                queryClient.invalidateQueries();
+                toast({
+                  title: language === 'ar' ? 'تم التحديث' : 'Refreshed',
+                  description: language === 'ar' ? 'تم تحديث جميع البيانات' : 'All data refreshed',
+                });
+              }}
+              className="w-full"
+            >
+              {language === 'ar' ? 'تحديث البيانات' : 'Refresh Data'}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 
