@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AlertCircle, CheckCircle, RefreshCw, TestTube } from 'lucide-react';
 
 export function DoctorDebugPanel() {
@@ -9,6 +9,8 @@ export function DoctorDebugPanel() {
     lastCheck: '',
     apiCalls: 0
   });
+  
+  const apiCallsRef = useRef(0);
 
   useEffect(() => {
     const checkSystemStatus = () => {
@@ -16,12 +18,14 @@ export function DoctorDebugPanel() {
       const swRegistered = 'serviceWorker' in navigator;
       const notificationsEnabled = 'Notification' in window;
       
+      apiCallsRef.current += 1;
+      
       setDebugInfo({
         token: !!token,
         serviceWorker: swRegistered,
         notifications: notificationsEnabled,
         lastCheck: new Date().toLocaleTimeString('ar'),
-        apiCalls: debugInfo.apiCalls + 1
+        apiCalls: apiCallsRef.current
       });
     };
 
@@ -29,7 +33,7 @@ export function DoctorDebugPanel() {
     const interval = setInterval(checkSystemStatus, 5000);
     
     return () => clearInterval(interval);
-  }, [debugInfo.apiCalls]);
+  }, []); // Empty dependency array to prevent infinite loop
 
   const forceRefresh = () => {
     // Clear caches only, preserve tokens

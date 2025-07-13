@@ -617,6 +617,9 @@ Changelog:
 - July 13, 2025. FIXED: Critical WebSocket console errors by disabling replit-dev-banner.js script
 - July 13, 2025. RESOLVED: "setupWebSocket localhost:undefined" errors that appeared on all login pages
 - July 13, 2025. COMPLETED: Doctor login system now fully functional without console errors (v001/123456 tested successfully)
+- July 13, 2025. FIXED: DoctorDebugPanel.tsx causing infinite render loop with 6000+ console errors on doctor activity page
+- July 13, 2025. RESOLVED: "Maximum update depth exceeded" error caused by useEffect dependency array including state that was being updated inside the effect
+- July 13, 2025. DISABLED: DoctorDebugPanel component to prevent infinite setState calls and improve doctor interface stability
 - July 8, 2025. FIXED: Pet vitals field mapping issue - resolved pet_id null constraint error by mapping frontend field names (petId, bookingId, heartRate) to database field names (pet_id, booking_id, heart_rate)
 - July 8, 2025. VERIFIED: Complete pet vitals system working perfectly - all CRUD operations functional with correct data persistence
 - July 8, 2025. RESOLVED: Schema field name mismatch - updated server routes to use camelCase field names (bookingId, petId, heartRate) matching shared/schema.ts definitions

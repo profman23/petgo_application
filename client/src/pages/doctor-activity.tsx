@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DoctorFooter } from '@/components/doctor-footer';
-import { DoctorDebugPanel } from '@/components/DoctorDebugPanel';
+// import { DoctorDebugPanel } from '@/components/DoctorDebugPanel'; // Removed to prevent infinite loops
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck, Play } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
@@ -776,8 +776,7 @@ export default function DoctorActivity() {
         </DialogContent>
       </Dialog>
 
-      {/* Debug Panel for Development */}
-      {!import.meta.env.PROD && <DoctorDebugPanel />}
+      {/* Debug Panel disabled to prevent infinite loops */}
 
       <DoctorFooter />
     </div>
