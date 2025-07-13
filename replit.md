@@ -604,6 +604,10 @@ Changelog:
 - July 13, 2025. RESOLVED: Doctor notification system now gets fresh tokens before each API call to prevent 401 Unauthorized
 - July 13, 2025. ENHANCED: Audio notification system with multiple fallback sources and comprehensive debugging
 - July 13, 2025. ADDED: Test audio button for doctors with detailed console logging and diagnostic information
+- July 13, 2025. IMPLEMENTED: Comprehensive PWA cache-busting system to eliminate CTRL+SHIFT+R requirement
+- July 13, 2025. UPDATED: Service Worker to never cache API requests or notification hooks
+- July 13, 2025. CREATED: Force refresh notification system that bypasses ALL browser caching
+- July 13, 2025. ADDED: Cache busting utilities and debug panel for real-time monitoring
 - July 8, 2025. FIXED: Pet vitals field mapping issue - resolved pet_id null constraint error by mapping frontend field names (petId, bookingId, heartRate) to database field names (pet_id, booking_id, heart_rate)
 - July 8, 2025. VERIFIED: Complete pet vitals system working perfectly - all CRUD operations functional with correct data persistence
 - July 8, 2025. RESOLVED: Schema field name mismatch - updated server routes to use camelCase field names (bookingId, petId, heartRate) matching shared/schema.ts definitions

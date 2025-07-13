@@ -78,8 +78,35 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Skip API requests (let them go to network)
+  // NEVER cache API requests - force fresh fetch every time
   if (event.request.url.includes('/api/')) {
+    event.respondWith(
+      fetch(event.request, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      })
+    );
+    return;
+  }
+  
+  // NEVER cache notification hooks or JS files
+  if (event.request.url.includes('useGlobalNotifications') || 
+      event.request.url.includes('notification') ||
+      event.request.url.includes('/src/hooks/') ||
+      event.request.url.includes('.js?') ||
+      event.request.url.includes('.ts?')) {
+    event.respondWith(
+      fetch(event.request, { 
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+      })
+    );
     return;
   }
   

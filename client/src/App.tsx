@@ -40,7 +40,8 @@ import { LanguageTestingPanel } from "@/components/LanguageTestingPanel";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { SimpleCacheManager } from "@/utils/simpleCacheManager";
-import { useGlobalNotificationsUltimate } from "@/hooks/useGlobalNotificationsUltimate";
+import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications";
+import "@/utils/cacheBuster"; // Auto-initialize cache busting
 
 // Clear manifest cache on app start to ensure fresh icons
 const clearManifestCache = async () => {
@@ -166,8 +167,8 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
 function Router() {
   const [location] = useLocation();
   
-  // Global notification system for doctors (works across all pages) - ULTIMATE VERSION
-  useGlobalNotificationsUltimate();
+  // Force refresh notification system that bypasses ALL PWA caching
+  useForceRefreshNotifications();
   
   // Pages that should show the footer
   const pagesWithFooter = ['/home', '/account', '/activity', '/customer-activity', '/patients', '/ride-request'];
