@@ -10,11 +10,12 @@ export class CacheBuster {
         console.log('✅ All caches cleared');
       }
       
-      // Clear localStorage notification data
+      // Clear localStorage cache data but preserve authentication tokens
       const keysToRemove = [];
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.includes('notification') || key.includes('booking'))) {
+        if (key && (key.includes('notification') || key.includes('booking') || key.includes('cache')) 
+            && !key.includes('token') && !key.includes('user')) {
           keysToRemove.push(key);
         }
       }
@@ -64,9 +65,45 @@ export class CacheBuster {
   }
 }
 
-// Auto-clear caches on app start (only once per session)
+// Auto-clear caches on app start (only once per session) but preserve auth tokens
 if (!sessionStorage.getItem('cache-cleared')) {
-  CacheBuster.clearAllCaches();
+  console.log('🧹 Cache clearing started - preserving auth tokens');
+  
+  // Backup tokens before cache clear
+  const token = localStorage.getItem('token');
+  const doctorToken = localStorage.getItem('doctorToken');
+  const user = localStorage.getItem('user');
+  
+  if (token) sessionStorage.setItem('backup_token', token);
+  if (doctorToken) sessionStorage.setItem('backup_doctorToken', doctorToken);
+  if (user) sessionStorage.setItem('backup_user', user);
+  
+  // Only clear caches, not localStorage tokens
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => caches.delete(name));
+    });
+  }
+  
   CacheBuster.updateServiceWorker();
   sessionStorage.setItem('cache-cleared', 'true');
+  
+  // Restore tokens after cache clear
+  setTimeout(() => {
+    const backupToken = sessionStorage.getItem('backup_token');
+    const backupDoctorToken = sessionStorage.getItem('backup_doctorToken');
+    const backupUser = sessionStorage.getItem('backup_user');
+    
+    if (backupToken && !localStorage.getItem('token')) {
+      localStorage.setItem('token', backupToken);
+    }
+    if (backupDoctorToken && !localStorage.getItem('doctorToken')) {
+      localStorage.setItem('doctorToken', backupDoctorToken);
+    }
+    if (backupUser && !localStorage.getItem('user')) {
+      localStorage.setItem('user', backupUser);
+    }
+    
+    console.log('🔐 Auth tokens restored after cache clear');
+  }, 100);
 }

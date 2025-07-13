@@ -85,14 +85,29 @@ export default function Login() {
       return response as AuthResponse;
     },
     onSuccess: (data) => {
+      // Force immediate token storage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Force session storage backup
+      sessionStorage.setItem('temp_token', data.token);
+      sessionStorage.setItem('temp_user', JSON.stringify(data.user));
+      
+      console.log('🔐 Customer tokens saved:', {
+        token: data.token.substring(0, 10) + '...',
+        stored: !!localStorage.getItem('token')
+      });
+      
       toast({
         title: t('loginSuccess'),
         description: `${t('welcomeNewUser')} ${data.user.name}`,
         variant: "default",
       });
-      setLocation('/home');
+      
+      // Small delay to ensure tokens are stored
+      setTimeout(() => {
+        setLocation('/home');
+      }, 100);
     },
     onError: (error: Error) => {
       toast({

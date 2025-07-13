@@ -32,13 +32,22 @@ export function DoctorDebugPanel() {
   }, [debugInfo.apiCalls]);
 
   const forceRefresh = () => {
-    // Clear everything and reload
+    // Clear caches only, preserve tokens
     if ('caches' in window) {
       caches.keys().then(names => {
         names.forEach(name => caches.delete(name));
       });
     }
-    localStorage.removeItem('doctorToken');
+    // Clear cache-related localStorage only
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.includes('cache') || key.includes('notification')) 
+          && !key.includes('token') && !key.includes('user')) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(key => localStorage.removeItem(key));
     window.location.reload();
   };
 

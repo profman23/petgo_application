@@ -57,15 +57,30 @@ export default function DoctorLogin() {
       return response as AuthResponse;
     },
     onSuccess: (data) => {
+      // Force immediate token storage
       localStorage.setItem('token', data.token);
       localStorage.setItem('doctorToken', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Force session storage backup
+      sessionStorage.setItem('temp_doctorToken', data.token);
+      sessionStorage.setItem('temp_user', JSON.stringify(data.user));
+      
+      console.log('🔐 Doctor tokens saved:', {
+        token: data.token.substring(0, 10) + '...',
+        stored: !!localStorage.getItem('doctorToken')
+      });
+      
       toast({
         title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Login Successful',
         description: language === 'ar' ? `مرحباً بك في خدمتنا البيطرية د. ${data.user.name}` : `Welcome to our veterinary service Dr. ${data.user.name}`,
         variant: "default",
       });
-      window.location.href = '/doctor-dashboard';
+      
+      // Use setLocation instead of window.location.href
+      setTimeout(() => {
+        setLocation('/doctor-activity');
+      }, 100);
     },
     onError: (error) => {
       toast({

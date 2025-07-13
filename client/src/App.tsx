@@ -42,6 +42,7 @@ import { useLocation } from "wouter";
 import { SimpleCacheManager } from "@/utils/simpleCacheManager";
 import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications";
 import "@/utils/cacheBuster"; // Auto-initialize cache busting
+import "@/utils/authFix"; // Auto-preserve authentication tokens
 
 // Clear manifest cache on app start to ensure fresh icons
 const clearManifestCache = async () => {

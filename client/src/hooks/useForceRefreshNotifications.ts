@@ -17,7 +17,10 @@ export function useForceRefreshNotifications() {
       try {
         // Force fresh token from localStorage (bypasses React state cache)
         const freshToken = window.localStorage.getItem('doctorToken');
-        if (!freshToken) return;
+        if (!freshToken) {
+          console.log('🔐 No doctor token found, skipping notification check');
+          return;
+        }
 
         // Create unique URL with timestamp to bypass cache
         const timestamp = Date.now();
