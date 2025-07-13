@@ -1,5 +1,5 @@
-// Force refresh notification system DISABLED to prevent login loops
+// COMPLETELY DISABLED - Function removed to prevent login loops and runtime errors
 export function useForceRefreshNotifications() {
-  // DISABLED function - returns empty cleanup function to prevent login loops
+  // Empty function that returns empty cleanup to prevent any errors
   return () => {};
 }

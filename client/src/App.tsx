@@ -41,7 +41,8 @@ import LoginSimple from "@/pages/login-simple";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 // import { SimpleCacheManager } from "@/utils/simpleCacheManager"; // DISABLED
-// Removed problematic import: useForceRefreshNotifications was causing errors
+// Fixed: Import useForceRefreshNotifications to resolve runtime error
+import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications";
 // Removed auto-imports that cause refresh loops
 // import "@/utils/cacheBuster"; // Auto-initialize cache busting  
 // import "@/utils/authFix"; // Auto-preserve authentication tokens
