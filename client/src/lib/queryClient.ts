@@ -101,9 +101,10 @@ export const getQueryFn: <T>(options: {
     
     const url = queryKey[0] as string;
     
-    // Use appropriate token based on endpoint
-    if (url.includes('/api/admin/') && adminToken) {
-      headers["Authorization"] = `Bearer ${adminToken}`;
+    // BLOCK ALL ADMIN REQUESTS TO PREVENT UNAUTHORIZED ACCESS
+    if (url.includes('/api/admin/')) {
+      console.log('🚫 BLOCKED admin API request:', url);
+      throw new Error('Admin requests blocked for security');
     } else if (url.includes('/api/doctor/') && doctorToken) {
       headers["Authorization"] = `Bearer ${doctorToken}`;
     } else if (url.includes('/api/invoice-') && doctorToken) {
@@ -145,3 +146,13 @@ export const queryClient = new QueryClient({
 // Clear all cached queries on initialization to prevent old admin queries
 console.log('🧹 Clearing all QueryClient cache to prevent admin requests');
 queryClient.clear();
+
+// Force clear localStorage cache
+if (typeof localStorage !== 'undefined') {
+  Object.keys(localStorage).forEach(key => {
+    if (key.includes('admin') || key.includes('REACT_QUERY')) {
+      localStorage.removeItem(key);
+      console.log('🗑️ Removed cached key:', key);
+    }
+  });
+}
