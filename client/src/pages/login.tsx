@@ -106,16 +106,20 @@ export default function Login() {
         variant: "default",
       });
       
-      // Use simple auth handler
-      if (window.handleLoginSuccess) {
-        window.handleLoginSuccess(data.token, data.user);
-      } else {
-        // Fallback direct method
-        localStorage.clear();
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        window.location.replace('/home');
-      }
+      // Clear any existing data first
+      localStorage.clear();
+      
+      // Set new auth data immediately
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      console.log('✅ Auth data stored successfully');
+      
+      // Force immediate redirect to home
+      setTimeout(() => {
+        console.log('🚀 Redirecting to home page...');
+        window.location.href = '/home';
+      }, 100);
     },
     onError: (error: Error) => {
       toast({

@@ -200,8 +200,8 @@ function Router() {
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
           <Route path="/user-type-selection" component={UserTypeSelection} />
-          <Route path="/login" component={LoginSimple} />
-          <Route path="/login-complex" component={Login} />
+          <Route path="/login" component={Login} />
+          <Route path="/login-simple" component={LoginSimple} />
           <Route path="/login/customer" component={Login} />
           <Route path="/otp-verification" component={OtpVerification} />
           <Route path="/login/doctor" component={DoctorLogin} />
@@ -239,7 +239,7 @@ function Router() {
               window.location.replace('/home');
               return null;
             }
-            return <LoginSimple />;
+            return <Login />;
           }} />
           <Route component={NotFound} />
         </Switch>
