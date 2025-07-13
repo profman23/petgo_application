@@ -27,7 +27,7 @@ import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
 import CustomerActivity from "@/pages/customer-activity";
 import AdminLogin from "@/pages/admin-login";
-// DISABLED: import AdminDashboard from "@/pages/admin-dashboard"; // Completely removed to prevent unauthorized access
+import AdminDashboard from "@/pages/admin-dashboard";
 // DISABLED: import VetsVanShifts from "@/pages/vets-van-shifts"; // Completely removed to prevent unauthorized access
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
@@ -227,7 +227,7 @@ function Router() {
           <Route path="/customer-activity" component={() => <AuthCheck><CustomerActivity /></AuthCheck>} />
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
-          {/* DISABLED: <Route path="/admin-dashboard" component={AdminDashboard} /> - Completely removed to prevent unauthorized access */}
+          <Route path="/admin-dashboard" component={AdminDashboard} />
           {/* DISABLED: <Route path="/vets-van-shifts" component={VetsVanShifts} /> - Completely removed to prevent unauthorized access */}
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
