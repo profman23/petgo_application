@@ -293,7 +293,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   const { data: userBookings = [] } = useQuery({
     queryKey: ['/api/user/bookings'],
     retry: false,
-    refetchInterval: 2000, // تحديث كل ثانيتين لرؤية تحديثات الحالة
+    // DISABLED: refetchInterval: 2000, // تحديث كل ثانيتين لرؤية تحديثات الحالة - DISABLED to reduce system load
   });
 
   // دالة لعرض نص الحالة

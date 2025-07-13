@@ -28,7 +28,7 @@ export function DoctorBookingsTable({ vetsVanId, vetsVanName }: DoctorBookingsTa
     queryKey: ['/api/doctor/bookings', vetsVanId],
     staleTime: 30 * 1000, // 30 seconds - frequent updates for real-time notifications
     gcTime: 60 * 1000, // 1 minute
-    refetchInterval: 10 * 1000, // Poll every 10 seconds for new bookings
+    // DISABLED: refetchInterval: 10 * 1000, // Poll every 10 seconds for new bookings - DISABLED to reduce system load
   });
 
   // Note: Notifications are now handled globally via useGlobalNotifications hook in App.tsx

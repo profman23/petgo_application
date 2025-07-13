@@ -32,7 +32,7 @@ export function useGlobalNotifications() {
   // Only run notifications for doctors with valid tokens
   const { data: bookings = [] } = useQuery({
     queryKey: ['/api/doctor/bookings'],
-    refetchInterval: isDoctorUser ? 5000 : false, // Poll every 5 seconds only for doctors
+    // DISABLED: refetchInterval: isDoctorUser ? 5000 : false, // Poll every 5 seconds only for doctors - DISABLED to reduce system load
     enabled: isDoctorUser, // Only fetch if user is a doctor with token
     staleTime: 0, // Always fetch fresh data
     gcTime: 1000 * 60, // Keep in cache for 1 minute

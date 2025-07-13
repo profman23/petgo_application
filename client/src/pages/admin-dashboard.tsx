@@ -250,7 +250,7 @@ export default function AdminDashboard() {
 
   // Check admin authentication and prevent doctors access
   useEffect(() => {
-    const adminToken = localStorage.getItem("adminToken");
+    const adminToken = null; // DISABLED: localStorage.getItem("adminToken");
     const regularToken = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
     }
   }, [setLocation, toast, language]);
 
-  const adminToken = localStorage.getItem("adminToken");
+  const adminToken = null; // DISABLED: localStorage.getItem("adminToken"); - Completely disabled to prevent unauthorized API calls
   const adminData = localStorage.getItem("admin");
   let admin = {};
   try {
@@ -374,9 +374,9 @@ export default function AdminDashboard() {
         createdAt: string;
       }>;
     },
-    enabled: !!adminToken,
-    refetchInterval: 2000, // Poll every 2 seconds for real-time updates
-    refetchIntervalInBackground: true,
+    enabled: false, // COMPLETELY DISABLED to prevent unauthorized requests from customer users
+    // DISABLED: refetchInterval: 2000, // Poll every 2 seconds for real-time updates
+    // DISABLED: refetchIntervalInBackground: true,
   });
 
   // Monitor for new requests and trigger notifications
