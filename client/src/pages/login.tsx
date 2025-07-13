@@ -97,34 +97,40 @@ export default function Login() {
       return response as AuthResponse;
     },
     onSuccess: (data) => {
-      // Force immediate token storage
+      console.log('🎉 LOGIN SUCCESS - Starting redirect process');
+      
+      // Clear any existing tokens first
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
+      // Set new tokens immediately
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      // Force session storage backup
-      sessionStorage.setItem('temp_token', data.token);
-      sessionStorage.setItem('temp_user', JSON.stringify(data.user));
+      // Verify storage worked
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
       
-      console.log('🔐 Customer tokens saved:', {
-        token: data.token.substring(0, 10) + '...',
-        stored: !!localStorage.getItem('token'),
-        userStored: !!localStorage.getItem('user')
+      console.log('🔐 Token storage verification:', {
+        tokenSaved: !!storedToken,
+        userSaved: !!storedUser,
+        tokenMatch: storedToken === data.token,
+        tokenPreview: data.token.substring(0, 10) + '...'
       });
       
+      // Show success message
       toast({
         title: t('loginSuccess'),
         description: `${t('welcomeNewUser')} ${data.user.name}`,
         variant: "default",
       });
       
-      // Trigger storage event manually for same-tab detection
-      window.dispatchEvent(new Event('storage'));
+      // Dispatch custom event for AuthCheck
+      window.dispatchEvent(new CustomEvent('loginSuccess'));
       
-      // Force immediate redirect with small delay to ensure storage is complete
-      console.log('🚀 Redirecting to /home in 100ms');
-      setTimeout(() => {
-        setLocation('/home');
-      }, 100);
+      // Force immediate redirect
+      console.log('🚀 IMMEDIATE REDIRECT TO /home');
+      window.location.href = '/home';
     },
     onError: (error: Error) => {
       toast({

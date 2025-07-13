@@ -159,52 +159,61 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
       const user = localStorage.getItem('user');
       
       console.log('🔍 AuthCheck:', {
+        currentLocation: location,
         hasToken: !!token,
         hasUser: !!user,
-        tokenPreview: token ? token.substring(0, 10) + '...' : 'none',
-        userExists: !!user
+        tokenPreview: token ? token.substring(0, 10) + '...' : 'none'
       });
       
       const authenticated = !!(token && user);
-      setIsAuthenticated(authenticated);
       
-      // If not authenticated, redirect to login
-      if (!authenticated) {
-        console.log('❌ Not authenticated, redirecting to /login');
+      // Only redirect if we're on a protected route and not authenticated
+      if (!authenticated && location !== '/login') {
+        console.log('❌ Not authenticated, redirecting to /login from:', location);
         setLocation('/login');
+        setIsAuthenticated(false);
+        return;
       }
+      
+      setIsAuthenticated(authenticated);
     };
 
-    // Check immediately
     checkAuth();
     
-    // Listen for storage changes (when login happens in another tab/component)
-    const handleStorageChange = () => {
-      console.log('📢 Storage changed, rechecking auth');
-      checkAuth();
+    // Listen for manual storage events
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token' || e.key === 'user') {
+        console.log('📢 Storage changed:', e.key);
+        setTimeout(checkAuth, 50); // Small delay for storage to settle
+      }
     };
     
     window.addEventListener('storage', handleStorageChange);
     
-    // Also check periodically to catch same-tab changes
-    const interval = setInterval(checkAuth, 1000);
+    // Listen for custom events from login
+    const handleLoginSuccess = () => {
+      console.log('📢 Login success event received');
+      setTimeout(checkAuth, 100);
+    };
+    
+    window.addEventListener('loginSuccess', handleLoginSuccess);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
+      window.removeEventListener('loginSuccess', handleLoginSuccess);
     };
-  }, [setLocation]);
+  }, [location, setLocation]);
 
+  // Don't render anything while checking auth
   if (isAuthenticated === null) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">جاري التحميل...</div>
     </div>;
   }
 
+  // If not authenticated, let the router handle showing login page
   if (!isAuthenticated) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">جاري إعادة التوجيه...</div>
-    </div>;
+    return null;
   }
 
   return <>{children}</>;
@@ -254,7 +263,21 @@ function Router() {
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
-          <Route path="/" component={Login} />
+          <Route path="/" component={() => {
+            // Check if user is authenticated and redirect appropriately
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            const isAuthenticated = !!(token && user);
+            
+            if (isAuthenticated) {
+              console.log('✅ User authenticated on root, redirecting to /home');
+              window.location.href = '/home';
+              return null;
+            } else {
+              console.log('❌ User not authenticated on root, showing login');
+              return <Login />;
+            }
+          }} />
           <Route component={NotFound} />
         </Switch>
       </div>
