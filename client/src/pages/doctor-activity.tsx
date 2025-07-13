@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DoctorFooter } from '@/components/doctor-footer';
-import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck, Play } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
 import { useToast } from '@/hooks/use-toast';
@@ -217,6 +217,25 @@ export default function DoctorActivity() {
     }
   };
 
+  // Test audio notification separately
+  const testAudio = async () => {
+    try {
+      console.log('🔊 Testing audio notification...');
+      await audioNotification.playNotification();
+      toast({
+        title: language === 'ar' ? '🔊 اختبار الصوت' : '🔊 Audio Test',
+        description: language === 'ar' ? 'تم تشغيل صوت الاختبار' : 'Test sound played successfully',
+      });
+    } catch (error) {
+      console.error('❌ Audio test failed:', error);
+      toast({
+        title: language === 'ar' ? '❌ فشل الاختبار' : '❌ Test Failed',
+        description: language === 'ar' ? 'فشل في تشغيل الصوت' : 'Failed to play audio',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Handle booking click to show map
   const handleBookingClick = (booking: Booking) => {
     setSelectedBooking(booking);
@@ -348,21 +367,31 @@ export default function DoctorActivity() {
               {language === 'ar' ? 'النشاط' : 'Activity'}
             </h1>
           </div>
-          <Button
-            variant="ghost"
-            onClick={toggleAudio}
-            className={`p-2 rounded-full ${audioEnabled ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}
-            title={language === 'ar' 
-              ? (audioEnabled ? 'إيقاف الإشعارات الصوتية' : 'تفعيل الإشعارات الصوتية')
-              : (audioEnabled ? 'Disable audio notifications' : 'Enable audio notifications')
-            }
-          >
-            {audioEnabled ? (
-              <Volume2 className="w-5 h-5" />
-            ) : (
-              <VolumeX className="w-5 h-5" />
-            )}
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              onClick={testAudio}
+              className="p-2 rounded-full text-blue-600 hover:bg-blue-50"
+              title={language === 'ar' ? 'اختبار الصوت' : 'Test Audio'}
+            >
+              <Play className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={toggleAudio}
+              className={`p-2 rounded-full ${audioEnabled ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}
+              title={language === 'ar' 
+                ? (audioEnabled ? 'إيقاف الإشعارات الصوتية' : 'تفعيل الإشعارات الصوتية')
+                : (audioEnabled ? 'Disable audio notifications' : 'Enable audio notifications')
+              }
+            >
+              {audioEnabled ? (
+                <Volume2 className="w-5 h-5" />
+              ) : (
+                <VolumeX className="w-5 h-5" />
+              )}
+            </Button>
+          </div>
         </div>
       </header>
 

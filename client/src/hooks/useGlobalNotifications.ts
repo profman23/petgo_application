@@ -18,27 +18,51 @@ interface Booking {
 }
 
 export function useGlobalNotifications() {
+  console.log('🔧 useGlobalNotifications hook initialized');
   const { language } = useLanguage();
   const { toast } = useToast();
   const previousBookingCount = useRef<number>(-1); // -1 indicates not initialized
   const lastBookingId = useRef<number>(0); // Track the latest booking ID
 
-  // Check if user is a doctor
+  // Check if user is a doctor and get their VetsVan info
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const isDoctorUser = user?.membershipType === 'doctor';
+  const doctorToken = localStorage.getItem('doctorToken');
+  const isDoctorUser = user?.membershipType === 'doctor' && doctorToken;
 
-  // Only run notifications for doctors
+  // Only run notifications for doctors with valid tokens
   const { data: bookings = [] } = useQuery({
     queryKey: ['/api/doctor/bookings'],
     refetchInterval: isDoctorUser ? 5000 : false, // Poll every 5 seconds only for doctors
-    enabled: isDoctorUser, // Only fetch if user is a doctor
+    enabled: isDoctorUser, // Only fetch if user is a doctor with token
     staleTime: 0, // Always fetch fresh data
     gcTime: 1000 * 60, // Keep in cache for 1 minute
+    queryFn: async () => {
+      const response = await fetch('/api/doctor/bookings', {
+        headers: {
+          'Authorization': `Bearer ${doctorToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        console.error('Failed to fetch doctor bookings:', response.status);
+        throw new Error(`Failed to fetch bookings: ${response.status}`);
+      }
+      
+      return response.json();
+    }
   });
 
   // Global notification effect
   useEffect(() => {
-    if (!isDoctorUser || !Array.isArray(bookings)) return;
+    if (!isDoctorUser || !Array.isArray(bookings)) {
+      console.log('❌ Global notifications not active:', {
+        isDoctorUser,
+        bookingsIsArray: Array.isArray(bookings),
+        bookings
+      });
+      return;
+    }
 
     const currentBookingCount = bookings.length;
     const latestBooking = bookings.length > 0 ? 
@@ -50,9 +74,11 @@ export function useGlobalNotifications() {
     if (previousBookingCount.current === -1) {
       previousBookingCount.current = currentBookingCount;
       lastBookingId.current = latestBooking?.id || 0;
-      console.log('🔔 Global notifications initialized:', {
+      console.log('🔔 Global notifications initialized for doctor:', user?.vetsvanCode, {
         count: currentBookingCount,
-        latestId: lastBookingId.current
+        latestId: lastBookingId.current,
+        hasToken: !!doctorToken,
+        user: user
       });
       return;
     }
@@ -62,9 +88,11 @@ export function useGlobalNotifications() {
       (latestBooking && latestBooking.id > lastBookingId.current);
 
     if (hasNewBooking) {
-      console.log('🔔 New booking detected! Playing notification...');
+      console.log('🔔 NEW BOOKING DETECTED! Playing notification...');
+      console.log('Doctor:', user?.vetsvanCode || user?.username);
       console.log('Previous count:', previousBookingCount.current, 'Current count:', currentBookingCount);
       console.log('Previous ID:', lastBookingId.current, 'Latest ID:', latestBooking?.id);
+      console.log('Latest booking details:', latestBooking);
 
       // Play audio notification
       const playAudioNotification = async () => {
