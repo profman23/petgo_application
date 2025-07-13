@@ -1931,6 +1931,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'VetsVan Code, Name, Username, Password, and Phone are required' });
       }
 
+      // Check if username already exists
+      const existingDriver = await storage.getDriverByUsername(username);
+      if (existingDriver) {
+        return res.status(400).json({ 
+          message: 'اسم المستخدم موجود مسبقاً. اختر اسم مستخدم آخر مثل v004 أو v005'
+        });
+      }
+
       // Hash the password using bcrypt
       const hashedPassword = await bcrypt.hash(password, 10);
 

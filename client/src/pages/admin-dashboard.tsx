@@ -103,10 +103,13 @@ export default function AdminDashboard() {
     refetchInterval: 3000,
   });
 
-  const { data: drivers = [], isLoading: driversLoading } = useQuery({
+  const { data: driversData, isLoading: driversLoading } = useQuery({
     queryKey: ['/api/admin/drivers'],
     refetchInterval: 5000,
   });
+  
+  // Ensure drivers is always an array
+  const drivers = Array.isArray(driversData) ? driversData : [];
 
   const { data: shifts = [], isLoading: shiftsLoading } = useQuery({
     queryKey: ['/api/admin/shifts'],
@@ -145,6 +148,14 @@ export default function AdminDashboard() {
       toast({
         title: language === 'ar' ? 'تم الإضافة' : 'Added Successfully',
         description: language === 'ar' ? 'تم إضافة VetsVan وحساب الطبيب بنجاح' : 'VetsVan and doctor account created successfully',
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error adding VetsVan:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: error.message || (language === 'ar' ? 'فشل في إضافة VetsVan' : 'Failed to add VetsVan'),
+        variant: "destructive",
       });
     },
   });
