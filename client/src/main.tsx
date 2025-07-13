@@ -3,6 +3,7 @@ import App from "./App";
 import "./index.css";
 import "./styles/map-override.css";
 import "./utils/pwa-diagnostics";
+import "./utils/ultimateWebSocketFix";
 // import "./utils/nukeCaches"; // DISABLED - was causing login loops
 // import "./utils/simpleAuthFix"; // DISABLED - was interfering with auth
 import { setupInstallNotificationHandler } from "./utils/install-notification";
