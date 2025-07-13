@@ -99,6 +99,7 @@ export default function DoctorInvoice() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isRecordLocked, setIsRecordLocked] = useState(false);
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -408,6 +409,27 @@ export default function DoctorInvoice() {
     saveInvoiceItems(newItems);
   };
 
+  // Smart search filtering function
+  const filterItems = (items: any[], query: string) => {
+    if (!query.trim()) return items;
+    
+    const searchTerm = query.toLowerCase().trim();
+    return items.filter(item => {
+      const name = item.name?.toLowerCase() || '';
+      const description = item.description?.toLowerCase() || '';
+      // Support both Arabic and English search
+      return name.includes(searchTerm) || 
+             description.includes(searchTerm) ||
+             // Handle Arabic search with partial matches
+             name.includes(searchTerm.replace(/ي/g, 'ى')) ||
+             name.includes(searchTerm.replace(/ى/g, 'ي'));
+    });
+  };
+
+  // Get filtered products and services based on search
+  const filteredProducts = filterItems(products, searchQuery);
+  const filteredServices = filterItems(services, searchQuery);
+
   // Handle product/service selection - shows only imported data
   const handleProductServiceSelect = (itemId: string, selectedId: string) => {
     const selectedProduct = products.find(p => p.id.toString() === selectedId);
@@ -424,6 +446,9 @@ export default function DoctorInvoice() {
       updateItem(itemId, 'unitPrice', parseFloat(selectedService.price));
       updateItem(itemId, 'total', parseFloat(selectedService.price) * (currentItem?.quantity || 1));
     }
+    
+    // Clear search after selection
+    setSearchQuery('');
   };
 
   // Remove item
@@ -852,35 +877,85 @@ export default function DoctorInvoice() {
                               </PopoverTrigger>
                               <PopoverContent className="w-full p-0">
                                 <Command>
-                                  <CommandInput placeholder={language === 'ar' ? 'ابحث...' : 'Search...'} />
-                                  <CommandEmpty>{language === 'ar' ? 'لا توجد نتائج' : 'No results found'}</CommandEmpty>
+                                  <CommandInput 
+                                    placeholder={language === 'ar' ? 'ابحث في المنتجات والخدمات...' : 'Search products and services...'} 
+                                    value={searchQuery}
+                                    onValueChange={setSearchQuery}
+                                  />
+                                  {/* Search Results Summary */}
+                                  {searchQuery && (
+                                    <div className="px-3 py-2 bg-blue-50 border-b border-blue-200">
+                                      <div className="text-xs text-blue-700 font-medium">
+                                        {language === 'ar' ? 
+                                          `🔍 نتائج البحث: ${filteredProducts.length + filteredServices.length} عنصر` :
+                                          `🔍 Search Results: ${filteredProducts.length + filteredServices.length} items`
+                                        }
+                                      </div>
+                                      <div className="text-xs text-blue-600 mt-1">
+                                        {language === 'ar' ? `"${searchQuery}"` : `"${searchQuery}"`}
+                                      </div>
+                                    </div>
+                                  )}
                                   
-                                  {/* Sub Tabs for Products/Services */}
+                                  <CommandEmpty>
+                                    <div className="p-4 text-center">
+                                      <div className="text-sm text-gray-500">
+                                        {language === 'ar' ? 'لا توجد نتائج مطابقة' : 'No matching results'}
+                                      </div>
+                                      {searchQuery && (
+                                        <div className="text-xs text-gray-400 mt-1">
+                                          {language === 'ar' ? `جرب كلمات أخرى للبحث` : `Try different search terms`}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </CommandEmpty>
+                                  
+                                  {/* Sub Tabs for Products/Services with counts */}
                                   <div className="flex border-b border-gray-200 bg-gray-50 p-2">
                                     <button
                                       onClick={() => setInvoiceSubTab('products')}
                                       className={`px-3 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
                                         invoiceSubTab === 'products'
-                                          ? 'border-purple-600 text-purple-600 #85208550'
+                                          ? 'border-purple-600 text-purple-600 bg-purple-50'
                                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                       }`}
                                     >
-                                      {language === 'ar' ? '📦 المنتجات' : '📦 Products'}
+                                      <div className="flex items-center justify-center gap-1">
+                                        <span>📦</span>
+                                        <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
+                                        {searchQuery && (
+                                          <span className="bg-purple-100 text-purple-700 px-1 rounded text-xs">
+                                            {filteredProducts.length}
+                                          </span>
+                                        )}
+                                      </div>
                                     </button>
                                     <button
                                       onClick={() => setInvoiceSubTab('services')}
                                       className={`px-3 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
                                         invoiceSubTab === 'services'
-                                          ? 'border-purple-600 text-purple-600 #85208550'
+                                          ? 'border-purple-600 text-purple-600 bg-purple-50'
                                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                       }`}
                                     >
-                                      {language === 'ar' ? '🩺 الخدمات' : '🩺 Services'}
+                                      <div className="flex items-center justify-center gap-1">
+                                        <span>🩺</span>
+                                        <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+                                        {searchQuery && (
+                                          <span className="bg-purple-100 text-purple-700 px-1 rounded text-xs">
+                                            {filteredServices.length}
+                                          </span>
+                                        )}
+                                      </div>
                                     </button>
                                   </div>
-                                  {invoiceSubTab === 'products' && products.length > 0 && (
-                                    <CommandGroup heading={t('products')}>
-                                      {products.map((product: any) => (
+                                  {invoiceSubTab === 'products' && filteredProducts.length > 0 && (
+                                    <CommandGroup heading={
+                                      searchQuery ? 
+                                        `${t('products')} (${filteredProducts.length}/${products.length})` : 
+                                        t('products')
+                                    }>
+                                      {filteredProducts.map((product: any) => (
                                         <CommandItem
                                           key={`product-${product.id}`}
                                           onSelect={() => handleProductServiceSelect(item.id, product.id.toString())}
@@ -890,14 +965,34 @@ export default function DoctorInvoice() {
                                               item.description === product.name ? 'opacity-100' : 'opacity-0'
                                             }`}
                                           />
-                                          {product.name}
+                                          <div className="flex-1">
+                                            {searchQuery ? (
+                                              <span
+                                                dangerouslySetInnerHTML={{
+                                                  __html: product.name.replace(
+                                                    new RegExp(`(${searchQuery})`, 'gi'),
+                                                    '<mark class="bg-yellow-200 rounded px-1">$1</mark>'
+                                                  )
+                                                }}
+                                              />
+                                            ) : (
+                                              product.name
+                                            )}
+                                            <div className="text-xs text-gray-500">
+                                              {product.price} {language === 'ar' ? 'ريال' : 'SAR'}
+                                            </div>
+                                          </div>
                                         </CommandItem>
                                       ))}
                                     </CommandGroup>
                                   )}
-                                  {invoiceSubTab === 'services' && services.length > 0 && (
-                                    <CommandGroup heading={t('services')}>
-                                      {services.map((service: any) => (
+                                  {invoiceSubTab === 'services' && filteredServices.length > 0 && (
+                                    <CommandGroup heading={
+                                      searchQuery ? 
+                                        `${t('services')} (${filteredServices.length}/${services.length})` : 
+                                        t('services')
+                                    }>
+                                      {filteredServices.map((service: any) => (
                                         <CommandItem
                                           key={`service-${service.id}`}
                                           onSelect={() => handleProductServiceSelect(item.id, service.id.toString())}
@@ -907,7 +1002,23 @@ export default function DoctorInvoice() {
                                               item.description === service.name ? 'opacity-100' : 'opacity-0'
                                             }`}
                                           />
-                                          {service.name}
+                                          <div className="flex-1">
+                                            {searchQuery ? (
+                                              <span
+                                                dangerouslySetInnerHTML={{
+                                                  __html: service.name.replace(
+                                                    new RegExp(`(${searchQuery})`, 'gi'),
+                                                    '<mark class="bg-yellow-200 rounded px-1">$1</mark>'
+                                                  )
+                                                }}
+                                              />
+                                            ) : (
+                                              service.name
+                                            )}
+                                            <div className="text-xs text-gray-500">
+                                              {service.price} {language === 'ar' ? 'ريال' : 'SAR'}
+                                            </div>
+                                          </div>
                                         </CommandItem>
                                       ))}
                                     </CommandGroup>
