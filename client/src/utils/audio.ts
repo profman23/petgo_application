@@ -25,46 +25,21 @@ export class AudioNotification {
   }
 
   public async playNotification(): Promise<void> {
-    if (!this.isEnabled) {
-      console.log('🔇 Audio notification disabled');
-      return;
-    }
+    if (!this.isEnabled) return;
 
     try {
       // Reset audio to beginning if already playing
       this.audio.currentTime = 0;
       
-      // Try alternative methods if main audio fails
-      console.log('🔊 Attempting to play notification sound...');
+      // Play the notification sound
       await this.audio.play();
-      console.log('✅ Audio notification played successfully');
+      console.log('🔊 Audio notification played successfully');
     } catch (error) {
-      console.warn('❌ Failed to play notification sound:', error);
-      
-      // Try fallback audio
-      try {
-        console.log('🔄 Trying fallback audio method...');
-        const fallbackAudio = new Audio('/رسائل-الايفون_1751699547648.mp3');
-        fallbackAudio.volume = 0.8;
-        await fallbackAudio.play();
-        console.log('✅ Fallback audio played successfully');
-      } catch (fallbackError) {
-        console.warn('❌ Fallback audio also failed:', fallbackError);
-        
-        // Try basic beep sound as last resort
-        try {
-          const beepAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFAlBmN3zvmYdBjuO1fnOfjEFJnTB8OGTQw0PWrHm7KpXFA==');
-          beepAudio.volume = 0.5;
-          await beepAudio.play();
-          console.log('🔔 Basic beep notification played');
-        } catch (beepError) {
-          console.warn('❌ All audio methods failed:', beepError);
-        }
-      }
+      console.warn('Failed to play notification sound:', error);
       
       // Try to enable audio with user interaction
       if (error instanceof DOMException && error.name === 'NotAllowedError') {
-        console.log('🚫 Audio blocked by browser. User interaction required.');
+        console.log('Audio blocked by browser. User interaction required.');
         this.showAudioPermissionNotice();
       }
     }

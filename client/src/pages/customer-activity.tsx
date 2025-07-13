@@ -310,7 +310,7 @@ export default function CustomerActivity() {
         <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-gray-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -431,7 +431,7 @@ export default function CustomerActivity() {
                             {/* Payment sections removed per user request */}
 
                             {/* Action Buttons */}
-                            <div className="pt-3 border-t border-gray-300 space-y-2">
+                            <div className="pt-3 border-t border-purple-600 space-y-2">
                               {/* Tracking Button for Active Bookings */}
                               {(booking.status === 'confirmed' || booking.status === 'booked' || booking.status === 'in_progress') && (
                                 <Button

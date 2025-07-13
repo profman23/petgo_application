@@ -9,8 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DoctorFooter } from '@/components/doctor-footer';
-// import { DoctorDebugPanel } from '@/components/DoctorDebugPanel'; // Removed to prevent infinite loops
-import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck, Play } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
 import { useToast } from '@/hooks/use-toast';
@@ -48,8 +47,9 @@ export default function DoctorActivity() {
   // Get current doctor info
   const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-  // Audio control state (notifications now handled globally)
+  // State for tracking notifications
   const [audioEnabled, setAudioEnabled] = useState(audioNotification.isAudioEnabled());
+  const previousBookingCount = useRef<number>(0);
 
   // Fetch VetsVan location information
   const { data: vetsVanInfo } = useQuery({
@@ -193,7 +193,33 @@ export default function DoctorActivity() {
     }
   };
 
-  // Note: Audio notifications are now handled globally via useGlobalNotifications hook in App.tsx
+  // Audio notification system
+  useEffect(() => {
+    const currentBookingCount = (bookings as Booking[]).length;
+    
+    // Play notification sound when new booking is added
+    if (previousBookingCount.current > 0 && currentBookingCount > previousBookingCount.current) {
+      const playAudioNotification = async () => {
+        try {
+          await playBookingNotification();
+          toast({
+            title: language === 'ar' ? '🔔 طلب جديد!' : '🔔 New Booking!',
+            description: language === 'ar' 
+              ? 'تم إضافة موعد جديد إلى جدولك'
+              : 'A new appointment has been added to your schedule',
+            variant: 'default',
+          });
+        } catch (error) {
+          console.warn('Audio notification failed:', error);
+        }
+      };
+      
+      playAudioNotification();
+    }
+    
+    // Update the previous count
+    previousBookingCount.current = currentBookingCount;
+  }, [bookings, language, toast]);
 
   // Audio control functions
   const toggleAudio = () => {
@@ -215,25 +241,6 @@ export default function DoctorActivity() {
       });
       // Test the audio
       testAudioNotification();
-    }
-  };
-
-  // Test audio notification separately
-  const testAudio = async () => {
-    try {
-      console.log('🔊 Testing audio notification...');
-      await audioNotification.playNotification();
-      toast({
-        title: language === 'ar' ? '🔊 اختبار الصوت' : '🔊 Audio Test',
-        description: language === 'ar' ? 'تم تشغيل صوت الاختبار' : 'Test sound played successfully',
-      });
-    } catch (error) {
-      console.error('❌ Audio test failed:', error);
-      toast({
-        title: language === 'ar' ? '❌ فشل الاختبار' : '❌ Test Failed',
-        description: language === 'ar' ? 'فشل في تشغيل الصوت' : 'Failed to play audio',
-        variant: 'destructive',
-      });
     }
   };
 
@@ -368,31 +375,21 @@ export default function DoctorActivity() {
               {language === 'ar' ? 'النشاط' : 'Activity'}
             </h1>
           </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              onClick={testAudio}
-              className="p-2 rounded-full text-blue-600 hover:bg-blue-50"
-              title={language === 'ar' ? 'اختبار الصوت' : 'Test Audio'}
-            >
-              <Play className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={toggleAudio}
-              className={`p-2 rounded-full ${audioEnabled ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}
-              title={language === 'ar' 
-                ? (audioEnabled ? 'إيقاف الإشعارات الصوتية' : 'تفعيل الإشعارات الصوتية')
-                : (audioEnabled ? 'Disable audio notifications' : 'Enable audio notifications')
-              }
-            >
-              {audioEnabled ? (
-                <Volume2 className="w-5 h-5" />
-              ) : (
-                <VolumeX className="w-5 h-5" />
-              )}
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            onClick={toggleAudio}
+            className={`p-2 rounded-full ${audioEnabled ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}
+            title={language === 'ar' 
+              ? (audioEnabled ? 'إيقاف الإشعارات الصوتية' : 'تفعيل الإشعارات الصوتية')
+              : (audioEnabled ? 'Disable audio notifications' : 'Enable audio notifications')
+            }
+          >
+            {audioEnabled ? (
+              <Volume2 className="w-5 h-5" />
+            ) : (
+              <VolumeX className="w-5 h-5" />
+            )}
+          </Button>
         </div>
       </header>
 
@@ -775,8 +772,6 @@ export default function DoctorActivity() {
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Debug Panel disabled to prevent infinite loops */}
 
       <DoctorFooter />
     </div>

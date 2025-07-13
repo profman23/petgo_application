@@ -16,7 +16,7 @@ import logoImage from "@assets/Screenshot 2025-07-10 182605_1752161515777.png";
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 
 interface LoginFormData {
-  phone: string;
+  identifier: string;
   password: string;
 }
 
@@ -46,9 +46,9 @@ export default function Login() {
   const { t, language } = useTranslation();
 
   const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema.omit({ identifier: true }).extend({ phone: loginSchema.shape.identifier })),
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      phone: '',
+      identifier: '',
       password: '',
     },
   });
@@ -78,56 +78,21 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data: LoginFormData) => {
-      // Convert phone to identifier for backend compatibility
-      const loginData = {
-        identifier: data.phone,
-        password: data.password
-      };
-      console.log('🔑 Sending login request:', { 
-        originalData: data,
-        loginData: loginData,
-        hasIdentifier: !!loginData.identifier,
-        hasPassword: !!loginData.password
-      });
-      
       const response = await apiRequest('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify(loginData)
+        body: JSON.stringify(data)
       });
       return response as AuthResponse;
     },
     onSuccess: (data) => {
-      console.log('🎉 LOGIN SUCCESS:', data.token.substring(0, 10) + '...');
-      
-      // Show success message
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
       toast({
         title: t('loginSuccess'),
         description: `${t('welcomeNewUser')} ${data.user.name}`,
         variant: "default",
       });
-      
-      // Clear any existing data first
-      localStorage.clear();
-      
-      // Set new auth data immediately
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      console.log('✅ Auth data stored successfully');
-      
-      // Verify storage worked
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
-      
-      console.log('🔐 Storage verification:', {
-        tokenStored: !!storedToken,
-        userStored: !!storedUser,
-        tokenMatch: storedToken === data.token
-      });
-      
-      // Force immediate redirect to home
-      console.log('🚀 Redirecting to home page immediately...');
-      window.location.href = '/home';
+      setLocation('/home');
     },
     onError: (error: Error) => {
       toast({
@@ -183,7 +148,6 @@ export default function Login() {
   });
 
   const onLoginSubmit = (data: LoginFormData) => {
-    console.log('📋 Form data before submission:', data);
     loginMutation.mutate(data);
   };
 
@@ -199,7 +163,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
       <div className="w-full max-w-lg">
-        <Card className="shadow-xl" style={{ boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
+        <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
             
@@ -224,7 +188,7 @@ export default function Login() {
               <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
                 <FormField
                   control={loginForm.control}
-                  name="phone"
+                  name="identifier"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-700 font-semibold">
@@ -240,8 +204,8 @@ export default function Login() {
                               focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
                               ${language === 'ar' ? 'text-right' : 'text-left'}`}
                             style={{ 
-                              borderColor: '#d1d5db', 
-                              '--tw-ring-color': '#9ca3af',
+                              borderColor: 'var(--purple-primary)', 
+                              '--tw-ring-color': 'var(--purple-primary)',
                               fontSize: '16px'
                             } as any}
                           />
@@ -274,8 +238,8 @@ export default function Login() {
                               focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
                               ${language === 'ar' ? 'text-right' : 'text-left'}`}
                             style={{ 
-                              borderColor: '#d1d5db', 
-                              '--tw-ring-color': '#9ca3af',
+                              borderColor: 'var(--purple-primary)', 
+                              '--tw-ring-color': 'var(--purple-primary)',
                               fontSize: '16px'
                             } as any}
                           />
@@ -312,7 +276,7 @@ export default function Login() {
                     onClick={() => setIsRegistering(true)}
                     className="w-full py-3 rounded-xl font-semibold border-2 transition-all duration-300 
                       hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
-                      bg-white hover:bg-gray-100 text-gray-600 border-gray-300 hover:border-gray-400"
+                      bg-white hover:bg-purple-100 text-purple-600 border-purple-600 hover:border-purple-600"
                   >
                     <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
                       <UserPlus className="w-5 h-5" />

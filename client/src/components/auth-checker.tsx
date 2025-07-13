@@ -5,32 +5,44 @@ export function AuthChecker() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Disabled automatic auth checking to prevent refresh loops
-    console.log('AuthChecker disabled to prevent infinite redirects');
-    
-    // Only do token cleanup if token is invalid, but don't redirect
-    const checkTokenValidity = async () => {
+    const checkAuth = async () => {
       const token = localStorage.getItem('token');
-      if (!token) return;
+      
+      if (!token) {
+        // No token, redirect to login
+        window.location.href = '/login';
+        return;
+      }
 
       try {
+        // Test token validity
         const response = await fetch('/api/rides/active', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
         if (response.status === 401) {
-          // Token expired, only clear localStorage - no redirect
+          // Token expired, clear and redirect
           localStorage.removeItem('token');
           localStorage.removeItem('user');
-          console.log('Invalid token cleared from localStorage');
+          toast({
+            title: 'انتهت جلسة العمل',
+            description: 'يتم إعادة توجيهك لتسجيل الدخول...',
+            variant: 'destructive',
+          });
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 1000);
         }
       } catch (error) {
         // Network error, ignore
       }
     };
 
-    // Only check token validity without redirects
-    const interval = setInterval(checkTokenValidity, 30000); // Every 30 seconds
+    // Check immediately on mount
+    checkAuth();
+    
+    // Check every 10 seconds
+    const interval = setInterval(checkAuth, 10000);
     
     return () => clearInterval(interval);
   }, [toast]);

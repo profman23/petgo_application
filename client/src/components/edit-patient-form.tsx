@@ -128,7 +128,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
   return (
     <div className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
       <div className="max-w-lg mx-auto">
-        <Card className="shadow-lg">
+        <Card className="border-2 border-purple-600 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-purple-600 to-purple-600 text-white rounded-t-lg">
             <div className="flex items-center gap-3">
               <Button
@@ -156,7 +156,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                 <Input
                   id="name"
                   {...form.register('name')}
-                  className="border-2 border-gray-300 focus:border-gray-400 rounded-lg"
+                  className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
                   placeholder={t('patientName')}
                   autoFocus
                 />
@@ -174,7 +174,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                   onValueChange={(value) => form.setValue('type', value as 'Cat' | 'Dog' | 'Bird')}
                   defaultValue={form.watch('type')}
                 >
-                  <SelectTrigger className="border-2 border-gray-300 focus:border-gray-400 rounded-lg">
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
                     <SelectValue placeholder={t('selectPatientType')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -265,7 +265,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                     <img
                       src={selectedPhoto}
                       alt="Patient"
-                      className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300"
+                      className="w-24 h-24 object-cover rounded-lg border-2 border-purple-600"
                     />
                   </div>
                 )}
@@ -282,7 +282,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                     type="button"
                     variant="outline"
                     onClick={() => document.getElementById('photo-upload')?.click()}
-                    className="border-2 border-gray-300 hover:border-gray-400 text-gray-600"
+                    className="border-2 border-purple-600 hover:border-purple-600 text-purple-600"
                   >
                     <Camera className="h-4 w-4 mr-2" />
                     {language === 'ar' ? 'اختر صورة' : 'Choose Photo'}

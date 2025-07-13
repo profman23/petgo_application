@@ -3,7 +3,7 @@ import { useLanguage } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { X, Upload, File, Trash2, Eye, Download } from 'lucide-react';
+import { X, Upload, File, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -25,8 +25,6 @@ const translations = {
     fileSize: 'حجم الملف',
     uploadedAt: 'تاريخ الرفع',
     delete: 'حذف',
-    view: 'عرض',
-    download: 'تحميل',
     maxFileSize: 'الحد الأقصى لحجم الملف 10 ميجابايت',
     fileTooBig: 'حجم الملف كبير جداً. الحد الأقصى 10 ميجابايت'
   },
@@ -47,8 +45,6 @@ const translations = {
     fileSize: 'File Size',
     uploadedAt: 'Uploaded At',
     delete: 'Delete',
-    view: 'View',
-    download: 'Download',
     maxFileSize: 'Maximum file size 10MB',
     fileTooBig: 'File is too large. Maximum size is 10MB'
   }
@@ -76,53 +72,22 @@ export default function UploadAttachmentModal({
 
   const t = (key: keyof typeof translations.ar) => translations[language as keyof typeof translations][key];
 
-  // Fetch existing attachments
+  // Fetch existing attachments using query parameters
   const { data: attachments = [], refetch } = useQuery({
-    queryKey: ['/api/pet-attachments', petId, bookingId],
-    queryFn: async () => {
-      try {
-        const token = localStorage.getItem('doctorToken');
-        const response = await fetch(`/api/pet-attachments?petId=${petId}&bookingId=${bookingId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('Fetched attachments:', data);
-        return data;
-      } catch (error) {
-        console.error('Error fetching attachments:', error);
-        return [];
-      }
-    },
+    queryKey: [`/api/pet-attachments?petId=${petId}&bookingId=${bookingId}`],
     enabled: isOpen,
   });
 
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async (attachmentData: any) => {
-      const token = localStorage.getItem('doctorToken');
-      const response = await fetch('/api/pet-attachments', {
+      return apiRequest(`/api/pet-attachments`, {
         method: 'POST',
+        body: JSON.stringify(attachmentData),
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(attachmentData)
       });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Upload failed: ${response.status} - ${errorText}`);
-      }
-      
-      return response.json();
     },
     onSuccess: () => {
       alert(t('uploadSuccess'));
@@ -139,20 +104,9 @@ export default function UploadAttachmentModal({
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (attachmentId: number) => {
-      const token = localStorage.getItem('doctorToken');
-      const response = await fetch(`/api/pet-attachments/${attachmentId}`, {
+      return apiRequest(`/api/pet-attachments/${attachmentId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
       });
-      
-      if (!response.ok) {
-        throw new Error(`Delete failed: ${response.status}`);
-      }
-      
-      return response.json();
     },
     onSuccess: () => {
       alert(t('deleteSuccess'));
@@ -179,17 +133,10 @@ export default function UploadAttachmentModal({
   const handleUpload = async () => {
     if (!selectedFile || !description.trim()) return;
 
-    console.log('Starting file upload for:', selectedFile.name, 'Size:', selectedFile.size);
-
     // Convert file to base64
     const reader = new FileReader();
     reader.onload = () => {
       const base64String = reader.result as string;
-      console.log('FileReader result length:', base64String.length);
-      
-      // Remove the data URL prefix to get only the base64 data
-      const base64Data = base64String.split(',')[1];
-      console.log('Base64 data length after split:', base64Data?.length || 0);
       
       const attachmentData = {
         petId,
@@ -197,23 +144,12 @@ export default function UploadAttachmentModal({
         fileName: selectedFile.name,
         fileType: selectedFile.type,
         fileSize: selectedFile.size,
-        fileData: base64Data, // Store only base64 data without prefix
+        fileUrl: base64String, // Store as base64 for simplicity
         description: description.trim(),
       };
 
-      console.log('Attachment data to send:', {
-        ...attachmentData,
-        fileData: `${attachmentData.fileData?.substring(0, 50)}...` || 'EMPTY'
-      });
-
       uploadMutation.mutate(attachmentData);
     };
-    
-    reader.onerror = (error) => {
-      console.error('FileReader error:', error);
-      alert('خطأ في قراءة الملف');
-    };
-    
     reader.readAsDataURL(selectedFile);
   };
 
@@ -229,67 +165,6 @@ export default function UploadAttachmentModal({
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  // View file in browser (for images, PDFs)
-  const handleViewFile = async (attachmentId: number) => {
-    try {
-      console.log('Opening file view for attachment ID:', attachmentId);
-      
-      const token = localStorage.getItem('doctorToken');
-      const response = await fetch(`/api/pet-attachments/view/${attachmentId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-      } else {
-        const errorText = await response.text();
-        console.error('Failed to view file:', response.status, errorText);
-        alert('خطأ في عرض الملف');
-      }
-    } catch (error) {
-      console.error('Error viewing file:', error);
-      alert('خطأ في عرض الملف');
-    }
-  };
-
-  // Download file to device
-  const handleDownloadFile = async (attachmentId: number, fileName: string) => {
-    try {
-      console.log('Downloading file for attachment ID:', attachmentId);
-      
-      const token = localStorage.getItem('doctorToken');
-      const response = await fetch(`/api/pet-attachments/download/${attachmentId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      } else {
-        const errorText = await response.text();
-        console.error('Failed to download file:', response.status, errorText);
-        alert('خطأ في تحميل الملف');
-      }
-    } catch (error) {
-      console.error('Error downloading file:', error);
-      alert('خطأ في تحميل الملف');
-    }
   };
 
   if (!isOpen) return null;
@@ -372,59 +247,26 @@ export default function UploadAttachmentModal({
             ) : (
               <div className="space-y-2">
                 {attachments.map((attachment: any) => (
-                  <div key={attachment.id} className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                  <div key={attachment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
                     <div className="flex items-center flex-1">
-                      <div className="flex-shrink-0">
-                        <File className="h-8 w-8 text-gray-400" />
-                      </div>
-                      <div className="ml-4">
-                        <p className="font-semibold text-gray-900">{attachment.fileName}</p>
-                        <p className="text-sm text-gray-600 mt-1">{attachment.description}</p>
-                        <p className="text-xs text-gray-500 mt-1">
+                      <File className="h-5 w-5 mr-3 text-gray-600" />
+                      <div>
+                        <p className="font-medium text-gray-800">{attachment.fileName}</p>
+                        <p className="text-sm text-gray-600">{attachment.description}</p>
+                        <p className="text-xs text-gray-500">
                           {formatFileSize(attachment.fileSize)} • {new Date(attachment.uploadedAt).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
-                    
-                    {/* Action buttons */}
-                    <div className="flex items-center space-x-2 ml-4">
-                      {/* View button */}
-                      <Button
-                        onClick={() => handleViewFile(attachment.id)}
-                        variant="outline"
-                        size="sm"
-                        className="text-blue-600 hover:text-blue-700 border-blue-300 bg-blue-50 hover:bg-blue-100 px-3 py-2 text-sm font-medium"
-                        title={t('view')}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        {t('view')}
-                      </Button>
-                      
-                      {/* Download button */}
-                      <Button
-                        onClick={() => handleDownloadFile(attachment.id, attachment.fileName)}
-                        variant="outline"
-                        size="sm"
-                        className="text-green-600 hover:text-green-700 border-green-300 bg-green-50 hover:bg-green-100 px-3 py-2 text-sm font-medium"
-                        title={t('download')}
-                      >
-                        <Download className="h-4 w-4 mr-1" />
-                        {t('download')}
-                      </Button>
-                      
-                      {/* Delete button */}
-                      <Button
-                        onClick={() => handleDelete(attachment.id)}
-                        disabled={deleteMutation.isPending}
-                        variant="outline"
-                        size="sm"
-                        className="text-red-600 hover:text-red-700 border-red-300 bg-red-50 hover:bg-red-100 px-3 py-2 text-sm font-medium"
-                        title={t('delete')}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        {t('delete')}
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={() => handleDelete(attachment.id)}
+                      disabled={deleteMutation.isPending}
+                      variant="outline"
+                      size="sm"
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 ))}
               </div>

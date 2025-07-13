@@ -28,7 +28,7 @@ export function LoadingScreen({ onLoadingComplete }: LoadingScreenProps) {
   }, [onLoadingComplete]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-white screen-border">
       {/* Simple Loading Text */}
       <div className="text-center">
         <p className="text-2xl font-bold text-purple-600">

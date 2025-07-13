@@ -15,14 +15,13 @@ import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753
 import newClinicImage from "@assets/freepik_assistant_1751363666289_1751363695395.png";
 import newestHouseImage from "@assets/freepik_assistant_1751364682430_1751364706224.png";
 import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png";
-// New Custom Purple Icons
-import whatsappIcon from '@assets/freepik__background__20710_1752333859889.png';
-import phoneIcon from '@assets/freepik__a-modern-and-sleek-smartphone-icon-in-dark-mauve-c__20709_1752333859889.png';
+// SVG icons without background
+const whatsappIcon = '/icons/whatsapp-3d.svg';
+import phoneIcon from '@assets/freepik__background__45618_1752165541475.png';
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
-import { InstallButton } from '@/components/InstallButton';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -342,7 +341,7 @@ export default function Home() {
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
       </div>
     );
   }
@@ -351,10 +350,10 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-white text-gray-800 px-3 py-3 h-14 border-b shadow-sm" style={{ borderBottomColor: '#852085', borderBottomWidth: '3px' }}>
+        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-gray-300 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
@@ -371,7 +370,6 @@ export default function Home() {
             </div>
             <div className="flex items-center space-x-2">
               <LanguageSelector />
-              <InstallButton />
               <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"
@@ -386,16 +384,16 @@ export default function Home() {
         </div>
 
         {/* Current Location */}
-        <div className="p-3 bg-white border-b hidden">
+        <div className="p-3 bg-blue-50 border-b">
           <div className="flex items-center justify-between mb-1">
-            <h3 className="font-semibold text-white text-sm" style={{ textAlign }}>
+            <h3 className="font-semibold text-gray-800 text-sm" style={{ textAlign }}>
               {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
             </h3>
-            {locationInfo.isLoading && <Loader2 className="w-4 h-4 animate-spin text-white" />}
+            {locationInfo.isLoading && <Loader2 className="w-4 h-4 animate-spin text-blue-600" />}
           </div>
           <div className="flex items-center">
-            <MapPin className="w-4 h-4 text-white mr-2" />
-            <span className="text-white text-sm flex-1">
+            <MapPin className="w-4 h-4 text-blue-600 mr-2" />
+            <span className="text-gray-700 text-sm flex-1">
               {locationInfo.address}
             </span>
             {locationInfo.error && (
@@ -403,7 +401,7 @@ export default function Home() {
                 variant="ghost" 
                 size="sm" 
                 onClick={getCurrentLocation}
-                className="text-xs text-white p-1 h-auto"
+                className="text-xs text-blue-600 p-1 h-auto"
               >
                 {language === 'ar' ? 'إعادة تحديد' : 'Refresh'}
               </Button>
@@ -411,20 +409,20 @@ export default function Home() {
           </div>
           {/* Debug location info */}
           <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
-            <div className="text-white">
+            <div className="text-gray-600">
               <strong>{language === 'ar' ? 'معلومات النظام:' : 'System Info:'}</strong>
             </div>
-            <div className="text-white mt-1">
+            <div className="text-gray-700 mt-1">
               {language === 'ar' ? 'نظام تحديد الموقع الدقيق مفعل' : 'Precise location system active'}
             </div>
-            <div className="text-white">
+            <div className="text-gray-700">
               {language === 'ar' ? 'يعرض الشوارع والأحياء التفصيلية' : 'Shows detailed streets and neighborhoods'}
             </div>
-            <div className="text-white">
+            <div className="text-gray-700">
               {language === 'ar' ? 'يدعم المدن السعودية مع نظام احتياطي' : 'Supports Saudi cities with fallback system'}
             </div>
             {locationInfo.coordinates && (
-              <div className="text-white mt-1 text-xs">
+              <div className="text-gray-600 mt-1 text-xs">
                 <strong>{language === 'ar' ? 'الإحداثيات:' : 'Coordinates:'}</strong> {locationInfo.coordinates.lat.toFixed(6)}, {locationInfo.coordinates.lon.toFixed(6)}
                 {locationInfo.accuracy && (
                   <span className="ml-2">
@@ -683,21 +681,21 @@ export default function Home() {
           
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
-            <div className="mb-3 p-3 bg-white rounded-2xl shadow-lg">
+            <div className="mb-3 p-3 bg-white rounded-2xl border-2 border-purple-600 shadow-lg">
               <div className="text-center">
                 <div className="text-sm font-semibold text-gray-800 mb-2" style={{ textAlign }}>
                   {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
                 </div>
                 
                 {/* Enhanced Road Animation */}
-                <div className="relative h-20 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2 overflow-hidden shadow-inner">
+                <div className="relative h-16 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2 overflow-hidden shadow-inner">
                   {/* Road markings */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-full h-2 bg-purple-600 opacity-50 animate-pulse rounded-full"></div>
                   </div>
                   
                   {/* New Veterinary Van Image */}
-                  <div className={`absolute top-2 h-14 w-18 transform transition-all duration-4000 ease-in-out ${
+                  <div className={`absolute top-1 h-12 w-16 transform transition-all duration-4000 ease-in-out ${
                     language === 'ar' ? 'animate-bounce-right-to-left' : 'animate-bounce-left-to-right'
                   }`}>
                     <img 
@@ -708,20 +706,20 @@ export default function Home() {
                   </div>
                   
                   {/* 3D Veterinary Clinic - Start Position */}
-                  <div className={`absolute -top-[9px] ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
+                  <div className={`absolute top-0 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
                     <img 
                       src={newVetClinicImage}
                       alt="Veterinary Clinic" 
-                      className="w-[90px] h-[94px] drop-shadow-xl"
+                      className="w-16 h-16 drop-shadow-xl"
                     />
                   </div>
                   
-                  {/* Custom House - End Position - Raised Higher */}
-                  <div className={`absolute -top-4 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
+                  {/* Custom House - End Position - Same Level as Clinic */}
+                  <div className={`absolute top-0 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
                     <img 
                       src={newestHouseImage}
                       alt="House" 
-                      className="w-28 h-28 drop-shadow-xl"
+                      className="w-20 h-20 drop-shadow-xl"
                     />
                   </div>
                 </div>
@@ -731,7 +729,7 @@ export default function Home() {
 
           {/* Custom Dog and Cat Image */}
           <div className="flex justify-center mb-3">
-            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-600 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm">
+            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-600 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm border border-purple-600">
               <img 
                 src={petsImage}
                 alt="Dogs and Cats" 
@@ -764,28 +762,19 @@ export default function Home() {
           </button>
 
           {/* Contact Section - Icons Only */}
-          <div className="mt-4 p-4 bg-white rounded-xl shadow-sm">
+          <div className="mt-4 p-4 bg-white rounded-xl shadow-sm border border-purple-100">
             <div className="flex items-center justify-center space-x-6 rtl:space-x-reverse">
               {/* WhatsApp Button */}
               <a
                 href="https://wa.me/966535152250"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center transform hover:scale-110 transition-all duration-300 active:animate-pulse"
-                style={{
-                  animation: 'shake 2s ease-in-out infinite'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.animation = 'shake 1s ease-in-out infinite';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.animation = 'shake 2s ease-in-out infinite';
-                }}
+                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
               >
                 <img 
                   src={whatsappIcon}
                   alt="WhatsApp"
-                  className="w-20 h-20 object-contain"
+                  className="w-12 h-12 object-contain"
                   style={{
                     filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
                   }}
@@ -794,22 +783,13 @@ export default function Home() {
               
               {/* Phone Call Button */}
               <a
-                href="tel:920011626"
-                className="flex items-center justify-center transform hover:scale-110 transition-all duration-300 active:animate-pulse"
-                style={{
-                  animation: 'shake 2s ease-in-out infinite'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.animation = 'shake 1s ease-in-out infinite';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.animation = 'shake 2s ease-in-out infinite';
-                }}
+                href="tel:+966535152250"
+                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
               >
                 <img 
                   src={phoneIcon}
                   alt="Phone Call"
-                  className="w-16 h-16 object-contain"
+                  className="w-12 h-12 object-contain"
                   style={{
                     filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
                   }}

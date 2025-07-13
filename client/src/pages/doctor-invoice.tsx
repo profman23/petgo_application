@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, RefreshCw } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -66,21 +66,18 @@ interface BookingDetails {
   status: string;
 }
 
-// UPDATED: Added 100% discount option - V2.1 with cache fixes
 export default function DoctorInvoice() {
   const [, params] = useRoute('/doctor-invoice/:bookingId');
   const [, setLocation] = useLocation();
   const { language } = useLanguage();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([
     { id: '1', description: '', quantity: 1, unitPrice: 0, total: 0 }
   ]);
   const [notes, setNotes] = useState('');
-  const [discountType, setDiscountType] = useState<'none' | 'percentage' | 'full'>('none');
+  const [applyDiscount, setApplyDiscount] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [forceRender, setForceRender] = useState(0);
   
   // Tax rate constant (15%)
   const TAX_RATE = 0.15;
@@ -103,22 +100,6 @@ export default function DoctorInvoice() {
   const [isRecordLocked, setIsRecordLocked] = useState(false);
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
 
-  // Force refresh function
-  const forceRefresh = useCallback(async () => {
-    console.log('Force refreshing all data with cache invalidation...');
-    queryClient.clear();
-    setForceRender(Date.now());
-    setDiscountType('none');
-    
-    toast({
-      title: language === 'ar' ? 'تم تحديث البيانات' : 'Data refreshed',
-      description: language === 'ar' ? 'تم تحديث جميع البيانات بنجاح' : 'All data has been refreshed successfully'
-    });
-    
-    // Complete page refresh
-    window.location.reload();
-  }, [queryClient, language, toast]);
-
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
     queryKey: [`/api/doctor/booking/${params?.bookingId}`],
@@ -136,16 +117,13 @@ export default function DoctorInvoice() {
   });
 
   // Fetch saved invoice items
-  const { data: savedInvoiceItems, refetch: refetchInvoiceItems } = useQuery({
+  const { data: savedInvoiceItems } = useQuery({
     queryKey: [`/api/invoice-items/${params?.bookingId}`],
     queryFn: async () => {
-      const token = localStorage.getItem('doctorToken');
-      const response = await fetch(`/api/invoice-items/${params?.bookingId}?t=${Date.now()}`, {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/invoice-items/${params?.bookingId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
         },
       });
       if (!response.ok) {
@@ -155,24 +133,16 @@ export default function DoctorInvoice() {
       return await response.json();
     },
     enabled: !!params?.bookingId,
-    staleTime: 0, // Always fetch fresh data
-    cacheTime: 0, // Don't cache to avoid stale data
-    refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: false,
-    retry: false
   });
 
   // Fetch invoice status
-  const { data: invoiceStatus, refetch: refetchInvoiceStatus } = useQuery({
+  const { data: invoiceStatus } = useQuery({
     queryKey: [`/api/invoice-status/${params?.bookingId}`],
     queryFn: async () => {
-      const token = localStorage.getItem('doctorToken');
-      const response = await fetch(`/api/invoice-status/${params?.bookingId}?t=${Date.now()}`, {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/invoice-status/${params?.bookingId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
         },
       });
       if (!response.ok) {
@@ -182,11 +152,6 @@ export default function DoctorInvoice() {
       return await response.json();
     },
     enabled: !!params?.bookingId,
-    staleTime: 0, // Always fetch fresh data
-    cacheTime: 0, // Don't cache to avoid stale lock state
-    refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: false, // Don't refetch on window focus
-    retry: false, // Don't retry failed requests
   });
 
   // Fetch products for invoice item selection
@@ -243,96 +208,12 @@ export default function DoctorInvoice() {
 
   // Load invoice status when data is available
   useEffect(() => {
-    if (invoiceStatus) {
-      console.log('Invoice status loaded:', invoiceStatus);
-      const isGenerated = invoiceStatus.isGenerated || invoiceStatus.is_generated;
-      setIsRecordLocked(Boolean(isGenerated));
-      console.log('Record lock status set to:', Boolean(isGenerated));
-      
-      if (isGenerated) {
-        // Determine discount type based on discount amount
-        const discountValue = parseFloat(invoiceStatus.discountAmount) || 0;
-        const subtotalValue = parseFloat(invoiceStatus.subtotal) || 0;
-        const totalWithTaxValue = subtotalValue * (1 + TAX_RATE);
-        
-        console.log('Discount analysis:', { 
-          discountValue, 
-          subtotalValue, 
-          totalWithTaxValue,
-          discountAmount: invoiceStatus.discountAmount,
-          subtotal: invoiceStatus.subtotal 
-        });
-        
-        // Force update discount type with immediate state change
-        if (discountValue === 0) {
-          console.log('Setting discount type to: none');
-          setDiscountType(prev => {
-            console.log('Discount type changed from', prev, 'to none');
-            return 'none';
-          });
-        } else if (Math.abs(discountValue - totalWithTaxValue) < 0.01) {
-          console.log('Setting discount type to: full');
-          setDiscountType(prev => {
-            console.log('Discount type changed from', prev, 'to full');
-            return 'full';
-          });
-        } else {
-          console.log('Setting discount type to: percentage');
-          setDiscountType(prev => {
-            console.log('Discount type changed from', prev, 'to percentage');
-            return 'percentage';
-          });
-        }
-        setNotes(invoiceStatus.notes || '');
-      } else {
-        console.log('Invoice not generated, resetting discount type to none');
-        setDiscountType(prev => {
-          console.log('Discount type reset from', prev, 'to none');
-          return 'none';
-        });
-      }
-    } else {
-      console.log('No invoice status data available');
-      // Set default discount type when no status available
-      setDiscountType(prev => {
-        if (prev !== 'none') {
-          console.log('Default discount type set from', prev, 'to none');
-          return 'none';
-        }
-        return prev;
-      });
+    if (invoiceStatus && invoiceStatus.isGenerated) {
+      setIsRecordLocked(true);
+      setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
+      setNotes(invoiceStatus.notes || '');
     }
   }, [invoiceStatus]);
-
-  // Initialize and force refresh on component mount
-  useEffect(() => {
-    console.log('Component mounted, clearing cache and initializing...');
-    
-    // Clear any existing cache for this booking
-    queryClient.removeQueries({ queryKey: [`/api/invoice-status/${params?.bookingId}`] });
-    queryClient.removeQueries({ queryKey: [`/api/invoice-items/${params?.bookingId}`] });
-    
-    // Force component re-render
-    setForceRender(prev => prev + 1);
-    
-    // Set initial discount type with force
-    setDiscountType('none');
-    
-    // Force another render after a short delay to ensure state is updated
-    setTimeout(() => {
-      setForceRender(prev => prev + 1);
-      console.log('Force render triggered with counter:', forceRender + 1);
-    }, 50);
-  }, [params?.bookingId]); // Run when bookingId changes
-
-  // Separate effect for invoice status updates
-  useEffect(() => {
-    if (!invoiceStatus && discountType === '') {
-      console.log('No invoice status and empty discount, setting to none');
-      setDiscountType('none');
-    }
-  }, [invoiceStatus]);
-
 
 
 
@@ -479,8 +360,7 @@ export default function DoctorInvoice() {
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.total, 0);
   const taxAmount = subtotal * TAX_RATE;
   const totalWithTax = subtotal + taxAmount;
-  const discountAmount = discountType === 'percentage' ? totalWithTax * DISCOUNT_RATE : 
-                        discountType === 'full' ? totalWithTax : 0;
+  const discountAmount = applyDiscount ? totalWithTax * DISCOUNT_RATE : 0;
   const finalTotal = totalWithTax - discountAmount;
   const remainingBalance = finalTotal - totalPaid;
 
@@ -696,7 +576,7 @@ export default function DoctorInvoice() {
         body: { items: invoiceItems }
       });
 
-      // Save invoice status to database with lock flag
+      // Save invoice status to database
       await apiRequest(`/api/invoice-status/${booking.id}`, {
         method: 'POST',
         body: {
@@ -704,8 +584,7 @@ export default function DoctorInvoice() {
           taxAmount,
           discountAmount,
           finalTotal,
-          notes,
-          isGenerated: true // Mark as generated and locked
+          notes
         }
       });
 
@@ -787,7 +666,7 @@ export default function DoctorInvoice() {
   }
 
   return (
-    <div key={`invoice-${params?.bookingId}-${forceRender}`} className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
+    <div className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -802,14 +681,6 @@ export default function DoctorInvoice() {
             <div className="flex items-center">
               <FileText className="h-8 w-8 text-purple-600 ml-3" />
               <h1 className="text-2xl font-bold text-gray-900">{t('invoiceTitle')}</h1>
-              <Button
-                onClick={forceRefresh}
-                variant="outline"
-                size="sm"
-                className="mr-3 text-purple-600 border-purple-600 hover:bg-purple-50"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </div>
@@ -1138,28 +1009,18 @@ export default function DoctorInvoice() {
                   <span>{t('tax')}:</span>
                   <span>{taxAmount.toFixed(2)} {t('sar')}</span>
                 </div>
-                <div key={`discount-${discountType}-${forceRender}`} className="flex justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-2">
                   <span>{t('discount')}:</span>
                   <div className="flex items-center space-x-2">
-                    {isRecordLocked ? (
-                      <div className="bg-gray-100 p-2 rounded text-gray-700">
-                        {discountType === 'none' && (language === 'ar' ? 'بدون خصم ✘' : 'No Discount ✘')}
-                        {discountType === 'percentage' && (language === 'ar' ? 'خصم 10% ✓' : '10% Discount ✓')}
-                        {discountType === 'full' && (language === 'ar' ? 'خصم 100% مجاني ✓' : '100% FREE Discount ✓')}
-                      </div>
-                    ) : (
-                      <select
-                        key={`discount-select-${discountType}-${forceRender}`}
-                        value={discountType}
-                        onChange={(e) => setDiscountType(e.target.value as 'none' | 'percentage' | 'full')}
-                        className="border border-gray-300 rounded px-3 py-1 text-sm"
-                        dir={language === 'ar' ? 'rtl' : 'ltr'}
-                      >
-                        <option value="none">{language === 'ar' ? 'بدون خصم ✘' : 'No Discount ✘'}</option>
-                        <option value="percentage">{language === 'ar' ? 'خصم 10% ✓' : '10% Discount ✓'}</option>
-                        <option value="full">{language === 'ar' ? 'خصم 100% مجاني ✓' : '100% FREE Discount ✓'}</option>
-                      </select>
-                    )}
+                    <select
+                      value={applyDiscount ? "yes" : "no"}
+                      onChange={(e) => setApplyDiscount(e.target.value === "yes")}
+                      className="border border-gray-300 rounded px-3 py-1 text-sm"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
+                    >
+                      <option value="no">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</option>
+                      <option value="yes">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</option>
+                    </select>
                     <span className="text-lg font-medium">{discountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
                 </div>
@@ -1184,9 +1045,9 @@ export default function DoctorInvoice() {
                 <div className="flex justify-end">
                   <button
                     onClick={() => setShowPaymentModal(true)}
-                    disabled={remainingBalance <= 0 || isRecordLocked}
+                    disabled={remainingBalance <= 0}
                     className={`px-6 py-2 rounded-lg flex items-center transition-colors ${
-                      (remainingBalance <= 0 || isRecordLocked)
+                      remainingBalance <= 0 
                         ? 'bg-gray-400 cursor-not-allowed text-white' 
                         : 'bg-green-600 hover:bg-green-700 text-white'
                     }`}
@@ -1194,8 +1055,7 @@ export default function DoctorInvoice() {
                     <svg className="h-4 w-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    {isRecordLocked ? (language === 'ar' ? 'مؤمن - للمشاهدة فقط' : 'Locked - View Only') : 
-                     (remainingBalance <= 0 ? `${t('paymentAdded')} ✓` : t('addPayment'))}
+                    {remainingBalance <= 0 ? `${t('paymentAdded')} ✓` : t('addPayment')}
                   </button>
                 </div>
               </div>
@@ -1254,22 +1114,13 @@ export default function DoctorInvoice() {
 
         {/* Actions */}
         <div className="flex justify-center mb-6">
-          {isRecordLocked ? (
-            <div className="flex items-center bg-green-100 text-green-700 px-8 py-3 rounded-lg text-lg font-semibold">
-              <svg className="h-6 w-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {language === 'ar' ? 'تم إنشاء الفاتورة ✓' : 'Invoice Generated ✓'}
-            </div>
-          ) : (
-            <Button
-              onClick={handleGenerateInvoiceClick}
-              className="bg-purple-600 hover:bg-purple-600 text-white px-8 py-3 text-lg"
-            >
-              <Receipt className="h-6 w-6 ml-2" />
-              {t('generateInvoice')}
-            </Button>
-          )}
+          <Button
+            onClick={handleGenerateInvoiceClick}
+            className="bg-purple-600 hover:bg-purple-600 text-white px-8 py-3 text-lg"
+          >
+            <Receipt className="h-6 w-6 ml-2" />
+            {t('generateInvoice')}
+          </Button>
         </div>
       </div>
 

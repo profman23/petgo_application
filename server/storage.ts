@@ -106,7 +106,6 @@ export interface IStorage {
   getPetAttachmentsByBooking(bookingId: number): Promise<PetAttachment[]>;
   getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]>;
   deletePetAttachment(id: number, uploadedBy: string): Promise<boolean>;
-  getPetAttachmentById(id: number): Promise<PetAttachment | undefined>;
 
   // Invoice Items operations
   saveInvoiceItems(bookingId: number, items: any[]): Promise<InvoiceItem[]>;
@@ -738,11 +737,6 @@ export class DatabaseStorage implements IStorage {
     return true;
   }
 
-  async getPetAttachmentById(id: number): Promise<PetAttachment | undefined> {
-    const [attachment] = await db.select().from(petAttachments).where(eq(petAttachments.id, id));
-    return attachment;
-  }
-
   // Invoice Items operations
   async saveInvoiceItems(bookingId: number, items: any[]): Promise<InvoiceItem[]> {
     // Delete existing items
@@ -774,29 +768,8 @@ export class DatabaseStorage implements IStorage {
 
   // Invoice Status operations
   async saveInvoiceStatus(status: InsertInvoiceStatus): Promise<InvoiceStatus> {
-    // Check if status already exists
-    const existing = await this.getInvoiceStatus(status.bookingId);
-    
-    if (existing) {
-      // Update existing status
-      const [updatedStatus] = await db
-        .update(invoiceStatus)
-        .set({
-          ...status,
-          updatedAt: new Date()
-        })
-        .where(eq(invoiceStatus.bookingId, status.bookingId))
-        .returning();
-      return updatedStatus;
-    } else {
-      // Insert new status
-      const [newStatus] = await db.insert(invoiceStatus).values({
-        ...status,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }).returning();
-      return newStatus;
-    }
+    const [newStatus] = await db.insert(invoiceStatus).values(status).returning();
+    return newStatus;
   }
 
   async getInvoiceStatus(bookingId: number): Promise<InvoiceStatus | undefined> {

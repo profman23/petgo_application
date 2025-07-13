@@ -14,7 +14,6 @@ import bcrypt from 'bcrypt';
 
 // Simple session middleware
 const sessions = new Map();
-const doctorSessions = new Map();
 
 function generateSessionId() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -28,18 +27,11 @@ function requireAuth(req: any, res: any, next: any) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
-  // Check if token exists in regular sessions Map
-  let session = sessions.get(sessionId);
-  
-  // If not found in regular sessions, check doctor sessions
-  if (!session) {
-    session = doctorSessions.get(sessionId);
-  }
+  const session = sessions.get(sessionId);
   
   if (!session) {
     console.log('Invalid token:', sessionId);
     console.log('Available sessions:', Array.from(sessions.keys()));
-    console.log('Available doctor sessions:', Array.from(doctorSessions.keys()));
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
@@ -91,48 +83,6 @@ function calculateRideEstimates(distance: number) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Pet attachments endpoint - high priority for UI debugging
-  app.get('/internal/pet-attachments', async (req, res) => {
-    try {
-      console.log('API call to /api/pet-attachments-list');
-      const petId = parseInt(req.query.petId as string);
-      const bookingId = parseInt(req.query.bookingId as string);
-      
-      if (isNaN(petId) || isNaN(bookingId)) {
-        return res.status(400).json({ message: 'Invalid petId or bookingId in query parameters' });
-      }
-      
-      const attachments = await storage.getPetAttachmentsByPet(petId, bookingId);
-      console.log('Found attachments:', attachments?.length || 0);
-      res.json(attachments || []);
-    } catch (error) {
-      console.error('Error fetching pet attachments:', error);
-      res.status(500).json({ message: 'Error fetching pet attachments', error: error.message });
-    }
-  });
-
-  // Serve static images with proper MIME types and cache busting
-  app.get('/app-icon.png', (req, res) => {
-    const iconPath = path.join(__dirname, '../public/app-icon.png');
-    res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // Force refresh
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.setHeader('ETag', Date.now().toString()); // Force browser refresh
-    res.sendFile(iconPath);
-  });
-
-  app.get('/app-icon-maskable.png', (req, res) => {
-    const iconPath = path.join(__dirname, '../public/app-icon-maskable.png');
-    res.setHeader('Content-Type', 'image/png');
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate'); // Force refresh
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.setHeader('ETag', Date.now().toString()); // Force browser refresh
-    res.sendFile(iconPath);
-  });
-
-
   // PWA Routes - Serve Service Worker and Manifest
   app.get('/sw.js', (req, res) => {
     res.setHeader('Content-Type', 'application/javascript');
@@ -154,24 +104,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post('/api/auth/login', async (req, res) => {
     try {
-      console.log('🔐 Login request received:', {
-        body: req.body,
-        contentType: req.headers['content-type'],
-        bodyKeys: Object.keys(req.body || {}),
-        hasIdentifier: !!req.body?.identifier,
-        hasPhone: !!req.body?.phone,
-        hasPassword: !!req.body?.password
-      });
-      
-      // Support both old format (phone) and new format (identifier)
-      const body = req.body;
-      const identifier = body.identifier || body.phone;
-      const password = body.password;
-      
-      if (!identifier || !password) {
-        console.log('❌ Missing credentials:', { identifier, password, body });
-        return res.status(400).json({ message: 'Phone/Email and password are required' });
-      }
+      const { identifier, password } = loginSchema.parse(req.body);
       
       const user = await storage.getUserByIdentifier(identifier);
       if (!user) {
@@ -470,12 +403,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Doctor login endpoint (both paths for compatibility)
-  app.post('/api/auth/doctor-login', async (req, res) => {
+  // Doctor login endpoint  
+  app.post('/api/doctor/login', async (req, res) => {
     try {
       const { username, password } = req.body;
-      
-      console.log('🔐 Doctor login attempt:', { username, password: password ? 'PROVIDED' : 'MISSING' });
       
       if (!username || !password) {
         return res.status(400).json({ message: 'Username and password are required' });
@@ -484,33 +415,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Find driver by username
       const driver = await storage.getDriverByUsername(username);
       
-      console.log('🔐 Found driver:', { 
-        found: !!driver, 
-        driverName: driver?.name,
-        passwordType: driver?.password.startsWith('$2b$') ? 'HASHED' : 'PLAIN'
-      });
-      
-      if (!driver) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-      
-      // Compare password using bcrypt for hashed passwords or direct comparison for plain text
-      let isPasswordValid = false;
-      if (driver.password.startsWith('$2b$')) {
-        isPasswordValid = await bcrypt.compare(password, driver.password);
-        console.log('🔐 Bcrypt comparison result:', isPasswordValid);
-      } else {
-        isPasswordValid = driver.password === password;
-        console.log('🔐 Plain text comparison result:', isPasswordValid);
-      }
-      
-      if (!isPasswordValid) {
-        console.log('🔐 Authentication failed for user:', username);
+      if (!driver || driver.password !== password) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
       const sessionId = generateSessionId();
-      doctorSessions.set(sessionId, { 
+      sessions.set(sessionId, { 
         user: { 
           id: driver.id, 
           phone: driver.phone, 
@@ -520,8 +430,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           vetsVanName: driver.vetsvanName
         } 
       });
-      
-      console.log('🔐 Doctor login successful:', { username, sessionId: sessionId.substring(0, 10) + '...' });
       
       res.json({ 
         token: sessionId, 
@@ -1922,46 +1830,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add new driver with doctor account creation
+  // Add new driver
   app.post('/api/admin/drivers', requireAdminAuth, async (req, res) => {
     try {
-      console.log('Received driver data:', req.body);
-      const { vetsvanCode, name, username, password, phone, model, color, plateNumber } = req.body;
+      const { vetsvanCode, vetsvanName, phone, username, password } = req.body;
       
-      console.log('Extracted fields:', { vetsvanCode, name, username, password: password ? 'PROVIDED' : 'MISSING', phone, model, color, plateNumber });
-      
-      if (!vetsvanCode || !name || !username || !password || !phone) {
-        return res.status(400).json({ message: 'VetsVan Code, Name, Username, Password, and Phone are required' });
+      if (!vetsvanCode || !vetsvanName || !phone || !username || !password) {
+        return res.status(400).json({ message: 'All fields are required' });
       }
-
-      // Check if username already exists
-      const existingDriver = await storage.getDriverByUsername(username);
-      if (existingDriver) {
-        return res.status(400).json({ 
-          message: 'اسم المستخدم موجود مسبقاً. اختر اسم مستخدم آخر مثل v004 أو v005'
-        });
-      }
-
-      // Hash the password using bcrypt
-      const hashedPassword = await bcrypt.hash(password, 10);
 
       const driver = await storage.createDriver({
         vetsvanCode,
-        vetsvanName: name,
-        name: name,
+        vetsvanName,
+        name: vetsvanName, // Use vetsvanName as the driver name
         phone,
         username,
-        password: hashedPassword,
+        password,
         rating: 4.5,
-        carModel: model || "Mercedes Sprinter",
-        carColor: color || "أبيض",
-        plateNumber: plateNumber || vetsvanCode,
+        carModel: "Mercedes Sprinter",
+        carColor: "أبيض",
+        plateNumber: vetsvanCode,
         latitude: 24.7136,
         longitude: 46.6753,
         isAvailable: true
       });
 
-      console.log(`✅ Created VetsVan and doctor account: ${username} for ${name}`);
       res.json(driver);
     } catch (error) {
       console.error('Error creating driver:', error);
@@ -2484,25 +2377,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Pet Attachments endpoints
-  // Get pet attachments with query params (with auth)
-  app.get('/api/pet-attachments', requireAuth, async (req, res) => {
-    try {
-      const petId = parseInt(req.query.petId as string);
-      const bookingId = parseInt(req.query.bookingId as string);
-      
-      if (isNaN(petId) || isNaN(bookingId)) {
-        return res.status(400).json({ message: 'Invalid petId or bookingId in query parameters' });
-      }
-      
-      const attachments = await storage.getPetAttachmentsByPet(petId, bookingId);
-      console.log(`Found ${attachments?.length || 0} attachments for pet ${petId}, booking ${bookingId}`);
-      res.json(attachments || []);
-    } catch (error) {
-      console.error('Error fetching pet attachments:', error);
-      res.status(500).json({ message: 'Error fetching pet attachments' });
-    }
-  });
-
   app.post('/api/pet-attachments', requireAuth, async (req: any, res) => {
     try {
       const doctorId = req.user?.id;
@@ -2515,7 +2389,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         uploadedBy: doctorId.toString()
       };
 
-      console.log('Creating attachment with fileData length:', req.body.fileData?.length || 0);
       const newAttachment = await storage.createPetAttachment(attachmentData);
       res.status(201).json(newAttachment);
     } catch (error) {
@@ -2535,8 +2408,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get pet attachments for specific pet and booking - without auth for testing
-  app.get('/api/pet-attachments-list', async (req, res) => {
+  // Get pet attachments for specific pet and booking
+  app.get('/api/pet-attachments', requireAuth, async (req, res) => {
     try {
       const petId = parseInt(req.query.petId as string);
       const bookingId = parseInt(req.query.bookingId as string);
@@ -2571,127 +2444,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deleting pet attachment:', error);
       res.status(500).json({ message: 'Error deleting pet attachment' });
-    }
-  });
-
-  // Auth middleware for file download/view that accepts token from query params
-  function fileAccessAuth(req: any, res: any, next: any) {
-    const token = req.query.token || req.headers.authorization?.replace('Bearer ', '');
-    
-    if (!token) {
-      console.log('No token provided');
-      return res.status(401).json({ message: 'No token provided' });
-    }
-
-    // Check if token exists in sessions Map
-    const session = sessions.get(token);
-    
-    console.log('Looking for token:', token);
-    console.log('Available sessions:', Array.from(sessions.keys()));
-    
-    if (!session) {
-      console.log('Invalid token:', token);
-      console.log('Available sessions:', Array.from(sessions.keys()));
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-
-    req.user = session.user;
-    next();
-  }
-
-  // Download attachment endpoint - serves file data from database
-  app.get('/api/pet-attachments/download/:id', requireAuth, async (req, res) => {
-    try {
-      const attachmentId = parseInt(req.params.id);
-      console.log('Downloading attachment ID:', attachmentId);
-      
-      const attachment = await storage.getPetAttachmentById(attachmentId);
-      console.log('Found attachment:', attachment ? attachment.fileName : 'null');
-      
-      if (!attachment) {
-        console.log('Attachment not found for ID:', attachmentId);
-        return res.status(404).json({ message: 'Attachment not found' });
-      }
-
-      let fileBuffer: Buffer;
-      
-      // Handle both new format (fileData) and old format (fileUrl)
-      if (attachment.fileData) {
-        // New format: direct base64 data
-        fileBuffer = Buffer.from(attachment.fileData, 'base64');
-        console.log('Using fileData, buffer length:', fileBuffer.length);
-      } else if (attachment.fileUrl) {
-        // Old format: data URL (data:type;base64,data)
-        const base64Data = attachment.fileUrl.split(',')[1];
-        if (!base64Data) {
-          console.log('Invalid fileUrl format for attachment ID:', attachmentId);
-          return res.status(404).json({ message: 'Invalid file data format' });
-        }
-        fileBuffer = Buffer.from(base64Data, 'base64');
-        console.log('Using fileUrl, buffer length:', fileBuffer.length);
-      } else {
-        console.log('No file data found for attachment ID:', attachmentId);
-        return res.status(404).json({ message: 'File data not found' });
-      }
-      
-      // Set appropriate headers for file download
-      res.setHeader('Content-Type', attachment.fileType || 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${attachment.fileName}"`);
-      res.setHeader('Content-Length', fileBuffer.length);
-      
-      // Send file data
-      res.send(fileBuffer);
-    } catch (error) {
-      console.error('Error downloading attachment:', error);
-      res.status(500).json({ message: 'Error downloading attachment' });
-    }
-  });
-
-  // View attachment endpoint - for inline viewing (images, PDFs)
-  app.get('/api/pet-attachments/view/:id', requireAuth, async (req, res) => {
-    try {
-      const attachmentId = parseInt(req.params.id);
-      console.log('Viewing attachment ID:', attachmentId);
-      
-      const attachment = await storage.getPetAttachmentById(attachmentId);
-      console.log('Found attachment:', attachment ? attachment.fileName : 'null');
-      
-      if (!attachment) {
-        console.log('Attachment not found for ID:', attachmentId);
-        return res.status(404).json({ message: 'Attachment not found' });
-      }
-
-      let fileBuffer: Buffer;
-      
-      // Handle both new format (fileData) and old format (fileUrl)
-      if (attachment.fileData) {
-        // New format: direct base64 data
-        fileBuffer = Buffer.from(attachment.fileData, 'base64');
-        console.log('Using fileData, buffer length:', fileBuffer.length);
-      } else if (attachment.fileUrl) {
-        // Old format: data URL (data:type;base64,data)
-        const base64Data = attachment.fileUrl.split(',')[1];
-        if (!base64Data) {
-          console.log('Invalid fileUrl format for attachment ID:', attachmentId);
-          return res.status(404).json({ message: 'Invalid file data format' });
-        }
-        fileBuffer = Buffer.from(base64Data, 'base64');
-        console.log('Using fileUrl, buffer length:', fileBuffer.length);
-      } else {
-        console.log('No file data found for attachment ID:', attachmentId);
-        return res.status(404).json({ message: 'File data not found' });
-      }
-      
-      // Set appropriate headers for inline viewing
-      res.setHeader('Content-Type', attachment.fileType || 'application/octet-stream');
-      res.setHeader('Content-Disposition', `inline; filename="${attachment.fileName}"`);
-      res.setHeader('Content-Length', fileBuffer.length);
-      
-      // Send file data
-      res.send(fileBuffer);
-    } catch (error) {
-      console.error('Error viewing attachment:', error);
-      res.status(500).json({ message: 'Error viewing attachment' });
     }
   });
 
@@ -2739,7 +2491,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
-      const { subtotal, taxAmount, discountAmount, finalTotal, notes, isGenerated } = req.body;
+      const { subtotal, taxAmount, discountAmount, finalTotal, notes } = req.body;
       
       const statusData = {
         bookingId,
@@ -2748,8 +2500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         discountAmount: parseFloat(discountAmount),
         finalTotal: parseFloat(finalTotal),
         generatedBy: req.user.id.toString(),
-        notes: notes || null,
-        isGenerated: Boolean(isGenerated) // Convert to boolean
+        notes: notes || null
       };
       
       const savedStatus = await storage.saveInvoiceStatus(statusData);
@@ -3007,80 +2758,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching tracking data:', error);
       res.status(500).json({ message: 'Failed to fetch tracking data' });
-    }
-  });
-
-  // Add version endpoint for cache management
-  app.get('/api/version', (req, res) => {
-    // Return current deployment timestamp as version
-    const version = process.env.DEPLOYMENT_TIME || Date.now().toString();
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    });
-    res.send(version);
-  });
-
-  // Add cache clear endpoint
-  app.post('/api/clear-cache', (req, res) => {
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
-    });
-    res.json({ 
-      success: true, 
-      message: 'Cache cleared',
-      timestamp: Date.now()
-    });
-  });
-
-  // Add alias endpoint for doctor login (for backward compatibility)
-  app.post('/api/doctor/login', async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      
-      if (!username || !password) {
-        return res.status(400).json({ message: 'Username and password are required' });
-      }
-
-      // Find driver by username
-      const driver = await storage.getDriverByUsername(username);
-      
-      if (!driver) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-      
-      // Compare password using bcrypt
-      const isPasswordValid = await bcrypt.compare(password, driver.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
-
-      const sessionId = generateSessionId();
-      doctorSessions.set(sessionId, { 
-        user: { 
-          id: driver.id, 
-          phone: driver.phone, 
-          name: driver.name, 
-          membershipType: 'doctor',
-          vetsVanId: driver.id
-        } 
-      });
-      
-      res.json({
-        token: sessionId,
-        user: {
-          id: driver.id,
-          phone: driver.phone,
-          name: driver.name,
-          membershipType: 'doctor'
-        }
-      });
-    } catch (error) {
-      console.error('Doctor login error:', error);
-      res.status(500).json({ message: 'Login failed' });
     }
   });
 

@@ -13,11 +13,6 @@ import DoctorDashboard from "@/pages/doctor-dashboard";
 import DoctorActivity from "@/pages/doctor-activity";
 import DoctorAccount from "@/pages/doctor-account";
 import DoctorInvoice from "@/pages/doctor-invoice";
-import DoctorInvoiceV2 from "@/pages/doctor-invoice-v2";
-import DoctorInvoiceV3 from "@/pages/doctor-invoice-v3";
-import DoctorInvoiceSimple from "@/pages/doctor-invoice-simple";
-import DoctorInvoiceFresh from "@/pages/doctor-invoice-fresh";
-import DoctorInvoiceUltimate from "@/pages/doctor-invoice-ultimate";
 import InvoiceView from "@/pages/invoice-view";
 import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
@@ -28,65 +23,13 @@ import Activity from "@/pages/activity";
 import CustomerActivity from "@/pages/customer-activity";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
-// DISABLED: import VetsVanShifts from "@/pages/vets-van-shifts"; // Completely removed to prevent unauthorized access
+import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
-import LoadingScreen from "@/components/LoadingScreen";
-import { InstallPrompt } from "@/components/InstallPrompt";
-import { PWAInstaller } from "@/components/PWAInstaller";
-import { MobileInstallBanner } from "@/components/MobileInstallBanner";
-import { LanguageTestingPanel } from "@/components/LanguageTestingPanel";
-import LoginSimple from "@/pages/login-simple";
+import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-// import { SimpleCacheManager } from "@/utils/simpleCacheManager"; // DISABLED
-// Fixed: Import useForceRefreshNotifications to resolve runtime error
-// DISABLED: import { useForceRefreshNotifications } from "@/hooks/useForceRefreshNotifications"; // Completely removed to prevent admin requests
-// Removed auto-imports that cause refresh loops
-// import "@/utils/cacheBuster"; // Auto-initialize cache busting  
-// import "@/utils/authFix"; // Auto-preserve authentication tokens
-// import "@/utils/authDebug"; // Auto-debug authentication state
-
-// Clear manifest cache on app start to ensure fresh icons
-const clearManifestCache = async () => {
-  if ('caches' in window) {
-    try {
-      const cacheNames = await caches.keys();
-      await Promise.all(
-        cacheNames.map(async (cacheName) => {
-          const cache = await caches.open(cacheName);
-          await cache.delete('/manifest.json');
-          await cache.delete('/app-icon.png');
-          // Clear all icon variations
-          const iconSizes = ['72x72', '96x96', '128x128', '144x144', '152x152', '192x192', '384x384', '512x512'];
-          await Promise.all(iconSizes.map(size => cache.delete(`/icons/icon-${size}.png`)));
-        })
-      );
-      console.log('✅ Manifest and icon cache cleared');
-    } catch (error) {
-      console.log('Cache clear failed:', error);
-    }
-  }
-};
-
-// Test icon availability
-const testIconAvailability = async () => {
-  const iconSizes = ['72x72', '96x96', '128x128', '144x144', '152x152', '192x192', '384x384', '512x512'];
-  
-  for (const size of iconSizes) {
-    try {
-      const response = await fetch(`/icons/icon-${size}.png`);
-      if (!response.ok) {
-        console.warn(`❌ Icon not available: icon-${size}.png (${response.status})`);
-      } else {
-        console.log(`✅ Icon available: icon-${size}.png`);
-      }
-    } catch (error) {
-      console.warn(`❌ Icon test failed: icon-${size}.png`, error);
-    }
-  }
-};
 
 // Check for expired tokens on app start (skip for admin routes)
 const checkAndClearExpiredTokens = async () => {
@@ -118,15 +61,6 @@ if (!window.location.pathname.includes('admin')) {
   checkAndClearExpiredTokens();
 }
 
-// Clear manifest cache and test icons on app start
-clearManifestCache();
-// Initialize simple cache manager (runs once on PWA launch only)
-// SimpleCacheManager.initializeOnLoad(); // Disabled to prevent cache spam
-// Test icons in development
-if (!import.meta.env.PROD) {
-  setTimeout(testIconAvailability, 1000);
-}
-
 // Configure default authorization header for API requests
 const token = localStorage.getItem('token');
 if (token) {
@@ -152,40 +86,20 @@ if (token) {
 }
 
 function AuthCheck({ children }: { children: React.ReactNode }) {
-  const [isReady, setIsReady] = useState(false);
-  
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
-      
-      console.log('🔍 AuthCheck - Token and User check:', {
-        hasToken: !!token,
-        hasUser: !!user,
-        tokenPreview: token ? token.substring(0, 10) + '...' : 'none'
-      });
-      
-      if (!token || !user) {
-        console.log('❌ Missing auth data, redirecting to login');
-        window.location.href = '/login';
-        return;
-      }
-      
-      console.log('✅ Auth data found, showing protected content');
-      setIsReady(true);
-    };
-    
-    // Small delay to ensure localStorage is ready
-    const timer = setTimeout(checkAuth, 50);
-    return () => clearTimeout(timer);
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    setIsAuthenticated(!!(token && user));
   }, []);
-  
-  if (!isReady) {
+
+  if (isAuthenticated === null) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">جاري التحميل...</div>
     </div>;
   }
-  
+
   return <>{children}</>;
 }
 
@@ -197,12 +111,11 @@ function Router() {
   const shouldShowFooter = pagesWithFooter.includes(location);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col screen-border">
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
           <Route path="/user-type-selection" component={UserTypeSelection} />
           <Route path="/login" component={Login} />
-          <Route path="/login-simple" component={LoginSimple} />
           <Route path="/login/customer" component={Login} />
           <Route path="/otp-verification" component={OtpVerification} />
           <Route path="/login/doctor" component={DoctorLogin} />
@@ -211,11 +124,6 @@ function Router() {
           <Route path="/doctor-activity" component={DoctorActivity} />
           <Route path="/doctor-account" component={DoctorAccount} />
           <Route path="/doctor-invoice/:bookingId" component={DoctorInvoice} />
-          <Route path="/doctor-invoice-v2/:bookingId" component={DoctorInvoiceV2} />
-          <Route path="/doctor-invoice-v3/:bookingId" component={DoctorInvoiceV3} />
-          <Route path="/doctor-invoice-simple/:bookingId" component={DoctorInvoiceSimple} />
-          <Route path="/doctor-invoice-fresh/:bookingId" component={DoctorInvoiceFresh} />
-          <Route path="/doctor-invoice-ultimate/:bookingId" component={DoctorInvoiceUltimate} />
           <Route path="/invoice-view" component={InvoiceView} />
           <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
           <Route path="/ride-request" component={() => <AuthCheck><RideRequest /></AuthCheck>} />
@@ -228,30 +136,14 @@ function Router() {
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
-          {/* DISABLED: <Route path="/vets-van-shifts" component={VetsVanShifts} /> - Completely removed to prevent unauthorized access */}
+          <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
-          <Route path="/" component={() => {
-            // Simple root check
-            const token = localStorage.getItem('token');
-            const user = localStorage.getItem('user');
-            
-            if (token && user) {
-              window.location.replace('/home');
-              return null;
-            }
-            return <Login />;
-          }} />
+          <Route path="/" component={Login} />
           <Route component={NotFound} />
         </Switch>
       </div>
       {shouldShowFooter && <FixedFooter />}
-      {/* DISABLED PWA COMPONENTS TO FIX LOGIN ISSUES:
-      <InstallPrompt />
-      <PWAInstaller />
-      <MobileInstallBanner />
-      */}
-      <LanguageTestingPanel />
     </div>
   );
 }
@@ -267,7 +159,7 @@ function App() {
     return (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <LoadingScreen onComplete={handleLoadingComplete} />
+          <LoadingScreen onLoadingComplete={handleLoadingComplete} />
         </TooltipProvider>
       </QueryClientProvider>
     );
@@ -278,7 +170,6 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
-        <LanguageTestingPanel />
       </TooltipProvider>
     </QueryClientProvider>
   );
