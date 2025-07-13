@@ -3,8 +3,7 @@ import App from "./App";
 import "./index.css";
 import "./styles/map-override.css";
 import "./utils/pwa-diagnostics";
-import "./utils/websocketFix"; // Import WebSocket error prevention
-import "./utils/cacheUtils"; // Import cache management utilities
+import "./utils/nukeCaches"; // Nuclear cache clearing and WebSocket blocking
 import { setupInstallNotificationHandler } from "./utils/install-notification";
 
 // Setup install notification handler

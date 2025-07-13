@@ -78,10 +78,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // NEVER cache API requests or WebSocket requests - force fresh fetch every time
+  // NEVER cache ANYTHING that might contain WebSocket code
   if (event.request.url.includes('/api/') || 
       event.request.url.includes('websocket') ||
-      event.request.url.includes('/ws')) {
+      event.request.url.includes('/ws') ||
+      event.request.url.includes('chunk-') ||
+      event.request.url.includes('replit-dev-banner') ||
+      event.request.url.includes('setupWebSocket') ||
+      event.request.url.includes('.js') ||
+      event.request.url.includes('main.tsx') ||
+      event.request.url.includes('vite')) {
     event.respondWith(
       fetch(event.request, {
         cache: 'no-store',
