@@ -1906,6 +1906,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update VetsVan data (edit function)
+  app.put('/api/admin/drivers/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const driverId = parseInt(req.params.id);
+      const { vetsvanCode, vetsvanName } = req.body;
+      
+      if (!vetsvanCode || !vetsvanName) {
+        return res.status(400).json({ message: 'VetsVan code and name are required' });
+      }
+      
+      await storage.updateVetsVanData(driverId, vetsvanCode, vetsvanName);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error updating VetsVan data:', error);
+      res.status(500).json({ message: 'Failed to update VetsVan data' });
+    }
+  });
+
   // Shifts management endpoints
   app.get('/api/admin/shifts', requireAdminAuth, async (req, res) => {
     try {

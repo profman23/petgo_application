@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
@@ -55,6 +55,12 @@ export default function AdminDashboard() {
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
   const [showReviewsDialog, setShowReviewsDialog] = useState(false);
   const [showSmsDialog, setShowSmsDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
+  const [editDriverData, setEditDriverData] = useState<{vetsvanCode: string, vetsvanName: string}>({
+    vetsvanCode: "",
+    vetsvanName: ""
+  });
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importSubTab, setImportSubTab] = useState<'products' | 'services'>('products');
@@ -484,6 +490,32 @@ export default function AdminDashboard() {
     },
   });
 
+  // Edit driver mutation
+  const editDriverMutation = useMutation({
+    mutationFn: async ({ driverId, data }: { driverId: number; data: {vetsvanCode: string, vetsvanName: string} }) => {
+      await apiRequest(`/api/admin/drivers/${driverId}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
+      setShowEditDialog(false);
+      setEditingDriver(null);
+      toast({
+        title: language === 'ar' ? 'تم التحديث' : 'Updated',
+        description: language === 'ar' ? 'تم تحديث بيانات VetsVan بنجاح' : 'VetsVan data updated successfully',
+      });
+    },
+    onError: () => {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'فشل في تحديث البيانات' : 'Failed to update data',
+        variant: "destructive",
+      });
+    },
+  });
+
   // Delete driver mutation
   const deleteDriverMutation = useMutation({
     mutationFn: async (driverId: number) => {
@@ -645,6 +677,31 @@ export default function AdminDashboard() {
       return;
     }
     addDriverMutation.mutate(newDriver);
+  };
+
+  const handleEditClick = (driver: Driver) => {
+    setEditingDriver(driver);
+    setEditDriverData({
+      vetsvanCode: (driver as any).vetsvanCode || '',
+      vetsvanName: (driver as any).vetsvanName || ''
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingDriver || !editDriverData.vetsvanCode || !editDriverData.vetsvanName) {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields',
+        variant: "destructive",
+      });
+      return;
+    }
+    editDriverMutation.mutate({
+      driverId: editingDriver.id,
+      data: editDriverData
+    });
   };
 
   if (isLoading) {
@@ -914,6 +971,13 @@ export default function AdminDashboard() {
                               >
                                 <MapPin className="w-3 h-3" />
                                 {language === 'ar' ? 'تحديد الموقع' : 'Set Location'}
+                              </button>
+                              <button
+                                onClick={() => handleEditClick(driver)}
+                                className="text-sm text-green-600 hover:text-green-900 inline-flex items-center gap-1"
+                              >
+                                <Edit className="w-3 h-3" />
+                                {language === 'ar' ? 'تعديل' : 'Edit'}
                               </button>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -1567,6 +1631,75 @@ export default function AdminDashboard() {
                   {updateLocationMutation.isPending 
                     ? (language === 'ar' ? 'جاري التحديث...' : 'Updating...')
                     : (language === 'ar' ? 'تحديث الموقع' : 'Update Location')
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit VetsVan Dialog */}
+      {showEditDialog && editingDriver && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" dir={getDirection(language)}>
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                {language === 'ar' ? 'تعديل بيانات VETS VAN' : 'Edit VETS VAN Data'}
+              </h3>
+              <button
+                onClick={() => setShowEditDialog(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'كود VETS VAN' : 'VETS VAN Code'}
+                </label>
+                <input
+                  type="text"
+                  value={editDriverData.vetsvanCode}
+                  onChange={(e) => setEditDriverData({ ...editDriverData, vetsvanCode: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  style={{ textAlign: getTextAlign(language) }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'اسم VETS VAN' : 'VETS VAN Name'}
+                </label>
+                <input
+                  type="text"
+                  value={editDriverData.vetsvanName}
+                  onChange={(e) => setEditDriverData({ ...editDriverData, vetsvanName: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  style={{ textAlign: getTextAlign(language) }}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowEditDialog(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  type="submit"
+                  disabled={editDriverMutation.isPending}
+                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {editDriverMutation.isPending 
+                    ? (language === 'ar' ? 'جاري التحديث...' : 'Updating...')
+                    : (language === 'ar' ? 'تحديث البيانات' : 'Update Data')
                   }
                 </button>
               </div>
