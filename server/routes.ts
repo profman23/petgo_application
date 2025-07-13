@@ -1922,31 +1922,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Add new driver
+  // Add new driver with doctor account creation
   app.post('/api/admin/drivers', requireAdminAuth, async (req, res) => {
     try {
-      const { vetsvanCode, vetsvanName, phone, username, password } = req.body;
+      const { vetsvanCode, name, username, password, phone, model, color, plateNumber } = req.body;
       
-      if (!vetsvanCode || !vetsvanName || !phone || !username || !password) {
-        return res.status(400).json({ message: 'All fields are required' });
+      if (!vetsvanCode || !name || !username || !password || !phone) {
+        return res.status(400).json({ message: 'VetsVan Code, Name, Username, Password, and Phone are required' });
       }
+
+      // Hash the password using bcrypt
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const driver = await storage.createDriver({
         vetsvanCode,
-        vetsvanName,
-        name: vetsvanName, // Use vetsvanName as the driver name
+        vetsvanName: name,
+        name: name,
         phone,
         username,
-        password,
+        password: hashedPassword,
         rating: 4.5,
-        carModel: "Mercedes Sprinter",
-        carColor: "أبيض",
-        plateNumber: vetsvanCode,
+        carModel: model || "Mercedes Sprinter",
+        carColor: color || "أبيض",
+        plateNumber: plateNumber || vetsvanCode,
         latitude: 24.7136,
         longitude: 46.6753,
         isAvailable: true
       });
 
+      console.log(`✅ Created VetsVan and doctor account: ${username} for ${name}`);
       res.json(driver);
     } catch (error) {
       console.error('Error creating driver:', error);

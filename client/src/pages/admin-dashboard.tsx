@@ -66,6 +66,8 @@ export default function AdminDashboard() {
   const [newDriver, setNewDriver] = useState({
     vetsvanCode: '',
     name: '',
+    username: '',
+    password: '',
     phone: '',
     model: '',
     color: '',
@@ -139,10 +141,10 @@ export default function AdminDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/drivers'] });
-      setNewDriver({ vetsvanCode: '', name: '', phone: '', model: '', color: '', plateNumber: '' });
+      setNewDriver({ vetsvanCode: '', name: '', username: '', password: '', phone: '', model: '', color: '', plateNumber: '' });
       toast({
         title: language === 'ar' ? 'تم الإضافة' : 'Added Successfully',
-        description: language === 'ar' ? 'تم إضافة VetsVan جديد بنجاح' : 'New VetsVan added successfully',
+        description: language === 'ar' ? 'تم إضافة VetsVan وحساب الطبيب بنجاح' : 'VetsVan and doctor account created successfully',
       });
     },
   });
@@ -338,7 +340,24 @@ export default function AdminDashboard() {
                 <Input
                   value={newDriver.name}
                   onChange={(e) => setNewDriver({ ...newDriver, name: e.target.value })}
-                  placeholder={language === 'ar' ? 'اسم السائق' : 'Driver Name'}
+                  placeholder={language === 'ar' ? 'اسم الطبيب' : 'Doctor Name'}
+                />
+              </div>
+              <div>
+                <Label>{language === 'ar' ? 'اسم المستخدم' : 'Username'}</Label>
+                <Input
+                  value={newDriver.username}
+                  onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
+                  placeholder="v001"
+                />
+              </div>
+              <div>
+                <Label>{language === 'ar' ? 'كلمة المرور' : 'Password'}</Label>
+                <Input
+                  type="password"
+                  value={newDriver.password}
+                  onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
+                  placeholder="123456"
                 />
               </div>
               <div>
