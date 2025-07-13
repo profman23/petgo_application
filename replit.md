@@ -614,6 +614,9 @@ Changelog:
 - July 13, 2025. CONFIRMED: Login system working for both customers (0501234567/123456) and doctors (v001, v002, v003/123456)
 - July 13, 2025. ENHANCED: Service Worker to prevent caching of partial content (status 206) that was causing errors
 - July 13, 2025. IMPROVED: Authentication token management with automatic cleanup on 401 errors
+- July 13, 2025. FIXED: Critical WebSocket console errors by disabling replit-dev-banner.js script
+- July 13, 2025. RESOLVED: "setupWebSocket localhost:undefined" errors that appeared on all login pages
+- July 13, 2025. COMPLETED: Doctor login system now fully functional without console errors (v001/123456 tested successfully)
 - July 8, 2025. FIXED: Pet vitals field mapping issue - resolved pet_id null constraint error by mapping frontend field names (petId, bookingId, heartRate) to database field names (pet_id, booking_id, heart_rate)
 - July 8, 2025. VERIFIED: Complete pet vitals system working perfectly - all CRUD operations functional with correct data persistence
 - July 8, 2025. RESOLVED: Schema field name mismatch - updated server routes to use camelCase field names (bookingId, petId, heartRate) matching shared/schema.ts definitions
