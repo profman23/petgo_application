@@ -291,7 +291,7 @@ export default function AdminDashboard() {
   }
 
   // Fetch drivers
-  const { data: drivers, isLoading } = useQuery({
+  const { data: drivers, isLoading, refetch: refetchDrivers } = useQuery({
     queryKey: ["/api/admin/drivers"],
     queryFn: async () => {
       const response = await fetch("/api/admin/drivers", {
@@ -303,6 +303,8 @@ export default function AdminDashboard() {
       return await response.json() as Driver[];
     },
     enabled: !!adminToken,
+    staleTime: 0, // Always consider data stale for immediate updates
+    cacheTime: 1000, // Keep cache for 1 second only
   });
 
   // Fetch reports statistics
@@ -499,20 +501,16 @@ export default function AdminDashboard() {
       });
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["/api/admin/drivers"] });
-      await queryClient.refetchQueries({ queryKey: ["/api/admin/drivers"] });
+      // Clear cache completely
+      queryClient.removeQueries({ queryKey: ["/api/admin/drivers"] });
+      // Force immediate refresh
+      await refetchDrivers();
       setShowEditDialog(false);
       setEditingDriver(null);
       toast({
         title: language === 'ar' ? 'تم التحديث بنجاح' : 'Updated Successfully',
-        description: language === 'ar' ? 'تم تحديث بيانات VetsVan وستظهر التغييرات فوراً في القائمة' : 'VetsVan data updated and changes will appear immediately in the list',
+        description: language === 'ar' ? 'تم تحديث بيانات VetsVan بنجاح في القائمة' : 'VetsVan data successfully updated in the list',
       });
-      // Force a complete re-render by removing the data from cache
-      queryClient.removeQueries({ queryKey: ["/api/admin/drivers"] });
-      // Trigger a fresh fetch
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ["/api/admin/drivers"] });
-      }, 100);
     },
     onError: () => {
       toast({
