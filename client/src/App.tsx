@@ -151,16 +151,59 @@ if (token) {
 
 function AuthCheck({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [location, setLocation] = useLocation();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    setIsAuthenticated(!!(token && user));
-  }, []);
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      
+      console.log('🔍 AuthCheck:', {
+        hasToken: !!token,
+        hasUser: !!user,
+        tokenPreview: token ? token.substring(0, 10) + '...' : 'none',
+        userExists: !!user
+      });
+      
+      const authenticated = !!(token && user);
+      setIsAuthenticated(authenticated);
+      
+      // If not authenticated, redirect to login
+      if (!authenticated) {
+        console.log('❌ Not authenticated, redirecting to /login');
+        setLocation('/login');
+      }
+    };
+
+    // Check immediately
+    checkAuth();
+    
+    // Listen for storage changes (when login happens in another tab/component)
+    const handleStorageChange = () => {
+      console.log('📢 Storage changed, rechecking auth');
+      checkAuth();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also check periodically to catch same-tab changes
+    const interval = setInterval(checkAuth, 1000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
+  }, [setLocation]);
 
   if (isAuthenticated === null) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">جاري التحميل...</div>
+    </div>;
+  }
+
+  if (!isAuthenticated) {
+    return <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">جاري إعادة التوجيه...</div>
     </div>;
   }
 

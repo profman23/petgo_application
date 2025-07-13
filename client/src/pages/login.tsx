@@ -107,7 +107,8 @@ export default function Login() {
       
       console.log('🔐 Customer tokens saved:', {
         token: data.token.substring(0, 10) + '...',
-        stored: !!localStorage.getItem('token')
+        stored: !!localStorage.getItem('token'),
+        userStored: !!localStorage.getItem('user')
       });
       
       toast({
@@ -116,9 +117,14 @@ export default function Login() {
         variant: "default",
       });
       
-      // Force immediate redirect without delay
-      console.log('🚀 Redirecting to /home immediately');
-      setLocation('/home');
+      // Trigger storage event manually for same-tab detection
+      window.dispatchEvent(new Event('storage'));
+      
+      // Force immediate redirect with small delay to ensure storage is complete
+      console.log('🚀 Redirecting to /home in 100ms');
+      setTimeout(() => {
+        setLocation('/home');
+      }, 100);
     },
     onError: (error: Error) => {
       toast({
