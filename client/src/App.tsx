@@ -191,9 +191,6 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
 function Router() {
   const [location] = useLocation();
   
-  // Disabled force refresh that was causing logout loops
-  // useForceRefreshNotifications();
-  
   // Pages that should show the footer
   const pagesWithFooter = ['/home', '/account', '/activity', '/customer-activity', '/patients', '/ride-request'];
   const shouldShowFooter = pagesWithFooter.includes(location);
