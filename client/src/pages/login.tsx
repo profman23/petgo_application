@@ -16,7 +16,7 @@ import logoImage from "@assets/Screenshot 2025-07-10 182605_1752161515777.png";
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 
 interface LoginFormData {
-  identifier: string;
+  phone: string;
   password: string;
 }
 
@@ -46,9 +46,9 @@ export default function Login() {
   const { t, language } = useTranslation();
 
   const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchema.omit({ identifier: true }).extend({ phone: loginSchema.shape.identifier })),
     defaultValues: {
-      identifier: '',
+      phone: '',
       password: '',
     },
   });
@@ -83,7 +83,12 @@ export default function Login() {
         identifier: data.phone,
         password: data.password
       };
-      console.log('🔑 Sending login request:', { identifier: loginData.identifier });
+      console.log('🔑 Sending login request:', { 
+        originalData: data,
+        loginData: loginData,
+        hasIdentifier: !!loginData.identifier,
+        hasPassword: !!loginData.password
+      });
       
       const response = await apiRequest('/api/auth/login', {
         method: 'POST',
@@ -170,6 +175,7 @@ export default function Login() {
   });
 
   const onLoginSubmit = (data: LoginFormData) => {
+    console.log('📋 Form data before submission:', data);
     loginMutation.mutate(data);
   };
 
@@ -210,7 +216,7 @@ export default function Login() {
               <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
                 <FormField
                   control={loginForm.control}
-                  name="identifier"
+                  name="phone"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-gray-700 font-semibold">

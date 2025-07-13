@@ -154,12 +154,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post('/api/auth/login', async (req, res) => {
     try {
+      console.log('🔐 Login request received:', {
+        body: req.body,
+        contentType: req.headers['content-type'],
+        bodyKeys: Object.keys(req.body || {}),
+        hasIdentifier: !!req.body?.identifier,
+        hasPhone: !!req.body?.phone,
+        hasPassword: !!req.body?.password
+      });
+      
       // Support both old format (phone) and new format (identifier)
       const body = req.body;
       const identifier = body.identifier || body.phone;
       const password = body.password;
       
       if (!identifier || !password) {
+        console.log('❌ Missing credentials:', { identifier, password, body });
         return res.status(400).json({ message: 'Phone/Email and password are required' });
       }
       
