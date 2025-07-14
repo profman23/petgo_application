@@ -1763,34 +1763,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin Authentication
   const adminSessions = new Map();
-  
-  // Add session timeout (1 hour)
-  const SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour in milliseconds
 
   function requireAdminAuth(req: any, res: any, next: any) {
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
     
     if (!sessionId) {
-      console.log('🚫 Admin auth failed: No session ID');
       return res.status(401).json({ message: 'Unauthorized' });
     }
     
     const session = adminSessions.get(sessionId);
     
-    if (!session) {
-      console.log('🚫 Admin auth failed: Session not found');
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    
-    // Check session timeout
-    if (Date.now() - session.createdAt > SESSION_TIMEOUT) {
-      adminSessions.delete(sessionId);
-      console.log('🚫 Admin auth failed: Session expired');
-      return res.status(401).json({ message: 'Session expired' });
-    }
-    
-    if (session.role !== 'admin') {
-      console.log('🚫 Admin auth failed: Not admin role');
+    if (!session || session.role !== 'admin') {
       return res.status(401).json({ message: 'Unauthorized' });
     }
     
@@ -1818,11 +1801,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: admin.id,
         username: admin.username,
         name: admin.name,
-        role: admin.role,
-        createdAt: Date.now()
+        role: admin.role
       });
-      
-      console.log('✅ Admin login successful:', admin.username);
 
       res.json({
         token: sessionId,
