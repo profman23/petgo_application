@@ -1,0 +1,31 @@
+doctor-invoice.tsx:1853 Uncaught ReferenceError: discountAmount is not defined
+    at DoctorInvoice (doctor-invoice.tsx:1853:23)
+
+doctor-invoice.tsx:1853 Uncaught ReferenceError: discountAmount is not defined
+    at DoctorInvoice (doctor-invoice.tsx:1853:23)
+chunk-RPCDYKBN.js?v=1cbd31a8:14032 The above error occurred in the <DoctorInvoice> component:
+
+    at DoctorInvoice (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/doctor-invoice.tsx:36:22)
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=1cbd31a8:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=1cbd31a8:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=x2akFimbwg-NTiI52LEKJ:118:22)
+    at Provider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-M3NVYRND.js?v=1cbd31a8:48:15)
+    at TooltipProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=1cbd31a8:58:5)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=1cbd31a8:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=x2akFimbwg-NTiI52LEKJ:348:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-RPCDYKBN.js?v=1cbd31a8:19413 Uncaught ReferenceError: discountAmount is not defined
+    at DoctorInvoice (doctor-invoice.tsx:1853:23)
+queryClient.ts:55 
+ POST https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/api/send-invoice-email/22 500 (Internal Server Error)
+doctor-invoice.tsx:793 Error sending invoice email: Error: {"message":"Failed to send invoice email"}
+    at throwIfResNotOk (queryClient.ts:27:13)
+    at async apiRequest (queryClient.ts:62:3)
+    at async confirmGenerateInvoice (doctor-invoice.tsx:775:31)
+
+﻿
+

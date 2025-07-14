@@ -1850,7 +1850,7 @@ export default function DoctorInvoice() {
             serviceType: booking.serviceType,
             items: invoiceItems,
             subtotal: subtotal,
-            discount: discountAmount,
+            discount: totalDiscountAmount,
             tax: taxAmount,
             total: finalTotal,
             notes: notes,

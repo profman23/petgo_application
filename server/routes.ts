@@ -2256,8 +2256,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send email with invoice link
       const { emailService } = await import('./emailService');
       const emailSent = await emailService.sendInvoiceLinkEmail(
-        booking.customer.email,
-        `${booking.customer.firstName} ${booking.customer.lastName}`,
+        booking.customerEmail,
+        booking.customerName,
         `INV-${bookingId}`,
         invoiceLink
       );
