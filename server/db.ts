@@ -2,6 +2,7 @@ import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
+import { dbProtection } from './dbProtection';
 
 neonConfig.webSocketConstructor = ws;
 
@@ -11,14 +12,33 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// Protected database pool with query validation
+class ProtectedPool extends Pool {
+  async query(text: string | object, params?: any[]): Promise<any> {
+    // Validate query through protection system
+    const validation = dbProtection.validateQuery(text);
+    
+    if (!validation.allowed) {
+      console.error(`🛡️ Database Protection: ${validation.reason}`);
+      console.error(`🚫 Blocked Query: ${typeof text === 'string' ? text : text.toString()}`);
+      throw new Error(`Database Protection: ${validation.reason}`);
+    }
+
+    return super.query(text as string, params);
+  }
+}
+
+export const pool = new ProtectedPool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
 
 // Initialize database schema
 export async function initDatabase() {
+  console.log("🔧 Initializing database schema...");
+  
+  // Log protection status
+  dbProtection.logProtectionStatus();
+  
   try {
-    console.log('Initializing database schema...');
-    
     // Create pet_attachments table if it doesn't exist
     await pool.query(`
       CREATE TABLE IF NOT EXISTS pet_attachments (
@@ -89,8 +109,9 @@ export async function initDatabase() {
       );
     `);
     
-    console.log('Database schema initialized successfully');
+    console.log('✅ Database schema initialized successfully with protection enabled');
   } catch (error) {
-    console.error('Error initializing database:', error);
+    console.error('❌ Error initializing database:', error);
+    throw error;
   }
 }
