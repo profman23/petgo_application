@@ -1098,20 +1098,9 @@ export default function DoctorInvoice() {
                         
                         {/* Unit Price */}
                         <td className="py-2 px-2">
-                          {isRecordLocked ? (
-                            <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
-                              {item.unitPrice.toFixed(2)}
-                            </div>
-                          ) : (
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={item.unitPrice}
-                              onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                              className="w-full text-center"
-                            />
-                          )}
+                          <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                            {item.unitPrice.toFixed(2)}
+                          </div>
                         </td>
                         
                         {/* Quantity */}
@@ -1513,20 +1502,9 @@ export default function DoctorInvoice() {
                         
                         {/* Unit Price */}
                         <td className="py-2 px-2">
-                          {isRecordLocked ? (
-                            <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
-                              {item.unitPrice.toFixed(2)}
-                            </div>
-                          ) : (
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={item.unitPrice}
-                              onChange={(e) => updateItem(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
-                              className="w-full text-center"
-                            />
-                          )}
+                          <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                            {item.unitPrice.toFixed(2)}
+                          </div>
                         </td>
                         
                         {/* Discount */}
