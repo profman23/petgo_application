@@ -100,6 +100,7 @@ export default function DoctorInvoice() {
   const [isRecordLocked, setIsRecordLocked] = useState(false);
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
   const [searchQuery, setSearchQuery] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState('');
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -934,245 +935,280 @@ export default function DoctorInvoice() {
                         </div>
                       ) : (
                         <div>
-                          {/* Searchable dropdown for products/services */}
+                          {/* Enhanced Search Field for products/services */}
                           {(products.length > 0 || services.length > 0) ? (
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  role="combobox"
-                                  className="w-full justify-between"
-                                >
-                                  {item.description || t('selectProduct')}
-                                  <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-80 max-h-96 overflow-hidden p-0" side="bottom" align="start">
-                                <Command shouldFilter={false}>
-                                  <div className="flex items-center border-b px-3 py-2">
-                                    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                                    <CommandInput 
-                                      placeholder={t('searchPlaceholder')}
-                                      value={searchQuery}
-                                      onValueChange={setSearchQuery}
-                                      className="border-0 focus:ring-0 flex-1"
-                                    />
-                                    {searchQuery && (
+                            <div className="relative">
+                              <div className="relative">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <input
+                                  type="text"
+                                  value={item.description || ''}
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    updateInvoiceItem(item.id, { description: value });
+                                    setSearchQuery(value);
+                                    setDropdownOpen(value.length > 0 ? item.id : '');
+                                  }}
+                                  onFocus={() => {
+                                    setSearchQuery(item.description || '');
+                                    setDropdownOpen(item.id);
+                                  }}
+                                  onBlur={() => {
+                                    setTimeout(() => setDropdownOpen(''), 200);
+                                  }}
+                                  placeholder={language === 'ar' ? 'ابحث أو اكتب اسم المنتج/الخدمة...' : 'Search or type product/service name...'}
+                                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                  dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                />
+                                {(item.description || searchQuery) && (
+                                  <button
+                                    onClick={() => {
+                                      updateInvoiceItem(item.id, { description: '' });
+                                      setSearchQuery('');
+                                      setDropdownOpen('');
+                                    }}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-sm opacity-70 hover:opacity-100 hover:bg-gray-100"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                )}
+                              </div>
+                              
+                              {/* Search Results Dropdown */}
+                              {dropdownOpen === item.id && (filteredProducts.length > 0 || filteredServices.length > 0) && (
+                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-96 overflow-hidden">
+                                  <div className="p-0">
+                                    <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
+                                      <div className="flex items-center justify-between">
+                                        <div className="text-xs font-medium text-purple-700">
+                                          {searchQuery ? (
+                                            `${t('searchResults')}: ${filteredProducts.length + filteredServices.length}/6`
+                                          ) : (
+                                            `${t('importedItems')}: ${(products.length + services.length > 8 ? 8 : products.length + services.length)}/${products.length + services.length}`
+                                          )}
+                                        </div>
+                                        {searchQuery && (
+                                          <div className="text-xs text-purple-600 bg-white px-2 py-1 rounded-full">
+                                            "{searchQuery}"
+                                          </div>
+                                        )}
+                                      </div>
+                                      {(filteredProducts.length > 0 || filteredServices.length > 0) && (
+                                        <div className="text-xs text-gray-600 mt-1 flex gap-4">
+                                          {filteredProducts.length > 0 && (
+                                            <span>📦 {filteredProducts.length} {t('products')}</span>
+                                          )}
+                                          {filteredServices.length > 0 && (
+                                            <span>🔧 {filteredServices.length} {t('services')}</span>
+                                          )}
+                                        </div>
+                                      )}
+                                      {!searchQuery && (products.length + services.length > 8) && (
+                                        <div className="text-xs text-gray-500 mt-1">
+                                          {language === 'ar' ? 'ابدأ الكتابة للبحث في جميع العناصر' : 'Start typing to search all items'}
+                                        </div>
+                                      )}
+                                    </div>
+                                    
+                                    {/* Sub Tabs for Products/Services with counts */}
+                                    <div className="flex border-b border-gray-200 bg-gray-50 p-1">
                                       <button
-                                        onClick={() => setSearchQuery('')}
-                                        className="ml-2 p-1 rounded-sm opacity-70 hover:opacity-100 hover:bg-gray-100"
+                                        onClick={() => setInvoiceSubTab('products')}
+                                        className={`px-2 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
+                                          invoiceSubTab === 'products'
+                                            ? 'border-purple-600 text-purple-600 bg-purple-50'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                        }`}
                                       >
-                                        <X className="h-3 w-3" />
+                                        <div className="flex items-center justify-center gap-1">
+                                          <span className="text-xs">📦</span>
+                                          <span className="truncate">{language === 'ar' ? 'منتجات' : 'Products'}</span>
+                                          <span className="bg-purple-100 text-purple-700 px-1 rounded text-xs min-w-4 text-center">
+                                            {filteredProducts.length}
+                                          </span>
+                                        </div>
                                       </button>
-                                    )}
-                                  </div>
-                                  
-                                  {/* Enhanced Search Results Summary */}
-                                  <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
-                                    <div className="flex items-center justify-between">
-                                      <div className="text-xs font-medium text-purple-700">
-                                        {searchQuery ? (
-                                          `${t('searchResults')}: ${filteredProducts.length + filteredServices.length}/6`
+                                      <button
+                                        onClick={() => setInvoiceSubTab('services')}
+                                        className={`px-2 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
+                                          invoiceSubTab === 'services'
+                                            ? 'border-purple-600 text-purple-600 bg-purple-50'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                      >
+                                        <div className="flex items-center justify-center gap-1">
+                                          <span className="text-xs">🩺</span>
+                                          <span className="truncate">{language === 'ar' ? 'خدمات' : 'Services'}</span>
+                                          <span className="bg-blue-100 text-blue-700 px-1 rounded text-xs min-w-4 text-center">
+                                            {filteredServices.length}
+                                          </span>
+                                        </div>
+                                      </button>
+                                    </div>
+                                    
+                                    {/* Products Section */}
+                                    {invoiceSubTab === 'products' && (
+                                      <div className="max-h-60 overflow-y-auto">
+                                        {filteredProducts.length > 0 ? (
+                                          filteredProducts.map((product: any, index: number) => (
+                                            <div
+                                              key={`product-${product.id}`}
+                                              onClick={() => {
+                                                updateInvoiceItem(item.id, { 
+                                                  description: product.name,
+                                                  unitPrice: parseFloat(product.price) || 0 
+                                                });
+                                                setDropdownOpen('');
+                                                setSearchQuery('');
+                                              }}
+                                              className="p-3 hover:bg-purple-50 cursor-pointer border-b border-gray-100 transition-all duration-200 group"
+                                            >
+                                              <div className="flex items-center w-full">
+                                                <Check
+                                                  className={`mr-3 h-4 w-4 transition-all duration-200 ${
+                                                    item.description === product.name 
+                                                      ? 'opacity-100 text-purple-600' 
+                                                      : 'opacity-0 group-hover:opacity-30'
+                                                  }`}
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                  <div className="flex items-center justify-between">
+                                                    <div className="text-sm font-medium text-gray-900 truncate max-w-40">
+                                                      {searchQuery ? (
+                                                        <span
+                                                          dangerouslySetInnerHTML={{
+                                                            __html: (product.name || '').replace(
+                                                              new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+                                                              '<mark class="bg-purple-200 text-purple-900 rounded px-1 font-semibold">$1</mark>'
+                                                            )
+                                                          }}
+                                                        />
+                                                      ) : (
+                                                        product.name
+                                                      )}
+                                                    </div>
+                                                    <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded">
+                                                      {product.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                    </div>
+                                                  </div>
+                                                  <div className="text-xs text-gray-500 mt-0.5 flex items-center justify-between">
+                                                    <span className="flex items-center truncate">
+                                                      {product.category && (
+                                                        <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-xs mr-1 truncate max-w-16">
+                                                          {product.category}
+                                                        </span>
+                                                      )}
+                                                    </span>
+                                                    <span className="text-xs text-purple-500">#{index + 1}</span>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))
                                         ) : (
-                                          `${t('importedItems')}: ${(products.length + services.length > 8 ? 8 : products.length + services.length)}/${products.length + services.length}`
-                                        )}
-                                      </div>
-                                      {searchQuery && (
-                                        <div className="text-xs text-purple-600 bg-white px-2 py-1 rounded-full">
-                                          "{searchQuery}"
-                                        </div>
-                                      )}
-                                    </div>
-                                    {(filteredProducts.length > 0 || filteredServices.length > 0) && (
-                                      <div className="text-xs text-gray-600 mt-1 flex gap-4">
-                                        {filteredProducts.length > 0 && (
-                                          <span>📦 {filteredProducts.length} {t('products')}</span>
-                                        )}
-                                        {filteredServices.length > 0 && (
-                                          <span>🔧 {filteredServices.length} {t('services')}</span>
+                                          <div className="p-6 text-center">
+                                            <div className="mb-2">📦</div>
+                                            <div className="text-sm font-medium text-gray-700 mb-1">
+                                              {language === 'ar' ? 'لا توجد منتجات' : 'No products found'}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                              {language === 'ar' ? 'جرب كلمات بحث أخرى' : 'Try different search terms'}
+                                            </div>
+                                          </div>
                                         )}
                                       </div>
                                     )}
-                                    {!searchQuery && (products.length + services.length > 8) && (
-                                      <div className="text-xs text-gray-500 mt-1">
-                                        {language === 'ar' ? 'ابدأ الكتابة للبحث في جميع العناصر' : 'Start typing to search all items'}
+                                    
+                                    {/* Services Section */}
+                                    {invoiceSubTab === 'services' && (
+                                      <div className="max-h-60 overflow-y-auto">
+                                        {filteredServices.length > 0 ? (
+                                          filteredServices.map((service: any, index: number) => (
+                                            <div
+                                              key={`service-${service.id}`}
+                                              onClick={() => {
+                                                updateInvoiceItem(item.id, { 
+                                                  description: service.name,
+                                                  unitPrice: parseFloat(service.price) || 0 
+                                                });
+                                                setDropdownOpen('');
+                                                setSearchQuery('');
+                                              }}
+                                              className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 transition-all duration-200 group"
+                                            >
+                                              <div className="flex items-center w-full">
+                                                <Check
+                                                  className={`mr-3 h-4 w-4 transition-all duration-200 ${
+                                                    item.description === service.name 
+                                                      ? 'opacity-100 text-blue-600' 
+                                                      : 'opacity-0 group-hover:opacity-30'
+                                                  }`}
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                  <div className="flex items-center justify-between">
+                                                    <div className="text-sm font-medium text-gray-900 truncate max-w-40">
+                                                      {searchQuery ? (
+                                                        <span
+                                                          dangerouslySetInnerHTML={{
+                                                            __html: (service.name || '').replace(
+                                                              new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
+                                                              '<mark class="bg-blue-200 text-blue-900 rounded px-1 font-semibold">$1</mark>'
+                                                            )
+                                                          }}
+                                                        />
+                                                      ) : (
+                                                        service.name
+                                                      )}
+                                                    </div>
+                                                    <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded">
+                                                      {service.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                    </div>
+                                                  </div>
+                                                  <div className="text-xs text-gray-500 mt-0.5 flex items-center justify-between">
+                                                    <span className="flex items-center truncate">
+                                                      {service.category && (
+                                                        <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded text-xs mr-1 truncate max-w-16">
+                                                          {service.category}
+                                                        </span>
+                                                      )}
+                                                    </span>
+                                                    <span className="text-xs text-blue-500">#{index + 1}</span>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))
+                                        ) : (
+                                          <div className="p-6 text-center">
+                                            <div className="mb-2">🩺</div>
+                                            <div className="text-sm font-medium text-gray-700 mb-1">
+                                              {language === 'ar' ? 'لا توجد خدمات' : 'No services found'}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                              {language === 'ar' ? 'جرب كلمات بحث أخرى' : 'Try different search terms'}
+                                            </div>
+                                          </div>
+                                        )}
                                       </div>
                                     )}
                                   </div>
-                                  
-                                  <CommandEmpty>
-                                    <div className="p-6 text-center">
-                                      <div className="mb-2">🔍</div>
-                                      <div className="text-sm font-medium text-gray-700 mb-1">
-                                        {t('noResults')}
-                                      </div>
-                                      <div className="text-xs text-gray-500">
-                                        {language === 'ar' ? 
-                                          'جرب البحث باستخدام كلمات مختلفة أو أزل بعض الفلاتر' : 
-                                          'Try searching with different keywords or remove some filters'
-                                        }
-                                      </div>
-                                      {searchQuery && (
-                                        <div className="mt-2 text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded inline-block">
-                                          {language === 'ar' ? `البحث عن: "${searchQuery}"` : `Searching for: "${searchQuery}"`}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </CommandEmpty>
-                                  
-                                  {/* Sub Tabs for Products/Services with counts */}
-                                  <div className="flex border-b border-gray-200 bg-gray-50 p-1">
-                                    <button
-                                      onClick={() => setInvoiceSubTab('products')}
-                                      className={`px-2 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
-                                        invoiceSubTab === 'products'
-                                          ? 'border-purple-600 text-purple-600 bg-purple-50'
-                                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                                      }`}
-                                    >
-                                      <div className="flex items-center justify-center gap-1">
-                                        <span className="text-xs">📦</span>
-                                        <span className="truncate">{language === 'ar' ? 'منتجات' : 'Products'}</span>
-                                        <span className="bg-purple-100 text-purple-700 px-1 rounded text-xs min-w-4 text-center">
-                                          {filteredProducts.length}
-                                        </span>
-                                      </div>
-                                    </button>
-                                    <button
-                                      onClick={() => setInvoiceSubTab('services')}
-                                      className={`px-2 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
-                                        invoiceSubTab === 'services'
-                                          ? 'border-purple-600 text-purple-600 bg-purple-50'
-                                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                                      }`}
-                                    >
-                                      <div className="flex items-center justify-center gap-1">
-                                        <span className="text-xs">🩺</span>
-                                        <span className="truncate">{language === 'ar' ? 'خدمات' : 'Services'}</span>
-                                        <span className="bg-blue-100 text-blue-700 px-1 rounded text-xs min-w-4 text-center">
-                                          {filteredServices.length}
-                                        </span>
-                                      </div>
-                                    </button>
-                                  </div>
-                                  {invoiceSubTab === 'products' && filteredProducts.length > 0 && (
-                                    <CommandGroup>
-                                      <div className="max-h-60 overflow-y-auto">
-                                        {filteredProducts.map((product: any, index: number) => (
-                                        <CommandItem
-                                          key={`product-${product.id}`}
-                                          onSelect={() => handleProductServiceSelect(item.id, product.id.toString())}
-                                          className="transition-all duration-200 hover:bg-purple-50 group"
-                                        >
-                                          <div className="flex items-center w-full">
-                                            <Check
-                                              className={`mr-3 h-4 w-4 transition-all duration-200 ${
-                                                item.description === product.name 
-                                                  ? 'opacity-100 text-purple-600' 
-                                                  : 'opacity-0 group-hover:opacity-30'
-                                              }`}
-                                            />
-                                            <div className="flex-1 min-w-0">
-                                              <div className="flex items-center justify-between">
-                                                <div className="text-sm font-medium text-gray-900 truncate max-w-40">
-                                                  {searchQuery ? (
-                                                    <span
-                                                      dangerouslySetInnerHTML={{
-                                                        __html: (product.name || '').replace(
-                                                          new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
-                                                          '<mark class="bg-purple-200 text-purple-900 rounded px-1 font-semibold">$1</mark>'
-                                                        )
-                                                      }}
-                                                    />
-                                                  ) : (
-                                                    product.name
-                                                  )}
-                                                </div>
-                                                <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded">
-                                                  {product.price} {language === 'ar' ? 'ر.س' : 'SAR'}
-                                                </div>
-                                              </div>
-                                              <div className="text-xs text-gray-500 mt-0.5 flex items-center justify-between">
-                                                <span className="flex items-center truncate">
-                                                  {product.category && (
-                                                    <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-xs mr-1 truncate max-w-16">
-                                                      {product.category}
-                                                    </span>
-                                                  )}
-                                                </span>
-                                                <span className="text-xs text-purple-500">#{index + 1}</span>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </CommandItem>
-                                        ))}
-                                      </div>
-                                    </CommandGroup>
-                                  )}
-                                  {invoiceSubTab === 'services' && filteredServices.length > 0 && (
-                                    <CommandGroup>
-                                      <div className="max-h-60 overflow-y-auto">
-                                        {filteredServices.map((service: any, index: number) => (
-                                        <CommandItem
-                                          key={`service-${service.id}`}
-                                          onSelect={() => handleProductServiceSelect(item.id, service.id.toString())}
-                                          className="transition-all duration-200 hover:bg-blue-50 group"
-                                        >
-                                          <div className="flex items-center w-full">
-                                            <Check
-                                              className={`mr-3 h-4 w-4 transition-all duration-200 ${
-                                                item.description === service.name 
-                                                  ? 'opacity-100 text-blue-600' 
-                                                  : 'opacity-0 group-hover:opacity-30'
-                                              }`}
-                                            />
-                                            <div className="flex-1 min-w-0">
-                                              <div className="flex items-center justify-between">
-                                                <div className="text-sm font-medium text-gray-900 truncate max-w-40">
-                                                  {searchQuery ? (
-                                                    <span
-                                                      dangerouslySetInnerHTML={{
-                                                        __html: (service.name || '').replace(
-                                                          new RegExp(`(${searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
-                                                          '<mark class="bg-blue-200 text-blue-900 rounded px-1 font-semibold">$1</mark>'
-                                                        )
-                                                      }}
-                                                    />
-                                                  ) : (
-                                                    service.name
-                                                  )}
-                                                </div>
-                                                <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded">
-                                                  {service.price} {language === 'ar' ? 'ر.س' : 'SAR'}
-                                                </div>
-                                              </div>
-                                              <div className="text-xs text-gray-500 mt-0.5 flex items-center justify-between">
-                                                <span className="flex items-center truncate">
-                                                  {service.category && (
-                                                    <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded text-xs mr-1 truncate max-w-16">
-                                                      {service.category}
-                                                    </span>
-                                                  )}
-                                                </span>
-                                                <span className="text-xs text-blue-500">#{index + 1}</span>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </CommandItem>
-                                        ))}
-                                      </div>
-                                    </CommandGroup>
-                                  )}
-                                </Command>
-                              </PopoverContent>
-                            </Popover>
+                                </div>
+                              )}
+                            </div>
                           ) : (
-                            <Input
-                              value={item.description}
-                              onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                              placeholder={t('description')}
-                              className="w-full"
-                            />
+                            // Regular search input fallback when no products/services
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input 
+                                type="text"
+                                value={item.description}
+                                onChange={(e) => updateInvoiceItem(item.id, { description: e.target.value })}
+                                placeholder={language === 'ar' ? 'اكتب وصف المنتج أو الخدمة...' : 'Type product or service description...'}
+                                className="pl-10"
+                                dir={getDirection(language)}
+                                style={{ textAlign: getTextAlign(language) }}
+                              />
+                            </div>
                           )}
                         </div>
                       )}
