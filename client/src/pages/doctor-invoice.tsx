@@ -94,13 +94,10 @@ export default function DoctorInvoice() {
     }
   ]);
   const [notes, setNotes] = useState('');
-  const [applyDiscount, setApplyDiscount] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   
   // Tax rate constant (15%)
   const TAX_RATE = 0.15;
-  // Discount rate constant (10%)
-  const DISCOUNT_RATE = 0.10;
   const [showVitalsModal, setShowVitalsModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -272,7 +269,7 @@ export default function DoctorInvoice() {
       addItem: 'إضافة صنف',
       removeItem: 'حذف الصنف',
       subtotal: 'المجموع قبل الضريبة',
-      tax: 'الضريبة (15%)',
+      tax: 'ضريبة القيمة المضافة 15%',
       discount: 'الخصم',
       finalTotal: 'المجموع النهائي',
       addPayment: 'إضافة دفعة',
@@ -338,7 +335,7 @@ export default function DoctorInvoice() {
       addItem: 'Add Item',
       removeItem: 'Remove Item',
       subtotal: 'Total Before VAT',
-      tax: 'Tax (15%)',
+      tax: 'VAT 15%',
       discount: 'Discount',
       finalTotal: 'Final Total',
       addPayment: 'Add Payment',
@@ -430,8 +427,7 @@ export default function DoctorInvoice() {
     return sum;
   }, 0);
   const totalWithTax = subtotal + taxAmount;
-  const discountAmount = applyDiscount ? totalWithTax * DISCOUNT_RATE : 0;
-  const finalTotal = totalWithTax - discountAmount;
+  const finalTotal = totalWithTax;
   const remainingBalance = finalTotal - totalPaid;
   
   // Calculate values for each item automatically
@@ -1628,21 +1624,6 @@ export default function DoctorInvoice() {
                 <div className="flex justify-between mb-2">
                   <span>{t('tax')}:</span>
                   <span>{taxAmount.toFixed(2)} {t('sar')}</span>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span>{t('discount')}:</span>
-                  <div className="flex items-center space-x-2">
-                    <select
-                      value={applyDiscount ? "yes" : "no"}
-                      onChange={(e) => setApplyDiscount(e.target.value === "yes")}
-                      className="border border-gray-300 rounded px-3 py-1 text-sm"
-                      dir={language === 'ar' ? 'rtl' : 'ltr'}
-                    >
-                      <option value="no">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</option>
-                      <option value="yes">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</option>
-                    </select>
-                    <span className="text-lg font-medium">{discountAmount.toFixed(2)} {t('sar')}</span>
-                  </div>
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
                   <span>{t('finalTotal')}:</span>
