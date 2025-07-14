@@ -243,12 +243,67 @@ export default function DoctorInvoice() {
 
   // Load invoice status when data is available
   useEffect(() => {
-    if (invoiceStatus && invoiceStatus.isGenerated) {
-      setIsRecordLocked(true);
-      setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
-      setNotes(invoiceStatus.notes || '');
+    if (invoiceStatus) {
+      if (invoiceStatus.isGenerated) {
+        setIsRecordLocked(true);
+        
+        // Check if this is a generated invoice with invoice number (new system)
+        if (invoiceStatus.invoiceNumber) {
+          console.log('✅ Invoice found:', invoiceStatus.invoiceNumber);
+          // Invoice is permanently generated - show as read-only
+          setShowInvoiceGenerator(true);
+          
+          // Load the complete generated invoice data
+          loadGeneratedInvoiceData(invoiceStatus.invoiceNumber);
+        } else {
+          // Old system compatibility
+          if (invoiceStatus.discountAmount) {
+            setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
+          }
+          if (invoiceStatus.notes) {
+            setNotes(invoiceStatus.notes);
+          }
+        }
+      }
     }
   }, [invoiceStatus]);
+
+  // Function to load generated invoice data
+  const loadGeneratedInvoiceData = async (invoiceNumber: string) => {
+    try {
+      const response = await fetch(`/api/generated-invoice/${invoiceNumber}`);
+      if (response.ok) {
+        const generatedInvoice = await response.json();
+        console.log('📄 Loading generated invoice data:', generatedInvoice);
+        
+        // Restore invoice items from generated invoice
+        if (generatedInvoice.items) {
+          setInvoiceItems(generatedInvoice.items.map((item: any) => ({
+            id: item.id || Date.now().toString(),
+            description: item.description,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            discount: item.discount || 0,
+            discountType: item.discountType || 'none',
+            vatRate: item.vatRate || 15,
+            vatAmount: item.vatAmount || 0,
+            totalBeforeVat: item.totalBeforeVat || item.total,
+            totalAfterVat: item.totalAfterVat || (item.total * 1.15),
+            total: item.total
+          })));
+        }
+        
+        // Restore notes
+        if (generatedInvoice.notes) {
+          setNotes(generatedInvoice.notes);
+        }
+        
+        console.log('✅ Generated invoice data loaded successfully');
+      }
+    } catch (error) {
+      console.error('Error loading generated invoice data:', error);
+    }
+  };
 
 
 
@@ -1717,10 +1772,15 @@ export default function DoctorInvoice() {
         <div className="flex justify-center mb-6">
           <Button
             onClick={handleGenerateInvoiceClick}
-            className="bg-purple-600 hover:bg-purple-600 text-white px-8 py-3 text-lg"
+            disabled={isRecordLocked}
+            className={`px-8 py-3 text-lg ${
+              isRecordLocked 
+                ? 'bg-gray-400 hover:bg-gray-400 text-gray-600 cursor-not-allowed' 
+                : 'bg-purple-600 hover:bg-purple-600 text-white'
+            }`}
           >
             <Receipt className="h-6 w-6 ml-2" />
-            {t('generateInvoice')}
+            {isRecordLocked ? `${t('generateInvoice')} ✓` : t('generateInvoice')}
           </Button>
         </div>
       </div>
