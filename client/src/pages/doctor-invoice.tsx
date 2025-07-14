@@ -431,13 +431,14 @@ export default function DoctorInvoice() {
     saveInvoiceItems(newItems);
   };
 
-  // Advanced smart search filtering function
+  // Mobile-optimized search filtering function
   const filterItems = (items: any[], query: string) => {
-    if (!query.trim()) return items;
+    // Show first 8 items when no search query (mobile-friendly)
+    if (!query.trim()) return items.slice(0, 8);
     
     const searchTerm = query.toLowerCase().trim();
     
-    return items.filter(item => {
+    const filteredItems = items.filter(item => {
       // Get all searchable fields
       const name = item.name?.toLowerCase() || '';
       const nameAr = item.name_ar?.toLowerCase() || '';
@@ -492,6 +493,9 @@ export default function DoctorInvoice() {
       // Then sort by name length (shorter names first)
       return aName.length - bName.length;
     });
+
+    // Limit search results to 6 items for mobile optimization
+    return filteredItems.slice(0, 6);
   };
 
   // Get filtered products and services based on search
@@ -943,7 +947,7 @@ export default function DoctorInvoice() {
                                   <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-full p-0">
+                              <PopoverContent className="w-80 max-h-96 overflow-hidden p-0" side="bottom" align="start">
                                 <Command shouldFilter={false}>
                                   <div className="flex items-center border-b px-3 py-2">
                                     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
@@ -964,28 +968,37 @@ export default function DoctorInvoice() {
                                   </div>
                                   
                                   {/* Enhanced Search Results Summary */}
-                                  {searchQuery && (
-                                    <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
-                                      <div className="flex items-center justify-between">
-                                        <div className="text-xs font-medium text-purple-700">
-                                          {t('searchResults')}: {filteredProducts.length + filteredServices.length} {t('importedItems')}
-                                        </div>
+                                  <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
+                                    <div className="flex items-center justify-between">
+                                      <div className="text-xs font-medium text-purple-700">
+                                        {searchQuery ? (
+                                          `${t('searchResults')}: ${filteredProducts.length + filteredServices.length}/6`
+                                        ) : (
+                                          `${t('importedItems')}: ${(products.length + services.length > 8 ? 8 : products.length + services.length)}/${products.length + services.length}`
+                                        )}
+                                      </div>
+                                      {searchQuery && (
                                         <div className="text-xs text-purple-600 bg-white px-2 py-1 rounded-full">
                                           "{searchQuery}"
                                         </div>
-                                      </div>
-                                      {(filteredProducts.length > 0 || filteredServices.length > 0) && (
-                                        <div className="text-xs text-gray-600 mt-1 flex gap-4">
-                                          {filteredProducts.length > 0 && (
-                                            <span>📦 {filteredProducts.length} {t('products')}</span>
-                                          )}
-                                          {filteredServices.length > 0 && (
-                                            <span>🔧 {filteredServices.length} {t('services')}</span>
-                                          )}
-                                        </div>
                                       )}
                                     </div>
-                                  )}
+                                    {(filteredProducts.length > 0 || filteredServices.length > 0) && (
+                                      <div className="text-xs text-gray-600 mt-1 flex gap-4">
+                                        {filteredProducts.length > 0 && (
+                                          <span>📦 {filteredProducts.length} {t('products')}</span>
+                                        )}
+                                        {filteredServices.length > 0 && (
+                                          <span>🔧 {filteredServices.length} {t('services')}</span>
+                                        )}
+                                      </div>
+                                    )}
+                                    {!searchQuery && (products.length + services.length > 8) && (
+                                      <div className="text-xs text-gray-500 mt-1">
+                                        {language === 'ar' ? 'ابدأ الكتابة للبحث في جميع العناصر' : 'Start typing to search all items'}
+                                      </div>
+                                    )}
+                                  </div>
                                   
                                   <CommandEmpty>
                                     <div className="p-6 text-center">
@@ -1008,51 +1021,44 @@ export default function DoctorInvoice() {
                                   </CommandEmpty>
                                   
                                   {/* Sub Tabs for Products/Services with counts */}
-                                  <div className="flex border-b border-gray-200 bg-gray-50 p-2">
+                                  <div className="flex border-b border-gray-200 bg-gray-50 p-1">
                                     <button
                                       onClick={() => setInvoiceSubTab('products')}
-                                      className={`px-3 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
+                                      className={`px-2 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
                                         invoiceSubTab === 'products'
                                           ? 'border-purple-600 text-purple-600 bg-purple-50'
                                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                       }`}
                                     >
                                       <div className="flex items-center justify-center gap-1">
-                                        <span>📦</span>
-                                        <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-                                        {searchQuery && (
-                                          <span className="bg-purple-100 text-purple-700 px-1 rounded text-xs">
-                                            {filteredProducts.length}
-                                          </span>
-                                        )}
+                                        <span className="text-xs">📦</span>
+                                        <span className="truncate">{language === 'ar' ? 'منتجات' : 'Products'}</span>
+                                        <span className="bg-purple-100 text-purple-700 px-1 rounded text-xs min-w-4 text-center">
+                                          {filteredProducts.length}
+                                        </span>
                                       </div>
                                     </button>
                                     <button
                                       onClick={() => setInvoiceSubTab('services')}
-                                      className={`px-3 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
+                                      className={`px-2 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
                                         invoiceSubTab === 'services'
                                           ? 'border-purple-600 text-purple-600 bg-purple-50'
                                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                                       }`}
                                     >
                                       <div className="flex items-center justify-center gap-1">
-                                        <span>🩺</span>
-                                        <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
-                                        {searchQuery && (
-                                          <span className="bg-purple-100 text-purple-700 px-1 rounded text-xs">
-                                            {filteredServices.length}
-                                          </span>
-                                        )}
+                                        <span className="text-xs">🩺</span>
+                                        <span className="truncate">{language === 'ar' ? 'خدمات' : 'Services'}</span>
+                                        <span className="bg-blue-100 text-blue-700 px-1 rounded text-xs min-w-4 text-center">
+                                          {filteredServices.length}
+                                        </span>
                                       </div>
                                     </button>
                                   </div>
                                   {invoiceSubTab === 'products' && filteredProducts.length > 0 && (
-                                    <CommandGroup heading={
-                                      searchQuery ? 
-                                        `${t('products')} (${filteredProducts.length}/${products.length})` : 
-                                        t('products')
-                                    }>
-                                      {filteredProducts.map((product: any, index: number) => (
+                                    <CommandGroup>
+                                      <div className="max-h-60 overflow-y-auto">
+                                        {filteredProducts.map((product: any, index: number) => (
                                         <CommandItem
                                           key={`product-${product.id}`}
                                           onSelect={() => handleProductServiceSelect(item.id, product.id.toString())}
@@ -1068,7 +1074,7 @@ export default function DoctorInvoice() {
                                             />
                                             <div className="flex-1 min-w-0">
                                               <div className="flex items-center justify-between">
-                                                <div className="text-sm font-medium text-gray-900 truncate">
+                                                <div className="text-sm font-medium text-gray-900 truncate max-w-40">
                                                   {searchQuery ? (
                                                     <span
                                                       dangerouslySetInnerHTML={{
@@ -1082,21 +1088,16 @@ export default function DoctorInvoice() {
                                                     product.name
                                                   )}
                                                 </div>
-                                                <div className="text-xs font-bold text-purple-600 ml-2 bg-purple-100 px-2 py-1 rounded-full">
+                                                <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded">
                                                   {product.price} {language === 'ar' ? 'ر.س' : 'SAR'}
                                                 </div>
                                               </div>
-                                              <div className="text-xs text-gray-500 mt-1 flex items-center justify-between">
-                                                <span className="flex items-center">
+                                              <div className="text-xs text-gray-500 mt-0.5 flex items-center justify-between">
+                                                <span className="flex items-center truncate">
                                                   {product.category && (
-                                                    <>
-                                                      <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs mr-2">
-                                                        {product.category}
-                                                      </span>
-                                                    </>
-                                                  )}
-                                                  {product.sku && (
-                                                    <span className="text-gray-400">SKU: {product.sku}</span>
+                                                    <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-xs mr-1 truncate max-w-16">
+                                                      {product.category}
+                                                    </span>
                                                   )}
                                                 </span>
                                                 <span className="text-xs text-purple-500">#{index + 1}</span>
@@ -1104,16 +1105,14 @@ export default function DoctorInvoice() {
                                             </div>
                                           </div>
                                         </CommandItem>
-                                      ))}
+                                        ))}
+                                      </div>
                                     </CommandGroup>
                                   )}
                                   {invoiceSubTab === 'services' && filteredServices.length > 0 && (
-                                    <CommandGroup heading={
-                                      searchQuery ? 
-                                        `${t('services')} (${filteredServices.length}/${services.length})` : 
-                                        t('services')
-                                    }>
-                                      {filteredServices.map((service: any, index: number) => (
+                                    <CommandGroup>
+                                      <div className="max-h-60 overflow-y-auto">
+                                        {filteredServices.map((service: any, index: number) => (
                                         <CommandItem
                                           key={`service-${service.id}`}
                                           onSelect={() => handleProductServiceSelect(item.id, service.id.toString())}
@@ -1129,7 +1128,7 @@ export default function DoctorInvoice() {
                                             />
                                             <div className="flex-1 min-w-0">
                                               <div className="flex items-center justify-between">
-                                                <div className="text-sm font-medium text-gray-900 truncate">
+                                                <div className="text-sm font-medium text-gray-900 truncate max-w-40">
                                                   {searchQuery ? (
                                                     <span
                                                       dangerouslySetInnerHTML={{
@@ -1143,19 +1142,16 @@ export default function DoctorInvoice() {
                                                     service.name
                                                   )}
                                                 </div>
-                                                <div className="text-xs font-bold text-blue-600 ml-2 bg-blue-100 px-2 py-1 rounded-full">
+                                                <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded">
                                                   {service.price} {language === 'ar' ? 'ر.س' : 'SAR'}
                                                 </div>
                                               </div>
-                                              <div className="text-xs text-gray-500 mt-1 flex items-center justify-between">
-                                                <span className="flex items-center">
+                                              <div className="text-xs text-gray-500 mt-0.5 flex items-center justify-between">
+                                                <span className="flex items-center truncate">
                                                   {service.category && (
-                                                    <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-xs mr-2">
+                                                    <span className="bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded text-xs mr-1 truncate max-w-16">
                                                       {service.category}
                                                     </span>
-                                                  )}
-                                                  {service.duration && (
-                                                    <span className="text-gray-400">{service.duration} {language === 'ar' ? 'دقيقة' : 'min'}</span>
                                                   )}
                                                 </span>
                                                 <span className="text-xs text-blue-500">#{index + 1}</span>
@@ -1163,7 +1159,8 @@ export default function DoctorInvoice() {
                                             </div>
                                           </div>
                                         </CommandItem>
-                                      ))}
+                                        ))}
+                                      </div>
                                     </CommandGroup>
                                   )}
                                 </Command>
