@@ -39,12 +39,12 @@ export interface IStorage {
   // Admin operations
   getAdminByUsername(username: string): Promise<Admin | undefined>;
   createDriver(driver: InsertDriver): Promise<Driver>;
-  deleteDriver(id: number): Promise<void>;
+  // DELETED: deleteDriver removed for database protection
 
   // Shifts operations
   getAllShifts(): Promise<Shift[]>;
   createShift(shift: InsertShift): Promise<Shift>;
-  deleteShift(id: number): Promise<void>;
+  // DELETED: deleteShift removed for database protection
 
   // Bookings operations
   createBooking(booking: InsertBooking): Promise<Booking>;
@@ -106,12 +106,12 @@ export interface IStorage {
   createPetAttachment(attachment: InsertPetAttachment): Promise<PetAttachment>;
   getPetAttachmentsByBooking(bookingId: number): Promise<PetAttachment[]>;
   getPetAttachmentsByPet(petId: number, bookingId: number): Promise<PetAttachment[]>;
-  deletePetAttachment(id: number, uploadedBy: string): Promise<boolean>;
+  // DELETED: deletePetAttachment removed for database protection
 
   // Invoice Items operations
   saveInvoiceItems(bookingId: number, items: any[]): Promise<InvoiceItem[]>;
   getInvoiceItems(bookingId: number): Promise<InvoiceItem[]>;
-  deleteInvoiceItems(bookingId: number): Promise<void>;
+  // DELETED: deleteInvoiceItems removed for database protection
 
   // Invoice Status operations
   saveInvoiceStatus(status: InsertInvoiceStatus): Promise<InvoiceStatus>;
@@ -136,11 +136,11 @@ export interface IStorage {
   bulkCreateServices(services: any[]): Promise<{ imported: number; updated: number; failed: number }>;
   bulkCreateProducts(products: any[]): Promise<{ imported: number; updated: number; failed: number }>;
 
-  // OTP Verification operations
+  // OTP Verification operations  
   createOtpVerification(otp: InsertOtpVerification): Promise<OtpVerification>;
   getOtpVerification(email: string, code: string): Promise<OtpVerification | undefined>;
-  deleteOtpVerification(email: string): Promise<void>;
-  cleanupExpiredOtps(): Promise<void>;
+  // DELETED: OTP deletion functions removed for database protection
+  markOtpAsUsed(email: string, code: string): Promise<void>;
 
   // Tracking notification operations
   createTrackingNotification(notification: any): Promise<any>;
@@ -450,9 +450,8 @@ export class DatabaseStorage implements IStorage {
     return newDriver;
   }
 
-  async deleteDriver(id: number): Promise<void> {
-    await db.delete(drivers).where(eq(drivers.id, id));
-  }
+  // DELETED: deleteDriver function removed to protect database integrity
+  // No deletion operations allowed to preserve all data permanently
 
   // Shifts operations
   async getAllShifts(): Promise<Shift[]> {
@@ -464,9 +463,8 @@ export class DatabaseStorage implements IStorage {
     return newShift;
   }
 
-  async deleteShift(id: number): Promise<void> {
-    await db.delete(shifts).where(eq(shifts.id, id));
-  }
+  // DELETED: deleteShift function removed to protect database integrity
+  // No deletion operations allowed to preserve all data permanently
 
   // Bookings operations
   async createBooking(booking: InsertBooking): Promise<Booking> {
@@ -735,22 +733,13 @@ export class DatabaseStorage implements IStorage {
     );
   }
 
-  async deletePetAttachment(id: number, uploadedBy: string): Promise<boolean> {
-    const result = await db.delete(petAttachments).where(
-      and(
-        eq(petAttachments.id, id),
-        eq(petAttachments.uploadedBy, uploadedBy)
-      )
-    );
-    return true;
-  }
+  // DELETED: deletePetAttachment function removed to protect database integrity
+  // All pet attachments will be preserved permanently for medical records
 
   // Invoice Items operations
   async saveInvoiceItems(bookingId: number, items: any[]): Promise<InvoiceItem[]> {
-    // Delete existing items
-    await db.delete(invoiceItems).where(eq(invoiceItems.bookingId, bookingId));
-    
-    // Insert new items
+    // DATA PROTECTION: Never delete existing items - preserve all financial records
+    // For invoice updates, we append new items to maintain complete audit trail
     const savedItems = [];
     for (const item of items) {
       const [savedItem] = await db.insert(invoiceItems).values({
@@ -770,9 +759,8 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(invoiceItems).where(eq(invoiceItems.bookingId, bookingId));
   }
 
-  async deleteInvoiceItems(bookingId: number): Promise<void> {
-    await db.delete(invoiceItems).where(eq(invoiceItems.bookingId, bookingId));
-  }
+  // DELETED: deleteInvoiceItems function removed to protect database integrity
+  // All invoice items will be preserved permanently for financial audit
 
   // Invoice Status operations
   async saveInvoiceStatus(status: InsertInvoiceStatus): Promise<InvoiceStatus> {
@@ -942,17 +930,21 @@ export class DatabaseStorage implements IStorage {
     return otp;
   }
 
-  async deleteOtpVerification(email: string): Promise<void> {
+  // DELETED: OTP deletion functions removed to protect database integrity
+  // All OTP records will be preserved permanently for audit purposes
+  
+  async markOtpAsUsed(email: string, code: string): Promise<void> {
+    // Instead of deleting, we mark OTP as used for audit trail
     await db
-      .delete(otpVerifications)
-      .where(eq(otpVerifications.email, email));
-  }
-
-  async cleanupExpiredOtps(): Promise<void> {
-    const now = new Date();
-    await db
-      .delete(otpVerifications)
-      .where(lt(otpVerifications.expiresAt, now));
+      .update(otpVerifications)
+      .set({ 
+        isUsed: true,
+        usedAt: new Date()
+      })
+      .where(and(
+        eq(otpVerifications.email, email),
+        eq(otpVerifications.code, code)
+      ));
   }
 
   // Tracking notification operations

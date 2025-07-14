@@ -176,33 +176,7 @@ export default function VetsVanShifts() {
     },
   });
 
-  // حذف نوبة
-  const deleteShiftMutation = useMutation({
-    mutationFn: async (shiftId: number) => {
-      const response = await fetch(`/api/admin/shifts/${shiftId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to delete shift');
-      return await response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/shifts'] });
-      toast({
-        title: t('success'),
-        description: t('shiftDeletedSuccess'),
-      });
-    },
-    onError: () => {
-      toast({
-        title: t('error'),
-        description: t('failedToDeleteShift'),
-        variant: "destructive",
-      });
-    },
-  });
+  // DELETE FUNCTIONALITY REMOVED - Database protection: All shift data preserved permanently
 
   const handleAddShift = () => {
     if (!selectedVetsVan) return;
@@ -458,14 +432,7 @@ export default function VetsVanShifts() {
                                   <div className="text-xs text-gray-600 mt-1">
                                     {shift.startTime} - {shift.endTime}
                                   </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute -top-1 -right-1 h-5 w-5 p-0 text-red-500 hover:text-red-700"
-                                    onClick={() => deleteShiftMutation.mutate(shift.id)}
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </Button>
+                                  {/* DELETE BUTTON REMOVED - Database protection: All shift data preserved permanently */}
                                 </div>
                               ) : (
                                 <Dialog open={isAddShiftOpen && selectedVetsVan === van.id} onOpenChange={(open) => {
