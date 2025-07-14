@@ -23,7 +23,7 @@ interface InvoiceItem {
   quantity: number;
   unitPrice: number;
   discount: number;
-  discountType: 'percentage' | 'amount';
+  discountType: 'none' | '10%' | '100%';
   vatRate: number;
   vatAmount: number;
   totalBeforeVat: number;
@@ -206,7 +206,7 @@ export default function DoctorInvoice() {
         quantity: parseInt(item.quantity) || 1,
         unitPrice: parseFloat(item.unitPrice) || 0,
         discount: parseFloat(item.discount) || 0,
-        discountType: item.discountType || 'percentage',
+        discountType: item.discountType || 'none',
         vatRate: parseFloat(item.vatRate) || 15,
         vatAmount: parseFloat(item.vatAmount) || 0,
         totalBeforeVat: parseFloat(item.totalBeforeVat) || 0,
@@ -426,16 +426,20 @@ export default function DoctorInvoice() {
   
   // Calculate values for each item automatically
   const calculateItemValues = (item: InvoiceItem) => {
-    // Calculate discount amount
+    // Calculate discount amount based on new discount types
     let discountAmount = 0;
-    if (item.discountType === 'percentage') {
-      discountAmount = (item.unitPrice * item.quantity * item.discount) / 100;
+    const subtotal = item.unitPrice * item.quantity;
+    
+    if (item.discountType === '10%') {
+      discountAmount = subtotal * 0.10; // 10% discount
+    } else if (item.discountType === '100%') {
+      discountAmount = subtotal; // 100% discount (free)
     } else {
-      discountAmount = item.discount;
+      discountAmount = 0; // No discount
     }
     
     // Calculate total before VAT
-    const totalBeforeVat = (item.unitPrice * item.quantity) - discountAmount;
+    const totalBeforeVat = subtotal - discountAmount;
     
     // Calculate VAT amount (15% of total before VAT)
     const vatAmount = totalBeforeVat * (item.vatRate / 100);
@@ -489,7 +493,7 @@ export default function DoctorInvoice() {
       quantity: 1, 
       unitPrice: 0, 
       discount: 0,
-      discountType: 'percentage' as const,
+      discountType: 'none' as const,
       vatRate: 15,
       vatAmount: 0,
       totalBeforeVat: 0,
@@ -1066,30 +1070,30 @@ export default function DoctorInvoice() {
                         
                         {/* Discount */}
                         <td className="py-2 px-2">
-                          <div className="flex items-center space-x-1">
+                          {isRecordLocked ? (
+                            <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                              {item.discountType === 'none' 
+                                ? (language === 'ar' ? 'بدون خصم' : 'No Discount')
+                                : item.discountType === '10%' 
+                                  ? (language === 'ar' ? 'خصم 10%' : '10% Discount')
+                                  : (language === 'ar' ? 'خصم 100%' : '100% Discount')
+                              }
+                            </div>
+                          ) : (
                             <Select
                               value={item.discountType}
                               onValueChange={(value) => updateItem(item.id, 'discountType', value)}
-                              disabled={isRecordLocked}
                             >
-                              <SelectTrigger className="w-16 h-8 text-xs">
+                              <SelectTrigger className="w-full h-8 text-xs">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="percentage">%</SelectItem>
-                                <SelectItem value="amount">{t('sar')}</SelectItem>
+                                <SelectItem value="none">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</SelectItem>
+                                <SelectItem value="10%">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</SelectItem>
+                                <SelectItem value="100%">{language === 'ar' ? 'خصم 100%' : '100% Discount'}</SelectItem>
                               </SelectContent>
                             </Select>
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={item.discount}
-                              onChange={(e) => updateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
-                              className="w-16 h-8 text-xs text-center"
-                              disabled={isRecordLocked}
-                            />
-                          </div>
+                          )}
                         </td>
                         
                         {/* Unit Price */}
@@ -1527,30 +1531,30 @@ export default function DoctorInvoice() {
                         
                         {/* Discount */}
                         <td className="py-2 px-2">
-                          <div className="flex items-center space-x-1">
-                            <Input
-                              type="number"
-                              min="0"
-                              step="0.01"
-                              value={item.discount}
-                              onChange={(e) => updateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
-                              className="w-16 h-8 text-xs text-center"
-                              disabled={isRecordLocked}
-                            />
+                          {isRecordLocked ? (
+                            <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                              {item.discountType === 'none' 
+                                ? (language === 'ar' ? 'بدون خصم' : 'No Discount')
+                                : item.discountType === '10%' 
+                                  ? (language === 'ar' ? 'خصم 10%' : '10% Discount')
+                                  : (language === 'ar' ? 'خصم 100%' : '100% Discount')
+                              }
+                            </div>
+                          ) : (
                             <Select
                               value={item.discountType}
                               onValueChange={(value) => updateItem(item.id, 'discountType', value)}
-                              disabled={isRecordLocked}
                             >
-                              <SelectTrigger className="w-16 h-8 text-xs">
+                              <SelectTrigger className="w-full h-8 text-xs">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="percentage">%</SelectItem>
-                                <SelectItem value="amount">{t('sar')}</SelectItem>
+                                <SelectItem value="none">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</SelectItem>
+                                <SelectItem value="10%">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</SelectItem>
+                                <SelectItem value="100%">{language === 'ar' ? 'خصم 100%' : '100% Discount'}</SelectItem>
                               </SelectContent>
                             </Select>
-                          </div>
+                          )}
                         </td>
                         
                         {/* VAT Amount */}
