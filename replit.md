@@ -1,15 +1,8 @@
-# VetsVan Veterinary Services Application
+# Ride Hailing Application
 
 ## Overview
 
-This is a comprehensive veterinary appointment booking system with real-time GPS tracking, OTP email verification, and Progressive Web App (PWA) functionality. The system supports mobile app installation with VetsVan branding, offline functionality, bilingual support (Arabic/English), and admin management features. The application prioritizes complete data protection with zero deletion capabilities to preserve all records permanently.
-
-## Database Protection Status
-- **CRITICAL**: All DELETE operations completely removed from the system
-- **Storage Layer**: deleteDriver, deleteShift, deleteOtpVerification, cleanupExpiredOtps, deletePetAttachment, deleteInvoiceItems functions removed
-- **Admin Interface**: All delete buttons removed from admin dashboard and VetsVan shifts management
-- **Data Preservation**: 151 products and services protected, all user data, bookings, invoices, and medical records preserved permanently
-- **Audit Trail**: OTP verification uses markOtpAsUsed instead of deletion for complete audit trail
+This is a full-stack ride hailing application built with a modern tech stack. The application allows users to request rides, track their status, and provides a complete ride management system with real-time updates. The frontend is built with React and TypeScript, while the backend uses Express.js with a PostgreSQL database managed through Drizzle ORM.
 
 ## System Architecture
 

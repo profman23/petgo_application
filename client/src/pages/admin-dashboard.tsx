@@ -984,7 +984,33 @@ export default function AdminDashboard() {
                                 <Edit className="w-3 h-3" />
                                 {language === 'ar' ? 'تعديل' : 'Edit'}
                               </button>
-                              {/* DELETE BUTTON REMOVED - Database protection: All VetsVan data preserved permanently */}
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <button className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1">
+                                    <Trash2 className="w-3 h-3" />
+                                    {t('delete')}
+                                  </button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>{t('confirmDelete')}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      {t('deleteVetsVanConfirm')} {(driver as any).vetsvanCode} - {(driver as any).vetsvanName}?
+                                      <br />
+                                      {t('deleteWarning')}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deleteDriverMutation.mutate(driver.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      {t('deleteConfirm')}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </div>
                         </li>
