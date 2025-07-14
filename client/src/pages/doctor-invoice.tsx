@@ -893,7 +893,7 @@ export default function DoctorInvoice() {
         </div>
 
         {/* Invoice Items */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6 relative" style={{ overflow: 'visible', zIndex: 1 }}>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">
               {t('invoiceItems')}
@@ -906,7 +906,7 @@ export default function DoctorInvoice() {
             )}
           </div>
           
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto relative" style={{ overflow: 'visible' }}>
             <table className="w-full mb-4">
               <thead>
                 <tr className="border-b">
@@ -976,7 +976,11 @@ export default function DoctorInvoice() {
                               
                               {/* Search Results Dropdown */}
                               {dropdownOpen === item.id && (filteredProducts.length > 0 || filteredServices.length > 0) && (
-                                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-96 overflow-hidden">
+                                <div className="absolute bottom-full mb-2 left-0 z-50 bg-white border border-gray-200 rounded-md shadow-2xl max-h-96 overflow-hidden" style={{ 
+                                  zIndex: 9999,
+                                  width: '100%',
+                                  maxWidth: '400px'
+                                }}>
                                   <div className="p-0">
                                     <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
                                       <div className="flex items-center justify-between">
