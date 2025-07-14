@@ -117,8 +117,8 @@ export default function DoctorInvoice() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isRecordLocked, setIsRecordLocked] = useState(false);
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
-  const [searchQuery, setSearchQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState('');
+
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -135,6 +135,50 @@ export default function DoctorInvoice() {
     },
     enabled: !!params?.bookingId,
   });
+
+  // Fetch products and services for search
+  const { data: products = [], isLoading: isProductsLoading } = useQuery({
+    queryKey: ['/api/admin/products'],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/admin/products', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        if (response.status === 404) return [];
+        throw new Error('Failed to fetch products');
+      }
+      return await response.json();
+    },
+  });
+
+  const { data: services = [], isLoading: isServicesLoading } = useQuery({
+    queryKey: ['/api/admin/services'],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/admin/services', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        if (response.status === 404) return [];
+        throw new Error('Failed to fetch services');
+      }
+      return await response.json();
+    },
+  });
+
+  // Filter products and services based on search - moved after queries
+  const filteredProducts = products.filter((product: any) =>
+    !searchQuery || product.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  ).slice(0, 10);
+
+  const filteredServices = services.filter((service: any) =>
+    !searchQuery || service.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  ).slice(0, 10);
 
   // Fetch saved invoice items
   const { data: savedInvoiceItems } = useQuery({
@@ -172,28 +216,6 @@ export default function DoctorInvoice() {
       return await response.json();
     },
     enabled: !!params?.bookingId,
-  });
-
-  // Fetch products for invoice item selection
-  const { data: products = [], isLoading: isProductsLoading } = useQuery({
-    queryKey: ['/api/products'],
-    queryFn: async () => {
-      const response = await apiRequest('/api/products');
-      return response;
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
-  });
-
-  // Fetch services for invoice item selection
-  const { data: services = [], isLoading: isServicesLoading } = useQuery({
-    queryKey: ['/api/services'],
-    queryFn: async () => {
-      const response = await apiRequest('/api/services');
-      return response;
-    },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
   });
 
   // Load saved invoice items when data is available
@@ -885,7 +907,7 @@ export default function DoctorInvoice() {
           <h2 className="text-xl font-semibold mb-4">
             {t('petInfo')}
           </h2>
-          {booking.pets && booking.pets.length > 0 ? booking.pets.map((pet, index) => (
+          {booking?.pets && Array.isArray(booking.pets) && booking.pets.length > 0 ? booking.pets.map((pet, index) => (
             <div key={index} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -984,25 +1006,25 @@ export default function DoctorInvoice() {
                   {language === 'ar' ? (
                     // Arabic RTL order
                     <>
-                      <th className="text-center py-2 px-2 w-32">
+                      <th className="text-center py-2 px-2 w-20">
                         {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} ({t('sar')})
                       </th>
-                      <th className="text-center py-2 px-2 w-32">
+                      <th className="text-center py-2 px-2 w-20">
                         {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} ({t('sar')})
                       </th>
-                      <th className="text-center py-2 px-2 w-24">
+                      <th className="text-center py-2 px-2 w-16">
                         {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)
                       </th>
-                      <th className="text-center py-2 px-2 w-28">
+                      <th className="text-center py-2 px-2 w-20">
                         {language === 'ar' ? 'الخصم' : 'Discount'}
                       </th>
-                      <th className="text-center py-2 px-2 w-32">
+                      <th className="text-center py-2 px-2 w-20">
                         {t('unitPrice')} ({t('sar')})
                       </th>
-                      <th className="text-center py-2 px-2 w-24">
+                      <th className="text-center py-2 px-2 w-16">
                         {t('quantity')}
                       </th>
-                      <th className="text-left py-2 px-2" style={{ textAlign: getTextAlign(language) }}>
+                      <th className="text-left py-2 px-2 w-2/5" style={{ textAlign: getTextAlign(language) }}>
                         {t('description')}
                       </th>
                       <th className="w-16"></th>
@@ -1010,25 +1032,25 @@ export default function DoctorInvoice() {
                   ) : (
                     // English LTR order
                     <>
-                      <th className="text-left py-2 px-2" style={{ textAlign: getTextAlign(language) }}>
+                      <th className="text-left py-2 px-2 w-2/5" style={{ textAlign: getTextAlign(language) }}>
                         {t('description')}
                       </th>
-                      <th className="text-center py-2 px-2 w-24">
+                      <th className="text-center py-2 px-2 w-16">
                         {t('quantity')}
                       </th>
-                      <th className="text-center py-2 px-2 w-32">
+                      <th className="text-center py-2 px-2 w-20">
                         {t('unitPrice')} ({t('sar')})
                       </th>
-                      <th className="text-center py-2 px-2 w-28">
+                      <th className="text-center py-2 px-2 w-20">
                         {language === 'ar' ? 'الخصم' : 'Discount'}
                       </th>
-                      <th className="text-center py-2 px-2 w-24">
+                      <th className="text-center py-2 px-2 w-16">
                         {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)
                       </th>
-                      <th className="text-center py-2 px-2 w-32">
+                      <th className="text-center py-2 px-2 w-20">
                         {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} ({t('sar')})
                       </th>
-                      <th className="text-center py-2 px-2 w-32">
+                      <th className="text-center py-2 px-2 w-20">
                         {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} ({t('sar')})
                       </th>
                       <th className="w-16"></th>
@@ -1037,7 +1059,7 @@ export default function DoctorInvoice() {
                 </tr>
               </thead>
               <tbody>
-                {invoiceItems.map((item) => (
+                {Array.isArray(invoiceItems) ? invoiceItems.map((item) => (
                   <tr key={item.id} className="border-b">
                     {/* Render cells in different order based on language */}
                     {language === 'ar' ? (
@@ -1134,15 +1156,179 @@ export default function DoctorInvoice() {
                               {item.description || t('description')}
                             </div>
                           ) : (
-                            <Input
-                              type="text"
-                              value={item.description}
-                              onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                              placeholder={language === 'ar' ? 'وصف المنتج أو الخدمة' : 'Product/Service description'}
-                              className="w-full"
-                              dir={language === 'ar' ? 'rtl' : 'ltr'}
-                              style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
-                            />
+                            <div className="relative">
+                              {/* Enhanced Search Field for products/services */}
+                              {(filteredProducts.length > 0 || filteredServices.length > 0 || products.length > 0 || services.length > 0) ? (
+                                <div className="relative">
+                                  <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input
+                                      type="text"
+                                      value={item.description || ''}
+                                      onChange={(e) => {
+                                        const value = e.target.value;
+                                        updateItem(item.id, 'description', value);
+                                        setSearchQuery(value);
+                                        setDropdownOpen(value.length > 0 ? item.id : '');
+                                      }}
+                                      onFocus={() => {
+                                        setSearchQuery(item.description || '');
+                                        setDropdownOpen(item.id);
+                                      }}
+                                      onBlur={() => {
+                                        setTimeout(() => setDropdownOpen(''), 200);
+                                      }}
+                                      placeholder={language === 'ar' ? 'ابحث أو اكتب اسم المنتج/الخدمة...' : 'Search or type product/service name...'}
+                                      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                      dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                    />
+                                    {(item.description || searchQuery) && (
+                                      <button
+                                        onClick={() => {
+                                          updateItem(item.id, 'description', '');
+                                          setSearchQuery('');
+                                          setDropdownOpen('');
+                                        }}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-sm opacity-70 hover:opacity-100 hover:bg-gray-100"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Search Results Dropdown */}
+                                  {dropdownOpen === item.id && (filteredProducts.length > 0 || filteredServices.length > 0) && (
+                                    <div className="absolute bottom-full mb-2 left-0 z-50 bg-white border border-gray-200 rounded-md shadow-2xl max-h-96 overflow-hidden" style={{ 
+                                      zIndex: 9999,
+                                      width: '100%',
+                                      maxWidth: '400px'
+                                    }}>
+                                      <div className="p-0">
+                                        <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
+                                          <div className="flex items-center justify-between">
+                                            <div className="text-xs font-medium text-purple-700">
+                                              {language === 'ar' ? 'المنتجات والخدمات' : 'Products & Services'}
+                                              <span className="ml-2 text-purple-600">
+                                                ({filteredProducts.length + filteredServices.length})
+                                              </span>
+                                            </div>
+                                            {searchQuery && (
+                                              <div className="text-xs text-purple-600 bg-white px-2 py-1 rounded-full">
+                                                "{searchQuery}"
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                        
+                                        {/* Combined Products & Services List */}
+                                        <div className="max-h-60 overflow-y-auto">
+                                          {/* Products Section */}
+                                          {filteredProducts.length > 0 && (
+                                            <>
+                                              <div className="px-3 py-2 bg-purple-50 border-b border-purple-100">
+                                                <div className="flex items-center text-xs font-medium text-purple-700">
+                                                  <span className="mr-2">📦</span>
+                                                  {language === 'ar' ? 'المنتجات' : 'Products'} ({filteredProducts.length})
+                                                </div>
+                                              </div>
+                                              {filteredProducts.map((product: any, index: number) => (
+                                                <div
+                                                  key={`product-${product.id}`}
+                                                  onClick={() => {
+                                                    updateItem(item.id, 'description', product.name);
+                                                    updateItem(item.id, 'unitPrice', parseFloat(product.price) || 0);
+                                                    setDropdownOpen('');
+                                                    setSearchQuery('');
+                                                  }}
+                                                  className="p-3 hover:bg-purple-50 cursor-pointer border-b border-gray-100 transition-all duration-200 group"
+                                                >
+                                                  <div className="flex items-center w-full">
+                                                    <Check
+                                                      className={`mr-3 h-4 w-4 transition-all duration-200 ${
+                                                        item.description === product.name 
+                                                          ? 'opacity-100 text-purple-600' 
+                                                          : 'opacity-0 group-hover:opacity-30'
+                                                      }`}
+                                                    />
+                                                    <div className="flex-1 min-w-0">
+                                                      <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-medium text-gray-900 truncate max-w-40">
+                                                          {product.name}
+                                                        </div>
+                                                        <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded">
+                                                          {product.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </>
+                                          )}
+                                          
+                                          {/* Services Section */}
+                                          {filteredServices.length > 0 && (
+                                            <>
+                                              <div className="px-3 py-2 bg-blue-50 border-b border-blue-100">
+                                                <div className="flex items-center text-xs font-medium text-blue-700">
+                                                  <span className="mr-2">🩺</span>
+                                                  {language === 'ar' ? 'الخدمات' : 'Services'} ({filteredServices.length})
+                                                </div>
+                                              </div>
+                                              {filteredServices.map((service: any, index: number) => (
+                                                <div
+                                                  key={`service-${service.id}`}
+                                                  onClick={() => {
+                                                    updateItem(item.id, 'description', service.name);
+                                                    updateItem(item.id, 'unitPrice', parseFloat(service.price) || 0);
+                                                    setDropdownOpen('');
+                                                    setSearchQuery('');
+                                                  }}
+                                                  className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 transition-all duration-200 group"
+                                                >
+                                                  <div className="flex items-center w-full">
+                                                    <Check
+                                                      className={`mr-3 h-4 w-4 transition-all duration-200 ${
+                                                        item.description === service.name 
+                                                          ? 'opacity-100 text-blue-600' 
+                                                          : 'opacity-0 group-hover:opacity-30'
+                                                      }`}
+                                                    />
+                                                    <div className="flex-1 min-w-0">
+                                                      <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-medium text-gray-900 truncate max-w-40">
+                                                          {service.name}
+                                                        </div>
+                                                        <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded">
+                                                          {service.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="relative">
+                                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Input
+                                    type="text"
+                                    value={item.description}
+                                    onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                                    placeholder={language === 'ar' ? 'اكتب وصف المنتج أو الخدمة...' : 'Type product or service description...'}
+                                    className="pl-10"
+                                    dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                    style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
+                                  />
+                                </div>
+                              )}
+                            </div>
                           )}
                         </td>
                       </>
@@ -1156,15 +1342,179 @@ export default function DoctorInvoice() {
                               {item.description || t('description')}
                             </div>
                           ) : (
-                            <Input
-                              type="text"
-                              value={item.description}
-                              onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                              placeholder={language === 'ar' ? 'وصف المنتج أو الخدمة' : 'Product/Service description'}
-                              className="w-full"
-                              dir={language === 'ar' ? 'rtl' : 'ltr'}
-                              style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
-                            />
+                            <div className="relative">
+                              {/* Enhanced Search Field for products/services */}
+                              {(filteredProducts.length > 0 || filteredServices.length > 0 || products.length > 0 || services.length > 0) ? (
+                                <div className="relative">
+                                  <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input
+                                      type="text"
+                                      value={item.description || ''}
+                                      onChange={(e) => {
+                                        const value = e.target.value;
+                                        updateItem(item.id, 'description', value);
+                                        setSearchQuery(value);
+                                        setDropdownOpen(value.length > 0 ? item.id : '');
+                                      }}
+                                      onFocus={() => {
+                                        setSearchQuery(item.description || '');
+                                        setDropdownOpen(item.id);
+                                      }}
+                                      onBlur={() => {
+                                        setTimeout(() => setDropdownOpen(''), 200);
+                                      }}
+                                      placeholder={language === 'ar' ? 'ابحث أو اكتب اسم المنتج/الخدمة...' : 'Search or type product/service name...'}
+                                      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                      dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                    />
+                                    {(item.description || searchQuery) && (
+                                      <button
+                                        onClick={() => {
+                                          updateItem(item.id, 'description', '');
+                                          setSearchQuery('');
+                                          setDropdownOpen('');
+                                        }}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-sm opacity-70 hover:opacity-100 hover:bg-gray-100"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Search Results Dropdown */}
+                                  {dropdownOpen === item.id && (filteredProducts.length > 0 || filteredServices.length > 0) && (
+                                    <div className="absolute bottom-full mb-2 left-0 z-50 bg-white border border-gray-200 rounded-md shadow-2xl max-h-96 overflow-hidden" style={{ 
+                                      zIndex: 9999,
+                                      width: '100%',
+                                      maxWidth: '400px'
+                                    }}>
+                                      <div className="p-0">
+                                        <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
+                                          <div className="flex items-center justify-between">
+                                            <div className="text-xs font-medium text-purple-700">
+                                              {language === 'ar' ? 'المنتجات والخدمات' : 'Products & Services'}
+                                              <span className="ml-2 text-purple-600">
+                                                ({filteredProducts.length + filteredServices.length})
+                                              </span>
+                                            </div>
+                                            {searchQuery && (
+                                              <div className="text-xs text-purple-600 bg-white px-2 py-1 rounded-full">
+                                                "{searchQuery}"
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                        
+                                        {/* Combined Products & Services List */}
+                                        <div className="max-h-60 overflow-y-auto">
+                                          {/* Products Section */}
+                                          {filteredProducts.length > 0 && (
+                                            <>
+                                              <div className="px-3 py-2 bg-purple-50 border-b border-purple-100">
+                                                <div className="flex items-center text-xs font-medium text-purple-700">
+                                                  <span className="mr-2">📦</span>
+                                                  {language === 'ar' ? 'المنتجات' : 'Products'} ({filteredProducts.length})
+                                                </div>
+                                              </div>
+                                              {filteredProducts.map((product: any, index: number) => (
+                                                <div
+                                                  key={`product-${product.id}`}
+                                                  onClick={() => {
+                                                    updateItem(item.id, 'description', product.name);
+                                                    updateItem(item.id, 'unitPrice', parseFloat(product.price) || 0);
+                                                    setDropdownOpen('');
+                                                    setSearchQuery('');
+                                                  }}
+                                                  className="p-3 hover:bg-purple-50 cursor-pointer border-b border-gray-100 transition-all duration-200 group"
+                                                >
+                                                  <div className="flex items-center w-full">
+                                                    <Check
+                                                      className={`mr-3 h-4 w-4 transition-all duration-200 ${
+                                                        item.description === product.name 
+                                                          ? 'opacity-100 text-purple-600' 
+                                                          : 'opacity-0 group-hover:opacity-30'
+                                                      }`}
+                                                    />
+                                                    <div className="flex-1 min-w-0">
+                                                      <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-medium text-gray-900 truncate max-w-40">
+                                                          {product.name}
+                                                        </div>
+                                                        <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded">
+                                                          {product.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </>
+                                          )}
+                                          
+                                          {/* Services Section */}
+                                          {filteredServices.length > 0 && (
+                                            <>
+                                              <div className="px-3 py-2 bg-blue-50 border-b border-blue-100">
+                                                <div className="flex items-center text-xs font-medium text-blue-700">
+                                                  <span className="mr-2">🩺</span>
+                                                  {language === 'ar' ? 'الخدمات' : 'Services'} ({filteredServices.length})
+                                                </div>
+                                              </div>
+                                              {filteredServices.map((service: any, index: number) => (
+                                                <div
+                                                  key={`service-${service.id}`}
+                                                  onClick={() => {
+                                                    updateItem(item.id, 'description', service.name);
+                                                    updateItem(item.id, 'unitPrice', parseFloat(service.price) || 0);
+                                                    setDropdownOpen('');
+                                                    setSearchQuery('');
+                                                  }}
+                                                  className="p-3 hover:bg-blue-50 cursor-pointer border-b border-gray-100 transition-all duration-200 group"
+                                                >
+                                                  <div className="flex items-center w-full">
+                                                    <Check
+                                                      className={`mr-3 h-4 w-4 transition-all duration-200 ${
+                                                        item.description === service.name 
+                                                          ? 'opacity-100 text-blue-600' 
+                                                          : 'opacity-0 group-hover:opacity-30'
+                                                      }`}
+                                                    />
+                                                    <div className="flex-1 min-w-0">
+                                                      <div className="flex items-center justify-between">
+                                                        <div className="text-sm font-medium text-gray-900 truncate max-w-40">
+                                                          {service.name}
+                                                        </div>
+                                                        <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded">
+                                                          {service.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              ))}
+                                            </>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="relative">
+                                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                  <Input
+                                    type="text"
+                                    value={item.description}
+                                    onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                                    placeholder={language === 'ar' ? 'اكتب وصف المنتج أو الخدمة...' : 'Type product or service description...'}
+                                    className="pl-10"
+                                    dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                    style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
+                                  />
+                                </div>
+                              )}
+                            </div>
                           )}
                         </td>
                         
@@ -1272,7 +1622,7 @@ export default function DoctorInvoice() {
                       )}
                     </td>
                   </tr>
-                ))}
+                )) : null}
               </tbody>
             </table>
           </div>
@@ -1384,7 +1734,7 @@ export default function DoctorInvoice() {
               {t('paymentHistory')}
             </h2>
             <div className="space-y-3">
-              {payments.map((payment) => (
+              {Array.isArray(payments) ? payments.map((payment) => (
                 <div key={payment.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
                   <div>
                     <div className="font-semibold text-green-600">
@@ -1401,7 +1751,7 @@ export default function DoctorInvoice() {
                     ✓
                   </div>
                 </div>
-              ))}
+              )) : null}
             </div>
             <div className="mt-4 pt-4 border-t">
               <div className="flex justify-between font-bold">
