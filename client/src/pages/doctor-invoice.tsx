@@ -419,6 +419,16 @@ export default function DoctorInvoice() {
   // Calculate totals
   const subtotal = invoiceItems.reduce((sum, item) => sum + item.totalAfterVat, 0);
   const taxAmount = invoiceItems.reduce((sum, item) => sum + item.vatAmount, 0);
+  // Calculate total discount amount from all items
+  const totalDiscountAmount = invoiceItems.reduce((sum, item) => {
+    const itemSubtotal = item.unitPrice * item.quantity;
+    if (item.discountType === '10%') {
+      return sum + (itemSubtotal * 0.10);
+    } else if (item.discountType === '100%') {
+      return sum + itemSubtotal;
+    }
+    return sum;
+  }, 0);
   const totalWithTax = subtotal;
   const discountAmount = applyDiscount ? totalWithTax * DISCOUNT_RATE : 0;
   const finalTotal = totalWithTax - discountAmount;
@@ -1609,6 +1619,12 @@ export default function DoctorInvoice() {
                   <span>{t('subtotal')}:</span>
                   <span>{subtotal.toFixed(2)} {t('sar')}</span>
                 </div>
+                {totalDiscountAmount > 0 && (
+                  <div className="flex justify-between mb-2 text-green-600">
+                    <span>{t('discount')}:</span>
+                    <span>-{totalDiscountAmount.toFixed(2)} {t('sar')}</span>
+                  </div>
+                )}
                 <div className="flex justify-between mb-2">
                   <span>{t('tax')}:</span>
                   <span>{taxAmount.toFixed(2)} {t('sar')}</span>
