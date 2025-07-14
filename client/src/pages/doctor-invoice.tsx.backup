@@ -1,0 +1,1312 @@
+import { useState, useEffect } from 'react';
+import { useLocation, useRoute } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import { useLanguage } from '@/lib/i18n';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
+import PaymentModal from './payment-modal';
+import UploadAttachmentModal from '@/components/UploadAttachmentModal';
+import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronDown, Search, X } from "lucide-react";
+
+interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  unitPriceBeforeVAT: number;
+  discount: number; // percentage (0-100)
+  vatRate: number; // fixed at 15%
+  totalBeforeVAT: number;
+  totalAfterVAT: number;
+}
+
+interface Customer {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+}
+
+interface Pet {
+  id: number;
+  name: string;
+  type: string;
+  ageYear: number;
+  ageMonth: number;
+  ageDay: number;
+}
+
+interface PetVital {
+  id?: number;
+  bookingId: number;
+  petId: number;
+  weight?: number | null;
+  temperature?: number | null;
+  heartRate?: number | null;
+  notes?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface BookingDetails {
+  id: number;
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  pets: Pet[];
+  appointmentDate: string;
+  appointmentTime: string;
+  serviceType: string;
+  location: any;
+  status: string;
+}
+
+export default function DoctorInvoice() {
+  const [, params] = useRoute('/doctor-invoice/:bookingId');
+  const [, setLocation] = useLocation();
+  const { language } = useLanguage();
+  const { toast } = useToast();
+  
+  const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([
+    { 
+      id: '1', 
+      description: '', 
+      quantity: 1, 
+      unitPriceBeforeVAT: 0, 
+      discount: 0, 
+      vatRate: 15, 
+      totalBeforeVAT: 0, 
+      totalAfterVAT: 0 
+    }
+  ]);
+  const [notes, setNotes] = useState('');
+  const [applyDiscount, setApplyDiscount] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  
+  // Tax rate constant (15%)
+  const TAX_RATE = 0.15;
+  // Discount rate constant (10%)
+  const DISCOUNT_RATE = 0.10;
+  const [showVitalsModal, setShowVitalsModal] = useState(false);
+  const [selectedPetForVitals, setSelectedPetForVitals] = useState<Pet | null>(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedPetForUpload, setSelectedPetForUpload] = useState<Pet | null>(null);
+  const [vitalsData, setVitalsData] = useState({
+    weight: '',
+    temperature: '',
+    heartRate: '',
+    notes: ''
+  });
+  const [totalPaid, setTotalPaid] = useState(0);
+  const [payments, setPayments] = useState<any[]>([]);
+  const [showInvoiceGenerator, setShowInvoiceGenerator] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isRecordLocked, setIsRecordLocked] = useState(false);
+  const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState('');
+
+  // Fetch booking details
+  const { data: booking, isLoading } = useQuery({
+    queryKey: [`/api/doctor/booking/${params?.bookingId}`],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/doctor/booking/${params?.bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch booking details');
+      return await response.json() as BookingDetails;
+    },
+    enabled: !!params?.bookingId,
+  });
+
+  // Fetch saved invoice items
+  const { data: savedInvoiceItems } = useQuery({
+    queryKey: [`/api/invoice-items/${params?.bookingId}`],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/invoice-items/${params?.bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        if (response.status === 404) return []; // No items found
+        throw new Error('Failed to fetch invoice items');
+      }
+      return await response.json();
+    },
+    enabled: !!params?.bookingId,
+  });
+
+  // Fetch invoice status
+  const { data: invoiceStatus } = useQuery({
+    queryKey: [`/api/invoice-status/${params?.bookingId}`],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/invoice-status/${params?.bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        if (response.status === 404) return null; // No status found
+        throw new Error('Failed to fetch invoice status');
+      }
+      return await response.json();
+    },
+    enabled: !!params?.bookingId,
+  });
+
+  // Fetch products for invoice item selection
+  const { data: products = [], isLoading: isProductsLoading } = useQuery({
+    queryKey: ['/api/products'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/products');
+      return response;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    cacheTime: 30 * 60 * 1000, // 30 minutes
+  });
+
+  // Fetch services for invoice item selection
+  const { data: services = [], isLoading: isServicesLoading } = useQuery({
+    queryKey: ['/api/services'],
+    queryFn: async () => {
+      const response = await apiRequest('/api/services');
+      return response;
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    cacheTime: 30 * 60 * 1000, // 30 minutes
+  });
+
+  // Load saved invoice items when data is available
+  useEffect(() => {
+    if (savedInvoiceItems && savedInvoiceItems.length > 0) {
+      console.log('Loading saved invoice items:', savedInvoiceItems);
+      const loadedItems = savedInvoiceItems.map((item: any, index: number) => ({
+        id: (index + 1).toString(),
+        description: item.description || '',
+        quantity: parseInt(item.quantity) || 1,
+        unitPrice: parseFloat(item.unitPrice) || 0,
+        total: parseFloat(item.total) || 0
+      }));
+      console.log('Loaded items:', loadedItems);
+      setInvoiceItems(loadedItems);
+    } else if (savedInvoiceItems && savedInvoiceItems.length === 0) {
+      // If no saved items, keep the default item
+      setInvoiceItems([{ id: '1', description: '', quantity: 1, unitPrice: 0, total: 0 }]);
+    }
+  }, [savedInvoiceItems]);
+
+  // Auto-save when items are modified
+  useEffect(() => {
+    if (invoiceItems.length > 0 && booking && !isRecordLocked) {
+      const timeoutId = setTimeout(() => {
+        saveInvoiceItems(invoiceItems);
+      }, 1000); // Save after 1 second of inactivity
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [invoiceItems, booking, isRecordLocked]);
+
+  // Load invoice status when data is available
+  useEffect(() => {
+    if (invoiceStatus && invoiceStatus.isGenerated) {
+      setIsRecordLocked(true);
+      setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
+      setNotes(invoiceStatus.notes || '');
+    }
+  }, [invoiceStatus]);
+
+
+
+  const getDirection = (lang: string) => lang === 'ar' ? 'rtl' : 'ltr';
+  const getTextAlign = (lang: string) => lang === 'ar' ? 'right' : 'left';
+
+  const translations = {
+    ar: {
+      invoiceTitle: 'فاتورة خدمة VETS VAN',
+      customerInfo: 'بيانات العميل',
+      petInfo: 'بيانات الأليف',
+      serviceDetails: 'تفاصيل الخدمة',
+      invoiceItems: 'أصناف الفاتورة',
+      description: 'الوصف',
+      quantity: 'الكمية',
+      unitPrice: 'السعر للوحدة',
+      total: 'المجموع',
+      addItem: 'إضافة صنف',
+      removeItem: 'حذف الصنف',
+      subtotal: 'المجموع الفرعي',
+      tax: 'الضريبة (15%)',
+      discount: 'الخصم',
+      finalTotal: 'المجموع النهائي',
+      addPayment: 'إضافة دفعة',
+      paymentAdded: 'تمت إضافة الدفعة',
+      paymentSuccess: 'تمت إضافة الدفعة بنجاح',
+      remainingBalance: 'الرصيد المتبقي',
+      totalPaid: 'إجمالي المدفوع',
+      paymentHistory: 'سجل المدفوعات',
+      notes: 'ملاحظات',
+      generateInvoice: 'إنشاء الفاتورة',
+      back: 'رجوع',
+      name: 'الاسم',
+      phone: 'رقم الهاتف',
+      email: 'البريد الإلكتروني',
+      date: 'التاريخ',
+      time: 'الوقت',
+      service: 'نوع الخدمة',
+      vitals: 'المؤشرات الحيوية',
+      weight: 'الوزن (كيلو)',
+      temperature: 'درجة الحرارة (°س)',
+      heartRate: 'نبضات القلب',
+      save: 'حفظ',
+      cancel: 'إلغاء',
+      vitalsFor: 'المؤشرات الحيوية لـ',
+      petName: 'اسم الأليف',
+      petType: 'نوع الأليف',
+      age: 'العمر',
+      years: 'سنة',
+      months: 'شهر',
+      days: 'يوم',
+      sar: 'ريال',
+      confirmTitle: 'تأكيد إنشاء الفاتورة',
+      confirmMessage: 'هل أنت متأكد من إنشاء الفاتورة؟ سيتم حفظ جميع بنود الفاتورة وجعلها للمشاهدة فقط. لن تتمكن من تعديلها لاحقاً.',
+      confirm: 'موافق',
+      invoiceGenerated: 'تم إنشاء الفاتورة بنجاح',
+      readOnly: 'للمشاهدة فقط',
+      selectProduct: 'اختر المنتج أو الخدمة',
+      products: 'المنتجات',
+      services: 'الخدمات',
+      importedItems: 'عناصر مستوردة',
+      searchPlaceholder: 'ابحث في المنتجات والخدمات...',
+      noResults: 'لا توجد نتائج',
+      searchResults: 'نتائج البحث',
+      exactMatch: 'تطابق تام',
+      partialMatch: 'تطابق جزئي',
+      categoryFilter: 'تصفية حسب الفئة',
+      priceRange: 'نطاق السعر',
+      sortBy: 'ترتيب حسب',
+      sortByName: 'الاسم',
+      sortByPrice: 'السعر',
+      clearFilters: 'مسح الفلاتر',
+    },
+    en: {
+      invoiceTitle: 'VETS VAN Service Invoice',
+      customerInfo: 'Customer Information',
+      petInfo: 'Pet Information',
+      serviceDetails: 'Service Details',
+      invoiceItems: 'Invoice Items',
+      description: 'Description',
+      quantity: 'Quantity',
+      unitPrice: 'Unit Price',
+      total: 'Total',
+      addItem: 'Add Item',
+      removeItem: 'Remove Item',
+      subtotal: 'Subtotal',
+      tax: 'Tax (15%)',
+      discount: 'Discount',
+      finalTotal: 'Final Total',
+      addPayment: 'Add Payment',
+      paymentAdded: 'Payment Added',
+      paymentSuccess: 'Payment has been added successfully',
+      remainingBalance: 'Remaining Balance',
+      totalPaid: 'Total Paid',
+      paymentHistory: 'Payment History',
+      notes: 'Notes',
+      generateInvoice: 'Generate Invoice',
+      back: 'Back',
+      name: 'Name',
+      phone: 'Phone',
+      email: 'Email',
+      date: 'Date',
+      time: 'Time',
+      service: 'Service Type',
+      vitals: 'Pet Vitals',
+      weight: 'Weight (KG)',
+      temperature: 'Temperature (°C)',
+      heartRate: 'Heart Rate',
+      save: 'Save',
+      cancel: 'Cancel',
+      vitalsFor: 'Vitals for',
+      petName: 'Pet Name',
+      petType: 'Pet Type',
+      age: 'Age',
+      years: 'years',
+      months: 'months',
+      days: 'days',
+      sar: 'SAR',
+      confirmTitle: 'Confirm Invoice Generation',
+      confirmMessage: 'Are you sure you want to generate the invoice? All invoice items will be saved and made read-only. You will not be able to edit them later.',
+      confirm: 'Confirm',
+      invoiceGenerated: 'Invoice generated successfully',
+      readOnly: 'Read Only',
+      selectProduct: 'Select Product or Service',
+      products: 'Products',
+      services: 'Services',
+      importedItems: 'Imported Items',
+      searchPlaceholder: 'Search products and services...',
+      noResults: 'No results found',
+      searchResults: 'Search Results',
+      exactMatch: 'Exact Match',
+      partialMatch: 'Partial Match',
+      categoryFilter: 'Filter by Category',
+      priceRange: 'Price Range',
+      sortBy: 'Sort By',
+      sortByName: 'Name',
+      sortByPrice: 'Price',
+      clearFilters: 'Clear Filters',
+    }
+  };
+
+  const t = (key: keyof typeof translations.ar) => translations[language as keyof typeof translations][key];
+
+  // Handle payment submission
+  const handlePaymentSubmit = (paymentData: any) => {
+    const newPayment = {
+      id: Date.now(),
+      amount: parseFloat(paymentData.amount),
+      type: paymentData.paymentType,
+      description: paymentData.description,
+      date: new Date().toISOString()
+    };
+    
+    setPayments(prev => [...prev, newPayment]);
+    setTotalPaid(prev => prev + newPayment.amount);
+    setShowPaymentModal(false);
+    
+    toast({
+      title: t('paymentAdded'),
+      description: `${t('paymentSuccess')} - ${newPayment.amount} ${t('sar')}`,
+      variant: 'default',
+    });
+  };
+
+  // Advanced calculation function for new invoice structure
+  const calculateItemTotals = (item: InvoiceItem) => {
+    const quantity = item.quantity || 0;
+    const unitPriceBeforeVAT = item.unitPriceBeforeVAT || 0;
+    const discount = item.discount || 0; // percentage
+    const vatRate = 15; // fixed 15%
+    
+    // Calculate total before VAT (after discount)
+    const grossAmount = quantity * unitPriceBeforeVAT;
+    const discountAmount = grossAmount * (discount / 100);
+    const totalBeforeVAT = grossAmount - discountAmount;
+    
+    // Calculate VAT amount
+    const vatAmount = totalBeforeVAT * (vatRate / 100);
+    
+    // Calculate total after VAT
+    const totalAfterVAT = totalBeforeVAT + vatAmount;
+    
+    return {
+      totalBeforeVAT: Math.round(totalBeforeVAT * 100) / 100,
+      totalAfterVAT: Math.round(totalAfterVAT * 100) / 100,
+      vatAmount: Math.round(vatAmount * 100) / 100,
+      discountAmount: Math.round(discountAmount * 100) / 100
+    };
+  };
+
+  // Update item calculation when any field changes
+  const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
+    setInvoiceItems(items => 
+      items.map(item => {
+        if (item.id === id) {
+          const updated = { ...item, [field]: value };
+          
+          // Recalculate totals for this item
+          const calculations = calculateItemTotals(updated);
+          updated.totalBeforeVAT = calculations.totalBeforeVAT;
+          updated.totalAfterVAT = calculations.totalAfterVAT;
+          
+          return updated;
+        }
+        return item;
+      })
+    );
+  };
+
+  // Calculate invoice totals
+  const calculateInvoiceTotals = () => {
+    let subtotalBeforeVAT = 0;
+    let totalVATAmount = 0;
+    let totalAfterVAT = 0;
+    let totalDiscountAmount = 0;
+    
+    invoiceItems.forEach(item => {
+      const calculations = calculateItemTotals(item);
+      subtotalBeforeVAT += calculations.totalBeforeVAT;
+      totalVATAmount += calculations.vatAmount;
+      totalAfterVAT += calculations.totalAfterVAT;
+      totalDiscountAmount += calculations.discountAmount;
+    });
+    
+    return {
+      subtotalBeforeVAT: Math.round(subtotalBeforeVAT * 100) / 100,
+      totalVATAmount: Math.round(totalVATAmount * 100) / 100,
+      totalAfterVAT: Math.round(totalAfterVAT * 100) / 100,
+      totalDiscountAmount: Math.round(totalDiscountAmount * 100) / 100
+    };
+  };
+  
+  const invoiceTotals = calculateInvoiceTotals();
+  const remainingBalance = invoiceTotals.totalAfterVAT - totalPaid;
+
+  // Save invoice items to database (auto-save)
+  const saveInvoiceItems = async (itemsToSave: InvoiceItem[]) => {
+    if (!booking || isRecordLocked) return;
+    
+    try {
+      await apiRequest(`/api/invoice-items/${booking.id}`, {
+        method: 'POST',
+        body: { items: itemsToSave }
+      });
+    } catch (error) {
+      console.error('Error auto-saving invoice items:', error);
+    }
+  };
+
+  // Add new item
+  const addItem = () => {
+    const newId = (invoiceItems.length + 1).toString();
+    const newItems = [...invoiceItems, { 
+      id: newId, 
+      description: '', 
+      quantity: 1, 
+      unitPriceBeforeVAT: 0, 
+      discount: 0, 
+      vatRate: 15, 
+      totalBeforeVAT: 0, 
+      totalAfterVAT: 0 
+    }];
+    setInvoiceItems(newItems);
+    saveInvoiceItems(newItems);
+  };
+
+  // Remove item
+  const removeItem = (id: string) => {
+    if (invoiceItems.length > 1) {
+      const newItems = invoiceItems.filter(item => item.id !== id);
+      setInvoiceItems(newItems);
+      saveInvoiceItems(newItems);
+    }
+  };
+
+  // Dialog functions
+  const openConfirmDialog = () => {
+    setShowConfirmDialog(true);
+  };
+
+  // Confirm generate invoice
+  const confirmGenerateInvoice = async () => {
+    try {
+      await apiRequest(`/api/invoice-status/${booking?.id}`, {
+        method: 'POST',
+        body: { status: 'generated', generatedAt: new Date().toISOString() }
+      });
+
+      setIsRecordLocked(true);
+      setShowConfirmDialog(false);
+      setShowInvoice(true);
+
+      // Send invoice link email
+      if (booking?.id) {
+        try {
+          await apiRequest(`/api/send-invoice-email/${booking.id}`, {
+            method: 'POST'
+          });
+          
+          toast({
+            title: language === 'ar' ? '✅ تم إرسال رابط الفاتورة' : '✅ Invoice link sent',
+            description: language === 'ar' ? 'تم إرسال رابط الفاتورة إلى العميل' : 'Invoice link sent to customer',
+            variant: 'default',
+          });
+        } catch (emailError) {
+          console.error('Error sending invoice email:', emailError);
+        }
+      }
+
+      toast({
+        title: language === 'ar' ? '✅ تم إنشاء الفاتورة' : '✅ Invoice generated successfully',
+        variant: 'default',
+      });
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      toast({
+        title: language === 'ar' ? '❌ خطأ في إنشاء الفاتورة' : '❌ Error generating invoice',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // Pet modal functions
+  const saveVitals = async () => {
+    if (!selectedPetForVitals || !booking) return;
+
+    try {
+      const vitalsToSave = {
+        bookingId: booking.id,
+        petId: selectedPetForVitals.id,
+        weight: vitalsData.weight,
+        temperature: vitalsData.temperature,
+        heartRate: vitalsData.heartRate,
+        notes: vitalsData.notes
+      };
+
+      await apiRequest(`/api/pet-vitals`, {
+        method: 'POST',
+        body: vitalsToSave
+      });
+
+      toast({
+        title: language === 'ar' ? '✅ تم حفظ العلامات الحيوية' : '✅ Vitals saved successfully',
+        variant: 'default',
+      });
+
+      setShowVitalsModal(false);
+      setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+    } catch (error) {
+      console.error('Error saving vitals:', error);
+      toast({
+        title: language === 'ar' ? '❌ خطأ في حفظ العلامات الحيوية' : '❌ Error saving vitals',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const openVitalsModal = async (pet: Pet) => {
+    setSelectedPetForVitals(pet);
+    setShowVitalsModal(true);
+    
+    // Load existing vitals if any
+    try {
+      const response = await apiRequest(`/api/pet-vitals/${booking?.id}?petId=${pet.id}`);
+      if (response.length > 0) {
+        const latestVitals = response.sort((a: any, b: any) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )[0];
+        setVitalsData({
+          weight: latestVitals.weight,
+          temperature: latestVitals.temperature,
+          heartRate: latestVitals.heartRate,
+          notes: latestVitals.notes || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error loading vitals:', error);
+    }
+  };
+
+  // Mobile-optimized search filtering function
+  const filterItems = (items: any[], query: string) => {
+    // Show first 8 items when no search query (mobile-friendly)
+    if (!query.trim()) return items.slice(0, 8);
+    
+    const searchTerm = query.toLowerCase().trim();
+    
+    const filteredItems = items.filter(item => {
+      // Get all searchable fields
+      const name = item.name?.toLowerCase() || '';
+      const nameAr = item.name_ar?.toLowerCase() || '';
+      const description = item.description?.toLowerCase() || '';
+      const descriptionAr = item.description_ar?.toLowerCase() || '';
+      const category = item.category?.toLowerCase() || '';
+      const categoryAr = item.category_ar?.toLowerCase() || '';
+      const sku = item.sku?.toLowerCase() || '';
+      const unit = item.unit?.toLowerCase() || '';
+      const unitAr = item.unit_ar?.toLowerCase() || '';
+      
+      // Create array of all searchable text
+      const searchableFields = [
+        name, nameAr, description, descriptionAr, 
+        category, categoryAr, sku, unit, unitAr
+      ].filter(field => field.length > 0);
+      
+      // Multiple search strategies
+      return searchableFields.some(field => {
+        // Exact match
+        if (field.includes(searchTerm)) return true;
+        
+        // Arabic letter variations
+        const normalizedField = field.replace(/[ي]/g, 'ى').replace(/[ک]/g, 'ك').replace(/[ؤ]/g, 'و');
+        const normalizedSearch = searchTerm.replace(/[ي]/g, 'ى').replace(/[ک]/g, 'ك').replace(/[ؤ]/g, 'و');
+        if (normalizedField.includes(normalizedSearch)) return true;
+        
+        // Word boundary search (each word in search term)
+        const searchWords = searchTerm.split(/\s+/).filter(w => w.length > 0);
+        if (searchWords.length > 1) {
+          return searchWords.every(word => field.includes(word));
+        }
+        
+        // Partial word match for Arabic (minimum 2 characters)
+        if (searchTerm.length >= 2 && /[\u0600-\u06FF]/.test(searchTerm)) {
+          const searchChars = searchTerm.split('');
+          return searchChars.every(char => field.includes(char));
+        }
+        
+        return false;
+      });
+    }).sort((a, b) => {
+      // Smart sorting: exact matches first, then partial matches
+      const aName = a.name?.toLowerCase() || '';
+      const bName = b.name?.toLowerCase() || '';
+      
+      const aExact = aName.startsWith(searchTerm) ? 1 : 0;
+      const bExact = bName.startsWith(searchTerm) ? 1 : 0;
+      
+      if (aExact !== bExact) return bExact - aExact;
+      
+      // Then sort by name length (shorter names first)
+      return aName.length - bName.length;
+    });
+
+    // Limit search results to 6 items for mobile optimization
+    return filteredItems.slice(0, 6);
+  };
+
+  // Get filtered products and services based on search
+  const filteredProducts = filterItems(products, searchQuery);
+  const filteredServices = filterItems(services, searchQuery);
+
+  // Handle product/service selection - shows only imported data
+  const handleProductServiceSelect = (itemId: string, selectedId: string) => {
+    const selectedProduct = products.find(p => p.id.toString() === selectedId);
+    const selectedService = services.find(s => s.id.toString() === selectedId);
+    
+    const currentItem = invoiceItems.find(item => item.id === itemId);
+    
+    if (selectedProduct) {
+      updateItem(itemId, 'description', selectedProduct.name);
+      updateItem(itemId, 'unitPrice', parseFloat(selectedProduct.price));
+      updateItem(itemId, 'total', parseFloat(selectedProduct.price) * (currentItem?.quantity || 1));
+    } else if (selectedService) {
+      updateItem(itemId, 'description', selectedService.name);
+      updateItem(itemId, 'unitPrice', parseFloat(selectedService.price));
+      updateItem(itemId, 'total', parseFloat(selectedService.price) * (currentItem?.quantity || 1));
+    }
+    
+    // Clear search after selection
+    setSearchQuery('');
+  };
+
+  // Remove item
+  const removeItem = (id: string) => {
+    if (invoiceItems.length > 1) {
+      const newItems = invoiceItems.filter(item => item.id !== id);
+      setInvoiceItems(newItems);
+      saveInvoiceItems(newItems);
+    }
+  };
+
+  // Remove duplicate function definitions - these are properly defined later in the code
+
+  // Fetch doctor info for invoice
+  const { data: doctorInfo } = useQuery({
+    queryKey: ['/api/doctor/vetsvan-location'],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/doctor/vetsvan-location', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch doctor info');
+      return response.json();
+    }
+  });
+
+  // Show confirmation dialog for invoice generation
+  const handleGenerateInvoiceClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  // Generate invoice after confirmation
+  const confirmGenerateInvoice = async () => {
+    try {
+      if (!booking || !doctorInfo) {
+        toast({
+          title: language === 'ar' ? 'بيانات غير مكتملة' : 'Incomplete data',
+          description: language === 'ar' ? 'يرجى التأكد من توفر جميع البيانات' : 'Please ensure all data is available',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Save invoice items to database
+      await apiRequest(`/api/invoice-items/${booking.id}`, {
+        method: 'POST',
+        body: { items: invoiceItems }
+      });
+
+      // Save invoice status to database
+      await apiRequest(`/api/invoice-status/${booking.id}`, {
+        method: 'POST',
+        body: {
+          subtotal,
+          taxAmount,
+          discountAmount,
+          finalTotal,
+          notes
+        }
+      });
+
+      // Lock the record (make invoice items read-only)
+      setIsRecordLocked(true);
+      setShowConfirmDialog(false);
+      setShowInvoiceGenerator(true);
+
+      // Send invoice link via email
+      try {
+        const emailResponse = await apiRequest(`/api/send-invoice-email/${booking.id}`, {
+          method: 'POST'
+        });
+        
+        if (emailResponse.success) {
+          toast({
+            title: t('invoiceGenerated'),
+            description: language === 'ar' ? 'تم حفظ بنود الفاتورة وإرسال رابط الفاتورة للعميل' : 'Invoice items saved and invoice link sent to customer',
+            variant: 'default',
+          });
+        } else {
+          toast({
+            title: t('invoiceGenerated'),
+            description: language === 'ar' ? 'تم حفظ بنود الفاتورة ولكن فشل إرسال الرابط' : 'Invoice items saved but failed to send email link',
+            variant: 'default',
+          });
+        }
+      } catch (emailError) {
+        console.error('Error sending invoice email:', emailError);
+        toast({
+          title: t('invoiceGenerated'),
+          description: language === 'ar' ? 'تم حفظ بنود الفاتورة ولكن فشل إرسال الرابط' : 'Invoice items saved but failed to send email link',
+          variant: 'default',
+        });
+      }
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      toast({
+        title: language === 'ar' ? '❌ خطأ في إنشاء الفاتورة' : '❌ Error generating invoice',
+        description: language === 'ar' ? 'حدث خطأ أثناء إنشاء الفاتورة' : 'An error occurred while generating the invoice',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const openUploadModal = (pet: Pet) => {
+    setSelectedPetForUpload(pet);
+    setShowUploadModal(true);
+  };
+
+  const closeUploadModal = () => {
+    setShowUploadModal(false);
+    setSelectedPetForUpload(null);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">
+            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!booking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">
+            {language === 'ar' ? 'لم يتم العثور على بيانات الموعد' : 'Booking data not found'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4" dir={getDirection(language)}>
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={() => setLocation('/doctor-activity')}
+              className="flex items-center text-gray-600 hover:text-purple-600"
+            >
+              <ArrowLeft className="h-5 w-5 ml-2" />
+              {t('back')}
+            </button>
+            <div className="flex items-center">
+              <FileText className="h-8 w-8 text-purple-600 ml-3" />
+              <h1 className="text-2xl font-bold text-gray-900">{t('invoiceTitle')}</h1>
+            </div>
+          </div>
+        </div>
+
+        {/* Customer Information */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center">
+            <User className="h-6 w-6 text-purple-600 ml-2" />
+            {t('customerInfo')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('name')}
+              </label>
+              <p className="text-gray-900">{booking?.customerName || 'غير محدد'}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('phone')}
+              </label>
+              <p className="text-gray-900">{booking?.customerPhone || 'غير محدد'}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('email')}
+              </label>
+              <p className="text-gray-900">{booking?.customerEmail || 'غير محدد'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Pet Information */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">
+            {t('petInfo')}
+          </h2>
+          {booking?.pets && booking.pets.length > 0 ? booking.pets.map((pet, index) => (
+            <div key={index} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('petName')}
+                  </label>
+                  <p className="text-gray-900">{pet.name}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('petType')}
+                  </label>
+                  <p className="text-gray-900">{pet.type}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('age')}
+                  </label>
+                  <p className="text-gray-900">
+                    {pet.ageYear} {t('years')} {pet.ageMonth} {t('months')} {pet.ageDay} {t('days')}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 flex space-x-2">
+                <Button 
+                  onClick={() => openVitalsModal(pet)}
+                  className="bg-purple-600 hover:bg-purple-600 text-white"
+                >
+                  <Stethoscope className="h-4 w-4 mr-2" />
+                  {t('vitals')}
+                </Button>
+                <Button 
+                  onClick={() => openUploadModal(pet)}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'رفع مرفق' : 'Upload'}
+                </Button>
+              </div>
+            </div>
+          )) : (
+            <div className="text-center py-4 text-gray-500">
+              {language === 'ar' ? 'لا توجد حيوانات أليفة مسجلة' : 'No pets registered'}
+            </div>
+          )}
+        </div>
+
+        {/* Service Details */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4 flex items-center">
+            <Calendar className="h-6 w-6 text-purple-600 ml-2" />
+            {t('serviceDetails')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('date')}
+              </label>
+              <p className="text-gray-900">{booking?.appointmentDate}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('time')}
+              </label>
+              <p className="text-gray-900">{booking?.appointmentTime}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('service')}
+              </label>
+              <p className="text-gray-900">{booking?.serviceType}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Invoice Items - New Enhanced Structure */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold flex items-center">
+              <Receipt className="h-6 w-6 text-purple-600 ml-2" />
+              {t('invoiceItems')}
+            </h2>
+            {isRecordLocked && (
+              <div className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+                {language === 'ar' ? 'مقفل - تم إنشاء الفاتورة' : 'Locked - Invoice Generated'}
+              </div>
+            )}
+          </div>
+          
+          {/* New Invoice Items Table with Required Fields */}
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-gray-700">
+                    {language === 'ar' ? 'الوصف' : 'Description'}
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-gray-700">
+                    {language === 'ar' ? 'الكمية' : 'Quantity'}
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-gray-700">
+                    {language === 'ar' ? 'سعر الوحدة قبل ضريبة القيمة المضافة' : 'Unit Price Before VAT'}
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-gray-700">
+                    {language === 'ar' ? 'الخصم %' : 'Discount %'}
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-gray-700">
+                    {language === 'ar' ? 'ضريبة القيمة المضافة 15%' : 'VAT 15%'}
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-gray-700">
+                    {language === 'ar' ? 'المجموع قبل ضريبة القيمة المضافة' : 'Total Before VAT'}
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-gray-700">
+                    {language === 'ar' ? 'المجموع بعد ضريبة القيمة المضافة' : 'Total After VAT'}
+                  </th>
+                  <th className="border border-gray-300 px-2 py-2 text-xs font-medium text-gray-700">
+                    {language === 'ar' ? 'إجراءات' : 'Actions'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoiceItems.map((item, index) => {
+                  const calculations = calculateItemTotals(item);
+                  return (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      {/* 1. Description */}
+                      <td className="border border-gray-300 px-2 py-2">
+                        <Input
+                          type="text"
+                          value={item.description}
+                          onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                          placeholder={language === 'ar' ? 'وصف الخدمة/المنتج' : 'Service/Product description'}
+                          className="w-full min-w-[150px]"
+                          disabled={isRecordLocked}
+                        />
+                      </td>
+                      
+                      {/* 2. Quantity */}
+                      <td className="border border-gray-300 px-2 py-2">
+                        <Input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(item.id, 'quantity', parseInt(e.target.value) || 0)}
+                          min="0"
+                          className="w-full min-w-[80px]"
+                          disabled={isRecordLocked}
+                        />
+                      </td>
+                      
+                      {/* 3. Unit Price Before VAT */}
+                      <td className="border border-gray-300 px-2 py-2">
+                        <Input
+                          type="number"
+                          value={item.unitPriceBeforeVAT}
+                          onChange={(e) => updateItem(item.id, 'unitPriceBeforeVAT', parseFloat(e.target.value) || 0)}
+                          min="0"
+                          step="0.01"
+                          className="w-full min-w-[100px]"
+                          disabled={isRecordLocked}
+                        />
+                      </td>
+                      
+                      {/* 4. Discount % */}
+                      <td className="border border-gray-300 px-2 py-2">
+                        <Input
+                          type="number"
+                          value={item.discount}
+                          onChange={(e) => updateItem(item.id, 'discount', parseFloat(e.target.value) || 0)}
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          className="w-full min-w-[80px]"
+                          disabled={isRecordLocked}
+                        />
+                      </td>
+                      
+                      {/* 5. VAT 15% (Auto-calculated) */}
+                      <td className="border border-gray-300 px-2 py-2 bg-gray-50">
+                        <div className="text-sm text-gray-700 text-center font-medium">
+                          {calculations.vatAmount.toFixed(2)}
+                        </div>
+                      </td>
+                      
+                      {/* 6. Total Before VAT (Auto-calculated) */}
+                      <td className="border border-gray-300 px-2 py-2 bg-gray-50">
+                        <div className="text-sm text-gray-700 text-center font-medium">
+                          {calculations.totalBeforeVAT.toFixed(2)}
+                        </div>
+                      </td>
+                      
+                      {/* 7. Total After VAT (Auto-calculated) */}
+                      <td className="border border-gray-300 px-2 py-2 bg-blue-50">
+                        <div className="text-sm text-blue-700 text-center font-bold">
+                          {calculations.totalAfterVAT.toFixed(2)}
+                        </div>
+                      </td>
+                      
+                      {/* Actions */}
+                      <td className="border border-gray-300 px-2 py-2">
+                        <div className="flex space-x-1">
+                          {!isRecordLocked && (
+                            <Button
+                              onClick={() => removeItem(item.id)}
+                              variant="destructive"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          
+          {/* Add New Item Button */}
+          {!isRecordLocked && (
+            <div className="mt-4">
+              <Button onClick={addItem} className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Plus className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'إضافة صف جديد' : 'Add New Row'}
+              </Button>
+            </div>
+          )}
+          
+          {/* Invoice Totals Summary */}
+          <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-3">
+              {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <div className="text-sm text-gray-600">
+                  {language === 'ar' ? 'المجموع الفرعي قبل ضريبة القيمة المضافة' : 'Subtotal Before VAT'}
+                </div>
+                <div className="text-lg font-bold text-gray-800">
+                  {invoiceTotals.subtotalBeforeVAT.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-gray-600">
+                  {language === 'ar' ? 'إجمالي الخصم' : 'Total Discount'}
+                </div>
+                <div className="text-lg font-bold text-red-600">
+                  -{invoiceTotals.totalDiscountAmount.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-gray-600">
+                  {language === 'ar' ? 'إجمالي ضريبة القيمة المضافة' : 'Total VAT'}
+                </div>
+                <div className="text-lg font-bold text-blue-600">
+                  {invoiceTotals.totalVATAmount.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="text-sm text-gray-600">
+                  {language === 'ar' ? 'المجموع النهائي' : 'Final Total'}
+                </div>
+                <div className="text-xl font-bold text-green-600">
+                  {invoiceTotals.totalAfterVAT.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Generate Invoice Button */}
+        <div className="flex justify-center mb-6">
+          <Button
+            onClick={openConfirmDialog}
+            disabled={isRecordLocked || invoiceItems.length === 0}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg"
+          >
+            <FileText className="h-5 w-5 mr-2" />
+            {isRecordLocked ? (language === 'ar' ? 'تم إنشاء الفاتورة' : 'Invoice Generated') : t('generateInvoice')}
+          </Button>
+        </div>
+
+        {/* Invoice Display */}
+        {showInvoice && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">{t('invoicePreview')}</h2>
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => setShowInvoice(false)}
+                  variant="outline"
+                  size="sm"
+                >
+                  {t('hideInvoice')}
+                </Button>
+              </div>
+            </div>
+            <InvoiceGeneratorProfessional
+              booking={booking}
+              invoiceItems={invoiceItems}
+              totalPaid={totalPaid}
+              notes={notes}
+              finalTotal={invoiceTotals.totalAfterVAT}
+              language={language}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{language === 'ar' ? 'تأكيد إنشاء الفاتورة' : 'Confirm Invoice Generation'}</DialogTitle>
+            <DialogDescription>
+              {language === 'ar' 
+                ? 'سيتم قفل بنود الفاتورة ولن يمكن تعديلها بعد إنشاء الفاتورة. هل تريد المتابعة؟'
+                : 'Invoice items will be locked and cannot be edited after generation. Do you want to continue?'
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+              {language === 'ar' ? 'إلغاء' : 'Cancel'}
+            </Button>
+            <Button onClick={confirmGenerateInvoice} className="bg-purple-600 hover:bg-purple-700">
+              {language === 'ar' ? 'تأكيد' : 'Confirm'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pet Vitals Modal */}
+      <Dialog open={showVitalsModal} onOpenChange={setShowVitalsModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {language === 'ar' ? 'العلامات الحيوية للحيوان الأليف' : 'Pet Vitals'}
+              {selectedPetForVitals && ` - ${selectedPetForVitals.name}`}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedPetForVitals && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {language === 'ar' ? 'الوزن (كجم)' : 'Weight (kg)'}
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="0.0"
+                    value={vitalsData.weight || ''}
+                    onChange={(e) => setVitalsData(prev => ({ ...prev, weight: parseFloat(e.target.value) || null }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {language === 'ar' ? 'درجة الحرارة (°س)' : 'Temperature (°C)'}
+                  </label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    placeholder="0.0"
+                    value={vitalsData.temperature || ''}
+                    onChange={(e) => setVitalsData(prev => ({ ...prev, temperature: parseFloat(e.target.value) || null }))}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'معدل نبضات القلب (نبضة/دقيقة)' : 'Heart Rate (bpm)'}
+                </label>
+                <Input
+                  type="number"
+                  placeholder="0"
+                  value={vitalsData.heartRate || ''}
+                  onChange={(e) => setVitalsData(prev => ({ ...prev, heartRate: parseInt(e.target.value) || null }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'ملاحظات' : 'Notes'}
+                </label>
+                <Textarea
+                  rows={3}
+                  placeholder={language === 'ar' ? 'ملاحظات إضافية...' : 'Additional notes...'}
+                  value={vitalsData.notes || ''}
+                  onChange={(e) => setVitalsData(prev => ({ ...prev, notes: e.target.value }))}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowVitalsModal(false)}>
+              {language === 'ar' ? 'إلغاء' : 'Cancel'}
+            </Button>
+            <Button onClick={saveVitals} className="bg-purple-600 hover:bg-purple-700">
+              {language === 'ar' ? 'حفظ' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Upload Modal */}
+      {showUploadModal && selectedPetForUpload && (
+        <UploadAttachmentModal
+          petId={selectedPetForUpload.id}
+          onClose={closeUploadModal}
+          language={language}
+        />
+      )}
+    </div>
+  );
+}
+
+export default DoctorInvoice;
