@@ -945,7 +945,7 @@ export default function DoctorInvoice() {
                                   value={item.description || ''}
                                   onChange={(e) => {
                                     const value = e.target.value;
-                                    updateInvoiceItem(item.id, { description: value });
+                                    updateItem(item.id, 'description', value);
                                     setSearchQuery(value);
                                     setDropdownOpen(value.length > 0 ? item.id : '');
                                   }}
@@ -963,7 +963,7 @@ export default function DoctorInvoice() {
                                 {(item.description || searchQuery) && (
                                   <button
                                     onClick={() => {
-                                      updateInvoiceItem(item.id, { description: '' });
+                                      updateItem(item.id, 'description', '');
                                       setSearchQuery('');
                                       setDropdownOpen('');
                                     }}
@@ -1054,10 +1054,8 @@ export default function DoctorInvoice() {
                                             <div
                                               key={`product-${product.id}`}
                                               onClick={() => {
-                                                updateInvoiceItem(item.id, { 
-                                                  description: product.name,
-                                                  unitPrice: parseFloat(product.price) || 0 
-                                                });
+                                                updateItem(item.id, 'description', product.name);
+                                                updateItem(item.id, 'unitPrice', parseFloat(product.price) || 0);
                                                 setDropdownOpen('');
                                                 setSearchQuery('');
                                               }}
@@ -1127,10 +1125,8 @@ export default function DoctorInvoice() {
                                             <div
                                               key={`service-${service.id}`}
                                               onClick={() => {
-                                                updateInvoiceItem(item.id, { 
-                                                  description: service.name,
-                                                  unitPrice: parseFloat(service.price) || 0 
-                                                });
+                                                updateItem(item.id, 'description', service.name);
+                                                updateItem(item.id, 'unitPrice', parseFloat(service.price) || 0);
                                                 setDropdownOpen('');
                                                 setSearchQuery('');
                                               }}
@@ -1202,7 +1198,7 @@ export default function DoctorInvoice() {
                               <Input 
                                 type="text"
                                 value={item.description}
-                                onChange={(e) => updateInvoiceItem(item.id, { description: e.target.value })}
+                                onChange={(e) => updateItem(item.id, 'description', e.target.value)}
                                 placeholder={language === 'ar' ? 'اكتب وصف المنتج أو الخدمة...' : 'Type product or service description...'}
                                 className="pl-10"
                                 dir={getDirection(language)}
