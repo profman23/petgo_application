@@ -271,7 +271,7 @@ export default function DoctorInvoice() {
       total: 'المجموع',
       addItem: 'إضافة صنف',
       removeItem: 'حذف الصنف',
-      subtotal: 'المجموع الفرعي',
+      subtotal: 'المجموع قبل الضريبة',
       tax: 'الضريبة (15%)',
       discount: 'الخصم',
       finalTotal: 'المجموع النهائي',
@@ -337,7 +337,7 @@ export default function DoctorInvoice() {
       total: 'Total',
       addItem: 'Add Item',
       removeItem: 'Remove Item',
-      subtotal: 'Subtotal',
+      subtotal: 'Total Before VAT',
       tax: 'Tax (15%)',
       discount: 'Discount',
       finalTotal: 'Final Total',
@@ -417,7 +417,7 @@ export default function DoctorInvoice() {
   };
 
   // Calculate totals
-  const subtotal = invoiceItems.reduce((sum, item) => sum + item.totalAfterVat, 0);
+  const subtotal = invoiceItems.reduce((sum, item) => sum + item.totalBeforeVat, 0);
   const taxAmount = invoiceItems.reduce((sum, item) => sum + item.vatAmount, 0);
   // Calculate total discount amount from all items
   const totalDiscountAmount = invoiceItems.reduce((sum, item) => {
@@ -429,7 +429,7 @@ export default function DoctorInvoice() {
     }
     return sum;
   }, 0);
-  const totalWithTax = subtotal;
+  const totalWithTax = subtotal + taxAmount;
   const discountAmount = applyDiscount ? totalWithTax * DISCOUNT_RATE : 0;
   const finalTotal = totalWithTax - discountAmount;
   const remainingBalance = finalTotal - totalPaid;
