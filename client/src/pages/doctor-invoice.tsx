@@ -1002,7 +1002,7 @@ export default function DoctorInvoice() {
                       <th className="text-center py-2 px-2 w-24">
                         {t('quantity')}
                       </th>
-                      <th className="text-left py-2 px-2" style={{ textAlign: getTextAlign(language) }}>
+                      <th className="text-left py-2 px-2" style={{ textAlign: getTextAlign(language), width: '35%' }}>
                         {t('description')}
                       </th>
                       <th className="w-16"></th>
@@ -1010,7 +1010,7 @@ export default function DoctorInvoice() {
                   ) : (
                     // English LTR order
                     <>
-                      <th className="text-left py-2 px-2" style={{ textAlign: getTextAlign(language) }}>
+                      <th className="text-left py-2 px-2" style={{ textAlign: getTextAlign(language), width: '35%' }}>
                         {t('description')}
                       </th>
                       <th className="text-center py-2 px-2 w-24">
@@ -1128,7 +1128,7 @@ export default function DoctorInvoice() {
                         </td>
                         
                         {/* Description */}
-                        <td className="py-2 px-2">
+                        <td className="py-2 px-2" style={{ width: '35%' }}>
                           {isRecordLocked ? (
                             <div className="bg-gray-100 p-2 rounded text-gray-700">
                               {item.description || t('description')}
@@ -1150,7 +1150,7 @@ export default function DoctorInvoice() {
                       // English LTR order: Description, Quantity, Unit Price, Discount, VAT, Total Before VAT, Total After VAT
                       <>
                         {/* Description */}
-                        <td className="py-2 px-2">
+                        <td className="py-2 px-2" style={{ width: '35%' }}>
                           {isRecordLocked ? (
                             <div className="bg-gray-100 p-2 rounded text-gray-700">
                               {item.description || t('description')}
