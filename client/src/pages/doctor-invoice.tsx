@@ -759,7 +759,7 @@ export default function DoctorInvoice() {
         body: {
           subtotal,
           taxAmount,
-          discountAmount,
+          discountAmount: totalDiscountAmount,
           finalTotal,
           notes
         }
