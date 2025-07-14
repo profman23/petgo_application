@@ -117,8 +117,8 @@ export default function DoctorInvoice() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isRecordLocked, setIsRecordLocked] = useState(false);
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
-  const [searchQuery, setSearchQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState('');
+
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -907,7 +907,7 @@ export default function DoctorInvoice() {
           <h2 className="text-xl font-semibold mb-4">
             {t('petInfo')}
           </h2>
-          {booking.pets && booking.pets.length > 0 ? booking.pets.map((pet, index) => (
+          {booking?.pets && Array.isArray(booking.pets) && booking.pets.length > 0 ? booking.pets.map((pet, index) => (
             <div key={index} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0 last:mb-0">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
@@ -1059,7 +1059,7 @@ export default function DoctorInvoice() {
                 </tr>
               </thead>
               <tbody>
-                {invoiceItems.map((item) => (
+                {Array.isArray(invoiceItems) ? invoiceItems.map((item) => (
                   <tr key={item.id} className="border-b">
                     {/* Render cells in different order based on language */}
                     {language === 'ar' ? (
@@ -1622,7 +1622,7 @@ export default function DoctorInvoice() {
                       )}
                     </td>
                   </tr>
-                ))}
+                )) : null}
               </tbody>
             </table>
           </div>
@@ -1734,7 +1734,7 @@ export default function DoctorInvoice() {
               {t('paymentHistory')}
             </h2>
             <div className="space-y-3">
-              {payments.map((payment) => (
+              {Array.isArray(payments) ? payments.map((payment) => (
                 <div key={payment.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
                   <div>
                     <div className="font-semibold text-green-600">
@@ -1751,7 +1751,7 @@ export default function DoctorInvoice() {
                     ✓
                   </div>
                 </div>
-              ))}
+              )) : null}
             </div>
             <div className="mt-4 pt-4 border-t">
               <div className="flex justify-between font-bold">

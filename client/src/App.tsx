@@ -12,7 +12,7 @@ import RideTracking from "@/pages/ride-tracking";
 import DoctorDashboard from "@/pages/doctor-dashboard";
 import DoctorActivity from "@/pages/doctor-activity";
 import DoctorAccount from "@/pages/doctor-account";
-import DoctorInvoice from "@/pages/doctor-invoice";
+import DoctorInvoice from "@/pages/doctor-invoice-new";
 import InvoiceView from "@/pages/invoice-view";
 import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
