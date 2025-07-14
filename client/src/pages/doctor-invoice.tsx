@@ -985,11 +985,10 @@ export default function DoctorInvoice() {
                                     <div className="px-3 py-2 bg-gradient-to-r from-purple-50 to-blue-50 border-b">
                                       <div className="flex items-center justify-between">
                                         <div className="text-xs font-medium text-purple-700">
-                                          {searchQuery ? (
-                                            `${t('searchResults')}: ${filteredProducts.length + filteredServices.length}/6`
-                                          ) : (
-                                            `${t('importedItems')}: ${(products.length + services.length > 8 ? 8 : products.length + services.length)}/${products.length + services.length}`
-                                          )}
+                                          {language === 'ar' ? 'المنتجات والخدمات' : 'Products & Services'}
+                                          <span className="ml-2 text-purple-600">
+                                            ({filteredProducts.length + filteredServices.length})
+                                          </span>
                                         </div>
                                         {searchQuery && (
                                           <div className="text-xs text-purple-600 bg-white px-2 py-1 rounded-full">
@@ -997,16 +996,6 @@ export default function DoctorInvoice() {
                                           </div>
                                         )}
                                       </div>
-                                      {(filteredProducts.length > 0 || filteredServices.length > 0) && (
-                                        <div className="text-xs text-gray-600 mt-1 flex gap-4">
-                                          {filteredProducts.length > 0 && (
-                                            <span>📦 {filteredProducts.length} {t('products')}</span>
-                                          )}
-                                          {filteredServices.length > 0 && (
-                                            <span>🔧 {filteredServices.length} {t('services')}</span>
-                                          )}
-                                        </div>
-                                      )}
                                       {!searchQuery && (products.length + services.length > 8) && (
                                         <div className="text-xs text-gray-500 mt-1">
                                           {language === 'ar' ? 'ابدأ الكتابة للبحث في جميع العناصر' : 'Start typing to search all items'}
@@ -1014,47 +1003,18 @@ export default function DoctorInvoice() {
                                       )}
                                     </div>
                                     
-                                    {/* Sub Tabs for Products/Services with counts */}
-                                    <div className="flex border-b border-gray-200 bg-gray-50 p-1">
-                                      <button
-                                        onClick={() => setInvoiceSubTab('products')}
-                                        className={`px-2 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
-                                          invoiceSubTab === 'products'
-                                            ? 'border-purple-600 text-purple-600 bg-purple-50'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                      >
-                                        <div className="flex items-center justify-center gap-1">
-                                          <span className="text-xs">📦</span>
-                                          <span className="truncate">{language === 'ar' ? 'منتجات' : 'Products'}</span>
-                                          <span className="bg-purple-100 text-purple-700 px-1 rounded text-xs min-w-4 text-center">
-                                            {filteredProducts.length}
-                                          </span>
-                                        </div>
-                                      </button>
-                                      <button
-                                        onClick={() => setInvoiceSubTab('services')}
-                                        className={`px-2 py-1 text-xs font-medium border-b-2 transition-colors flex-1 ${
-                                          invoiceSubTab === 'services'
-                                            ? 'border-purple-600 text-purple-600 bg-purple-50'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                      >
-                                        <div className="flex items-center justify-center gap-1">
-                                          <span className="text-xs">🩺</span>
-                                          <span className="truncate">{language === 'ar' ? 'خدمات' : 'Services'}</span>
-                                          <span className="bg-blue-100 text-blue-700 px-1 rounded text-xs min-w-4 text-center">
-                                            {filteredServices.length}
-                                          </span>
-                                        </div>
-                                      </button>
-                                    </div>
-                                    
-                                    {/* Products Section */}
-                                    {invoiceSubTab === 'products' && (
-                                      <div className="max-h-60 overflow-y-auto">
-                                        {filteredProducts.length > 0 ? (
-                                          filteredProducts.map((product: any, index: number) => (
+                                    {/* Combined Products & Services List */}
+                                    <div className="max-h-60 overflow-y-auto">
+                                      {/* Products Section */}
+                                      {filteredProducts.length > 0 && (
+                                        <>
+                                          <div className="px-3 py-2 bg-purple-50 border-b border-purple-100">
+                                            <div className="flex items-center text-xs font-medium text-purple-700">
+                                              <span className="mr-2">📦</span>
+                                              {language === 'ar' ? 'المنتجات' : 'Products'} ({filteredProducts.length})
+                                            </div>
+                                          </div>
+                                          {filteredProducts.map((product: any, index: number) => (
                                             <div
                                               key={`product-${product.id}`}
                                               onClick={() => {
@@ -1106,26 +1066,20 @@ export default function DoctorInvoice() {
                                                 </div>
                                               </div>
                                             </div>
-                                          ))
-                                        ) : (
-                                          <div className="p-6 text-center">
-                                            <div className="mb-2">📦</div>
-                                            <div className="text-sm font-medium text-gray-700 mb-1">
-                                              {language === 'ar' ? 'لا توجد منتجات' : 'No products found'}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                              {language === 'ar' ? 'جرب كلمات بحث أخرى' : 'Try different search terms'}
+                                          ))}
+                                        </>
+                                      )}
+                                      
+                                      {/* Services Section */}
+                                      {filteredServices.length > 0 && (
+                                        <>
+                                          <div className="px-3 py-2 bg-blue-50 border-b border-blue-100">
+                                            <div className="flex items-center text-xs font-medium text-blue-700">
+                                              <span className="mr-2">🩺</span>
+                                              {language === 'ar' ? 'الخدمات' : 'Services'} ({filteredServices.length})
                                             </div>
                                           </div>
-                                        )}
-                                      </div>
-                                    )}
-                                    
-                                    {/* Services Section */}
-                                    {invoiceSubTab === 'services' && (
-                                      <div className="max-h-60 overflow-y-auto">
-                                        {filteredServices.length > 0 ? (
-                                          filteredServices.map((service: any, index: number) => (
+                                          {filteredServices.map((service: any, index: number) => (
                                             <div
                                               key={`service-${service.id}`}
                                               onClick={() => {
@@ -1177,20 +1131,23 @@ export default function DoctorInvoice() {
                                                 </div>
                                               </div>
                                             </div>
-                                          ))
-                                        ) : (
-                                          <div className="p-6 text-center">
-                                            <div className="mb-2">🩺</div>
-                                            <div className="text-sm font-medium text-gray-700 mb-1">
-                                              {language === 'ar' ? 'لا توجد خدمات' : 'No services found'}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
-                                              {language === 'ar' ? 'جرب كلمات بحث أخرى' : 'Try different search terms'}
-                                            </div>
+                                          ))}
+                                        </>
+                                      )}
+                                      
+                                      {/* No Results Message */}
+                                      {filteredProducts.length === 0 && filteredServices.length === 0 && (
+                                        <div className="p-6 text-center">
+                                          <div className="mb-2">🔍</div>
+                                          <div className="text-sm font-medium text-gray-700 mb-1">
+                                            {language === 'ar' ? 'لا توجد نتائج' : 'No results found'}
                                           </div>
-                                        )}
-                                      </div>
-                                    )}
+                                          <div className="text-xs text-gray-500">
+                                            {language === 'ar' ? 'جرب كلمات بحث أخرى' : 'Try different search terms'}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               )}
