@@ -1979,6 +1979,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get all generated invoices for sales report
+  app.get('/api/admin/generated-invoices', requireAdminAuth, async (req, res) => {
+    try {
+      const generatedInvoices = await storage.getAllGeneratedInvoices();
+      res.json(generatedInvoices);
+    } catch (error) {
+      console.error('Error fetching generated invoices:', error);
+      res.status(500).json({ message: 'Failed to fetch generated invoices' });
+    }
+  });
+
   // Doctor VetsVan location endpoint
   app.get('/api/doctor/vetsvan-location', requireAuth, async (req: any, res) => {
     try {
