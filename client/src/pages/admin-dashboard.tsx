@@ -1213,7 +1213,6 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                             )}
-                          </> 
                         </>
                       )}
 
@@ -1740,7 +1739,7 @@ export default function AdminDashboard() {
                   step="any"
                   value={newLocation.latitude}
                   onChange={(e) => setNewLocation({ ...newLocation, latitude: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   placeholder="24.7136"
                   required
                   style={{ textAlign: getTextAlign(language) }}
@@ -1756,7 +1755,7 @@ export default function AdminDashboard() {
                   step="any"
                   value={newLocation.longitude}
                   onChange={(e) => setNewLocation({ ...newLocation, longitude: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   placeholder="46.6753"
                   required
                   style={{ textAlign: getTextAlign(language) }}
