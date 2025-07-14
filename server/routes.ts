@@ -2505,24 +2505,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Invoice Status endpoints
+  // Invoice Status endpoints (Updated to create final invoice)
   app.post('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
       const { subtotal, taxAmount, discountAmount, finalTotal, notes } = req.body;
       
-      const statusData = {
+      // Get booking details
+      const booking = await storage.getBookingWithDetails(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Get doctor info
+      const doctor = await storage.getDriver(req.user.id);
+      if (!doctor) {
+        return res.status(404).json({ message: 'Doctor not found' });
+      }
+
+      // Get saved invoice items
+      const invoiceItems = await storage.getInvoiceItems(bookingId);
+
+      // Check if invoice already exists for this booking
+      const existingInvoice = await storage.getGeneratedInvoiceByBooking(bookingId);
+      if (existingInvoice) {
+        return res.json(existingInvoice); // Return existing invoice instead of creating duplicate
+      }
+
+      // Generate unique invoice number
+      const invoiceNumber = await storage.getNextInvoiceNumber();
+
+      // Create permanent invoice record
+      const invoiceData = {
+        invoiceNumber,
         bookingId,
-        subtotal: parseFloat(subtotal),
-        taxAmount: parseFloat(taxAmount),
-        discountAmount: parseFloat(discountAmount),
-        finalTotal: parseFloat(finalTotal),
-        generatedBy: req.user.id.toString(),
-        notes: notes || null
+        customerName: booking.customerName,
+        customerPhone: booking.customerPhone,
+        customerEmail: booking.customerEmail,
+        doctorName: doctor.name,
+        vetsVanCode: doctor.vetsvanCode,
+        appointmentDate: booking.appointmentDate,
+        appointmentTime: booking.appointmentTime,
+        serviceType: booking.serviceType,
+        pets: booking.pets || [],
+        items: invoiceItems.map(item => ({
+          id: item.id.toString(),
+          description: item.description,
+          quantity: parseInt(item.quantity as any),
+          unitPrice: parseFloat(item.unitPrice),
+          discount: 0, // Will be calculated
+          discountType: 'none',
+          vatRate: 15,
+          vatAmount: 0, // Will be calculated
+          totalBeforeVat: parseFloat(item.total),
+          totalAfterVat: parseFloat(item.total) * 1.15,
+          total: parseFloat(item.total)
+        })),
+        subtotal: subtotal.toString(),
+        totalDiscountAmount: discountAmount.toString(),
+        vatAmount: taxAmount.toString(),
+        finalTotal: finalTotal.toString(),
+        notes: notes || null,
+        generatedBy: req.user.id,
+        isEmailSent: false
       };
+
+      const savedInvoice = await storage.createGeneratedInvoice(invoiceData);
       
-      const savedStatus = await storage.saveInvoiceStatus(statusData);
-      res.json(savedStatus);
+      // Also save to old invoice_status table for backward compatibility
+      try {
+        const statusData = {
+          bookingId,
+          isGenerated: true
+        };
+        await storage.saveInvoiceStatus(statusData);
+      } catch (statusError) {
+        // Ignore if already exists due to unique constraint
+        console.log('Invoice status already exists, skipping...');
+      }
+
+      res.json(savedInvoice);
     } catch (error) {
       console.error('Error saving invoice status:', error);
       res.status(500).json({ message: 'Failed to save invoice status' });
@@ -2532,11 +2594,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
+      
+      // First check if there's a generated invoice (new system)
+      const generatedInvoice = await storage.getGeneratedInvoiceByBooking(bookingId);
+      if (generatedInvoice) {
+        return res.json({ 
+          id: generatedInvoice.id,
+          bookingId: generatedInvoice.bookingId,
+          isGenerated: true,
+          invoiceNumber: generatedInvoice.invoiceNumber,
+          generatedAt: generatedInvoice.generatedAt
+        });
+      }
+
+      // Fallback to old system
       const status = await storage.getInvoiceStatus(bookingId);
       res.json(status);
     } catch (error) {
       console.error('Error fetching invoice status:', error);
       res.status(500).json({ message: 'Failed to fetch invoice status' });
+    }
+  });
+
+  // New endpoint for all generated invoices
+  app.get('/api/generated-invoices', requireAuth, async (req: any, res) => {
+    try {
+      const invoices = await storage.getAllGeneratedInvoices();
+      res.json(invoices);
+    } catch (error) {
+      console.error('Error fetching generated invoices:', error);
+      res.status(500).json({ message: 'Failed to fetch generated invoices' });
+    }
+  });
+
+  // New endpoint for specific generated invoice
+  app.get('/api/generated-invoice/:invoiceNumber', async (req: any, res) => {
+    try {
+      const invoiceNumber = req.params.invoiceNumber;
+      const invoice = await storage.getGeneratedInvoiceByNumber(invoiceNumber);
+      
+      if (!invoice) {
+        return res.status(404).json({ message: 'Invoice not found' });
+      }
+
+      res.json(invoice);
+    } catch (error) {
+      console.error('Error fetching generated invoice:', error);
+      res.status(500).json({ message: 'Failed to fetch generated invoice' });
     }
   });
 

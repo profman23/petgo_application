@@ -476,9 +476,97 @@ export const insertImportHistorySchema = createInsertSchema(importHistory).pick(
   importedBy: true,
 });
 
+// Generated Invoices table for permanent storage
+export const generatedInvoices = pgTable("generated_invoices", {
+  id: serial("id").primaryKey(),
+  invoiceNumber: varchar("invoice_number", { length: 50 }).notNull().unique(), // Vets9000001, Vets9000002, etc.
+  bookingId: integer("booking_id").notNull().references(() => bookings.id),
+  
+  // Customer details (snapshot at time of invoice generation)
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  customerPhone: varchar("customer_phone", { length: 50 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 255 }),
+  
+  // Doctor/VetsVan details
+  doctorName: varchar("doctor_name", { length: 255 }).notNull(),
+  vetsVanCode: varchar("vets_van_code", { length: 50 }).notNull(),
+  
+  // Appointment details
+  appointmentDate: text("appointment_date").notNull(),
+  appointmentTime: text("appointment_time").notNull(),
+  serviceType: varchar("service_type", { length: 255 }),
+  
+  // Pet details (snapshot)
+  pets: jsonb("pets").$type<Array<{
+    id: number;
+    name: string;
+    type: string;
+    ageYear?: number;
+    ageMonth?: number;
+    ageDay?: number;
+  }>>(),
+  
+  // Invoice items (snapshot)
+  items: jsonb("items").$type<Array<{
+    id: string;
+    description: string;
+    quantity: number;
+    unitPrice: number;
+    discount: number;
+    discountType: string;
+    vatRate: number;
+    vatAmount: number;
+    totalBeforeVat: number;
+    totalAfterVat: number;
+    total: number;
+  }>>(),
+  
+  // Financial totals
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  totalDiscountAmount: decimal("total_discount_amount", { precision: 10, scale: 2 }).default("0.00"),
+  vatAmount: decimal("vat_amount", { precision: 10, scale: 2 }).notNull(), // 15% VAT
+  finalTotal: decimal("final_total", { precision: 10, scale: 2 }).notNull(),
+  
+  // Additional info
+  notes: text("notes"),
+  
+  // Audit trail
+  generatedBy: integer("generated_by").notNull().references(() => drivers.id), // Which doctor generated
+  generatedAt: timestamp("generated_at").defaultNow(),
+  isEmailSent: boolean("is_email_sent").default(false),
+  emailSentAt: timestamp("email_sent_at"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertGeneratedInvoiceSchema = createInsertSchema(generatedInvoices).pick({
+  invoiceNumber: true,
+  bookingId: true,
+  customerName: true,
+  customerPhone: true,
+  customerEmail: true,
+  doctorName: true,
+  vetsVanCode: true,
+  appointmentDate: true,
+  appointmentTime: true,
+  serviceType: true,
+  pets: true,
+  items: true,
+  subtotal: true,
+  totalDiscountAmount: true,
+  vatAmount: true,
+  finalTotal: true,
+  notes: true,
+  generatedBy: true,
+  isEmailSent: true,
+});
+
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
 export type ImportHistory = typeof importHistory.$inferSelect;
 export type InsertImportHistory = z.infer<typeof insertImportHistorySchema>;
+export type GeneratedInvoice = typeof generatedInvoices.$inferSelect;
+export type InsertGeneratedInvoice = z.infer<typeof insertGeneratedInvoiceSchema>;

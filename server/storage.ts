@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -117,6 +117,15 @@ export interface IStorage {
   saveInvoiceStatus(status: InsertInvoiceStatus): Promise<InvoiceStatus>;
   getInvoiceStatus(bookingId: number): Promise<InvoiceStatus | undefined>;
   updateInvoiceStatus(bookingId: number, data: Partial<InvoiceStatus>): Promise<InvoiceStatus | undefined>;
+
+  // Generated Invoices operations
+  createGeneratedInvoice(invoice: InsertGeneratedInvoice): Promise<GeneratedInvoice>;
+  getAllGeneratedInvoices(): Promise<GeneratedInvoice[]>;
+  getGeneratedInvoice(id: number): Promise<GeneratedInvoice | undefined>;
+  getGeneratedInvoiceByNumber(invoiceNumber: string): Promise<GeneratedInvoice | undefined>;
+  getGeneratedInvoiceByBooking(bookingId: number): Promise<GeneratedInvoice | undefined>;
+  getNextInvoiceNumber(): Promise<string>;
+  updateInvoiceEmailStatus(id: number, isEmailSent: boolean): Promise<void>;
   
   // Products and Services for import system
   getProducts(): Promise<any[]>;
@@ -969,6 +978,76 @@ export class DatabaseStorage implements IStorage {
       .from(bookings)
       .where(eq(bookings.id, bookingId));
     return booking;
+  }
+
+  // Generated Invoices operations
+  async createGeneratedInvoice(invoice: InsertGeneratedInvoice): Promise<GeneratedInvoice> {
+    const [newInvoice] = await db
+      .insert(generatedInvoices)
+      .values(invoice)
+      .returning();
+    return newInvoice;
+  }
+
+  async getAllGeneratedInvoices(): Promise<GeneratedInvoice[]> {
+    return await db
+      .select()
+      .from(generatedInvoices)
+      .orderBy(desc(generatedInvoices.generatedAt));
+  }
+
+  async getGeneratedInvoice(id: number): Promise<GeneratedInvoice | undefined> {
+    const [invoice] = await db
+      .select()
+      .from(generatedInvoices)
+      .where(eq(generatedInvoices.id, id));
+    return invoice;
+  }
+
+  async getGeneratedInvoiceByNumber(invoiceNumber: string): Promise<GeneratedInvoice | undefined> {
+    const [invoice] = await db
+      .select()
+      .from(generatedInvoices)
+      .where(eq(generatedInvoices.invoiceNumber, invoiceNumber));
+    return invoice;
+  }
+
+  async getGeneratedInvoiceByBooking(bookingId: number): Promise<GeneratedInvoice | undefined> {
+    const [invoice] = await db
+      .select()
+      .from(generatedInvoices)
+      .where(eq(generatedInvoices.bookingId, bookingId));
+    return invoice;
+  }
+
+  async getNextInvoiceNumber(): Promise<string> {
+    // Get the latest invoice number
+    const [latestInvoice] = await db
+      .select()
+      .from(generatedInvoices)
+      .orderBy(desc(generatedInvoices.id))
+      .limit(1);
+
+    if (!latestInvoice) {
+      return "Vets9000001"; // First invoice
+    }
+
+    // Extract number from "Vets9000001" format
+    const currentNumber = parseInt(latestInvoice.invoiceNumber.replace('Vets', ''));
+    const nextNumber = currentNumber + 1;
+    
+    // Format with leading zeros to maintain "Vets9000001" format
+    return `Vets${nextNumber.toString().padStart(7, '0')}`;
+  }
+
+  async updateInvoiceEmailStatus(id: number, isEmailSent: boolean): Promise<void> {
+    await db
+      .update(generatedInvoices)
+      .set({ 
+        isEmailSent, 
+        emailSentAt: isEmailSent ? new Date() : null 
+      })
+      .where(eq(generatedInvoices.id, id));
   }
 }
 
