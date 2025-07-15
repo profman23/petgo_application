@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
@@ -45,292 +45,6 @@ interface NewDriverData {
   phone: string;
   username: string;
   password: string;
-}
-
-interface InvoiceDetails {
-  invoiceItems: any[];
-  invoiceStatus: {
-    subtotal: number;
-    taxAmount: number;
-    discountAmount: number;
-    finalTotal: number;
-    notes: string;
-  };
-  booking: {
-    id: number;
-    customerName: string;
-    customerPhone: string;
-    customerEmail: string;
-    appointmentDate: string;
-    appointmentTime: string;
-    serviceType: string;
-    pets: any[];
-  };
-}
-
-// Invoice Card Component with Collapse/Expand functionality
-function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; language: string }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [invoiceDetails, setInvoiceDetails] = useState<InvoiceDetails | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchInvoiceDetails = async () => {
-    if (invoiceDetails) return; // Already loaded
-    
-    setIsLoading(true);
-    try {
-      const token = localStorage.getItem('adminToken');
-      const response = await fetch(`/api/admin/invoice-details/${invoice.bookingId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      if (response.ok) {
-        const details = await response.json();
-        setInvoiceDetails(details);
-      }
-    } catch (error) {
-      console.error('Error fetching invoice details:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleToggleExpand = () => {
-    if (!isExpanded) {
-      fetchInvoiceDetails();
-    }
-    setIsExpanded(!isExpanded);
-  };
-
-  return (
-    <div className="bg-white rounded-lg shadow-md border">
-      {/* Invoice Header - Always Visible */}
-      <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
-          <div className="flex-1 grid grid-cols-6 gap-4 text-sm">
-            <div>
-              <span className="text-gray-500 block">{language === 'ar' ? 'رقم الفاتورة' : 'Invoice #'}</span>
-              <span className="font-medium">{invoice.invoiceNumber}</span>
-            </div>
-            <div>
-              <span className="text-gray-500 block">{language === 'ar' ? 'العميل' : 'Customer'}</span>
-              <span className="font-medium">{invoice.customerName}</span>
-              <span className="text-gray-400 block text-xs">{invoice.customerPhone}</span>
-            </div>
-            <div>
-              <span className="text-gray-500 block">{language === 'ar' ? 'الطبيب' : 'Doctor'}</span>
-              <span className="font-medium">{invoice.doctorName}</span>
-            </div>
-            <div>
-              <span className="text-gray-500 block">VetsVan</span>
-              <span className="font-medium">{invoice.vetsVanCode}</span>
-            </div>
-            <div>
-              <span className="text-gray-500 block">{language === 'ar' ? 'الإجمالي' : 'Total'}</span>
-              <span className="font-medium text-green-600">{Number(invoice.finalTotal)} SAR</span>
-            </div>
-            <div>
-              <span className="text-gray-500 block">{language === 'ar' ? 'التاريخ' : 'Date'}</span>
-              <span className="font-medium">{new Date(invoice.generatedAt || '').toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}</span>
-            </div>
-          </div>
-          
-          {/* Expand/Collapse Button */}
-          <button
-            onClick={handleToggleExpand}
-            className="flex items-center text-purple-600 hover:text-purple-800 transition-colors ml-4"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : isExpanded ? (
-              <ChevronUp className="h-5 w-5" />
-            ) : (
-              <ChevronDown className="h-5 w-5" />
-            )}
-            <span className="ml-1">
-              {language === 'ar' ? (isExpanded ? 'إخفاء التفاصيل' : 'عرض التفاصيل') : (isExpanded ? 'Hide Details' : 'Show Details')}
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* Expandable Invoice Details */}
-      {isExpanded && invoiceDetails && (
-        <div className="p-6 bg-gray-50" dir={getDirection(language)}>
-          {/* Customer Information */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 flex items-center">
-              <User className="h-5 w-5 text-purple-600 ml-2" />
-              {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'الاسم' : 'Name'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.customerName}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'الهاتف' : 'Phone'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.customerPhone}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'الإيميل' : 'Email'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.customerEmail}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Service Details */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 flex items-center">
-              <Calendar className="h-5 w-5 text-purple-600 ml-2" />
-              {language === 'ar' ? 'تفاصيل الخدمة' : 'Service Details'}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'التاريخ' : 'Date'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.appointmentDate}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'الوقت' : 'Time'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.appointmentTime}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'نوع الخدمة' : 'Service Type'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.serviceType}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Pet Information */}
-          {invoiceDetails.booking.pets && invoiceDetails.booking.pets.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">{language === 'ar' ? 'معلومات الحيوان الأليف' : 'Pet Information'}</h3>
-              {invoiceDetails.booking.pets.map((pet, index) => (
-                <div key={index} className="border-b border-gray-200 pb-3 mb-3 last:border-b-0 last:mb-0">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'اسم الحيوان' : 'Pet Name'}</label>
-                      <p className="text-gray-900">{pet.name}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'النوع' : 'Type'}</label>
-                      <p className="text-gray-900">{pet.type}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'العمر' : 'Age'}</label>
-                      <p className="text-gray-900">
-                        {pet.ageYear} {language === 'ar' ? 'سنة' : 'years'} {pet.ageMonth} {language === 'ar' ? 'شهر' : 'months'} {pet.ageDay} {language === 'ar' ? 'يوم' : 'days'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Invoice Items Table */}
-          {invoiceDetails.invoiceItems && invoiceDetails.invoiceItems.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-4">{language === 'ar' ? 'بنود الفاتورة' : 'Invoice Items'}</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full border border-gray-200 rounded-lg">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      {language === 'ar' ? (
-                        // Arabic RTL order
-                        <>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الخصم' : 'Discount'}</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'سعر الوحدة' : 'Unit Price'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الكمية' : 'Quantity'}</th>
-                          <th className="text-right py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الوصف' : 'Description'}</th>
-                        </>
-                      ) : (
-                        // English LTR order
-                        <>
-                          <th className="text-left py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الوصف' : 'Description'}</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الكمية' : 'Quantity'}</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'سعر الوحدة' : 'Unit Price'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الخصم' : 'Discount'}</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} (SAR)</th>
-                        </>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invoiceDetails.invoiceItems.map((item, index) => (
-                      <tr key={index} className="border-b hover:bg-gray-50">
-                        {language === 'ar' ? (
-                          // Arabic RTL order
-                          <>
-                            <td className="py-3 px-4 text-center font-semibold text-green-600">{parseFloat(item.totalAfterVat || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{parseFloat(item.totalBeforeVat || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center text-blue-600">{parseFloat(item.vatAmount || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{item.discountType === 'none' ? (language === 'ar' ? 'بدون خصم' : 'No Discount') : item.discountType}</td>
-                            <td className="py-3 px-4 text-center">{parseFloat(item.unitPrice || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{item.quantity}</td>
-                            <td className="py-3 px-4 text-right">{item.description}</td>
-                          </>
-                        ) : (
-                          // English LTR order
-                          <>
-                            <td className="py-3 px-4 text-left">{item.description}</td>
-                            <td className="py-3 px-4 text-center">{item.quantity}</td>
-                            <td className="py-3 px-4 text-center">{parseFloat(item.unitPrice || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{item.discountType === 'none' ? (language === 'ar' ? 'بدون خصم' : 'No Discount') : item.discountType}</td>
-                            <td className="py-3 px-4 text-center text-blue-600">{parseFloat(item.vatAmount || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{parseFloat(item.totalBeforeVat || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center font-semibold text-green-600">{parseFloat(item.totalAfterVat || '0').toFixed(2)}</td>
-                          </>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Invoice Totals */}
-              <div className="mt-4 bg-white p-4 rounded-lg border">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div className="text-center">
-                    <span className="block text-gray-500">{language === 'ar' ? 'المجموع الفرعي' : 'Subtotal'}</span>
-                    <span className="font-medium">{parseFloat(invoiceDetails.invoiceStatus.subtotal || '0').toFixed(2)} SAR</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="block text-gray-500">{language === 'ar' ? 'الضريبة' : 'Tax'} (15%)</span>
-                    <span className="font-medium text-blue-600">{parseFloat(invoiceDetails.invoiceStatus.taxAmount || '0').toFixed(2)} SAR</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="block text-gray-500">{language === 'ar' ? 'الخصم' : 'Discount'}</span>
-                    <span className="font-medium text-orange-600">{parseFloat(invoiceDetails.invoiceStatus.discountAmount || '0').toFixed(2)} SAR</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="block text-gray-500">{language === 'ar' ? 'الإجمالي النهائي' : 'Final Total'}</span>
-                    <span className="font-bold text-lg text-green-600">{parseFloat(invoiceDetails.invoiceStatus.finalTotal || '0').toFixed(2)} SAR</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Notes */}
-          {invoiceDetails.invoiceStatus.notes && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-3">{language === 'ar' ? 'ملاحظات' : 'Notes'}</h3>
-              <p className="text-gray-700 bg-yellow-50 p-3 rounded-lg border">{invoiceDetails.invoiceStatus.notes}</p>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default function AdminDashboard() {
@@ -1521,14 +1235,58 @@ export default function AdminDashboard() {
                               </div>
 
                               {generatedInvoices && generatedInvoices.length > 0 ? (
-                                <div className="space-y-4">
-                                  {generatedInvoices.map((invoice) => (
-                                    <InvoiceCard 
-                                      key={invoice.id} 
-                                      invoice={invoice} 
-                                      language={language}
-                                    />
-                                  ))}
+                                <div className="overflow-x-auto">
+                                  <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                      <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                          {language === 'ar' ? 'رقم الفاتورة' : 'Invoice Number'}
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                          {language === 'ar' ? 'العميل' : 'Customer'}
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                          {language === 'ar' ? 'الطبيب' : 'Doctor'}
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                          {language === 'ar' ? 'VetsVan' : 'VetsVan'}
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                          {language === 'ar' ? 'الإجمالي' : 'Total'}
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                          {language === 'ar' ? 'التاريخ' : 'Date'}
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                      {generatedInvoices.map((invoice) => (
+                                        <tr key={invoice.id} className="hover:bg-gray-50">
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            {invoice.invoiceNumber}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <div>
+                                              <div className="font-medium">{invoice.customerName}</div>
+                                              <div className="text-gray-400">{invoice.customerPhone}</div>
+                                            </div>
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {invoice.doctorName}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {invoice.vetsVanCode}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span className="font-medium">{Number(invoice.finalTotal)} SAR</span>
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {new Date(invoice.generatedAt || '').toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
                                 </div>
                               ) : (
                                 <div className="text-center py-12">

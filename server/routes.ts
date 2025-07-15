@@ -1990,52 +1990,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin: Get detailed invoice items for specific booking
-  app.get('/api/admin/invoice-details/:bookingId', requireAdminAuth, async (req, res) => {
-    try {
-      const { bookingId } = req.params;
-      
-      // Get invoice items
-      const invoiceItems = await storage.getInvoiceItems(parseInt(bookingId));
-      
-      // Get invoice status
-      const invoiceStatus = await storage.getInvoiceStatus(parseInt(bookingId));
-      
-      // Get booking details
-      const booking = await storage.getBookingWithDetails(parseInt(bookingId));
-      
-      if (!booking) {
-        return res.status(404).json({ message: 'Booking not found' });
-      }
-      
-      const response = {
-        invoiceItems: invoiceItems || [],
-        invoiceStatus: invoiceStatus || {
-          subtotal: 0,
-          taxAmount: 0,
-          discountAmount: 0,
-          finalTotal: 0,
-          notes: ''
-        },
-        booking: {
-          id: booking.id,
-          customerName: booking.customerName,
-          customerPhone: booking.customerPhone,
-          customerEmail: booking.customerEmail,
-          appointmentDate: booking.appointmentDate,
-          appointmentTime: booking.appointmentTime,
-          serviceType: booking.serviceType,
-          pets: booking.pets || []
-        }
-      };
-      
-      res.json(response);
-    } catch (error) {
-      console.error('Error fetching invoice details:', error);
-      res.status(500).json({ message: 'Failed to fetch invoice details' });
-    }
-  });
-
   // Doctor VetsVan location endpoint
   app.get('/api/doctor/vetsvan-location', requireAuth, async (req: any, res) => {
     try {
