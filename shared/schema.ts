@@ -336,7 +336,7 @@ export const invoiceItems = pgTable("invoice_items", {
   quantity: integer("quantity").notNull(),
   unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
   discount: decimal("discount", { precision: 10, scale: 2 }).default("0").notNull(),
-  discountType: text("discount_type").default("percentage").notNull(), // 'percentage' or 'amount'
+  discountType: text("discount_type").default("none").notNull(), // 'none', 'percentage' or 'amount'
   vatRate: decimal("vat_rate", { precision: 5, scale: 2 }).default("15.00").notNull(), // 15% VAT
   vatAmount: decimal("vat_amount", { precision: 10, scale: 2 }).notNull(),
   totalBeforeVat: decimal("total_before_vat", { precision: 10, scale: 2 }).notNull(),
