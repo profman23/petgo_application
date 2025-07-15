@@ -1,9 +1,0 @@
-<svg width="384" height="384" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
-  <!-- White background -->
-  <rect width="384" height="384" fill="white" rx="48" ry="48"/>
-  
-  <!-- Original logo image -->
-  <image x="38.400000000000006" y="38.400000000000006" width="307.20000000000005" height="307.20000000000005" 
-         href="/icons/original-logo.png" 
-         preserveAspectRatio="xMidYMid meet"/>
-</svg>
