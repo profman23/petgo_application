@@ -159,23 +159,50 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   constructor() {
     this.initializeTestData();
+    this.startDataProtection();
+  }
+
+  private async startDataProtection() {
+    try {
+      // Import and start data integrity guard
+      const { dataGuard } = await import('./dataIntegrityGuard');
+      await dataGuard.startMonitoring();
+      console.log("🛡️ Data Integrity Guard activated");
+    } catch (error) {
+      console.error("⚠️ Data protection system initialization failed:", error);
+    }
   }
 
   private async initializeTestData() {
     try {
-      // Check if basic data already exists
+      // Enhanced data integrity check - verify all critical tables
       const existingUsers = await db.select().from(users).limit(1);
       const existingProducts = await db.select().from(products).limit(1);
       const existingServices = await db.select().from(services).limit(1);
+      const existingDrivers = await db.select().from(drivers).limit(1);
+      const existingAdmins = await db.select().from(admins).limit(1);
       
-      // Only initialize users/drivers/shifts if no users exist
+      // Smart initialization - only create missing data
       let shouldInitializeUsers = existingUsers.length === 0;
-      // Always ensure products and services exist
+      let shouldInitializeDrivers = existingDrivers.length === 0;
+      let shouldInitializeAdmins = existingAdmins.length === 0;
+      // Never let products and services be empty
       let shouldInitializeProducts = existingProducts.length === 0;
       let shouldInitializeServices = existingServices.length === 0;
       
-      if (!shouldInitializeUsers && !shouldInitializeProducts && !shouldInitializeServices) {
-        return; // All data already initialized
+      // Data integrity log
+      console.log("🔍 Database Integrity Check:", {
+        users: existingUsers.length,
+        drivers: existingDrivers.length,
+        admins: existingAdmins.length,
+        products: existingProducts.length,
+        services: existingServices.length
+      });
+      
+      if (!shouldInitializeUsers && !shouldInitializeDrivers && !shouldInitializeAdmins && 
+          !shouldInitializeProducts && !shouldInitializeServices) {
+        console.log("✅ All critical data exists - no initialization needed");
+        return;
       }
 
       if (shouldInitializeUsers) {
@@ -194,8 +221,11 @@ export class DatabaseStorage implements IStorage {
         membershipType: "premium"
       });
 
-      // Create admin
-      await db.insert(admins).values({
+      }
+      
+      if (shouldInitializeAdmins) {
+        // Create admin
+        await db.insert(admins).values({
         id: 1,
         username: "admin",
         password: "123456",
@@ -203,8 +233,11 @@ export class DatabaseStorage implements IStorage {
         role: "admin"
       });
 
-      // Create drivers
-      await db.insert(drivers).values([
+      }
+      
+      if (shouldInitializeDrivers) {
+        // Create drivers
+        await db.insert(drivers).values([
         {
           id: 1,
           phone: "0512345678",
@@ -373,10 +406,12 @@ export class DatabaseStorage implements IStorage {
         ]);
       }
 
-      console.log("Database initialization completed:", {
-        users: shouldInitializeUsers ? "created" : "existed",
-        products: shouldInitializeProducts ? "created" : "existed", 
-        services: shouldInitializeServices ? "created" : "existed"
+      console.log("🎯 Database initialization completed:", {
+        users: shouldInitializeUsers ? "✅ created" : "⚡ existed",
+        drivers: shouldInitializeDrivers ? "✅ created" : "⚡ existed",
+        admins: shouldInitializeAdmins ? "✅ created" : "⚡ existed",
+        products: shouldInitializeProducts ? "✅ created" : "⚡ existed", 
+        services: shouldInitializeServices ? "✅ created" : "⚡ existed"
       });
     } catch (error) {
       console.error("Error initializing test data:", error);
