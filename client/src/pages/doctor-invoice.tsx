@@ -481,8 +481,8 @@ export default function DoctorInvoice() {
     }
     return sum;
   }, 0);
-  const totalWithTax = subtotal + taxAmount;
-  const finalTotal = totalWithTax;
+  // Final Total = (Total Before VAT - Discount) + VAT
+  const finalTotal = (subtotal - totalDiscountAmount) + taxAmount;
   const remainingBalance = finalTotal - totalPaid;
   
   // Calculate values for each item automatically
