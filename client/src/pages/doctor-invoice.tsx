@@ -469,7 +469,9 @@ export default function DoctorInvoice() {
   };
 
   // Calculate totals
-  const subtotal = invoiceItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+  const subtotal = invoiceItems.reduce((sum, item) => sum + item.totalBeforeVat, 0);
+  const taxAmount = invoiceItems.reduce((sum, item) => sum + item.vatAmount, 0);
+  // Calculate total discount amount from all items
   const totalDiscountAmount = invoiceItems.reduce((sum, item) => {
     const itemSubtotal = item.unitPrice * item.quantity;
     if (item.discountType === '10%') {
@@ -479,9 +481,8 @@ export default function DoctorInvoice() {
     }
     return sum;
   }, 0);
-  const totalBeforeVat = subtotal - totalDiscountAmount;
-  const taxAmount = totalBeforeVat * 0.15; // 15% VAT on total before VAT
-  const finalTotal = totalBeforeVat + taxAmount;
+  const totalWithTax = subtotal + taxAmount;
+  const finalTotal = totalWithTax;
   const remainingBalance = finalTotal - totalPaid;
   
   // Calculate values for each item automatically
@@ -1665,25 +1666,23 @@ export default function DoctorInvoice() {
           <div className="border-t pt-4">
             <div className="flex justify-end">
               <div className="w-80">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">{language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Total Before VAT:'}</span>
-                    <span className="text-sm font-medium">{subtotal.toFixed(2)} {t('sar')}</span>
+                <div className="flex justify-between mb-2">
+                  <span>{t('subtotal')}:</span>
+                  <span>{subtotal.toFixed(2)} {t('sar')}</span>
+                </div>
+                {totalDiscountAmount > 0 && (
+                  <div className="flex justify-between mb-2 text-green-600">
+                    <span>{t('discount')}:</span>
+                    <span>-{totalDiscountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
-                  {totalDiscountAmount > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">{t('discount')}:</span>
-                      <span className="text-sm font-medium">-{totalDiscountAmount.toFixed(2)} {t('sar')}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">{language === 'ar' ? 'الضريبة (15%):' : 'VAT (15%):'}</span>
-                    <span className="text-sm font-medium">{taxAmount.toFixed(2)} {t('sar')}</span>
-                  </div>
-                  <div className="flex justify-between border-t pt-2">
-                    <span className="text-base font-medium text-gray-900">{language === 'ar' ? 'الإجمالي النهائي:' : 'Final Total:'}</span>
-                    <span className="text-base font-bold text-purple-600">{finalTotal.toFixed(2)} {t('sar')}</span>
-                  </div>
+                )}
+                <div className="flex justify-between mb-2">
+                  <span>{t('tax')}:</span>
+                  <span>{taxAmount.toFixed(2)} {t('sar')}</span>
+                </div>
+                <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
+                  <span>{t('finalTotal')}:</span>
+                  <span>{finalTotal.toFixed(2)} {t('sar')}</span>
                 </div>
 
                 {/* Payment Summary */}

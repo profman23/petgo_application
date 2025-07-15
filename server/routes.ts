@@ -1990,61 +1990,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin: Get invoice details for specific invoice
-  app.get('/api/admin/invoice-details/:invoiceId', requireAdminAuth, async (req, res) => {
-    try {
-      const invoiceId = parseInt(req.params.invoiceId);
-      
-      if (isNaN(invoiceId)) {
-        return res.status(400).json({ message: 'Invalid invoice ID' });
-      }
-
-      // Get invoice basic information
-      const invoice = await storage.getGeneratedInvoice(invoiceId);
-      if (!invoice) {
-        return res.status(404).json({ message: 'Invoice not found' });
-      }
-
-      // Get invoice items
-      const invoiceItems = await storage.getInvoiceItems(invoice.bookingId);
-      
-      // Calculate totals
-      const subtotal = invoiceItems.reduce((sum, item) => sum + Number(item.total), 0);
-      const taxAmount = subtotal * 0.15; // 15% tax
-      const discountAmount = invoice.discountAmount || 0;
-      const finalTotal = subtotal + taxAmount - discountAmount;
-
-      const response = {
-        invoice: {
-          id: invoice.id,
-          invoiceNumber: invoice.invoiceNumber,
-          customerName: invoice.customerName,
-          customerPhone: invoice.customerPhone,
-          doctorName: invoice.doctorName,
-          vetsVanCode: invoice.vetsVanCode,
-          generatedAt: invoice.generatedAt
-        },
-        items: invoiceItems.map(item => ({
-          description: item.description,
-          quantity: Number(item.quantity),
-          unitPrice: Number(item.unitPrice),
-          total: Number(item.total)
-        })),
-        summary: {
-          subtotal: subtotal.toFixed(2),
-          taxAmount: taxAmount.toFixed(2),
-          discountAmount: discountAmount.toFixed(2),
-          finalTotal: finalTotal.toFixed(2)
-        }
-      };
-
-      res.json(response);
-    } catch (error) {
-      console.error('Error fetching invoice details:', error);
-      res.status(500).json({ message: 'Failed to fetch invoice details' });
-    }
-  });
-
   // Doctor VetsVan location endpoint
   app.get('/api/doctor/vetsvan-location', requireAuth, async (req: any, res) => {
     try {
@@ -2568,56 +2513,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deleting invoice items:', error);
       res.status(500).json({ message: 'Failed to delete invoice items' });
-    }
-  });
-
-  // Get invoice details with items for admin dashboard
-  app.get('/api/admin/invoice-details/:invoiceId', requireAuth, async (req: any, res) => {
-    try {
-      const invoiceId = parseInt(req.params.invoiceId);
-      
-      // Get the generated invoice
-      const invoice = await storage.getGeneratedInvoice(invoiceId);
-      if (!invoice) {
-        return res.status(404).json({ message: 'Invoice not found' });
-      }
-      
-      // Get the invoice items
-      const items = await storage.getInvoiceItems(invoice.bookingId);
-      
-      // Calculate totals
-      const subtotal = items.reduce((sum, item) => sum + parseFloat(item.total), 0);
-      const taxAmount = subtotal * 0.15; // 15% tax
-      const discountAmount = parseFloat(invoice.totalDiscountAmount || '0');
-      const finalTotal = subtotal + taxAmount - discountAmount;
-      
-      const result = {
-        invoice,
-        items: items.map(item => ({
-          id: item.id,
-          description: item.description,
-          quantity: item.quantity,
-          unitPrice: parseFloat(item.unitPrice),
-          total: parseFloat(item.total),
-          discount: parseFloat(item.discount || '0'),
-          discountType: item.discountType || 'none',
-          vatRate: parseFloat(item.vatRate || '15'),
-          vatAmount: parseFloat(item.vatAmount || '0'),
-          totalBeforeVat: parseFloat(item.totalBeforeVat || item.total),
-          totalAfterVat: parseFloat(item.totalAfterVat || item.total)
-        })),
-        summary: {
-          subtotal: subtotal.toFixed(2),
-          taxAmount: taxAmount.toFixed(2),
-          discountAmount: discountAmount.toFixed(2),
-          finalTotal: finalTotal.toFixed(2)
-        }
-      };
-      
-      res.json(result);
-    } catch (error) {
-      console.error('Error fetching invoice details:', error);
-      res.status(500).json({ message: 'Failed to fetch invoice details' });
     }
   });
 
