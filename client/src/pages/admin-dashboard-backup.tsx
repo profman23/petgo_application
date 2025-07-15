@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronRight } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
@@ -70,6 +70,7 @@ export default function AdminDashboard() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importSubTab, setImportSubTab] = useState<'products' | 'services'>('products');
+  const [expandedInvoices, setExpandedInvoices] = useState<Set<number>>(new Set());
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     vetsvanCode: "",
     vetsvanName: "",
@@ -259,6 +260,43 @@ export default function AdminDashboard() {
       setUploadingFile(false);
     }
   };
+
+  // Toggle invoice expansion
+  const toggleInvoiceExpansion = (invoiceId: number) => {
+    const newExpanded = new Set(expandedInvoices);
+    if (newExpanded.has(invoiceId)) {
+      newExpanded.delete(invoiceId);
+    } else {
+      newExpanded.add(invoiceId);
+    }
+    setExpandedInvoices(newExpanded);
+  };
+
+  // Fetch invoice details
+  const { data: invoiceDetails } = useQuery({
+    queryKey: ["/api/admin/invoice-details", Array.from(expandedInvoices)],
+    queryFn: async () => {
+      if (expandedInvoices.size === 0) return {};
+      
+      const details = {};
+      for (const invoiceId of expandedInvoices) {
+        try {
+          const response = await fetch(`/api/admin/invoice-details/${invoiceId}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
+          if (response.ok) {
+            details[invoiceId] = await response.json();
+          }
+        } catch (error) {
+          console.error(`Error fetching details for invoice ${invoiceId}:`, error);
+        }
+      }
+      return details;
+    },
+    enabled: !!adminToken && expandedInvoices.size > 0,
+  });
 
   // Check admin authentication and prevent doctors access
   useEffect(() => {
@@ -1213,7 +1251,6 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                             )}
-                          </> 
                         </>
                       )}
 
@@ -1240,6 +1277,9 @@ export default function AdminDashboard() {
                                   <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                       <tr>
+                                        <th className="px-2 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-8">
+                                          {/* Arrow column */}
+                                        </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                           {language === 'ar' ? 'رقم الفاتورة' : 'Invoice Number'}
                                         </th>
@@ -1262,29 +1302,96 @@ export default function AdminDashboard() {
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
                                       {generatedInvoices.map((invoice) => (
-                                        <tr key={invoice.id} className="hover:bg-gray-50">
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {invoice.invoiceNumber}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <div>
-                                              <div className="font-medium">{invoice.customerName}</div>
-                                              <div className="text-gray-400">{invoice.customerPhone}</div>
-                                            </div>
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {invoice.doctorName}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {invoice.vetsVanCode}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <span className="font-medium">{Number(invoice.finalTotal)} SAR</span>
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {new Date(invoice.generatedAt || '').toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                                          </td>
-                                        </tr>
+                                        <React.Fragment key={invoice.id}>
+                                          <tr className="hover:bg-gray-50">
+                                            <td className="px-2 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              <button
+                                                onClick={() => toggleInvoiceExpansion(invoice.id)}
+                                                className="hover:text-gray-700 transition-colors"
+                                              >
+                                                {expandedInvoices.has(invoice.id) ? (
+                                                  <ChevronDown className="h-4 w-4" />
+                                                ) : (
+                                                  <ChevronRight className="h-4 w-4" />
+                                                )}
+                                              </button>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                              {invoice.invoiceNumber}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              <div>
+                                                <div className="font-medium">{invoice.customerName}</div>
+                                                <div className="text-gray-400">{invoice.customerPhone}</div>
+                                              </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              {invoice.doctorName}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              {invoice.vetsVanCode}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              <span className="font-medium">{Number(invoice.finalTotal)} SAR</span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              {new Date(invoice.generatedAt || '').toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                                            </td>
+                                          </tr>
+                                          {expandedInvoices.has(invoice.id) && invoiceDetails?.[invoice.id] && (
+                                            <tr>
+                                              <td colSpan={7} className="px-6 py-4 bg-gray-50">
+                                                <div className="max-w-full overflow-x-auto">
+                                                  <h5 className="text-sm font-medium text-gray-900 mb-3">
+                                                    {language === 'ar' ? 'تفاصيل الفاتورة' : 'Invoice Details'}
+                                                  </h5>
+                                                  <table className="min-w-full table-auto">
+                                                    <thead>
+                                                      <tr className="bg-gray-100">
+                                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 border">
+                                                          {language === 'ar' ? 'الوصف' : 'Description'}
+                                                        </th>
+                                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 border">
+                                                          {language === 'ar' ? 'الكمية' : 'Quantity'}
+                                                        </th>
+                                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 border">
+                                                          {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
+                                                        </th>
+                                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 border">
+                                                          {language === 'ar' ? 'الخصم' : 'Discount'}
+                                                        </th>
+                                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 border">
+                                                          {language === 'ar' ? 'الضريبة' : 'VAT'}
+                                                        </th>
+                                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 border">
+                                                          {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'}
+                                                        </th>
+                                                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 border">
+                                                          {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'}
+                                                        </th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                      {invoiceDetails[invoice.id]?.items?.map((item, idx) => (
+                                                        <tr key={idx} className="border-b">
+                                                          <td className="px-3 py-2 text-sm text-gray-700 border">{item.description}</td>
+                                                          <td className="px-3 py-2 text-sm text-gray-700 border">{item.quantity}</td>
+                                                          <td className="px-3 py-2 text-sm text-gray-700 border">{item.unitPrice} SAR</td>
+                                                          <td className="px-3 py-2 text-sm text-gray-700 border">
+                                                            {item.discountType === '10%' ? '10%' : item.discountType === '100%' ? '100%' : '0%'}
+                                                          </td>
+                                                          <td className="px-3 py-2 text-sm text-gray-700 border">{Number(item.vatAmount || 0).toFixed(2)} SAR</td>
+                                                          <td className="px-3 py-2 text-sm text-gray-700 border">{(item.quantity * item.unitPrice).toFixed(2)} SAR</td>
+                                                          <td className="px-3 py-2 text-sm text-gray-700 border">{Number(item.totalAfterVat || 0).toFixed(2)} SAR</td>
+                                                        </tr>
+                                                      ))}
+                                                    </tbody>
+                                                  </table>
+                                                </div>
+                                              </td>
+                                            </tr>
+                                          )}
+                                        </React.Fragment>
                                       ))}
                                     </tbody>
                                   </table>
@@ -1300,10 +1407,6 @@ export default function AdminDashboard() {
                                   </p>
                                 </div>
                               )}
-                            </>
-                          )}
-                        </>
-                      )}
                       
                       {/* SMS Communication Section - Show in both tabs */}
                       <div className="bg-white border rounded-lg p-6 mt-6">
@@ -1740,7 +1843,7 @@ export default function AdminDashboard() {
                   step="any"
                   value={newLocation.latitude}
                   onChange={(e) => setNewLocation({ ...newLocation, latitude: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   placeholder="24.7136"
                   required
                   style={{ textAlign: getTextAlign(language) }}
@@ -1756,7 +1859,7 @@ export default function AdminDashboard() {
                   step="any"
                   value={newLocation.longitude}
                   onChange={(e) => setNewLocation({ ...newLocation, longitude: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-600"
                   placeholder="46.6753"
                   required
                   style={{ textAlign: getTextAlign(language) }}

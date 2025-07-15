@@ -1990,6 +1990,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get invoice details for sales report expansion
+  app.get('/api/admin/invoice-details/:invoiceId', requireAdminAuth, async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.invoiceId);
+      
+      if (isNaN(invoiceId)) {
+        return res.status(400).json({ message: 'Invalid invoice ID' });
+      }
+
+      // Get invoice items for this invoice
+      const invoiceItems = await storage.getInvoiceItems(invoiceId);
+      
+      res.json({
+        invoiceId,
+        items: invoiceItems || []
+      });
+    } catch (error) {
+      console.error('Error fetching invoice details:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice details' });
+    }
+  });
+
   // Doctor VetsVan location endpoint
   app.get('/api/doctor/vetsvan-location', requireAuth, async (req: any, res) => {
     try {

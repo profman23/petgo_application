@@ -11,7 +11,7 @@ import {
   Users, Upload, Loader2, MapPin, Volume2, VolumeX, 
   Bell, Clock, ChevronDown, ChevronRight 
 } from "lucide-react";
-import { useLanguage } from '@/lib/i18n';
+import { useLanguage } from '@/store/language';
 
 // Simplified Invoice Table Component
 function InvoiceDetailsTable({ invoice, invoiceDetails, language }) {
@@ -71,9 +71,9 @@ function InvoiceDetailsTable({ invoice, invoiceDetails, language }) {
 }
 
 export default function AdminDashboard() {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState('reports');
+  const [activeTab, setActiveTab] = useState('management');
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
   
@@ -83,16 +83,6 @@ export default function AdminDashboard() {
 
   // Admin info (from token/session)
   const admin = { name: 'Admin' };
-
-  // Simple translation function
-  const t = (key) => {
-    const translations = {
-      adminDashboard: language === 'ar' ? 'لوحة تحكم الإدارة' : 'Admin Dashboard',
-      welcome: language === 'ar' ? 'مرحباً' : 'Welcome',
-      logout: language === 'ar' ? 'تسجيل خروج' : 'Logout'
-    };
-    return translations[key] || key;
-  };
 
   // Helper functions
   const getDirection = (language) => language === 'ar' ? 'rtl' : 'ltr';
