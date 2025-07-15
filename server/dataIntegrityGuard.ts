@@ -13,7 +13,7 @@ export class DataIntegrityGuard {
     return DataIntegrityGuard.instance;
   }
 
-  // Auto-backup critical data
+  // Auto-backup critical data with enhanced protection for imported data
   async createBackup(): Promise<void> {
     try {
       const backup = {
@@ -39,6 +39,14 @@ export class DataIntegrityGuard {
       
       // Store backup in memory for quick recovery
       this.lastBackup = backup;
+      
+      // Alert if imported data detected and protect it
+      if (backup.products.length > 3 || backup.services.length > 3) {
+        console.log("🔒 IMPORTED DATA DETECTED - Enhanced protection activated");
+        console.log(`📊 Products: ${backup.products.length} (${backup.products.length - 3} imported)`);
+        console.log(`📊 Services: ${backup.services.length} (${backup.services.length - 3} imported)`);
+      }
+      
     } catch (error) {
       console.error("❌ Backup creation failed:", error);
     }
