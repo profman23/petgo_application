@@ -160,28 +160,6 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
       {/* Expandable Invoice Details */}
       {isExpanded && invoiceDetails && (
         <div className="p-6 bg-gray-50" dir={getDirection(language)}>
-          {/* Service Details */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 flex items-center">
-              <Calendar className="h-5 w-5 text-purple-600 ml-2" />
-              {language === 'ar' ? 'تفاصيل الخدمة' : 'Service Details'}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'التاريخ' : 'Date'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.appointmentDate}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'الوقت' : 'Time'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.appointmentTime}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'نوع الخدمة' : 'Service Type'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.serviceType}</p>
-              </div>
-            </div>
-          </div>
-
           {/* Pet Information */}
           {invoiceDetails.booking.pets && invoiceDetails.booking.pets.length > 0 && (
             <div className="mb-6">
