@@ -3,6 +3,7 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 import { dbProtection } from './dbProtection';
+import { importProtection } from './importDataProtection';
 
 neonConfig.webSocketConstructor = ws;
 
@@ -110,6 +111,10 @@ export async function initDatabase() {
     `);
     
     console.log('✅ Database schema initialized successfully with protection enabled');
+    
+    // Initialize import data protection system
+    await importProtection.initialize();
+    
   } catch (error) {
     console.error('❌ Error initializing database:', error);
     throw error;

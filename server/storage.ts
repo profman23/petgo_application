@@ -1067,6 +1067,17 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
+    // Trigger import data protection after bulk operation
+    if (imported > 0 || updated > 0) {
+      try {
+        const { importProtection } = await import('./importDataProtection');
+        await importProtection.createImportBackup();
+        console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated services`);
+      } catch (error) {
+        console.error('⚠️ Import protection update failed:', error);
+      }
+    }
+
     return { imported, updated, failed };
   }
 
@@ -1092,6 +1103,17 @@ export class DatabaseStorage implements IStorage {
       } catch (error) {
         console.error('Error importing product:', error);
         failed++;
+      }
+    }
+
+    // Trigger import data protection after bulk operation
+    if (imported > 0 || updated > 0) {
+      try {
+        const { importProtection } = await import('./importDataProtection');
+        await importProtection.createImportBackup();
+        console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated products`);
+      } catch (error) {
+        console.error('⚠️ Import protection update failed:', error);
       }
     }
 

@@ -24,6 +24,21 @@ export class DatabaseProtection {
     const queryString = typeof query === 'string' ? query : query.toString();
     const upperQuery = queryString.trim().toUpperCase();
     
+    // Enhanced protection for imported data
+    if (upperQuery.includes('DELETE FROM PRODUCTS') || upperQuery.includes('DROP TABLE PRODUCTS') || upperQuery.includes('TRUNCATE PRODUCTS')) {
+      return {
+        allowed: false,
+        reason: `🔒 IMPORT DATA PROTECTION: Products table contains imported data and cannot be deleted`
+      };
+    }
+    
+    if (upperQuery.includes('DELETE FROM SERVICES') || upperQuery.includes('DROP TABLE SERVICES') || upperQuery.includes('TRUNCATE SERVICES')) {
+      return {
+        allowed: false,
+        reason: `🔒 IMPORT DATA PROTECTION: Services table contains imported data and cannot be deleted`
+      };
+    }
+    
     // Check for protected operations
     for (const operation of this.protectedOperations) {
       if (upperQuery.startsWith(operation)) {
