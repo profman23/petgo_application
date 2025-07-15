@@ -1143,6 +1143,7 @@ export default function DoctorInvoice() {
                         
                         {/* Discount */}
                         <td className="py-2 px-2">
+                          <div className="text-xs text-blue-600 mb-1">DEBUG: {item.discountType}</div>
                           {isRecordLocked ? (
                             <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
                               {item.discountType === 'none' 
