@@ -264,7 +264,86 @@ export class DatabaseStorage implements IStorage {
         }
       ]);
 
-      console.log("Test data initialized successfully");
+      // Add essential products and services data to prevent loss
+      await db.insert(products).values([
+        {
+          name: 'Pet Food Premium',
+          nameAr: 'طعام حيوانات مميز',
+          description: 'High quality pet food for dogs and cats',
+          descriptionAr: 'طعام عالي الجودة للكلاب والقطط',
+          price: 85.50,
+          category: 'Food',
+          categoryAr: 'طعام',
+          sku: 'PF001',
+          unit: 'Bag',
+          unitAr: 'كيس',
+          isActive: true
+        },
+        {
+          name: 'Vitamin Supplements',
+          nameAr: 'فيتامينات',
+          description: 'Essential vitamins for pet health',
+          descriptionAr: 'فيتامينات أساسية لصحة الحيوانات',
+          price: 125.00,
+          category: 'Health',
+          categoryAr: 'صحة',
+          sku: 'VIT001',
+          unit: 'Bottle',
+          unitAr: 'زجاجة',
+          isActive: true
+        },
+        {
+          name: 'Pet Toys Set',
+          nameAr: 'مجموعة ألعاب',
+          description: 'Interactive toys for pets',
+          descriptionAr: 'ألعاب تفاعلية للحيوانات الأليفة',
+          price: 45.75,
+          category: 'Toys',
+          categoryAr: 'ألعاب',
+          sku: 'TOY001',
+          unit: 'Set',
+          unitAr: 'مجموعة',
+          isActive: true
+        }
+      ]);
+
+      await db.insert(services).values([
+        {
+          name: 'General Checkup',
+          nameAr: 'فحص عام',
+          description: 'Complete health examination',
+          descriptionAr: 'فحص صحي شامل',
+          price: 150.00,
+          category: 'Medical',
+          categoryAr: 'طبي',
+          duration: 30,
+          isActive: true
+        },
+        {
+          name: 'Vaccination',
+          nameAr: 'تطعيم',
+          description: 'Essential vaccinations',
+          descriptionAr: 'تطعيمات أساسية',
+          price: 200.00,
+          category: 'Medical',
+          categoryAr: 'طبي',
+          duration: 15,
+          isActive: true
+        },
+        {
+          name: 'Grooming',
+          nameAr: 'تنظيف',
+          description: 'Professional grooming service',
+          descriptionAr: 'خدمة تنظيف احترافية',
+          price: 100.00,
+          category: 'Grooming',
+          categoryAr: 'تنظيف',
+          duration: 45,
+          isActive: true
+        }
+      ]);
+
+      console.log("Test data initialized successfully with products and services");
     } catch (error) {
       console.error("Error initializing test data:", error);
     }
