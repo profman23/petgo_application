@@ -900,6 +900,12 @@ export class DatabaseStorage implements IStorage {
         description: item.description,
         quantity: item.quantity,
         unitPrice: item.unitPrice.toString(),
+        discount: item.discount ? item.discount.toString() : "0",
+        discountType: item.discountType || 'none',
+        vatRate: item.vatRate ? item.vatRate.toString() : "15.00",
+        vatAmount: item.vatAmount ? item.vatAmount.toString() : "0",
+        totalBeforeVat: item.totalBeforeVat ? item.totalBeforeVat.toString() : "0",
+        totalAfterVat: item.totalAfterVat ? item.totalAfterVat.toString() : "0",
         total: item.total.toString()
       }).returning();
       savedItems.push(savedItem);

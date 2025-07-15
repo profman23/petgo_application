@@ -714,6 +714,11 @@ Changelog:
 - July 15, 2025. INTEGRATED: Multi-level protection - Database Protection + Smart Check + Integrity Guard + Emergency Recovery
 - July 15, 2025. VERIFIED: All critical data now protected with 30-minute monitoring, hourly backups, and instant recovery capabilities
 - July 15, 2025. GUARANTEED: Zero data loss system - uploaded data will never be lost under any circumstances
+- July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
+- July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
+- July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat
+- July 15, 2025. CORRECTED: Default discountType values from 'percentage' to 'none' for consistency across all invoice creation flows
+- July 15, 2025. UPGRADED: Database storage operations to maintain complete invoice item data integrity during save/load operations
 - July 10, 2025. ENHANCED: Real-time GPS tracking system with interactive maps implemented for customer tracking interface
 - July 10, 2025. ADDED: New API endpoint /api/tracking/:bookingId for fetching real-time location data with distance calculations
 - July 10, 2025. IMPLEMENTED: Interactive Leaflet maps in TrackingModal showing customer and VetsVan locations with custom markers
