@@ -713,6 +713,9 @@ Changelog:
 - July 15, 2025. SIMPLIFIED: Invoice Summary section now shows only "Total Before VAT" as requested
 - July 15, 2025. IMPLEMENTED: Advanced financial calculations for each invoice item with proper discount and VAT distribution
 - July 15, 2025. SUCCESS: Complete invoice financial breakdown system operational with bilingual support
+- July 15, 2025. ENHANCED: Invoice Summary section with comprehensive financial totals display
+- July 15, 2025. ADDED: Total Before VAT, Discount, VAT (15%), and Final Total in Invoice Summary
+- July 15, 2025. COMPLETED: Complete financial summary with proper calculation flow and bilingual labels
 - July 10, 2025. ENHANCED: Real-time GPS tracking system with interactive maps implemented for customer tracking interface
 - July 10, 2025. ADDED: New API endpoint /api/tracking/:bookingId for fetching real-time location data with distance calculations
 - July 10, 2025. IMPLEMENTED: Interactive Leaflet maps in TrackingModal showing customer and VetsVan locations with custom markers

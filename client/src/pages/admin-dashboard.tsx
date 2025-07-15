@@ -1434,9 +1434,23 @@ export default function AdminDashboard() {
                                                       <h5 className="font-medium text-gray-900 mb-3">
                                                         {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
                                                       </h5>
-                                                      <div className="flex justify-between">
-                                                        <span className="text-base font-medium text-gray-900">{language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Total Before VAT:'}</span>
-                                                        <span className="text-base font-bold text-purple-600">{invoiceDetails[invoice.id].summary.subtotal} SAR</span>
+                                                      <div className="space-y-2">
+                                                        <div className="flex justify-between">
+                                                          <span className="text-sm text-gray-600">{language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Total Before VAT:'}</span>
+                                                          <span className="text-sm font-medium">{invoiceDetails[invoice.id].summary.subtotal} SAR</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                          <span className="text-sm text-gray-600">{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
+                                                          <span className="text-sm font-medium">-{invoiceDetails[invoice.id].summary.discountAmount} SAR</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                          <span className="text-sm text-gray-600">{language === 'ar' ? 'الضريبة (15%):' : 'VAT (15%):'}</span>
+                                                          <span className="text-sm font-medium">{invoiceDetails[invoice.id].summary.taxAmount} SAR</span>
+                                                        </div>
+                                                        <div className="flex justify-between border-t pt-2">
+                                                          <span className="text-base font-medium text-gray-900">{language === 'ar' ? 'الإجمالي النهائي:' : 'Final Total:'}</span>
+                                                          <span className="text-base font-bold text-purple-600">{invoiceDetails[invoice.id].summary.finalTotal} SAR</span>
+                                                        </div>
                                                       </div>
                                                     </div>
                                                   </div>
