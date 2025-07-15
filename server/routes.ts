@@ -2610,12 +2610,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           description: item.description,
           quantity: parseInt(item.quantity as any),
           unitPrice: parseFloat(item.unitPrice),
-          discount: 0, // Will be calculated
-          discountType: 'none',
+          discount: parseFloat(item.discount || 0),
+          discountType: item.discountType || 'none',
           vatRate: 15,
-          vatAmount: 0, // Will be calculated
-          totalBeforeVat: parseFloat(item.total),
-          totalAfterVat: parseFloat(item.total) * 1.15,
+          vatAmount: parseFloat(item.vatAmount || 0),
+          totalBeforeVat: parseFloat(item.totalBeforeVat || item.total),
+          totalAfterVat: parseFloat(item.totalAfterVat || (item.total * 1.15)),
           total: parseFloat(item.total)
         })),
         subtotal: subtotal.toString(),
