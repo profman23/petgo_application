@@ -163,14 +163,24 @@ export class DatabaseStorage implements IStorage {
 
   private async initializeTestData() {
     try {
-      // Check if data already exists
+      // Check if basic data already exists
       const existingUsers = await db.select().from(users).limit(1);
-      if (existingUsers.length > 0) {
-        return; // Data already initialized
+      const existingProducts = await db.select().from(products).limit(1);
+      const existingServices = await db.select().from(services).limit(1);
+      
+      // Only initialize users/drivers/shifts if no users exist
+      let shouldInitializeUsers = existingUsers.length === 0;
+      // Always ensure products and services exist
+      let shouldInitializeProducts = existingProducts.length === 0;
+      let shouldInitializeServices = existingServices.length === 0;
+      
+      if (!shouldInitializeUsers && !shouldInitializeProducts && !shouldInitializeServices) {
+        return; // All data already initialized
       }
 
-      // Create test user
-      await db.insert(users).values({
+      if (shouldInitializeUsers) {
+        // Create test user
+        await db.insert(users).values({
         id: 1,
         phone: "0501234567",
         email: "test@test.com",
@@ -278,8 +288,96 @@ export class DatabaseStorage implements IStorage {
           status: "active"
         }
       ]);
+      }
 
-      console.log("Test data initialized successfully");
+      // Add essential products and services data to prevent loss
+      if (shouldInitializeProducts) {
+        await db.insert(products).values([
+          {
+            name: 'Pet Food Premium',
+            nameAr: 'طعام حيوانات مميز',
+            description: 'High quality pet food for dogs and cats',
+            descriptionAr: 'طعام عالي الجودة للكلاب والقطط',
+            price: 85.50,
+            category: 'Food',
+            categoryAr: 'طعام',
+            sku: 'PF001',
+            unit: 'Bag',
+            unitAr: 'كيس',
+            isActive: true
+          },
+          {
+            name: 'Vitamin Supplements',
+            nameAr: 'فيتامينات',
+            description: 'Essential vitamins for pet health',
+            descriptionAr: 'فيتامينات أساسية لصحة الحيوانات',
+            price: 125.00,
+            category: 'Health',
+            categoryAr: 'صحة',
+            sku: 'VIT001',
+            unit: 'Bottle',
+            unitAr: 'زجاجة',
+            isActive: true
+          },
+          {
+            name: 'Pet Toys Set',
+            nameAr: 'مجموعة ألعاب',
+            description: 'Interactive toys for pets',
+            descriptionAr: 'ألعاب تفاعلية للحيوانات الأليفة',
+            price: 45.75,
+            category: 'Toys',
+            categoryAr: 'ألعاب',
+            sku: 'TOY001',
+            unit: 'Set',
+            unitAr: 'مجموعة',
+            isActive: true
+          }
+        ]);
+      }
+
+      if (shouldInitializeServices) {
+        await db.insert(services).values([
+          {
+            name: 'General Checkup',
+            nameAr: 'فحص عام',
+            description: 'Complete health examination',
+            descriptionAr: 'فحص صحي شامل',
+            price: 150.00,
+            category: 'Medical',
+            categoryAr: 'طبي',
+            duration: 30,
+            isActive: true
+          },
+          {
+            name: 'Vaccination',
+            nameAr: 'تطعيم',
+            description: 'Essential vaccinations',
+            descriptionAr: 'تطعيمات أساسية',
+            price: 200.00,
+            category: 'Medical',
+            categoryAr: 'طبي',
+            duration: 15,
+            isActive: true
+          },
+          {
+            name: 'Grooming',
+            nameAr: 'تنظيف',
+            description: 'Professional grooming service',
+            descriptionAr: 'خدمة تنظيف احترافية',
+            price: 100.00,
+            category: 'Grooming',
+            categoryAr: 'تنظيف',
+            duration: 45,
+            isActive: true
+          }
+        ]);
+      }
+
+      console.log("Database initialization completed:", {
+        users: shouldInitializeUsers ? "created" : "existed",
+        products: shouldInitializeProducts ? "created" : "existed", 
+        services: shouldInitializeServices ? "created" : "existed"
+      });
     } catch (error) {
       console.error("Error initializing test data:", error);
     }
