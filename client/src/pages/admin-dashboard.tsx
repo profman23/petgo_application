@@ -160,28 +160,6 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
       {/* Expandable Invoice Details */}
       {isExpanded && invoiceDetails && (
         <div className="p-6 bg-gray-50" dir={getDirection(language)}>
-          {/* Customer Information */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 flex items-center">
-              <User className="h-5 w-5 text-purple-600 ml-2" />
-              {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'الاسم' : 'Name'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.customerName}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'الهاتف' : 'Phone'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.customerPhone}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{language === 'ar' ? 'الإيميل' : 'Email'}</label>
-                <p className="text-gray-900">{invoiceDetails.booking.customerEmail}</p>
-              </div>
-            </div>
-          </div>
-
           {/* Service Details */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold mb-3 flex items-center">
