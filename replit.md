@@ -716,6 +716,11 @@ Changelog:
 - July 15, 2025. ENHANCED: Invoice Summary section with comprehensive financial totals display
 - July 15, 2025. ADDED: Total Before VAT, Discount, VAT (15%), and Final Total in Invoice Summary
 - July 15, 2025. COMPLETED: Complete financial summary with proper calculation flow and bilingual labels
+- July 15, 2025. ENHANCED: Doctor invoice calculation system updated to match admin dashboard calculations
+- July 15, 2025. FIXED: Invoice totals calculation - subtotal now calculated as (quantity × unitPrice) before discount
+- July 15, 2025. CORRECTED: VAT calculation applied to totalBeforeVat (subtotal - discount) × 15% for accurate tax computation
+- July 15, 2025. UPDATED: Doctor invoice summary display to match admin dashboard format with consistent styling and layout
+- July 15, 2025. STANDARDIZED: Invoice Summary sections across both admin dashboard and doctor interface for unified experience
 - July 10, 2025. ENHANCED: Real-time GPS tracking system with interactive maps implemented for customer tracking interface
 - July 10, 2025. ADDED: New API endpoint /api/tracking/:bookingId for fetching real-time location data with distance calculations
 - July 10, 2025. IMPLEMENTED: Interactive Leaflet maps in TrackingModal showing customer and VetsVan locations with custom markers
