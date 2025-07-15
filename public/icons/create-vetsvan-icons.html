@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create VetsVan PWA Icons</title>
+</head>
+<body>
+    <h2>VetsVan PWA Icon Generator</h2>
+    <canvas id="canvas192" width="192" height="192" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+    <canvas id="canvas512" width="512" height="512" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+    <br>
+    <button onclick="downloadIcons()">Download Icons</button>
+
+    <script>
+        function createIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const scale = size / 192; // Base scale on 192px
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // White background with rounded corners
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, size, size);
+            
+            // White border frame (15px thick scaled)
+            const frameThickness = 15 * scale;
+            ctx.strokeStyle = '#f8f9fa';
+            ctx.lineWidth = 2 * scale;
+            ctx.beginPath();
+            ctx.roundRect(frameThickness, frameThickness, 
+                         size - (frameThickness * 2), size - (frameThickness * 2), 
+                         16 * scale);
+            ctx.stroke();
+            
+            // Purple medical cross background
+            const crossMargin = 30 * scale;
+            const crossSize = size - (crossMargin * 2);
+            
+            ctx.fillStyle = '#A855F7';
+            
+            // Create medical cross shape
+            const armWidth = crossSize * 0.3;
+            const armLength = crossSize * 0.7;
+            const center = size / 2;
+            
+            // Horizontal arm
+            ctx.beginPath();
+            ctx.roundRect(center - armLength/2, center - armWidth/2, 
+                         armLength, armWidth, 8 * scale);
+            ctx.fill();
+            
+            // Vertical arm
+            ctx.beginPath();
+            ctx.roundRect(center - armWidth/2, center - armLength/2, 
+                         armWidth, armLength, 8 * scale);
+            ctx.fill();
+            
+            // White animal silhouettes
+            ctx.fillStyle = 'white';
+            
+            // Dog silhouette (top-left area of cross)
+            const dogX = center - armLength/4;
+            const dogY = center - armLength/4;
+            
+            // Dog head
+            ctx.beginPath();
+            ctx.ellipse(dogX, dogY, 12 * scale, 10 * scale, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Dog ear
+            ctx.beginPath();
+            ctx.ellipse(dogX - 8 * scale, dogY - 5 * scale, 5 * scale, 8 * scale, -0.3, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Dog body
+            ctx.beginPath();
+            ctx.ellipse(dogX, dogY + 15 * scale, 15 * scale, 12 * scale, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Cat silhouette (bottom-right area of cross)
+            const catX = center + armLength/4;
+            const catY = center + armLength/4;
+            
+            // Cat head
+            ctx.beginPath();
+            ctx.ellipse(catX, catY, 10 * scale, 8 * scale, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Cat ears
+            ctx.beginPath();
+            ctx.moveTo(catX - 8 * scale, catY - 5 * scale);
+            ctx.lineTo(catX - 5 * scale, catY - 12 * scale);
+            ctx.lineTo(catX - 2 * scale, catY - 5 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(catX + 2 * scale, catY - 5 * scale);
+            ctx.lineTo(catX + 5 * scale, catY - 12 * scale);
+            ctx.lineTo(catX + 8 * scale, catY - 5 * scale);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Cat body
+            ctx.beginPath();
+            ctx.ellipse(catX, catY + 10 * scale, 12 * scale, 9 * scale, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Medical stethoscope (bottom-right corner)
+            const stethoX = center + armLength/3;
+            const stethoY = center + armLength/3;
+            
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2 * scale;
+            ctx.beginPath();
+            ctx.arc(stethoX, stethoY, 6 * scale, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Stethoscope tube
+            ctx.beginPath();
+            ctx.quadraticCurveTo(stethoX + 10 * scale, stethoY + 10 * scale, 
+                               stethoX + 20 * scale, stethoY + 5 * scale);
+            ctx.stroke();
+            
+            // Earpiece
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(stethoX + 20 * scale, stethoY + 5 * scale, 3 * scale, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        // Create both icons
+        createIcon(document.getElementById('canvas192'), 192);
+        createIcon(document.getElementById('canvas512'), 512);
+
+        function downloadIcons() {
+            // Download 192x192 icon
+            const canvas192 = document.getElementById('canvas192');
+            const link192 = document.createElement('a');
+            link192.download = 'icon-192x192-vetsvan.png';
+            link192.href = canvas192.toDataURL('image/png');
+            link192.click();
+
+            // Download 512x512 icon
+            setTimeout(() => {
+                const canvas512 = document.getElementById('canvas512');
+                const link512 = document.createElement('a');
+                link512.download = 'icon-512x512-vetsvan.png';
+                link512.href = canvas512.toDataURL('image/png');
+                link512.click();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
