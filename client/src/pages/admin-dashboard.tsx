@@ -72,7 +72,6 @@ interface InvoiceDetails {
 function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; language: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [invoiceDetails, setInvoiceDetails] = useState<InvoiceDetails | null>(null);
-  const [payments, setPayments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchInvoiceDetails = async () => {
@@ -81,8 +80,6 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
     setIsLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      
-      // Fetch invoice details
       const response = await fetch(`/api/admin/invoice-details/${invoice.bookingId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -92,18 +89,6 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
       if (response.ok) {
         const details = await response.json();
         setInvoiceDetails(details);
-      }
-
-      // Fetch payment information
-      const paymentsResponse = await fetch(`/api/payments/invoice/${invoice.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      
-      if (paymentsResponse.ok) {
-        const paymentsData = await paymentsResponse.json();
-        setPayments(paymentsData);
       }
     } catch (error) {
       console.error('Error fetching invoice details:', error);
@@ -402,87 +387,6 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
               <p className="text-gray-700 bg-yellow-50 p-3 rounded-lg border">{invoiceDetails.invoiceStatus.notes}</p>
             </div>
           )}
-
-          {/* Payment Information */}
-          <div className="mt-6">
-            <h3 className="text-lg font-semibold mb-3">{language === 'ar' ? 'معلومات الدفع' : 'Payment Information'}</h3>
-            {payments.length > 0 ? (
-              <div className="space-y-3">
-                {payments.map((payment, index) => (
-                  <div key={payment.id || index} className="bg-green-50 border border-green-200 rounded-lg p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {language === 'ar' ? 'المبلغ المدفوع' : 'Amount Paid'}
-                        </label>
-                        <p className="text-green-700 font-semibold">{Number(payment.amountPaid)} SAR</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
-                        </label>
-                        <p className="text-gray-900">
-                          {payment.paymentMethod === 'cash' 
-                            ? (language === 'ar' ? 'نقدي' : 'Cash')
-                            : payment.paymentMethod === 'card'
-                              ? (language === 'ar' ? 'بطاقة' : 'Card')
-                              : payment.paymentMethod === 'transfer'
-                                ? (language === 'ar' ? 'تحويل' : 'Transfer')
-                                : payment.paymentMethod
-                          }
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {language === 'ar' ? 'حالة الدفع' : 'Payment Status'}
-                        </label>
-                        <UIBadge 
-                          variant={
-                            payment.paymentStatus === 'completed' ? 'default' :
-                            payment.paymentStatus === 'pending' ? 'secondary' :
-                            payment.paymentStatus === 'failed' ? 'destructive' : 'outline'
-                          }
-                        >
-                          {payment.paymentStatus === 'pending'
-                            ? (language === 'ar' ? 'في الانتظار' : 'Pending')
-                            : payment.paymentStatus === 'completed'
-                              ? (language === 'ar' ? 'مكتمل' : 'Completed')
-                              : payment.paymentStatus === 'failed'
-                                ? (language === 'ar' ? 'فشل' : 'Failed')
-                                : payment.paymentStatus === 'partial'
-                                  ? (language === 'ar' ? 'جزئي' : 'Partial')
-                                  : payment.paymentStatus
-                          }
-                        </UIBadge>
-                      </div>
-                    </div>
-                    {payment.paidAt && (
-                      <div className="mt-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {language === 'ar' ? 'تاريخ الدفع' : 'Payment Date'}
-                        </label>
-                        <p className="text-gray-600">
-                          {new Date(payment.paidAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')} - {new Date(payment.paidAt).toLocaleTimeString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                        </p>
-                      </div>
-                    )}
-                    {payment.notes && (
-                      <div className="mt-3">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {language === 'ar' ? 'ملاحظات الدفع' : 'Payment Notes'}
-                        </label>
-                        <p className="text-gray-600">{payment.notes}</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="bg-gray-100 border border-gray-200 rounded-lg p-4">
-                <p className="text-gray-600 text-center">{language === 'ar' ? 'لا توجد معلومات دفع' : 'No payment information available'}</p>
-              </div>
-            )}
-          </div>
         </div>
       )}
     </div>

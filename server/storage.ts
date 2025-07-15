@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, payments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type Payment, type InsertPayment } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -148,13 +148,6 @@ export interface IStorage {
   // OTP Verification operations
   createOtpVerification(otp: InsertOtpVerification): Promise<OtpVerification>;
   getOtpVerification(email: string, code: string): Promise<OtpVerification | undefined>;
-
-  // Payment operations
-  createPayment(payment: any): Promise<any>;
-  getPaymentsByInvoice(invoiceId: number): Promise<any[]>;
-  updatePayment(id: number, payment: any): Promise<any>;
-  getAllPayments(): Promise<any[]>;
-  
   deleteOtpVerification(email: string): Promise<void>;
   cleanupExpiredOtps(): Promise<void>;
 
@@ -1212,50 +1205,6 @@ export class DatabaseStorage implements IStorage {
         emailSentAt: isEmailSent ? new Date() : null 
       })
       .where(eq(generatedInvoices.id, id));
-  }
-
-  // Payment operations
-  async createPayment(payment: any): Promise<any> {
-    const [newPayment] = await db.insert(payments).values(payment).returning();
-    return newPayment;
-  }
-
-  async getPaymentsByInvoice(invoiceId: number): Promise<any[]> {
-    return await db
-      .select()
-      .from(payments)
-      .where(eq(payments.invoiceId, invoiceId))
-      .orderBy(desc(payments.createdAt));
-  }
-
-  async updatePayment(id: number, payment: any): Promise<any> {
-    const [updatedPayment] = await db
-      .update(payments)
-      .set({ ...payment, updatedAt: new Date() })
-      .where(eq(payments.id, id))
-      .returning();
-    return updatedPayment;
-  }
-
-  async getAllPayments(): Promise<any[]> {
-    return await db
-      .select({
-        id: payments.id,
-        invoiceId: payments.invoiceId,
-        bookingId: payments.bookingId,
-        amountPaid: payments.amountPaid,
-        paymentMethod: payments.paymentMethod,
-        paymentStatus: payments.paymentStatus,
-        paidAt: payments.paidAt,
-        notes: payments.notes,
-        createdAt: payments.createdAt,
-        invoiceNumber: generatedInvoices.invoiceNumber,
-        customerName: generatedInvoices.customerName,
-        finalTotal: generatedInvoices.finalTotal
-      })
-      .from(payments)
-      .leftJoin(generatedInvoices, eq(payments.invoiceId, generatedInvoices.id))
-      .orderBy(desc(payments.createdAt));
   }
 }
 
