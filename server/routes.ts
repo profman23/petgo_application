@@ -2516,6 +2516,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get invoice details with items for admin dashboard
+  app.get('/api/admin/invoice-details/:invoiceId', requireAuth, async (req: any, res) => {
+    try {
+      const invoiceId = parseInt(req.params.invoiceId);
+      
+      // Get the generated invoice
+      const invoice = await storage.getGeneratedInvoice(invoiceId);
+      if (!invoice) {
+        return res.status(404).json({ message: 'Invoice not found' });
+      }
+      
+      // Get the invoice items
+      const items = await storage.getInvoiceItems(invoice.bookingId);
+      
+      // Calculate totals
+      const subtotal = items.reduce((sum, item) => sum + parseFloat(item.total), 0);
+      const taxAmount = subtotal * 0.15; // 15% tax
+      const discountAmount = parseFloat(invoice.totalDiscountAmount || '0');
+      const finalTotal = subtotal + taxAmount - discountAmount;
+      
+      const result = {
+        invoice,
+        items: items.map(item => ({
+          id: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: parseFloat(item.unitPrice),
+          total: parseFloat(item.total),
+          discount: parseFloat(item.discount || '0'),
+          discountType: item.discountType || 'none',
+          vatRate: parseFloat(item.vatRate || '15'),
+          vatAmount: parseFloat(item.vatAmount || '0'),
+          totalBeforeVat: parseFloat(item.totalBeforeVat || item.total),
+          totalAfterVat: parseFloat(item.totalAfterVat || item.total)
+        })),
+        summary: {
+          subtotal: subtotal.toFixed(2),
+          taxAmount: taxAmount.toFixed(2),
+          discountAmount: discountAmount.toFixed(2),
+          finalTotal: finalTotal.toFixed(2)
+        }
+      };
+      
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching invoice details:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice details' });
+    }
+  });
+
   // Invoice Status endpoints (Updated to create final invoice)
   app.post('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
     try {

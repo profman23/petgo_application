@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronRight, X } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
@@ -56,6 +56,10 @@ export default function AdminDashboard() {
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
+  const [showInvoiceDetailsModal, setShowInvoiceDetailsModal] = useState(false);
+  const [selectedInvoiceForDetails, setSelectedInvoiceForDetails] = useState<GeneratedInvoice | null>(null);
+  const [invoiceDetails, setInvoiceDetails] = useState<any>(null);
+  const [isLoadingInvoiceDetails, setIsLoadingInvoiceDetails] = useState(false);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
@@ -82,6 +86,42 @@ export default function AdminDashboard() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
+
+  // Function to fetch invoice details
+  const fetchInvoiceDetails = async (invoiceId: number) => {
+    try {
+      setIsLoadingInvoiceDetails(true);
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(`/api/admin/invoice-details/${invoiceId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch invoice details');
+      }
+      
+      const data = await response.json();
+      setInvoiceDetails(data);
+    } catch (error) {
+      console.error('Error fetching invoice details:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في جلب تفاصيل الفاتورة' : 'Failed to fetch invoice details',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoadingInvoiceDetails(false);
+    }
+  };
+
+  // Function to handle invoice details modal
+  const handleShowInvoiceDetails = (invoice: GeneratedInvoice) => {
+    setSelectedInvoiceForDetails(invoice);
+    setShowInvoiceDetailsModal(true);
+    fetchInvoiceDetails(invoice.id);
+  };
 
   // Template download function
   const downloadTemplate = async (type: 'products' | 'services') => {
@@ -1257,6 +1297,9 @@ export default function AdminDashboard() {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                           {language === 'ar' ? 'التاريخ' : 'Date'}
                                         </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                          {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                                        </th>
                                       </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
@@ -1282,6 +1325,15 @@ export default function AdminDashboard() {
                                           </td>
                                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             {new Date(invoice.generatedAt || '').toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button
+                                              onClick={() => handleShowInvoiceDetails(invoice)}
+                                              className="text-purple-600 hover:text-purple-800 transition-colors duration-200"
+                                              title={language === 'ar' ? 'عرض تفاصيل الفاتورة' : 'View Invoice Details'}
+                                            >
+                                              <ChevronRight className="h-5 w-5" />
+                                            </button>
                                           </td>
                                         </tr>
                                       ))}
@@ -2040,6 +2092,154 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Invoice Details Modal */}
+      {showInvoiceDetailsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" dir={getDirection(language)}>
+          <div className="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-medium text-gray-900">
+                {language === 'ar' ? 'تفاصيل الفاتورة' : 'Invoice Details'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowInvoiceDetailsModal(false);
+                  setSelectedInvoiceForDetails(null);
+                  setInvoiceDetails(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            {isLoadingInvoiceDetails ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+              </div>
+            ) : invoiceDetails ? (
+              <div className="space-y-6">
+                {/* Invoice Header */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        {language === 'ar' ? 'معلومات الفاتورة' : 'Invoice Information'}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">{language === 'ar' ? 'رقم الفاتورة:' : 'Invoice Number:'}</span> {invoiceDetails.invoice.invoiceNumber}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">{language === 'ar' ? 'العميل:' : 'Customer:'}</span> {invoiceDetails.invoice.customerName}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">{language === 'ar' ? 'الهاتف:' : 'Phone:'}</span> {invoiceDetails.invoice.customerPhone}
+                      </p>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        {language === 'ar' ? 'معلومات الخدمة' : 'Service Information'}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">{language === 'ar' ? 'الطبيب:' : 'Doctor:'}</span> {invoiceDetails.invoice.doctorName}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">{language === 'ar' ? 'VetsVan:' : 'VetsVan:'}</span> {invoiceDetails.invoice.vetsVanCode}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        <span className="font-medium">{language === 'ar' ? 'التاريخ:' : 'Date:'}</span> {new Date(invoiceDetails.invoice.generatedAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Invoice Items */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">
+                    {language === 'ar' ? 'الأصناف والخدمات' : 'Items & Services'}
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'الوصف' : 'Description'}
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'الكمية' : 'Quantity'}
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'الإجمالي' : 'Total'}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {invoiceDetails.items.map((item: any, index: number) => (
+                          <tr key={index}>
+                            <td className="px-4 py-4 text-sm text-gray-900">{item.description}</td>
+                            <td className="px-4 py-4 text-sm text-gray-500">{item.quantity}</td>
+                            <td className="px-4 py-4 text-sm text-gray-500">{item.unitPrice.toFixed(2)} SAR</td>
+                            <td className="px-4 py-4 text-sm text-gray-500">{item.total.toFixed(2)} SAR</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Invoice Summary */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-4">
+                    {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
+                      <span className="text-sm font-medium">{invoiceDetails.summary.subtotal} SAR</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">{language === 'ar' ? 'الضريبة (15%):' : 'Tax (15%):'}</span>
+                      <span className="text-sm font-medium">{invoiceDetails.summary.taxAmount} SAR</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
+                      <span className="text-sm font-medium">-{invoiceDetails.summary.discountAmount} SAR</span>
+                    </div>
+                    <div className="border-t pt-2">
+                      <div className="flex justify-between">
+                        <span className="text-lg font-medium text-gray-900">{language === 'ar' ? 'الإجمالي النهائي:' : 'Final Total:'}</span>
+                        <span className="text-lg font-bold text-purple-600">{invoiceDetails.summary.finalTotal} SAR</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500">
+                  {language === 'ar' ? 'لا توجد تفاصيل متاحة' : 'No details available'}
+                </p>
+              </div>
+            )}
+            
+            <div className="border-t pt-4 mt-6">
+              <button
+                onClick={() => {
+                  setShowInvoiceDetailsModal(false);
+                  setSelectedInvoiceForDetails(null);
+                  setInvoiceDetails(null);
+                }}
+                className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              >
+                {language === 'ar' ? 'إغلاق' : 'Close'}
+              </button>
+            </div>
           </div>
         </div>
       )}
