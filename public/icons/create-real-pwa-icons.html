@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Real VetsVan PWA Icons</title>
+</head>
+<body>
+    <h2>إنشاء أيقونات PWA للصورة الأصلية</h2>
+    <canvas id="canvas192" width="192" height="192" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+    <canvas id="canvas512" width="512" height="512" style="border: 1px solid #ccc; margin: 10px;"></canvas>
+    <br>
+    <input type="file" id="imageInput" accept="image/*" style="margin: 10px;">
+    <button onclick="processImage()">معالج الصورة وإنشاء الأيقونات</button>
+    <br>
+    <button onclick="downloadIcons()">تحميل الأيقونات</button>
+
+    <script>
+        let originalImage = null;
+
+        function processImage() {
+            const input = document.getElementById('imageInput');
+            if (!input.files || !input.files[0]) {
+                alert('يرجى اختيار صورة أولاً');
+                return;
+            }
+
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    originalImage = img;
+                    createIconWithFrame(document.getElementById('canvas192'), 192);
+                    createIconWithFrame(document.getElementById('canvas512'), 512);
+                };
+                img.src = e.target.result;
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function createIconWithFrame(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // White background with rounded corners
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Calculate frame thickness (15px for 192, scaled for 512)
+            const frameThickness = (15 * size) / 192;
+            
+            // White frame border
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 3 * (size / 192);
+            ctx.beginPath();
+            ctx.roundRect(frameThickness/2, frameThickness/2, 
+                         size - frameThickness, size - frameThickness, 
+                         20 * (size / 192));
+            ctx.stroke();
+            
+            // Draw original image in center with proper scaling
+            if (originalImage) {
+                const imageSize = size - (frameThickness * 2);
+                const imageX = frameThickness;
+                const imageY = frameThickness;
+                
+                // Calculate aspect ratio to fit image properly
+                const aspectRatio = originalImage.width / originalImage.height;
+                let drawWidth = imageSize;
+                let drawHeight = imageSize;
+                
+                if (aspectRatio > 1) {
+                    drawHeight = imageSize / aspectRatio;
+                } else {
+                    drawWidth = imageSize * aspectRatio;
+                }
+                
+                // Center the image
+                const offsetX = (imageSize - drawWidth) / 2;
+                const offsetY = (imageSize - drawHeight) / 2;
+                
+                ctx.drawImage(originalImage, 
+                             imageX + offsetX, imageY + offsetY, 
+                             drawWidth, drawHeight);
+            }
+        }
+
+        function downloadIcons() {
+            if (!originalImage) {
+                alert('يرجى معالجة الصورة أولاً');
+                return;
+            }
+
+            // Download 192x192 icon
+            const canvas192 = document.getElementById('canvas192');
+            const link192 = document.createElement('a');
+            link192.download = 'vetsvan-icon-192x192.png';
+            link192.href = canvas192.toDataURL('image/png');
+            link192.click();
+
+            // Download 512x512 icon
+            setTimeout(() => {
+                const canvas512 = document.getElementById('canvas512');
+                const link512 = document.createElement('a');
+                link512.download = 'vetsvan-icon-512x512.png';
+                link512.href = canvas512.toDataURL('image/png');
+                link512.click();
+            }, 1000);
+        }
+
+        // Auto-load the original image if available
+        window.onload = function() {
+            // Try to load the original logo image
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                originalImage = img;
+                createIconWithFrame(document.getElementById('canvas192'), 192);
+                createIconWithFrame(document.getElementById('canvas512'), 512);
+                console.log('تم تحميل الصورة الأصلية تلقائياً');
+            };
+            img.onerror = function() {
+                console.log('لم يتم العثور على الصورة الأصلية');
+            };
+            img.src = '/icons/vetsvan-original-logo.png';
+        };
+    </script>
+</body>
+</html>

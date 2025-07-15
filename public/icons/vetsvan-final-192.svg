@@ -1,0 +1,10 @@
+<svg width='192' height='192' viewBox='0 0 192 192' xmlns='http://www.w3.org/2000/svg'>
+  <!-- White background -->
+  <rect width='192' height='192' fill='white' rx='24' ry='24'/>
+  
+  <!-- White frame border (15px thick) -->
+  <rect x='15' y='15' width='162' height='162' fill='white' stroke='#e5e7eb' stroke-width='3' rx='20' ry='20'/>
+  
+  <!-- Original image reference -->
+  <image x="30" y="30" width="132" height="132" href="/icons/vetsvan-original-logo.png" preserveAspectRatio="xMidYMid meet"/>
+</svg>
