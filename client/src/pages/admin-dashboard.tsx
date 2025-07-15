@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -56,10 +56,9 @@ export default function AdminDashboard() {
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
-  const [showInvoiceDetailsModal, setShowInvoiceDetailsModal] = useState(false);
-  const [selectedInvoiceForDetails, setSelectedInvoiceForDetails] = useState<GeneratedInvoice | null>(null);
-  const [invoiceDetails, setInvoiceDetails] = useState<any>(null);
-  const [isLoadingInvoiceDetails, setIsLoadingInvoiceDetails] = useState(false);
+  const [expandedInvoiceId, setExpandedInvoiceId] = useState<number | null>(null);
+  const [invoiceDetails, setInvoiceDetails] = useState<{[key: number]: any}>({});
+  const [loadingInvoiceIds, setLoadingInvoiceIds] = useState<Set<number>>(new Set());
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
@@ -87,40 +86,61 @@ export default function AdminDashboard() {
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
 
-  // Function to fetch invoice details
-  const fetchInvoiceDetails = async (invoiceId: number) => {
-    try {
-      setIsLoadingInvoiceDetails(true);
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch(`/api/admin/invoice-details/${invoiceId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch invoice details');
-      }
-      
-      const data = await response.json();
-      setInvoiceDetails(data);
-    } catch (error) {
-      console.error('Error fetching invoice details:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ' : 'Error',
-        description: language === 'ar' ? 'فشل في جلب تفاصيل الفاتورة' : 'Failed to fetch invoice details',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoadingInvoiceDetails(false);
+  // Function to toggle invoice details expansion
+  const toggleInvoiceDetails = async (invoice: GeneratedInvoice) => {
+    const invoiceId = invoice.id;
+    
+    // If currently expanded, collapse it
+    if (expandedInvoiceId === invoiceId) {
+      setExpandedInvoiceId(null);
+      return;
     }
-  };
-
-  // Function to handle invoice details modal
-  const handleShowInvoiceDetails = (invoice: GeneratedInvoice) => {
-    setSelectedInvoiceForDetails(invoice);
-    setShowInvoiceDetailsModal(true);
-    fetchInvoiceDetails(invoice.id);
+    
+    // If not loaded yet, fetch the details
+    if (!invoiceDetails[invoiceId]) {
+      setLoadingInvoiceIds(prev => new Set([...prev, invoiceId]));
+      
+      try {
+        const token = localStorage.getItem("adminToken");
+        const response = await fetch(`/api/admin/invoice-details/${invoiceId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch invoice details');
+        }
+        
+        const data = await response.json();
+        setInvoiceDetails(prev => ({
+          ...prev,
+          [invoiceId]: data
+        }));
+      } catch (error) {
+        console.error('Error fetching invoice details:', error);
+        toast({
+          title: language === 'ar' ? 'خطأ' : 'Error',
+          description: language === 'ar' ? 'فشل في جلب تفاصيل الفاتورة' : 'Failed to fetch invoice details',
+          variant: 'destructive',
+        });
+        setLoadingInvoiceIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(invoiceId);
+          return newSet;
+        });
+        return;
+      } finally {
+        setLoadingInvoiceIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(invoiceId);
+          return newSet;
+        });
+      }
+    }
+    
+    // Expand this invoice
+    setExpandedInvoiceId(invoiceId);
   };
 
   // Template download function
@@ -1304,38 +1324,132 @@ export default function AdminDashboard() {
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
                                       {generatedInvoices.map((invoice) => (
-                                        <tr key={invoice.id} className="hover:bg-gray-50">
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {invoice.invoiceNumber}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <div>
-                                              <div className="font-medium">{invoice.customerName}</div>
-                                              <div className="text-gray-400">{invoice.customerPhone}</div>
-                                            </div>
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {invoice.doctorName}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {invoice.vetsVanCode}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <span className="font-medium">{Number(invoice.finalTotal)} SAR</span>
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {new Date(invoice.generatedAt || '').toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                                          </td>
-                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <button
-                                              onClick={() => handleShowInvoiceDetails(invoice)}
-                                              className="text-purple-600 hover:text-purple-800 transition-colors duration-200"
-                                              title={language === 'ar' ? 'عرض تفاصيل الفاتورة' : 'View Invoice Details'}
-                                            >
-                                              <ChevronRight className="h-5 w-5" />
-                                            </button>
-                                          </td>
-                                        </tr>
+                                        <React.Fragment key={invoice.id}>
+                                          <tr className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                              {invoice.invoiceNumber}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              <div>
+                                                <div className="font-medium">{invoice.customerName}</div>
+                                                <div className="text-gray-400">{invoice.customerPhone}</div>
+                                              </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              {invoice.doctorName}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              {invoice.vetsVanCode}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              <span className="font-medium">{Number(invoice.finalTotal)} SAR</span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              {new Date(invoice.generatedAt || '').toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                              <button
+                                                onClick={() => toggleInvoiceDetails(invoice)}
+                                                className="text-purple-600 hover:text-purple-800 transition-colors duration-200"
+                                                title={language === 'ar' ? 'عرض/إخفاء تفاصيل الفاتورة' : 'Show/Hide Invoice Details'}
+                                                disabled={loadingInvoiceIds.has(invoice.id)}
+                                              >
+                                                {loadingInvoiceIds.has(invoice.id) ? (
+                                                  <Loader2 className="h-5 w-5 animate-spin" />
+                                                ) : (
+                                                  <ChevronRight 
+                                                    className={`h-5 w-5 transition-transform duration-200 ${
+                                                      expandedInvoiceId === invoice.id ? 'rotate-90' : ''
+                                                    }`} 
+                                                  />
+                                                )}
+                                              </button>
+                                            </td>
+                                          </tr>
+                                          
+                                          {/* Expandable Details Row */}
+                                          {expandedInvoiceId === invoice.id && (
+                                            <tr className="bg-gray-50">
+                                              <td colSpan={7} className="px-6 py-4">
+                                                {invoiceDetails[invoice.id] ? (
+                                                  <div className="space-y-4">
+                                                    {/* Invoice Items */}
+                                                    <div>
+                                                      <h5 className="font-medium text-gray-900 mb-3">
+                                                        {language === 'ar' ? 'الأصناف والخدمات' : 'Items & Services'}
+                                                      </h5>
+                                                      <div className="overflow-x-auto">
+                                                        <table className="min-w-full divide-y divide-gray-200">
+                                                          <thead className="bg-white">
+                                                            <tr>
+                                                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                                {language === 'ar' ? 'الوصف' : 'Description'}
+                                                              </th>
+                                                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                                {language === 'ar' ? 'الكمية' : 'Quantity'}
+                                                              </th>
+                                                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                                {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
+                                                              </th>
+                                                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                                {language === 'ar' ? 'الإجمالي' : 'Total'}
+                                                              </th>
+                                                            </tr>
+                                                          </thead>
+                                                          <tbody className="bg-white divide-y divide-gray-100">
+                                                            {invoiceDetails[invoice.id].items.map((item: any, itemIndex: number) => (
+                                                              <tr key={itemIndex}>
+                                                                <td className="px-3 py-2 text-sm text-gray-900">{item.description}</td>
+                                                                <td className="px-3 py-2 text-sm text-gray-500">{item.quantity}</td>
+                                                                <td className="px-3 py-2 text-sm text-gray-500">{item.unitPrice.toFixed(2)} SAR</td>
+                                                                <td className="px-3 py-2 text-sm text-gray-500">{item.total.toFixed(2)} SAR</td>
+                                                              </tr>
+                                                            ))}
+                                                          </tbody>
+                                                        </table>
+                                                      </div>
+                                                    </div>
+
+                                                    {/* Invoice Summary */}
+                                                    <div className="bg-white p-4 rounded border">
+                                                      <h5 className="font-medium text-gray-900 mb-3">
+                                                        {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
+                                                      </h5>
+                                                      <div className="grid grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                          <div className="flex justify-between">
+                                                            <span className="text-sm text-gray-600">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
+                                                            <span className="text-sm font-medium">{invoiceDetails[invoice.id].summary.subtotal} SAR</span>
+                                                          </div>
+                                                          <div className="flex justify-between">
+                                                            <span className="text-sm text-gray-600">{language === 'ar' ? 'الضريبة (15%):' : 'Tax (15%):'}</span>
+                                                            <span className="text-sm font-medium">{invoiceDetails[invoice.id].summary.taxAmount} SAR</span>
+                                                          </div>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                          <div className="flex justify-between">
+                                                            <span className="text-sm text-gray-600">{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
+                                                            <span className="text-sm font-medium">-{invoiceDetails[invoice.id].summary.discountAmount} SAR</span>
+                                                          </div>
+                                                          <div className="flex justify-between border-t pt-2">
+                                                            <span className="text-base font-medium text-gray-900">{language === 'ar' ? 'الإجمالي النهائي:' : 'Final Total:'}</span>
+                                                            <span className="text-base font-bold text-purple-600">{invoiceDetails[invoice.id].summary.finalTotal} SAR</span>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                ) : (
+                                                  <div className="text-center py-8">
+                                                    <p className="text-gray-500">
+                                                      {language === 'ar' ? 'جاري تحميل التفاصيل...' : 'Loading details...'}
+                                                    </p>
+                                                  </div>
+                                                )}
+                                              </td>
+                                            </tr>
+                                          )}
+                                        </React.Fragment>
                                       ))}
                                     </tbody>
                                   </table>
