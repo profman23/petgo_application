@@ -1392,19 +1392,38 @@ export default function AdminDashboard() {
                                                                 {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
                                                               </th>
                                                               <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
-                                                                {language === 'ar' ? 'الإجمالي' : 'Total'}
+                                                                {language === 'ar' ? 'الخصم' : 'Discount'}
+                                                              </th>
+                                                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                                {language === 'ar' ? 'الضريبة' : 'VAT'}
+                                                              </th>
+                                                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                                {language === 'ar' ? 'الإجمالي قبل الخصم' : 'Total Before Discount'}
+                                                              </th>
+                                                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                                                {language === 'ar' ? 'الإجمالي بعد الخصم' : 'Total After Discount'}
                                                               </th>
                                                             </tr>
                                                           </thead>
                                                           <tbody className="bg-white divide-y divide-gray-100">
-                                                            {invoiceDetails[invoice.id].items.map((item: any, itemIndex: number) => (
-                                                              <tr key={itemIndex}>
-                                                                <td className="px-3 py-2 text-sm text-gray-900">{item.description}</td>
-                                                                <td className="px-3 py-2 text-sm text-gray-500">{item.quantity}</td>
-                                                                <td className="px-3 py-2 text-sm text-gray-500">{item.unitPrice.toFixed(2)} SAR</td>
-                                                                <td className="px-3 py-2 text-sm text-gray-500">{item.total.toFixed(2)} SAR</td>
-                                                              </tr>
-                                                            ))}
+                                                            {invoiceDetails[invoice.id].items.map((item: any, itemIndex: number) => {
+                                                              const totalBeforeDiscount = item.quantity * item.unitPrice;
+                                                              const discountAmount = invoiceDetails[invoice.id].summary.discountAmount / invoiceDetails[invoice.id].items.length; // أقسم الخصم على عدد الأصناف
+                                                              const vatAmount = (totalBeforeDiscount - discountAmount) * 0.15; // الضريبة 15%
+                                                              const totalAfterDiscount = totalBeforeDiscount - discountAmount;
+                                                              
+                                                              return (
+                                                                <tr key={itemIndex}>
+                                                                  <td className="px-3 py-2 text-sm text-gray-900">{item.description}</td>
+                                                                  <td className="px-3 py-2 text-sm text-gray-500">{item.quantity}</td>
+                                                                  <td className="px-3 py-2 text-sm text-gray-500">{item.unitPrice.toFixed(2)} SAR</td>
+                                                                  <td className="px-3 py-2 text-sm text-gray-500">{discountAmount.toFixed(2)} SAR</td>
+                                                                  <td className="px-3 py-2 text-sm text-gray-500">{vatAmount.toFixed(2)} SAR</td>
+                                                                  <td className="px-3 py-2 text-sm text-gray-500">{totalBeforeDiscount.toFixed(2)} SAR</td>
+                                                                  <td className="px-3 py-2 text-sm text-gray-500">{totalAfterDiscount.toFixed(2)} SAR</td>
+                                                                </tr>
+                                                              );
+                                                            })}
                                                           </tbody>
                                                         </table>
                                                       </div>
@@ -1415,27 +1434,9 @@ export default function AdminDashboard() {
                                                       <h5 className="font-medium text-gray-900 mb-3">
                                                         {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
                                                       </h5>
-                                                      <div className="grid grid-cols-2 gap-4">
-                                                        <div className="space-y-2">
-                                                          <div className="flex justify-between">
-                                                            <span className="text-sm text-gray-600">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
-                                                            <span className="text-sm font-medium">{invoiceDetails[invoice.id].summary.subtotal} SAR</span>
-                                                          </div>
-                                                          <div className="flex justify-between">
-                                                            <span className="text-sm text-gray-600">{language === 'ar' ? 'الضريبة (15%):' : 'Tax (15%):'}</span>
-                                                            <span className="text-sm font-medium">{invoiceDetails[invoice.id].summary.taxAmount} SAR</span>
-                                                          </div>
-                                                        </div>
-                                                        <div className="space-y-2">
-                                                          <div className="flex justify-between">
-                                                            <span className="text-sm text-gray-600">{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
-                                                            <span className="text-sm font-medium">-{invoiceDetails[invoice.id].summary.discountAmount} SAR</span>
-                                                          </div>
-                                                          <div className="flex justify-between border-t pt-2">
-                                                            <span className="text-base font-medium text-gray-900">{language === 'ar' ? 'الإجمالي النهائي:' : 'Final Total:'}</span>
-                                                            <span className="text-base font-bold text-purple-600">{invoiceDetails[invoice.id].summary.finalTotal} SAR</span>
-                                                          </div>
-                                                        </div>
+                                                      <div className="flex justify-between">
+                                                        <span className="text-base font-medium text-gray-900">{language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Total Before VAT:'}</span>
+                                                        <span className="text-base font-bold text-purple-600">{invoiceDetails[invoice.id].summary.subtotal} SAR</span>
                                                       </div>
                                                     </div>
                                                   </div>

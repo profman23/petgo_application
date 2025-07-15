@@ -708,6 +708,11 @@ Changelog:
 - July 15, 2025. ADDED: Arrow button functionality with loading indicators and rotation animation for expanding/collapsing details
 - July 15, 2025. COMPLETED: Clean code transition - removed all deprecated modal components and variables
 - July 15, 2025. VERIFIED: Inline invoice expansion system fully operational with proper state management and error handling
+- July 15, 2025. ENHANCED: Invoice details table expanded with comprehensive financial breakdown columns
+- July 15, 2025. ADDED: Quantity, Unit Price, Discount, VAT, Total Before Discount, Total After Discount columns to invoice items display
+- July 15, 2025. SIMPLIFIED: Invoice Summary section now shows only "Total Before VAT" as requested
+- July 15, 2025. IMPLEMENTED: Advanced financial calculations for each invoice item with proper discount and VAT distribution
+- July 15, 2025. SUCCESS: Complete invoice financial breakdown system operational with bilingual support
 - July 10, 2025. ENHANCED: Real-time GPS tracking system with interactive maps implemented for customer tracking interface
 - July 10, 2025. ADDED: New API endpoint /api/tracking/:bookingId for fetching real-time location data with distance calculations
 - July 10, 2025. IMPLEMENTED: Interactive Leaflet maps in TrackingModal showing customer and VetsVan locations with custom markers
