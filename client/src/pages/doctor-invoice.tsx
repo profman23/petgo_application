@@ -468,8 +468,8 @@ export default function DoctorInvoice() {
     });
   };
 
-  // Calculate totals
-  const subtotal = invoiceItems.reduce((sum, item) => sum + item.totalBeforeVat, 0);
+  // Calculate totals - Total Before VAT = Quantity * Unit Price (without discount)
+  const subtotal = invoiceItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
   const taxAmount = invoiceItems.reduce((sum, item) => sum + item.vatAmount, 0);
   // Calculate total discount amount from all items
   const totalDiscountAmount = invoiceItems.reduce((sum, item) => {
