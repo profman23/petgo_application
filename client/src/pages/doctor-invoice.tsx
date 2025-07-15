@@ -197,19 +197,31 @@ export default function DoctorInvoice() {
   useEffect(() => {
     if (savedInvoiceItems && savedInvoiceItems.length > 0) {
       console.log('Loading saved invoice items:', savedInvoiceItems);
-      const loadedItems = savedInvoiceItems.map((item: any, index: number) => ({
-        id: (index + 1).toString(),
-        description: item.description || '',
-        quantity: parseInt(item.quantity) || 1,
-        unitPrice: parseFloat(item.unitPrice) || 0,
-        discount: parseFloat(item.discount) || 0,
-        discountType: item.discountType ? item.discountType : 'none',
-        vatRate: parseFloat(item.vatRate) || 15,
-        vatAmount: parseFloat(item.vatAmount) || 0,
-        totalBeforeVat: parseFloat(item.totalBeforeVat) || 0,
-        totalAfterVat: parseFloat(item.totalAfterVat) || 0,
-        total: parseFloat(item.total) || 0
-      }));
+      const loadedItems = savedInvoiceItems.map((item: any, index: number) => {
+        // Handle both camelCase and snake_case field names
+        const discountType = item.discountType || item.discount_type || 'none';
+        const vatRate = parseFloat(item.vatRate || item.vat_rate) || 15;
+        const vatAmount = parseFloat(item.vatAmount || item.vat_amount) || 0;
+        const totalBeforeVat = parseFloat(item.totalBeforeVat || item.total_before_vat) || 0;
+        const totalAfterVat = parseFloat(item.totalAfterVat || item.total_after_vat) || 0;
+        const unitPrice = parseFloat(item.unitPrice || item.unit_price) || 0;
+        
+        console.log(`Item ${index + 1}: discountType = "${discountType}"`);
+        
+        return {
+          id: (index + 1).toString(),
+          description: item.description || '',
+          quantity: parseInt(item.quantity) || 1,
+          unitPrice: unitPrice,
+          discount: parseFloat(item.discount) || 0,
+          discountType: discountType,
+          vatRate: vatRate,
+          vatAmount: vatAmount,
+          totalBeforeVat: totalBeforeVat,
+          totalAfterVat: totalAfterVat,
+          total: parseFloat(item.total) || 0
+        };
+      });
       console.log('Loaded items:', loadedItems);
       setInvoiceItems(loadedItems);
     } else if (savedInvoiceItems && savedInvoiceItems.length === 0) {

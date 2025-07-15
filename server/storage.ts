@@ -915,7 +915,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getInvoiceItems(bookingId: number): Promise<InvoiceItem[]> {
-    return await db.select().from(invoiceItems).where(eq(invoiceItems.bookingId, bookingId));
+    const items = await db.select().from(invoiceItems).where(eq(invoiceItems.bookingId, bookingId));
+    
+    // Convert database fields to frontend format
+    return items.map(item => ({
+      id: item.id,
+      bookingId: item.bookingId,
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      discount: item.discount,
+      discountType: item.discountType,
+      vatRate: item.vatRate,
+      vatAmount: item.vatAmount,
+      totalBeforeVat: item.totalBeforeVat,
+      totalAfterVat: item.totalAfterVat,
+      total: item.total,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt
+    }));
   }
 
   async deleteInvoiceItems(bookingId: number): Promise<void> {
