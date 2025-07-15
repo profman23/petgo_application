@@ -187,91 +187,195 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
             </div>
           )}
 
-          {/* Invoice Items Table */}
+          {/* Invoice Items Table - Exact copy from Doctor Invoice */}
           {invoiceDetails.invoiceItems && invoiceDetails.invoiceItems.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-4">{language === 'ar' ? 'بنود الفاتورة' : 'Invoice Items'}</h3>
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">
+                {language === 'ar' ? 'بنود الفاتورة' : 'Invoice Items'}
+              </h2>
+              
               <div className="overflow-x-auto">
-                <table className="w-full border border-gray-200 rounded-lg">
-                  <thead className="bg-gray-100">
-                    <tr>
+                <table className="w-full mb-4">
+                  <thead>
+                    <tr className="border-b">
+                      {/* Field order for English: Description, Quantity, Unit Price, Discount, VAT, Total Before VAT, Total After VAT */}
+                      {/* Field order for Arabic: Total After VAT, Total Before VAT, VAT, Discount, Unit Price, Quantity, Description */}
                       {language === 'ar' ? (
                         // Arabic RTL order
                         <>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الخصم' : 'Discount'}</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'سعر الوحدة' : 'Unit Price'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الكمية' : 'Quantity'}</th>
-                          <th className="text-right py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الوصف' : 'Description'}</th>
+                          <th className="text-center py-2 px-2 w-32">
+                            {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} (SAR)
+                          </th>
+                          <th className="text-center py-2 px-2 w-32">
+                            {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} (SAR)
+                          </th>
+                          <th className="text-center py-2 px-2 w-24">
+                            {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)
+                          </th>
+                          <th className="text-center py-2 px-2 w-28">
+                            {language === 'ar' ? 'الخصم' : 'Discount'}
+                          </th>
+                          <th className="text-center py-2 px-2 w-32">
+                            {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'} (SAR)
+                          </th>
+                          <th className="text-center py-2 px-2 w-24">
+                            {language === 'ar' ? 'الكمية' : 'Quantity'}
+                          </th>
+                          <th className="text-left py-2 px-2" style={{ textAlign: language === 'ar' ? 'right' : 'left', width: '35%' }}>
+                            {language === 'ar' ? 'الوصف' : 'Description'}
+                          </th>
                         </>
                       ) : (
                         // English LTR order
                         <>
-                          <th className="text-left py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الوصف' : 'Description'}</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الكمية' : 'Quantity'}</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'سعر الوحدة' : 'Unit Price'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'الخصم' : 'Discount'}</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} (SAR)</th>
-                          <th className="text-center py-3 px-4 border-b font-medium text-gray-700">{language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} (SAR)</th>
+                          <th className="text-left py-2 px-2" style={{ textAlign: language === 'ar' ? 'right' : 'left', width: '35%' }}>
+                            {language === 'ar' ? 'الوصف' : 'Description'}
+                          </th>
+                          <th className="text-center py-2 px-2 w-24">
+                            {language === 'ar' ? 'الكمية' : 'Quantity'}
+                          </th>
+                          <th className="text-center py-2 px-2 w-32">
+                            {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'} (SAR)
+                          </th>
+                          <th className="text-center py-2 px-2 w-28">
+                            {language === 'ar' ? 'الخصم' : 'Discount'}
+                          </th>
+                          <th className="text-center py-2 px-2 w-24">
+                            {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)
+                          </th>
+                          <th className="text-center py-2 px-2 w-32">
+                            {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} (SAR)
+                          </th>
+                          <th className="text-center py-2 px-2 w-32">
+                            {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} (SAR)
+                          </th>
                         </>
                       )}
                     </tr>
                   </thead>
                   <tbody>
                     {invoiceDetails.invoiceItems.map((item, index) => (
-                      <tr key={index} className="border-b hover:bg-gray-50">
+                      <tr key={index} className="border-b">
+                        {/* Render cells in different order based on language */}
                         {language === 'ar' ? (
-                          // Arabic RTL order
+                          // Arabic RTL order: Total After VAT, Total Before VAT, VAT, Discount, Unit Price, Quantity, Description
                           <>
-                            <td className="py-3 px-4 text-center font-semibold text-green-600">{parseFloat(item.totalAfterVat || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{parseFloat(item.totalBeforeVat || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center text-blue-600">{parseFloat(item.vatAmount || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{item.discountType === 'none' ? (language === 'ar' ? 'بدون خصم' : 'No Discount') : item.discountType}</td>
-                            <td className="py-3 px-4 text-center">{parseFloat(item.unitPrice || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{item.quantity}</td>
-                            <td className="py-3 px-4 text-right">{item.description}</td>
+                            {/* Total After VAT */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-gray-100 p-2 rounded text-gray-700 font-semibold">
+                                {parseFloat(item.totalAfterVat || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Total Before VAT */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                {parseFloat(item.totalBeforeVat || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* VAT Amount */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-green-100 p-2 rounded text-green-700">
+                                {parseFloat(item.vatAmount || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Discount */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {item.discountType === 'none' 
+                                  ? (language === 'ar' ? 'بدون خصم' : 'No Discount')
+                                  : item.discountType === '10%' 
+                                    ? (language === 'ar' ? 'خصم 10%' : '10% Discount')
+                                    : (language === 'ar' ? 'خصم 100%' : '100% Discount')
+                                }
+                              </div>
+                            </td>
+                            
+                            {/* Unit Price */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {parseFloat(item.unitPrice || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Quantity */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {item.quantity}
+                              </div>
+                            </td>
+                            
+                            {/* Description */}
+                            <td className="py-2 px-2" style={{ width: '35%' }}>
+                              <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                {item.description || (language === 'ar' ? 'الوصف' : 'Description')}
+                              </div>
+                            </td>
                           </>
                         ) : (
-                          // English LTR order
+                          // English LTR order: Description, Quantity, Unit Price, Discount, VAT, Total Before VAT, Total After VAT
                           <>
-                            <td className="py-3 px-4 text-left">{item.description}</td>
-                            <td className="py-3 px-4 text-center">{item.quantity}</td>
-                            <td className="py-3 px-4 text-center">{parseFloat(item.unitPrice || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{item.discountType === 'none' ? (language === 'ar' ? 'بدون خصم' : 'No Discount') : item.discountType}</td>
-                            <td className="py-3 px-4 text-center text-blue-600">{parseFloat(item.vatAmount || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center">{parseFloat(item.totalBeforeVat || '0').toFixed(2)}</td>
-                            <td className="py-3 px-4 text-center font-semibold text-green-600">{parseFloat(item.totalAfterVat || '0').toFixed(2)}</td>
+                            {/* Description */}
+                            <td className="py-2 px-2" style={{ width: '35%' }}>
+                              <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                {item.description || (language === 'ar' ? 'الوصف' : 'Description')}
+                              </div>
+                            </td>
+                            
+                            {/* Quantity */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {item.quantity}
+                              </div>
+                            </td>
+                            
+                            {/* Unit Price */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {parseFloat(item.unitPrice || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Discount */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {item.discountType === 'none' 
+                                  ? (language === 'ar' ? 'بدون خصم' : 'No Discount')
+                                  : item.discountType === '10%' 
+                                    ? (language === 'ar' ? 'خصم 10%' : '10% Discount')
+                                    : (language === 'ar' ? 'خصم 100%' : '100% Discount')
+                                }
+                              </div>
+                            </td>
+                            
+                            {/* VAT Amount */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-green-100 p-2 rounded text-green-700">
+                                {parseFloat(item.vatAmount || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Total Before VAT */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                {parseFloat(item.totalBeforeVat || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Total After VAT */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-gray-100 p-2 rounded text-gray-700 font-semibold">
+                                {parseFloat(item.totalAfterVat || '0').toFixed(2)}
+                              </div>
+                            </td>
                           </>
                         )}
                       </tr>
                     ))}
                   </tbody>
                 </table>
-              </div>
-
-              {/* Invoice Totals */}
-              <div className="mt-4 bg-white p-4 rounded-lg border">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                  <div className="text-center">
-                    <span className="block text-gray-500">{language === 'ar' ? 'المجموع الفرعي' : 'Subtotal'}</span>
-                    <span className="font-medium">{parseFloat(invoiceDetails.invoiceStatus.subtotal || '0').toFixed(2)} SAR</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="block text-gray-500">{language === 'ar' ? 'الضريبة' : 'Tax'} (15%)</span>
-                    <span className="font-medium text-blue-600">{parseFloat(invoiceDetails.invoiceStatus.taxAmount || '0').toFixed(2)} SAR</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="block text-gray-500">{language === 'ar' ? 'الخصم' : 'Discount'}</span>
-                    <span className="font-medium text-orange-600">{parseFloat(invoiceDetails.invoiceStatus.discountAmount || '0').toFixed(2)} SAR</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="block text-gray-500">{language === 'ar' ? 'الإجمالي النهائي' : 'Final Total'}</span>
-                    <span className="font-bold text-lg text-green-600">{parseFloat(invoiceDetails.invoiceStatus.finalTotal || '0').toFixed(2)} SAR</span>
-                  </div>
-                </div>
               </div>
             </div>
           )}
