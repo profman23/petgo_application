@@ -2940,6 +2940,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Payments endpoints
+  app.post('/api/payments', async (req, res) => {
+    try {
+      const payment = await storage.createPayment(req.body);
+      res.status(201).json(payment);
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      res.status(500).json({ message: 'Failed to create payment' });
+    }
+  });
+
+  app.get('/api/payments/invoice/:invoiceId', async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.invoiceId);
+      const payments = await storage.getPaymentsByInvoice(invoiceId);
+      res.json(payments);
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+      res.status(500).json({ message: 'Failed to fetch payments' });
+    }
+  });
+
+  app.get('/api/payments', async (req, res) => {
+    try {
+      const payments = await storage.getAllPayments();
+      res.json(payments);
+    } catch (error) {
+      console.error('Error fetching all payments:', error);
+      res.status(500).json({ message: 'Failed to fetch payments' });
+    }
+  });
+
+  app.put('/api/payments/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const payment = await storage.updatePayment(id, req.body);
+      res.json(payment);
+    } catch (error) {
+      console.error('Error updating payment:', error);
+      res.status(500).json({ message: 'Failed to update payment' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
