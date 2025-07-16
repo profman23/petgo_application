@@ -26,9 +26,31 @@ interface InvoicePaymentDetails {
   payments: PaymentDetail[];
 }
 
+interface InvoiceItem {
+  id: number;
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
+interface InvoiceItemsDetails {
+  bookingId: number;
+  invoiceNumber: string;
+  items: InvoiceItem[];
+  subtotal: number;
+  discountType: string;
+  discountAmount: number;
+  totalBeforeVat: number;
+  vatAmount: number;
+  finalTotal: number;
+  generatedAt: string;
+}
+
 export const SalesReport = ({ language }: SalesReportProps) => {
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showItemsModal, setShowItemsModal] = useState(false);
   const { toast } = useToast();
 
   const { data: generatedInvoices, isLoading } = useQuery<GeneratedInvoice[]>({
@@ -44,6 +66,16 @@ export const SalesReport = ({ language }: SalesReportProps) => {
       return await apiRequest(`/api/admin/invoice-payment-details/${selectedInvoice.bookingId}`);
     },
     enabled: !!selectedInvoice && showDetailsModal,
+  });
+
+  // Fetch invoice items for selected invoice
+  const { data: invoiceItems, isLoading: isLoadingItems } = useQuery<InvoiceItemsDetails>({
+    queryKey: ['/api/admin/invoice-items', selectedInvoice?.bookingId],
+    queryFn: async () => {
+      if (!selectedInvoice) return null;
+      return await apiRequest(`/api/admin/invoice-items/${selectedInvoice.bookingId}`);
+    },
+    enabled: !!selectedInvoice && showItemsModal,
   });
 
   // Export sales report with payment details
@@ -113,10 +145,17 @@ export const SalesReport = ({ language }: SalesReportProps) => {
     setShowDetailsModal(true);
   };
 
+  // Show invoice items modal
+  const showInvoiceItems = (invoice: GeneratedInvoice) => {
+    setSelectedInvoice(invoice);
+    setShowItemsModal(true);
+  };
+
   // Close modal
   const closeModal = () => {
     setSelectedInvoice(null);
     setShowDetailsModal(false);
+    setShowItemsModal(false);
   };
 
   if (isLoading) {
@@ -214,13 +253,22 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                     {new Date(invoice.generatedAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <button
-                      onClick={() => showPaymentDetails(invoice)}
-                      className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors text-sm"
-                    >
-                      <Eye className="h-3 w-3" />
-                      {language === 'ar' ? 'عرض التفاصيل' : 'Show Details'}
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => showPaymentDetails(invoice)}
+                        className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md transition-colors text-sm"
+                      >
+                        <Eye className="h-3 w-3" />
+                        {language === 'ar' ? 'المدفوعات' : 'Payments'}
+                      </button>
+                      <button
+                        onClick={() => showInvoiceItems(invoice)}
+                        className="flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-md transition-colors text-sm"
+                      >
+                        <Eye className="h-3 w-3" />
+                        {language === 'ar' ? 'تفاصيل الفاتورة' : 'Invoice Details'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -359,6 +407,146 @@ export const SalesReport = ({ language }: SalesReportProps) => {
               ) : (
                 <div className="text-center py-8 text-gray-500">
                   {language === 'ar' ? 'فشل في تحميل التفاصيل' : 'Failed to load details'}
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+              <button
+                onClick={closeModal}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                {language === 'ar' ? 'إغلاق' : 'Close'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invoice Items Modal */}
+      {showItemsModal && selectedInvoice && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 bg-purple-600 text-white border-b border-gray-200">
+              <h3 className="text-lg font-semibold">
+                {language === 'ar' ? 'تفاصيل الفاتورة' : 'Invoice Details'}
+              </h3>
+              <p className="text-sm text-purple-100 mt-1">
+                {language === 'ar' ? 'رقم الفاتورة' : 'Invoice #'}: {invoiceItems?.invoiceNumber || ''}
+              </p>
+            </div>
+
+            <div className="p-6">
+              {isLoadingItems ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">
+                    {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+                  </p>
+                </div>
+              ) : invoiceItems ? (
+                <div className="space-y-6">
+                  {/* Invoice Items */}
+                  <div>
+                    <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                      {language === 'ar' ? 'عناصر الفاتورة' : 'Invoice Items'}
+                    </h4>
+                    {invoiceItems.items.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {language === 'ar' ? 'الوصف' : 'Description'}
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {language === 'ar' ? 'الكمية' : 'Quantity'}
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {language === 'ar' ? 'السعر للوحدة (ريال)' : 'Unit Price (SAR)'}
+                              </th>
+                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                {language === 'ar' ? 'المجموع (ريال)' : 'Total (SAR)'}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {invoiceItems.items.map((item) => (
+                              <tr key={item.id}>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  {item.description}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  {item.quantity}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  {item.unitPrice.toFixed(2)}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  {item.total.toFixed(2)}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 text-gray-500">
+                        {language === 'ar' ? 'لا توجد عناصر في الفاتورة' : 'No items in invoice'}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Financial Summary */}
+                  <div className="border-t pt-4">
+                    <h4 className="text-lg font-semibold mb-4 text-gray-800">
+                      {language === 'ar' ? 'الملخص المالي' : 'Financial Summary'}
+                    </h4>
+                    <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">
+                          {language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}
+                        </span>
+                        <span className="font-medium">{invoiceItems.subtotal.toFixed(2)} SAR</span>
+                      </div>
+                      
+                      {invoiceItems.discountType !== 'none' && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">
+                            {language === 'ar' ? 'الخصم:' : 'Discount:'}
+                          </span>
+                          <span className="font-medium text-green-600">
+                            -{invoiceItems.discountAmount.toFixed(2)} SAR
+                          </span>
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">
+                          {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
+                        </span>
+                        <span className="font-medium">{invoiceItems.totalBeforeVat.toFixed(2)} SAR</span>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">
+                          {language === 'ar' ? 'ضريبة القيمة المضافة (15%):' : 'VAT (15%):'}
+                        </span>
+                        <span className="font-medium">{invoiceItems.vatAmount.toFixed(2)} SAR</span>
+                      </div>
+                      
+                      <div className="flex justify-between border-t pt-3 text-lg">
+                        <span className="font-semibold text-gray-800">
+                          {language === 'ar' ? 'المجموع النهائي:' : 'Total After VAT:'}
+                        </span>
+                        <span className="font-bold text-purple-600">{invoiceItems.finalTotal.toFixed(2)} SAR</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  {language === 'ar' ? 'فشل في تحميل تفاصيل الفاتورة' : 'Failed to load invoice details'}
                 </div>
               )}
             </div>

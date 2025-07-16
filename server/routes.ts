@@ -2032,6 +2032,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get invoice items details for specific booking
+  app.get('/api/admin/invoice-items/:bookingId', requireAdminAuth, async (req, res) => {
+    try {
+      const { bookingId } = req.params;
+      
+      // Get invoice items for this booking
+      const invoiceItems = await storage.getInvoiceItems(parseInt(bookingId));
+      
+      // Get generated invoice for this booking to get totals
+      const generatedInvoice = await storage.getGeneratedInvoiceByBooking(parseInt(bookingId));
+      
+      if (!generatedInvoice) {
+        return res.status(404).json({ message: 'Invoice not found' });
+      }
+      
+      const response = {
+        bookingId: parseInt(bookingId),
+        invoiceNumber: generatedInvoice.invoiceNumber,
+        items: invoiceItems.map(item => ({
+          id: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: parseFloat(item.unitPrice || '0'),
+          total: parseFloat(item.total || '0')
+        })),
+        subtotal: parseFloat(generatedInvoice.subtotal || '0'),
+        discountType: generatedInvoice.discountType || 'none',
+        discountAmount: parseFloat(generatedInvoice.discountAmount || '0'),
+        totalBeforeVat: parseFloat(generatedInvoice.totalBeforeVat || '0'),
+        vatAmount: parseFloat(generatedInvoice.vatAmount || '0'),
+        finalTotal: parseFloat(generatedInvoice.finalTotal || '0'),
+        generatedAt: generatedInvoice.generatedAt
+      };
+      
+      res.json(response);
+    } catch (error) {
+      console.error('Error fetching invoice items:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice items' });
+    }
+  });
+
   // Admin: Export sales report with payment details
   app.get('/api/admin/export-sales-report', requireAdminAuth, async (req, res) => {
     try {
