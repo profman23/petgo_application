@@ -2885,6 +2885,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all products endpoint
+  app.get('/api/admin/products', requireAdminAuth, async (req, res) => {
+    try {
+      const products = await storage.getProducts();
+      res.json(products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      res.status(500).json({ error: 'Failed to fetch products' });
+    }
+  });
+
+  // Get all services endpoint
+  app.get('/api/admin/services', requireAdminAuth, async (req, res) => {
+    try {
+      const services = await storage.getServices();
+      res.json(services);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      res.status(500).json({ error: 'Failed to fetch services' });
+    }
+  });
+
+  // Update product price endpoint
+  app.put('/api/admin/products/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const productId = parseInt(req.params.id);
+      const { price } = req.body;
+      
+      if (!price || isNaN(parseFloat(price))) {
+        return res.status(400).json({ error: 'Valid price is required' });
+      }
+
+      const updatedProduct = await storage.updateProduct(productId, { price: parseFloat(price) });
+      res.json(updatedProduct);
+    } catch (error) {
+      console.error('Error updating product price:', error);
+      res.status(500).json({ error: 'Failed to update product price' });
+    }
+  });
+
+  // Update service price endpoint
+  app.put('/api/admin/services/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const serviceId = parseInt(req.params.id);
+      const { price } = req.body;
+      
+      if (!price || isNaN(parseFloat(price))) {
+        return res.status(400).json({ error: 'Valid price is required' });
+      }
+
+      const updatedService = await storage.updateService(serviceId, { price: parseFloat(price) });
+      res.json(updatedService);
+    } catch (error) {
+      console.error('Error updating service price:', error);
+      res.status(500).json({ error: 'Failed to update service price' });
+    }
+  });
+
   // Download templates endpoint
   app.get('/api/admin/download-template/:type', requireAdminAuth, (req, res) => {
     const type = req.params.type;

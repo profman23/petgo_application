@@ -9,6 +9,348 @@ import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
 import Papa from 'papaparse';
+
+// Services Management Component
+const ServicesManagementTable = ({ language }: { language: string }) => {
+  const { toast } = useToast();
+  const [editingService, setEditingService] = useState<{ id: number; price: string } | null>(null);
+  const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
+
+  const { data: services, isLoading, refetch } = useQuery({
+    queryKey: ['/api/admin/services'],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const updateServiceMutation = useMutation({
+    mutationFn: async ({ id, price }: { id: number; price: string }) => {
+      return apiRequest(`/api/admin/services/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ price }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/services'] });
+      toast({
+        title: language === 'ar' ? "تم التحديث بنجاح" : "Updated Successfully",
+        description: language === 'ar' ? "تم تحديث سعر الخدمة" : "Service price updated",
+      });
+      setEditingService(null);
+      setEditedServices({});
+    },
+    onError: () => {
+      toast({
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "فشل في تحديث السعر" : "Failed to update price",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePriceEdit = (serviceId: number, currentPrice: string) => {
+    setEditingService({ id: serviceId, price: currentPrice });
+    setEditedServices({ ...editedServices, [serviceId]: currentPrice });
+  };
+
+  const handlePriceChange = (serviceId: number, newPrice: string) => {
+    setEditedServices({ ...editedServices, [serviceId]: newPrice });
+  };
+
+  const handleSave = () => {
+    if (editingService) {
+      const newPrice = editedServices[editingService.id];
+      if (newPrice && !isNaN(parseFloat(newPrice))) {
+        updateServiceMutation.mutate({ id: editingService.id, price: newPrice });
+      }
+    }
+  };
+
+  const getTextAlign = (lang: string) => lang === 'ar' ? 'right' : 'left';
+
+  if (isLoading) {
+    return (
+      <div className="bg-white overflow-hidden shadow rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white overflow-hidden shadow rounded-lg">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900" style={{ textAlign: getTextAlign(language) }}>
+            {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
+          </h3>
+          <div className="text-sm text-gray-500">
+            {language === 'ar' ? 'المجموع:' : 'Total:'} {services?.length || 0}
+          </div>
+        </div>
+
+        {services && services.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'اسم الخدمة' : 'Service Name'}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {services.map((service: any) => (
+                  <tr key={service.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" style={{ textAlign: getTextAlign(language) }}>
+                      {service.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" style={{ textAlign: getTextAlign(language) }}>
+                      {editingService?.id === service.id ? (
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={editedServices[service.id] || service.price}
+                          onChange={(e) => handlePriceChange(service.id, e.target.value)}
+                          className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:ring-purple-600 focus:border-purple-600"
+                          style={{ textAlign: getTextAlign(language) }}
+                        />
+                      ) : (
+                        `${service.price} ${language === 'ar' ? 'ريال' : 'SAR'}`
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ textAlign: getTextAlign(language) }}>
+                      {editingService?.id === service.id ? (
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={handleSave}
+                            disabled={updateServiceMutation.isPending}
+                            className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                          >
+                            {updateServiceMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              language === 'ar' ? 'حفظ' : 'Save'
+                            )}
+                          </button>
+                          <button
+                            onClick={() => setEditingService(null)}
+                            className="text-gray-600 hover:text-gray-900"
+                          >
+                            {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handlePriceEdit(service.id, service.price)}
+                          className="text-purple-600 hover:text-purple-900 inline-flex items-center gap-1"
+                        >
+                          <Edit className="w-4 h-4" />
+                          {language === 'ar' ? 'تعديل' : 'Edit'}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Stethoscope className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {language === 'ar' ? 'لا توجد خدمات' : 'No Services Found'}
+            </h3>
+            <p className="text-gray-600">
+              {language === 'ar' 
+                ? 'قم برفع ملف الخدمات من قسم الاستيراد'
+                : 'Upload services file from Import section'
+              }
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Products Management Component
+const ProductsManagementTable = ({ language }: { language: string }) => {
+  const { toast } = useToast();
+  const [editingProduct, setEditingProduct] = useState<{ id: number; price: string } | null>(null);
+  const [editedProducts, setEditedProducts] = useState<{ [key: number]: string }>({});
+
+  const { data: products, isLoading, refetch } = useQuery({
+    queryKey: ['/api/admin/products'],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const updateProductMutation = useMutation({
+    mutationFn: async ({ id, price }: { id: number; price: string }) => {
+      return apiRequest(`/api/admin/products/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ price }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/products'] });
+      toast({
+        title: language === 'ar' ? "تم التحديث بنجاح" : "Updated Successfully",
+        description: language === 'ar' ? "تم تحديث سعر المنتج" : "Product price updated",
+      });
+      setEditingProduct(null);
+      setEditedProducts({});
+    },
+    onError: () => {
+      toast({
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "فشل في تحديث السعر" : "Failed to update price",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handlePriceEdit = (productId: number, currentPrice: string) => {
+    setEditingProduct({ id: productId, price: currentPrice });
+    setEditedProducts({ ...editedProducts, [productId]: currentPrice });
+  };
+
+  const handlePriceChange = (productId: number, newPrice: string) => {
+    setEditedProducts({ ...editedProducts, [productId]: newPrice });
+  };
+
+  const handleSave = () => {
+    if (editingProduct) {
+      const newPrice = editedProducts[editingProduct.id];
+      if (newPrice && !isNaN(parseFloat(newPrice))) {
+        updateProductMutation.mutate({ id: editingProduct.id, price: newPrice });
+      }
+    }
+  };
+
+  const getTextAlign = (lang: string) => lang === 'ar' ? 'right' : 'left';
+
+  if (isLoading) {
+    return (
+      <div className="bg-white overflow-hidden shadow rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white overflow-hidden shadow rounded-lg">
+      <div className="px-4 py-5 sm:p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900" style={{ textAlign: getTextAlign(language) }}>
+            {language === 'ar' ? 'إدارة المنتجات' : 'Products Management'}
+          </h3>
+          <div className="text-sm text-gray-500">
+            {language === 'ar' ? 'المجموع:' : 'Total:'} {products?.length || 0}
+          </div>
+        </div>
+
+        {products && products.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'اسم المنتج' : 'Product Name'}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {products.map((product: any) => (
+                  <tr key={product.id}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" style={{ textAlign: getTextAlign(language) }}>
+                      {product.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" style={{ textAlign: getTextAlign(language) }}>
+                      {editingProduct?.id === product.id ? (
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={editedProducts[product.id] || product.price}
+                          onChange={(e) => handlePriceChange(product.id, e.target.value)}
+                          className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:ring-purple-600 focus:border-purple-600"
+                          style={{ textAlign: getTextAlign(language) }}
+                        />
+                      ) : (
+                        `${product.price} ${language === 'ar' ? 'ريال' : 'SAR'}`
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ textAlign: getTextAlign(language) }}>
+                      {editingProduct?.id === product.id ? (
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={handleSave}
+                            disabled={updateProductMutation.isPending}
+                            className="text-green-600 hover:text-green-900 disabled:opacity-50"
+                          >
+                            {updateProductMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              language === 'ar' ? 'حفظ' : 'Save'
+                            )}
+                          </button>
+                          <button
+                            onClick={() => setEditingProduct(null)}
+                            className="text-gray-600 hover:text-gray-900"
+                          >
+                            {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handlePriceEdit(product.id, product.price)}
+                          className="text-purple-600 hover:text-purple-900 inline-flex items-center gap-1"
+                        >
+                          <Edit className="w-4 h-4" />
+                          {language === 'ar' ? 'تعديل' : 'Edit'}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {language === 'ar' ? 'لا توجد منتجات' : 'No Products Found'}
+            </h3>
+            <p className="text-gray-600">
+              {language === 'ar' 
+                ? 'قم برفع ملف المنتجات من قسم الاستيراد'
+                : 'Upload products file from Import section'
+              }
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 import {
   AlertDialog,
   AlertDialogAction,
@@ -2027,54 +2369,12 @@ export default function AdminDashboard() {
 
               {/* Services Tab */}
               {activeTab === 'services' && (
-                <div>
-                  <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6" style={{ textAlign: getTextAlign(language) }}>
-                        {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
-                      </h3>
-                      
-                      <div className="text-center py-12">
-                        <Stethoscope className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          {language === 'ar' ? 'قسم الخدمات' : 'Services Section'}
-                        </h3>
-                        <p className="text-gray-600">
-                          {language === 'ar' 
-                            ? 'هذا القسم مخصص لإدارة الخدمات البيطرية'
-                            : 'This section is dedicated to managing veterinary services'
-                          }
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ServicesManagementTable language={language} />
               )}
 
               {/* Products Tab */}
               {activeTab === 'products' && (
-                <div>
-                  <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6" style={{ textAlign: getTextAlign(language) }}>
-                        {language === 'ar' ? 'إدارة المنتجات' : 'Products Management'}
-                      </h3>
-                      
-                      <div className="text-center py-12">
-                        <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">
-                          {language === 'ar' ? 'قسم المنتجات' : 'Products Section'}
-                        </h3>
-                        <p className="text-gray-600">
-                          {language === 'ar' 
-                            ? 'هذا القسم مخصص لإدارة المنتجات البيطرية'
-                            : 'This section is dedicated to managing veterinary products'
-                          }
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ProductsManagementTable language={language} />
               )}
 
             </div>
