@@ -12,6 +12,11 @@ export const SalesReport = ({ language }: SalesReportProps) => {
     staleTime: 30000,
   });
 
+  const { data: totalPaidData, isLoading: isLoadingTotalPaid } = useQuery<{ totalPaid: number }>({
+    queryKey: ['/api/admin/total-paid'],
+    staleTime: 30000,
+  });
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -43,6 +48,22 @@ export const SalesReport = ({ language }: SalesReportProps) => {
         <p className="text-sm text-gray-600">
           {language === 'ar' ? 'جميع الفواتير المولدة' : 'All Generated Invoices'}
         </p>
+      </div>
+
+      {/* Total Paid Summary */}
+      <div className="mb-6 p-4 bg-purple-50 rounded-lg border border-purple-200">
+        <div className="flex items-center justify-between">
+          <span className="text-lg font-medium text-purple-900">
+            {language === 'ar' ? 'إجمالي المدفوع' : 'Total Paid'}:
+          </span>
+          <span className="text-xl font-bold text-purple-600">
+            {isLoadingTotalPaid ? (
+              <Loader2 className="h-6 w-6 animate-spin" />
+            ) : (
+              `${totalPaidData?.totalPaid || 0} SAR`
+            )}
+          </span>
+        </div>
       </div>
 
       <div className="bg-white border rounded-lg overflow-hidden">

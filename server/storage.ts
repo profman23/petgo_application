@@ -159,6 +159,7 @@ export interface IStorage {
   createInvoicePayment(payment: InsertInvoicePayment): Promise<InvoicePayment>;
   getInvoicePaymentsByBooking(bookingId: number): Promise<InvoicePayment[]>;
   deleteInvoicePayment(paymentId: number): Promise<void>;
+  getTotalPaidAmount(): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1188,6 +1189,12 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(generatedInvoices)
       .orderBy(desc(generatedInvoices.generatedAt));
+  }
+
+  async getTotalPaidAmount(): Promise<number> {
+    const payments = await db.select().from(invoicePayments);
+    const total = payments.reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
+    return total;
   }
 
   async getGeneratedInvoice(id: number): Promise<GeneratedInvoice | undefined> {
