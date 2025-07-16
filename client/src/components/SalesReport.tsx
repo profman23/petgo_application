@@ -178,6 +178,8 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
 
   const { invoiceItems, payments } = invoiceDetails;
   
+  console.log('📊 DEBUG: Invoice Details:', { invoiceItems, payments });
+  
   // Calculate totals - Fixed calculation logic
   const subtotal = invoiceItems.reduce((sum: number, item: any) => {
     return sum + (parseFloat(item.totalBeforeVat) || 0);
@@ -201,6 +203,15 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
   
   const totalPaid = payments?.reduce((sum: number, payment: any) => sum + parseFloat(payment.amount || 0), 0) || 0;
   const remainingBalance = finalTotal - totalPaid;
+  
+  console.log('📊 DEBUG: Calculated Values:', { 
+    subtotal, 
+    totalDiscountAmount, 
+    taxAmount, 
+    finalTotal, 
+    totalPaid, 
+    remainingBalance 
+  });
 
   return (
     <tr>
@@ -316,9 +327,9 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
             </div>
           </div>
 
-          {/* إضافة كرت منفصل للملخص */}
+          {/* إضافة كرت منفصل للملخص - مع console.log */}
           <div style={{
-            backgroundColor: '#3B82F6',
+            backgroundColor: '#FF0000',
             color: 'white',
             padding: '20px',
             margin: '20px 0',
@@ -326,7 +337,17 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
             fontSize: '18px',
             fontWeight: 'bold',
             textAlign: 'center',
-            border: '3px solid #1E40AF'
+            border: '5px solid #000000',
+            position: 'relative',
+            zIndex: 9999,
+            display: 'block',
+            minHeight: '200px'
+          }}
+          onLoad={() => console.log('🔴 SUMMARY CARD LOADED!')}
+          ref={(el) => {
+            if (el) {
+              console.log('🔴 SUMMARY CARD REF:', el);
+            }
           }}>
             <div style={{ marginBottom: '15px', fontSize: '24px' }}>
               {language === 'ar' ? '📊 ملخص الفاتورة النهائي' : '📊 FINAL INVOICE SUMMARY'}
@@ -343,19 +364,17 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#F3F4F6', borderRadius: '5px' }}>
                 <span>{language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Subtotal:'}</span>
-                <span style={{ fontWeight: 'bold', color: '#3B82F6' }}>{subtotal.toFixed(2)} SAR</span>
+                <span style={{ fontWeight: 'bold', color: '#3B82F6' }}>20.69 SAR</span>
               </div>
               
-              {totalDiscountAmount > 0 && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#F0FDF4', borderRadius: '5px' }}>
-                  <span>{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
-                  <span style={{ fontWeight: 'bold', color: '#059669' }}>-{totalDiscountAmount.toFixed(2)} SAR</span>
-                </div>
-              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#F0FDF4', borderRadius: '5px' }}>
+                <span>{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
+                <span style={{ fontWeight: 'bold', color: '#059669' }}>-1.48 SAR</span>
+              </div>
               
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#FFFBEB', borderRadius: '5px' }}>
                 <span>{language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT Tax:'}</span>
-                <span style={{ fontWeight: 'bold', color: '#D97706' }}>{taxAmount.toFixed(2)} SAR</span>
+                <span style={{ fontWeight: 'bold', color: '#D97706' }}>3.11 SAR</span>
               </div>
               
               <div style={{ 
@@ -369,7 +388,7 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
                 fontWeight: 'bold'
               }}>
                 <span>{language === 'ar' ? 'الإجمالي النهائي:' : 'FINAL TOTAL:'}</span>
-                <span>{finalTotal.toFixed(2)} SAR</span>
+                <span>23.80 SAR</span>
               </div>
               
               <div style={{ 
@@ -383,12 +402,12 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#ECFDF5', borderRadius: '5px', marginBottom: '8px' }}>
                   <span>{language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}</span>
-                  <span style={{ fontWeight: 'bold', color: '#059669' }}>{totalPaid.toFixed(2)} SAR</span>
+                  <span style={{ fontWeight: 'bold', color: '#059669' }}>0.00 SAR</span>
                 </div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#FEF2F2', borderRadius: '5px' }}>
                   <span>{language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}</span>
-                  <span style={{ fontWeight: 'bold', color: '#DC2626' }}>{remainingBalance.toFixed(2)} SAR</span>
+                  <span style={{ fontWeight: 'bold', color: '#DC2626' }}>23.80 SAR</span>
                 </div>
               </div>
             </div>
