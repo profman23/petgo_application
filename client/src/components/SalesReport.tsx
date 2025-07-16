@@ -12,11 +12,6 @@ export const SalesReport = ({ language }: SalesReportProps) => {
     staleTime: 30000,
   });
 
-  // Calculate total paid from all invoices
-  const totalPaid = generatedInvoices ? generatedInvoices.reduce((sum, invoice) => {
-    return sum + Number(invoice.finalTotal || 0);
-  }, 0) : 0;
-
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -103,18 +98,6 @@ export const SalesReport = ({ language }: SalesReportProps) => {
               ))}
             </tbody>
           </table>
-        </div>
-        
-        {/* Total Paid Summary */}
-        <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
-          <div className="flex justify-between items-center">
-            <span className="text-lg font-medium text-gray-900">
-              {language === 'ar' ? 'إجمالي المدفوع:' : 'Total Paid:'}
-            </span>
-            <span className="text-xl font-bold text-purple-600">
-              {totalPaid.toFixed(2)} SAR
-            </span>
-          </div>
         </div>
       </div>
     </div>
