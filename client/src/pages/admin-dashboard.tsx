@@ -876,6 +876,20 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
             </div>
           )}
 
+          {/* Payment Section */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">
+              {language === 'ar' ? 'الدفع' : 'Payment'}:
+            </h2>
+            
+            <div className="space-y-3">
+              {/* Payment information will be displayed here when implemented */}
+              <div className="text-gray-500 text-center py-4">
+                {language === 'ar' ? 'سيتم عرض معلومات الدفع هنا' : 'Payment information will be displayed here'}
+              </div>
+            </div>
+          </div>
+
           {/* Notes */}
           {invoiceDetails.invoiceStatus.notes && (
             <div className="mt-6">
