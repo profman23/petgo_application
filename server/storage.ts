@@ -158,7 +158,8 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   constructor() {
-    // DISABLED: this.initializeTestData(); - Causing data loss issues
+    // PERMANENTLY DISABLED - No initialization of test data
+    // All data creation now happens only through Import system
     this.startDataProtection();
   }
 
@@ -168,12 +169,22 @@ export class DatabaseStorage implements IStorage {
       const { dataGuard } = await import('./dataIntegrityGuard');
       await dataGuard.startMonitoring();
       console.log("🛡️ Data Integrity Guard activated");
+      
+      // Initialize Import Data Lock System
+      const { importDataLock } = await import('./importDataLock');
+      await importDataLock.initializeLock();
+      console.log("🔒 Import Data Lock System activated");
     } catch (error) {
       console.error("⚠️ Data protection system initialization failed:", error);
     }
   }
 
-  private async initializeTestData() {
+  // PERMANENTLY DISABLED FUNCTION - NO LONGER USED
+  private async DISABLED_initializeTestData() {
+    // THIS FUNCTION IS PERMANENTLY DISABLED TO PREVENT DATA LOSS
+    // All data is now created only through the Import system
+    return; // Exit immediately without doing anything
+    
     try {
       // Enhanced data integrity check - verify all critical tables
       const existingUsers = await db.select().from(users).limit(1);
@@ -993,6 +1004,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProduct(id: number): Promise<void> {
+    // Check import data lock before deletion
+    try {
+      const { importDataLock } = await import('./importDataLock');
+      const canDelete = await importDataLock.preventDataDeletion();
+      
+      if (!canDelete) {
+        throw new Error("Cannot delete imported data - Data is permanently locked");
+      }
+    } catch (error) {
+      console.log("🔒 Import data protected from deletion");
+      throw new Error("Cannot delete imported products - Data is protected");
+    }
+    
     await db
       .update(products)
       .set({ isActive: false })
@@ -1019,6 +1043,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteService(id: number): Promise<void> {
+    // Check import data lock before deletion
+    try {
+      const { importDataLock } = await import('./importDataLock');
+      const canDelete = await importDataLock.preventDataDeletion();
+      
+      if (!canDelete) {
+        throw new Error("Cannot delete imported data - Data is permanently locked");
+      }
+    } catch (error) {
+      console.log("🔒 Import data protected from deletion");
+      throw new Error("Cannot delete imported services - Data is protected");
+    }
+    
     await db
       .update(services)
       .set({ isActive: false })
@@ -1070,14 +1107,14 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Trigger import data protection after bulk operation
+    // Trigger import data lock after bulk operation
     if (imported > 0 || updated > 0) {
       try {
-        const { importProtection } = await import('./importDataProtection');
-        await importProtection.createImportBackup();
-        console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated services`);
+        const { importDataLock } = await import('./importDataLock');
+        await importDataLock.lockImportedData();
+        console.log(`🔒 Import data permanently locked: ${imported} new, ${updated} updated services`);
       } catch (error) {
-        console.error('⚠️ Import protection update failed:', error);
+        console.error('⚠️ Import data lock failed:', error);
       }
     }
 
@@ -1109,14 +1146,14 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Trigger import data protection after bulk operation
+    // Trigger import data lock after bulk operation
     if (imported > 0 || updated > 0) {
       try {
-        const { importProtection } = await import('./importDataProtection');
-        await importProtection.createImportBackup();
-        console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated products`);
+        const { importDataLock } = await import('./importDataLock');
+        await importDataLock.lockImportedData();
+        console.log(`🔒 Import data permanently locked: ${imported} new, ${updated} updated products`);
       } catch (error) {
-        console.error('⚠️ Import protection update failed:', error);
+        console.error('⚠️ Import data lock failed:', error);
       }
     }
 
