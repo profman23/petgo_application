@@ -256,9 +256,9 @@ export default function DoctorInvoice() {
   // Load existing payments when booking data is available
   useEffect(() => {
     const loadExistingPayments = async () => {
-      if (bookingDetails?.id && payments.length === 0) {
+      if (booking?.id && payments.length === 0) {
         try {
-          const response = await apiRequest(`/api/payments/${bookingDetails.id}`);
+          const response = await apiRequest(`/api/payments/${booking.id}`);
           if (response.ok) {
             const existingPayments = await response.json();
             const formattedPayments = existingPayments.map((payment: any) => ({
@@ -282,7 +282,7 @@ export default function DoctorInvoice() {
     };
 
     loadExistingPayments();
-  }, [bookingDetails?.id]);
+  }, [booking?.id]);
 
   // Load invoice status when data is available
   useEffect(() => {
@@ -494,7 +494,7 @@ export default function DoctorInvoice() {
   const handlePaymentSubmit = async (paymentData: any) => {
     try {
       const paymentPayload = {
-        bookingId: bookingDetails?.id,
+        bookingId: booking?.id,
         amountPaid: parseFloat(paymentData.amount),
         paymentMethod: paymentData.paymentType,
         paymentStatus: 'completed',
