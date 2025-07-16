@@ -9,7 +9,6 @@ import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
 import Papa from 'papaparse';
-import { SalesReport } from "@/components/SalesReport";
 
 // Services Management Component
 const ServicesManagementTable = ({ language }: { language: string }) => {
@@ -1202,7 +1201,20 @@ export default function AdminDashboard() {
     enabled: !!adminToken && showReviewsDialog,
   });
 
-  // Removed: Fetch generated invoices - now handled by SalesReport component
+  // Fetch generated invoices for sales report
+  const { data: generatedInvoices, isLoading: isLoadingInvoices } = useQuery({
+    queryKey: ["/api/admin/generated-invoices"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/generated-invoices", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch generated invoices");
+      return await response.json() as GeneratedInvoice[];
+    },
+    enabled: !!adminToken && activeTab === 'reports' && reportsSubTab === 'sales',
+  });
 
   // Fetch all VetsVan requests with real-time notifications
   const { data: vetsVanRequests, isLoading: isLoadingRequests } = useQuery({
@@ -2070,7 +2082,46 @@ export default function AdminDashboard() {
 
                       {/* Sales Report Tab Content */}
                       {reportsSubTab === 'sales' && (
-                        <SalesReport language={language} />
+                        <>
+                          {isLoadingInvoices ? (
+                            <div className="flex justify-center py-12">
+                              <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                            </div>
+                          ) : (
+                            <>
+                              <div className="mb-4">
+                                <h4 className="text-lg font-medium text-gray-900 mb-2">
+                                  {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
+                                </h4>
+                                <p className="text-sm text-gray-600">
+                                  {language === 'ar' ? 'جميع الفواتير المولدة' : 'All Generated Invoices'}
+                                </p>
+                              </div>
+
+                              {generatedInvoices && generatedInvoices.length > 0 ? (
+                                <div className="space-y-4">
+                                  {generatedInvoices.map((invoice) => (
+                                    <InvoiceCard 
+                                      key={invoice.id} 
+                                      invoice={invoice} 
+                                      language={language}
+                                    />
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-center py-12">
+                                  <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                    {language === 'ar' ? 'لا توجد فواتير' : 'No Invoices'}
+                                  </h3>
+                                  <p className="text-gray-500">
+                                    {language === 'ar' ? 'لم يتم إنشاء أي فواتير بعد' : 'No invoices have been generated yet'}
+                                  </p>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </>
                       )}
                       
                       {/* SMS Communication Section - Show in both tabs */}
