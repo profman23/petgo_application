@@ -15,6 +15,8 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   const { toast } = useToast();
   const [editingService, setEditingService] = useState<{ id: number; price: string } | null>(null);
   const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const { data: services, isLoading, refetch } = useQuery({
     queryKey: ['/api/admin/services'],
@@ -186,6 +188,8 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
   const { toast } = useToast();
   const [editingProduct, setEditingProduct] = useState<{ id: number; price: string } | null>(null);
   const [editedProducts, setEditedProducts] = useState<{ [key: number]: string }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   const { data: products, isLoading, refetch } = useQuery({
     queryKey: ['/api/admin/products'],
