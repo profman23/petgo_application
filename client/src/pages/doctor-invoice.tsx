@@ -341,6 +341,12 @@ export default function DoctorInvoice() {
           setNotes(generatedInvoice.notes);
         }
         
+        // Restore total paid amount if exists
+        if (generatedInvoice.totalPaid) {
+          setTotalPaid(parseFloat(generatedInvoice.totalPaid));
+          console.log('💰 Restored totalPaid:', generatedInvoice.totalPaid);
+        }
+        
         console.log('✅ Generated invoice data loaded successfully');
       }
     } catch (error) {
@@ -888,6 +894,7 @@ export default function DoctorInvoice() {
           taxAmount,
           discountAmount: totalDiscountAmount,
           finalTotal,
+          totalPaid,
           notes
         }
       });

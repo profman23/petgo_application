@@ -375,6 +375,7 @@ export const invoiceStatus = pgTable("invoice_status", {
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
   discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull(),
   finalTotal: decimal("final_total", { precision: 10, scale: 2 }).notNull(),
+  totalPaid: decimal("total_paid", { precision: 10, scale: 2 }).notNull().default("0"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -388,6 +389,7 @@ export const insertInvoiceStatusSchema = createInsertSchema(invoiceStatus).pick(
   taxAmount: true,
   discountAmount: true,
   finalTotal: true,
+  totalPaid: true,
 });
 
 export type InvoiceStatus = typeof invoiceStatus.$inferSelect;
@@ -526,6 +528,7 @@ export const generatedInvoices = pgTable("generated_invoices", {
   totalDiscountAmount: decimal("total_discount_amount", { precision: 10, scale: 2 }).default("0.00"),
   vatAmount: decimal("vat_amount", { precision: 10, scale: 2 }).notNull(), // 15% VAT
   finalTotal: decimal("final_total", { precision: 10, scale: 2 }).notNull(),
+  totalPaid: decimal("total_paid", { precision: 10, scale: 2 }).notNull().default("0"),
   
   // Additional info
   notes: text("notes"),
@@ -557,6 +560,7 @@ export const insertGeneratedInvoiceSchema = createInsertSchema(generatedInvoices
   totalDiscountAmount: true,
   vatAmount: true,
   finalTotal: true,
+  totalPaid: true,
   notes: true,
   generatedBy: true,
   isEmailSent: true,

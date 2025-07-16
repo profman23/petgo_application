@@ -2621,7 +2621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
-      const { subtotal, taxAmount, discountAmount, finalTotal, notes } = req.body;
+      const { subtotal, taxAmount, discountAmount, finalTotal, totalPaid, notes } = req.body;
       
       // Get booking details
       const booking = await storage.getBookingWithDetails(bookingId);
@@ -2677,6 +2677,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalDiscountAmount: discountAmount.toString(),
         vatAmount: taxAmount.toString(),
         finalTotal: finalTotal.toString(),
+        totalPaid: totalPaid ? totalPaid.toString() : "0",
         notes: notes || null,
         generatedBy: req.user.id,
         isEmailSent: false
@@ -2688,7 +2689,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const statusData = {
           bookingId,
-          isGenerated: true
+          isGenerated: true,
+          totalPaid: parseFloat(totalPaid || 0)
         };
         await storage.saveInvoiceStatus(statusData);
       } catch (statusError) {
