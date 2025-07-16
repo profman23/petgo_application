@@ -71,6 +71,42 @@ export class ImportDataProtection {
     }
   }
 
+  // Create immediate snapshot after import
+  async createPostImportSnapshot(): Promise<void> {
+    try {
+      const allProducts = await db.select().from(products);
+      const allServices = await db.select().from(services);
+      
+      const snapshotData = {
+        timestamp: new Date().toISOString(),
+        snapshotType: 'POST_IMPORT',
+        products: allProducts,
+        services: allServices,
+        totalProductsCount: allProducts.length,
+        totalServicesCount: allServices.length,
+        importedProductsCount: Math.max(0, allProducts.length - 3),
+        importedServicesCount: Math.max(0, allServices.length - 3)
+      };
+      
+      console.log("📸 POST-IMPORT SNAPSHOT CREATED:", {
+        timestamp: snapshotData.timestamp,
+        totalProducts: snapshotData.totalProductsCount,
+        importedProducts: snapshotData.importedProductsCount,
+        totalServices: snapshotData.totalServicesCount,
+        importedServices: snapshotData.importedServicesCount
+      });
+      
+      // Store snapshot in memory for immediate access
+      this.lastImportBackup = snapshotData;
+      
+      // Create persistent backup
+      await this.createImportBackup();
+      
+    } catch (error) {
+      console.error("❌ Post-import snapshot creation failed:", error);
+    }
+  }
+
   private lastImportBackup: any = null;
 
   // Prevent accidental deletion of imported data

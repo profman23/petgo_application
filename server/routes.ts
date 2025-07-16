@@ -2837,6 +2837,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         errorMessage: result.failed > 0 ? `${result.failed} records failed to import` : null
       });
       
+      // Create post-import snapshot for protection
+      try {
+        const { importProtection } = await import('./importDataProtection');
+        await importProtection.createPostImportSnapshot();
+        console.log("📸 Post-import snapshot created successfully");
+      } catch (snapshotError) {
+        console.error("❌ Failed to create post-import snapshot:", snapshotError);
+      }
+
       console.log(`Bulk import completed:`, result);
       res.json({ 
         message: `Successfully processed ${result.imported + result.updated} ${type}`,
@@ -2845,6 +2854,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error importing data:', error);
       res.status(500).json({ error: 'Failed to import data' });
+    }
+  });
+
+  // Create immediate snapshot endpoint
+  app.post('/api/admin/create-snapshot', requireAdminAuth, async (req, res) => {
+    try {
+      const { importProtection } = await import('./importDataProtection');
+      await importProtection.createPostImportSnapshot();
+      
+      // Get current data counts
+      const allProducts = await storage.getAllProducts();
+      const allServices = await storage.getAllServices();
+      
+      res.json({
+        success: true,
+        message: 'Snapshot created successfully',
+        snapshot: {
+          timestamp: new Date().toISOString(),
+          totalProducts: allProducts.length,
+          totalServices: allServices.length,
+          importedProducts: Math.max(0, allProducts.length - 3),
+          importedServices: Math.max(0, allServices.length - 3)
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error creating snapshot:', error);
+      res.status(500).json({ error: 'Failed to create snapshot' });
     }
   });
 
