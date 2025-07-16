@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
-import { useLocation, Link } from "wouter";
+import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope } from "lucide-react";
@@ -1928,12 +1928,16 @@ export default function AdminDashboard() {
                             >
                               {language === 'ar' ? 'تحليلات وإحصائيات' : 'Analytics'}
                             </button>
-                            <Link
-                              href="/admin-dashboard/reports/salesreport"
-                              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300`}
+                            <button
+                              onClick={() => setReportsSubTab('sales')}
+                              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
+                                reportsSubTab === 'sales'
+                                  ? 'border-purple-500 text-purple-600'
+                                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                              }`}
                             >
                               {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
-                            </Link>
+                            </button>
                           </nav>
                         </div>
                       </div>
