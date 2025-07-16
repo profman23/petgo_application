@@ -67,19 +67,10 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                   {language === 'ar' ? 'العميل' : 'Customer'}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {language === 'ar' ? 'الطبيب' : 'Doctor'}
+                  {language === 'ar' ? 'المبلغ المدفوع' : 'Amount Paid'}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {language === 'ar' ? 'VetsVan' : 'VetsVan'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {language === 'ar' ? 'الإجمالي' : 'Total'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {language === 'ar' ? 'معلومات الدفع' : 'Payment Info'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {language === 'ar' ? 'التاريخ' : 'Date'}
+                  {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
                 </th>
               </tr>
             </thead>
@@ -96,43 +87,29 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {invoice.doctorName}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {invoice.vetsVanCode}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <span className="font-medium">{Number(invoice.finalTotal)} SAR</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {invoice.paymentInfo ? (
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <CreditCard className="h-4 w-4 text-green-600" />
-                          <span className="font-medium text-green-600">
-                            {Number(invoice.paymentInfo.amountPaid)} SAR
-                          </span>
-                        </div>
-                        <div className="text-xs text-gray-400">
-                          {language === 'ar' ? 
-                            (invoice.paymentInfo.paymentMethod === 'cash' ? 'نقدي' :
-                             invoice.paymentInfo.paymentMethod === 'card' ? 'بطاقة' :
-                             invoice.paymentInfo.paymentMethod === 'transfer' ? 'تحويل' : 
-                             invoice.paymentInfo.paymentMethod) :
-                            invoice.paymentInfo.paymentMethod}
-                        </div>
-                      </div>
+                      <span className="font-medium text-green-600">
+                        {Number(invoice.paymentInfo.amountPaid)} SAR
+                      </span>
                     ) : (
-                      <div className="flex items-center gap-2 text-gray-400">
-                        <CreditCard className="h-4 w-4" />
-                        <span className="text-xs">
-                          {language === 'ar' ? 'لا توجد معلومات دفع' : 'No payment info'}
-                        </span>
-                      </div>
+                      <span className="text-gray-400">
+                        {language === 'ar' ? 'غير مدفوع' : 'Not Paid'}
+                      </span>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(invoice.generatedAt).toLocaleDateString()}
+                    {invoice.paymentInfo ? (
+                      <span>
+                        {language === 'ar' ? 
+                          (invoice.paymentInfo.paymentMethod === 'cash' ? 'نقدي' :
+                           invoice.paymentInfo.paymentMethod === 'card' ? 'بطاقة' :
+                           invoice.paymentInfo.paymentMethod === 'transfer' ? 'تحويل' : 
+                           invoice.paymentInfo.paymentMethod) :
+                          invoice.paymentInfo.paymentMethod}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
                   </td>
                 </tr>
               ))}
