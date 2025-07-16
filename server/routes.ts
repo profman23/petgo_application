@@ -2019,9 +2019,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         payments: payments.map(payment => ({
           id: payment.id,
           amount: parseFloat(payment.amount || '0'),
-          method: payment.method || 'cash',
+          method: payment.paymentType || 'cash',
           createdAt: payment.createdAt,
-          notes: payment.notes || ''
+          notes: payment.description || ''
         }))
       };
       
@@ -2063,9 +2063,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           generatedDate: invoice.generatedAt ? new Date(invoice.generatedAt).toLocaleDateString('ar-SA') : '',
           payments: payments.map(p => ({
             amount: parseFloat(p.amount || '0'),
-            method: p.method || 'نقد',
+            method: p.paymentType || 'نقد',
             date: p.createdAt ? new Date(p.createdAt).toLocaleDateString('ar-SA') : '',
-            notes: p.notes || ''
+            notes: p.description || ''
           }))
         });
       }

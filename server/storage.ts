@@ -157,6 +157,7 @@ export interface IStorage {
 
   // Invoice Payment operations
   createInvoicePayment(payment: InsertInvoicePayment): Promise<InvoicePayment>;
+  getInvoicePayments(bookingId: number): Promise<InvoicePayment[]>;
   getInvoicePaymentsByBooking(bookingId: number): Promise<InvoicePayment[]>;
   deleteInvoicePayment(paymentId: number): Promise<void>;
 }
@@ -1248,6 +1249,12 @@ export class DatabaseStorage implements IStorage {
   async createInvoicePayment(payment: InsertInvoicePayment): Promise<InvoicePayment> {
     const [newPayment] = await db.insert(invoicePayments).values(payment).returning();
     return newPayment;
+  }
+
+  async getInvoicePayments(bookingId: number): Promise<InvoicePayment[]> {
+    return await db.select().from(invoicePayments)
+      .where(eq(invoicePayments.bookingId, bookingId))
+      .orderBy(desc(invoicePayments.createdAt));
   }
 
   async getInvoicePaymentsByBooking(bookingId: number): Promise<InvoicePayment[]> {
