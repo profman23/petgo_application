@@ -10,6 +10,21 @@ import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
 import Papa from 'papaparse';
 
+// Import Card components for UI
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge as UIBadge } from "@/components/ui/badge";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 // Services Management Component
 const ServicesManagementTable = ({ language }: { language: string }) => {
   const { toast } = useToast();
@@ -505,19 +520,7 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
     </div>
   );
 };
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge as UIBadge } from '@/components/ui/badge';
+
 import { type GeneratedInvoice } from "@shared/schema";
 
 interface Driver {
@@ -636,7 +639,7 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
           {/* Expand/Collapse Button */}
           <button
             onClick={handleToggleExpand}
-            className="flex items-center text-purple-600 hover:text-purple-800 transition-colors ml-4"
+            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors ml-4"
             disabled={isLoading}
           >
             {isLoading ? (
