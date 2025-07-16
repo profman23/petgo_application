@@ -719,6 +719,9 @@ Changelog:
 - July 16, 2025. RESOLVED: 500 Internal Server Error in payment endpoints caused by schema definition mismatch
 - July 16, 2025. ENHANCED: Payment system API endpoints with comprehensive logging and error handling
 - July 16, 2025. SUCCESS: Payment system fully operational after schema alignment - zero data loss maintained
+- July 16, 2025. ENHANCED: Sales Report column headers - updated "Total" to "Total Sales" for better clarity
+- July 16, 2025. ADDED: New "Total Paid" column in Sales Report section next to "Total Sales" column
+- July 16, 2025. IMPLEMENTED: Multi-column Sales Report layout with bilingual support for new payment tracking column
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat

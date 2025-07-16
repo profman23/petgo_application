@@ -605,7 +605,7 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
       {/* Invoice Header - Always Visible */}
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
-          <div className="flex-1 grid grid-cols-6 gap-4 text-sm">
+          <div className="flex-1 grid grid-cols-7 gap-4 text-sm">
             <div>
               <span className="text-gray-500 block">{language === 'ar' ? 'رقم الفاتورة' : 'Invoice #'}</span>
               <span className="font-medium">{invoice.invoiceNumber}</span>
@@ -626,6 +626,10 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
             <div>
               <span className="text-gray-500 block">{language === 'ar' ? 'إجمالي المبيعات' : 'Total Sales'}</span>
               <span className="font-medium text-green-600">{Number(invoice.finalTotal)} SAR</span>
+            </div>
+            <div>
+              <span className="text-gray-500 block">{language === 'ar' ? 'إجمالي المدفوع' : 'Total Paid'}</span>
+              <span className="font-medium text-blue-600">-</span>
             </div>
             <div>
               <span className="text-gray-500 block">{language === 'ar' ? 'التاريخ' : 'Date'}</span>
