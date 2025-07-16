@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
@@ -1194,6 +1194,28 @@ export default function AdminDashboard() {
               <Upload className="ml-3 h-6 w-6" />
               {language === 'ar' ? 'استيراد البيانات' : 'Import'}
             </button>
+            <button
+              onClick={() => setActiveTab('services')}
+              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+                activeTab === 'services'
+                  ? 'bg-purple-600 text-purple-600'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Stethoscope className="ml-3 h-6 w-6" />
+              {language === 'ar' ? 'الخدمات' : 'Services'}
+            </button>
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+                activeTab === 'products'
+                  ? 'bg-purple-600 text-purple-600'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <Package className="ml-3 h-6 w-6" />
+              {language === 'ar' ? 'المنتجات' : 'Products'}
+            </button>
           </nav>
         </div>
 
@@ -1997,6 +2019,58 @@ export default function AdminDashboard() {
                             }
                           </p>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Services Tab */}
+              {activeTab === 'services' && (
+                <div>
+                  <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6" style={{ textAlign: getTextAlign(language) }}>
+                        {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
+                      </h3>
+                      
+                      <div className="text-center py-12">
+                        <Stethoscope className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          {language === 'ar' ? 'قسم الخدمات' : 'Services Section'}
+                        </h3>
+                        <p className="text-gray-600">
+                          {language === 'ar' 
+                            ? 'هذا القسم مخصص لإدارة الخدمات البيطرية'
+                            : 'This section is dedicated to managing veterinary services'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Products Tab */}
+              {activeTab === 'products' && (
+                <div>
+                  <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6" style={{ textAlign: getTextAlign(language) }}>
+                        {language === 'ar' ? 'إدارة المنتجات' : 'Products Management'}
+                      </h3>
+                      
+                      <div className="text-center py-12">
+                        <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">
+                          {language === 'ar' ? 'قسم المنتجات' : 'Products Section'}
+                        </h3>
+                        <p className="text-gray-600">
+                          {language === 'ar' 
+                            ? 'هذا القسم مخصص لإدارة المنتجات البيطرية'
+                            : 'This section is dedicated to managing veterinary products'
+                          }
+                        </p>
                       </div>
                     </div>
                   </div>
