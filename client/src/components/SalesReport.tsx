@@ -178,11 +178,27 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
 
   const { invoiceItems, payments } = invoiceDetails;
   
-  // Calculate totals (same logic as doctor interface)
-  const subtotal = invoiceItems.reduce((sum: number, item: any) => sum + (parseFloat(item.totalBeforeVat) || parseFloat(item.total) || 0), 0);
-  const totalDiscountAmount = invoiceItems.reduce((sum: number, item: any) => sum + (parseFloat(item.discount) || 0), 0);
-  const taxAmount = invoiceItems.reduce((sum: number, item: any) => sum + (parseFloat(item.vatAmount) || (parseFloat(item.total) * 0.15) || 0), 0);
-  const finalTotal = subtotal - totalDiscountAmount + taxAmount;
+  // Calculate totals - Fixed calculation logic
+  const subtotal = invoiceItems.reduce((sum: number, item: any) => {
+    return sum + (parseFloat(item.totalBeforeVat) || 0);
+  }, 0);
+  
+  const totalDiscountAmount = invoiceItems.reduce((sum: number, item: any) => {
+    const itemSubtotal = parseFloat(item.unitPrice) * parseFloat(item.quantity);
+    const discountValue = item.discountType === 'percentage' 
+      ? (itemSubtotal * parseFloat(item.discount || 0)) / 100
+      : parseFloat(item.discount || 0);
+    return sum + discountValue;
+  }, 0);
+  
+  const taxAmount = invoiceItems.reduce((sum: number, item: any) => {
+    return sum + (parseFloat(item.vatAmount) || 0);
+  }, 0);
+  
+  const finalTotal = invoiceItems.reduce((sum: number, item: any) => {
+    return sum + (parseFloat(item.totalAfterVat) || parseFloat(item.total) || 0);
+  }, 0);
+  
   const totalPaid = payments?.reduce((sum: number, payment: any) => sum + parseFloat(payment.amount || 0), 0) || 0;
   const remainingBalance = finalTotal - totalPaid;
 
@@ -236,10 +252,13 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
             </div>
           </div>
 
-          {/* Invoice Summary - Same as Doctor Interface but different colors */}
-          <div className="border-t pt-4">
-            <div className="flex justify-end">
-              <div className="w-80">
+          {/* Invoice Summary Section */}
+          <div className="border-t-2 border-blue-300 pt-6 mt-6">
+            <h4 className="text-lg font-medium text-blue-900 mb-4 text-center">
+              {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
+            </h4>
+            <div className="flex justify-center">
+              <div className="w-80 bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-700">
                     {language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Total Before VAT:'}
@@ -264,7 +283,10 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
                 </div>
 
                 {/* Payment Summary */}
-                <div className="border-t pt-4 mb-4">
+                <div className="border-t-2 border-blue-200 pt-4 mt-4">
+                  <h5 className="text-md font-medium text-blue-800 mb-3 text-center">
+                    {language === 'ar' ? 'ملخص المدفوعات' : 'Payment Summary'}
+                  </h5>
                   <div className="flex justify-between text-blue-600 font-semibold mb-2">
                     <span>{language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}</span>
                     <span>{totalPaid.toFixed(2)} SAR</span>
