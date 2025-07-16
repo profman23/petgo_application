@@ -16,7 +16,7 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   const [editingService, setEditingService] = useState<{ id: number; price: string } | null>(null);
   const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const { data: services, isLoading, refetch } = useQuery({
     queryKey: ['/api/admin/services'],
@@ -66,6 +66,21 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
     }
   };
 
+  // Pagination calculations
+  const totalPages = Math.ceil((services?.length || 0) / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedServices = services?.slice(startIndex, endIndex) || [];
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page
+  };
+
   const getTextAlign = (lang: string) => lang === 'ar' ? 'right' : 'left';
 
   if (isLoading) {
@@ -93,24 +108,55 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
         </div>
 
         {services && services.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
-                    {language === 'ar' ? 'اسم الخدمة' : 'Service Name'}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
-                    {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
-                    {language === 'ar' ? 'الإجراءات' : 'Actions'}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {services.map((service: any) => (
-                  <tr key={service.id}>
+          <>
+            {/* Pagination Controls - Top */}
+            <div className="flex items-center justify-between mb-4" style={{ direction: getDirection(language) }}>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-700">
+                  {language === 'ar' ? 'عرض' : 'Show'}
+                </span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                  className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-purple-600 focus:border-purple-600"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-sm text-gray-700">
+                  {language === 'ar' ? 'من' : 'of'} {services.length} {language === 'ar' ? 'خدمة' : 'services'}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-700">
+                  {language === 'ar' 
+                    ? `عرض ${startIndex + 1}-${Math.min(endIndex, services.length)} من ${services.length}`
+                    : `Showing ${startIndex + 1}-${Math.min(endIndex, services.length)} of ${services.length}`
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                      {language === 'ar' ? 'اسم الخدمة' : 'Service Name'}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                      {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                      {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {paginatedServices.map((service: any) => (
+                    <tr key={service.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" style={{ textAlign: getTextAlign(language) }}>
                       {service.name}
                     </td>
@@ -160,10 +206,39 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
                       )}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls - Bottom */}
+            <div className="flex items-center justify-between mt-4" style={{ direction: getDirection(language) }}>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {language === 'ar' ? 'السابق' : 'Previous'}
+                </button>
+                
+                <span className="px-3 py-1 text-sm text-gray-700">
+                  {language === 'ar' 
+                    ? `صفحة ${currentPage} من ${totalPages}`
+                    : `Page ${currentPage} of ${totalPages}`
+                  }
+                </span>
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {language === 'ar' ? 'التالي' : 'Next'}
+                </button>
+              </div>
+            </div>
+          </>
         ) : (
           <div className="text-center py-12">
             <Stethoscope className="mx-auto h-12 w-12 text-gray-400 mb-4" />
@@ -189,7 +264,7 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
   const [editingProduct, setEditingProduct] = useState<{ id: number; price: string } | null>(null);
   const [editedProducts, setEditedProducts] = useState<{ [key: number]: string }>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(20);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const { data: products, isLoading, refetch } = useQuery({
     queryKey: ['/api/admin/products'],
@@ -239,6 +314,21 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
     }
   };
 
+  // Pagination calculations
+  const totalPages = Math.ceil((products?.length || 0) / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProducts = products?.slice(startIndex, endIndex) || [];
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page
+  };
+
   const getTextAlign = (lang: string) => lang === 'ar' ? 'right' : 'left';
 
   if (isLoading) {
@@ -266,24 +356,55 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
         </div>
 
         {products && products.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
-                    {language === 'ar' ? 'اسم المنتج' : 'Product Name'}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
-                    {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
-                    {language === 'ar' ? 'الإجراءات' : 'Actions'}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {products.map((product: any) => (
-                  <tr key={product.id}>
+          <>
+            {/* Pagination Controls - Top */}
+            <div className="flex items-center justify-between mb-4" style={{ direction: getDirection(language) }}>
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-700">
+                  {language === 'ar' ? 'عرض' : 'Show'}
+                </span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                  className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-purple-600 focus:border-purple-600"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-sm text-gray-700">
+                  {language === 'ar' ? 'من' : 'of'} {products.length} {language === 'ar' ? 'منتج' : 'products'}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-700">
+                  {language === 'ar' 
+                    ? `عرض ${startIndex + 1}-${Math.min(endIndex, products.length)} من ${products.length}`
+                    : `Showing ${startIndex + 1}-${Math.min(endIndex, products.length)} of ${products.length}`
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                        {language === 'ar' ? 'اسم المنتج' : 'Product Name'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                        {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ textAlign: getTextAlign(language) }}>
+                        {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {paginatedProducts.map((product: any) => (
+                      <tr key={product.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" style={{ textAlign: getTextAlign(language) }}>
                       {product.name}
                     </td>
@@ -333,10 +454,39 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
                       )}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Controls - Bottom */}
+              <div className="flex items-center justify-between mt-4" style={{ direction: getDirection(language) }}>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {language === 'ar' ? 'السابق' : 'Previous'}
+                  </button>
+                  
+                  <span className="px-3 py-1 text-sm text-gray-700">
+                    {language === 'ar' 
+                      ? `صفحة ${currentPage} من ${totalPages}`
+                      : `Page ${currentPage} of ${totalPages}`
+                    }
+                  </span>
+                  
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage >= totalPages}
+                    className="px-3 py-1 text-sm border border-gray-300 rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {language === 'ar' ? 'التالي' : 'Next'}
+                  </button>
+                </div>
+              </div>
+            </>
         ) : (
           <div className="text-center py-12">
             <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
