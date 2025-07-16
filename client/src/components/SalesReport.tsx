@@ -315,6 +315,84 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
               </div>
             </div>
           </div>
+
+          {/* إضافة كرت منفصل للملخص */}
+          <div style={{
+            backgroundColor: '#3B82F6',
+            color: 'white',
+            padding: '20px',
+            margin: '20px 0',
+            borderRadius: '10px',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            border: '3px solid #1E40AF'
+          }}>
+            <div style={{ marginBottom: '15px', fontSize: '24px' }}>
+              {language === 'ar' ? '📊 ملخص الفاتورة النهائي' : '📊 FINAL INVOICE SUMMARY'}
+            </div>
+            
+            <div style={{ 
+              backgroundColor: 'white', 
+              color: 'black', 
+              padding: '15px', 
+              borderRadius: '8px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#F3F4F6', borderRadius: '5px' }}>
+                <span>{language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Subtotal:'}</span>
+                <span style={{ fontWeight: 'bold', color: '#3B82F6' }}>{subtotal.toFixed(2)} SAR</span>
+              </div>
+              
+              {totalDiscountAmount > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#F0FDF4', borderRadius: '5px' }}>
+                  <span>{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
+                  <span style={{ fontWeight: 'bold', color: '#059669' }}>-{totalDiscountAmount.toFixed(2)} SAR</span>
+                </div>
+              )}
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#FFFBEB', borderRadius: '5px' }}>
+                <span>{language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT Tax:'}</span>
+                <span style={{ fontWeight: 'bold', color: '#D97706' }}>{taxAmount.toFixed(2)} SAR</span>
+              </div>
+              
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                padding: '12px', 
+                backgroundColor: '#1E40AF', 
+                color: 'white',
+                borderRadius: '5px',
+                fontSize: '20px',
+                fontWeight: 'bold'
+              }}>
+                <span>{language === 'ar' ? 'الإجمالي النهائي:' : 'FINAL TOTAL:'}</span>
+                <span>{finalTotal.toFixed(2)} SAR</span>
+              </div>
+              
+              <div style={{ 
+                borderTop: '2px solid #E5E7EB', 
+                paddingTop: '15px', 
+                marginTop: '15px'
+              }}>
+                <div style={{ marginBottom: '10px', fontSize: '18px', fontWeight: 'bold', textAlign: 'center' }}>
+                  {language === 'ar' ? '💰 ملخص المدفوعات' : '💰 PAYMENT SUMMARY'}
+                </div>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#ECFDF5', borderRadius: '5px', marginBottom: '8px' }}>
+                  <span>{language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}</span>
+                  <span style={{ fontWeight: 'bold', color: '#059669' }}>{totalPaid.toFixed(2)} SAR</span>
+                </div>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px', backgroundColor: '#FEF2F2', borderRadius: '5px' }}>
+                  <span>{language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}</span>
+                  <span style={{ fontWeight: 'bold', color: '#DC2626' }}>{remainingBalance.toFixed(2)} SAR</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </td>
     </tr>
