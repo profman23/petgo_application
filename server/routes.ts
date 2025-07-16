@@ -3035,6 +3035,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Invoice Payment endpoints
+  app.post('/api/invoice-payments', requireAuth, async (req, res) => {
+    try {
+      const { bookingId, amount, paymentType, description } = req.body;
+      
+      if (!bookingId || !amount || !paymentType) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const payment = await storage.createInvoicePayment({
+        bookingId,
+        amount: parseFloat(amount),
+        paymentType,
+        description
+      });
+
+      res.json(payment);
+    } catch (error) {
+      console.error('Error creating invoice payment:', error);
+      res.status(500).json({ message: 'Failed to create payment' });
+    }
+  });
+
+  app.get('/api/invoice-payments/:bookingId', requireAuth, async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const payments = await storage.getInvoicePaymentsByBooking(bookingId);
+      
+      res.json(payments);
+    } catch (error) {
+      console.error('Error fetching invoice payments:', error);
+      res.status(500).json({ message: 'Failed to fetch payments' });
+    }
+  });
+
+  app.delete('/api/invoice-payments/:paymentId', requireAuth, async (req, res) => {
+    try {
+      const paymentId = parseInt(req.params.paymentId);
+      await storage.deleteInvoicePayment(paymentId);
+      
+      res.json({ message: 'Payment deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting invoice payment:', error);
+      res.status(500).json({ message: 'Failed to delete payment' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

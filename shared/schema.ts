@@ -393,6 +393,27 @@ export const insertInvoiceStatusSchema = createInsertSchema(invoiceStatus).pick(
 export type InvoiceStatus = typeof invoiceStatus.$inferSelect;
 export type InsertInvoiceStatus = z.infer<typeof insertInvoiceStatusSchema>;
 
+// Invoice Payments table
+export const invoicePayments = pgTable("invoice_payments", {
+  id: serial("id").primaryKey(),
+  bookingId: integer("booking_id").references(() => bookings.id).notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  paymentType: varchar("payment_type", { length: 50 }).notNull(), // cash, card, transfer
+  description: text("description"),
+  paymentDate: timestamp("payment_date").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertInvoicePaymentSchema = createInsertSchema(invoicePayments).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InvoicePayment = typeof invoicePayments.$inferSelect;
+export type InsertInvoicePayment = z.infer<typeof insertInvoicePaymentSchema>;
+
 // Products and Services tables for import system
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
 import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
@@ -171,6 +171,25 @@ export default function DoctorInvoice() {
     enabled: !!params?.bookingId,
   });
 
+  // Fetch invoice payments
+  const { data: invoicePayments = [], refetch: refetchPayments } = useQuery({
+    queryKey: [`/api/invoice-payments/${params?.bookingId}`],
+    queryFn: async () => {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/invoice-payments/${params?.bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        if (response.status === 404) return []; // No payments found
+        throw new Error('Failed to fetch invoice payments');
+      }
+      return await response.json();
+    },
+    enabled: !!params?.bookingId,
+  });
+
   // Fetch products for invoice item selection
   const { data: products = [], isLoading: isProductsLoading } = useQuery({
     queryKey: ['/api/products'],
@@ -279,6 +298,16 @@ export default function DoctorInvoice() {
       }
     }
   }, [invoiceStatus]);
+
+  // Update total paid when payments change
+  useEffect(() => {
+    if (invoicePayments && invoicePayments.length > 0) {
+      const total = invoicePayments.reduce((sum: number, payment: any) => sum + parseFloat(payment.amount), 0);
+      setTotalPaid(total);
+    } else {
+      setTotalPaid(0);
+    }
+  }, [invoicePayments]);
 
   // Function to load generated invoice data
   const loadGeneratedInvoiceData = async (invoiceNumber: string) => {
@@ -1746,23 +1775,23 @@ export default function DoctorInvoice() {
         </div>
 
         {/* Payment History */}
-        {payments.length > 0 && (
+        {invoicePayments && invoicePayments.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold mb-4">
               {t('paymentHistory')}
             </h2>
             <div className="space-y-3">
-              {payments.map((payment) => (
+              {invoicePayments.map((payment) => (
                 <div key={payment.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
                   <div>
                     <div className="font-semibold text-green-600">
-                      {payment.amount.toFixed(2)} {t('sar')}
+                      {parseFloat(payment.amount).toFixed(2)} {t('sar')}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {payment.type} • {payment.description}
+                      {payment.paymentType} • {payment.description || t('noDescription')}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {new Date(payment.date).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      {new Date(payment.createdAt).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
                     </div>
                   </div>
                   <div className="text-green-500">
@@ -1889,9 +1918,11 @@ export default function DoctorInvoice() {
       <PaymentModal
         isOpen={showPaymentModal}
         onClose={() => setShowPaymentModal(false)}
-        currentTotal={finalTotal}
-        remainingBalance={remainingBalance}
-        onPaymentSubmit={handlePaymentSubmit}
+        bookingId={booking?.id || 0}
+        totalAmount={finalTotal}
+        totalPaid={totalPaid}
+        payments={invoicePayments}
+        onPaymentAdded={refetchPayments}
       />
 
       {/* Upload Attachment Modal */}

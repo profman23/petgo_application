@@ -1,205 +1,319 @@
-import React, { useState } from 'react';
-import { useLanguage } from '@/lib/i18n';
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { X } from 'lucide-react';
+import { Plus, Trash2, CreditCard, Banknote, DollarSign } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/lib/i18n';
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentTotal: number;
-  remainingBalance?: number;
-  onPaymentSubmit: (payment: PaymentData) => void;
+  bookingId: number;
+  totalAmount: number;
+  totalPaid: number;
+  payments: any[];
+  onPaymentAdded: () => void;
 }
 
-interface PaymentData {
-  amount: number;
-  paymentType: string;
-  description: string;
-}
-
-const translations = {
-  ar: {
-    currentInvoice: 'الفاتورة الحالية',
-    amount: 'المبلغ',
-    paymentType: 'نوع الدفع',
-    description: 'الوصف',
-    cash: 'نقداً',
-    card: 'بطاقة',
-    tabby: 'تابي',
-    tamara: 'تمارا',
-    submitPayment: 'تأكيد الدفعة',
-    cancel: 'إلغاء',
-    sar: 'ريال',
-    enterAmount: 'أدخل المبلغ',
-    enterDescription: 'أدخل وصف الدفعة',
-    selectPaymentType: 'اختر نوع الدفع',
-    remainingBalance: 'الرصيد المتبقي',
-    amountError: 'المبلغ لا يمكن أن يتجاوز الرصيد المتبقي'
-  },
-  en: {
-    currentInvoice: 'Current Invoice',
-    amount: 'Amount',
-    paymentType: 'Payment Type',
-    description: 'Description',
-    cash: 'Cash',
-    card: 'Card',
-    tabby: 'Tabby',
-    tamara: 'Tamara',
-    submitPayment: 'Submit Payment',
-    cancel: 'Cancel',
-    sar: 'SAR',
-    enterAmount: 'Enter amount',
-    enterDescription: 'Enter payment description',
-    selectPaymentType: 'Select payment type',
-    remainingBalance: 'Remaining Balance',
-    amountError: 'Amount cannot exceed remaining balance'
-  }
-};
-
-export default function PaymentModal({ isOpen, onClose, currentTotal, remainingBalance, onPaymentSubmit }: PaymentModalProps) {
-  const { language } = useLanguage();
-  const [amount, setAmount] = useState(0);
+export default function PaymentModal({
+  isOpen,
+  onClose,
+  bookingId,
+  totalAmount,
+  totalPaid,
+  payments,
+  onPaymentAdded
+}: PaymentModalProps) {
+  const [amount, setAmount] = useState('');
   const [paymentType, setPaymentType] = useState('');
   const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  const { language } = useLanguage();
 
-  // Reset form when modal opens
-  React.useEffect(() => {
-    if (isOpen) {
-      setAmount(remainingBalance || currentTotal);
-      setPaymentType('');
-      setDescription('');
+  const translations = {
+    ar: {
+      addPayment: 'إضافة دفعة',
+      amount: 'المبلغ',
+      paymentType: 'نوع الدفعة',
+      description: 'الوصف',
+      cash: 'نقد',
+      card: 'بطاقة',
+      transfer: 'تحويل بنكي',
+      cancel: 'إلغاء',
+      save: 'حفظ',
+      paymentHistory: 'سجل المدفوعات',
+      totalAmount: 'المبلغ الإجمالي',
+      totalPaid: 'إجمالي المدفوع',
+      remainingBalance: 'الرصيد المتبقي',
+      date: 'التاريخ',
+      type: 'النوع',
+      paymentAdded: 'تمت إضافة الدفعة بنجاح',
+      paymentDeleted: 'تم حذف الدفعة بنجاح',
+      error: 'خطأ',
+      delete: 'حذف',
+      noPayments: 'لا توجد دفعات',
+      optional: 'اختياري'
+    },
+    en: {
+      addPayment: 'Add Payment',
+      amount: 'Amount',
+      paymentType: 'Payment Type',
+      description: 'Description',
+      cash: 'Cash',
+      card: 'Card',
+      transfer: 'Bank Transfer',
+      cancel: 'Cancel',
+      save: 'Save',
+      paymentHistory: 'Payment History',
+      totalAmount: 'Total Amount',
+      totalPaid: 'Total Paid',
+      remainingBalance: 'Remaining Balance',
+      date: 'Date',
+      type: 'Type',
+      paymentAdded: 'Payment added successfully',
+      paymentDeleted: 'Payment deleted successfully',
+      error: 'Error',
+      delete: 'Delete',
+      noPayments: 'No payments',
+      optional: 'Optional'
     }
-  }, [isOpen, remainingBalance, currentTotal]);
-
-  const t = (key: keyof typeof translations.ar) => translations[language as keyof typeof translations][key];
-
-  const handleSubmit = () => {
-    if (!amount || !paymentType) return;
-    
-    const remainingAmount = remainingBalance || currentTotal;
-    if (amount > remainingAmount) {
-      alert(t('amountError'));
-      return;
-    }
-    
-    onPaymentSubmit({
-      amount,
-      paymentType,
-      description
-    });
-    
-    // Reset form
-    setAmount(0);
-    setPaymentType('');
-    setDescription('');
-    onClose();
   };
 
-  if (!isOpen) return null;
+  const t = translations[language];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!amount || !paymentType) {
+      toast({
+        title: t.error,
+        description: language === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      await apiRequest('/api/invoice-payments', {
+        method: 'POST',
+        body: {
+          bookingId,
+          amount: parseFloat(amount),
+          paymentType,
+          description: description || null
+        }
+      });
+
+      toast({
+        title: t.paymentAdded,
+        variant: 'default',
+      });
+
+      // Reset form
+      setAmount('');
+      setPaymentType('');
+      setDescription('');
+      
+      // Refresh payments
+      onPaymentAdded();
+      
+    } catch (error) {
+      console.error('Error adding payment:', error);
+      toast({
+        title: t.error,
+        description: language === 'ar' ? 'فشل في إضافة الدفعة' : 'Failed to add payment',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeletePayment = async (paymentId: number) => {
+    try {
+      await apiRequest(`/api/invoice-payments/${paymentId}`, {
+        method: 'DELETE'
+      });
+
+      toast({
+        title: t.paymentDeleted,
+        variant: 'default',
+      });
+
+      // Refresh payments
+      onPaymentAdded();
+      
+    } catch (error) {
+      console.error('Error deleting payment:', error);
+      toast({
+        title: t.error,
+        description: language === 'ar' ? 'فشل في حذف الدفعة' : 'Failed to delete payment',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const remainingBalance = totalAmount - totalPaid;
+
+  const getPaymentIcon = (type: string) => {
+    switch (type) {
+      case 'cash':
+        return <Banknote className="h-4 w-4" />;
+      case 'card':
+        return <CreditCard className="h-4 w-4" />;
+      case 'transfer':
+        return <DollarSign className="h-4 w-4" />;
+      default:
+        return <Plus className="h-4 w-4" />;
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full m-4">
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            {t('currentInvoice')}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <X className="h-6 w-6" />
-          </button>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            {t.addPayment}
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* Payment Summary */}
+        <div className="bg-gray-50 p-4 rounded-lg mb-4">
+          <div className="grid grid-cols-3 gap-4 text-sm">
+            <div>
+              <p className="font-medium text-gray-700">{t.totalAmount}</p>
+              <p className="text-lg font-bold text-gray-900">{totalAmount.toFixed(2)} SAR</p>
+            </div>
+            <div>
+              <p className="font-medium text-gray-700">{t.totalPaid}</p>
+              <p className="text-lg font-bold text-green-600">{totalPaid.toFixed(2)} SAR</p>
+            </div>
+            <div>
+              <p className="font-medium text-gray-700">{t.remainingBalance}</p>
+              <p className={`text-lg font-bold ${remainingBalance > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                {remainingBalance.toFixed(2)} SAR
+              </p>
+            </div>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-          {/* Current Invoice & Remaining Balance */}
-          <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-            <div className="text-sm font-medium text-gray-700 mb-2">
-              {t('currentInvoice')}: <span className="text-lg font-bold text-purple-600">{currentTotal.toFixed(2)} {t('sar')}</span>
-            </div>
-            {remainingBalance !== undefined && (
-              <div className="text-sm font-medium text-gray-700">
-                {t('remainingBalance')}: <span className="text-lg font-bold text-red-600">{remainingBalance.toFixed(2)} {t('sar')}</span>
-              </div>
-            )}
-          </div>
-          
-          {/* Amount */}
+        {/* Add Payment Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('amount')}
+            <label className="block text-sm font-medium mb-2">
+              {t.amount} <span className="text-red-500">*</span>
             </label>
-            <div className="flex items-center">
-              <Input
-                type="number"
-                min="0"
-                step="0.01"
-                value={amount}
-                onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-                placeholder={t('enterAmount')}
-                className="flex-1"
-              />
-              <span className="ml-2 text-gray-600">{t('sar')}</span>
-            </div>
+            <Input
+              type="number"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
+              className="w-full"
+              required
+            />
           </div>
 
-          {/* Payment Type */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('paymentType')}
+            <label className="block text-sm font-medium mb-2">
+              {t.paymentType} <span className="text-red-500">*</span>
             </label>
-            <select
-              value={paymentType}
-              onChange={(e) => setPaymentType(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
-              dir={language === 'ar' ? 'rtl' : 'ltr'}
-            >
-              <option value="">{t('selectPaymentType')}</option>
-              <option value="cash">{t('cash')}</option>
-              <option value="card">{t('card')}</option>
-              <option value="tabby">{t('tabby')}</option>
-              <option value="tamara">{t('tamara')}</option>
-            </select>
+            <Select value={paymentType} onValueChange={setPaymentType} required>
+              <SelectTrigger>
+                <SelectValue placeholder={language === 'ar' ? 'اختر نوع الدفعة' : 'Select payment type'} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cash">
+                  <div className="flex items-center gap-2">
+                    <Banknote className="h-4 w-4" />
+                    {t.cash}
+                  </div>
+                </SelectItem>
+                <SelectItem value="card">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    {t.card}
+                  </div>
+                </SelectItem>
+                <SelectItem value="transfer">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    {t.transfer}
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
-          {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('description')}
+            <label className="block text-sm font-medium mb-2">
+              {t.description} <span className="text-gray-500">({t.optional})</span>
             </label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('enterDescription')}
-              rows={3}
+              placeholder={language === 'ar' ? 'وصف الدفعة...' : 'Payment description...'}
               className="w-full"
+              rows={3}
             />
           </div>
-        </div>
 
-        {/* Footer */}
-        <div className="flex justify-end space-x-3 p-6 border-t" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="px-6 py-2"
-          >
-            {t('cancel')}
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!amount || !paymentType || !description.trim()}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
-          >
-            {t('submitPayment')}
-          </Button>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              {t.cancel}
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') : t.save}
+            </Button>
+          </div>
+        </form>
+
+        {/* Payment History */}
+        <div className="mt-6">
+          <h3 className="text-lg font-semibold mb-3">{t.paymentHistory}</h3>
+          
+          {payments.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">{t.noPayments}</p>
+          ) : (
+            <div className="space-y-2">
+              {payments.map((payment) => (
+                <div key={payment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {getPaymentIcon(payment.paymentType)}
+                    <div>
+                      <p className="font-medium">
+                        {payment.amount} SAR - {t[payment.paymentType] || payment.paymentType}
+                      </p>
+                      {payment.description && (
+                        <p className="text-sm text-gray-600">{payment.description}</p>
+                      )}
+                      <p className="text-xs text-gray-500">
+                        {new Date(payment.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeletePayment(payment.id)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
