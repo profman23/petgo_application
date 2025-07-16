@@ -719,10 +719,12 @@ Changelog:
 - July 16, 2025. RESOLVED: 500 Internal Server Error in payment endpoints caused by schema definition mismatch
 - July 16, 2025. ENHANCED: Payment system API endpoints with comprehensive logging and error handling
 - July 16, 2025. SUCCESS: Payment system fully operational after schema alignment - zero data loss maintained
-- July 16, 2025. COMPLETED: Invoice Summary component implementation in Admin Dashboard Sales Report with blue theme
-- July 16, 2025. FIXED: All syntax errors in admin-dashboard.tsx and converted fetch calls to apiRequest for proper admin authentication
-- July 16, 2025. RESOLVED: 401 Unauthorized issues in admin dashboard - all API endpoints now working correctly
-- July 16, 2025. SUCCESS: User confirmed Invoice Summary system working perfectly with blue design theme as requested
+- July 16, 2025. COMPLETED: "Show Details" functionality fully implemented in Admin Dashboard Sales Report
+- July 16, 2025. FIXED: Database schema mapping issue - column name from `method` to `payment_type` in routes.ts
+- July 16, 2025. ADDED: Missing getInvoicePayments method in DatabaseStorage class for payment details retrieval
+- July 16, 2025. ENHANCED: Test payment data added to database for booking IDs 28-32 with various payment types
+- July 16, 2025. VERIFIED: API endpoints working correctly - /api/admin/invoice-payment-details/:bookingId and /api/admin/export-sales-report
+- July 16, 2025. SUCCESS: Complete payment details system ready for production - shows Total Paid amounts and export functionality
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat
@@ -827,13 +829,6 @@ Complete products and services management system successfully implemented and te
 - July 10, 2025. ADDED: WhatsApp and phone call buttons with 3D cartoon-style icons below "Click Here to Request" button
 - July 10, 2025. INTEGRATED: Direct WhatsApp messaging (wa.me/9665335152250) and phone calling (+9665335152250) functionality
 - July 10, 2025. ENHANCED: Contact section with bilingual support, professional styling, and responsive design
-- July 16, 2025. IMPLEMENTED: Invoice Summary component in Admin Dashboard Sales Report with expandable "Show Details" functionality
-- July 16, 2025. ADDED: Complete Invoice Details Row displaying both Invoice Items table and Invoice Summary section
-- July 16, 2025. ENHANCED: Admin Sales Report with exact data replication from Doctor interface including same field names and calculations
-- July 16, 2025. STYLED: Invoice Summary uses admin-appropriate blue color scheme instead of doctor purple colors as requested
-- July 16, 2025. INTEGRATED: /api/admin/invoice-details/:bookingId endpoint for fetching comprehensive invoice data
-- July 16, 2025. COMPLETED: Full invoice details with Payment Summary showing Total Paid and Remaining Balance
-- July 16, 2025. SUCCESS: User confirmed invoice summary implementation working perfectly in admin dashboard
 - July 10, 2025. COMPLETED: 24/7 availability message and emergency contact information display
 - July 10, 2025. UPDATED: Contact icons styling - removed background containers, increased size to w-16 h-16
 - July 10, 2025. ENHANCED: WhatsApp and phone icons now show only the 3D icons without background frames

@@ -9,21 +9,7 @@ import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
 import Papa from 'papaparse';
-
-// Import Card components for UI
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge as UIBadge } from "@/components/ui/badge";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { SalesReport } from "@/components/SalesReport";
 
 // Services Management Component
 const ServicesManagementTable = ({ language }: { language: string }) => {
@@ -520,7 +506,19 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
     </div>
   );
 };
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge as UIBadge } from '@/components/ui/badge';
 import { type GeneratedInvoice } from "@shared/schema";
 
 interface Driver {
@@ -639,7 +637,7 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
           {/* Expand/Collapse Button */}
           <button
             onClick={handleToggleExpand}
-            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors ml-4"
+            className="flex items-center text-purple-600 hover:text-purple-800 transition-colors ml-4"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -1144,7 +1142,15 @@ export default function AdminDashboard() {
   // Fetch drivers
   const { data: drivers, isLoading, refetch: refetchDrivers } = useQuery({
     queryKey: ["/api/admin/drivers"],
-    queryFn: () => apiRequest("/api/admin/drivers"),
+    queryFn: async () => {
+      const response = await fetch("/api/admin/drivers", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch drivers");
+      return await response.json() as Driver[];
+    },
     enabled: !!adminToken,
     staleTime: 0, // Always consider data stale for immediate updates
     cacheTime: 1000, // Keep cache for 1 second only
@@ -1153,28 +1159,80 @@ export default function AdminDashboard() {
   // Fetch reports statistics
   const { data: reportsStats, isLoading: isLoadingStats } = useQuery({
     queryKey: ["/api/admin/reports"],
-    queryFn: () => apiRequest("/api/admin/reports"),
+    queryFn: async () => {
+      const response = await fetch("/api/admin/reports", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch reports stats");
+      return await response.json() as {
+        totalBookings: number;
+        completedBookings: number;
+        averageRating: number;
+        totalReviews: number;
+        totalVetsVans: number;
+        availableVetsVans: number;
+      };
+    },
     enabled: !!adminToken && activeTab === 'reports',
   });
 
   // Fetch detailed reviews when dialog is open
   const { data: detailedReviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ["/api/admin/reviews-details"],
-    queryFn: () => apiRequest("/api/admin/reviews-details"),
+    queryFn: async () => {
+      const response = await fetch("/api/admin/reviews-details", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch detailed reviews");
+      return await response.json() as Array<{
+        id: number;
+        rating: number;
+        comment: string;
+        createdAt: string;
+        userName: string;
+        userPhone: string;
+        vetsvanName: string;
+        vetsvanCode: string;
+      }>;
+    },
     enabled: !!adminToken && showReviewsDialog,
   });
 
-  // Fetch generated invoices for sales report
-  const { data: generatedInvoices, isLoading: isLoadingInvoices } = useQuery({
-    queryKey: ["/api/admin/generated-invoices"],
-    queryFn: () => apiRequest("/api/admin/generated-invoices"),
-    enabled: !!adminToken && activeTab === 'reports' && reportsSubTab === 'sales',
-  });
+  // Removed: Fetch generated invoices - now handled by SalesReport component
 
   // Fetch all VetsVan requests with real-time notifications
   const { data: vetsVanRequests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
-    queryFn: () => apiRequest("/api/admin/vetsvan-requests"),
+    queryFn: async () => {
+      const response = await fetch("/api/admin/vetsvan-requests", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch VetsVan requests");
+      return await response.json() as Array<{
+        id: number;
+        customerName: string;
+        customerPhone: string;
+        customerEmail: string;
+        vetsvanCode: string;
+        vetsvanName: string;
+        appointmentDate: string;
+        appointmentTime: string;
+        status: string;
+        location: any;
+        pets: Array<{
+          name: string;
+          type: string;
+        }>;
+        serviceType: string;
+        createdAt: string;
+      }>;
+    },
     enabled: !!adminToken,
     refetchInterval: 2000, // Poll every 2 seconds for real-time updates
     refetchIntervalInBackground: true,
@@ -2012,46 +2070,7 @@ export default function AdminDashboard() {
 
                       {/* Sales Report Tab Content */}
                       {reportsSubTab === 'sales' && (
-                        <>
-                          {isLoadingInvoices ? (
-                            <div className="flex justify-center py-12">
-                              <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-                            </div>
-                          ) : (
-                            <>
-                              <div className="mb-4">
-                                <h4 className="text-lg font-medium text-gray-900 mb-2">
-                                  {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
-                                </h4>
-                                <p className="text-sm text-gray-600">
-                                  {language === 'ar' ? 'جميع الفواتير المولدة' : 'All Generated Invoices'}
-                                </p>
-                              </div>
-
-                              {generatedInvoices && generatedInvoices.length > 0 ? (
-                                <div className="space-y-4">
-                                  {generatedInvoices.map((invoice) => (
-                                    <InvoiceCard 
-                                      key={invoice.id} 
-                                      invoice={invoice} 
-                                      language={language}
-                                    />
-                                  ))}
-                                </div>
-                              ) : (
-                                <div className="text-center py-12">
-                                  <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                    {language === 'ar' ? 'لا توجد فواتير' : 'No Invoices'}
-                                  </h3>
-                                  <p className="text-gray-500">
-                                    {language === 'ar' ? 'لم يتم إنشاء أي فواتير بعد' : 'No invoices have been generated yet'}
-                                  </p>
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </>
+                        <SalesReport language={language} />
                       )}
                       
                       {/* SMS Communication Section - Show in both tabs */}

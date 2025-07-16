@@ -157,6 +157,7 @@ export interface IStorage {
 
   // Invoice Payment operations
   createInvoicePayment(payment: InsertInvoicePayment): Promise<InvoicePayment>;
+  getInvoicePayments(bookingId: number): Promise<InvoicePayment[]>;
   getInvoicePaymentsByBooking(bookingId: number): Promise<InvoicePayment[]>;
   deleteInvoicePayment(paymentId: number): Promise<void>;
 }
@@ -346,7 +347,7 @@ export class DatabaseStorage implements IStorage {
             nameAr: 'طعام حيوانات مميز',
             description: 'High quality pet food for dogs and cats',
             descriptionAr: 'طعام عالي الجودة للكلاب والقطط',
-            price: '85.50',
+            price: 85.50,
             category: 'Food',
             categoryAr: 'طعام',
             sku: 'PF001',
@@ -359,7 +360,7 @@ export class DatabaseStorage implements IStorage {
             nameAr: 'فيتامينات',
             description: 'Essential vitamins for pet health',
             descriptionAr: 'فيتامينات أساسية لصحة الحيوانات',
-            price: '125.00',
+            price: 125.00,
             category: 'Health',
             categoryAr: 'صحة',
             sku: 'VIT001',
@@ -372,7 +373,7 @@ export class DatabaseStorage implements IStorage {
             nameAr: 'مجموعة ألعاب',
             description: 'Interactive toys for pets',
             descriptionAr: 'ألعاب تفاعلية للحيوانات الأليفة',
-            price: '45.75',
+            price: 45.75,
             category: 'Toys',
             categoryAr: 'ألعاب',
             sku: 'TOY001',
@@ -390,7 +391,7 @@ export class DatabaseStorage implements IStorage {
             nameAr: 'فحص عام',
             description: 'Complete health examination',
             descriptionAr: 'فحص صحي شامل',
-            price: '150.00',
+            price: 150.00,
             category: 'Medical',
             categoryAr: 'طبي',
             duration: 30,
@@ -401,7 +402,7 @@ export class DatabaseStorage implements IStorage {
             nameAr: 'تطعيم',
             description: 'Essential vaccinations',
             descriptionAr: 'تطعيمات أساسية',
-            price: '200.00',
+            price: 200.00,
             category: 'Medical',
             categoryAr: 'طبي',
             duration: 15,
@@ -412,7 +413,7 @@ export class DatabaseStorage implements IStorage {
             nameAr: 'تنظيف',
             description: 'Professional grooming service',
             descriptionAr: 'خدمة تنظيف احترافية',
-            price: '100.00',
+            price: 100.00,
             category: 'Grooming',
             categoryAr: 'تنظيف',
             duration: 45,
@@ -1248,6 +1249,12 @@ export class DatabaseStorage implements IStorage {
   async createInvoicePayment(payment: InsertInvoicePayment): Promise<InvoicePayment> {
     const [newPayment] = await db.insert(invoicePayments).values(payment).returning();
     return newPayment;
+  }
+
+  async getInvoicePayments(bookingId: number): Promise<InvoicePayment[]> {
+    return await db.select().from(invoicePayments)
+      .where(eq(invoicePayments.bookingId, bookingId))
+      .orderBy(desc(invoicePayments.createdAt));
   }
 
   async getInvoicePaymentsByBooking(bookingId: number): Promise<InvoicePayment[]> {

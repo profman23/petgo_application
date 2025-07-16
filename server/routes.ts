@@ -1990,6 +1990,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get invoice payment details for Show Details functionality
+  app.get('/api/admin/invoice-payment-details/:bookingId', requireAdminAuth, async (req, res) => {
+    try {
+      const { bookingId } = req.params;
+      
+      // Get payments for this booking/invoice
+      const payments = await storage.getInvoicePayments(parseInt(bookingId));
+      
+      // Calculate total paid amount
+      const totalPaid = payments.reduce((sum, payment) => {
+        return sum + parseFloat(payment.amount || '0');
+      }, 0);
+      
+      // Get generated invoice for this booking to get total amount
+      const generatedInvoice = await storage.getGeneratedInvoiceByBooking(parseInt(bookingId));
+      const totalAmount = generatedInvoice ? parseFloat(generatedInvoice.finalTotal || '0') : 0;
+      
+      // Calculate remaining amount
+      const remainingAmount = totalAmount - totalPaid;
+      
+      const response = {
+        bookingId: parseInt(bookingId),
+        totalAmount: totalAmount,
+        totalPaid: totalPaid,
+        remainingAmount: remainingAmount,
+        paymentStatus: remainingAmount <= 0 ? 'paid' : 'pending',
+        payments: payments.map(payment => ({
+          id: payment.id,
+          amount: parseFloat(payment.amount || '0'),
+          method: payment.paymentType || 'cash',
+          createdAt: payment.createdAt,
+          notes: payment.description || ''
+        }))
+      };
+      
+      res.json(response);
+    } catch (error) {
+      console.error('Error fetching invoice payment details:', error);
+      res.status(500).json({ message: 'Failed to fetch payment details' });
+    }
+  });
+
+  // Admin: Get invoice items details for specific booking
+  app.get('/api/admin/invoice-items/:bookingId', requireAdminAuth, async (req, res) => {
+    try {
+      const { bookingId } = req.params;
+      
+      // Get invoice items for this booking
+      const invoiceItems = await storage.getInvoiceItems(parseInt(bookingId));
+      
+      // Get generated invoice for this booking to get totals
+      const generatedInvoice = await storage.getGeneratedInvoiceByBooking(parseInt(bookingId));
+      
+      if (!generatedInvoice) {
+        return res.status(404).json({ message: 'Invoice not found' });
+      }
+      
+      const response = {
+        bookingId: parseInt(bookingId),
+        invoiceNumber: generatedInvoice.invoiceNumber,
+        items: invoiceItems.map(item => ({
+          id: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: parseFloat(item.unitPrice || '0'),
+          total: parseFloat(item.total || '0')
+        })),
+        subtotal: parseFloat(generatedInvoice.subtotal || '0'),
+        discountType: generatedInvoice.discountType || 'none',
+        discountAmount: parseFloat(generatedInvoice.discountAmount || '0'),
+        totalBeforeVat: parseFloat(generatedInvoice.totalBeforeVat || '0'),
+        vatAmount: parseFloat(generatedInvoice.vatAmount || '0'),
+        finalTotal: parseFloat(generatedInvoice.finalTotal || '0'),
+        generatedAt: generatedInvoice.generatedAt
+      };
+      
+      res.json(response);
+    } catch (error) {
+      console.error('Error fetching invoice items:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice items' });
+    }
+  });
+
+  // Admin: Export sales report with payment details
+  app.get('/api/admin/export-sales-report', requireAdminAuth, async (req, res) => {
+    try {
+      const generatedInvoices = await storage.getAllGeneratedInvoices();
+      
+      // Prepare export data with payment details
+      const exportData = [];
+      
+      for (const invoice of generatedInvoices) {
+        // Get payments for this invoice
+        const payments = await storage.getInvoicePayments(invoice.bookingId);
+        const totalPaid = payments.reduce((sum, payment) => {
+          return sum + parseFloat(payment.amount || '0');
+        }, 0);
+        
+        const totalAmount = parseFloat(invoice.finalTotal || '0');
+        const remainingAmount = totalAmount - totalPaid;
+        
+        exportData.push({
+          invoiceNumber: invoice.invoiceNumber || '',
+          customerName: invoice.customerName || '',
+          customerPhone: invoice.customerPhone || '',
+          doctorName: invoice.doctorName || '',
+          vetsVanCode: invoice.vetsVanCode || '',
+          totalAmount: totalAmount,
+          totalPaid: totalPaid,
+          remainingAmount: remainingAmount,
+          paymentStatus: remainingAmount <= 0 ? 'مدفوع' : 'غير مدفوع',
+          generatedDate: invoice.generatedAt ? new Date(invoice.generatedAt).toLocaleDateString('ar-SA') : '',
+          payments: payments.map(p => ({
+            amount: parseFloat(p.amount || '0'),
+            method: p.paymentType || 'نقد',
+            date: p.createdAt ? new Date(p.createdAt).toLocaleDateString('ar-SA') : '',
+            notes: p.description || ''
+          }))
+        });
+      }
+      
+      res.json(exportData);
+    } catch (error) {
+      console.error('Error exporting sales report:', error);
+      res.status(500).json({ message: 'Failed to export sales report' });
+    }
+  });
+
   // Admin: Get detailed invoice items for specific booking
   app.get('/api/admin/invoice-details/:bookingId', requireAdminAuth, async (req, res) => {
     try {
@@ -3088,6 +3216,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error deleting invoice payment:', error);
       res.status(500).json({ message: 'Failed to delete payment' });
+    }
+  });
+
+  // Admin: Get detailed invoice items with correct discount and VAT values
+  app.get('/api/admin/invoice-items/:bookingId', requireAdminAuth, async (req, res) => {
+    try {
+      const { bookingId } = req.params;
+      
+      // Get invoice items from database with actual values
+      const invoiceItems = await storage.getInvoiceItems(parseInt(bookingId));
+      
+      if (!invoiceItems || invoiceItems.length === 0) {
+        return res.json([]);
+      }
+      
+      // Format items to ensure proper number types and display correct values
+      const formattedItems = invoiceItems.map(item => {
+        const discount = parseFloat(item.discount || 0);
+        const discountType = item.discountType || 'none';
+        const vatAmount = parseFloat(item.vatAmount || 0);
+        const totalBeforeVat = parseFloat(item.totalBeforeVat || item.total || 0);
+        const totalAfterVat = parseFloat(item.totalAfterVat || (totalBeforeVat + vatAmount));
+        
+        return {
+          id: item.id,
+          description: item.description,
+          quantity: parseInt(item.quantity as any),
+          unitPrice: parseFloat(item.unitPrice),
+          discount: discount,
+          discountType: discountType,
+          discountDisplay: discountType === 'none' ? 'No Discount' : 
+                          discountType === 'percentage' ? `${discount}%` : 
+                          `${discount} SAR`,
+          vatRate: parseFloat(item.vatRate || 15),
+          vatAmount: vatAmount,
+          totalBeforeVat: totalBeforeVat,
+          totalAfterVat: totalAfterVat,
+          total: parseFloat(item.total)
+        };
+      });
+      
+      res.json(formattedItems);
+    } catch (error) {
+      console.error('Error fetching admin invoice items:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice items' });
     }
   });
 
