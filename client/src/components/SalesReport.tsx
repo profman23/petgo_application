@@ -147,16 +147,7 @@ interface InvoiceDetailsRowProps {
 
 const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
   const { data: invoiceDetails, isLoading } = useQuery({
-    queryKey: ['/api/admin/invoice-details', invoice.bookingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/admin/invoice-details/${invoice.bookingId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch invoice details');
-      return response.json();
-    },
+    queryKey: [`/api/admin/invoice-details/${invoice.bookingId}`],
     enabled: true,
   });
 
