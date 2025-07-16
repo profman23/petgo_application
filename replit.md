@@ -722,6 +722,10 @@ Changelog:
 - July 16, 2025. ENHANCED: Sales Report column headers - updated "Total" to "Total Sales" for better clarity
 - July 16, 2025. ADDED: New "Total Paid" column in Sales Report section next to "Total Sales" column
 - July 16, 2025. IMPLEMENTED: Multi-column Sales Report layout with bilingual support for new payment tracking column
+- July 16, 2025. COMPLETED: Multi-page route functionality for Sales Report section with sub-pages (All Invoices, Daily Report, Monthly Report, VetsVan Report, Service Report)
+- July 16, 2025. INTEGRATED: Real payment data display system - "Total Paid" column now shows actual payment amounts from invoice_payments table instead of placeholder "-" values
+- July 16, 2025. ENHANCED: Database getAllGeneratedInvoices() method to calculate totalPaid using LEFT JOIN with invoice_payments table and SUM aggregation
+- July 16, 2025. VERIFIED: Payment data integration working correctly - Invoice Vets9000012 displays actual payment total of 23.80 SAR from database calculations
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat
