@@ -586,5 +586,7 @@ export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
 export type ImportHistory = typeof importHistory.$inferSelect;
 export type InsertImportHistory = z.infer<typeof insertImportHistorySchema>;
-export type GeneratedInvoice = typeof generatedInvoices.$inferSelect;
+export type GeneratedInvoice = typeof generatedInvoices.$inferSelect & {
+  totalPaid?: string;
+};
 export type InsertGeneratedInvoice = z.infer<typeof insertGeneratedInvoiceSchema>;

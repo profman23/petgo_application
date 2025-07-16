@@ -1184,10 +1184,29 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllGeneratedInvoices(): Promise<GeneratedInvoice[]> {
-    return await db
+    const invoices = await db
       .select()
       .from(generatedInvoices)
       .orderBy(desc(generatedInvoices.generatedAt));
+    
+    // Calculate total paid for each invoice
+    const invoicesWithTotalPaid = await Promise.all(
+      invoices.map(async (invoice) => {
+        const payments = await db
+          .select()
+          .from(invoicePayments)
+          .where(eq(invoicePayments.bookingId, invoice.bookingId));
+        
+        const totalPaid = payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+        
+        return {
+          ...invoice,
+          totalPaid: totalPaid.toFixed(2)
+        };
+      })
+    );
+    
+    return invoicesWithTotalPaid;
   }
 
   async getGeneratedInvoice(id: number): Promise<GeneratedInvoice | undefined> {
