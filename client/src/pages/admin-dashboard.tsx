@@ -895,8 +895,8 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
                         {language === 'ar' ? 'إجمالي المبلغ المدفوع' : 'Total Amount Paid'}
                       </p>
                       <p className="text-2xl font-bold text-green-700" dir="ltr">
-                        {(selectedInvoice as any)?.totalPaidAmount ? 
-                          `${parseFloat((selectedInvoice as any).totalPaidAmount).toFixed(2)} SAR` : 
+                        {(invoice as any)?.totalPaidAmount ? 
+                          `${parseFloat((invoice as any).totalPaidAmount).toFixed(2)} SAR` : 
                           '0.00 SAR'
                         }
                       </p>
@@ -906,11 +906,11 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
                   {/* Payment Status Badge */}
                   <div className="text-right">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      (selectedInvoice as any)?.totalPaidAmount && parseFloat((selectedInvoice as any).totalPaidAmount) > 0
+                      (invoice as any)?.totalPaidAmount && parseFloat((invoice as any).totalPaidAmount) > 0
                         ? 'bg-green-100 text-green-800'
                         : 'bg-gray-100 text-gray-600'
                     }`}>
-                      {(selectedInvoice as any)?.totalPaidAmount && parseFloat((selectedInvoice as any).totalPaidAmount) > 0
+                      {(invoice as any)?.totalPaidAmount && parseFloat((invoice as any).totalPaidAmount) > 0
                         ? (language === 'ar' ? 'تم الدفع' : 'Paid')
                         : (language === 'ar' ? 'لم يتم الدفع' : 'Not Paid')
                       }

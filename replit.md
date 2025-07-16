@@ -716,6 +716,9 @@ Changelog:
 - July 15, 2025. GUARANTEED: Zero data loss system - uploaded data will never be lost under any circumstances
 - July 16, 2025. ENHANCED: Admin Dashboard Sales Report Show Details - Added Payment section display below Invoice Items
 - July 16, 2025. IMPLEMENTED: Payment section UI in admin dashboard with bilingual support (Arabic/English) maintaining existing design consistency
+- July 16, 2025. ENHANCED: getSalesReportWithPayments function to calculate total payment amounts for each booking
+- July 16, 2025. UPDATED: admin dashboard to display total payment amounts alongside Payment section
+- July 16, 2025. FIXED: selectedInvoice variable reference error in InvoiceCard component
 - July 16, 2025. ULTIMATE SOLUTION: Complete Import Data Loss Prevention System implemented
 - July 16, 2025. PERMANENTLY DISABLED: initializeTestData() function that was causing data deletion on every restart
 - July 16, 2025. IMPLEMENTED: ImportDataLock System - automatic permanent locking of imported data
