@@ -3219,6 +3219,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get detailed invoice items with correct discount and VAT values
+  app.get('/api/admin/invoice-items/:bookingId', requireAdminAuth, async (req, res) => {
+    try {
+      const { bookingId } = req.params;
+      
+      // Get invoice items from database with actual values
+      const invoiceItems = await storage.getInvoiceItems(parseInt(bookingId));
+      
+      if (!invoiceItems || invoiceItems.length === 0) {
+        return res.json([]);
+      }
+      
+      // Format items to ensure proper number types and display correct values
+      const formattedItems = invoiceItems.map(item => {
+        const discount = parseFloat(item.discount || 0);
+        const discountType = item.discountType || 'none';
+        const vatAmount = parseFloat(item.vatAmount || 0);
+        const totalBeforeVat = parseFloat(item.totalBeforeVat || item.total || 0);
+        const totalAfterVat = parseFloat(item.totalAfterVat || (totalBeforeVat + vatAmount));
+        
+        return {
+          id: item.id,
+          description: item.description,
+          quantity: parseInt(item.quantity as any),
+          unitPrice: parseFloat(item.unitPrice),
+          discount: discount,
+          discountType: discountType,
+          discountDisplay: discountType === 'none' ? 'No Discount' : 
+                          discountType === 'percentage' ? `${discount}%` : 
+                          `${discount} SAR`,
+          vatRate: parseFloat(item.vatRate || 15),
+          vatAmount: vatAmount,
+          totalBeforeVat: totalBeforeVat,
+          totalAfterVat: totalAfterVat,
+          total: parseFloat(item.total)
+        };
+      });
+      
+      res.json(formattedItems);
+    } catch (error) {
+      console.error('Error fetching admin invoice items:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice items' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

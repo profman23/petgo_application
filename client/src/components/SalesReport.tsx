@@ -33,23 +33,12 @@ interface InvoiceItem {
   unitPrice: number;
   discount: number;
   discountType: string;
+  discountDisplay: string;
+  vatRate: number;
   vatAmount: number;
   totalBeforeVat: number;
   totalAfterVat: number;
   total: number;
-}
-
-interface InvoiceItemsDetails {
-  bookingId: number;
-  invoiceNumber: string;
-  items: InvoiceItem[];
-  subtotal: number;
-  discountType: string;
-  discountAmount: number;
-  totalBeforeVat: number;
-  vatAmount: number;
-  finalTotal: number;
-  generatedAt: string;
 }
 
 export const SalesReport = ({ language }: SalesReportProps) => {
@@ -73,8 +62,8 @@ export const SalesReport = ({ language }: SalesReportProps) => {
     enabled: !!selectedInvoice && showDetailsModal,
   });
 
-  // Fetch invoice items for selected invoice
-  const { data: invoiceItems, isLoading: isLoadingItems } = useQuery<InvoiceItemsDetails>({
+  // Fetch invoice items for selected invoice with correct discount and VAT values
+  const { data: invoiceItems, isLoading: isLoadingItems } = useQuery<InvoiceItem[]>({
     queryKey: ['/api/admin/invoice-items', selectedInvoice?.bookingId],
     queryFn: async () => {
       if (!selectedInvoice) return null;
@@ -437,7 +426,7 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                 {language === 'ar' ? 'تفاصيل الفاتورة' : 'Invoice Details'}
               </h3>
               <p className="text-sm text-purple-100 mt-1">
-                {language === 'ar' ? 'رقم الفاتورة' : 'Invoice #'}: {invoiceItems?.invoiceNumber || ''}
+                {language === 'ar' ? 'رقم الفاتورة' : 'Invoice #'}: {selectedInvoice?.invoiceNumber || ''}
               </p>
             </div>
 
@@ -456,7 +445,7 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                     <h4 className="text-lg font-semibold mb-4 text-gray-800">
                       {language === 'ar' ? 'عناصر الفاتورة' : 'Invoice Items'}
                     </h4>
-                    {invoiceItems.items.length > 0 ? (
+                    {invoiceItems && invoiceItems.length > 0 ? (
                       <div className="overflow-x-auto">
                         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                           <thead className="bg-gray-50">
@@ -515,7 +504,7 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                             </tr>
                           </thead>
                           <tbody className="bg-white divide-y divide-gray-200">
-                            {invoiceItems.items.map((item) => (
+                            {invoiceItems.map((item) => (
                               <tr key={item.id}>
                                 {language === 'ar' ? (
                                   // Arabic RTL order
@@ -588,49 +577,20 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                     )}
                   </div>
 
-                  {/* Financial Summary */}
+                  {/* Summary from selected invoice */}
                   <div className="border-t pt-4">
                     <h4 className="text-lg font-semibold mb-4 text-gray-800">
                       {language === 'ar' ? 'الملخص المالي' : 'Financial Summary'}
                     </h4>
                     <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">
-                          {language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}
-                        </span>
-                        <span className="font-medium">{invoiceItems.subtotal.toFixed(2)} SAR</span>
-                      </div>
-                      
-                      {invoiceItems.discountType !== 'none' && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">
-                            {language === 'ar' ? 'الخصم:' : 'Discount:'}
-                          </span>
-                          <span className="font-medium text-green-600">
-                            -{invoiceItems.discountAmount.toFixed(2)} SAR
-                          </span>
-                        </div>
-                      )}
-                      
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">
-                          {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
-                        </span>
-                        <span className="font-medium">{invoiceItems.totalBeforeVat.toFixed(2)} SAR</span>
-                      </div>
-                      
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">
-                          {language === 'ar' ? 'ضريبة القيمة المضافة (15%):' : 'VAT (15%):'}
-                        </span>
-                        <span className="font-medium">{invoiceItems.vatAmount.toFixed(2)} SAR</span>
-                      </div>
-                      
                       <div className="flex justify-between border-t pt-3 text-lg">
                         <span className="font-semibold text-gray-800">
-                          {language === 'ar' ? 'المجموع النهائي:' : 'Total After VAT:'}
+                          {language === 'ar' ? 'المجموع النهائي:' : 'Total Amount:'}
                         </span>
-                        <span className="font-bold text-purple-600">{invoiceItems.finalTotal.toFixed(2)} SAR</span>
+                        <span className="font-bold text-purple-600">{Number(selectedInvoice?.finalTotal || 0).toFixed(2)} SAR</span>
+                      </div>
+                      <div className="text-center text-sm text-gray-600">
+                        {language === 'ar' ? 'تاريخ الإنشاء:' : 'Generated Date:'} {new Date(selectedInvoice?.generatedAt || '').toLocaleDateString()}
                       </div>
                     </div>
                   </div>
