@@ -2780,6 +2780,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/products/:id', requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
+      
+      // Check if import data is locked
+      const { importDataLock } = await import('./importDataLock');
+      if (importDataLock.isImportDataLocked()) {
+        console.log("🚨 PRODUCT DELETE BLOCKED - Import data is permanently protected");
+        return res.status(403).json({ 
+          error: 'Cannot delete products - Import data is permanently protected',
+          message: 'البيانات المستوردة محمية ولا يمكن حذفها'
+        });
+      }
+      
       await storage.deleteProduct(parseInt(id));
       res.json({ message: 'Product deleted successfully' });
     } catch (error) {
@@ -2791,6 +2802,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/services/:id', requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
+      
+      // Check if import data is locked
+      const { importDataLock } = await import('./importDataLock');
+      if (importDataLock.isImportDataLocked()) {
+        console.log("🚨 SERVICE DELETE BLOCKED - Import data is permanently protected");
+        return res.status(403).json({ 
+          error: 'Cannot delete services - Import data is permanently protected',
+          message: 'البيانات المستوردة محمية ولا يمكن حذفها'
+        });
+      }
+      
       await storage.deleteService(parseInt(id));
       res.json({ message: 'Service deleted successfully' });
     } catch (error) {
