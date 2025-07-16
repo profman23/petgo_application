@@ -575,7 +575,7 @@ export type InsertImportHistory = z.infer<typeof insertImportHistorySchema>;
 // Payments table for tracking payment information
 export const payments = pgTable("payments", {
   id: serial("id").primaryKey(),
-  invoiceId: integer("invoice_id"), // Reference to generated invoice
+  invoiceId: integer("invoice_id"), // Reference to generated invoice (optional)
   bookingId: integer("booking_id").notNull().references(() => bookings.id),
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
   paymentMethod: text("payment_method").notNull(), // cash, card, transfer

@@ -507,35 +507,29 @@ export default function DoctorInvoice() {
         notes: paymentData.description
       };
 
-      const response = await apiRequest('/api/payments', {
+      const newPayment = await apiRequest('/api/payments', {
         method: 'POST',
-        body: JSON.stringify(paymentPayload)
+        body: paymentPayload
       });
-
-      if (response.ok) {
-        const newPayment = await response.json();
-        
-        // Update local state
-        const formattedPayment = {
-          id: newPayment.id,
-          amount: parseFloat(newPayment.amountPaid),
-          type: newPayment.paymentMethod,
-          description: newPayment.notes || '',
-          date: newPayment.paidAt
-        };
-        
-        setPayments(prev => [...prev, formattedPayment]);
-        setTotalPaid(prev => prev + formattedPayment.amount);
-        setShowPaymentModal(false);
-        
-        toast({
-          title: t('paymentAdded'),
-          description: `${t('paymentSuccess')} - ${formattedPayment.amount} ${t('sar')}`,
-          variant: 'default',
-        });
-      } else {
-        throw new Error('Failed to save payment');
-      }
+      
+      // Update local state
+      const formattedPayment = {
+        id: newPayment.id,
+        amount: parseFloat(newPayment.amountPaid),
+        type: newPayment.paymentMethod,
+        description: newPayment.notes || '',
+        date: newPayment.paidAt
+      };
+      
+      setPayments(prev => [...prev, formattedPayment]);
+      setTotalPaid(prev => prev + formattedPayment.amount);
+      setShowPaymentModal(false);
+      
+      toast({
+        title: t('paymentAdded'),
+        description: `${t('paymentSuccess')} - ${formattedPayment.amount} SAR`,
+        variant: 'default',
+      });
     } catch (error) {
       console.error('Error saving payment:', error);
       toast({
