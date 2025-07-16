@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, payments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type Payment, type InsertPayment } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -1277,6 +1277,87 @@ export class DatabaseStorage implements IStorage {
         emailSentAt: isEmailSent ? new Date() : null 
       })
       .where(eq(generatedInvoices.id, id));
+  }
+
+  // Get sales report with payment information
+  async getSalesReportWithPayments(): Promise<any[]> {
+    try {
+      const result = await db
+        .select({
+          // Invoice fields
+          id: generatedInvoices.id,
+          invoiceNumber: generatedInvoices.invoiceNumber,
+          bookingId: generatedInvoices.bookingId,
+          customerName: generatedInvoices.customerName,
+          customerPhone: generatedInvoices.customerPhone,
+          customerEmail: generatedInvoices.customerEmail,
+          doctorName: generatedInvoices.doctorName,
+          vetsVanCode: generatedInvoices.vetsVanCode,
+          appointmentDate: generatedInvoices.appointmentDate,
+          appointmentTime: generatedInvoices.appointmentTime,
+          serviceType: generatedInvoices.serviceType,
+          pets: generatedInvoices.pets,
+          items: generatedInvoices.items,
+          subtotal: generatedInvoices.subtotal,
+          totalDiscountAmount: generatedInvoices.totalDiscountAmount,
+          vatAmount: generatedInvoices.vatAmount,
+          finalTotal: generatedInvoices.finalTotal,
+          notes: generatedInvoices.notes,
+          generatedBy: generatedInvoices.generatedBy,
+          generatedAt: generatedInvoices.generatedAt,
+          isEmailSent: generatedInvoices.isEmailSent,
+          emailSentAt: generatedInvoices.emailSentAt,
+          createdAt: generatedInvoices.createdAt,
+          updatedAt: generatedInvoices.updatedAt,
+          // Payment fields
+          paymentId: payments.id,
+          amountPaid: payments.amountPaid,
+          paymentMethod: payments.paymentMethod,
+          paymentStatus: payments.paymentStatus,
+          paidAt: payments.paidAt,
+          paymentNotes: payments.notes,
+        })
+        .from(generatedInvoices)
+        .leftJoin(payments, eq(generatedInvoices.bookingId, payments.bookingId))
+        .orderBy(desc(generatedInvoices.generatedAt));
+
+      // Transform results to include payment info as nested object
+      return result.map(row => ({
+        id: row.id,
+        invoiceNumber: row.invoiceNumber,
+        bookingId: row.bookingId,
+        customerName: row.customerName,
+        customerPhone: row.customerPhone,
+        customerEmail: row.customerEmail,
+        doctorName: row.doctorName,
+        vetsVanCode: row.vetsVanCode,
+        appointmentDate: row.appointmentDate,
+        appointmentTime: row.appointmentTime,
+        serviceType: row.serviceType,
+        pets: row.pets,
+        items: row.items,
+        subtotal: row.subtotal,
+        totalDiscountAmount: row.totalDiscountAmount,
+        vatAmount: row.vatAmount,
+        finalTotal: row.finalTotal,
+        notes: row.notes,
+        generatedBy: row.generatedBy,
+        generatedAt: row.generatedAt,
+        isEmailSent: row.isEmailSent,
+        emailSentAt: row.emailSentAt,
+        createdAt: row.createdAt,
+        updatedAt: row.updatedAt,
+        paymentInfo: row.paymentId ? {
+          amountPaid: row.amountPaid?.toString() || '0',
+          paymentMethod: row.paymentMethod || '',
+          paymentStatus: row.paymentStatus || '',
+          paidAt: row.paidAt?.toISOString() || ''
+        } : null
+      }));
+    } catch (error) {
+      console.error('Error fetching sales report with payments:', error);
+      throw error;
+    }
   }
 }
 

@@ -1,14 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, BarChart3 } from "lucide-react";
-import { type GeneratedInvoice } from "@shared/schema";
+import { Loader2, BarChart3, CreditCard } from "lucide-react";
+import { type GeneratedInvoice, type Payment } from "@shared/schema";
 
 interface SalesReportProps {
   language: string;
 }
 
+// Extended interface for invoice with payment info
+interface InvoiceWithPayment extends GeneratedInvoice {
+  paymentInfo?: {
+    amountPaid: string;
+    paymentMethod: string;
+    paymentStatus: string;
+    paidAt: string;
+  } | null;
+}
+
 export const SalesReport = ({ language }: SalesReportProps) => {
-  const { data: generatedInvoices, isLoading } = useQuery<GeneratedInvoice[]>({
-    queryKey: ['/api/admin/generated-invoices'],
+  const { data: generatedInvoices, isLoading } = useQuery<InvoiceWithPayment[]>({
+    queryKey: ['/api/admin/sales-report'],
     staleTime: 30000,
   });
 
@@ -66,6 +76,9 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                   {language === 'ar' ? 'الإجمالي' : 'Total'}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  {language === 'ar' ? 'معلومات الدفع' : 'Payment Info'}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   {language === 'ar' ? 'التاريخ' : 'Date'}
                 </th>
               </tr>
@@ -90,6 +103,33 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <span className="font-medium">{Number(invoice.finalTotal)} SAR</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {invoice.paymentInfo ? (
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-4 w-4 text-green-600" />
+                          <span className="font-medium text-green-600">
+                            {Number(invoice.paymentInfo.amountPaid)} SAR
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {language === 'ar' ? 
+                            (invoice.paymentInfo.paymentMethod === 'cash' ? 'نقدي' :
+                             invoice.paymentInfo.paymentMethod === 'card' ? 'بطاقة' :
+                             invoice.paymentInfo.paymentMethod === 'transfer' ? 'تحويل' : 
+                             invoice.paymentInfo.paymentMethod) :
+                            invoice.paymentInfo.paymentMethod}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-gray-400">
+                        <CreditCard className="h-4 w-4" />
+                        <span className="text-xs">
+                          {language === 'ar' ? 'لا توجد معلومات دفع' : 'No payment info'}
+                        </span>
+                      </div>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(invoice.generatedAt).toLocaleDateString()}

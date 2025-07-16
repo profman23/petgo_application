@@ -568,5 +568,31 @@ export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
 export type ImportHistory = typeof importHistory.$inferSelect;
 export type InsertImportHistory = z.infer<typeof insertImportHistorySchema>;
+// Payments table for tracking payment information
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  invoiceId: integer("invoice_id"), // Reference to generated invoice
+  bookingId: integer("booking_id").notNull().references(() => bookings.id),
+  amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: text("payment_method").notNull(), // cash, card, transfer
+  paymentStatus: text("payment_status").notNull().default("completed"), // completed, pending, partial
+  paidAt: timestamp("paid_at").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPaymentSchema = createInsertSchema(payments).pick({
+  invoiceId: true,
+  bookingId: true,
+  amountPaid: true,
+  paymentMethod: true,
+  paymentStatus: true,
+  paidAt: true,
+  notes: true,
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type GeneratedInvoice = typeof generatedInvoices.$inferSelect;
 export type InsertGeneratedInvoice = z.infer<typeof insertGeneratedInvoiceSchema>;

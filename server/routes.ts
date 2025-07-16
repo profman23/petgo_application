@@ -1990,6 +1990,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get sales report with payment information
+  app.get('/api/admin/sales-report', requireAdminAuth, async (req, res) => {
+    try {
+      const salesReport = await storage.getSalesReportWithPayments();
+      res.json(salesReport);
+    } catch (error) {
+      console.error('Error fetching sales report:', error);
+      res.status(500).json({ error: 'Failed to fetch sales report' });
+    }
+  });
+
   // Admin: Get detailed invoice items for specific booking
   app.get('/api/admin/invoice-details/:bookingId', requireAdminAuth, async (req, res) => {
     try {
