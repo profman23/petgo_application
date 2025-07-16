@@ -158,7 +158,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   constructor() {
-    this.initializeTestData();
+    // DISABLED: this.initializeTestData(); - Causing data loss issues
     this.startDataProtection();
   }
 
@@ -333,8 +333,9 @@ export class DatabaseStorage implements IStorage {
       ]);
       }
 
-      // Add essential products and services data to prevent loss
-      if (shouldInitializeProducts) {
+      // DISABLED - This was causing data loss on every restart
+      // Essential products protected by Import Data Protection System
+      if (false && shouldInitializeProducts) {
         await db.insert(products).values([
           {
             name: 'Pet Food Premium',
@@ -378,7 +379,9 @@ export class DatabaseStorage implements IStorage {
         ]);
       }
 
-      if (shouldInitializeServices) {
+      // DISABLED - This was causing data loss on every restart  
+      // Essential services protected by Import Data Protection System
+      if (false && shouldInitializeServices) {
         await db.insert(services).values([
           {
             name: 'General Checkup',
