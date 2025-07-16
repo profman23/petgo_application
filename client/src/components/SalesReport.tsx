@@ -31,6 +31,11 @@ interface InvoiceItem {
   description: string;
   quantity: number;
   unitPrice: number;
+  discount: number;
+  discountType: string;
+  vatAmount: number;
+  totalBeforeVat: number;
+  totalAfterVat: number;
   total: number;
 }
 
@@ -456,35 +461,121 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                         <table className="min-w-full bg-white border border-gray-200 rounded-lg">
                           <thead className="bg-gray-50">
                             <tr>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {language === 'ar' ? 'الوصف' : 'Description'}
-                              </th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {language === 'ar' ? 'الكمية' : 'Quantity'}
-                              </th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {language === 'ar' ? 'السعر للوحدة (ريال)' : 'Unit Price (SAR)'}
-                              </th>
-                              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {language === 'ar' ? 'المجموع (ريال)' : 'Total (SAR)'}
-                              </th>
+                              {language === 'ar' ? (
+                                // Arabic RTL order
+                                <>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'المجموع بعد الضريبة (ريال)' : 'Total After VAT (SAR)'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'المجموع قبل الضريبة (ريال)' : 'Total Before VAT (SAR)'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'ضريبة القيمة المضافة (ريال)' : 'VAT (SAR)'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'الخصم' : 'Discount'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'السعر للوحدة (ريال)' : 'Unit Price (SAR)'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'الكمية' : 'Quantity'}
+                                  </th>
+                                  <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'الوصف' : 'Description'}
+                                  </th>
+                                </>
+                              ) : (
+                                // English LTR order
+                                <>
+                                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'الوصف' : 'Description'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'الكمية' : 'Quantity'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'السعر للوحدة (ريال)' : 'Unit Price (SAR)'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'الخصم' : 'Discount'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'ضريبة القيمة المضافة (ريال)' : 'VAT (SAR)'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'المجموع قبل الضريبة (ريال)' : 'Total Before VAT (SAR)'}
+                                  </th>
+                                  <th className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    {language === 'ar' ? 'المجموع بعد الضريبة (ريال)' : 'Total After VAT (SAR)'}
+                                  </th>
+                                </>
+                              )}
                             </tr>
                           </thead>
                           <tbody className="bg-white divide-y divide-gray-200">
                             {invoiceItems.items.map((item) => (
                               <tr key={item.id}>
-                                <td className="px-4 py-3 text-sm text-gray-900">
-                                  {item.description}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">
-                                  {item.quantity}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">
-                                  {item.unitPrice.toFixed(2)}
-                                </td>
-                                <td className="px-4 py-3 text-sm text-gray-900">
-                                  {item.total.toFixed(2)}
-                                </td>
+                                {language === 'ar' ? (
+                                  // Arabic RTL order
+                                  <>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.totalAfterVat ? item.totalAfterVat.toFixed(2) : item.total.toFixed(2)}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.totalBeforeVat ? item.totalBeforeVat.toFixed(2) : (item.quantity * item.unitPrice).toFixed(2)}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.vatAmount ? item.vatAmount.toFixed(2) : '0.00'}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.discountType === 'none' || !item.discountType ? 
+                                        (language === 'ar' ? 'بدون خصم' : 'No Discount') : 
+                                        item.discountType === '10%' ? '10%' : 
+                                        item.discount ? `${item.discount.toFixed(2)} SAR` : 'N/A'
+                                      }
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.unitPrice.toFixed(2)}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.quantity}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-right">
+                                      {item.description}
+                                    </td>
+                                  </>
+                                ) : (
+                                  // English LTR order
+                                  <>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-left">
+                                      {item.description}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.quantity}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.unitPrice.toFixed(2)}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.discountType === 'none' || !item.discountType ? 
+                                        (language === 'ar' ? 'بدون خصم' : 'No Discount') : 
+                                        item.discountType === '10%' ? '10%' : 
+                                        item.discount ? `${item.discount.toFixed(2)} SAR` : 'N/A'
+                                      }
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.vatAmount ? item.vatAmount.toFixed(2) : '0.00'}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.totalBeforeVat ? item.totalBeforeVat.toFixed(2) : (item.quantity * item.unitPrice).toFixed(2)}
+                                    </td>
+                                    <td className="px-3 py-3 text-sm text-gray-900 text-center">
+                                      {item.totalAfterVat ? item.totalAfterVat.toFixed(2) : item.total.toFixed(2)}
+                                    </td>
+                                  </>
+                                )}
                               </tr>
                             ))}
                           </tbody>
