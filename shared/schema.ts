@@ -375,7 +375,6 @@ export const invoiceStatus = pgTable("invoice_status", {
   taxAmount: decimal("tax_amount", { precision: 10, scale: 2 }).notNull(),
   discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull(),
   finalTotal: decimal("final_total", { precision: 10, scale: 2 }).notNull(),
-  totalPaid: decimal("total_paid", { precision: 10, scale: 2 }).notNull().default("0"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -389,7 +388,6 @@ export const insertInvoiceStatusSchema = createInsertSchema(invoiceStatus).pick(
   taxAmount: true,
   discountAmount: true,
   finalTotal: true,
-  totalPaid: true,
 });
 
 export type InvoiceStatus = typeof invoiceStatus.$inferSelect;
@@ -528,7 +526,6 @@ export const generatedInvoices = pgTable("generated_invoices", {
   totalDiscountAmount: decimal("total_discount_amount", { precision: 10, scale: 2 }).default("0.00"),
   vatAmount: decimal("vat_amount", { precision: 10, scale: 2 }).notNull(), // 15% VAT
   finalTotal: decimal("final_total", { precision: 10, scale: 2 }).notNull(),
-  totalPaid: decimal("total_paid", { precision: 10, scale: 2 }).notNull().default("0"),
   
   // Additional info
   notes: text("notes"),
@@ -560,7 +557,6 @@ export const insertGeneratedInvoiceSchema = createInsertSchema(generatedInvoices
   totalDiscountAmount: true,
   vatAmount: true,
   finalTotal: true,
-  totalPaid: true,
   notes: true,
   generatedBy: true,
   isEmailSent: true,
@@ -572,31 +568,5 @@ export type Service = typeof services.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
 export type ImportHistory = typeof importHistory.$inferSelect;
 export type InsertImportHistory = z.infer<typeof insertImportHistorySchema>;
-// Payments table for tracking payment information
-export const payments = pgTable("payments", {
-  id: serial("id").primaryKey(),
-  invoiceId: integer("invoice_id"), // Reference to generated invoice (optional)
-  bookingId: integer("booking_id").notNull().references(() => bookings.id),
-  amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
-  paymentMethod: text("payment_method").notNull(), // cash, card, transfer
-  paymentStatus: text("payment_status").notNull().default("completed"), // completed, pending, partial
-  paidAt: timestamp("paid_at").notNull(),
-  notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertPaymentSchema = createInsertSchema(payments).pick({
-  invoiceId: true,
-  bookingId: true,
-  amountPaid: true,
-  paymentMethod: true,
-  paymentStatus: true,
-  paidAt: true,
-  notes: true,
-});
-
-export type Payment = typeof payments.$inferSelect;
-export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type GeneratedInvoice = typeof generatedInvoices.$inferSelect;
 export type InsertGeneratedInvoice = z.infer<typeof insertGeneratedInvoiceSchema>;

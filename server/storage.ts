@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, payments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type Payment, type InsertPayment } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -59,12 +59,6 @@ export interface IStorage {
   createReview(review: InsertReview): Promise<Review>;
   getBookingReview(bookingId: number): Promise<Review | undefined>;
   getUserReviews(userId: number): Promise<Review[]>;
-
-  // Payment operations
-  createPayment(payment: InsertPayment): Promise<Payment>;
-  getBookingPayments(bookingId: number): Promise<Payment[]>;
-  updatePayment(id: number, data: Partial<Payment>): Promise<Payment | undefined>;
-  deletePayment(id: number): Promise<void>;
 
   // Reports operations
   getReportsStats(): Promise<{
@@ -164,8 +158,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   constructor() {
-    // PERMANENTLY DISABLED - No initialization of test data
-    // All data creation now happens only through Import system
+    this.initializeTestData();
     this.startDataProtection();
   }
 
@@ -175,22 +168,12 @@ export class DatabaseStorage implements IStorage {
       const { dataGuard } = await import('./dataIntegrityGuard');
       await dataGuard.startMonitoring();
       console.log("🛡️ Data Integrity Guard activated");
-      
-      // Initialize Import Data Lock System
-      const { importDataLock } = await import('./importDataLock');
-      await importDataLock.initializeLock();
-      console.log("🔒 Import Data Lock System activated");
     } catch (error) {
       console.error("⚠️ Data protection system initialization failed:", error);
     }
   }
 
-  // PERMANENTLY DISABLED FUNCTION - NO LONGER USED
-  private async DISABLED_initializeTestData() {
-    // THIS FUNCTION IS PERMANENTLY DISABLED TO PREVENT DATA LOSS
-    // All data is now created only through the Import system
-    return; // Exit immediately without doing anything
-    
+  private async initializeTestData() {
     try {
       // Enhanced data integrity check - verify all critical tables
       const existingUsers = await db.select().from(users).limit(1);
@@ -350,9 +333,8 @@ export class DatabaseStorage implements IStorage {
       ]);
       }
 
-      // DISABLED - This was causing data loss on every restart
-      // Essential products protected by Import Data Protection System
-      if (false && shouldInitializeProducts) {
+      // Add essential products and services data to prevent loss
+      if (shouldInitializeProducts) {
         await db.insert(products).values([
           {
             name: 'Pet Food Premium',
@@ -396,9 +378,7 @@ export class DatabaseStorage implements IStorage {
         ]);
       }
 
-      // DISABLED - This was causing data loss on every restart  
-      // Essential services protected by Import Data Protection System
-      if (false && shouldInitializeServices) {
+      if (shouldInitializeServices) {
         await db.insert(services).values([
           {
             name: 'General Checkup',
@@ -1010,19 +990,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProduct(id: number): Promise<void> {
-    // Check import data lock before deletion
-    try {
-      const { importDataLock } = await import('./importDataLock');
-      const canDelete = await importDataLock.preventDataDeletion();
-      
-      if (!canDelete) {
-        throw new Error("Cannot delete imported data - Data is permanently locked");
-      }
-    } catch (error) {
-      console.log("🔒 Import data protected from deletion");
-      throw new Error("Cannot delete imported products - Data is protected");
-    }
-    
     await db
       .update(products)
       .set({ isActive: false })
@@ -1049,19 +1016,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteService(id: number): Promise<void> {
-    // Check import data lock before deletion
-    try {
-      const { importDataLock } = await import('./importDataLock');
-      const canDelete = await importDataLock.preventDataDeletion();
-      
-      if (!canDelete) {
-        throw new Error("Cannot delete imported data - Data is permanently locked");
-      }
-    } catch (error) {
-      console.log("🔒 Import data protected from deletion");
-      throw new Error("Cannot delete imported services - Data is protected");
-    }
-    
     await db
       .update(services)
       .set({ isActive: false })
@@ -1113,14 +1067,14 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Trigger import data lock after bulk operation
+    // Trigger import data protection after bulk operation
     if (imported > 0 || updated > 0) {
       try {
-        const { importDataLock } = await import('./importDataLock');
-        await importDataLock.lockImportedData();
-        console.log(`🔒 Import data permanently locked: ${imported} new, ${updated} updated services`);
+        const { importProtection } = await import('./importDataProtection');
+        await importProtection.createImportBackup();
+        console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated services`);
       } catch (error) {
-        console.error('⚠️ Import data lock failed:', error);
+        console.error('⚠️ Import protection update failed:', error);
       }
     }
 
@@ -1152,14 +1106,14 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Trigger import data lock after bulk operation
+    // Trigger import data protection after bulk operation
     if (imported > 0 || updated > 0) {
       try {
-        const { importDataLock } = await import('./importDataLock');
-        await importDataLock.lockImportedData();
-        console.log(`🔒 Import data permanently locked: ${imported} new, ${updated} updated products`);
+        const { importProtection } = await import('./importDataProtection');
+        await importProtection.createImportBackup();
+        console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated products`);
       } catch (error) {
-        console.error('⚠️ Import data lock failed:', error);
+        console.error('⚠️ Import protection update failed:', error);
       }
     }
 
@@ -1283,90 +1237,6 @@ export class DatabaseStorage implements IStorage {
         emailSentAt: isEmailSent ? new Date() : null 
       })
       .where(eq(generatedInvoices.id, id));
-  }
-
-  // Get sales report with payment information
-  async getSalesReportWithPayments(): Promise<any[]> {
-    try {
-      // First get all invoices
-      const invoices = await db
-        .select()
-        .from(generatedInvoices)
-        .orderBy(desc(generatedInvoices.generatedAt));
-
-      // For each invoice, get total payments
-      const invoicesWithPayments = await Promise.all(
-        invoices.map(async (invoice) => {
-          // Get all payments for this booking
-          const bookingPayments = await db
-            .select({
-              id: payments.id,
-              amountPaid: payments.amountPaid,
-              paymentMethod: payments.paymentMethod,
-              paymentStatus: payments.paymentStatus,
-              paidAt: payments.paidAt,
-              notes: payments.notes,
-            })
-            .from(payments)
-            .where(eq(payments.bookingId, invoice.bookingId));
-
-          // Calculate total paid amount
-          const totalPaid = bookingPayments.reduce((sum, payment) => {
-            return sum + parseFloat(payment.amountPaid?.toString() || '0');
-          }, 0);
-
-          return {
-            ...invoice,
-            totalPaidAmount: totalPaid.toString(),
-            paymentDetails: bookingPayments
-          };
-        })
-      );
-
-      return invoicesWithPayments;
-    } catch (error) {
-      console.error('Error fetching sales report with payments:', error);
-      throw error;
-    }
-  }
-
-  // Payment operations implementation
-  async createPayment(payment: InsertPayment): Promise<Payment> {
-    try {
-      const [newPayment] = await db.insert(payments).values(payment).returning();
-      return newPayment;
-    } catch (error) {
-      console.error('Error creating payment:', error);
-      throw error;
-    }
-  }
-
-  async getBookingPayments(bookingId: number): Promise<Payment[]> {
-    try {
-      return await db.select().from(payments).where(eq(payments.bookingId, bookingId));
-    } catch (error) {
-      console.error('Error fetching booking payments:', error);
-      throw error;
-    }
-  }
-
-  async updatePayment(id: number, data: Partial<Payment>): Promise<Payment | undefined> {
-    try {
-      const [updatedPayment] = await db.update(payments).set(data).where(eq(payments.id, id)).returning();
-      return updatedPayment;
-    } catch (error) {
-      console.error('Error updating payment:', error);
-      throw error;
-    }
-  }
-
-  async deletePayment(id: number): Promise<void> {
-    try {
-      await db.delete(payments).where(eq(payments.id, id));
-    } catch (error) {
-      console.error('Error deleting payment:', error);
-      throw error;
-    }
   }
 }
 

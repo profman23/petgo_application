@@ -1990,17 +1990,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get sales report with payment information
-  app.get('/api/admin/sales-report', requireAdminAuth, async (req, res) => {
-    try {
-      const salesReport = await storage.getSalesReportWithPayments();
-      res.json(salesReport);
-    } catch (error) {
-      console.error('Error fetching sales report:', error);
-      res.status(500).json({ error: 'Failed to fetch sales report' });
-    }
-  });
-
   // Admin: Get detailed invoice items for specific booking
   app.get('/api/admin/invoice-details/:bookingId', requireAdminAuth, async (req, res) => {
     try {
@@ -2267,50 +2256,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error updating booking status:', error);
       res.status(500).json({ message: 'Failed to update booking status' });
-    }
-  });
-
-  // Payment API endpoints
-  app.post('/api/payments', requireAuth, async (req, res) => {
-    try {
-      const user = sessions.get(req.headers.authorization?.replace('Bearer ', '') || '');
-      if (!user) {
-        return res.status(401).json({ message: 'Unauthorized' });
-      }
-
-      const paymentData = req.body;
-      
-      // Validate required fields
-      if (!paymentData.bookingId || !paymentData.amountPaid || !paymentData.paymentMethod) {
-        return res.status(400).json({ message: 'Missing required payment fields' });
-      }
-
-      // Create payment record
-      const newPayment = await storage.createPayment({
-        bookingId: parseInt(paymentData.bookingId),
-        amountPaid: paymentData.amountPaid.toString(),
-        paymentMethod: paymentData.paymentMethod,
-        paymentStatus: paymentData.paymentStatus || 'completed',
-        paidAt: new Date(),
-        notes: paymentData.notes || null,
-        invoiceId: paymentData.invoiceId || null
-      });
-
-      res.json(newPayment);
-    } catch (error) {
-      console.error('Error creating payment:', error);
-      res.status(500).json({ message: 'Failed to create payment' });
-    }
-  });
-
-  app.get('/api/payments/:bookingId', requireAuth, async (req, res) => {
-    try {
-      const { bookingId } = req.params;
-      const payments = await storage.getBookingPayments(parseInt(bookingId));
-      res.json(payments);
-    } catch (error) {
-      console.error('Error fetching payments:', error);
-      res.status(500).json({ message: 'Failed to fetch payments' });
     }
   });
 
@@ -2621,7 +2566,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/invoice-status/:bookingId', requireAuth, async (req: any, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
-      const { subtotal, taxAmount, discountAmount, finalTotal, totalPaid, notes } = req.body;
+      const { subtotal, taxAmount, discountAmount, finalTotal, notes } = req.body;
       
       // Get booking details
       const booking = await storage.getBookingWithDetails(bookingId);
@@ -2677,7 +2622,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalDiscountAmount: discountAmount.toString(),
         vatAmount: taxAmount.toString(),
         finalTotal: finalTotal.toString(),
-        totalPaid: totalPaid ? totalPaid.toString() : "0",
         notes: notes || null,
         generatedBy: req.user.id,
         isEmailSent: false
@@ -2689,8 +2633,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const statusData = {
           bookingId,
-          isGenerated: true,
-          totalPaid: parseFloat(totalPaid || 0)
+          isGenerated: true
         };
         await storage.saveInvoiceStatus(statusData);
       } catch (statusError) {
@@ -2837,17 +2780,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/products/:id', requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
-      
-      // Check if import data is locked
-      const { importDataLock } = await import('./importDataLock');
-      if (importDataLock.isImportDataLocked()) {
-        console.log("🚨 PRODUCT DELETE BLOCKED - Import data is permanently protected");
-        return res.status(403).json({ 
-          error: 'Cannot delete products - Import data is permanently protected',
-          message: 'البيانات المستوردة محمية ولا يمكن حذفها'
-        });
-      }
-      
       await storage.deleteProduct(parseInt(id));
       res.json({ message: 'Product deleted successfully' });
     } catch (error) {
@@ -2859,17 +2791,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete('/api/services/:id', requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
-      
-      // Check if import data is locked
-      const { importDataLock } = await import('./importDataLock');
-      if (importDataLock.isImportDataLocked()) {
-        console.log("🚨 SERVICE DELETE BLOCKED - Import data is permanently protected");
-        return res.status(403).json({ 
-          error: 'Cannot delete services - Import data is permanently protected',
-          message: 'البيانات المستوردة محمية ولا يمكن حذفها'
-        });
-      }
-      
       await storage.deleteService(parseInt(id));
       res.json({ message: 'Service deleted successfully' });
     } catch (error) {
