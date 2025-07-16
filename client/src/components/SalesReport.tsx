@@ -252,38 +252,64 @@ const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
             </div>
           </div>
 
-          {/* Totals - Copied from doctor-invoice.tsx with blue colors */}
-          <div className="border-t pt-4">
-            <div className="flex justify-end">
-              <div className="w-80">
-                <div className="flex justify-between mb-2">
-                  <span>{language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Subtotal:'}</span>
-                  <span>{subtotal.toFixed(2)} SAR</span>
-                </div>
-                {totalDiscountAmount > 0 && (
-                  <div className="flex justify-between mb-2 text-green-600">
-                    <span>{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
-                    <span>-{totalDiscountAmount.toFixed(2)} SAR</span>
+          {/* ملخص الفاتورة - INVOICE SUMMARY - بتصميم أزرق واضح */}
+          <div className="border-t-4 border-blue-500 pt-6 mt-6">
+            <div className="bg-blue-50 p-6 rounded-lg border-2 border-blue-200">
+              <h4 className="text-xl font-bold text-blue-900 mb-6 text-center">
+                {language === 'ar' ? '📊 ملخص الفاتورة' : '📊 INVOICE SUMMARY'}
+              </h4>
+              
+              <div className="bg-white p-6 rounded-lg border border-blue-200 shadow-lg">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded">
+                    <span className="text-lg font-medium text-gray-700">
+                      {language === 'ar' ? 'الإجمالي قبل الضريبة:' : 'Subtotal:'}
+                    </span>
+                    <span className="text-lg font-bold text-blue-600">{subtotal.toFixed(2)} SAR</span>
                   </div>
-                )}
-                <div className="flex justify-between mb-2">
-                  <span>{language === 'ar' ? 'ضريبة القيمة المضافة:' : 'Tax:'}</span>
-                  <span>{taxAmount.toFixed(2)} SAR</span>
-                </div>
-                <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
-                  <span>{language === 'ar' ? 'الإجمالي النهائي:' : 'Final Total:'}</span>
-                  <span>{finalTotal.toFixed(2)} SAR</span>
-                </div>
+                  
+                  {totalDiscountAmount > 0 && (
+                    <div className="flex justify-between items-center p-3 bg-green-50 rounded">
+                      <span className="text-lg font-medium text-green-700">
+                        {language === 'ar' ? 'الخصم:' : 'Discount:'}
+                      </span>
+                      <span className="text-lg font-bold text-green-600">-{totalDiscountAmount.toFixed(2)} SAR</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center p-3 bg-yellow-50 rounded">
+                    <span className="text-lg font-medium text-yellow-700">
+                      {language === 'ar' ? 'ضريبة القيمة المضافة (15%):' : 'VAT Tax (15%):'}
+                    </span>
+                    <span className="text-lg font-bold text-yellow-600">{taxAmount.toFixed(2)} SAR</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center p-4 bg-blue-100 rounded border-2 border-blue-300">
+                    <span className="text-xl font-bold text-blue-900">
+                      {language === 'ar' ? 'الإجمالي النهائي:' : 'FINAL TOTAL:'}
+                    </span>
+                    <span className="text-xl font-bold text-blue-900">{finalTotal.toFixed(2)} SAR</span>
+                  </div>
 
-                {/* Payment Summary */}
-                <div className="border-t pt-4 mb-4">
-                  <div className="flex justify-between text-blue-600 font-semibold mb-2">
-                    <span>{language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}</span>
-                    <span>{totalPaid.toFixed(2)} SAR</span>
-                  </div>
-                  <div className="flex justify-between text-red-600 font-semibold mb-4">
-                    <span>{language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}</span>
-                    <span>{remainingBalance.toFixed(2)} SAR</span>
+                  {/* Payment Summary */}
+                  <div className="border-t-2 border-blue-200 pt-4 mt-6">
+                    <h5 className="text-lg font-bold text-blue-800 mb-4 text-center">
+                      {language === 'ar' ? '💰 ملخص المدفوعات' : '💰 PAYMENT SUMMARY'}
+                    </h5>
+                    
+                    <div className="flex justify-between items-center p-3 bg-green-50 rounded mb-2">
+                      <span className="text-lg font-medium text-green-700">
+                        {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
+                      </span>
+                      <span className="text-lg font-bold text-green-600">{totalPaid.toFixed(2)} SAR</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center p-3 bg-red-50 rounded">
+                      <span className="text-lg font-medium text-red-700">
+                        {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
+                      </span>
+                      <span className="text-lg font-bold text-red-600">{remainingBalance.toFixed(2)} SAR</span>
+                    </div>
                   </div>
                 </div>
               </div>
