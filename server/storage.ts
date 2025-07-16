@@ -60,6 +60,12 @@ export interface IStorage {
   getBookingReview(bookingId: number): Promise<Review | undefined>;
   getUserReviews(userId: number): Promise<Review[]>;
 
+  // Payment operations
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  getBookingPayments(bookingId: number): Promise<Payment[]>;
+  updatePayment(id: number, data: Partial<Payment>): Promise<Payment | undefined>;
+  deletePayment(id: number): Promise<void>;
+
   // Reports operations
   getReportsStats(): Promise<{
     totalBookings: number;
@@ -1320,6 +1326,45 @@ export class DatabaseStorage implements IStorage {
       return invoicesWithPayments;
     } catch (error) {
       console.error('Error fetching sales report with payments:', error);
+      throw error;
+    }
+  }
+
+  // Payment operations implementation
+  async createPayment(payment: InsertPayment): Promise<Payment> {
+    try {
+      const [newPayment] = await db.insert(payments).values(payment).returning();
+      return newPayment;
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      throw error;
+    }
+  }
+
+  async getBookingPayments(bookingId: number): Promise<Payment[]> {
+    try {
+      return await db.select().from(payments).where(eq(payments.bookingId, bookingId));
+    } catch (error) {
+      console.error('Error fetching booking payments:', error);
+      throw error;
+    }
+  }
+
+  async updatePayment(id: number, data: Partial<Payment>): Promise<Payment | undefined> {
+    try {
+      const [updatedPayment] = await db.update(payments).set(data).where(eq(payments.id, id)).returning();
+      return updatedPayment;
+    } catch (error) {
+      console.error('Error updating payment:', error);
+      throw error;
+    }
+  }
+
+  async deletePayment(id: number): Promise<void> {
+    try {
+      await db.delete(payments).where(eq(payments.id, id));
+    } catch (error) {
+      console.error('Error deleting payment:', error);
       throw error;
     }
   }

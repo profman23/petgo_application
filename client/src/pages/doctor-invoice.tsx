@@ -253,6 +253,37 @@ export default function DoctorInvoice() {
     }
   }, [invoiceItems, booking, isRecordLocked]);
 
+  // Load existing payments when booking data is available
+  useEffect(() => {
+    const loadExistingPayments = async () => {
+      if (bookingDetails?.id && payments.length === 0) {
+        try {
+          const response = await apiRequest(`/api/payments/${bookingDetails.id}`);
+          if (response.ok) {
+            const existingPayments = await response.json();
+            const formattedPayments = existingPayments.map((payment: any) => ({
+              id: payment.id,
+              amount: parseFloat(payment.amountPaid),
+              type: payment.paymentMethod,
+              description: payment.notes || '',
+              date: payment.paidAt
+            }));
+            
+            setPayments(formattedPayments);
+            
+            // Calculate total paid amount
+            const totalPaidAmount = formattedPayments.reduce((sum: number, payment: any) => sum + payment.amount, 0);
+            setTotalPaid(totalPaidAmount);
+          }
+        } catch (error) {
+          console.error('Error loading existing payments:', error);
+        }
+      }
+    };
+
+    loadExistingPayments();
+  }, [bookingDetails?.id]);
+
   // Load invoice status when data is available
   useEffect(() => {
     if (invoiceStatus) {
@@ -460,24 +491,53 @@ export default function DoctorInvoice() {
   const t = (key: keyof typeof translations.ar) => translations[language as keyof typeof translations][key];
 
   // Handle payment submission
-  const handlePaymentSubmit = (paymentData: any) => {
-    const newPayment = {
-      id: Date.now(),
-      amount: parseFloat(paymentData.amount),
-      type: paymentData.paymentType,
-      description: paymentData.description,
-      date: new Date().toISOString()
-    };
-    
-    setPayments(prev => [...prev, newPayment]);
-    setTotalPaid(prev => prev + newPayment.amount);
-    setShowPaymentModal(false);
-    
-    toast({
-      title: t('paymentAdded'),
-      description: `${t('paymentSuccess')} - ${newPayment.amount} ${t('sar')}`,
-      variant: 'default',
-    });
+  const handlePaymentSubmit = async (paymentData: any) => {
+    try {
+      const paymentPayload = {
+        bookingId: bookingDetails?.id,
+        amountPaid: parseFloat(paymentData.amount),
+        paymentMethod: paymentData.paymentType,
+        paymentStatus: 'completed',
+        notes: paymentData.description
+      };
+
+      const response = await apiRequest('/api/payments', {
+        method: 'POST',
+        body: JSON.stringify(paymentPayload)
+      });
+
+      if (response.ok) {
+        const newPayment = await response.json();
+        
+        // Update local state
+        const formattedPayment = {
+          id: newPayment.id,
+          amount: parseFloat(newPayment.amountPaid),
+          type: newPayment.paymentMethod,
+          description: newPayment.notes || '',
+          date: newPayment.paidAt
+        };
+        
+        setPayments(prev => [...prev, formattedPayment]);
+        setTotalPaid(prev => prev + formattedPayment.amount);
+        setShowPaymentModal(false);
+        
+        toast({
+          title: t('paymentAdded'),
+          description: `${t('paymentSuccess')} - ${formattedPayment.amount} ${t('sar')}`,
+          variant: 'default',
+        });
+      } else {
+        throw new Error('Failed to save payment');
+      }
+    } catch (error) {
+      console.error('Error saving payment:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في حفظ الدفعة' : 'Failed to save payment',
+        variant: 'destructive',
+      });
+    }
   };
 
   // Calculate totals - Total Before VAT = Quantity * Unit Price (without discount)

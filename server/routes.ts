@@ -2270,6 +2270,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Payment API endpoints
+  app.post('/api/payments', requireAuth, async (req, res) => {
+    try {
+      const user = sessions.get(req.headers.authorization?.replace('Bearer ', '') || '');
+      if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+
+      const paymentData = req.body;
+      
+      // Validate required fields
+      if (!paymentData.bookingId || !paymentData.amountPaid || !paymentData.paymentMethod) {
+        return res.status(400).json({ message: 'Missing required payment fields' });
+      }
+
+      // Create payment record
+      const newPayment = await storage.createPayment({
+        bookingId: parseInt(paymentData.bookingId),
+        amountPaid: paymentData.amountPaid.toString(),
+        paymentMethod: paymentData.paymentMethod,
+        paymentStatus: paymentData.paymentStatus || 'completed',
+        paidAt: new Date(),
+        notes: paymentData.notes || null,
+        invoiceId: paymentData.invoiceId || null
+      });
+
+      res.json(newPayment);
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      res.status(500).json({ message: 'Failed to create payment' });
+    }
+  });
+
+  app.get('/api/payments/:bookingId', requireAuth, async (req, res) => {
+    try {
+      const { bookingId } = req.params;
+      const payments = await storage.getBookingPayments(parseInt(bookingId));
+      res.json(payments);
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+      res.status(500).json({ message: 'Failed to fetch payments' });
+    }
+  });
+
   // Taqnyat Webhook endpoint for SMS status updates
   app.post('/api/webhook/taqnyat', async (req, res) => {
     try {
