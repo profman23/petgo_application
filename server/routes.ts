@@ -3038,18 +3038,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Invoice Payment endpoints
   app.post('/api/invoice-payments', requireAuth, async (req, res) => {
     try {
+      console.log('Creating invoice payment:', req.body);
       const { bookingId, amount, paymentType, description } = req.body;
       
       if (!bookingId || !amount || !paymentType) {
+        console.log('Missing required fields:', { bookingId, amount, paymentType });
         return res.status(400).json({ message: 'Missing required fields' });
       }
 
-      const payment = await storage.createInvoicePayment({
-        bookingId,
+      const paymentData = {
+        bookingId: parseInt(bookingId),
         amount: parseFloat(amount),
         paymentType,
-        description
-      });
+        description: description || null
+      };
+
+      console.log('Payment data to create:', paymentData);
+      const payment = await storage.createInvoicePayment(paymentData);
+      console.log('Payment created successfully:', payment);
 
       res.json(payment);
     } catch (error) {
@@ -3061,7 +3067,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/invoice-payments/:bookingId', requireAuth, async (req, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
+      console.log('Fetching invoice payments for booking:', bookingId);
+      
       const payments = await storage.getInvoicePaymentsByBooking(bookingId);
+      console.log('Found payments:', payments);
       
       res.json(payments);
     } catch (error) {

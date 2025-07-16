@@ -400,15 +400,12 @@ export const invoicePayments = pgTable("invoice_payments", {
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   paymentType: varchar("payment_type", { length: 50 }).notNull(), // cash, card, transfer
   description: text("description"),
-  paymentDate: timestamp("payment_date").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertInvoicePaymentSchema = createInsertSchema(invoicePayments).omit({
   id: true,
   createdAt: true,
-  updatedAt: true,
 });
 
 export type InvoicePayment = typeof invoicePayments.$inferSelect;
