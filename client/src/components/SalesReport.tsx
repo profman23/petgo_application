@@ -18,7 +18,7 @@ interface InvoiceWithPayment extends GeneratedInvoice {
 
 export const SalesReport = ({ language }: SalesReportProps) => {
   const { data: generatedInvoices, isLoading } = useQuery<InvoiceWithPayment[]>({
-    queryKey: ['/api/admin/sales-report'],
+    queryKey: ['/api/admin/generated-invoices'],
     staleTime: 30000,
   });
 
