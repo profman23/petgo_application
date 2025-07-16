@@ -1658,8 +1658,12 @@ export default function AdminDashboard() {
               {language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard/reports')}
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              onClick={() => setActiveTab('reports')}
+              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+                activeTab === 'reports'
+                  ? 'bg-purple-600 text-purple-600'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
             >
               <BarChart3 className="ml-3 h-6 w-6" />
               {language === 'ar' ? 'التقارير' : 'Reports'}
