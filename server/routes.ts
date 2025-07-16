@@ -1990,6 +1990,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get invoice payment details for Show Details functionality
+  app.get('/api/admin/invoice-payment-details/:bookingId', requireAdminAuth, async (req, res) => {
+    try {
+      const { bookingId } = req.params;
+      
+      // Get payments for this booking/invoice
+      const payments = await storage.getInvoicePayments(parseInt(bookingId));
+      
+      // Calculate total paid amount
+      const totalPaid = payments.reduce((sum, payment) => {
+        return sum + parseFloat(payment.amount || '0');
+      }, 0);
+      
+      // Get generated invoice for this booking to get total amount
+      const generatedInvoice = await storage.getGeneratedInvoiceByBooking(parseInt(bookingId));
+      const totalAmount = generatedInvoice ? parseFloat(generatedInvoice.finalTotal || '0') : 0;
+      
+      // Calculate remaining amount
+      const remainingAmount = totalAmount - totalPaid;
+      
+      const response = {
+        bookingId: parseInt(bookingId),
+        totalAmount: totalAmount,
+        totalPaid: totalPaid,
+        remainingAmount: remainingAmount,
+        paymentStatus: remainingAmount <= 0 ? 'paid' : 'pending',
+        payments: payments.map(payment => ({
+          id: payment.id,
+          amount: parseFloat(payment.amount || '0'),
+          method: payment.method || 'cash',
+          createdAt: payment.createdAt,
+          notes: payment.notes || ''
+        }))
+      };
+      
+      res.json(response);
+    } catch (error) {
+      console.error('Error fetching invoice payment details:', error);
+      res.status(500).json({ message: 'Failed to fetch payment details' });
+    }
+  });
+
+  // Admin: Export sales report with payment details
+  app.get('/api/admin/export-sales-report', requireAdminAuth, async (req, res) => {
+    try {
+      const generatedInvoices = await storage.getAllGeneratedInvoices();
+      
+      // Prepare export data with payment details
+      const exportData = [];
+      
+      for (const invoice of generatedInvoices) {
+        // Get payments for this invoice
+        const payments = await storage.getInvoicePayments(invoice.bookingId);
+        const totalPaid = payments.reduce((sum, payment) => {
+          return sum + parseFloat(payment.amount || '0');
+        }, 0);
+        
+        const totalAmount = parseFloat(invoice.finalTotal || '0');
+        const remainingAmount = totalAmount - totalPaid;
+        
+        exportData.push({
+          invoiceNumber: invoice.invoiceNumber || '',
+          customerName: invoice.customerName || '',
+          customerPhone: invoice.customerPhone || '',
+          doctorName: invoice.doctorName || '',
+          vetsVanCode: invoice.vetsVanCode || '',
+          totalAmount: totalAmount,
+          totalPaid: totalPaid,
+          remainingAmount: remainingAmount,
+          paymentStatus: remainingAmount <= 0 ? 'مدفوع' : 'غير مدفوع',
+          generatedDate: invoice.generatedAt ? new Date(invoice.generatedAt).toLocaleDateString('ar-SA') : '',
+          payments: payments.map(p => ({
+            amount: parseFloat(p.amount || '0'),
+            method: p.method || 'نقد',
+            date: p.createdAt ? new Date(p.createdAt).toLocaleDateString('ar-SA') : '',
+            notes: p.notes || ''
+          }))
+        });
+      }
+      
+      res.json(exportData);
+    } catch (error) {
+      console.error('Error exporting sales report:', error);
+      res.status(500).json({ message: 'Failed to export sales report' });
+    }
+  });
+
   // Admin: Get detailed invoice items for specific booking
   app.get('/api/admin/invoice-details/:bookingId', requireAdminAuth, async (req, res) => {
     try {
