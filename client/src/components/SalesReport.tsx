@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2, BarChart3, ChevronDown, ChevronUp } from "lucide-react";
 import { type GeneratedInvoice } from "@shared/schema";
 import { useState } from "react";
+import { apiRequest } from "@/lib/queryClient";
 
 interface SalesReportProps {
   language: string;
@@ -12,6 +13,7 @@ export const SalesReport = ({ language }: SalesReportProps) => {
 
   const { data: generatedInvoices, isLoading } = useQuery<GeneratedInvoice[]>({
     queryKey: ['/api/admin/generated-invoices'],
+    queryFn: () => apiRequest('/api/admin/generated-invoices'),
     staleTime: 30000,
   });
 
@@ -148,6 +150,7 @@ interface InvoiceDetailsRowProps {
 const InvoiceDetailsRow = ({ invoice, language }: InvoiceDetailsRowProps) => {
   const { data: invoiceDetails, isLoading } = useQuery({
     queryKey: [`/api/admin/invoice-details/${invoice.bookingId}`],
+    queryFn: () => apiRequest(`/api/admin/invoice-details/${invoice.bookingId}`),
     enabled: true,
   });
 
