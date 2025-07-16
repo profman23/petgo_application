@@ -1141,15 +1141,7 @@ export default function AdminDashboard() {
   // Fetch drivers
   const { data: drivers, isLoading, refetch: refetchDrivers } = useQuery({
     queryKey: ["/api/admin/drivers"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/drivers", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch drivers");
-      return await response.json() as Driver[];
-    },
+    queryFn: () => apiRequest("/api/admin/drivers"),
     enabled: !!adminToken,
     staleTime: 0, // Always consider data stale for immediate updates
     cacheTime: 1000, // Keep cache for 1 second only
@@ -1158,93 +1150,28 @@ export default function AdminDashboard() {
   // Fetch reports statistics
   const { data: reportsStats, isLoading: isLoadingStats } = useQuery({
     queryKey: ["/api/admin/reports"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/reports", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch reports stats");
-      return await response.json() as {
-        totalBookings: number;
-        completedBookings: number;
-        averageRating: number;
-        totalReviews: number;
-        totalVetsVans: number;
-        availableVetsVans: number;
-      };
-    },
+    queryFn: () => apiRequest("/api/admin/reports"),
     enabled: !!adminToken && activeTab === 'reports',
   });
 
   // Fetch detailed reviews when dialog is open
   const { data: detailedReviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ["/api/admin/reviews-details"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/reviews-details", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch detailed reviews");
-      return await response.json() as Array<{
-        id: number;
-        rating: number;
-        comment: string;
-        createdAt: string;
-        userName: string;
-        userPhone: string;
-        vetsvanName: string;
-        vetsvanCode: string;
-      }>;
-    },
+    queryFn: () => apiRequest("/api/admin/reviews-details"),
     enabled: !!adminToken && showReviewsDialog,
   });
 
   // Fetch generated invoices for sales report
   const { data: generatedInvoices, isLoading: isLoadingInvoices } = useQuery({
     queryKey: ["/api/admin/generated-invoices"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/generated-invoices", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch generated invoices");
-      return await response.json() as GeneratedInvoice[];
-    },
+    queryFn: () => apiRequest("/api/admin/generated-invoices"),
     enabled: !!adminToken && activeTab === 'reports' && reportsSubTab === 'sales',
   });
 
   // Fetch all VetsVan requests with real-time notifications
   const { data: vetsVanRequests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/vetsvan-requests", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch VetsVan requests");
-      return await response.json() as Array<{
-        id: number;
-        customerName: string;
-        customerPhone: string;
-        customerEmail: string;
-        vetsvanCode: string;
-        vetsvanName: string;
-        appointmentDate: string;
-        appointmentTime: string;
-        status: string;
-        location: any;
-        pets: Array<{
-          name: string;
-          type: string;
-        }>;
-        serviceType: string;
-        createdAt: string;
-      }>;
-    },
+    queryFn: () => apiRequest("/api/admin/vetsvan-requests"),
     enabled: !!adminToken,
     refetchInterval: 2000, // Poll every 2 seconds for real-time updates
     refetchIntervalInBackground: true,
