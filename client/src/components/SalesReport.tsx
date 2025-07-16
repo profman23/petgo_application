@@ -8,12 +8,15 @@ interface SalesReportProps {
 
 // Extended interface for invoice with payment info
 interface InvoiceWithPayment extends GeneratedInvoice {
-  paymentInfo?: {
+  totalPaidAmount?: string;
+  paymentDetails?: Array<{
+    id: number;
     amountPaid: string;
     paymentMethod: string;
     paymentStatus: string;
     paidAt: string;
-  } | null;
+    notes?: string;
+  }>;
 }
 
 export const SalesReport = ({ language }: SalesReportProps) => {

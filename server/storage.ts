@@ -1282,78 +1282,42 @@ export class DatabaseStorage implements IStorage {
   // Get sales report with payment information
   async getSalesReportWithPayments(): Promise<any[]> {
     try {
-      const result = await db
-        .select({
-          // Invoice fields
-          id: generatedInvoices.id,
-          invoiceNumber: generatedInvoices.invoiceNumber,
-          bookingId: generatedInvoices.bookingId,
-          customerName: generatedInvoices.customerName,
-          customerPhone: generatedInvoices.customerPhone,
-          customerEmail: generatedInvoices.customerEmail,
-          doctorName: generatedInvoices.doctorName,
-          vetsVanCode: generatedInvoices.vetsVanCode,
-          appointmentDate: generatedInvoices.appointmentDate,
-          appointmentTime: generatedInvoices.appointmentTime,
-          serviceType: generatedInvoices.serviceType,
-          pets: generatedInvoices.pets,
-          items: generatedInvoices.items,
-          subtotal: generatedInvoices.subtotal,
-          totalDiscountAmount: generatedInvoices.totalDiscountAmount,
-          vatAmount: generatedInvoices.vatAmount,
-          finalTotal: generatedInvoices.finalTotal,
-          notes: generatedInvoices.notes,
-          generatedBy: generatedInvoices.generatedBy,
-          generatedAt: generatedInvoices.generatedAt,
-          isEmailSent: generatedInvoices.isEmailSent,
-          emailSentAt: generatedInvoices.emailSentAt,
-          createdAt: generatedInvoices.createdAt,
-          updatedAt: generatedInvoices.updatedAt,
-          // Payment fields
-          paymentId: payments.id,
-          amountPaid: payments.amountPaid,
-          paymentMethod: payments.paymentMethod,
-          paymentStatus: payments.paymentStatus,
-          paidAt: payments.paidAt,
-          paymentNotes: payments.notes,
-        })
+      // First get all invoices
+      const invoices = await db
+        .select()
         .from(generatedInvoices)
-        .leftJoin(payments, eq(generatedInvoices.bookingId, payments.bookingId))
         .orderBy(desc(generatedInvoices.generatedAt));
 
-      // Transform results to include payment info as nested object
-      return result.map(row => ({
-        id: row.id,
-        invoiceNumber: row.invoiceNumber,
-        bookingId: row.bookingId,
-        customerName: row.customerName,
-        customerPhone: row.customerPhone,
-        customerEmail: row.customerEmail,
-        doctorName: row.doctorName,
-        vetsVanCode: row.vetsVanCode,
-        appointmentDate: row.appointmentDate,
-        appointmentTime: row.appointmentTime,
-        serviceType: row.serviceType,
-        pets: row.pets,
-        items: row.items,
-        subtotal: row.subtotal,
-        totalDiscountAmount: row.totalDiscountAmount,
-        vatAmount: row.vatAmount,
-        finalTotal: row.finalTotal,
-        notes: row.notes,
-        generatedBy: row.generatedBy,
-        generatedAt: row.generatedAt,
-        isEmailSent: row.isEmailSent,
-        emailSentAt: row.emailSentAt,
-        createdAt: row.createdAt,
-        updatedAt: row.updatedAt,
-        paymentInfo: row.paymentId ? {
-          amountPaid: row.amountPaid?.toString() || '0',
-          paymentMethod: row.paymentMethod || '',
-          paymentStatus: row.paymentStatus || '',
-          paidAt: row.paidAt?.toISOString() || ''
-        } : null
-      }));
+      // For each invoice, get total payments
+      const invoicesWithPayments = await Promise.all(
+        invoices.map(async (invoice) => {
+          // Get all payments for this booking
+          const bookingPayments = await db
+            .select({
+              id: payments.id,
+              amountPaid: payments.amountPaid,
+              paymentMethod: payments.paymentMethod,
+              paymentStatus: payments.paymentStatus,
+              paidAt: payments.paidAt,
+              notes: payments.notes,
+            })
+            .from(payments)
+            .where(eq(payments.bookingId, invoice.bookingId));
+
+          // Calculate total paid amount
+          const totalPaid = bookingPayments.reduce((sum, payment) => {
+            return sum + parseFloat(payment.amountPaid?.toString() || '0');
+          }, 0);
+
+          return {
+            ...invoice,
+            totalPaidAmount: totalPaid.toString(),
+            paymentDetails: bookingPayments
+          };
+        })
+      );
+
+      return invoicesWithPayments;
     } catch (error) {
       console.error('Error fetching sales report with payments:', error);
       throw error;

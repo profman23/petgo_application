@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, CreditCard } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
@@ -883,9 +883,40 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
             </h2>
             
             <div className="space-y-3">
-              {/* Payment information will be displayed here when implemented */}
-              <div className="text-gray-500 text-center py-4">
-                {language === 'ar' ? 'سيتم عرض معلومات الدفع هنا' : 'Payment information will be displayed here'}
+              {/* Total Payment Amount Display */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <CreditCard className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600">
+                        {language === 'ar' ? 'إجمالي المبلغ المدفوع' : 'Total Amount Paid'}
+                      </p>
+                      <p className="text-2xl font-bold text-green-700" dir="ltr">
+                        {(selectedInvoice as any)?.totalPaidAmount ? 
+                          `${parseFloat((selectedInvoice as any).totalPaidAmount).toFixed(2)} SAR` : 
+                          '0.00 SAR'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Payment Status Badge */}
+                  <div className="text-right">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      (selectedInvoice as any)?.totalPaidAmount && parseFloat((selectedInvoice as any).totalPaidAmount) > 0
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {(selectedInvoice as any)?.totalPaidAmount && parseFloat((selectedInvoice as any).totalPaidAmount) > 0
+                        ? (language === 'ar' ? 'تم الدفع' : 'Paid')
+                        : (language === 'ar' ? 'لم يتم الدفع' : 'Not Paid')
+                      }
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
