@@ -1990,17 +1990,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin: Get total paid amount from all payments
-  app.get('/api/admin/total-paid', requireAdminAuth, async (req, res) => {
-    try {
-      const totalPaid = await storage.getTotalPaidAmount();
-      res.json({ totalPaid });
-    } catch (error) {
-      console.error('Error fetching total paid amount:', error);
-      res.status(500).json({ message: 'Failed to fetch total paid amount' });
-    }
-  });
-
   // Admin: Get detailed invoice items for specific booking
   app.get('/api/admin/invoice-details/:bookingId', requireAdminAuth, async (req, res) => {
     try {
