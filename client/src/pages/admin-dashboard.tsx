@@ -624,7 +624,7 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
               <span className="font-medium">{invoice.vetsVanCode}</span>
             </div>
             <div>
-              <span className="text-gray-500 block">{language === 'ar' ? 'الإجمالي' : 'Total'}</span>
+              <span className="text-gray-500 block">{language === 'ar' ? 'إجمالي المبيعات' : 'Total Sales'}</span>
               <span className="font-medium text-green-600">{Number(invoice.finalTotal)} SAR</span>
             </div>
             <div>
