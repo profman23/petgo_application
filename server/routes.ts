@@ -3091,6 +3091,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Export Sales Report to Excel
+  app.get('/api/admin/export-sales-report', requireAdminAuth, async (req, res) => {
+    try {
+      // Get all invoices with payment details
+      const invoices = await storage.getAllGeneratedInvoices();
+      
+      // Prepare data for Excel export
+      const excelData = [];
+      
+      for (const invoice of invoices) {
+        // Basic invoice data
+        const baseRow = {
+          'Invoice Number': invoice.invoiceNumber,
+          'Customer Name': invoice.customerName,
+          'Customer Phone': invoice.customerPhone,
+          'Customer Email': invoice.customerEmail || '',
+          'Doctor Name': invoice.doctorName,
+          'VetsVan Code': invoice.vetsVanCode,
+          'Appointment Date': invoice.appointmentDate,
+          'Appointment Time': invoice.appointmentTime,
+          'Service Type': invoice.serviceType || '',
+          'Total Sales (SAR)': parseFloat(invoice.finalTotal || '0').toFixed(2),
+          'Total Paid (SAR)': invoice.totalPaid || '0.00',
+          'VAT Amount (SAR)': parseFloat(invoice.vatAmount || '0').toFixed(2),
+          'Discount Amount (SAR)': parseFloat(invoice.totalDiscountAmount || '0').toFixed(2),
+          'Generated Date': invoice.generatedAt ? new Date(invoice.generatedAt).toLocaleDateString() : '',
+          'Notes': invoice.notes || ''
+        };
+
+        // Add pets information
+        if (invoice.pets && invoice.pets.length > 0) {
+          const petNames = invoice.pets.map(pet => pet.name).join(', ');
+          const petTypes = invoice.pets.map(pet => pet.type).join(', ');
+          baseRow['Pet Names'] = petNames;
+          baseRow['Pet Types'] = petTypes;
+        } else {
+          baseRow['Pet Names'] = '';
+          baseRow['Pet Types'] = '';
+        }
+
+        // Add payment methods details
+        if (invoice.payments && invoice.payments.length > 0) {
+          invoice.payments.forEach((payment, index) => {
+            const paymentRow = { ...baseRow };
+            paymentRow['Payment #'] = index + 1;
+            paymentRow['Payment Amount (SAR)'] = parseFloat(payment.amount).toFixed(2);
+            paymentRow['Payment Type'] = payment.paymentType;
+            paymentRow['Payment Description'] = payment.description || '';
+            paymentRow['Payment Date'] = new Date(payment.createdAt).toLocaleDateString();
+            paymentRow['Payment Time'] = new Date(payment.createdAt).toLocaleTimeString();
+            
+            excelData.push(paymentRow);
+          });
+        } else {
+          // Add row even if no payments
+          baseRow['Payment #'] = '';
+          baseRow['Payment Amount (SAR)'] = '';
+          baseRow['Payment Type'] = '';
+          baseRow['Payment Description'] = '';
+          baseRow['Payment Date'] = '';
+          baseRow['Payment Time'] = '';
+          
+          excelData.push(baseRow);
+        }
+      }
+
+      // Send the data to be processed on frontend
+      res.json({
+        success: true,
+        data: excelData,
+        filename: `Sales_Report_${new Date().toISOString().split('T')[0]}.xlsx`
+      });
+
+    } catch (error) {
+      console.error('Error exporting sales report:', error);
+      res.status(500).json({ message: 'Failed to export sales report' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

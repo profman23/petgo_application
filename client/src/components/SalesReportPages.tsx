@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, BarChart3, Calendar, TrendingUp, Car, Stethoscope, DollarSign, Clock, FileText } from "lucide-react";
+import { Loader2, BarChart3, Calendar, TrendingUp, Car, Stethoscope, DollarSign, Clock, FileText, Download } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 // Invoice Card Component
 const InvoiceCard = ({ invoice, language }: { invoice: any; language: string }) => {
@@ -472,6 +474,49 @@ const ServiceReportPage = ({ language, generatedInvoices }: { language: string; 
   );
 };
 
+// Excel Export Function
+const exportToExcel = async (language: string) => {
+  try {
+    const response = await fetch('/api/admin/export-sales-report', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to export data');
+    }
+
+    const { data, filename } = await response.json();
+
+    // Create workbook and worksheet
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    // Auto-width columns
+    const maxWidth = 50;
+    const columnWidths = Object.keys(data[0] || {}).map((key) => ({
+      wch: Math.min(maxWidth, Math.max(key.length, 12))
+    }));
+    worksheet['!cols'] = columnWidths;
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, language === 'ar' ? 'تقرير المبيعات' : 'Sales Report');
+
+    // Generate Excel file and download
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    
+    saveAs(blob, filename);
+    
+    return true;
+  } catch (error) {
+    console.error('Error exporting to Excel:', error);
+    throw error;
+  }
+};
+
 // Main Sales Report Component with Multi Page Route
 export const SalesReportPages = ({ 
   language, 
@@ -483,6 +528,20 @@ export const SalesReportPages = ({
   isLoadingInvoices: boolean;
 }) => {
   const [activePage, setActivePage] = useState('all');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportToExcel = async () => {
+    setIsExporting(true);
+    try {
+      await exportToExcel(language);
+      // Success toast could be added here
+    } catch (error) {
+      console.error('Export failed:', error);
+      // Error toast could be added here
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const pages = [
     { id: 'all', nameAr: 'جميع الفواتير', nameEn: 'All Invoices', icon: FileText },
@@ -519,6 +578,28 @@ export const SalesReportPages = ({
 
   return (
     <div dir={getDirection(language)}>
+      {/* Header with Export Button */}
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-xl font-bold text-gray-900">
+          {language === 'ar' ? 'تقارير المبيعات' : 'Sales Reports'}
+        </h3>
+        <button
+          onClick={handleExportToExcel}
+          disabled={isExporting || !generatedInvoices || generatedInvoices.length === 0}
+          className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors"
+        >
+          {isExporting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Download className="w-4 h-4" />
+          )}
+          {isExporting 
+            ? (language === 'ar' ? 'جاري التصدير...' : 'Exporting...') 
+            : (language === 'ar' ? 'تصدير إلى إكسيل' : 'Export to Excel')
+          }
+        </button>
+      </div>
+
       {/* Navigation Tabs */}
       <div className="mb-6">
         <div className="border-b border-gray-200">
