@@ -1,0 +1,32 @@
+InvoiceGeneratorProfessional.tsx:101 Uncaught TypeError: amount.toFixed is not a function
+    at formatCurrency (InvoiceGeneratorProfessional.tsx:101:17)
+    at InvoiceGeneratorProfessional.tsx:835:28
+    at Array.map (<anonymous>)
+    at InvoiceGeneratorProfessional (InvoiceGeneratorProfessional.tsx:822:45)
+
+InvoiceGeneratorProfessional.tsx:101 Uncaught TypeError: amount.toFixed is not a function
+    at formatCurrency (InvoiceGeneratorProfessional.tsx:101:17)
+    at InvoiceGeneratorProfessional.tsx:835:28
+    at Array.map (<anonymous>)
+    at InvoiceGeneratorProfessional (InvoiceGeneratorProfessional.tsx:822:45)
+chunk-RPCDYKBN.js?v=04cf3f82:14032 The above error occurred in the <InvoiceGeneratorProfessional> component:
+
+    at InvoiceGeneratorProfessional (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/InvoiceGeneratorProfessional.tsx:26:56)
+    at div
+    at DoctorInvoice (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/doctor-invoice.tsx:36:22)
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=04cf3f82:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=04cf3f82:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=rpTLbpFdPJQ_rXO5ojUxT:116:22)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=04cf3f82:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=rpTLbpFdPJQ_rXO5ojUxT:346:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+chunk-RPCDYKBN.js?v=04cf3f82:9129 Uncaught TypeError: amount.toFixed is not a function
+    at formatCurrency (InvoiceGeneratorProfessional.tsx:101:17)
+    at InvoiceGeneratorProfessional.tsx:835:28
+    at Array.map (<anonymous>)
+    at InvoiceGeneratorProfessional (InvoiceGeneratorProfessional.tsx:822:45)

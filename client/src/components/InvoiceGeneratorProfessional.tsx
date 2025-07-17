@@ -95,10 +95,11 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     />
   );
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | string) => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
     return (
       <span className="flex items-center justify-center">
-        {amount.toFixed(2)}
+        {(numAmount || 0).toFixed(2)}
         <RiyalIcon />
       </span>
     );
@@ -847,7 +848,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                       {language === 'ar' ? 'إجمالي المدفوع:' : 'Total Paid:'}
                     </span>
                     <span className="font-bold text-green-700 text-xl">
-                      {formatCurrency(invoiceData.paymentMethods.reduce((sum, p) => sum + p.amount, 0))}
+                      {formatCurrency(invoiceData.paymentMethods.reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount), 0))}
                     </span>
                   </div>
                 </div>

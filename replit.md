@@ -748,6 +748,10 @@ Changelog:
 - July 17, 2025. IMPROVED: Invoice Summary with enhanced sections for Subtotal, Total Discount, VAT (15%), Amount After Discount, and Final Total
 - July 17, 2025. UPDATED: Print view CSS optimization for better single-page layout and professional appearance
 - July 17, 2025. STANDARDIZED: Popup invoice preview now matches print view design exactly with consistent formatting and enhanced details
+- July 17, 2025. CRITICAL FIX: Resolved TypeError in formatCurrency function - amount.toFixed() error when amount is string instead of number
+- July 17, 2025. ENHANCED: formatCurrency function now properly handles both string and number input types with parseFloat conversion
+- July 17, 2025. FIXED: Payment amount calculation error in invoiceData.paymentMethods.reduce() - added proper type checking for string/number amounts
+- July 17, 2025. VERIFIED: All invoice generation runtime errors resolved - InvoiceGeneratorProfessional component now handles mixed data types correctly
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat
