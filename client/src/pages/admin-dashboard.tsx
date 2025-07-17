@@ -632,6 +632,7 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
               <span className="font-medium text-blue-600">
                 {invoice.totalPaid ? `${invoice.totalPaid} SAR` : '0.00 SAR'}
               </span>
+              <span className="text-gray-400 text-xs block mt-1">{language === 'ar' ? 'طرق الدفع' : 'Pay Methods'}</span>
             </div>
             <div>
               <span className="text-gray-500 block">{language === 'ar' ? 'التاريخ' : 'Date'}</span>
