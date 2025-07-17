@@ -3134,19 +3134,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           baseRow['Pet Types'] = '';
         }
 
-        // Prepare consolidated payment information for this invoice
-        let consolidatedPaymentTypes = '';
-        let consolidatedPaymentDescriptions = '';
-        let consolidatedPaymentDates = '';
-        let consolidatedPaymentTimes = '';
-        
-        if (invoice.payments && invoice.payments.length > 0) {
-          consolidatedPaymentTypes = invoice.payments.map(p => p.paymentType).join(' - ');
-          consolidatedPaymentDescriptions = invoice.payments.map(p => p.description || '').join(' - ');
-          consolidatedPaymentDates = invoice.payments.map(p => new Date(p.createdAt).toLocaleDateString()).join(' - ');
-          consolidatedPaymentTimes = invoice.payments.map(p => new Date(p.createdAt).toLocaleTimeString()).join(' - ');
-        }
-
         // Add invoice items details
         if (invoiceItems && invoiceItems.length > 0) {
           invoiceItems.forEach((item, itemIndex) => {
@@ -3158,11 +3145,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             itemRow['Item Total (SAR)'] = parseFloat(item.total || '0').toFixed(2);
             itemRow['Item Discount'] = item.discountType === 'percentage' ? '10%' : (item.discountType === 'none' ? 'No Discount' : item.discountType);
             
-            // Add consolidated payment information to each item row
-            itemRow['Payment Types'] = consolidatedPaymentTypes;
-            itemRow['Payment Descriptions'] = consolidatedPaymentDescriptions;
-            itemRow['Payment Dates'] = consolidatedPaymentDates;
-            itemRow['Payment Times'] = consolidatedPaymentTimes;
+            // Add individual payment columns (up to 5 payments max)
+            for (let i = 1; i <= 5; i++) {
+              if (invoice.payments && invoice.payments[i-1]) {
+                const payment = invoice.payments[i-1];
+                itemRow[`Payment Type ${i}`] = payment.paymentType;
+                itemRow[`Payment Amount ${i} (SAR)`] = parseFloat(payment.amount).toFixed(2);
+                itemRow[`Payment Description ${i}`] = payment.description || '';
+                itemRow[`Payment Date ${i}`] = new Date(payment.createdAt).toLocaleDateString();
+                itemRow[`Payment Time ${i}`] = new Date(payment.createdAt).toLocaleTimeString();
+              } else {
+                itemRow[`Payment Type ${i}`] = '';
+                itemRow[`Payment Amount ${i} (SAR)`] = '';
+                itemRow[`Payment Description ${i}`] = '';
+                itemRow[`Payment Date ${i}`] = '';
+                itemRow[`Payment Time ${i}`] = '';
+              }
+            }
             
             excelData.push(itemRow);
           });
@@ -3174,10 +3173,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           baseRow['Unit Price (SAR)'] = '';
           baseRow['Item Total (SAR)'] = '';
           baseRow['Item Discount'] = '';
-          baseRow['Payment Types'] = consolidatedPaymentTypes;
-          baseRow['Payment Descriptions'] = consolidatedPaymentDescriptions;
-          baseRow['Payment Dates'] = consolidatedPaymentDates;
-          baseRow['Payment Times'] = consolidatedPaymentTimes;
+          
+          // Add individual payment columns (up to 5 payments max)
+          for (let i = 1; i <= 5; i++) {
+            if (invoice.payments && invoice.payments[i-1]) {
+              const payment = invoice.payments[i-1];
+              baseRow[`Payment Type ${i}`] = payment.paymentType;
+              baseRow[`Payment Amount ${i} (SAR)`] = parseFloat(payment.amount).toFixed(2);
+              baseRow[`Payment Description ${i}`] = payment.description || '';
+              baseRow[`Payment Date ${i}`] = new Date(payment.createdAt).toLocaleDateString();
+              baseRow[`Payment Time ${i}`] = new Date(payment.createdAt).toLocaleTimeString();
+            } else {
+              baseRow[`Payment Type ${i}`] = '';
+              baseRow[`Payment Amount ${i} (SAR)`] = '';
+              baseRow[`Payment Description ${i}`] = '';
+              baseRow[`Payment Date ${i}`] = '';
+              baseRow[`Payment Time ${i}`] = '';
+            }
+          }
           
           excelData.push(baseRow);
         }
