@@ -733,6 +733,9 @@ Changelog:
 - July 17, 2025. CREATED: Export API endpoint /api/admin/export-sales-report with detailed data preparation including payment methods breakdown
 - July 17, 2025. COMPLETED: Excel export button in Sales Report header with bilingual support and loading states
 - July 17, 2025. SUCCESS: Full Sales Report Excel export system operational - exports comprehensive data with auto-sized columns and proper formatting
+- July 17, 2025. OPTIMIZED: Excel export structure with individual payment type columns (Payment Type 1-5, Payment Amount 1-5) to eliminate item duplication
+- July 17, 2025. ENHANCED: Payment information displays once per invoice level - first item shows all payment details, subsequent items show only item details
+- July 17, 2025. FINALIZED: Advanced Excel export with up to 5 payment types per invoice, comprehensive item-level details, and optimized data organization
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat
