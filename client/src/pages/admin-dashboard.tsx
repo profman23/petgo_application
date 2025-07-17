@@ -11,7 +11,6 @@ import { playBookingNotification, testAudioNotification, audioNotification } fro
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { SalesReportPages } from '@/components/SalesReportPages';
 
 // Services Management Component
 const ServicesManagementTable = ({ language }: { language: string }) => {
@@ -1337,17 +1336,11 @@ export default function AdminDashboard() {
     enabled: !!adminToken && showReviewsDialog,
   });
 
-  // State for date filtering in sales report
-  const [salesDateFilter, setSalesDateFilter] = useState({
-    fromDate: new Date().toISOString().split('T')[0],
-    toDate: new Date().toISOString().split('T')[0]
-  });
-
   // Fetch generated invoices for sales report
   const { data: generatedInvoices, isLoading: isLoadingInvoices } = useQuery({
-    queryKey: ["/api/admin/generated-invoices", salesDateFilter.fromDate, salesDateFilter.toDate],
+    queryKey: ["/api/admin/generated-invoices"],
     queryFn: async () => {
-      const response = await fetch(`/api/admin/generated-invoices?fromDate=${salesDateFilter.fromDate}&toDate=${salesDateFilter.toDate}`, {
+      const response = await fetch("/api/admin/generated-invoices", {
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -2224,13 +2217,67 @@ export default function AdminDashboard() {
 
                       {/* Sales Report Tab Content */}
                       {reportsSubTab === 'sales' && (
-                        <SalesReportPages 
-                          language={language}
-                          generatedInvoices={generatedInvoices || []}
-                          isLoadingInvoices={isLoadingInvoices}
-                          dateFilter={salesDateFilter}
-                          onDateFilterChange={setSalesDateFilter}
-                        />
+                        <>
+                          {isLoadingInvoices ? (
+                            <div className="flex justify-center py-12">
+                              <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                            </div>
+                          ) : (
+                            <>
+                              <div className="mb-4 flex justify-between items-center">
+                                <div>
+                                  <h4 className="text-lg font-medium text-gray-900 mb-2">
+                                    {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
+                                  </h4>
+                                  <p className="text-sm text-gray-600">
+                                    {language === 'ar' ? 'جميع الفواتير المولدة' : 'All Generated Invoices'}
+                                  </p>
+                                </div>
+                                
+                                {/* Excel Export Button */}
+                                <button
+                                  onClick={handleExportToExcel}
+                                  disabled={isExporting}
+                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {isExporting ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                      {language === 'ar' ? 'جاري التصدير...' : 'Exporting...'}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Download className="w-4 h-4 mr-2" />
+                                      {language === 'ar' ? 'تصدير إلى Excel' : 'Export to Excel'}
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+
+                              {generatedInvoices && generatedInvoices.length > 0 ? (
+                                <div className="space-y-4">
+                                  {generatedInvoices.map((invoice) => (
+                                    <InvoiceCard 
+                                      key={invoice.id} 
+                                      invoice={invoice} 
+                                      language={language}
+                                    />
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="text-center py-12">
+                                  <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                    {language === 'ar' ? 'لا توجد فواتير' : 'No Invoices'}
+                                  </h3>
+                                  <p className="text-gray-500">
+                                    {language === 'ar' ? 'لم يتم إنشاء أي فواتير بعد' : 'No invoices have been generated yet'}
+                                  </p>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </>
                       )}
                       
                       {/* SMS Communication Section - Show in both tabs */}

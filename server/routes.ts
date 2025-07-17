@@ -1979,27 +1979,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin: Get all generated invoices for sales report with date filtering
+  // Admin: Get all generated invoices for sales report
   app.get('/api/admin/generated-invoices', requireAdminAuth, async (req, res) => {
     try {
-      const { fromDate, toDate } = req.query;
-      console.log('Fetching generated invoices with filters:', { fromDate, toDate });
-      
-      let generatedInvoices;
-      if (fromDate && toDate) {
-        // Filter by Generated Date range
-        generatedInvoices = await storage.getGeneratedInvoicesByDateRange(
-          fromDate as string, 
-          toDate as string
-        );
-        console.log(`Found ${generatedInvoices.length} generated invoices between ${fromDate} and ${toDate}`);
-      } else {
-        // Default: show only today's invoices for performance
-        const today = new Date().toISOString().split('T')[0];
-        generatedInvoices = await storage.getGeneratedInvoicesByDateRange(today, today);
-        console.log(`Found ${generatedInvoices.length} generated invoices for today (${today})`);
-      }
-      
+      const generatedInvoices = await storage.getAllGeneratedInvoices();
       res.json(generatedInvoices);
     } catch (error) {
       console.error('Error fetching generated invoices:', error);
