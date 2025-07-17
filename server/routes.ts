@@ -3145,9 +3145,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             itemRow['Item Total (SAR)'] = parseFloat(item.total || '0').toFixed(2);
             itemRow['Item Discount'] = item.discountType === 'percentage' ? '10%' : (item.discountType === 'none' ? 'No Discount' : item.discountType);
             
-            // Add individual payment columns (up to 5 payments max)
+            // Add payment information only for the first item (itemIndex === 0)
             for (let i = 1; i <= 5; i++) {
-              if (invoice.payments && invoice.payments[i-1]) {
+              if (itemIndex === 0 && invoice.payments && invoice.payments[i-1]) {
                 const payment = invoice.payments[i-1];
                 itemRow[`Payment Type ${i}`] = payment.paymentType;
                 itemRow[`Payment Amount ${i} (SAR)`] = parseFloat(payment.amount).toFixed(2);

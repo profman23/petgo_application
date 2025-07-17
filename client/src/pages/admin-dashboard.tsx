@@ -980,7 +980,7 @@ export default function AdminDashboard() {
       // Create worksheet from data
       const worksheet = XLSX.utils.json_to_sheet(data);
 
-      // Set column widths (updated for consolidated payment columns)
+      // Set column widths (updated for individual payment columns - up to 5 payments)
       const columnWidths = [
         { wch: 15 }, // Invoice Number
         { wch: 20 }, // Customer Name
@@ -1005,10 +1005,32 @@ export default function AdminDashboard() {
         { wch: 15 }, // Unit Price (SAR)
         { wch: 15 }, // Item Total (SAR)
         { wch: 15 }, // Item Discount
-        { wch: 25 }, // Payment Types (consolidated)
-        { wch: 30 }, // Payment Descriptions (consolidated)
-        { wch: 20 }, // Payment Dates (consolidated)
-        { wch: 20 }  // Payment Times (consolidated)
+        // Payment columns for up to 5 payments
+        { wch: 15 }, // Payment Type 1
+        { wch: 15 }, // Payment Amount 1 (SAR)
+        { wch: 20 }, // Payment Description 1
+        { wch: 12 }, // Payment Date 1
+        { wch: 12 }, // Payment Time 1
+        { wch: 15 }, // Payment Type 2
+        { wch: 15 }, // Payment Amount 2 (SAR)
+        { wch: 20 }, // Payment Description 2
+        { wch: 12 }, // Payment Date 2
+        { wch: 12 }, // Payment Time 2
+        { wch: 15 }, // Payment Type 3
+        { wch: 15 }, // Payment Amount 3 (SAR)
+        { wch: 20 }, // Payment Description 3
+        { wch: 12 }, // Payment Date 3
+        { wch: 12 }, // Payment Time 3
+        { wch: 15 }, // Payment Type 4
+        { wch: 15 }, // Payment Amount 4 (SAR)
+        { wch: 20 }, // Payment Description 4
+        { wch: 12 }, // Payment Date 4
+        { wch: 12 }, // Payment Time 4
+        { wch: 15 }, // Payment Type 5
+        { wch: 15 }, // Payment Amount 5 (SAR)
+        { wch: 20 }, // Payment Description 5
+        { wch: 12 }, // Payment Date 5
+        { wch: 12 }  // Payment Time 5
       ];
       worksheet['!cols'] = columnWidths;
 
