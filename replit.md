@@ -759,6 +759,9 @@ Changelog:
 - July 17, 2025. UNIFIED: Print layout with popup layout - removed all @media print CSS rules to make print output identical to Generate Invoice popup
 - July 17, 2025. ENHANCED: Print functionality now shows exact same design as popup modal without compression or size reduction
 - July 17, 2025. MAINTAINED: Full professional layout preserved during printing including headers, buttons, and complete styling
+- July 17, 2025. FIXED: Print content duplication and button display issues - print now shows only invoice content without control buttons
+- July 17, 2025. ENHANCED: Print functionality opens new window with exact invoice content and proper Tailwind CSS styling
+- July 17, 2025. RESOLVED: Print layout now displays complete invoice content without repetition or cut-off sections
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat

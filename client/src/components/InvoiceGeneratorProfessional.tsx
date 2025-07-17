@@ -146,7 +146,113 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
   }, [invoiceData]);
 
   const printInvoice = () => {
-    window.print();
+    const printContent = invoiceRef.current;
+    if (!printContent) return;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    // Get the exact same content but without the outer container styling
+    const invoiceContent = printContent.cloneNode(true) as HTMLElement;
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
+        <head>
+          <meta charset="utf-8">
+          <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+              line-height: 1.5;
+              color: #374151;
+              background: white;
+              padding: 20px;
+            }
+            /* Copy all Tailwind classes used in the invoice */
+            .p-8 { padding: 2rem; }
+            .mb-4 { margin-bottom: 1rem; }
+            .mb-6 { margin-bottom: 1.5rem; }
+            .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+            .font-black { font-weight: 900; }
+            .text-purple-600 { color: rgb(147 51 234); }
+            .text-gray-600 { color: rgb(75 85 99); }
+            .font-medium { font-weight: 500; }
+            .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+            .space-y-1 > * + * { margin-top: 0.25rem; }
+            .flex { display: flex; }
+            .items-center { align-items: center; }
+            .h-4 { height: 1rem; }
+            .w-4 { width: 1rem; }
+            .mr-2 { margin-right: 0.5rem; }
+            .text-center { text-align: center; }
+            .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+            .font-bold { font-weight: 700; }
+            .justify-center { justify-content: center; }
+            .font-semibold { font-weight: 600; }
+            .grid { display: grid; }
+            .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .gap-6 { gap: 1.5rem; }
+            .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
+            .from-purple-50 { --tw-gradient-from: rgb(250 245 255); --tw-gradient-to: rgb(250 245 255 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+            .to-blue-50 { --tw-gradient-to: rgb(239 246 255); }
+            .rounded-xl { border-radius: 0.75rem; }
+            .border-2 { border-width: 2px; }
+            .border-purple-200 { border-color: rgb(196 181 253); }
+            .p-6 { padding: 1.5rem; }
+            .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+            .mb-3 { margin-bottom: 0.75rem; }
+            .space-y-2 > * + * { margin-top: 0.5rem; }
+            .ml-2 { margin-left: 0.5rem; }
+            .w-full { width: 100%; }
+            .border-collapse { border-collapse: collapse; }
+            .overflow-hidden { overflow: hidden; }
+            .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
+            .from-purple-600 { --tw-gradient-from: rgb(147 51 234); --tw-gradient-to: rgb(147 51 234 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+            .to-purple-700 { --tw-gradient-to: rgb(126 34 206); }
+            .text-white { color: rgb(255 255 255); }
+            .px-4 { padding-left: 1rem; padding-right: 1rem; }
+            .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+            .border { border-width: 1px; }
+            .border-gray-200 { border-color: rgb(229 231 235); }
+            .text-xs { font-size: 0.75rem; line-height: 1rem; }
+            .even\\:bg-gray-50:nth-child(even) { background-color: rgb(249 250 251); }
+            .border-t-2 { border-top-width: 2px; }
+            .border-purple-600 { border-color: rgb(147 51 234); }
+            .pt-4 { padding-top: 1rem; }
+            .mt-4 { margin-top: 1rem; }
+            .justify-between { justify-content: space-between; }
+            .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+            .text-right { text-align: right; }
+            .bg-purple-600 { background-color: rgb(147 51 234); }
+            .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+            .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+            .rounded-lg { border-radius: 0.5rem; }
+            .mx-auto { margin-left: auto; margin-right: auto; }
+            .h-20 { height: 5rem; }
+            .object-contain { object-fit: contain; }
+            .text-green-600 { color: rgb(22 163 74); }
+            .text-gray-500 { color: rgb(107 114 128); }
+            /* RTL support */
+            [dir="rtl"] .mr-2 { margin-right: 0; margin-left: 0.5rem; }
+            [dir="rtl"] .ml-2 { margin-left: 0; margin-right: 0.5rem; }
+            [dir="rtl"] .text-right { text-align: left; }
+          </style>
+        </head>
+        <body>
+          ${invoiceContent.outerHTML}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
   };
 
   const downloadInvoice = async () => {
@@ -201,7 +307,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
       <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-gray-200">
         {/* Action Buttons */}
-        <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-purple-600 to-purple-700 rounded-t-2xl">
+        <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-purple-600 to-purple-700 rounded-t-2xl print:hidden">
           <h3 className="text-2xl font-bold text-white flex items-center">
             <FileText className="h-7 w-7 mr-3 text-white" />
             {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
