@@ -12,12 +12,6 @@ interface InvoiceItem {
   description: string;
   quantity: number;
   unitPrice: number;
-  discount: number;
-  discountType: string;
-  vatRate: number;
-  vatAmount: number;
-  totalBeforeVat: number;
-  totalAfterVat: number;
   total: number;
 }
 
@@ -37,14 +31,6 @@ interface Pet {
   ageDay: number;
 }
 
-interface PaymentMethod {
-  id: string;
-  method: string;
-  amount: number;
-  date: string;
-  reference?: string;
-}
-
 interface InvoiceData {
   bookingId: number;
   customer: Customer;
@@ -60,7 +46,6 @@ interface InvoiceData {
   notes: string;
   doctorName: string;
   vetsVanCode: string;
-  paymentMethods?: PaymentMethod[];
 }
 
 interface InvoiceGeneratorProps {
@@ -95,11 +80,10 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     />
   );
 
-  const formatCurrency = (amount: number | string) => {
-    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  const formatCurrency = (amount: number) => {
     return (
       <span className="flex items-center justify-center">
-        {(numAmount || 0).toFixed(2)}
+        {amount.toFixed(2)}
         <RiyalIcon />
       </span>
     );
@@ -149,103 +133,327 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     const printContent = invoiceRef.current;
     if (!printContent) return;
 
-    // Get all the current stylesheets from the page
-    const allStyles = Array.from(document.styleSheets)
-      .map(sheet => {
-        try {
-          return Array.from(sheet.cssRules)
-            .map(rule => rule.cssText)
-            .join('\n');
-        } catch (e) {
-          console.log('Cannot access stylesheet:', e);
-          return '';
-        }
-      })
-      .join('\n');
-
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
-    // Clone the content and remove control buttons
-    const invoiceContent = printContent.cloneNode(true) as HTMLElement;
-    
-    // Remove modal overlay styling and control buttons
-    const overlay = invoiceContent.querySelector('.fixed.inset-0');
-    if (overlay) {
-      // Extract just the invoice content
-      const modalContent = overlay.querySelector('.bg-white.rounded-xl');
-      if (modalContent) {
-        modalContent.classList.remove('max-h-[95vh]', 'overflow-y-auto');
-        invoiceContent.innerHTML = modalContent.outerHTML;
-      }
-    }
-    
-    // Remove control buttons
-    const controlButtons = invoiceContent.querySelector('.print\\:hidden');
-    if (controlButtons) {
-      controlButtons.remove();
-    }
-    
     printWindow.document.write(`
       <!DOCTYPE html>
       <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
         <head>
           <meta charset="utf-8">
           <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
-          <link href="https://cdn.tailwindcss.com/3.4.1/tailwind.min.css" rel="stylesheet">
           <style>
-            /* Copy all existing styles */
-            ${allStyles}
-            
-            /* Additional print optimizations */
+            * { margin: 0; padding: 0; box-sizing: border-box; }
             body { 
-              font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-              margin: 0;
-              padding: 15px;
+              font-family: 'Arial', 'Helvetica', sans-serif; 
+              font-size: 14px; 
+              line-height: 1.6; 
+              color: #333;
               background: white;
-              line-height: 1.5;
             }
-            
-            /* Remove modal styling for print */
-            .fixed { position: relative !important; }
-            .inset-0 { position: relative !important; }
-            .bg-black { background: transparent !important; }
-            .bg-opacity-60 { background: transparent !important; }
-            .z-50 { z-index: auto !important; }
-            .max-h-\\[95vh\\] { max-height: none !important; }
-            .overflow-y-auto { overflow: visible !important; }
-            
-            /* Ensure visibility */
-            .print\\:hidden { display: none !important; }
-            
-            /* Maintain exact styling */
-            .bg-purple-600 { background-color: #9333ea !important; }
-            .text-purple-600 { color: #9333ea !important; }
-            .border-purple-600 { border-color: #9333ea !important; }
-            .bg-gradient-to-r { background: linear-gradient(to right, var(--tw-gradient-stops)) !important; }
-            .from-purple-600 { --tw-gradient-from: #9333ea !important; }
-            .to-purple-600 { --tw-gradient-to: #9333ea !important; }
-            
-            /* Table styling */
-            table { border-collapse: collapse !important; }
-            th, td { border: 1px solid #e5e7eb !important; }
-            .bg-gray-50 { background-color: #f9fafb !important; }
-            .bg-white { background-color: white !important; }
-            .hover\\:bg-purple-100:hover { background-color: #f3e8ff !important; }
-            
-            /* Responsive adjustments for print */
-            .max-w-6xl { max-width: 100% !important; }
-            .p-4 { padding: 1rem !important; }
-            .rounded-xl { border-radius: 0.75rem !important; }
-            
+            .invoice-container { 
+              max-width: 210mm; 
+              margin: 0 auto; 
+              padding: 20mm;
+              background: white;
+            }
+            .header { 
+              display: flex; 
+              justify-content: space-between; 
+              align-items: flex-start; 
+              margin-bottom: 15px; 
+              padding-bottom: 15px; 
+              border-bottom: 3px solid #8B2F8B;
+            }
+            .logo-header {
+              text-align: center;
+              margin-bottom: 15px;
+            }
+            .logo-header img {
+              height: 60px !important;
+              width: auto !important;
+              max-width: 200px !important;
+              object-fit: contain !important;
+            }
+            .logo-section { flex: 1.5; }
+            .company-name { 
+              font-size: 32px; 
+              font-weight: 900; 
+              color: #8B2F8B; 
+              margin-bottom: 8px;
+              text-shadow: 1px 1px 2px rgba(139, 47, 139, 0.1);
+            }
+            .company-tagline { 
+              font-size: 16px; 
+              color: #666; 
+              font-style: italic;
+              margin-bottom: 10px;
+            }
+            .contact-info { 
+              font-size: 12px; 
+              color: #888; 
+              line-height: 1.4;
+            }
+            .invoice-details { 
+              flex: 1; 
+              text-align: center; 
+              padding: 0 20px;
+            }
+            .invoice-number { 
+              font-size: 24px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              margin-bottom: 10px;
+            }
+            .invoice-date { 
+              font-size: 14px; 
+              color: #666; 
+              margin-bottom: 5px;
+            }
+            .qr-section { 
+              flex: 1; 
+              text-align: ${language === 'ar' ? 'left' : 'right'};
+            }
+            .qr-code { 
+              width: 120px; 
+              height: 120px; 
+              border: 2px solid #000; 
+              border-radius: 8px;
+            }
+            .section { 
+              margin-bottom: 25px; 
+              padding: 20px; 
+              background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); 
+              border-radius: 10px; 
+              border-left: 5px solid #8B2F8B;
+            }
+            .section-title { 
+              font-size: 18px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              margin-bottom: 15px; 
+              border-bottom: 1px solid #e9ecef; 
+              padding-bottom: 8px;
+            }
+            .customer-info { 
+              display: grid; 
+              grid-template-columns: 1fr 1fr; 
+              gap: 20px; 
+              margin-top: 15px;
+            }
+            .info-item { 
+              margin-bottom: 8px; 
+            }
+            .info-label { 
+              font-weight: bold; 
+              color: #555; 
+              display: inline-block; 
+              min-width: 80px;
+            }
+            .pets-grid { 
+              display: grid; 
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+              gap: 15px; 
+              margin-top: 15px;
+            }
+            .pet-card { 
+              padding: 15px; 
+              background: white; 
+              border-radius: 8px; 
+              border: 2px solid #e9ecef; 
+              text-align: center;
+            }
+            .pet-name { 
+              font-size: 16px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              margin-bottom: 8px;
+            }
+            .pet-details { 
+              font-size: 12px; 
+              color: #666; 
+              line-height: 1.4;
+            }
+            .services-table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin: 15px 0; 
+              border-radius: 8px; 
+              overflow: hidden; 
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .services-table th { 
+              background: linear-gradient(135deg, #8B2F8B 0%, #a855f7 100%); 
+              color: white; 
+              padding: 15px 10px; 
+              text-align: center; 
+              font-weight: bold; 
+              font-size: 14px;
+            }
+            .services-table td { 
+              padding: 12px 10px; 
+              border: 1px solid #e9ecef; 
+              text-align: center;
+            }
+            .services-table tbody tr:nth-child(even) { 
+              background: #f8f9fa;
+            }
+            .total-section { 
+              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+              padding: 25px; 
+              border-radius: 12px; 
+              border: 3px solid #8B2F8B; 
+              margin-top: 20px;
+            }
+            .total-row { 
+              display: flex; 
+              justify-content: space-between; 
+              padding: 8px 0; 
+              border-bottom: 1px solid #d1d5db; 
+              font-size: 15px;
+            }
+            .total-row:last-child { 
+              border-bottom: none;
+            }
+            .final-total { 
+              font-size: 20px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              border-top: 2px solid #8B2F8B; 
+              padding-top: 15px; 
+              margin-top: 10px; 
+              background: white; 
+              padding: 15px; 
+              border-radius: 8px; 
+              text-align: center;
+            }
+            .notes-section { 
+              margin-top: 25px; 
+              padding: 20px; 
+              background: #fff8dc; 
+              border-radius: 8px; 
+              border: 2px solid #d4af37;
+            }
+            .footer { 
+              margin-top: 40px; 
+              padding-top: 20px; 
+              border-top: 2px solid #8B2F8B; 
+              text-align: center; 
+              font-size: 12px; 
+              color: #666;
+            }
+            .thank-you { 
+              font-size: 18px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              margin-bottom: 10px;
+            }
+            .logo-header img {
+              height: 60px !important;
+              width: auto !important;
+              max-width: 200px !important;
+              object-fit: contain !important;
+            }
             @media print {
-              body { margin: 0; padding: 10px; }
-              .shadow-2xl { box-shadow: none !important; }
+              .logo-header img {
+                height: 50px !important;
+                width: auto !important;
+                max-width: 180px !important;
+                object-fit: contain !important;
+              }
+              .section {
+                margin-bottom: 6px !important;
+                padding: 6px !important;
+                font-size: 11px !important;
+              }
+              .section-title {
+                font-size: 13px !important;
+                padding: 4px !important;
+                margin-bottom: 4px !important;
+              }
+              .info-item {
+                padding: 1px 0 !important;
+                font-size: 10px !important;
+                line-height: 1.2 !important;
+              }
+              .info-label {
+                font-size: 10px !important;
+              }
+              .pet-card {
+                padding: 4px !important;
+                margin-bottom: 4px !important;
+              }
+              .pet-name {
+                font-size: 12px !important;
+              }
+              .pet-detail {
+                font-size: 9px !important;
+              }
+              .header {
+                margin-bottom: 8px !important;
+                padding-bottom: 6px !important;
+              }
+              .company-name {
+                font-size: 20px !important;
+              }
+              .company-tagline {
+                font-size: 10px !important;
+              }
+              .invoice-details {
+                font-size: 11px !important;
+              }
+              .invoice-number {
+                font-size: 16px !important;
+              }
+              .contact-info {
+                font-size: 9px !important;
+              }
+              .qr-section {
+                margin: 8px 0 !important;
+              }
+              .qr-code {
+                width: 80px !important;
+                height: 80px !important;
+              }
+              .service-items-table th {
+                font-size: 10px !important;
+                padding: 4px !important;
+              }
+              .service-items-table td {
+                font-size: 9px !important;
+                padding: 3px !important;
+              }
+              .totals-section {
+                margin-top: 8px !important;
+                padding: 6px !important;
+              }
+              .total-row {
+                font-size: 10px !important;
+                padding: 2px 0 !important;
+              }
+              .final-total {
+                font-size: 14px !important;
+                padding: 8px !important;
+                margin-top: 6px !important;
+              }
+              .notes-section {
+                margin-top: 8px !important;
+                padding: 6px !important;
+                font-size: 10px !important;
+              }
+              .footer {
+                margin-top: 8px !important;
+                padding-top: 6px !important;
+                font-size: 9px !important;
+              }
+              .thank-you {
+                font-size: 12px !important;
+              }
             }
           </style>
         </head>
         <body>
-          ${invoiceContent.innerHTML}
+          ${printContent.innerHTML}
         </body>
       </html>
     `);
@@ -256,7 +464,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     setTimeout(() => {
       printWindow.print();
       printWindow.close();
-    }, 1000);
+    }, 500);
   };
 
   const downloadInvoice = async () => {
@@ -311,21 +519,21 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
       <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-gray-200">
         {/* Action Buttons */}
-        <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-purple-600 to-purple-700 rounded-t-2xl print:hidden">
-          <h3 className="text-2xl font-bold text-white flex items-center">
-            <FileText className="h-7 w-7 mr-3 text-white" />
+        <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r #85208550 to-purple-600 no-print rounded-t-2xl">
+          <h3 className="text-2xl font-bold text-purple-600 flex items-center">
+            <FileText className="h-7 w-7 mr-3" />
             {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
           </h3>
           <div className="flex gap-3">
-            <Button onClick={printInvoice} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
+            <Button onClick={printInvoice} variant="outline" size="sm" className="text-purple-600 border-purple-600 hover:bg-purple-100">
               <Printer className="h-4 w-4 mr-2" />
               {language === 'ar' ? 'طباعة' : 'Print'}
             </Button>
-            <Button onClick={downloadInvoice} disabled={isGenerating} size="sm" className="bg-white text-purple-600 hover:bg-gray-100">
+            <Button onClick={downloadInvoice} disabled={isGenerating} size="sm" className="bg-purple-600 hover:bg-purple-600">
               <Download className="h-4 w-4 mr-2" />
               {language === 'ar' ? 'تحميل' : 'Download'}
             </Button>
-            <Button onClick={onClose} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
+            <Button onClick={onClose} variant="outline" size="sm" className="text-gray-600 hover:bg-gray-100">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -448,15 +656,15 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
 
           {/* Pets Information */}
           <div className="section border-2 border-purple-600 shadow-lg">
-            <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
+            <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg">
               <PawPrint className="h-5 w-5 mr-2" />
               {language === 'ar' ? 'معلومات الحيوانات الأليفة' : 'Pet Information'}
             </h3>
             <div className="pets-grid">
               {invoiceData.pets.map((pet) => (
-                <div key={pet.id} className="pet-card border-2 border-purple-600 shadow-md rounded-lg p-4 bg-gradient-to-r from-purple-50 to-white">
-                  <div className="pet-name text-lg font-bold text-purple-600 mb-2">{pet.name}</div>
-                  <div className="pet-details text-sm text-gray-700 space-y-1">
+                <div key={pet.id} className="pet-card border-2 border-purple-600 shadow-md">
+                  <div className="pet-name">{pet.name}</div>
+                  <div className="pet-details">
                     <div><strong>{language === 'ar' ? 'النوع:' : 'Type:'}</strong> {pet.type}</div>
                     <div><strong>{language === 'ar' ? 'العمر:' : 'Age:'}</strong> {pet.ageYear || 0} {language === 'ar' ? 'سنوات' : 'years'} {pet.ageMonth || 0} {language === 'ar' ? 'شهور' : 'months'}</div>
                   </div>
@@ -470,7 +678,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
 
           {/* Service Items */}
           <div className="section border-2 border-purple-600 shadow-lg">
-            <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
+            <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg">
               <FileText className="h-5 w-5 mr-2" />
               {language === 'ar' ? 'تفاصيل الخدمات' : 'Service Details'}
             </h3>
@@ -478,80 +686,34 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               <table className="services-table w-full border-2 border-purple-600 rounded-lg overflow-hidden shadow-md">
                 <thead>
                   <tr className="bg-gradient-to-r from-purple-600 to-purple-600">
-                    <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
+                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-600">
                       {language === 'ar' ? 'الخدمة' : 'Service'}
                     </th>
-                    <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'الكمية' : 'Qty'}
+                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-600">
+                      {language === 'ar' ? 'الكمية' : 'Quantity'}
                     </th>
-                    <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
+                    <th className="text-white font-bold py-4 px-6 text-center border-r border-purple-600">
                       {language === 'ar' ? 'السعر' : 'Unit Price'}
                     </th>
-                    <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'الخصم' : 'Discount'}
-                    </th>
-                    <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'ضريبة' : 'VAT'}
-                    </th>
-                    <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'قبل الضريبة' : 'Before VAT'}
-                    </th>
-                    <th className="text-white font-bold py-3 px-3 text-center text-xs">
-                      {language === 'ar' ? 'بعد الضريبة' : 'After VAT'}
+                    <th className="text-white font-bold py-4 px-6 text-center">
+                      {language === 'ar' ? 'المجموع' : 'Total'}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {invoiceData.items.map((item, index) => (
                     <tr key={item.id} className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-purple-100 transition-colors`}>
-                      <td className="font-medium py-3 px-3 text-left border-r border-gray-200 text-sm">
+                      <td className="font-medium py-4 px-6 text-left border-r border-gray-200">
                         {item.description}
                       </td>
-                      <td className="py-3 px-3 text-center border-r border-gray-200 font-semibold text-sm">
+                      <td className="py-4 px-6 text-center border-r border-gray-200 font-semibold">
                         {item.quantity}
                       </td>
-                      <td className="py-3 px-3 text-center border-r border-gray-200 font-medium text-sm">
+                      <td className="py-4 px-6 text-center border-r border-gray-200 font-medium">
                         {formatCurrency(item.unitPrice)}
                       </td>
-                      <td className="py-3 px-3 text-center border-r border-gray-200 text-sm">
-                        <div className="text-green-600 font-semibold">
-                          {(() => {
-                            const itemSubtotal = item.unitPrice * item.quantity;
-                            let discountAmount = 0;
-                            
-                            if (item.discountType === '10%') {
-                              discountAmount = itemSubtotal * 0.10;
-                            } else if (item.discountType === '100%') {
-                              discountAmount = itemSubtotal;
-                            }
-                            
-                            if (discountAmount === 0) {
-                              return language === 'ar' ? 'لا يوجد' : 'None';
-                            }
-                            
-                            return (
-                              <div className="text-center">
-                                <div className="text-green-600 font-semibold">
-                                  {item.discountType === '10%' ? '10%' : item.discountType === '100%' ? '100%' : 'Custom'}
-                                </div>
-                                <div className="text-xs text-gray-500">
-                                  {formatCurrency(discountAmount)}
-                                </div>
-                              </div>
-                            );
-                          })()}
-                        </div>
-                      </td>
-                      <td className="py-3 px-3 text-center border-r border-gray-200 text-sm">
-                        <div className="text-blue-600 font-semibold">
-                          {formatCurrency(item.vatAmount)}
-                        </div>
-                      </td>
-                      <td className="py-3 px-3 text-center border-r border-gray-200 font-medium text-sm">
-                        {formatCurrency(item.totalBeforeVat)}
-                      </td>
-                      <td className="py-3 px-3 text-center font-bold text-purple-600 text-sm">
-                        {formatCurrency(item.totalAfterVat)}
+                      <td className="py-4 px-6 text-center font-bold text-purple-600">
+                        {formatCurrency(item.total)}
                       </td>
                     </tr>
                   ))}
@@ -563,94 +725,34 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           {/* Separator Line */}
           <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
 
-          {/* Enhanced Invoice Summary */}
-          <div className="total-section border-4 border-purple-600 shadow-xl bg-gradient-to-br from-purple-50 to-white rounded-lg">
-            <h3 className="section-title text-center text-xl bg-purple-600 -m-6 mb-6 p-4 rounded-t-lg text-white">
+          {/* Totals */}
+          <div className="total-section border-4 border-purple-600 shadow-xl">
+            <h3 className="section-title text-center text-xl bg-purple-600 -m-6 mb-4 p-4 rounded-t-lg">
               {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
             </h3>
-            <div className="space-y-4">
-              {/* Subtotal */}
-              <div className="total-row border-b border-purple-600 pb-3 bg-gray-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-gray-700">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
-                <span className="font-bold text-lg text-purple-600">{formatCurrency(invoiceData.subtotal)}</span>
+            <div className="space-y-3">
+              <div className="total-row border-b border-purple-600 pb-2">
+                <span className="font-medium text-lg">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
+                <span className="font-medium text-lg">{formatCurrency(invoiceData.subtotal)}</span>
               </div>
-              
-              {/* Discount Section */}
               {invoiceData.discount > 0 && (
-                <div className="total-row text-green-600 border-b border-purple-600 pb-3 bg-green-50 rounded-lg p-3">
-                  <span className="font-semibold text-lg">{language === 'ar' ? 'إجمالي الخصم:' : 'Total Discount:'}</span>
-                  <span className="font-bold text-lg">-{formatCurrency(invoiceData.discount)}</span>
+                <div className="total-row text-green-600 border-b border-purple-600 pb-2">
+                  <span className="font-medium text-lg">{language === 'ar' ? 'الخصم:' : 'Discount:'}</span>
+                  <span className="font-medium text-lg">-{formatCurrency(invoiceData.discount)}</span>
                 </div>
               )}
-              
-              {/* VAT Section */}
-              <div className="total-row border-b border-purple-600 pb-3 bg-blue-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-blue-700">{language === 'ar' ? 'ضريبة القيمة المضافة (15%):' : 'Value Added Tax (15%):'}</span>
-                <span className="font-bold text-lg text-blue-600">{formatCurrency(invoiceData.tax)}</span>
+              <div className="total-row border-b border-purple-600 pb-2">
+                <span className="font-medium text-lg">{language === 'ar' ? 'الضريبة (15%):' : 'Tax (15%):'}</span>
+                <span className="font-medium text-lg">{formatCurrency(invoiceData.tax)}</span>
               </div>
-              
-              {/* Amount After Discount */}
-              <div className="total-row border-b border-purple-600 pb-3 bg-purple-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-purple-700">{language === 'ar' ? 'المجموع بعد الخصم:' : 'Amount After Discount:'}</span>
-                <span className="font-bold text-lg text-purple-600">{formatCurrency(invoiceData.subtotal - invoiceData.discount)}</span>
-              </div>
-              
-              {/* Final Total */}
-              <div className="final-total bg-gradient-to-r from-purple-600 to-purple-600 border-3 border-purple-600 rounded-lg shadow-lg p-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-2xl font-black text-white">{language === 'ar' ? 'المبلغ الإجمالي:' : 'TOTAL AMOUNT:'}</span>
-                  <span className="text-3xl font-black text-white">{formatCurrency(invoiceData.total)}</span>
+              <div className="final-total bg-gradient-to-r from-purple-600 to-purple-600 border-2 border-purple-600 rounded-lg">
+                <div className="flex justify-between items-center text-xl">
+                  <span className="text-2xl font-bold">{language === 'ar' ? 'المجموع النهائي:' : 'Total Amount:'}</span>
+                  <span className="text-3xl font-black text-purple-600">{formatCurrency(invoiceData.total)}</span>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
-
-          {/* Payment Methods */}
-          {invoiceData.paymentMethods && invoiceData.paymentMethods.length > 0 && (
-            <div className="section border-2 border-green-600 shadow-lg">
-              <h3 className="section-title flex items-center bg-green-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
-                <FileText className="h-5 w-5 mr-2" />
-                {language === 'ar' ? 'تفاصيل الدفع' : 'Payment Details'}
-              </h3>
-              <div className="space-y-3">
-                {invoiceData.paymentMethods.map((payment) => (
-                  <div key={payment.id} className="payment-item bg-green-50 border-2 border-green-200 rounded-lg p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="font-bold text-green-800">{payment.method}</span>
-                        {payment.reference && (
-                          <span className="text-sm text-green-600 ml-2">
-                            ({language === 'ar' ? 'المرجع:' : 'Ref:'} {payment.reference})
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-green-700 text-lg">
-                          {formatCurrency(payment.amount)}
-                        </div>
-                        <div className="text-sm text-green-600">
-                          {new Date(payment.date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div className="payment-summary bg-green-100 border-2 border-green-400 rounded-lg p-4 mt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-green-800 text-lg">
-                      {language === 'ar' ? 'إجمالي المدفوع:' : 'Total Paid:'}
-                    </span>
-                    <span className="font-bold text-green-700 text-xl">
-                      {formatCurrency(invoiceData.paymentMethods.reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount), 0))}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Separator Line */}
           <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>

@@ -1951,29 +1951,14 @@ export default function DoctorInvoice() {
             appointmentDate: booking.appointmentDate,
             appointmentTime: booking.appointmentTime,
             serviceType: booking.serviceType,
-            items: invoiceItems.map(item => ({
-              ...item,
-              discount: item.discount || 0,
-              discountType: item.discountType || 'none',
-              vatRate: 15,
-              vatAmount: item.vatAmount || 0,
-              totalBeforeVat: item.totalBeforeVat || 0,
-              totalAfterVat: item.totalAfterVat || 0
-            })),
+            items: invoiceItems,
             subtotal: subtotal,
             discount: totalDiscountAmount,
             tax: taxAmount,
             total: finalTotal,
             notes: notes,
             doctorName: doctorInfo.name || 'Dr. VETS VAN',
-            vetsVanCode: doctorInfo.vetsvanCode || 'VETS001',
-            paymentMethods: invoicePayments.map(payment => ({
-              id: payment.id.toString(),
-              method: payment.paymentMethod,
-              amount: payment.amount,
-              date: payment.paymentDate,
-              reference: payment.reference
-            }))
+            vetsVanCode: doctorInfo.vetsvanCode || 'VETS001'
           }}
           onClose={() => setShowInvoiceGenerator(false)}
         />
