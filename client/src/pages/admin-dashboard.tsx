@@ -9,6 +9,8 @@ import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 // Services Management Component
 const ServicesManagementTable = ({ language }: { language: string }) => {
@@ -951,6 +953,86 @@ export default function AdminDashboard() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
+  
+  // State for Excel export
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Excel Export Function
+  const handleExportToExcel = async () => {
+    setIsExporting(true);
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch("/api/admin/export-sales-report", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to export data");
+      }
+
+      const { data, filename } = await response.json();
+
+      // Create workbook
+      const workbook = XLSX.utils.book_new();
+
+      // Create worksheet from data
+      const worksheet = XLSX.utils.json_to_sheet(data);
+
+      // Set column widths
+      const columnWidths = [
+        { wch: 15 }, // Invoice Number
+        { wch: 20 }, // Customer Name
+        { wch: 15 }, // Customer Phone
+        { wch: 25 }, // Customer Email
+        { wch: 15 }, // Doctor Name
+        { wch: 12 }, // VetsVan Code
+        { wch: 15 }, // Appointment Date
+        { wch: 12 }, // Appointment Time
+        { wch: 15 }, // Service Type
+        { wch: 15 }, // Total Sales
+        { wch: 15 }, // Total Paid
+        { wch: 12 }, // VAT Amount
+        { wch: 15 }, // Discount Amount
+        { wch: 15 }, // Generated Date
+        { wch: 20 }, // Notes
+        { wch: 15 }, // Pet Names
+        { wch: 12 }, // Pet Types
+        { wch: 8 },  // Payment #
+        { wch: 15 }, // Payment Amount
+        { wch: 15 }, // Payment Type
+        { wch: 20 }, // Payment Description
+        { wch: 12 }, // Payment Date
+        { wch: 12 }  // Payment Time
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(workbook, worksheet, language === 'ar' ? 'تقرير المبيعات' : 'Sales Report');
+
+      // Generate Excel file and download
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
+      saveAs(blob, filename);
+
+      toast({
+        title: language === 'ar' ? 'تم التصدير بنجاح' : 'Export Successful',
+        description: language === 'ar' ? 'تم تحميل ملف Excel بنجاح' : 'Excel file downloaded successfully',
+      });
+
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ في التصدير' : 'Export Error',
+        description: language === 'ar' ? 'فشل في تصدير البيانات' : 'Failed to export data',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Template download function
   const downloadTemplate = async (type: 'products' | 'services') => {
@@ -2116,13 +2198,34 @@ export default function AdminDashboard() {
                             </div>
                           ) : (
                             <>
-                              <div className="mb-4">
-                                <h4 className="text-lg font-medium text-gray-900 mb-2">
-                                  {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
-                                </h4>
-                                <p className="text-sm text-gray-600">
-                                  {language === 'ar' ? 'جميع الفواتير المولدة' : 'All Generated Invoices'}
-                                </p>
+                              <div className="mb-4 flex justify-between items-center">
+                                <div>
+                                  <h4 className="text-lg font-medium text-gray-900 mb-2">
+                                    {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
+                                  </h4>
+                                  <p className="text-sm text-gray-600">
+                                    {language === 'ar' ? 'جميع الفواتير المولدة' : 'All Generated Invoices'}
+                                  </p>
+                                </div>
+                                
+                                {/* Excel Export Button */}
+                                <button
+                                  onClick={handleExportToExcel}
+                                  disabled={isExporting}
+                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {isExporting ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                      {language === 'ar' ? 'جاري التصدير...' : 'Exporting...'}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Download className="w-4 h-4 mr-2" />
+                                      {language === 'ar' ? 'تصدير إلى Excel' : 'Export to Excel'}
+                                    </>
+                                  )}
+                                </button>
                               </div>
 
                               {generatedInvoices && generatedInvoices.length > 0 ? (
