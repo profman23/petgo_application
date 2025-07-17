@@ -2,7 +2,6 @@ import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Login from "@/pages/login";
 import OtpVerification from "@/pages/otp-verification";
@@ -156,21 +155,22 @@ function App() {
   };
 
   if (!isAppReady) {
+    setTimeout(() => setIsAppReady(true), 500);
     return (
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <LoadingScreen onLoadingComplete={handleLoadingComplete} />
-        </TooltipProvider>
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-purple-600">Loading...</p>
+          </div>
+        </div>
       </QueryClientProvider>
     );
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <Toaster />
+      <Router />
     </QueryClientProvider>
   );
 }

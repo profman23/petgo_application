@@ -1,0 +1,67 @@
+chunk-QCHXOAYK.js?v=7450eabe:136 Warning: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+
+chunk-QCHXOAYK.js?v=7450eabe:136 Warning: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+chunk-QCHXOAYK.js?v=7450eabe:1074 Uncaught TypeError: Cannot read properties of null (reading 'useRef')
+    at Object.useRef (chunk-QCHXOAYK.js?v=7450eabe:1074:29)
+    at TooltipProvider (@radix-ui_react-tool…js?v=7450eabe:62:34)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=1cbd31a8:11548:26)
+    at mountIndeterminateComponent (chunk-RPCDYKBN.js?v=1cbd31a8:14926:21)
+    at beginWork (chunk-RPCDYKBN.js?v=1cbd31a8:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=1cbd31a8:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=1cbd31a8:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=1cbd31a8:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=1cbd31a8:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=1cbd31a8:19198:20)
+chunk-QCHXOAYK.js?v=7450eabe:136 Warning: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+chunk-QCHXOAYK.js?v=7450eabe:136 Warning: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+chunk-QCHXOAYK.js?v=7450eabe:1074 Uncaught TypeError: Cannot read properties of null (reading 'useRef')
+    at Object.useRef (chunk-QCHXOAYK.js?v=7450eabe:1074:29)
+    at TooltipProvider (@radix-ui_react-tool…js?v=7450eabe:62:34)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=1cbd31a8:11548:26)
+    at mountIndeterminateComponent (chunk-RPCDYKBN.js?v=1cbd31a8:14926:21)
+    at beginWork (chunk-RPCDYKBN.js?v=1cbd31a8:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=1cbd31a8:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=1cbd31a8:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=1cbd31a8:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=1cbd31a8:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=1cbd31a8:19198:20)
+chunk-RPCDYKBN.js?v=1cbd31a8:14032 The above error occurred in the <TooltipProvider> component:
+
+    at TooltipProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=7450eabe:56:5)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=1cbd31a8:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=yFk-ZEsgJv-tbEeHIqX9:348:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-RPCDYKBN.js?v=1cbd31a8:19413 Uncaught TypeError: Cannot read properties of null (reading 'useRef')
+    at Object.useRef (chunk-QCHXOAYK.js?v=7450eabe:1074:29)
+    at TooltipProvider (@radix-ui_react-tool…js?v=7450eabe:62:34)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=1cbd31a8:11548:26)
+    at mountIndeterminateComponent (chunk-RPCDYKBN.js?v=1cbd31a8:14926:21)
+    at beginWork (chunk-RPCDYKBN.js?v=1cbd31a8:15914:22)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=1cbd31a8:19753:22)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=1cbd31a8:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=1cbd31a8:19137:13)
+    at renderRootSync (chunk-RPCDYKBN.js?v=1cbd31a8:19116:15)
+    at recoverFromConcurrentError (chunk-RPCDYKBN.js?v=1cbd31a8:18736:28)
+
+main.tsx:11 SW registered:  
+ServiceWorkerRegistration {installing: null, waiting: null, active: ServiceWorker, navigationPreload: NavigationPreloadManager, scope: 'https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/', …}
+﻿
+
