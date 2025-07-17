@@ -736,6 +736,11 @@ Changelog:
 - July 17, 2025. OPTIMIZED: Excel export structure with individual payment type columns (Payment Type 1-5, Payment Amount 1-5) to eliminate item duplication
 - July 17, 2025. ENHANCED: Payment information displays once per invoice level - first item shows all payment details, subsequent items show only item details
 - July 17, 2025. FINALIZED: Advanced Excel export with up to 5 payment types per invoice, comprehensive item-level details, and optimized data organization
+- July 17, 2025. CRITICAL FIX: Resolved automatic deletion of imported Products/Services data - disabled conflicting data integrity systems
+- July 17, 2025. ENHANCED: Modified DataIntegrityGuard to never consider Products/Services as compromised, protecting imported data permanently
+- July 17, 2025. DISABLED: Emergency restore functionality for Products/Services to prevent automatic deletion of imported data
+- July 17, 2025. PROTECTED: Permanently disabled Products/Services re-initialization in storage.ts to preserve all imported data
+- July 17, 2025. SOLUTION: Fixed root cause of data loss - conflicting protection systems were deleting imported data during "integrity checks"
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat

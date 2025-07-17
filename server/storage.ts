@@ -191,18 +191,16 @@ export class DatabaseStorage implements IStorage {
       let shouldInitializeUsers = existingUsers.length === 0;
       let shouldInitializeDrivers = existingDrivers.length === 0;
       let shouldInitializeAdmins = existingAdmins.length === 0;
-      // Only create default products/services if completely empty (protect imported data)
-      let shouldInitializeProducts = existingProducts.length === 0;
-      let shouldInitializeServices = existingServices.length === 0;
+      // PERMANENTLY DISABLE Products/Services initialization to protect imported data
+      let shouldInitializeProducts = false; // NEVER recreate products
+      let shouldInitializeServices = false; // NEVER recreate services
       
-      // Enhanced protection: If imported data exists (more than default 3), preserve it
-      if (existingProducts.length > 3) {
-        console.log(`🔒 IMPORTED PRODUCTS PROTECTED: ${existingProducts.length} products found, skipping default creation`);
-        shouldInitializeProducts = false;
+      // Always preserve existing Products/Services regardless of count
+      if (existingProducts.length > 0) {
+        console.log(`🔒 PRODUCTS PERMANENTLY PROTECTED: ${existingProducts.length} products preserved`);
       }
-      if (existingServices.length > 3) {
-        console.log(`🔒 IMPORTED SERVICES PROTECTED: ${existingServices.length} services found, skipping default creation`);
-        shouldInitializeServices = false;
+      if (existingServices.length > 0) {
+        console.log(`🔒 SERVICES PERMANENTLY PROTECTED: ${existingServices.length} services preserved`);
       }
       
       // Data integrity log

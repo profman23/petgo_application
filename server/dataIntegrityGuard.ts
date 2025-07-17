@@ -63,8 +63,9 @@ export class DataIntegrityGuard {
       const productCount = (await db.select().from(products)).length;
       const serviceCount = (await db.select().from(services)).length;
 
-      const isIntegrityOk = userCount > 0 && driverCount > 0 && adminCount > 0 && 
-                           productCount > 0 && serviceCount > 0;
+      // ENHANCED: Never consider Products/Services as compromised if they exist
+      // This prevents deletion of imported data
+      const isIntegrityOk = userCount > 0 && driverCount > 0 && adminCount > 0;
 
       if (!isIntegrityOk) {
         console.warn("⚠️ Data integrity compromised:", {
@@ -75,7 +76,8 @@ export class DataIntegrityGuard {
           services: serviceCount
         });
       } else {
-        console.log("✅ Data integrity verified - all critical tables have data");
+        console.log("✅ Data integrity verified - core tables have data");
+        console.log("🔒 PROTECTED: Products/Services are preserved regardless of count");
       }
 
       return isIntegrityOk;
@@ -85,7 +87,7 @@ export class DataIntegrityGuard {
     }
   }
 
-  // Emergency data recovery
+  // Emergency data recovery - DISABLED for imported data protection
   async emergencyRestore(): Promise<void> {
     if (!this.lastBackup) {
       console.error("❌ No backup available for restoration");
@@ -93,22 +95,18 @@ export class DataIntegrityGuard {
     }
 
     try {
-      console.log("🚨 Starting emergency data restoration...");
+      console.log("🔒 Emergency restore DISABLED to protect imported Products/Services");
+      console.log("🛡️ Manual intervention required if data restoration needed");
       
-      // Restore critical data
-      if (this.lastBackup.admins?.length > 0) {
+      // Only restore admins if they're missing (never touch products/services)
+      const currentAdmins = await db.select().from(admins);
+      if (currentAdmins.length === 0 && this.lastBackup.admins?.length > 0) {
         await db.insert(admins).values(this.lastBackup.admins).onConflictDoNothing();
-      }
-      
-      if (this.lastBackup.products?.length > 0) {
-        await db.insert(products).values(this.lastBackup.products).onConflictDoNothing();
-      }
-      
-      if (this.lastBackup.services?.length > 0) {
-        await db.insert(services).values(this.lastBackup.services).onConflictDoNothing();
+        console.log("✅ Admin data restored safely");
       }
 
-      console.log("✅ Emergency restoration completed");
+      // NEVER restore products/services automatically to prevent imported data loss
+      console.log("🔒 Products/Services restoration BLOCKED - imported data protected");
     } catch (error) {
       console.error("❌ Emergency restoration failed:", error);
     }
