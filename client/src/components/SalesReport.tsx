@@ -1,21 +1,45 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, BarChart3 } from "lucide-react";
+import { Loader2, BarChart3, Calendar, X } from "lucide-react";
 import { type GeneratedInvoice } from "@shared/schema";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 
 interface SalesReportProps {
   language: string;
 }
 
 export const SalesReport = ({ language }: SalesReportProps) => {
-  const { data: generatedInvoices, isLoading } = useQuery<GeneratedInvoice[]>({
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+
+  const { data: allInvoices, isLoading } = useQuery<GeneratedInvoice[]>({
     queryKey: ['/api/admin/generated-invoices'],
     staleTime: 30000,
   });
 
-  // Calculate total paid from all invoices
+  // Filter invoices by date range
+  const generatedInvoices = allInvoices?.filter(invoice => {
+    if (!dateFrom && !dateTo) return true;
+    
+    const invoiceDate = new Date(invoice.createdAt);
+    const fromMatch = !dateFrom || invoiceDate >= dateFrom;
+    const toMatch = !dateTo || invoiceDate <= dateTo;
+    
+    return fromMatch && toMatch;
+  });
+
+  // Calculate total paid from filtered invoices
   const totalPaid = generatedInvoices ? generatedInvoices.reduce((sum, invoice) => {
     return sum + Number(invoice.finalTotal || 0);
   }, 0) : 0;
+
+  const clearFilters = () => {
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
 
   if (isLoading) {
     return (
@@ -48,6 +72,91 @@ export const SalesReport = ({ language }: SalesReportProps) => {
         <p className="text-sm text-gray-600">
           {language === 'ar' ? 'جميع الفواتير المولدة' : 'All Generated Invoices'}
         </p>
+      </div>
+
+      {/* Date Filter Section */}
+      <div className="mb-4 bg-gray-50 rounded-lg p-4 border">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-medium text-gray-700">
+              {language === 'ar' ? 'فلترة حسب التاريخ:' : 'Filter by Date:'}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[140px] justify-start text-left font-normal"
+                >
+                  {dateFrom ? format(dateFrom, "dd/MM/yyyy") : (
+                    <span className="text-gray-500">
+                      {language === 'ar' ? 'من تاريخ' : 'From'}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={setDateFrom}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            <span className="text-gray-400">-</span>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-[140px] justify-start text-left font-normal"
+                >
+                  {dateTo ? format(dateTo, "dd/MM/yyyy") : (
+                    <span className="text-gray-500">
+                      {language === 'ar' ? 'إلى تاريخ' : 'To'}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={setDateTo}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+
+            {(dateFrom || dateTo) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="h-8 px-2 lg:px-3"
+              >
+                <X className="h-4 w-4" />
+                <span className="ml-1 text-xs">
+                  {language === 'ar' ? 'مسح' : 'Clear'}
+                </span>
+              </Button>
+            )}
+          </div>
+
+          {(dateFrom || dateTo) && (
+            <div className="text-xs text-gray-500">
+              {language === 'ar' 
+                ? `عرض ${generatedInvoices?.length || 0} فاتورة` 
+                : `Showing ${generatedInvoices?.length || 0} invoices`
+              }
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="bg-white border rounded-lg overflow-hidden">
