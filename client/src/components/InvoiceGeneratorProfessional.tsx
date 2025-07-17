@@ -250,40 +250,106 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             .border-collapse { border-collapse: collapse; }
             .overflow-hidden { overflow: hidden; }
             
-            /* Specific table styling */
-            table { 
+            /* Services Table Styling */
+            .services-table { 
               width: 100%; 
               border-collapse: collapse; 
-              margin: 15px 0; 
-              border-radius: 8px; 
+              border: 2px solid rgb(147 51 234); 
+              border-radius: 0.5rem; 
               overflow: hidden; 
-              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             }
             
-            table th { 
-              background: linear-gradient(135deg, #8B2F8B 0%, #a855f7 100%); 
+            .services-table thead tr { 
+              background: linear-gradient(to right, rgb(147 51 234), rgb(147 51 234)); 
+            }
+            
+            .services-table th { 
               color: white !important; 
-              padding: 12px 8px; 
-              text-align: center; 
               font-weight: bold; 
-              font-size: 14px;
-              border: none;
+              padding: 0.75rem; 
+              text-align: center; 
+              border-right: 1px solid rgb(147 51 234); 
+              font-size: 0.75rem;
             }
             
-            table td { 
-              padding: 10px 8px; 
-              border: 1px solid #e9ecef; 
+            .services-table th:last-child {
+              border-right: none;
+            }
+            
+            .services-table td { 
+              padding: 0.75rem; 
+              border-right: 1px solid rgb(229 231 235); 
               text-align: center;
-              font-size: 13px;
+              font-size: 0.875rem;
               vertical-align: middle;
             }
             
-            table tbody tr:nth-child(even) { 
-              background-color: #f8f9fa;
+            .services-table td:last-child {
+              border-right: none;
             }
             
-            table tbody tr:hover { 
-              background-color: #e9ecef;
+            .services-table tbody tr:nth-child(even) { 
+              background-color: rgb(249 250 251);
+            }
+            
+            .services-table tbody tr:nth-child(odd) { 
+              background-color: white;
+            }
+            
+            .services-table tbody tr:hover { 
+              background-color: rgb(243 232 255) !important;
+            }
+            
+            /* Section Styling */
+            .section { 
+              border: 2px solid rgb(147 51 234); 
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+              border-radius: 0.5rem;
+              padding: 1.5rem;
+              margin-bottom: 1.5rem;
+            }
+            
+            .section-title { 
+              background-color: rgb(147 51 234); 
+              color: white !important; 
+              display: flex; 
+              align-items: center; 
+              margin: -1.5rem -1.5rem 1rem -1.5rem; 
+              padding: 1rem; 
+              border-radius: 0.5rem 0.5rem 0 0;
+              font-weight: bold;
+            }
+            
+            /* Pet Cards */
+            .pets-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+              gap: 1rem;
+            }
+            
+            .pet-card {
+              border: 2px solid rgb(147 51 234);
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              border-radius: 0.5rem;
+              padding: 1rem;
+              background: linear-gradient(to right, rgb(250 245 255), white);
+            }
+            
+            .pet-name {
+              font-size: 1.125rem;
+              font-weight: bold;
+              color: rgb(147 51 234);
+              margin-bottom: 0.5rem;
+            }
+            
+            .pet-details {
+              font-size: 0.875rem;
+              color: rgb(55 65 81);
+            }
+            
+            .pet-details > div {
+              margin-bottom: 0.25rem;
             }
             
             /* Gradients */
@@ -297,29 +363,107 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             
             /* Invoice Summary Section */
             .invoice-summary {
-              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-              border: 2px solid #8B2F8B;
-              border-radius: 12px;
-              padding: 20px;
-              margin-top: 20px;
+              border: 2px solid rgb(147 51 234);
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+              border-radius: 0.5rem;
+              padding: 1.5rem;
+              margin-top: 1rem;
             }
             
             .summary-row {
               display: flex;
               justify-content: space-between;
-              padding: 8px 0;
-              border-bottom: 1px solid #d1d5db;
-              font-size: 15px;
+              padding: 0.5rem 0;
+              border-bottom: 1px solid rgb(209 213 219);
+              font-size: 0.875rem;
             }
             
             .summary-row:last-child {
               border-bottom: none;
               font-weight: bold;
-              font-size: 18px;
-              color: #8B2F8B;
-              border-top: 2px solid #8B2F8B;
-              padding-top: 15px;
-              margin-top: 10px;
+              font-size: 1.125rem;
+              color: rgb(147 51 234);
+              border-top: 2px solid rgb(147 51 234);
+              padding-top: 0.75rem;
+              margin-top: 0.5rem;
+            }
+            
+            /* Total Rows */
+            .total-row {
+              border-bottom: 1px solid rgb(147 51 234) !important;
+              padding-bottom: 0.75rem !important;
+              background-color: rgb(250 245 255);
+              border-radius: 0.5rem;
+              padding: 0.75rem;
+              margin: 0.5rem 0;
+            }
+            
+            .final-total {
+              background: linear-gradient(to right, rgb(147 51 234), rgb(147 51 234)) !important;
+              border: 3px solid rgb(147 51 234) !important;
+              border-radius: 0.5rem !important;
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+              padding: 1rem !important;
+              color: white !important;
+              margin: 1rem 0 !important;
+            }
+            
+            .final-total span {
+              color: white !important;
+              font-weight: 900 !important;
+            }
+            
+            /* Customer Info */
+            .customer-info {
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 1.5rem;
+            }
+            
+            .info-item {
+              display: flex;
+              justify-content: space-between;
+              padding: 0.5rem 0;
+              border-bottom: 1px solid rgb(229 231 235);
+            }
+            
+            .info-label {
+              font-weight: 600;
+              color: rgb(147 51 234);
+            }
+            
+            /* Logo Section */
+            .logo-section {
+              text-align: center;
+              margin-bottom: 1.5rem;
+            }
+            
+            /* Company Header */
+            .company-header {
+              text-align: center;
+              margin-bottom: 1.5rem;
+            }
+            
+            .company-title {
+              font-size: 1.875rem;
+              line-height: 2.25rem;
+              font-weight: 900;
+              color: rgb(147 51 234);
+              margin-bottom: 0.5rem;
+            }
+            
+            /* QR Section */
+            .qr-section {
+              text-align: center;
+            }
+            
+            .qr-code {
+              width: 8rem;
+              height: 8rem;
+              margin: 0 auto;
+              border: 2px solid black;
+              border-radius: 0.5rem;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
             
             /* RTL support */
