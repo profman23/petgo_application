@@ -4,7 +4,11 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X } from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
@@ -956,6 +960,16 @@ export default function AdminDashboard() {
   
   // State for Excel export
   const [isExporting, setIsExporting] = useState(false);
+  
+  // State for Date Filter
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+
+  // Clear Date Filters
+  const clearFilters = () => {
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
 
   // Excel Export Function
   const handleExportToExcel = async () => {
@@ -1337,7 +1351,7 @@ export default function AdminDashboard() {
   });
 
   // Fetch generated invoices for sales report
-  const { data: generatedInvoices, isLoading: isLoadingInvoices } = useQuery({
+  const { data: allInvoices, isLoading: isLoadingInvoices } = useQuery({
     queryKey: ["/api/admin/generated-invoices"],
     queryFn: async () => {
       const response = await fetch("/api/admin/generated-invoices", {
@@ -1349,6 +1363,17 @@ export default function AdminDashboard() {
       return await response.json() as GeneratedInvoice[];
     },
     enabled: !!adminToken && activeTab === 'reports' && reportsSubTab === 'sales',
+  });
+
+  // Filter invoices by date range
+  const generatedInvoices = allInvoices?.filter(invoice => {
+    if (!dateFrom && !dateTo) return true;
+    
+    const invoiceDate = new Date(invoice.createdAt);
+    const fromMatch = !dateFrom || invoiceDate >= dateFrom;
+    const toMatch = !dateTo || invoiceDate <= dateTo;
+    
+    return fromMatch && toMatch;
   });
 
   // Fetch all VetsVan requests with real-time notifications
@@ -2252,6 +2277,91 @@ export default function AdminDashboard() {
                                     </>
                                   )}
                                 </button>
+                              </div>
+
+                              {/* Date Filter Section */}
+                              <div className="mb-4 bg-gray-50 rounded-lg p-4 border">
+                                <div className="flex flex-wrap items-center gap-4">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4 text-gray-500" />
+                                    <span className="text-sm font-medium text-gray-700">
+                                      {language === 'ar' ? 'فلترة حسب التاريخ:' : 'Filter by Date:'}
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2">
+                                    <Popover>
+                                      <PopoverTrigger asChild>
+                                        <Button
+                                          variant="outline"
+                                          className="w-[140px] justify-start text-left font-normal"
+                                        >
+                                          {dateFrom ? format(dateFrom, "dd/MM/yyyy") : (
+                                            <span className="text-gray-500">
+                                              {language === 'ar' ? 'من تاريخ' : 'From'}
+                                            </span>
+                                          )}
+                                        </Button>
+                                      </PopoverTrigger>
+                                      <PopoverContent className="w-auto p-0" align="start">
+                                        <CalendarComponent
+                                          mode="single"
+                                          selected={dateFrom}
+                                          onSelect={setDateFrom}
+                                          initialFocus
+                                        />
+                                      </PopoverContent>
+                                    </Popover>
+
+                                    <span className="text-gray-400">-</span>
+
+                                    <Popover>
+                                      <PopoverTrigger asChild>
+                                        <Button
+                                          variant="outline"
+                                          className="w-[140px] justify-start text-left font-normal"
+                                        >
+                                          {dateTo ? format(dateTo, "dd/MM/yyyy") : (
+                                            <span className="text-gray-500">
+                                              {language === 'ar' ? 'إلى تاريخ' : 'To'}
+                                            </span>
+                                          )}
+                                        </Button>
+                                      </PopoverTrigger>
+                                      <PopoverContent className="w-auto p-0" align="start">
+                                        <CalendarComponent
+                                          mode="single"
+                                          selected={dateTo}
+                                          onSelect={setDateTo}
+                                          initialFocus
+                                        />
+                                      </PopoverContent>
+                                    </Popover>
+
+                                    {(dateFrom || dateTo) && (
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={clearFilters}
+                                        className="h-8 px-2 lg:px-3"
+                                      >
+                                        <X className="h-4 w-4" />
+                                        <span className="ml-1 text-xs">
+                                          {language === 'ar' ? 'مسح' : 'Clear'}
+                                        </span>
+                                      </Button>
+                                    )}
+                                  </div>
+
+                                  {(dateFrom || dateTo) && (
+                                    <div className="text-xs text-gray-500">
+                                      {language === 'ar' 
+                                        ? `عرض ${generatedInvoices?.length || 0} فاتورة` 
+                                        : `Showing ${generatedInvoices?.length || 0} invoices`
+                                      }
+                                    </div>
+                                  )}
+                                </div>
                               </div>
 
                               {generatedInvoices && generatedInvoices.length > 0 ? (
