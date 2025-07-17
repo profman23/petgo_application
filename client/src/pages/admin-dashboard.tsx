@@ -980,7 +980,7 @@ export default function AdminDashboard() {
       // Create worksheet from data
       const worksheet = XLSX.utils.json_to_sheet(data);
 
-      // Set column widths (updated for new invoice items columns)
+      // Set column widths (updated for consolidated payment columns)
       const columnWidths = [
         { wch: 15 }, // Invoice Number
         { wch: 20 }, // Customer Name
@@ -1005,11 +1005,10 @@ export default function AdminDashboard() {
         { wch: 15 }, // Unit Price (SAR)
         { wch: 15 }, // Item Total (SAR)
         { wch: 15 }, // Item Discount
-        { wch: 15 }, // Payment Amount
-        { wch: 15 }, // Payment Type
-        { wch: 20 }, // Payment Description
-        { wch: 12 }, // Payment Date
-        { wch: 12 }  // Payment Time
+        { wch: 25 }, // Payment Types (consolidated)
+        { wch: 30 }, // Payment Descriptions (consolidated)
+        { wch: 20 }, // Payment Dates (consolidated)
+        { wch: 20 }  // Payment Times (consolidated)
       ];
       worksheet['!cols'] = columnWidths;
 
