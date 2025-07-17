@@ -155,322 +155,44 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     // Get the exact same content but without the outer container styling
     const invoiceContent = printContent.cloneNode(true) as HTMLElement;
     
+    // Remove the control buttons from the cloned content
+    const controlButtons = invoiceContent.querySelector('.print\\:hidden');
+    if (controlButtons) {
+      controlButtons.remove();
+    }
+    
     printWindow.document.write(`
       <!DOCTYPE html>
       <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
         <head>
           <meta charset="utf-8">
           <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
+          <link href="https://cdn.tailwindcss.com/3.3.7/tailwind.min.css" rel="stylesheet">
           <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
             body { 
-              font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              line-height: 1.5;
-              color: #374151;
-              background: white;
+              font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              margin: 0;
               padding: 20px;
+              background: white;
             }
             
-            /* Layout Classes */
-            .p-8 { padding: 2rem; }
-            .p-6 { padding: 1.5rem; }
-            .px-4 { padding-left: 1rem; padding-right: 1rem; }
-            .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-            .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-            .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-            .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-            .pt-4 { padding-top: 1rem; }
+            /* Print specific overrides */
+            .fixed { position: relative !important; }
+            .inset-0 { position: relative !important; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important; }
+            .bg-black { background: transparent !important; }
+            .bg-opacity-60 { background: transparent !important; }
+            .z-50 { z-index: auto !important; }
+            .max-h-\\[95vh\\] { max-height: none !important; }
+            .overflow-y-auto { overflow: visible !important; }
+            .shadow-2xl { box-shadow: none !important; }
             
-            .mb-3 { margin-bottom: 0.75rem; }
-            .mb-4 { margin-bottom: 1rem; }
-            .mb-6 { margin-bottom: 1.5rem; }
-            .mt-4 { margin-top: 1rem; }
-            .mx-auto { margin-left: auto; margin-right: auto; }
+            /* Ensure proper spacing */
+            .p-4 { padding: 1rem !important; }
+            .max-w-6xl { max-width: none !important; }
+            .w-full { width: 100% !important; }
             
-            .w-full { width: 100%; }
-            .h-4 { height: 1rem; }
-            .w-4 { width: 1rem; }
-            .h-20 { height: 5rem; }
-            
-            /* Typography */
-            .text-xs { font-size: 0.75rem; line-height: 1rem; }
-            .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-            .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-            .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-            .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-            
-            .font-medium { font-weight: 500; }
-            .font-semibold { font-weight: 600; }
-            .font-bold { font-weight: 700; }
-            .font-black { font-weight: 900; }
-            
-            /* Colors */
-            .text-white { color: rgb(255 255 255); }
-            .text-purple-600 { color: rgb(147 51 234); }
-            .text-gray-600 { color: rgb(75 85 99); }
-            .text-gray-500 { color: rgb(107 114 128); }
-            .text-green-600 { color: rgb(22 163 74); }
-            
-            .bg-purple-600 { background-color: rgb(147 51 234); }
-            
-            /* Layout */
-            .flex { display: flex; }
-            .grid { display: grid; }
-            .items-center { align-items: center; }
-            .justify-center { justify-content: center; }
-            .justify-between { justify-content: space-between; }
-            .text-center { text-align: center; }
-            .text-right { text-align: right; }
-            
-            .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .gap-6 { gap: 1.5rem; }
-            
-            /* Spacing */
-            .space-y-1 > * + * { margin-top: 0.25rem; }
-            .space-y-2 > * + * { margin-top: 0.5rem; }
-            .mr-2 { margin-right: 0.5rem; }
-            .ml-2 { margin-left: 0.5rem; }
-            
-            /* Borders */
-            .border { border-width: 1px; }
-            .border-2 { border-width: 2px; }
-            .border-t-2 { border-top-width: 2px; }
-            .border-gray-200 { border-color: rgb(229 231 235); }
-            .border-purple-200 { border-color: rgb(196 181 253); }
-            .border-purple-600 { border-color: rgb(147 51 234); }
-            
-            /* Border Radius */
-            .rounded-lg { border-radius: 0.5rem; }
-            .rounded-xl { border-radius: 0.75rem; }
-            
-            /* Object Fit */
-            .object-contain { object-fit: contain; }
-            
-            /* Table Styles */
-            .border-collapse { border-collapse: collapse; }
-            .overflow-hidden { overflow: hidden; }
-            
-            /* Services Table Styling */
-            .services-table { 
-              width: 100%; 
-              border-collapse: collapse; 
-              border: 2px solid rgb(147 51 234); 
-              border-radius: 0.5rem; 
-              overflow: hidden; 
-              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            }
-            
-            .services-table thead tr { 
-              background: linear-gradient(to right, rgb(147 51 234), rgb(147 51 234)); 
-            }
-            
-            .services-table th { 
-              color: white !important; 
-              font-weight: bold; 
-              padding: 0.75rem; 
-              text-align: center; 
-              border-right: 1px solid rgb(147 51 234); 
-              font-size: 0.75rem;
-            }
-            
-            .services-table th:last-child {
-              border-right: none;
-            }
-            
-            .services-table td { 
-              padding: 0.75rem; 
-              border-right: 1px solid rgb(229 231 235); 
-              text-align: center;
-              font-size: 0.875rem;
-              vertical-align: middle;
-            }
-            
-            .services-table td:last-child {
-              border-right: none;
-            }
-            
-            .services-table tbody tr:nth-child(even) { 
-              background-color: rgb(249 250 251);
-            }
-            
-            .services-table tbody tr:nth-child(odd) { 
-              background-color: white;
-            }
-            
-            .services-table tbody tr:hover { 
-              background-color: rgb(243 232 255) !important;
-            }
-            
-            /* Section Styling */
-            .section { 
-              border: 2px solid rgb(147 51 234); 
-              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
-              border-radius: 0.5rem;
-              padding: 1.5rem;
-              margin-bottom: 1.5rem;
-            }
-            
-            .section-title { 
-              background-color: rgb(147 51 234); 
-              color: white !important; 
-              display: flex; 
-              align-items: center; 
-              margin: -1.5rem -1.5rem 1rem -1.5rem; 
-              padding: 1rem; 
-              border-radius: 0.5rem 0.5rem 0 0;
-              font-weight: bold;
-            }
-            
-            /* Pet Cards */
-            .pets-grid {
-              display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-              gap: 1rem;
-            }
-            
-            .pet-card {
-              border: 2px solid rgb(147 51 234);
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-              border-radius: 0.5rem;
-              padding: 1rem;
-              background: linear-gradient(to right, rgb(250 245 255), white);
-            }
-            
-            .pet-name {
-              font-size: 1.125rem;
-              font-weight: bold;
-              color: rgb(147 51 234);
-              margin-bottom: 0.5rem;
-            }
-            
-            .pet-details {
-              font-size: 0.875rem;
-              color: rgb(55 65 81);
-            }
-            
-            .pet-details > div {
-              margin-bottom: 0.25rem;
-            }
-            
-            /* Gradients */
-            .bg-gradient-to-br { 
-              background: linear-gradient(to bottom right, #faf5ff 0%, #eff6ff 100%); 
-            }
-            
-            .bg-gradient-to-r { 
-              background: linear-gradient(to right, #8B2F8B 0%, #7c3aed 100%); 
-            }
-            
-            /* Invoice Summary Section */
-            .invoice-summary {
-              border: 2px solid rgb(147 51 234);
-              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-              border-radius: 0.5rem;
-              padding: 1.5rem;
-              margin-top: 1rem;
-            }
-            
-            .summary-row {
-              display: flex;
-              justify-content: space-between;
-              padding: 0.5rem 0;
-              border-bottom: 1px solid rgb(209 213 219);
-              font-size: 0.875rem;
-            }
-            
-            .summary-row:last-child {
-              border-bottom: none;
-              font-weight: bold;
-              font-size: 1.125rem;
-              color: rgb(147 51 234);
-              border-top: 2px solid rgb(147 51 234);
-              padding-top: 0.75rem;
-              margin-top: 0.5rem;
-            }
-            
-            /* Total Rows */
-            .total-row {
-              border-bottom: 1px solid rgb(147 51 234) !important;
-              padding-bottom: 0.75rem !important;
-              background-color: rgb(250 245 255);
-              border-radius: 0.5rem;
-              padding: 0.75rem;
-              margin: 0.5rem 0;
-            }
-            
-            .final-total {
-              background: linear-gradient(to right, rgb(147 51 234), rgb(147 51 234)) !important;
-              border: 3px solid rgb(147 51 234) !important;
-              border-radius: 0.5rem !important;
-              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-              padding: 1rem !important;
-              color: white !important;
-              margin: 1rem 0 !important;
-            }
-            
-            .final-total span {
-              color: white !important;
-              font-weight: 900 !important;
-            }
-            
-            /* Customer Info */
-            .customer-info {
-              display: grid;
-              grid-template-columns: repeat(2, minmax(0, 1fr));
-              gap: 1.5rem;
-            }
-            
-            .info-item {
-              display: flex;
-              justify-content: space-between;
-              padding: 0.5rem 0;
-              border-bottom: 1px solid rgb(229 231 235);
-            }
-            
-            .info-label {
-              font-weight: 600;
-              color: rgb(147 51 234);
-            }
-            
-            /* Logo Section */
-            .logo-section {
-              text-align: center;
-              margin-bottom: 1.5rem;
-            }
-            
-            /* Company Header */
-            .company-header {
-              text-align: center;
-              margin-bottom: 1.5rem;
-            }
-            
-            .company-title {
-              font-size: 1.875rem;
-              line-height: 2.25rem;
-              font-weight: 900;
-              color: rgb(147 51 234);
-              margin-bottom: 0.5rem;
-            }
-            
-            /* QR Section */
-            .qr-section {
-              text-align: center;
-            }
-            
-            .qr-code {
-              width: 8rem;
-              height: 8rem;
-              margin: 0 auto;
-              border: 2px solid black;
-              border-radius: 0.5rem;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            
-            /* RTL support */
-            [dir="rtl"] .mr-2 { margin-right: 0; margin-left: 0.5rem; }
-            [dir="rtl"] .ml-2 { margin-left: 0; margin-right: 0.5rem; }
-            [dir="rtl"] .text-right { text-align: left; }
-            [dir="rtl"] table th, [dir="rtl"] table td { text-align: center; }
+            /* Hide buttons */
+            .print\\:hidden { display: none !important; }
           </style>
         </head>
         <body>
