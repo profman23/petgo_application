@@ -980,7 +980,7 @@ export default function AdminDashboard() {
       // Create worksheet from data
       const worksheet = XLSX.utils.json_to_sheet(data);
 
-      // Set column widths
+      // Set column widths (updated for new invoice items columns)
       const columnWidths = [
         { wch: 15 }, // Invoice Number
         { wch: 20 }, // Customer Name
@@ -999,7 +999,12 @@ export default function AdminDashboard() {
         { wch: 20 }, // Notes
         { wch: 15 }, // Pet Names
         { wch: 12 }, // Pet Types
-        { wch: 8 },  // Payment #
+        { wch: 8 },  // Item #
+        { wch: 25 }, // Description
+        { wch: 10 }, // Quantity
+        { wch: 15 }, // Unit Price (SAR)
+        { wch: 15 }, // Item Total (SAR)
+        { wch: 15 }, // Item Discount
         { wch: 15 }, // Payment Amount
         { wch: 15 }, // Payment Type
         { wch: 20 }, // Payment Description

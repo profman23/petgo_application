@@ -3101,6 +3101,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const excelData = [];
       
       for (const invoice of invoices) {
+        // Get invoice items for this booking
+        const invoiceItems = await storage.getInvoiceItems(invoice.bookingId);
+        
         // Basic invoice data
         const baseRow = {
           'Invoice Number': invoice.invoiceNumber,
@@ -3131,29 +3134,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
           baseRow['Pet Types'] = '';
         }
 
-        // Add payment methods details
-        if (invoice.payments && invoice.payments.length > 0) {
-          invoice.payments.forEach((payment, index) => {
-            const paymentRow = { ...baseRow };
-            paymentRow['Payment #'] = index + 1;
-            paymentRow['Payment Amount (SAR)'] = parseFloat(payment.amount).toFixed(2);
-            paymentRow['Payment Type'] = payment.paymentType;
-            paymentRow['Payment Description'] = payment.description || '';
-            paymentRow['Payment Date'] = new Date(payment.createdAt).toLocaleDateString();
-            paymentRow['Payment Time'] = new Date(payment.createdAt).toLocaleTimeString();
+        // Add invoice items details
+        if (invoiceItems && invoiceItems.length > 0) {
+          invoiceItems.forEach((item, itemIndex) => {
+            const itemRow = { ...baseRow };
+            itemRow['Item #'] = itemIndex + 1;
+            itemRow['Description'] = item.description || '';
+            itemRow['Quantity'] = item.quantity || '';
+            itemRow['Unit Price (SAR)'] = parseFloat(item.unitPrice || '0').toFixed(2);
+            itemRow['Item Total (SAR)'] = parseFloat(item.total || '0').toFixed(2);
+            itemRow['Item Discount'] = item.discountType === 'percentage' ? '10%' : (item.discountType === 'none' ? 'No Discount' : item.discountType);
             
-            excelData.push(paymentRow);
+            // Add payment information to each item row
+            if (invoice.payments && invoice.payments.length > 0) {
+              // For multiple payments, we'll show the first payment with each item
+              const payment = invoice.payments[0];
+              itemRow['Payment Amount (SAR)'] = parseFloat(payment.amount).toFixed(2);
+              itemRow['Payment Type'] = payment.paymentType;
+              itemRow['Payment Description'] = payment.description || '';
+              itemRow['Payment Date'] = new Date(payment.createdAt).toLocaleDateString();
+              itemRow['Payment Time'] = new Date(payment.createdAt).toLocaleTimeString();
+              
+              // If there are multiple payments, add them as separate rows
+              if (invoice.payments.length > 1) {
+                invoice.payments.slice(1).forEach((payment, payIndex) => {
+                  const paymentRow = { ...itemRow };
+                  paymentRow['Payment Amount (SAR)'] = parseFloat(payment.amount).toFixed(2);
+                  paymentRow['Payment Type'] = payment.paymentType;
+                  paymentRow['Payment Description'] = payment.description || '';
+                  paymentRow['Payment Date'] = new Date(payment.createdAt).toLocaleDateString();
+                  paymentRow['Payment Time'] = new Date(payment.createdAt).toLocaleTimeString();
+                  paymentRow['Description'] = `${item.description} (Payment ${payIndex + 2})`;
+                  excelData.push(paymentRow);
+                });
+              }
+            } else {
+              // No payments
+              itemRow['Payment Amount (SAR)'] = '';
+              itemRow['Payment Type'] = '';
+              itemRow['Payment Description'] = '';
+              itemRow['Payment Date'] = '';
+              itemRow['Payment Time'] = '';
+            }
+            
+            excelData.push(itemRow);
           });
         } else {
-          // Add row even if no payments
-          baseRow['Payment #'] = '';
-          baseRow['Payment Amount (SAR)'] = '';
-          baseRow['Payment Type'] = '';
-          baseRow['Payment Description'] = '';
-          baseRow['Payment Date'] = '';
-          baseRow['Payment Time'] = '';
-          
-          excelData.push(baseRow);
+          // No invoice items, add payment details only
+          if (invoice.payments && invoice.payments.length > 0) {
+            invoice.payments.forEach((payment, index) => {
+              const paymentRow = { ...baseRow };
+              paymentRow['Item #'] = '';
+              paymentRow['Description'] = '';
+              paymentRow['Quantity'] = '';
+              paymentRow['Unit Price (SAR)'] = '';
+              paymentRow['Item Total (SAR)'] = '';
+              paymentRow['Item Discount'] = '';
+              paymentRow['Payment Amount (SAR)'] = parseFloat(payment.amount).toFixed(2);
+              paymentRow['Payment Type'] = payment.paymentType;
+              paymentRow['Payment Description'] = payment.description || '';
+              paymentRow['Payment Date'] = new Date(payment.createdAt).toLocaleDateString();
+              paymentRow['Payment Time'] = new Date(payment.createdAt).toLocaleTimeString();
+              
+              excelData.push(paymentRow);
+            });
+          } else {
+            // No items and no payments
+            baseRow['Item #'] = '';
+            baseRow['Description'] = '';
+            baseRow['Quantity'] = '';
+            baseRow['Unit Price (SAR)'] = '';
+            baseRow['Item Total (SAR)'] = '';
+            baseRow['Item Discount'] = '';
+            baseRow['Payment Amount (SAR)'] = '';
+            baseRow['Payment Type'] = '';
+            baseRow['Payment Description'] = '';
+            baseRow['Payment Date'] = '';
+            baseRow['Payment Time'] = '';
+            
+            excelData.push(baseRow);
+          }
         }
       }
 
