@@ -741,6 +741,13 @@ Changelog:
 - July 17, 2025. DISABLED: Emergency restore functionality for Products/Services to prevent automatic deletion of imported data
 - July 17, 2025. PROTECTED: Permanently disabled Products/Services re-initialization in storage.ts to preserve all imported data
 - July 17, 2025. SOLUTION: Fixed root cause of data loss - conflicting protection systems were deleting imported data during "integrity checks"
+- July 17, 2025. COMPLETED: Invoice Layout Unification Project - unified popup and print view designs in doctor invoice system
+- July 17, 2025. ENHANCED: InvoiceGeneratorProfessional component with detailed payment information, discounts per line, and improved Invoice Summary
+- July 17, 2025. ADDED: Comprehensive service items table with 7 columns: Service, Quantity, Unit Price, Discount, VAT, Before VAT, After VAT
+- July 17, 2025. INTEGRATED: Payment Methods section showing all payment details with amounts, dates, and references
+- July 17, 2025. IMPROVED: Invoice Summary with enhanced sections for Subtotal, Total Discount, VAT (15%), Amount After Discount, and Final Total
+- July 17, 2025. UPDATED: Print view CSS optimization for better single-page layout and professional appearance
+- July 17, 2025. STANDARDIZED: Popup invoice preview now matches print view design exactly with consistent formatting and enhanced details
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat
