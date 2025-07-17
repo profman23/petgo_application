@@ -1,6 +1,6 @@
 import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
+import { eq, and, not, inArray, desc, lt, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -121,6 +121,7 @@ export interface IStorage {
   // Generated Invoices operations
   createGeneratedInvoice(invoice: InsertGeneratedInvoice): Promise<GeneratedInvoice>;
   getAllGeneratedInvoices(): Promise<GeneratedInvoice[]>;
+  getGeneratedInvoicesByDateRange(fromDate: string, toDate: string): Promise<GeneratedInvoice[]>;
   getGeneratedInvoice(id: number): Promise<GeneratedInvoice | undefined>;
   getGeneratedInvoiceByNumber(invoiceNumber: string): Promise<GeneratedInvoice | undefined>;
   getGeneratedInvoiceByBooking(bookingId: number): Promise<GeneratedInvoice | undefined>;
@@ -1185,6 +1186,43 @@ export class DatabaseStorage implements IStorage {
     const invoices = await db
       .select()
       .from(generatedInvoices)
+      .orderBy(desc(generatedInvoices.generatedAt));
+    
+    // Calculate total paid and get payment details for each invoice
+    const invoicesWithPaymentData = await Promise.all(
+      invoices.map(async (invoice) => {
+        const payments = await db
+          .select()
+          .from(invoicePayments)
+          .where(eq(invoicePayments.bookingId, invoice.bookingId))
+          .orderBy(desc(invoicePayments.createdAt));
+        
+        const totalPaid = payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+        
+        return {
+          ...invoice,
+          totalPaid: totalPaid.toFixed(2),
+          payments: payments
+        };
+      })
+    );
+    
+    return invoicesWithPaymentData;
+  }
+
+  async getGeneratedInvoicesByDateRange(fromDate: string, toDate: string): Promise<GeneratedInvoice[]> {
+    const startDate = new Date(fromDate + 'T00:00:00.000Z');
+    const endDate = new Date(toDate + 'T23:59:59.999Z');
+    
+    const invoices = await db
+      .select()
+      .from(generatedInvoices)
+      .where(
+        and(
+          gte(generatedInvoices.generatedAt, startDate),
+          lte(generatedInvoices.generatedAt, endDate)
+        )
+      )
       .orderBy(desc(generatedInvoices.generatedAt));
     
     // Calculate total paid and get payment details for each invoice

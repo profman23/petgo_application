@@ -521,11 +521,15 @@ const exportToExcel = async (language: string) => {
 export const SalesReportPages = ({ 
   language, 
   generatedInvoices, 
-  isLoadingInvoices 
+  isLoadingInvoices,
+  dateFilter,
+  onDateFilterChange
 }: { 
   language: string; 
   generatedInvoices: any[];
   isLoadingInvoices: boolean;
+  dateFilter: { fromDate: string; toDate: string };
+  onDateFilterChange: (filter: { fromDate: string; toDate: string }) => void;
 }) => {
   const [activePage, setActivePage] = useState('all');
   const [isExporting, setIsExporting] = useState(false);
@@ -578,6 +582,47 @@ export const SalesReportPages = ({
 
   return (
     <div dir={getDirection(language)}>
+      {/* Date Filter Section */}
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="flex flex-col md:flex-row gap-4 items-center">
+            <h4 className="text-lg font-medium text-gray-900">
+              {language === 'ar' ? 'فلترة حسب التاريخ' : 'Filter by Date'}
+            </h4>
+            <div className="flex gap-4 items-center">
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-600 mb-1">
+                  {language === 'ar' ? 'من تاريخ' : 'From Date'}
+                </label>
+                <input
+                  type="date"
+                  value={dateFilter.fromDate}
+                  onChange={(e) => onDateFilterChange({ ...dateFilter, fromDate: e.target.value })}
+                  className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="text-sm text-gray-600 mb-1">
+                  {language === 'ar' ? 'إلى تاريخ' : 'To Date'}
+                </label>
+                <input
+                  type="date"
+                  value={dateFilter.toDate}
+                  onChange={(e) => onDateFilterChange({ ...dateFilter, toDate: e.target.value })}
+                  className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="text-sm text-gray-500">
+            {language === 'ar' 
+              ? `عرض: ${generatedInvoices?.length || 0} فاتورة` 
+              : `Showing: ${generatedInvoices?.length || 0} invoices`
+            }
+          </div>
+        </div>
+      </div>
+
       {/* Header with Export Button */}
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-bold text-gray-900">
