@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useState, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playNotificationSound, requestAudioPermission } from '@/utils/audio';
-import { useState, useRef } from 'react';
+import { DoctorFooter } from '@/components/doctor-footer';
 import { DoctorFooter } from '@/components/doctor-footer';
 
 export default function DoctorDashboard() {
@@ -106,10 +106,10 @@ export default function DoctorDashboard() {
   });
 
   // Simple notification tracking without loops
-  const lastNotificationCount = React.useRef(0);
+  const lastNotificationCount = useRef(0);
   
   // دالة تشغيل الصوت المحسنة
-  const playNewRequestSound = React.useCallback(() => {
+  const playNewRequestSound = useCallback(() => {
     try {
       // الطريقة الأولى: استخدام Web Audio API
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
