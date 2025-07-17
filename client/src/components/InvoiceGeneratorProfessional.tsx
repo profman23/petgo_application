@@ -91,7 +91,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
       alt="SAR"
       width="20" 
       height="20" 
-      className="inline-block ml-1 object-contain bg-white rounded px-1 py-0.5"
+      className="inline-block ml-1 object-contain bg-white rounded px-1 py-0.5 print:w-3 print:h-3 print:mt-1"
     />
   );
 
