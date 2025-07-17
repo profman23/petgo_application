@@ -371,102 +371,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               max-width: 200px !important;
               object-fit: contain !important;
             }
-            @media print {
-              .logo-header img {
-                height: 50px !important;
-                width: auto !important;
-                max-width: 180px !important;
-                object-fit: contain !important;
-              }
-              .section {
-                margin-bottom: 6px !important;
-                padding: 6px !important;
-                font-size: 11px !important;
-              }
-              .section-title {
-                font-size: 13px !important;
-                padding: 4px !important;
-                margin-bottom: 4px !important;
-              }
-              .info-item {
-                padding: 1px 0 !important;
-                font-size: 10px !important;
-                line-height: 1.2 !important;
-              }
-              .info-label {
-                font-size: 10px !important;
-              }
-              .pet-card {
-                padding: 4px !important;
-                margin-bottom: 4px !important;
-              }
-              .pet-name {
-                font-size: 12px !important;
-              }
-              .pet-detail {
-                font-size: 9px !important;
-              }
-              .header {
-                margin-bottom: 8px !important;
-                padding-bottom: 6px !important;
-              }
-              .company-name {
-                font-size: 20px !important;
-              }
-              .company-tagline {
-                font-size: 10px !important;
-              }
-              .invoice-details {
-                font-size: 11px !important;
-              }
-              .invoice-number {
-                font-size: 16px !important;
-              }
-              .contact-info {
-                font-size: 9px !important;
-              }
-              .qr-section {
-                margin: 8px 0 !important;
-              }
-              .qr-code {
-                width: 80px !important;
-                height: 80px !important;
-              }
-              .services-table th {
-                font-size: 8px !important;
-                padding: 3px !important;
-              }
-              .services-table td {
-                font-size: 7px !important;
-                padding: 2px !important;
-              }
-              .totals-section {
-                margin-top: 8px !important;
-                padding: 6px !important;
-              }
-              .total-row {
-                font-size: 10px !important;
-                padding: 2px 0 !important;
-              }
-              .final-total {
-                font-size: 14px !important;
-                padding: 8px !important;
-                margin-top: 6px !important;
-              }
-              .notes-section {
-                margin-top: 8px !important;
-                padding: 6px !important;
-                font-size: 10px !important;
-              }
-              .footer {
-                margin-top: 8px !important;
-                padding-top: 6px !important;
-                font-size: 9px !important;
-              }
-              .thank-you {
-                font-size: 12px !important;
-              }
-            }
+
           </style>
         </head>
         <body>
@@ -536,7 +441,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
       <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto shadow-2xl border border-gray-200">
         {/* Action Buttons */}
-        <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-purple-600 to-purple-700 no-print rounded-t-2xl">
+        <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-purple-600 to-purple-700 rounded-t-2xl">
           <h3 className="text-2xl font-bold text-white flex items-center">
             <FileText className="h-7 w-7 mr-3 text-white" />
             {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
