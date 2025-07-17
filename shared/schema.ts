@@ -588,5 +588,6 @@ export type ImportHistory = typeof importHistory.$inferSelect;
 export type InsertImportHistory = z.infer<typeof insertImportHistorySchema>;
 export type GeneratedInvoice = typeof generatedInvoices.$inferSelect & {
   totalPaid?: string;
+  payments?: InvoicePayment[];
 };
 export type InsertGeneratedInvoice = z.infer<typeof insertGeneratedInvoiceSchema>;

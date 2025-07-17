@@ -633,6 +633,26 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
                 {invoice.totalPaid ? `${invoice.totalPaid} SAR` : '0.00 SAR'}
               </span>
               <span className="text-gray-400 text-xs block mt-1">{language === 'ar' ? 'طرق الدفع' : 'Pay Methods'}</span>
+              
+              {/* Payment Methods Details */}
+              {invoice.payments && invoice.payments.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {invoice.payments.map((payment) => (
+                    <div key={payment.id} className="text-xs bg-gray-50 p-2 rounded border">
+                      <div className="font-semibold text-green-600">
+                        {parseFloat(payment.amount).toFixed(2)} SAR
+                      </div>
+                      <div className="text-gray-600">
+                        {payment.paymentType} • {payment.description || (language === 'ar' ? 'لا يوجد وصف' : 'No description')}
+                      </div>
+                      <div className="text-gray-500">
+                        {new Date(payment.createdAt).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      </div>
+                      <div className="text-green-500 float-right">✓</div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div>
               <span className="text-gray-500 block">{language === 'ar' ? 'التاريخ' : 'Date'}</span>
