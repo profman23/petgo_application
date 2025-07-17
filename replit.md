@@ -752,6 +752,10 @@ Changelog:
 - July 17, 2025. ENHANCED: formatCurrency function now properly handles both string and number input types with parseFloat conversion
 - July 17, 2025. FIXED: Payment amount calculation error in invoiceData.paymentMethods.reduce() - added proper type checking for string/number amounts
 - July 17, 2025. VERIFIED: All invoice generation runtime errors resolved - InvoiceGeneratorProfessional component now handles mixed data types correctly
+- July 17, 2025. ENHANCED: Discount display in invoice Service Details table - now shows both percentage and calculated amount for each line item
+- July 17, 2025. IMPLEMENTED: Dynamic discount calculation in InvoiceGeneratorProfessional - properly calculates 10% and 100% discounts based on item subtotal
+- July 17, 2025. IMPROVED: Discount column now displays "10%" or "100%" with calculated SAR amount below for better clarity
+- July 17, 2025. FIXED: Discount values showing as zero - now properly calculates and displays discount amounts based on discountType field
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat

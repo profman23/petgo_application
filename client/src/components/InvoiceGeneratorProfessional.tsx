@@ -740,10 +740,31 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                       </td>
                       <td className="py-3 px-3 text-center border-r border-gray-200 text-sm">
                         <div className="text-green-600 font-semibold">
-                          {item.discountType === 'percentage' ? 
-                            `${item.discount}%` : 
-                            formatCurrency(item.discount)
-                          }
+                          {(() => {
+                            const itemSubtotal = item.unitPrice * item.quantity;
+                            let discountAmount = 0;
+                            
+                            if (item.discountType === '10%') {
+                              discountAmount = itemSubtotal * 0.10;
+                            } else if (item.discountType === '100%') {
+                              discountAmount = itemSubtotal;
+                            }
+                            
+                            if (discountAmount === 0) {
+                              return language === 'ar' ? 'لا يوجد' : 'None';
+                            }
+                            
+                            return (
+                              <div className="text-center">
+                                <div className="text-green-600 font-semibold">
+                                  {item.discountType === '10%' ? '10%' : item.discountType === '100%' ? '100%' : 'Custom'}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {formatCurrency(discountAmount)}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </td>
                       <td className="py-3 px-3 text-center border-r border-gray-200 text-sm">
