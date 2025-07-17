@@ -91,7 +91,11 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
       alt="SAR"
       width="20" 
       height="20" 
-      className="inline-block ml-1 object-contain bg-white rounded px-1 py-0.5 print:w-3 print:h-3 print:mt-1"
+      className="inline-block ml-1 object-contain bg-white rounded px-1 py-0.5 riyal-icon"
+      style={{ 
+        width: '20px', 
+        height: '20px'
+      }}
     />
   );
 
@@ -314,6 +318,12 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             }
             .services-table tbody tr:nth-child(even) { 
               background: #f8f9fa;
+            }
+            .riyal-icon { 
+              width: 14px !important; 
+              height: 14px !important; 
+              margin-bottom: 3px !important;
+              vertical-align: middle !important;
             }
             .total-section { 
               background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 

@@ -756,6 +756,9 @@ Changelog:
 - July 17, 2025. IMPLEMENTED: Dynamic discount calculation in InvoiceGeneratorProfessional - properly calculates 10% and 100% discounts based on item subtotal
 - July 17, 2025. IMPROVED: Discount column now displays "10%" or "100%" with calculated SAR amount below for better clarity
 - July 17, 2025. FIXED: Discount values showing as zero - now properly calculates and displays discount amounts based on discountType field
+- July 17, 2025. ENHANCED: Saudi Riyal logo size optimization in print layout - reduced from 20px to 14px for better proportions
+- July 17, 2025. IMPROVED: Riyal logo positioning in print view - added margin-bottom and vertical-align middle for better alignment
+- July 17, 2025. MAINTAINED: Screen display design unchanged while optimizing print-specific appearance
 - July 15, 2025. FIXED: Critical discount calculation bug in Doctor Invoice system - discount values now properly preserved after Generate Invoice
 - July 15, 2025. RESOLVED: Issue where discountType would reset to "No Discount" after invoice generation in Doctor interface
 - July 15, 2025. ENHANCED: Invoice Items save functionality to preserve all fields including discountType, vatAmount, totalBeforeVat, totalAfterVat
