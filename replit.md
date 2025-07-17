@@ -741,6 +741,11 @@ Changelog:
 - July 17, 2025. DISABLED: Emergency restore functionality for Products/Services to prevent automatic deletion of imported data
 - July 17, 2025. PROTECTED: Permanently disabled Products/Services re-initialization in storage.ts to preserve all imported data
 - July 17, 2025. SOLUTION: Fixed root cause of data loss - conflicting protection systems were deleting imported data during "integrity checks"
+- July 17, 2025. EMERGENCY FIX: Discovered and disabled Data Integrity Guard system that was causing data loss during rollbacks
+- July 17, 2025. ROOT CAUSE IDENTIFIED: Data Integrity Guard monitoring every 30 minutes was restoring old backups, deleting imported data
+- July 17, 2025. DISABLED: All automatic monitoring and recovery systems that could cause data loss (dataGuard.startMonitoring, emergencyRecover, monitorIntegrity)
+- July 17, 2025. PROTECTION ENHANCED: Only safe Import Protection System remains active without automatic restoration capabilities
+- July 17, 2025. CONFIRMED: Rollback protection implemented - system no longer vulnerable to backup restoration data loss
 - July 17, 2025. COMPLETED: Invoice Layout Unification Project - unified popup and print view designs in doctor invoice system
 - July 17, 2025. ENHANCED: InvoiceGeneratorProfessional component with detailed payment information, discounts per line, and improved Invoice Summary
 - July 17, 2025. ADDED: Comprehensive service items table with 7 columns: Service, Quantity, Unit Price, Discount, VAT, Before VAT, After VAT

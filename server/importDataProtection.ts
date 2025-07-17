@@ -134,9 +134,13 @@ export class ImportDataProtection {
     return this.isProtectionActive;
   }
 
-  // Emergency recovery of imported data
+  // Emergency recovery of imported data - PERMANENTLY DISABLED
   async emergencyRecover(): Promise<boolean> {
     try {
+      console.log("🔒 EMERGENCY RECOVERY PERMANENTLY DISABLED");
+      console.log("⚠️ This system was causing data loss during rollbacks");
+      console.log("💡 Manual intervention required for any data recovery");
+      
       if (!this.lastImportBackup) {
         console.log("⚠️ No import backup available for recovery");
         return false;
@@ -144,45 +148,47 @@ export class ImportDataProtection {
 
       const currentStatus = await this.hasImportedData();
       
-      // Only recover if current data is less than backup
-      if (currentStatus.count.products < this.lastImportBackup.products.length ||
-          currentStatus.count.services < this.lastImportBackup.services.length) {
-        
-        console.log("🚨 EMERGENCY RECOVERY INITIATED - Restoring imported data");
-        
-        // Note: In a real scenario, you'd restore from the backup
-        // For now, we'll log what would be restored
-        console.log("📦 Would restore:", {
+      // Log what would be restored but NEVER restore automatically
+      console.log("📊 Current Status:", {
+        products: currentStatus.count.products,
+        services: currentStatus.count.services
+      });
+      
+      if (this.lastImportBackup.products) {
+        console.log("📦 Backup Contains:", {
           products: this.lastImportBackup.products.length,
           services: this.lastImportBackup.services.length
         });
-        
-        return true;
       }
       
-      return false;
+      console.log("🚨 AUTOMATIC RESTORATION BLOCKED - preventing data corruption");
+      return false; // Never restore automatically
     } catch (error) {
-      console.error("❌ Emergency recovery failed:", error);
+      console.error("❌ Emergency recovery check failed:", error);
       return false;
     }
   }
 
-  // Monitor imported data integrity
+  // Monitor imported data integrity - DISABLED
   async monitorIntegrity(): Promise<void> {
-    const checkInterval = 60000; // Check every minute
+    console.log("🔒 INTEGRITY MONITORING PERMANENTLY DISABLED");
+    console.log("⚠️ Automatic monitoring was causing data loss during rollbacks");
+    console.log("💡 Manual checks only - no automatic recovery attempts");
     
-    setInterval(async () => {
-      try {
-        const importStatus = await this.hasImportedData();
-        
-        if (this.isProtectionActive && (!importStatus.products && !importStatus.services)) {
-          console.log("🚨 IMPORTED DATA LOSS DETECTED - Attempting recovery");
-          await this.emergencyRecover();
-        }
-      } catch (error) {
-        console.error("❌ Import data monitoring error:", error);
-      }
-    }, checkInterval);
+    // Log current status once without monitoring
+    try {
+      const importStatus = await this.hasImportedData();
+      console.log("📊 Initial Import Status Check:", {
+        products: importStatus.count.products,
+        services: importStatus.count.services,
+        hasImportedProducts: importStatus.products,
+        hasImportedServices: importStatus.services
+      });
+    } catch (error) {
+      console.error("❌ Initial import status check failed:", error);
+    }
+    
+    // No setInterval - no automatic monitoring that could cause data loss
   }
 
   // Initialize protection system

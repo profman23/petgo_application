@@ -169,10 +169,15 @@ export class DatabaseStorage implements IStorage {
 
   private async startDataProtection() {
     try {
-      // Import and start data integrity guard
-      const { dataGuard } = await import('./dataIntegrityGuard');
-      await dataGuard.startMonitoring();
-      console.log("🛡️ Data Integrity Guard activated");
+      // 🚨 EMERGENCY DISABLE: Data Integrity Guard was deleting imported data!
+      // The monitoring system was causing data loss during rollbacks
+      console.log("🔒 Data Integrity Guard PERMANENTLY DISABLED to protect imported data");
+      console.log("⚠️ Manual data protection relies on Import Protection System only");
+      
+      // Only start import protection (safe monitoring)
+      const { importProtection } = await import('./importDataProtection');
+      await importProtection.initialize();
+      console.log("✅ Import Protection System activated (safe mode)");
     } catch (error) {
       console.error("⚠️ Data protection system initialization failed:", error);
     }
