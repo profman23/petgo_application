@@ -149,13 +149,38 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     const printContent = invoiceRef.current;
     if (!printContent) return;
 
+    // Get all the current stylesheets from the page
+    const allStyles = Array.from(document.styleSheets)
+      .map(sheet => {
+        try {
+          return Array.from(sheet.cssRules)
+            .map(rule => rule.cssText)
+            .join('\n');
+        } catch (e) {
+          console.log('Cannot access stylesheet:', e);
+          return '';
+        }
+      })
+      .join('\n');
+
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
-    // Get the exact same content but without the outer container styling
+    // Clone the content and remove control buttons
     const invoiceContent = printContent.cloneNode(true) as HTMLElement;
     
-    // Remove the control buttons from the cloned content
+    // Remove modal overlay styling and control buttons
+    const overlay = invoiceContent.querySelector('.fixed.inset-0');
+    if (overlay) {
+      // Extract just the invoice content
+      const modalContent = overlay.querySelector('.bg-white.rounded-xl');
+      if (modalContent) {
+        modalContent.classList.remove('max-h-[95vh]', 'overflow-y-auto');
+        invoiceContent.innerHTML = modalContent.outerHTML;
+      }
+    }
+    
+    // Remove control buttons
     const controlButtons = invoiceContent.querySelector('.print\\:hidden');
     if (controlButtons) {
       controlButtons.remove();
@@ -167,36 +192,60 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
         <head>
           <meta charset="utf-8">
           <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
-          <link href="https://cdn.tailwindcss.com/3.3.7/tailwind.min.css" rel="stylesheet">
+          <link href="https://cdn.tailwindcss.com/3.4.1/tailwind.min.css" rel="stylesheet">
           <style>
+            /* Copy all existing styles */
+            ${allStyles}
+            
+            /* Additional print optimizations */
             body { 
               font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               margin: 0;
-              padding: 20px;
+              padding: 15px;
               background: white;
+              line-height: 1.5;
             }
             
-            /* Print specific overrides */
+            /* Remove modal styling for print */
             .fixed { position: relative !important; }
-            .inset-0 { position: relative !important; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important; }
+            .inset-0 { position: relative !important; }
             .bg-black { background: transparent !important; }
             .bg-opacity-60 { background: transparent !important; }
             .z-50 { z-index: auto !important; }
             .max-h-\\[95vh\\] { max-height: none !important; }
             .overflow-y-auto { overflow: visible !important; }
-            .shadow-2xl { box-shadow: none !important; }
             
-            /* Ensure proper spacing */
-            .p-4 { padding: 1rem !important; }
-            .max-w-6xl { max-width: none !important; }
-            .w-full { width: 100% !important; }
-            
-            /* Hide buttons */
+            /* Ensure visibility */
             .print\\:hidden { display: none !important; }
+            
+            /* Maintain exact styling */
+            .bg-purple-600 { background-color: #9333ea !important; }
+            .text-purple-600 { color: #9333ea !important; }
+            .border-purple-600 { border-color: #9333ea !important; }
+            .bg-gradient-to-r { background: linear-gradient(to right, var(--tw-gradient-stops)) !important; }
+            .from-purple-600 { --tw-gradient-from: #9333ea !important; }
+            .to-purple-600 { --tw-gradient-to: #9333ea !important; }
+            
+            /* Table styling */
+            table { border-collapse: collapse !important; }
+            th, td { border: 1px solid #e5e7eb !important; }
+            .bg-gray-50 { background-color: #f9fafb !important; }
+            .bg-white { background-color: white !important; }
+            .hover\\:bg-purple-100:hover { background-color: #f3e8ff !important; }
+            
+            /* Responsive adjustments for print */
+            .max-w-6xl { max-width: 100% !important; }
+            .p-4 { padding: 1rem !important; }
+            .rounded-xl { border-radius: 0.75rem !important; }
+            
+            @media print {
+              body { margin: 0; padding: 10px; }
+              .shadow-2xl { box-shadow: none !important; }
+            }
           </style>
         </head>
         <body>
-          ${invoiceContent.outerHTML}
+          ${invoiceContent.innerHTML}
         </body>
       </html>
     `);
@@ -207,7 +256,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     setTimeout(() => {
       printWindow.print();
       printWindow.close();
-    }, 500);
+    }, 1000);
   };
 
   const downloadInvoice = async () => {
