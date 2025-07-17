@@ -170,74 +170,163 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               background: white;
               padding: 20px;
             }
-            /* Copy all Tailwind classes used in the invoice */
+            
+            /* Layout Classes */
             .p-8 { padding: 2rem; }
+            .p-6 { padding: 1.5rem; }
+            .px-4 { padding-left: 1rem; padding-right: 1rem; }
+            .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+            .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+            .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+            .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+            .pt-4 { padding-top: 1rem; }
+            
+            .mb-3 { margin-bottom: 0.75rem; }
             .mb-4 { margin-bottom: 1rem; }
             .mb-6 { margin-bottom: 1.5rem; }
-            .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-            .font-black { font-weight: 900; }
-            .text-purple-600 { color: rgb(147 51 234); }
-            .text-gray-600 { color: rgb(75 85 99); }
-            .font-medium { font-weight: 500; }
-            .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-            .space-y-1 > * + * { margin-top: 0.25rem; }
-            .flex { display: flex; }
-            .items-center { align-items: center; }
+            .mt-4 { margin-top: 1rem; }
+            .mx-auto { margin-left: auto; margin-right: auto; }
+            
+            .w-full { width: 100%; }
             .h-4 { height: 1rem; }
             .w-4 { width: 1rem; }
-            .mr-2 { margin-right: 0.5rem; }
-            .text-center { text-align: center; }
+            .h-20 { height: 5rem; }
+            
+            /* Typography */
+            .text-xs { font-size: 0.75rem; line-height: 1rem; }
+            .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+            .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
             .text-2xl { font-size: 1.5rem; line-height: 2rem; }
-            .font-bold { font-weight: 700; }
-            .justify-center { justify-content: center; }
+            .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+            
+            .font-medium { font-weight: 500; }
             .font-semibold { font-weight: 600; }
+            .font-bold { font-weight: 700; }
+            .font-black { font-weight: 900; }
+            
+            /* Colors */
+            .text-white { color: rgb(255 255 255); }
+            .text-purple-600 { color: rgb(147 51 234); }
+            .text-gray-600 { color: rgb(75 85 99); }
+            .text-gray-500 { color: rgb(107 114 128); }
+            .text-green-600 { color: rgb(22 163 74); }
+            
+            .bg-purple-600 { background-color: rgb(147 51 234); }
+            
+            /* Layout */
+            .flex { display: flex; }
             .grid { display: grid; }
+            .items-center { align-items: center; }
+            .justify-center { justify-content: center; }
+            .justify-between { justify-content: space-between; }
+            .text-center { text-align: center; }
+            .text-right { text-align: right; }
+            
             .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .gap-6 { gap: 1.5rem; }
-            .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
-            .from-purple-50 { --tw-gradient-from: rgb(250 245 255); --tw-gradient-to: rgb(250 245 255 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
-            .to-blue-50 { --tw-gradient-to: rgb(239 246 255); }
-            .rounded-xl { border-radius: 0.75rem; }
-            .border-2 { border-width: 2px; }
-            .border-purple-200 { border-color: rgb(196 181 253); }
-            .p-6 { padding: 1.5rem; }
-            .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-            .mb-3 { margin-bottom: 0.75rem; }
+            
+            /* Spacing */
+            .space-y-1 > * + * { margin-top: 0.25rem; }
             .space-y-2 > * + * { margin-top: 0.5rem; }
+            .mr-2 { margin-right: 0.5rem; }
             .ml-2 { margin-left: 0.5rem; }
-            .w-full { width: 100%; }
+            
+            /* Borders */
+            .border { border-width: 1px; }
+            .border-2 { border-width: 2px; }
+            .border-t-2 { border-top-width: 2px; }
+            .border-gray-200 { border-color: rgb(229 231 235); }
+            .border-purple-200 { border-color: rgb(196 181 253); }
+            .border-purple-600 { border-color: rgb(147 51 234); }
+            
+            /* Border Radius */
+            .rounded-lg { border-radius: 0.5rem; }
+            .rounded-xl { border-radius: 0.75rem; }
+            
+            /* Object Fit */
+            .object-contain { object-fit: contain; }
+            
+            /* Table Styles */
             .border-collapse { border-collapse: collapse; }
             .overflow-hidden { overflow: hidden; }
-            .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
-            .from-purple-600 { --tw-gradient-from: rgb(147 51 234); --tw-gradient-to: rgb(147 51 234 / 0); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
-            .to-purple-700 { --tw-gradient-to: rgb(126 34 206); }
-            .text-white { color: rgb(255 255 255); }
-            .px-4 { padding-left: 1rem; padding-right: 1rem; }
-            .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-            .border { border-width: 1px; }
-            .border-gray-200 { border-color: rgb(229 231 235); }
-            .text-xs { font-size: 0.75rem; line-height: 1rem; }
-            .even\\:bg-gray-50:nth-child(even) { background-color: rgb(249 250 251); }
-            .border-t-2 { border-top-width: 2px; }
-            .border-purple-600 { border-color: rgb(147 51 234); }
-            .pt-4 { padding-top: 1rem; }
-            .mt-4 { margin-top: 1rem; }
-            .justify-between { justify-content: space-between; }
-            .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-            .text-right { text-align: right; }
-            .bg-purple-600 { background-color: rgb(147 51 234); }
-            .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-            .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-            .rounded-lg { border-radius: 0.5rem; }
-            .mx-auto { margin-left: auto; margin-right: auto; }
-            .h-20 { height: 5rem; }
-            .object-contain { object-fit: contain; }
-            .text-green-600 { color: rgb(22 163 74); }
-            .text-gray-500 { color: rgb(107 114 128); }
+            
+            /* Specific table styling */
+            table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin: 15px 0; 
+              border-radius: 8px; 
+              overflow: hidden; 
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            
+            table th { 
+              background: linear-gradient(135deg, #8B2F8B 0%, #a855f7 100%); 
+              color: white !important; 
+              padding: 12px 8px; 
+              text-align: center; 
+              font-weight: bold; 
+              font-size: 14px;
+              border: none;
+            }
+            
+            table td { 
+              padding: 10px 8px; 
+              border: 1px solid #e9ecef; 
+              text-align: center;
+              font-size: 13px;
+              vertical-align: middle;
+            }
+            
+            table tbody tr:nth-child(even) { 
+              background-color: #f8f9fa;
+            }
+            
+            table tbody tr:hover { 
+              background-color: #e9ecef;
+            }
+            
+            /* Gradients */
+            .bg-gradient-to-br { 
+              background: linear-gradient(to bottom right, #faf5ff 0%, #eff6ff 100%); 
+            }
+            
+            .bg-gradient-to-r { 
+              background: linear-gradient(to right, #8B2F8B 0%, #7c3aed 100%); 
+            }
+            
+            /* Invoice Summary Section */
+            .invoice-summary {
+              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+              border: 2px solid #8B2F8B;
+              border-radius: 12px;
+              padding: 20px;
+              margin-top: 20px;
+            }
+            
+            .summary-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 8px 0;
+              border-bottom: 1px solid #d1d5db;
+              font-size: 15px;
+            }
+            
+            .summary-row:last-child {
+              border-bottom: none;
+              font-weight: bold;
+              font-size: 18px;
+              color: #8B2F8B;
+              border-top: 2px solid #8B2F8B;
+              padding-top: 15px;
+              margin-top: 10px;
+            }
+            
             /* RTL support */
             [dir="rtl"] .mr-2 { margin-right: 0; margin-left: 0.5rem; }
             [dir="rtl"] .ml-2 { margin-left: 0; margin-right: 0.5rem; }
             [dir="rtl"] .text-right { text-align: left; }
+            [dir="rtl"] table th, [dir="rtl"] table td { text-align: center; }
           </style>
         </head>
         <body>
