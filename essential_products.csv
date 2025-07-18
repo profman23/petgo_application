@@ -1,0 +1,11 @@
+name,nameAr,description,descriptionAr,price,category,categoryAr,sku,unit,unitAr,isActive
+Pet Food Premium,طعام حيوانات مميز,High quality pet food for dogs and cats,طعام عالي الجودة للكلاب والقطط,85.50,Food,طعام,PF001,Bag,كيس,true
+Vitamin Supplements,فيتامينات,Essential vitamins for pet health,فيتامينات أساسية لصحة الحيوانات,125.00,Health,صحة,VIT001,Bottle,زجاجة,true
+Pet Toys Set,مجموعة ألعاب,Interactive toys for pets,ألعاب تفاعلية للحيوانات الأليفة,45.75,Toys,ألعاب,TOY001,Set,مجموعة,true
+Flea Treatment,علاج البراغيث,Effective flea treatment for dogs and cats,علاج فعال للبراغيث للكلاب والقطط,65.00,Health,صحة,FT001,Bottle,زجاجة,true
+Dental Chews,عضاضات الأسنان,Dental health chews for dogs,عضاضات لصحة الأسنان للكلاب,35.50,Health,صحة,DC001,Pack,علبة,true
+Cat Litter,رمل القطط,Premium cat litter,رمل قطط مميز,25.75,Hygiene,نظافة,CL001,Bag,كيس,true
+Dog Leash,حبل الكلب,Strong and durable dog leash,حبل كلب قوي ومتين,55.00,Accessories,إكسسوارات,DL001,Piece,قطعة,true
+Pet Bed,فراش الحيوان,Comfortable pet bed,فراش مريح للحيوانات,95.00,Accessories,إكسسوارات,PB001,Piece,قطعة,true
+Fish Food,طعام السمك,Nutritious fish food,طعام مغذي للأسماك,15.50,Food,طعام,FF001,Container,عبوة,true
+Bird Seed,بذور الطيور,Premium bird seed mix,خليط بذور طيور مميز,22.75,Food,طعام,BS001,Bag,كيس,true

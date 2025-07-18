@@ -185,28 +185,17 @@ export class DatabaseStorage implements IStorage {
 
   private async initializeTestData() {
     try {
+      // 🚨 EMERGENCY PROTECTION: Complete system shutdown for data protection
+      console.log("🔒 INITIALIZATION PERMANENTLY DISABLED - Data protection mode active");
+      console.log("⚠️ No test data will be created to protect imported Products/Services");
+      console.log("💡 Manual data creation only - automatic initialization bypassed");
+      
       // Enhanced data integrity check - verify all critical tables
       const existingUsers = await db.select().from(users).limit(1);
       const existingProducts = await db.select().from(products).limit(1);
       const existingServices = await db.select().from(services).limit(1);
       const existingDrivers = await db.select().from(drivers).limit(1);
       const existingAdmins = await db.select().from(admins).limit(1);
-      
-      // Smart initialization - only create missing data
-      let shouldInitializeUsers = existingUsers.length === 0;
-      let shouldInitializeDrivers = existingDrivers.length === 0;
-      let shouldInitializeAdmins = existingAdmins.length === 0;
-      // PERMANENTLY DISABLE Products/Services initialization to protect imported data
-      let shouldInitializeProducts = false; // NEVER recreate products
-      let shouldInitializeServices = false; // NEVER recreate services
-      
-      // Always preserve existing Products/Services regardless of count
-      if (existingProducts.length > 0) {
-        console.log(`🔒 PRODUCTS PERMANENTLY PROTECTED: ${existingProducts.length} products preserved`);
-      }
-      if (existingServices.length > 0) {
-        console.log(`🔒 SERVICES PERMANENTLY PROTECTED: ${existingServices.length} services preserved`);
-      }
       
       // Data integrity log
       console.log("🔍 Database Integrity Check:", {
@@ -217,220 +206,9 @@ export class DatabaseStorage implements IStorage {
         services: existingServices.length
       });
       
-      if (!shouldInitializeUsers && !shouldInitializeDrivers && !shouldInitializeAdmins && 
-          !shouldInitializeProducts && !shouldInitializeServices) {
-        console.log("✅ All critical data exists - no initialization needed");
-        return;
-      }
-
-      if (shouldInitializeUsers) {
-        // Create test user
-        await db.insert(users).values({
-        id: 1,
-        phone: "0501234567",
-        email: "test@test.com",
-        password: "123456",
-        name: "Test User",
-        firstName: "Test",
-        lastName: "User",
-        petName: "Test Pet",
-        petType: "Cat",
-        address: "Test Address",
-        membershipType: "premium"
-      });
-
-      }
-      
-      if (shouldInitializeAdmins) {
-        // Create admin
-        await db.insert(admins).values({
-        id: 1,
-        username: "admin",
-        password: "123456",
-        name: "Admin User",
-        role: "admin"
-      });
-
-      }
-      
-      if (shouldInitializeDrivers) {
-        // Create drivers
-        await db.insert(drivers).values([
-        {
-          id: 1,
-          phone: "0512345678",
-          password: "123456",
-          name: "د. أحمد محمد",
-          vetsvanCode: "v001",
-          vetsvanName: "VetsVan001",
-          username: "v001",
-          rating: 4.8,
-          carModel: "Mercedes Sprinter",
-          carColor: "Purple",
-          plateNumber: "ABC-123",
-          latitude: 24.7136,
-          longitude: 46.6753,
-          isAvailable: true,
-          profileImageUrl: null
-        },
-        {
-          id: 2,
-          phone: "0523456789",
-          password: "123456",
-          name: "د. فاطمة السالم",
-          vetsvanCode: "v002",
-          vetsvanName: "VetsVan002",
-          username: "v002",
-          rating: 4.6,
-          carModel: "Mercedes Sprinter",
-          carColor: "Purple",
-          plateNumber: "DEF-456",
-          latitude: 24.7200,
-          longitude: 46.6800,
-          isAvailable: true,
-          profileImageUrl: null
-        },
-        {
-          id: 3,
-          phone: "0534567890",
-          password: "123456",
-          name: "د. سارة علي",
-          vetsvanCode: "v003",
-          vetsvanName: "VETS003",
-          username: "v003",
-          rating: 4.9,
-          carModel: "Mercedes Sprinter",
-          carColor: "Purple",
-          plateNumber: "GHI-789",
-          latitude: 24.7136,
-          longitude: 46.6753,
-          isAvailable: true,
-          profileImageUrl: null
-        }
-      ]);
-
-      // Create shifts
-      await db.insert(shifts).values([
-        {
-          id: 1,
-          vetsVanId: 1,
-          date: "2025-01-10",
-          startTime: "08:00",
-          endTime: "17:00",
-          duration: 9,
-          status: "active"
-        },
-        {
-          id: 2,
-          vetsVanId: 2,
-          date: "2025-01-10",
-          startTime: "09:00",
-          endTime: "18:00",
-          duration: 9,
-          status: "active"
-        },
-        {
-          id: 3,
-          vetsVanId: 3,
-          date: "2025-01-10",
-          startTime: "07:00",
-          endTime: "16:00",
-          duration: 9,
-          status: "active"
-        }
-      ]);
-      }
-
-      // Add essential products and services data to prevent loss
-      if (shouldInitializeProducts) {
-        await db.insert(products).values([
-          {
-            name: 'Pet Food Premium',
-            nameAr: 'طعام حيوانات مميز',
-            description: 'High quality pet food for dogs and cats',
-            descriptionAr: 'طعام عالي الجودة للكلاب والقطط',
-            price: 85.50,
-            category: 'Food',
-            categoryAr: 'طعام',
-            sku: 'PF001',
-            unit: 'Bag',
-            unitAr: 'كيس',
-            isActive: true
-          },
-          {
-            name: 'Vitamin Supplements',
-            nameAr: 'فيتامينات',
-            description: 'Essential vitamins for pet health',
-            descriptionAr: 'فيتامينات أساسية لصحة الحيوانات',
-            price: 125.00,
-            category: 'Health',
-            categoryAr: 'صحة',
-            sku: 'VIT001',
-            unit: 'Bottle',
-            unitAr: 'زجاجة',
-            isActive: true
-          },
-          {
-            name: 'Pet Toys Set',
-            nameAr: 'مجموعة ألعاب',
-            description: 'Interactive toys for pets',
-            descriptionAr: 'ألعاب تفاعلية للحيوانات الأليفة',
-            price: 45.75,
-            category: 'Toys',
-            categoryAr: 'ألعاب',
-            sku: 'TOY001',
-            unit: 'Set',
-            unitAr: 'مجموعة',
-            isActive: true
-          }
-        ]);
-      }
-
-      if (shouldInitializeServices) {
-        await db.insert(services).values([
-          {
-            name: 'General Checkup',
-            nameAr: 'فحص عام',
-            description: 'Complete health examination',
-            descriptionAr: 'فحص صحي شامل',
-            price: 150.00,
-            category: 'Medical',
-            categoryAr: 'طبي',
-            duration: 30,
-            isActive: true
-          },
-          {
-            name: 'Vaccination',
-            nameAr: 'تطعيم',
-            description: 'Essential vaccinations',
-            descriptionAr: 'تطعيمات أساسية',
-            price: 200.00,
-            category: 'Medical',
-            categoryAr: 'طبي',
-            duration: 15,
-            isActive: true
-          },
-          {
-            name: 'Grooming',
-            nameAr: 'تنظيف',
-            description: 'Professional grooming service',
-            descriptionAr: 'خدمة تنظيف احترافية',
-            price: 100.00,
-            category: 'Grooming',
-            categoryAr: 'تنظيف',
-            duration: 45,
-            isActive: true
-          }
-        ]);
-      }
-
-      console.log("🎯 Database initialization completed:", {
-        users: shouldInitializeUsers ? "✅ created" : "⚡ existed",
-        drivers: shouldInitializeDrivers ? "✅ created" : "⚡ existed",
-        admins: shouldInitializeAdmins ? "✅ created" : "⚡ existed",
-        products: shouldInitializeProducts ? "✅ created" : "⚡ existed", 
-        services: shouldInitializeServices ? "✅ created" : "⚡ existed"
-      });
+      // COMPLETE SHUTDOWN - No automatic data creation
+      console.log("✅ Data protection active - no automatic initialization performed");
+      return;
     } catch (error) {
       console.error("Error initializing test data:", error);
     }

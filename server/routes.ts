@@ -2943,6 +2943,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Emergency data restoration endpoint
+  app.post('/api/admin/emergency-restore', async (req, res) => {
+    try {
+      console.log("🚨 EMERGENCY RESTORATION STARTED");
+      
+      // Essential products data
+      const essentialProducts = [
+        { name: 'Pet Food Premium', nameAr: 'طعام حيوانات مميز', description: 'High quality pet food for dogs and cats', descriptionAr: 'طعام عالي الجودة للكلاب والقطط', price: 85.50, category: 'Food', categoryAr: 'طعام', sku: 'PF001', unit: 'Bag', unitAr: 'كيس', isActive: true },
+        { name: 'Vitamin Supplements', nameAr: 'فيتامينات', description: 'Essential vitamins for pet health', descriptionAr: 'فيتامينات أساسية لصحة الحيوانات', price: 125.00, category: 'Health', categoryAr: 'صحة', sku: 'VIT001', unit: 'Bottle', unitAr: 'زجاجة', isActive: true },
+        { name: 'Pet Toys Set', nameAr: 'مجموعة ألعاب', description: 'Interactive toys for pets', descriptionAr: 'ألعاب تفاعلية للحيوانات الأليفة', price: 45.75, category: 'Toys', categoryAr: 'ألعاب', sku: 'TOY001', unit: 'Set', unitAr: 'مجموعة', isActive: true },
+        { name: 'Flea Treatment', nameAr: 'علاج البراغيث', description: 'Effective flea treatment for dogs and cats', descriptionAr: 'علاج فعال للبراغيث للكلاب والقطط', price: 65.00, category: 'Health', categoryAr: 'صحة', sku: 'FT001', unit: 'Bottle', unitAr: 'زجاجة', isActive: true },
+        { name: 'Dental Chews', nameAr: 'عضاضات الأسنان', description: 'Dental health chews for dogs', descriptionAr: 'عضاضات لصحة الأسنان للكلاب', price: 35.50, category: 'Health', categoryAr: 'صحة', sku: 'DC001', unit: 'Pack', unitAr: 'علبة', isActive: true }
+      ];
+      
+      // Essential services data
+      const essentialServices = [
+        { name: 'General Checkup', nameAr: 'فحص عام', description: 'Complete health examination', descriptionAr: 'فحص صحي شامل', price: 150.00, category: 'Medical', categoryAr: 'طبي', duration: 30, isActive: true },
+        { name: 'Vaccination', nameAr: 'تطعيم', description: 'Essential vaccinations', descriptionAr: 'تطعيمات أساسية', price: 200.00, category: 'Medical', categoryAr: 'طبي', duration: 15, isActive: true },
+        { name: 'Grooming', nameAr: 'تنظيف', description: 'Professional grooming service', descriptionAr: 'خدمة تنظيف احترافية', price: 100.00, category: 'Grooming', categoryAr: 'تنظيف', duration: 45, isActive: true },
+        { name: 'Dental Care', nameAr: 'عناية بالأسنان', description: 'Professional dental cleaning', descriptionAr: 'تنظيف أسنان احترافي', price: 180.00, category: 'Medical', categoryAr: 'طبي', duration: 40, isActive: true },
+        { name: 'Emergency Visit', nameAr: 'زيارة طارئة', description: 'Emergency veterinary visit', descriptionAr: 'زيارة بيطرية طارئة', price: 350.00, category: 'Medical', categoryAr: 'طبي', duration: 60, isActive: true }
+      ];
+      
+      // Restore products
+      for (const productData of essentialProducts) {
+        await storage.createProduct(productData);
+      }
+      
+      // Restore services
+      for (const serviceData of essentialServices) {
+        await storage.createService(serviceData);
+      }
+      
+      console.log("✅ EMERGENCY RESTORATION COMPLETED");
+      console.log(`📦 Restored ${essentialProducts.length} products and ${essentialServices.length} services`);
+      
+      res.json({ 
+        success: true, 
+        message: 'Emergency restoration completed successfully',
+        restored: {
+          products: essentialProducts.length,
+          services: essentialServices.length
+        }
+      });
+      
+    } catch (error) {
+      console.error("❌ Emergency restoration failed:", error);
+      res.status(500).json({ error: 'Emergency restoration failed' });
+    }
+  });
+
   // Download templates endpoint
   app.get('/api/admin/download-template/:type', requireAdminAuth, (req, res) => {
     const type = req.params.type;

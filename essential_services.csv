@@ -1,0 +1,11 @@
+name,nameAr,description,descriptionAr,price,category,categoryAr,duration,isActive
+General Checkup,فحص عام,Complete health examination,فحص صحي شامل,150.00,Medical,طبي,30,true
+Vaccination,تطعيم,Essential vaccinations,تطعيمات أساسية,200.00,Medical,طبي,15,true
+Grooming,تنظيف,Professional grooming service,خدمة تنظيف احترافية,100.00,Grooming,تنظيف,45,true
+Dental Care,عناية بالأسنان,Professional dental cleaning,تنظيف أسنان احترافي,180.00,Medical,طبي,40,true
+Flea Treatment,علاج البراغيث,Professional flea treatment,علاج براغيث احترافي,120.00,Medical,طبي,25,true
+Nail Trimming,تقليم الأظافر,Professional nail trimming,تقليم أظافر احترافي,50.00,Grooming,تنظيف,15,true
+Emergency Visit,زيارة طارئة,Emergency veterinary visit,زيارة بيطرية طارئة,350.00,Medical,طبي,60,true
+Health Certificate,شهادة صحية,Health certificate for travel,شهادة صحية للسفر,80.00,Medical,طبي,20,true
+Microchipping,رقاقة إلكترونية,Pet microchipping service,خدمة الرقاقة الإلكترونية,150.00,Medical,طبي,10,true
+Surgery Consultation,استشارة جراحية,Surgical consultation,استشارة جراحية,250.00,Medical,طبي,45,true
