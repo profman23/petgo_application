@@ -118,8 +118,8 @@ export class DataIntegrityGuard {
     console.log("⚠️ Automatic monitoring was causing data loss during rollbacks");
     console.log("💡 Manual checks only - no automatic recovery attempts");
     
-    // Create initial backup only
-    await this.createBackup();
+    // Create initial backup only - DISABLED
+    // await this.createBackup(); // DISABLED TO PREVENT AUTOMATIC BACKUPS
     
     // ALL AUTOMATIC MONITORING DISABLED TO PREVENT DATA LOSS
     // setInterval(async () => {

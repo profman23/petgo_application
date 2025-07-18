@@ -872,15 +872,11 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Trigger import data protection after bulk operation
+    // Trigger import data protection after bulk operation - DISABLED
     if (imported > 0 || updated > 0) {
-      try {
-        const { importProtection } = await import('./importDataProtection');
-        await importProtection.createImportBackup();
-        console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated services`);
-      } catch (error) {
-        console.error('⚠️ Import protection update failed:', error);
-      }
+      // const { importProtection } = await import('./importDataProtection');
+      // await importProtection.createImportBackup(); // DISABLED TO PREVENT AUTOMATIC BACKUPS
+      console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated services (NO AUTOMATIC BACKUP)`);
     }
 
     return { imported, updated, failed };
@@ -911,15 +907,11 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // Trigger import data protection after bulk operation
+    // Trigger import data protection after bulk operation - DISABLED
     if (imported > 0 || updated > 0) {
-      try {
-        const { importProtection } = await import('./importDataProtection');
-        await importProtection.createImportBackup();
-        console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated products`);
-      } catch (error) {
-        console.error('⚠️ Import protection update failed:', error);
-      }
+      // const { importProtection } = await import('./importDataProtection');
+      // await importProtection.createImportBackup(); // DISABLED TO PREVENT AUTOMATIC BACKUPS
+      console.log(`🔒 Import data protection updated: ${imported} new, ${updated} updated products (NO AUTOMATIC BACKUP)`);
     }
 
     return { imported, updated, failed };

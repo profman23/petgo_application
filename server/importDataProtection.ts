@@ -99,8 +99,8 @@ export class ImportDataProtection {
       // Store snapshot in memory for immediate access
       this.lastImportBackup = snapshotData;
       
-      // Create persistent backup
-      await this.createImportBackup();
+      // Create persistent backup - DISABLED
+      // await this.createImportBackup(); // DISABLED TO PREVENT AUTOMATIC BACKUPS
       
     } catch (error) {
       console.error("❌ Post-import snapshot creation failed:", error);

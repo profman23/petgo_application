@@ -226,7 +226,7 @@ export class UltimateDataProtection {
     const results = {
       databaseProtection: await this.enableDatabaseProtection(),
       applicationProtection: await this.enableApplicationProtection(),
-      backupSystem: await this.createRealTimeBackup(),
+      backupSystem: false, // await this.createRealTimeBackup(), // DISABLED TO PREVENT AUTOMATIC BACKUPS
       integrityMonitor: await this.monitorDataIntegrity(),
       readOnlyMode: await this.enableReadOnlyMode()
     };
