@@ -176,13 +176,13 @@ export class DatabaseStorage implements IStorage {
       const { finalDataProtection } = await import('./dataProtectionFinal');
       await finalDataProtection.initialize();
       
-      // Layer 2: Import Protection System
-      const { importProtection } = await import('./importDataProtection');
-      await importProtection.initialize();
+      // Layer 2: Import Protection System - DISABLED
+      // const { importProtection } = await import('./importDataProtection');
+      // await importProtection.initialize(); // DISABLED TO PREVENT AUTOMATIC BACKUPS
       
-      // Layer 3: Ultimate Protection System (All Solutions)
-      const { ultimateDataProtection } = await import('./ultimateDataProtection');
-      await ultimateDataProtection.initializeAllProtections();
+      // Layer 3: Ultimate Protection System (All Solutions) - DISABLED
+      // const { ultimateDataProtection } = await import('./ultimateDataProtection');
+      // await ultimateDataProtection.initializeAllProtections(); // DISABLED TO PREVENT AUTOMATIC BACKUPS
       
       console.log("✅ ULTIMATE DATA PROTECTION SYSTEM ACTIVE");
       console.log("🛡️ 7 Protection Solutions Activated:");

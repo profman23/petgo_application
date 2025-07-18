@@ -193,11 +193,11 @@ export class ImportDataProtection {
 
   // Initialize protection system
   async initialize(): Promise<void> {
-    await this.createImportBackup();
+    // await this.createImportBackup(); // DISABLED - NO AUTOMATIC BACKUPS
     await this.protectImportedData();
     await this.monitorIntegrity();
     
-    console.log("✅ Import Data Protection System initialized");
+    console.log("✅ Import Data Protection System initialized (NO AUTOMATIC BACKUPS)");
   }
 }
 
