@@ -112,26 +112,27 @@ export class DataIntegrityGuard {
     }
   }
 
-  // Monitor data changes
+  // Monitor data changes - PERMANENTLY DISABLED
   async startMonitoring(): Promise<void> {
-    console.log("🔍 Data Integrity Guard monitoring started");
+    console.log("🔒 INTEGRITY MONITORING PERMANENTLY DISABLED");
+    console.log("⚠️ Automatic monitoring was causing data loss during rollbacks");
+    console.log("💡 Manual checks only - no automatic recovery attempts");
     
-    // Create initial backup
+    // Create initial backup only
     await this.createBackup();
     
-    // Verify integrity every 30 minutes
-    setInterval(async () => {
-      const isOk = await this.verifyIntegrity();
-      if (!isOk) {
-        console.log("🚨 Data integrity issue detected - initiating recovery procedures");
-        await this.emergencyRestore();
-      }
-    }, 30 * 60 * 1000); // 30 minutes
+    // ALL AUTOMATIC MONITORING DISABLED TO PREVENT DATA LOSS
+    // setInterval(async () => {
+    //   const isOk = await this.verifyIntegrity();
+    //   if (!isOk) {
+    //     console.log("🚨 Data integrity issue detected - initiating recovery procedures");
+    //     await this.emergencyRestore();
+    //   }
+    // }, 30 * 60 * 1000); // 30 minutes - DISABLED
 
-    // Create backup every hour
-    setInterval(async () => {
-      await this.createBackup();
-    }, 60 * 60 * 1000); // 1 hour
+    // setInterval(async () => {
+    //   await this.createBackup();
+    // }, 60 * 60 * 1000); // 1 hour - DISABLED
   }
 }
 
