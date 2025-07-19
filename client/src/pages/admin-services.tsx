@@ -459,6 +459,39 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
             </div>
           </div>
           
+          {/* Navigation Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {language === 'ar' ? 'السابق' : 'Previous'}
+              </Button>
+              
+              <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
+                <span className="text-sm font-medium text-purple-700">
+                  {language === 'ar' 
+                    ? `صفحة ${currentPage} من ${totalPages}`
+                    : `Page ${currentPage} of ${totalPages}`
+                  }
+                </span>
+              </div>
+              
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {language === 'ar' ? 'التالي' : 'Next'}
+              </Button>
+            </div>
+          )}
 
         </div>
       </div>
