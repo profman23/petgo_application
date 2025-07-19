@@ -13,8 +13,24 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+// Protected database pool with query validation
+class ProtectedPool extends Pool {
+  async query(text: string | object, params?: any[]): Promise<any> {
+    // Validate query through protection system
+    const validation = dbProtection.validateQuery(text);
+    
+    if (!validation.allowed) {
+      console.error(`🛡️ Database Protection: ${validation.reason}`);
+      console.error(`🚫 Blocked Query: ${typeof text === 'string' ? text : text.toString()}`);
+      throw new Error(`Database Protection: ${validation.reason}`);
+    }
+
+    return super.query(text as string, params);
+  }
+}
+
+export const pool = new ProtectedPool({ connectionString: process.env.DATABASE_URL });
+export const db = drizzle({ client: pool, schema });
 
 // Initialize database schema
 export async function initDatabase() {
