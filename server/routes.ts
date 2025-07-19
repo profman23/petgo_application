@@ -2907,6 +2907,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create new service endpoint
+  app.post('/api/admin/services', requireAdminAuth, async (req, res) => {
+    try {
+      const { name, nameAr, price } = req.body;
+      
+      if (!name || !price || isNaN(parseFloat(price))) {
+        return res.status(400).json({ error: 'Name and valid price are required' });
+      }
+
+      const serviceData = {
+        name,
+        nameAr: nameAr || name,
+        price: parseFloat(price),
+        category: 'General',
+        categoryAr: 'عام',
+        isActive: true
+      };
+
+      const newService = await storage.createService(serviceData);
+      res.status(201).json(newService);
+    } catch (error) {
+      console.error('Error creating service:', error);
+      res.status(500).json({ error: 'Failed to create service' });
+    }
+  });
+
   // Update product price endpoint
   app.put('/api/admin/products/:id', requireAdminAuth, async (req, res) => {
     try {

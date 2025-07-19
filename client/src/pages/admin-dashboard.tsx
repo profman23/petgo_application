@@ -24,6 +24,14 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Add Service State
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newService, setNewService] = useState({
+    name: '',
+    nameAr: '',
+    price: ''
+  });
 
   const { data: services, isLoading, refetch } = useQuery({
     queryKey: ['/api/admin/services'],
@@ -55,6 +63,32 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
     },
   });
 
+  // Add Service Mutation
+  const addServiceMutation = useMutation({
+    mutationFn: async (serviceData: { name: string; nameAr: string; price: string }) => {
+      return apiRequest('/api/admin/services', {
+        method: 'POST',
+        body: JSON.stringify(serviceData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/services'] });
+      toast({
+        title: language === 'ar' ? "تم الإضافة بنجاح" : "Added Successfully",
+        description: language === 'ar' ? "تم إضافة الخدمة الجديدة" : "New service added",
+      });
+      setShowAddForm(false);
+      setNewService({ name: '', nameAr: '', price: '' });
+    },
+    onError: () => {
+      toast({
+        title: language === 'ar' ? "خطأ" : "Error",
+        description: language === 'ar' ? "فشل في إضافة الخدمة" : "Failed to add service",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handlePriceEdit = (serviceId: number, currentPrice: string) => {
     setEditingService({ id: serviceId, price: currentPrice });
     setEditedServices({ ...editedServices, [serviceId]: currentPrice });
@@ -71,6 +105,28 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
         updateServiceMutation.mutate({ id: editingService.id, price: newPrice });
       }
     }
+  };
+
+  // Add Service Functions
+  const handleAddService = () => {
+    if (newService.name && newService.price && !isNaN(parseFloat(newService.price))) {
+      addServiceMutation.mutate({
+        name: newService.name,
+        nameAr: newService.nameAr || newService.name,
+        price: newService.price
+      });
+    } else {
+      toast({
+        title: language === 'ar' ? "خطأ في البيانات" : "Data Error",
+        description: language === 'ar' ? "يرجى ملء جميع الحقول المطلوبة" : "Please fill all required fields",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelAdd = () => {
+    setShowAddForm(false);
+    setNewService({ name: '', nameAr: '', price: '' });
   };
 
   // Pagination calculations
@@ -109,10 +165,105 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
           <h3 className="text-lg leading-6 font-medium text-gray-900" style={{ textAlign: getTextAlign(language) }}>
             {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
           </h3>
-          <div className="text-sm text-gray-500">
-            {language === 'ar' ? 'المجموع:' : 'Total:'} {services?.length || 0}
+          <div className="flex items-center gap-4">
+            <Button 
+              onClick={() => setShowAddForm(true)}
+              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2 text-sm px-4 py-2"
+            >
+              <Stethoscope className="h-4 w-4" />
+              {language === 'ar' ? 'إضافة خدمة' : 'Add Service'}
+            </Button>
+            <div className="text-sm text-gray-500">
+              {language === 'ar' ? 'المجموع:' : 'Total:'} {services?.length || 0}
+            </div>
           </div>
         </div>
+
+        {/* Add Service Form */}
+        {showAddForm && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6" style={{ direction: getDirection(language) }}>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-md font-medium text-gray-900">
+                {language === 'ar' ? 'إضافة خدمة جديدة' : 'Add New Service'}
+              </h4>
+              <Button
+                onClick={handleCancelAdd}
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'اسم الخدمة (English)' : 'Service Name (English)'}
+                </label>
+                <Input
+                  type="text"
+                  value={newService.name}
+                  onChange={(e) => setNewService({...newService, name: e.target.value})}
+                  placeholder={language === 'ar' ? 'ادخل اسم الخدمة بالإنجليزية' : 'Enter service name in English'}
+                  className="w-full"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'اسم الخدمة (العربية)' : 'Service Name (Arabic)'}
+                </label>
+                <Input
+                  type="text"
+                  value={newService.nameAr}
+                  onChange={(e) => setNewService({...newService, nameAr: e.target.value})}
+                  placeholder={language === 'ar' ? 'ادخل اسم الخدمة بالعربية' : 'Enter service name in Arabic'}
+                  className="w-full"
+                  style={{ textAlign: language === 'ar' ? 'right' : 'left' }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'السعر (ريال سعودي)' : 'Price (SAR)'}
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={newService.price}
+                  onChange={(e) => setNewService({...newService, price: e.target.value})}
+                  placeholder={language === 'ar' ? 'ادخل السعر' : 'Enter price'}
+                  className="w-full"
+                />
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3" style={{ justifyContent: language === 'ar' ? 'flex-start' : 'flex-end' }}>
+              <Button
+                onClick={handleCancelAdd}
+                variant="outline"
+                className="px-6"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </Button>
+              <Button
+                onClick={handleAddService}
+                disabled={addServiceMutation.isPending}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-6"
+              >
+                {addServiceMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    {language === 'ar' ? 'جاري الحفظ...' : 'Saving...'}
+                  </>
+                ) : (
+                  language === 'ar' ? 'حفظ الخدمة' : 'Save Service'
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
 
         {services && services.length > 0 ? (
           <>
