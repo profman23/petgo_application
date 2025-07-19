@@ -2475,8 +2475,8 @@ export default function AdminDashboard() {
                       {language === 'ar' ? 'فلاتر البحث' : 'Search Filters'}
                     </h3>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      {/* Search Field */}
+                    <div className="space-y-4">
+                      {/* Search Field - Full Width */}
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
                           {language === 'ar' ? 'البحث (اسم، هاتف، إيميل، حيوانات أليفة، VetsVan)' : 'Search (Name, Phone, Email, Pets, VetsVan)'}
@@ -2494,22 +2494,22 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
-                      {/* Date Range Filter */}
+                      {/* Date Range Filter - Full Width Below Search */}
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
                           {language === 'ar' ? 'فلتر بتاريخ الموعد (من - إلى)' : 'Filter by Appointment Date (From - To)'}
                         </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {/* From Date */}
-                          <div>
-                            <label className="text-xs text-gray-500 mb-1 block">
+                          <div className="space-y-2">
+                            <label className="text-xs text-gray-500">
                               {language === 'ar' ? 'من تاريخ' : 'From Date'}
                             </label>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <Button
                                   variant="outline"
-                                  className="w-full justify-start text-left font-normal border-gray-300 hover:border-purple-600"
+                                  className="w-full justify-start text-left font-normal border-gray-300 hover:border-purple-600 h-10"
                                 >
                                   <Calendar className="mr-2 h-4 w-4" />
                                   {requestFilterDateFrom ? (
@@ -2540,15 +2540,15 @@ export default function AdminDashboard() {
                           </div>
 
                           {/* To Date */}
-                          <div>
-                            <label className="text-xs text-gray-500 mb-1 block">
+                          <div className="space-y-2">
+                            <label className="text-xs text-gray-500">
                               {language === 'ar' ? 'إلى تاريخ' : 'To Date'}
                             </label>
                             <Popover>
                               <PopoverTrigger asChild>
                                 <Button
                                   variant="outline"
-                                  className="w-full justify-start text-left font-normal border-gray-300 hover:border-purple-600"
+                                  className="w-full justify-start text-left font-normal border-gray-300 hover:border-purple-600 h-10"
                                 >
                                   <Calendar className="mr-2 h-4 w-4" />
                                   {requestFilterDateTo ? (
