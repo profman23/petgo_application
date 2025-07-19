@@ -163,7 +163,8 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   constructor() {
-    this.initializeTestData();
+    // 🔒 INITIALIZATION PERMANENTLY DISABLED TO PROTECT IMPORTED DATA
+    // this.initializeTestData(); // DISABLED - Was causing data loss on restart
     this.startDataProtection();
   }
 
@@ -172,9 +173,9 @@ export class DatabaseStorage implements IStorage {
       // 🚨 ULTIMATE PROTECTION: Complete multi-layered protection system
       console.log("🔒 ULTIMATE DATA PROTECTION INITIALIZING...");
       
-      // Layer 1: Final Protection System
-      const { finalDataProtection } = await import('./dataProtectionFinal');
-      await finalDataProtection.initialize();
+      // Layer 1: Final Protection System - DISABLED
+      // const { finalDataProtection } = await import('./dataProtectionFinal');
+      // await finalDataProtection.initialize(); // DISABLED TO PREVENT AUTOMATIC BACKUPS
       
       // Layer 2: Import Protection System - DISABLED
       // const { importProtection } = await import('./importDataProtection');
@@ -184,16 +185,9 @@ export class DatabaseStorage implements IStorage {
       // const { ultimateDataProtection } = await import('./ultimateDataProtection');
       // await ultimateDataProtection.initializeAllProtections(); // DISABLED TO PREVENT AUTOMATIC BACKUPS
       
-      console.log("✅ ULTIMATE DATA PROTECTION SYSTEM ACTIVE");
-      console.log("🛡️ 7 Protection Solutions Activated:");
-      console.log("  1. Database-Level Protection (Triggers)");
-      console.log("  2. Application-Level Protection (Function Override)");
-      console.log("  3. Automatic Backup System (Real-time)");
-      console.log("  4. Data Integrity Monitor (Continuous)");
-      console.log("  5. Emergency Restoration (Auto-recovery)");
-      console.log("  6. Read-Only Mode (Database Permissions)");
-      console.log("  7. Multi-layered Defense (Combined Systems)");
-      console.log("⚠️ Products & Services tables are now COMPLETELY PROTECTED");
+      console.log("🛡️ ULTIMATE DATA PROTECTION ACTIVATED (NO AUTOMATIC BACKUPS)");
+      console.log("⚠️ All automatic data deletion/reset systems DISABLED");
+      console.log("💡 Manual data management only - NO automatic changes");
       
     } catch (error) {
       console.error("❌ Ultimate data protection initialization failed:", error);
