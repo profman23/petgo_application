@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, dashboardLayouts, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type DashboardLayout, type InsertDashboardLayout } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -159,11 +159,6 @@ export interface IStorage {
   createInvoicePayment(payment: InsertInvoicePayment): Promise<InvoicePayment>;
   getInvoicePaymentsByBooking(bookingId: number): Promise<InvoicePayment[]>;
   deleteInvoicePayment(paymentId: number): Promise<void>;
-
-  // Dashboard Layout operations
-  saveDashboardLayout(layout: InsertDashboardLayout): Promise<DashboardLayout>;
-  getDashboardLayout(adminId: number): Promise<DashboardLayout | undefined>;
-  updateDashboardLayout(adminId: number, layout: Partial<DashboardLayout>): Promise<DashboardLayout | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1070,51 +1065,6 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInvoicePayment(paymentId: number): Promise<void> {
     await db.delete(invoicePayments).where(eq(invoicePayments.id, paymentId));
-  }
-
-  // Dashboard Layout operations
-  async saveDashboardLayout(layout: InsertDashboardLayout): Promise<DashboardLayout> {
-    // First check if layout exists for this admin
-    const existingLayout = await this.getDashboardLayout(layout.adminId);
-    
-    if (existingLayout) {
-      // Update existing layout
-      const [updatedLayout] = await db
-        .update(dashboardLayouts)
-        .set({
-          layout: layout.layout,
-          widgetSettings: layout.widgetSettings,
-          updatedAt: new Date()
-        })
-        .where(eq(dashboardLayouts.adminId, layout.adminId))
-        .returning();
-      return updatedLayout;
-    } else {
-      // Create new layout
-      const [newLayout] = await db.insert(dashboardLayouts).values(layout).returning();
-      return newLayout;
-    }
-  }
-
-  async getDashboardLayout(adminId: number): Promise<DashboardLayout | undefined> {
-    const [layout] = await db
-      .select()
-      .from(dashboardLayouts)
-      .where(eq(dashboardLayouts.adminId, adminId))
-      .limit(1);
-    return layout;
-  }
-
-  async updateDashboardLayout(adminId: number, layoutData: Partial<DashboardLayout>): Promise<DashboardLayout | undefined> {
-    const [updatedLayout] = await db
-      .update(dashboardLayouts)
-      .set({
-        ...layoutData,
-        updatedAt: new Date()
-      })
-      .where(eq(dashboardLayouts.adminId, adminId))
-      .returning();
-    return updatedLayout;
   }
 }
 

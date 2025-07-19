@@ -3289,62 +3289,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Dashboard Layout API Endpoints
-  app.get('/api/admin/dashboard-layout/:adminId', async (req, res) => {
-    try {
-      const adminId = parseInt(req.params.adminId);
-      const layout = await storage.getDashboardLayout(adminId);
-      
-      if (!layout) {
-        return res.status(404).json({ message: 'Layout not found' });
-      }
-      
-      res.json(layout);
-    } catch (error) {
-      console.error('Error fetching dashboard layout:', error);
-      res.status(500).json({ message: 'Failed to fetch dashboard layout' });
-    }
-  });
-
-  app.post('/api/admin/dashboard-layout', async (req, res) => {
-    try {
-      const { adminId, layout, widgetSettings } = req.body;
-      
-      if (!adminId || !layout || !widgetSettings) {
-        return res.status(400).json({ message: 'Missing required fields' });
-      }
-
-      const savedLayout = await storage.saveDashboardLayout({
-        adminId,
-        layout,
-        widgetSettings
-      });
-
-      res.status(201).json(savedLayout);
-    } catch (error) {
-      console.error('Error saving dashboard layout:', error);
-      res.status(500).json({ message: 'Failed to save dashboard layout' });
-    }
-  });
-
-  app.put('/api/admin/dashboard-layout/:adminId', async (req, res) => {
-    try {
-      const adminId = parseInt(req.params.adminId);
-      const updateData = req.body;
-      
-      const updatedLayout = await storage.updateDashboardLayout(adminId, updateData);
-      
-      if (!updatedLayout) {
-        return res.status(404).json({ message: 'Layout not found' });
-      }
-      
-      res.json(updatedLayout);
-    } catch (error) {
-      console.error('Error updating dashboard layout:', error);
-      res.status(500).json({ message: 'Failed to update dashboard layout' });
-    }
-  });
-
   const httpServer = createServer(app);
   return httpServer;
 }

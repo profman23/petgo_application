@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, Layout } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,6 @@ import { playBookingNotification, testAudioNotification, audioNotification } fro
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import DashboardWidgets from "@/components/dashboard-widgets";
 
 // Services Management Component
 const ServicesManagementTable = ({ language }: { language: string }) => {
@@ -929,7 +928,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'management', 'shifts', 'reports', 'requests', 'import', 'dashboard', 'services', or 'products'
+  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
@@ -1871,21 +1870,10 @@ export default function AdminDashboard() {
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-5 px-2">
             <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full ${
-                activeTab === 'dashboard'
-                  ? 'bg-purple-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Layout className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'لوحة المعلومات المخصصة' : 'Customizable Dashboard'}
-            </button>
-            <button
               onClick={() => setActiveTab('management')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full ${
                 activeTab === 'management'
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -1903,7 +1891,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('reports')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'reports'
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -1914,7 +1902,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('requests')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'requests'
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -1925,7 +1913,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('import')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'import'
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -1936,7 +1924,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('services')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'services'
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -1947,7 +1935,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('products')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'products'
-                  ? 'bg-purple-600 text-white'
+                  ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
@@ -1961,12 +1949,6 @@ export default function AdminDashboard() {
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
             <div className="px-1 py-3 sm:px-0">
-              {activeTab === 'dashboard' && (
-                <div>
-                  <DashboardWidgets adminId="admin1" />
-                </div>
-              )}
-
               {activeTab === 'management' && (
                 <div>
                   {/* Add Driver Section */}

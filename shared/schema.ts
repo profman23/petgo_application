@@ -74,25 +74,6 @@ export const otpVerifications = pgTable("otp_verifications", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Dashboard widget layout preferences
-export const dashboardLayouts = pgTable("dashboard_layouts", {
-  id: serial("id").primaryKey(),
-  adminId: integer("admin_id").notNull(),
-  layout: jsonb("layout").notNull(), // Store widget positions and sizes
-  widgetSettings: jsonb("widget_settings").notNull(), // Store widget visibility and preferences
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertDashboardLayoutSchema = createInsertSchema(dashboardLayouts).pick({
-  adminId: true,
-  layout: true,
-  widgetSettings: true,
-});
-
-export type DashboardLayout = typeof dashboardLayouts.$inferSelect;
-export type InsertDashboardLayout = z.infer<typeof insertDashboardLayoutSchema>;
-
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
