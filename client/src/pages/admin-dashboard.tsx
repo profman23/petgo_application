@@ -682,9 +682,8 @@ export default function AdminDashboard() {
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
-  const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
-  const [showInvoicePreview, setShowInvoicePreview] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
+  const [reportsSubTab, setReportsSubTab] = useState('analytics');
+
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
@@ -712,12 +711,7 @@ export default function AdminDashboard() {
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
   
-  // State for Excel export
-  const [isExporting, setIsExporting] = useState(false);
-  
-  // State for Date Filter
-  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
-  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+
 
   // State for VetsVan Requests Filters
   const [requestSearchTerm, setRequestSearchTerm] = useState('');
@@ -728,11 +722,7 @@ export default function AdminDashboard() {
   const [requestCurrentPage, setRequestCurrentPage] = useState(1);
   const [requestItemsPerPage, setRequestItemsPerPage] = useState(10);
 
-  // Clear Date Filters
-  const clearFilters = () => {
-    setDateFrom(undefined);
-    setDateTo(undefined);
-  };
+
 
   // Clear Request Filters
   const clearRequestFilters = () => {
@@ -742,108 +732,7 @@ export default function AdminDashboard() {
     setRequestCurrentPage(1); // Reset to first page when clearing filters
   };
 
-  // Excel Export Function
-  const handleExportToExcel = async () => {
-    setIsExporting(true);
-    try {
-      const token = localStorage.getItem("adminToken");
-      const response = await fetch("/api/admin/export-sales-report", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      if (!response.ok) {
-        throw new Error("Failed to export data");
-      }
-
-      const { data, filename } = await response.json();
-
-      // Create workbook
-      const workbook = XLSX.utils.book_new();
-
-      // Create worksheet from data
-      const worksheet = XLSX.utils.json_to_sheet(data);
-
-      // Set column widths (updated for individual payment columns - up to 5 payments)
-      const columnWidths = [
-        { wch: 15 }, // Invoice Number
-        { wch: 20 }, // Customer Name
-        { wch: 15 }, // Customer Phone
-        { wch: 25 }, // Customer Email
-        { wch: 15 }, // Doctor Name
-        { wch: 12 }, // VetsVan Code
-        { wch: 15 }, // Appointment Date
-        { wch: 12 }, // Appointment Time
-        { wch: 15 }, // Service Type
-        { wch: 15 }, // Total Sales
-        { wch: 15 }, // Total Paid
-        { wch: 12 }, // VAT Amount
-        { wch: 15 }, // Discount Amount
-        { wch: 15 }, // Generated Date
-        { wch: 20 }, // Notes
-        { wch: 15 }, // Pet Names
-        { wch: 12 }, // Pet Types
-        { wch: 8 },  // Item #
-        { wch: 25 }, // Description
-        { wch: 10 }, // Quantity
-        { wch: 15 }, // Unit Price (SAR)
-        { wch: 15 }, // Item Total (SAR)
-        { wch: 15 }, // Item Discount
-        // Payment columns for up to 5 payments
-        { wch: 15 }, // Payment Type 1
-        { wch: 15 }, // Payment Amount 1 (SAR)
-        { wch: 20 }, // Payment Description 1
-        { wch: 12 }, // Payment Date 1
-        { wch: 12 }, // Payment Time 1
-        { wch: 15 }, // Payment Type 2
-        { wch: 15 }, // Payment Amount 2 (SAR)
-        { wch: 20 }, // Payment Description 2
-        { wch: 12 }, // Payment Date 2
-        { wch: 12 }, // Payment Time 2
-        { wch: 15 }, // Payment Type 3
-        { wch: 15 }, // Payment Amount 3 (SAR)
-        { wch: 20 }, // Payment Description 3
-        { wch: 12 }, // Payment Date 3
-        { wch: 12 }, // Payment Time 3
-        { wch: 15 }, // Payment Type 4
-        { wch: 15 }, // Payment Amount 4 (SAR)
-        { wch: 20 }, // Payment Description 4
-        { wch: 12 }, // Payment Date 4
-        { wch: 12 }, // Payment Time 4
-        { wch: 15 }, // Payment Type 5
-        { wch: 15 }, // Payment Amount 5 (SAR)
-        { wch: 20 }, // Payment Description 5
-        { wch: 12 }, // Payment Date 5
-        { wch: 12 }  // Payment Time 5
-      ];
-      worksheet['!cols'] = columnWidths;
-
-      // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(workbook, worksheet, language === 'ar' ? 'تقرير المبيعات' : 'Sales Report');
-
-      // Generate Excel file and download
-      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      
-      saveAs(blob, filename);
-
-      toast({
-        title: language === 'ar' ? 'تم التصدير بنجاح' : 'Export Successful',
-        description: language === 'ar' ? 'تم تحميل ملف Excel بنجاح' : 'Excel file downloaded successfully',
-      });
-
-    } catch (error) {
-      console.error('Export failed:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ في التصدير' : 'Export Error',
-        description: language === 'ar' ? 'فشل في تصدير البيانات' : 'Failed to export data',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsExporting(false);
-    }
-  };
 
   // Template download function
   const downloadTemplate = async (type: 'products' | 'services') => {
@@ -1893,43 +1782,25 @@ export default function AdminDashboard() {
                         {language === 'ar' ? 'التقارير والإحصائيات' : 'Reports & Analytics'}
                       </h3>
 
-                      {/* Sub-tabs for Reports */}
-                      <div className="mb-6">
-                        <div className="border-b border-gray-200">
-                          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                            <button
-                              onClick={() => setReportsSubTab('analytics')}
-                              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-                                reportsSubTab === 'analytics'
-                                  ? 'border-purple-500 text-purple-600'
-                                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                              }`}
-                            >
-                              {language === 'ar' ? 'تحليلات وإحصائيات' : 'Analytics'}
-                            </button>
-                            <button
-                              onClick={() => setReportsSubTab('sales')}
-                              className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm ${
-                                reportsSubTab === 'sales'
-                                  ? 'border-purple-500 text-purple-600'
-                                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                              }`}
-                            >
-                              {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
-                            </button>
-                          </nav>
+                      {/* Add Sales Report Navigation Button */}
+                      <div className="mb-6 flex justify-between items-center">
+                        <div className="text-sm text-gray-600">
+                          {language === 'ar' ? 'عرض البيانات والإحصائيات التفصيلية للنظام' : 'View detailed system data and analytics'}
                         </div>
+                        <button
+                          onClick={() => setLocation('/admin/reports/sales')}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                        >
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
+                        </button>
                       </div>
-                      
-                      {/* Analytics Tab Content */}
-                      {reportsSubTab === 'analytics' && (
+                      {isLoadingStats ? (
+                        <div className="flex justify-center py-12">
+                          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+                        </div>
+                      ) : (
                         <>
-                          {isLoadingStats ? (
-                            <div className="flex justify-center py-12">
-                              <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-                            </div>
-                          ) : (
-                            <>
                           {/* Stats Cards */}
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                             <div className="bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg p-6 text-white">
@@ -2006,7 +1877,7 @@ export default function AdminDashboard() {
                                     {language === 'ar' ? 'اضغط لرؤية التفاصيل' : 'Click to view details'}
                                   </p>
                                 </div>
-                                <div className="text-indigo-200 text-2xl">💬</div>
+                                <div className="text-indigo-200 text-2xl">📝</div>
                               </div>
                             </div>
                           </div>
@@ -2055,161 +1926,10 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         </div>
-                            )}
-                        </>
-                      )}
+                      </div>
+                    )}
 
-                      {/* Sales Report Tab Content */}
-                      {reportsSubTab === 'sales' && (
-                        <>
-                          {isLoadingInvoices ? (
-                            <div className="flex justify-center py-12">
-                              <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-                            </div>
-                          ) : (
-                            <>
-                              <div className="mb-4 flex justify-between items-center">
-                                <div>
-                                  <h4 className="text-lg font-medium text-gray-900 mb-2">
-                                    {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
-                                  </h4>
-                                  <p className="text-sm text-gray-600">
-                                    {language === 'ar' ? 'جميع الفواتير المولدة' : 'All Generated Invoices'}
-                                  </p>
-                                </div>
-                                
-                                {/* Excel Export Button */}
-                                <button
-                                  onClick={handleExportToExcel}
-                                  disabled={isExporting}
-                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {isExporting ? (
-                                    <>
-                                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                      {language === 'ar' ? 'جاري التصدير...' : 'Exporting...'}
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Download className="w-4 h-4 mr-2" />
-                                      {language === 'ar' ? 'تصدير إلى Excel' : 'Export to Excel'}
-                                    </>
-                                  )}
-                                </button>
-                              </div>
-
-                              {/* Date Filter Section */}
-                              <div className="mb-4 bg-gray-50 rounded-lg p-4 border">
-                                <div className="flex flex-wrap items-center gap-4">
-                                  <div className="flex items-center gap-2">
-                                    <Calendar className="h-4 w-4 text-gray-500" />
-                                    <span className="text-sm font-medium text-gray-700">
-                                      {language === 'ar' ? 'فلترة حسب التاريخ:' : 'Filter by Date:'}
-                                    </span>
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-2">
-                                    <Popover>
-                                      <PopoverTrigger asChild>
-                                        <Button
-                                          variant="outline"
-                                          className="w-[140px] justify-start text-left font-normal"
-                                        >
-                                          {dateFrom ? format(dateFrom, "dd/MM/yyyy") : (
-                                            <span className="text-gray-500">
-                                              {language === 'ar' ? 'من تاريخ' : 'From'}
-                                            </span>
-                                          )}
-                                        </Button>
-                                      </PopoverTrigger>
-                                      <PopoverContent className="w-auto p-0" align="start">
-                                        <CalendarComponent
-                                          mode="single"
-                                          selected={dateFrom}
-                                          onSelect={setDateFrom}
-                                          initialFocus
-                                        />
-                                      </PopoverContent>
-                                    </Popover>
-
-                                    <span className="text-gray-400">-</span>
-
-                                    <Popover>
-                                      <PopoverTrigger asChild>
-                                        <Button
-                                          variant="outline"
-                                          className="w-[140px] justify-start text-left font-normal"
-                                        >
-                                          {dateTo ? format(dateTo, "dd/MM/yyyy") : (
-                                            <span className="text-gray-500">
-                                              {language === 'ar' ? 'إلى تاريخ' : 'To'}
-                                            </span>
-                                          )}
-                                        </Button>
-                                      </PopoverTrigger>
-                                      <PopoverContent className="w-auto p-0" align="start">
-                                        <CalendarComponent
-                                          mode="single"
-                                          selected={dateTo}
-                                          onSelect={setDateTo}
-                                          initialFocus
-                                        />
-                                      </PopoverContent>
-                                    </Popover>
-
-                                    {(dateFrom || dateTo) && (
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={clearFilters}
-                                        className="h-8 px-2 lg:px-3"
-                                      >
-                                        <X className="h-4 w-4" />
-                                        <span className="ml-1 text-xs">
-                                          {language === 'ar' ? 'مسح' : 'Clear'}
-                                        </span>
-                                      </Button>
-                                    )}
-                                  </div>
-
-                                  {(dateFrom || dateTo) && (
-                                    <div className="text-xs text-gray-500">
-                                      {language === 'ar' 
-                                        ? `عرض ${generatedInvoices?.length || 0} فاتورة` 
-                                        : `Showing ${generatedInvoices?.length || 0} invoices`
-                                      }
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              {generatedInvoices && generatedInvoices.length > 0 ? (
-                                <div className="space-y-4">
-                                  {generatedInvoices.map((invoice) => (
-                                    <InvoiceCard 
-                                      key={invoice.id} 
-                                      invoice={invoice} 
-                                      language={language}
-                                    />
-                                  ))}
-                                </div>
-                              ) : (
-                                <div className="text-center py-12">
-                                  <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                    {language === 'ar' ? 'لا توجد فواتير' : 'No Invoices'}
-                                  </h3>
-                                  <p className="text-gray-500">
-                                    {language === 'ar' ? 'لم يتم إنشاء أي فواتير بعد' : 'No invoices have been generated yet'}
-                                  </p>
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
-                      
-                      {/* SMS Communication Section - Show in both tabs */}
+                    {/* SMS Communication Section */}
                       <div className="bg-white border rounded-lg p-6 mt-6">
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="text-lg font-medium text-gray-900">
@@ -3095,7 +2815,7 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <div className="text-gray-400 text-6xl mb-4">💬</div>
+                  <div className="text-gray-400 text-6xl mb-4">📝</div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     {language === 'ar' ? 'لا توجد تقييمات' : 'No Reviews Yet'}
                   </h3>
