@@ -8,6 +8,7 @@ import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
@@ -965,10 +966,20 @@ export default function AdminDashboard() {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
+  // State for VetsVan Requests Filters
+  const [requestSearchTerm, setRequestSearchTerm] = useState('');
+  const [requestFilterDate, setRequestFilterDate] = useState<Date | undefined>(undefined);
+
   // Clear Date Filters
   const clearFilters = () => {
     setDateFrom(undefined);
     setDateTo(undefined);
+  };
+
+  // Clear Request Filters
+  const clearRequestFilters = () => {
+    setRequestSearchTerm('');
+    setRequestFilterDate(undefined);
   };
 
   // Excel Export Function
@@ -1377,7 +1388,7 @@ export default function AdminDashboard() {
   });
 
   // Fetch all VetsVan requests with real-time notifications
-  const { data: vetsVanRequests, isLoading: isLoadingRequests } = useQuery({
+  const { data: allVetsVanRequests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
     queryFn: async () => {
       const response = await fetch("/api/admin/vetsvan-requests", {
@@ -1410,10 +1421,31 @@ export default function AdminDashboard() {
     refetchIntervalInBackground: true,
   });
 
+  // Filter VetsVan requests based on search term and date
+  const vetsVanRequests = allVetsVanRequests?.filter(request => {
+    // Search filter - check name, phone, email, pets, vetsvan
+    const searchMatch = !requestSearchTerm || 
+      request.customerName.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
+      request.customerPhone.includes(requestSearchTerm) ||
+      request.customerEmail.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
+      request.vetsvanCode.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
+      request.vetsvanName.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
+      request.pets?.some(pet => 
+        pet.name.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
+        pet.type.toLowerCase().includes(requestSearchTerm.toLowerCase())
+      );
+
+    // Date filter - check appointment date
+    const dateMatch = !requestFilterDate || 
+      new Date(request.appointmentDate).toDateString() === requestFilterDate.toDateString();
+
+    return searchMatch && dateMatch;
+  });
+
   // Monitor for new requests and trigger notifications
   useEffect(() => {
-    if (vetsVanRequests && vetsVanRequests.length > 0) {
-      const currentCount = vetsVanRequests.length;
+    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
+      const currentCount = allVetsVanRequests.length;
       
       // Check if there are new requests
       if (lastRequestCountRef.current > 0 && currentCount > lastRequestCountRef.current) {
@@ -1450,7 +1482,7 @@ export default function AdminDashboard() {
       lastRequestCountRef.current = currentCount;
       setCurrentRequestCount(currentCount);
     }
-  }, [vetsVanRequests, audioEnabled, language, toast]);
+  }, [allVetsVanRequests, audioEnabled, language, toast]);
 
   // Request browser notification permission on component mount
   useEffect(() => {
@@ -2424,6 +2456,91 @@ export default function AdminDashboard() {
                     <p className="text-gray-600" style={{ textAlign: getTextAlign(language) }}>
                       {language === 'ar' ? 'عرض جميع طلبات العملاء لكل سيارات VETS VAN' : 'View all customer requests for all VetsVan vehicles'}
                     </p>
+                  </div>
+
+                  {/* Filters Section */}
+                  <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4" style={{ textAlign: getTextAlign(language) }}>
+                      {language === 'ar' ? 'فلاتر البحث' : 'Search Filters'}
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      {/* Search Field */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
+                          {language === 'ar' ? 'البحث (اسم، هاتف، إيميل، حيوانات أليفة، VetsVan)' : 'Search (Name, Phone, Email, Pets, VetsVan)'}
+                        </label>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <input
+                            type="text"
+                            value={requestSearchTerm}
+                            onChange={(e) => setRequestSearchTerm(e.target.value)}
+                            placeholder={language === 'ar' ? 'ابحث في جميع الحقول...' : 'Search all fields...'}
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+                            style={{ textAlign: getTextAlign(language) }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Date Filter */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
+                          {language === 'ar' ? 'فلتر بتاريخ الموعد' : 'Filter by Appointment Date'}
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start text-left font-normal border-gray-300 hover:border-purple-600"
+                            >
+                              <Calendar className="mr-2 h-4 w-4" />
+                              {requestFilterDate ? (
+                                format(requestFilterDate, language === 'ar' ? 'dd/MM/yyyy' : 'MM/dd/yyyy')
+                              ) : (
+                                <span className="text-gray-500">
+                                  {language === 'ar' ? 'اختر التاريخ' : 'Pick a date'}
+                                </span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={requestFilterDate}
+                              onSelect={setRequestFilterDate}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+
+                    {/* Filter Actions and Results Counter */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        {(requestSearchTerm || requestFilterDate) && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={clearRequestFilters}
+                            className="h-8 px-2 lg:px-3"
+                          >
+                            <X className="h-4 w-4" />
+                            <span className="ml-1 text-xs">
+                              {language === 'ar' ? 'مسح الفلاتر' : 'Clear Filters'}
+                            </span>
+                          </Button>
+                        )}
+                      </div>
+
+                      <div className="text-sm text-gray-500">
+                        {language === 'ar' 
+                          ? `عرض ${vetsVanRequests?.length || 0} من ${allVetsVanRequests?.length || 0} طلب` 
+                          : `Showing ${vetsVanRequests?.length || 0} of ${allVetsVanRequests?.length || 0} requests`
+                        }
+                      </div>
+                    </div>
                   </div>
 
                   {isLoadingRequests ? (
