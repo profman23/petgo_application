@@ -2645,7 +2645,7 @@ export default function AdminDashboard() {
                   ) : vetsVanRequests && vetsVanRequests.length > 0 ? (
                     <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
                       {vetsVanRequests.map((request) => (
-                        <Card key={request.id} className="border-2 border-purple-200 hover:border-purple-300 hover:shadow-md transition-all duration-200" style={{ borderColor: '#85208550' }}>
+                        <Card key={request.id} className="border-2 hover:shadow-md transition-all duration-200" style={{ borderColor: '#852085' }}>
                           <CardHeader className="pb-2 pt-3 px-3">
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
