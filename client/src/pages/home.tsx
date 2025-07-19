@@ -383,8 +383,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Current Location */}
-        <div className="p-3 bg-blue-50 border-b">
+        {/* Current Location - Hidden but functional */}
+        <div className="hidden">
           <div className="flex items-center justify-between mb-1">
             <h3 className="font-semibold text-gray-800 text-sm" style={{ textAlign }}>
               {language === 'ar' ? 'موقعك الحالي' : 'Your Current Location'}
@@ -407,7 +407,7 @@ export default function Home() {
               </Button>
             )}
           </div>
-          {/* Debug location info */}
+          {/* Debug location info - kept for functionality */}
           <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
             <div className="text-gray-600">
               <strong>{language === 'ar' ? 'معلومات النظام:' : 'System Info:'}</strong>
