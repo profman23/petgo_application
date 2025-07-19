@@ -22,6 +22,7 @@ import Activity from "@/pages/activity";
 import CustomerActivity from "@/pages/customer-activity";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
+import AdminServices from "@/pages/admin-services";
 import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
@@ -135,6 +136,7 @@ function Router() {
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
+          <Route path="/admin-dashboard/services" component={AdminServices} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
