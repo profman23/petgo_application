@@ -73,39 +73,45 @@
   outline: none !important;
 }
 
-/* Shaking Animation with Delay Loop */
-@keyframes shakeLoop {
+/* Strong Shaking Animation - 1 second shake, 1 second pause */
+@keyframes strongShake {
   0% { transform: translateX(0); }
-  2% { transform: translateX(-4px) rotate(-2deg); }
-  4% { transform: translateX(4px) rotate(2deg); }
-  6% { transform: translateX(-4px) rotate(-1deg); }
-  8% { transform: translateX(4px) rotate(1deg); }
-  10% { transform: translateX(-2px) rotate(-0.5deg); }
-  12% { transform: translateX(2px) rotate(0.5deg); }
-  14% { transform: translateX(0) rotate(0deg); }
-  100% { transform: translateX(0) rotate(0deg); }
+  5% { transform: translateX(-8px); }
+  10% { transform: translateX(8px); }
+  15% { transform: translateX(-8px); }
+  20% { transform: translateX(8px); }
+  25% { transform: translateX(-8px); }
+  30% { transform: translateX(8px); }
+  35% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  45% { transform: translateX(-6px); }
+  50% { transform: translateX(0); }
+  100% { transform: translateX(0); }
 }
 
-@keyframes shakeLoopDelayed {
+@keyframes strongShakeDelayed {
   0% { transform: translateX(0); }
   25% { transform: translateX(0); }
-  27% { transform: translateX(-4px) rotate(-2deg); }
-  29% { transform: translateX(4px) rotate(2deg); }
-  31% { transform: translateX(-4px) rotate(-1deg); }
-  33% { transform: translateX(4px) rotate(1deg); }
-  35% { transform: translateX(-2px) rotate(-0.5deg); }
-  37% { transform: translateX(2px) rotate(0.5deg); }
-  39% { transform: translateX(0) rotate(0deg); }
-  100% { transform: translateX(0) rotate(0deg); }
+  30% { transform: translateX(-8px); }
+  35% { transform: translateX(8px); }
+  40% { transform: translateX(-8px); }
+  45% { transform: translateX(8px); }
+  50% { transform: translateX(-8px); }
+  55% { transform: translateX(8px); }
+  60% { transform: translateX(-8px); }
+  65% { transform: translateX(8px); }
+  70% { transform: translateX(-6px); }
+  75% { transform: translateX(0); }
+  100% { transform: translateX(0); }
 }
 
-/* Apply shaking animation */
+/* Apply strong shaking animation - 2 seconds total (1 second shake + 1 second pause) */
 .shake-animation {
-  animation: shakeLoop 6s infinite;
+  animation: strongShake 2s infinite;
 }
 
 .shake-animation-delayed {
-  animation: shakeLoopDelayed 6s infinite;
+  animation: strongShakeDelayed 2s infinite;
 }
 
 /* Custom Select Pets Logo styling with transparent background */
