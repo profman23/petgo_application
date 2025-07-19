@@ -421,16 +421,24 @@ export class DatabaseStorage implements IStorage {
 
   // Bookings operations
   async createBooking(booking: InsertBooking): Promise<Booking> {
-    // Ensure customerLocation has proper typing
+    // Ensure customerLocation and selectedPets have proper typing
     const bookingData = {
       ...booking,
       customerLocation: booking.customerLocation ? {
         ...booking.customerLocation,
         address: booking.customerLocation.address as string | undefined
-      } : booking.customerLocation
+      } : booking.customerLocation,
+      selectedPets: booking.selectedPets ? booking.selectedPets.map((pet: any) => ({
+        id: pet.id,
+        name: pet.name,
+        type: pet.type,
+        ageYear: pet.ageYear ? Number(pet.ageYear) : undefined,
+        ageMonth: pet.ageMonth ? Number(pet.ageMonth) : undefined,
+        ageDay: pet.ageDay ? Number(pet.ageDay) : undefined
+      })) : booking.selectedPets
     };
     
-    const [newBooking] = await db.insert(bookings).values([bookingData]).returning();
+    const [newBooking] = await db.insert(bookings).values(bookingData).returning();
     return newBooking;
   }
 
@@ -964,7 +972,7 @@ export class DatabaseStorage implements IStorage {
   async createGeneratedInvoice(invoice: InsertGeneratedInvoice): Promise<GeneratedInvoice> {
     const [newInvoice] = await db
       .insert(generatedInvoices)
-      .values(invoice)
+      .values([invoice])
       .returning();
     return newInvoice;
   }

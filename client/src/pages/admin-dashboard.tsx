@@ -1926,11 +1926,10 @@ export default function AdminDashboard() {
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {/* SMS Communication Section */}
-                      <div className="bg-white border rounded-lg p-6 mt-6">
+                    <div className="bg-white border rounded-lg p-6 mt-6">
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="text-lg font-medium text-gray-900">
                             {language === 'ar' ? 'إرسال الرسائل النصية' : 'SMS Communication'}
