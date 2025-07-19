@@ -2643,23 +2643,19 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                   ) : vetsVanRequests && vetsVanRequests.length > 0 ? (
-                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
                       {vetsVanRequests.map((request) => (
-                        <Card key={request.id} className="border border-gray-200 hover:shadow-lg transition-shadow">
-                          <CardHeader className="pb-3">
+                        <Card key={request.id} className="border border-gray-200 hover:shadow-md transition-shadow">
+                          <CardHeader className="pb-2 pt-3 px-3">
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
-                                <CardTitle className="text-lg flex items-center gap-2">
-                                  <User className="h-5 w-5 text-purple-600" />
-                                  <span className="text-gray-900">{request.customerName}</span>
+                                <CardTitle className="text-sm flex items-center gap-1">
+                                  <User className="h-3 w-3 text-purple-600" />
+                                  <span className="text-gray-900 truncate">{request.customerName}</span>
                                 </CardTitle>
-                                <div className="flex items-center gap-2 mt-2">
-                                  <Phone className="h-4 w-4 text-gray-500" />
-                                  <span className="text-sm text-gray-600">{request.customerPhone}</span>
-                                </div>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Mail className="h-4 w-4 text-gray-500" />
-                                  <span className="text-sm text-gray-600">{request.customerEmail}</span>
+                                <div className="flex items-center gap-1 mt-1">
+                                  <Phone className="h-3 w-3 text-gray-500" />
+                                  <span className="text-xs text-gray-600">{request.customerPhone}</span>
                                 </div>
                               </div>
                               <UIBadge 
@@ -2668,97 +2664,69 @@ export default function AdminDashboard() {
                                   request.status === 'pending_review' ? 'secondary' :
                                   request.status === 'cancelled' ? 'destructive' : 'outline'
                                 }
-                                className="text-xs"
+                                className="text-xs px-1 py-0"
                               >
-                                {request.status === 'confirmed' && (language === 'ar' ? 'مؤكد' : 'Confirmed')}
-                                {request.status === 'pending_review' && (language === 'ar' ? 'قيد المراجعة' : 'Pending Review')}
-                                {request.status === 'cancelled' && (language === 'ar' ? 'ملغي' : 'Cancelled')}
+                                {request.status === 'confirmed' && (language === 'ar' ? 'مؤكد' : 'OK')}
+                                {request.status === 'pending_review' && (language === 'ar' ? 'انتظار' : 'Wait')}
+                                {request.status === 'cancelled' && (language === 'ar' ? 'ملغي' : 'X')}
                                 {!['confirmed', 'pending_review', 'cancelled'].includes(request.status) && request.status}
                               </UIBadge>
                             </div>
                           </CardHeader>
                           
-                          <CardContent className="space-y-4">
+                          <CardContent className="space-y-2 px-3 pb-3">
                             {/* VetsVan Info */}
-                            <div className="#85208550 rounded-lg p-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
-                                <span className="font-medium text-purple-600">
+                            <div className="bg-purple-50 rounded p-1">
+                              <div className="flex items-center gap-1">
+                                <div className="w-1 h-1 bg-purple-600 rounded-full"></div>
+                                <span className="text-xs font-medium text-purple-700">
                                   {request.vetsvanCode}
                                 </span>
                               </div>
-                              <p className="text-sm text-purple-600">{request.vetsvanName}</p>
                             </div>
 
                             {/* Appointment Details */}
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Calendar className="h-4 w-4 text-blue-600" />
-                                <span className="text-sm font-medium text-gray-700">
-                                  {language === 'ar' ? 'التاريخ:' : 'Date:'}
-                                </span>
-                                <span className="text-sm text-gray-600">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3 text-blue-600" />
+                                <span className="text-xs text-gray-600 truncate">
                                   {new Date(request.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                                 </span>
                               </div>
                               
-                              <div className="flex items-center gap-2">
-                                <Clock className="h-4 w-4 text-blue-600" />
-                                <span className="text-sm font-medium text-gray-700">
-                                  {language === 'ar' ? 'الوقت:' : 'Time:'}
-                                </span>
-                                <span className="text-sm text-gray-600">{request.appointmentTime}</span>
+                              <div className="flex items-center gap-1">
+                                <Clock className="h-3 w-3 text-blue-600" />
+                                <span className="text-xs text-gray-600">{request.appointmentTime}</span>
                               </div>
                             </div>
 
                             {/* Service Type */}
-                            <div className="bg-blue-50 rounded-lg p-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                                <span className="text-sm font-medium text-blue-900">
-                                  {language === 'ar' ? 'نوع الخدمة:' : 'Service Type:'}
-                                </span>
-                              </div>
-                              <p className="text-sm text-blue-700 mt-1">
-                                {request.serviceType === 'general_checkup' && (language === 'ar' ? 'كشف عام' : 'General Check Up')}
-                                {request.serviceType === 'grooming' && (language === 'ar' ? 'تنظيف' : 'Grooming')}
+                            <div className="bg-blue-50 rounded p-1">
+                              <span className="text-xs text-blue-700">
+                                {request.serviceType === 'general_checkup' && (language === 'ar' ? 'كشف' : 'Check')}
+                                {request.serviceType === 'grooming' && (language === 'ar' ? 'تنظيف' : 'Groom')}
                                 {!['general_checkup', 'grooming'].includes(request.serviceType) && request.serviceType}
-                              </p>
+                              </span>
                             </div>
 
                             {/* Pets */}
                             {request.pets && request.pets.length > 0 && (
-                              <div className="bg-green-50 rounded-lg p-3">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                                  <span className="text-sm font-medium text-green-900">
-                                    {language === 'ar' ? 'الحيوانات الأليفة:' : 'Pets:'}
-                                  </span>
-                                </div>
-                                <div className="space-y-1">
+                              <div className="bg-green-50 rounded p-1">
+                                <div className="flex flex-wrap gap-1">
                                   {request.pets.map((pet, index) => (
-                                    <div key={index} className="flex items-center gap-2">
-                                      <span className="text-sm font-medium text-green-800">{pet.name}</span>
-                                      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                                        {pet.type === 'cat' && (language === 'ar' ? 'قطة' : 'Cat')}
-                                        {pet.type === 'dog' && (language === 'ar' ? 'كلب' : 'Dog')}
-                                        {pet.type === 'bird' && (language === 'ar' ? 'طائر' : 'Bird')}
-                                        {!['cat', 'dog', 'bird'].includes(pet.type) && pet.type}
-                                      </span>
-                                    </div>
+                                    <span key={index} className="text-xs text-green-700 bg-green-100 px-1 rounded">
+                                      {pet.name}
+                                      {pet.type === 'cat' && ' 🐱'}
+                                      {pet.type === 'dog' && ' 🐶'}
+                                      {pet.type === 'bird' && ' 🐦'}
+                                    </span>
                                   ))}
                                 </div>
                               </div>
                             )}
 
                             {/* Status Update */}
-                            <div className="bg-gray-50 rounded-lg p-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
-                                <span className="text-sm font-medium text-gray-900">
-                                  {language === 'ar' ? 'تحديث الحالة:' : 'Update Status:'}
-                                </span>
-                              </div>
+                            <div className="bg-gray-50 rounded p-1">
                               <select
                                 value={request.status}
                                 onChange={(e) => {
@@ -2769,26 +2737,25 @@ export default function AdminDashboard() {
                                   });
                                 }}
                                 disabled={updateBookingStatusMutation.isPending}
-                                className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085 bg-white"
+                                className="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-600 bg-white"
                                 style={{ textAlign: getTextAlign(language) }}
                               >
                                 <option value="pending_review">
-                                  {language === 'ar' ? 'قيد المراجعة' : 'Pending Review'}
+                                  {language === 'ar' ? 'انتظار' : 'Wait'}
                                 </option>
                                 <option value="confirmed">
-                                  {language === 'ar' ? 'مؤكد' : 'Confirmed'}
+                                  {language === 'ar' ? 'مؤكد' : 'OK'}
                                 </option>
                                 <option value="cancelled">
-                                  {language === 'ar' ? 'ملغي' : 'Cancelled'}
+                                  {language === 'ar' ? 'ملغي' : 'X'}
                                 </option>
                               </select>
                             </div>
 
                             {/* Created Date */}
-                            <div className="border-t pt-3 mt-4">
-                              <div className="flex items-center justify-between text-xs text-gray-500">
-                                <span>{language === 'ar' ? 'تاريخ الطلب:' : 'Created:'}</span>
-                                <span>{new Date(request.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}</span>
+                            <div className="border-t pt-1 mt-1">
+                              <div className="text-xs text-gray-400 text-center">
+                                {new Date(request.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                               </div>
                             </div>
                           </CardContent>
