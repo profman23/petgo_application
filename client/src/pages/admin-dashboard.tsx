@@ -968,7 +968,8 @@ export default function AdminDashboard() {
 
   // State for VetsVan Requests Filters
   const [requestSearchTerm, setRequestSearchTerm] = useState('');
-  const [requestFilterDate, setRequestFilterDate] = useState<Date | undefined>(undefined);
+  const [requestFilterDateFrom, setRequestFilterDateFrom] = useState<Date | undefined>(undefined);
+  const [requestFilterDateTo, setRequestFilterDateTo] = useState<Date | undefined>(undefined);
 
   // Clear Date Filters
   const clearFilters = () => {
@@ -979,7 +980,8 @@ export default function AdminDashboard() {
   // Clear Request Filters
   const clearRequestFilters = () => {
     setRequestSearchTerm('');
-    setRequestFilterDate(undefined);
+    setRequestFilterDateFrom(undefined);
+    setRequestFilterDateTo(undefined);
   };
 
   // Excel Export Function
@@ -1435,9 +1437,11 @@ export default function AdminDashboard() {
         pet.type.toLowerCase().includes(requestSearchTerm.toLowerCase())
       );
 
-    // Date filter - check appointment date
-    const dateMatch = !requestFilterDate || 
-      new Date(request.appointmentDate).toDateString() === requestFilterDate.toDateString();
+    // Date filter - check appointment date within range
+    const appointmentDate = new Date(request.appointmentDate);
+    const dateMatch = (!requestFilterDateFrom && !requestFilterDateTo) ||
+      ((!requestFilterDateFrom || appointmentDate >= requestFilterDateFrom) &&
+       (!requestFilterDateTo || appointmentDate <= requestFilterDateTo));
 
     return searchMatch && dateMatch;
   });
@@ -2483,43 +2487,83 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
-                      {/* Date Filter */}
+                      {/* Date Range Filter */}
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
-                          {language === 'ar' ? 'فلتر بتاريخ الموعد' : 'Filter by Appointment Date'}
+                          {language === 'ar' ? 'فلتر بتاريخ الموعد (من - إلى)' : 'Filter by Appointment Date (From - To)'}
                         </label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-start text-left font-normal border-gray-300 hover:border-purple-600"
-                            >
-                              <Calendar className="mr-2 h-4 w-4" />
-                              {requestFilterDate ? (
-                                format(requestFilterDate, language === 'ar' ? 'dd/MM/yyyy' : 'MM/dd/yyyy')
-                              ) : (
-                                <span className="text-gray-500">
-                                  {language === 'ar' ? 'اختر التاريخ' : 'Pick a date'}
-                                </span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
-                              mode="single"
-                              selected={requestFilterDate}
-                              onSelect={setRequestFilterDate}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {/* From Date */}
+                          <div>
+                            <label className="text-xs text-gray-500 mb-1 block">
+                              {language === 'ar' ? 'من تاريخ' : 'From Date'}
+                            </label>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className="w-full justify-start text-left font-normal border-gray-300 hover:border-purple-600"
+                                >
+                                  <Calendar className="mr-2 h-4 w-4" />
+                                  {requestFilterDateFrom ? (
+                                    format(requestFilterDateFrom, language === 'ar' ? 'dd/MM/yyyy' : 'MM/dd/yyyy')
+                                  ) : (
+                                    <span className="text-gray-500">
+                                      {language === 'ar' ? 'من' : 'From'}
+                                    </span>
+                                  )}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <CalendarComponent
+                                  mode="single"
+                                  selected={requestFilterDateFrom}
+                                  onSelect={setRequestFilterDateFrom}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+
+                          {/* To Date */}
+                          <div>
+                            <label className="text-xs text-gray-500 mb-1 block">
+                              {language === 'ar' ? 'إلى تاريخ' : 'To Date'}
+                            </label>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  className="w-full justify-start text-left font-normal border-gray-300 hover:border-purple-600"
+                                >
+                                  <Calendar className="mr-2 h-4 w-4" />
+                                  {requestFilterDateTo ? (
+                                    format(requestFilterDateTo, language === 'ar' ? 'dd/MM/yyyy' : 'MM/dd/yyyy')
+                                  ) : (
+                                    <span className="text-gray-500">
+                                      {language === 'ar' ? 'إلى' : 'To'}
+                                    </span>
+                                  )}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <CalendarComponent
+                                  mode="single"
+                                  selected={requestFilterDateTo}
+                                  onSelect={setRequestFilterDateTo}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
                     {/* Filter Actions and Results Counter */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div className="flex items-center gap-2">
-                        {(requestSearchTerm || requestFilterDate) && (
+                        {(requestSearchTerm || requestFilterDateFrom || requestFilterDateTo) && (
                           <Button
                             variant="ghost"
                             size="sm"
