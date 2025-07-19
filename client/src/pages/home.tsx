@@ -772,7 +772,7 @@ export default function Home() {
                 href="https://wa.me/966535152250"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-20 h-20 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 border border-purple-200 shake-animation"
+                className="flex items-center justify-center w-20 h-20 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 shake-animation"
               >
                 <img 
                   src={whatsappIcon}
@@ -787,7 +787,7 @@ export default function Home() {
               {/* Phone Call Button */}
               <a
                 href="tel:+966535152250"
-                className="flex items-center justify-center w-20 h-20 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 border border-purple-200 shake-animation-delayed"
+                className="flex items-center justify-center w-20 h-20 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 shake-animation-delayed"
               >
                 <img 
                   src={phoneIcon}
