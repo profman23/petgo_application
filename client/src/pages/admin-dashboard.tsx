@@ -1947,8 +1947,8 @@ export default function AdminDashboard() {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto py-6 pl-2 pr-6 lg:pr-8">
-            <div className="px-2 py-6 sm:px-0">
+          <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
+            <div className="px-1 py-3 sm:px-0">
               {activeTab === 'management' && (
                 <div>
                   {/* Add Driver Section */}
