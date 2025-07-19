@@ -34,6 +34,18 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Maintain display order to prevent reordering after updates
+  const [displayServices, setDisplayServices] = useState<any[]>([]);
+  
+  useEffect(() => {
+    if (services) {
+      // Only update display order if it's different from current services
+      if (displayServices.length === 0 || services.length !== displayServices.length) {
+        setDisplayServices([...services]);
+      }
+    }
+  }, [services]);
+
   const updateServiceMutation = useMutation({
     mutationFn: async ({ id, price }: { id: number; price: string }) => {
       return apiRequest(`/api/admin/services/${id}`, {
@@ -41,8 +53,19 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
         body: JSON.stringify({ price }),
       });
     },
-    onSuccess: () => {
+    onSuccess: (updatedService, variables) => {
+      // Update the service in the display array to maintain position
+      setDisplayServices(prev => 
+        prev.map(service => 
+          service.id === variables.id 
+            ? { ...service, price: parseFloat(variables.price) }
+            : service
+        )
+      );
+      
+      // Also invalidate the cache for fresh data on next load
       queryClient.invalidateQueries({ queryKey: ['/api/admin/services'] });
+      
       toast({
         title: language === 'ar' ? "تم التحديث بنجاح" : "Updated Successfully",
         description: language === 'ar' ? "تم تحديث سعر الخدمة" : "Service price updated",
@@ -68,7 +91,10 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
         body: JSON.stringify(serviceData),
       });
     },
-    onSuccess: () => {
+    onSuccess: (newService) => {
+      // Add the new service to display array
+      setDisplayServices(prev => [...prev, newService]);
+      
       queryClient.invalidateQueries({ queryKey: ['/api/admin/services'] });
       toast({
         title: language === 'ar' ? "تمت الإضافة بنجاح" : "Added Successfully",
@@ -133,8 +159,8 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
     );
   }
 
-  // Filter services based on search text
-  const filteredServices = services?.filter(service => {
+  // Filter services based on search text using display services to maintain order
+  const filteredServices = displayServices.filter(service => {
     if (!filterText) return true;
     const searchLower = filterText.toLowerCase();
     return (
@@ -142,7 +168,7 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
       service.nameAr?.toLowerCase().includes(searchLower) ||
       service.price.toString().includes(searchLower)
     );
-  }) || [];
+  });
 
   // Pagination calculations based on filtered results
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -205,8 +231,8 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
             textAlign: getTextAlign(language) 
           }}>
             {language === 'ar' 
-              ? `عرض ${filteredServices.length} من ${services?.length || 0} خدمة`
-              : `Showing ${filteredServices.length} of ${services?.length || 0} services`
+              ? `عرض ${filteredServices.length} من ${displayServices.length} خدمة`
+              : `Showing ${filteredServices.length} of ${displayServices.length} services`
             }
           </div>
         )}
