@@ -970,6 +970,10 @@ export default function AdminDashboard() {
   const [requestSearchTerm, setRequestSearchTerm] = useState('');
   const [requestFilterDateFrom, setRequestFilterDateFrom] = useState<Date | undefined>(undefined);
   const [requestFilterDateTo, setRequestFilterDateTo] = useState<Date | undefined>(undefined);
+  
+  // Pagination State for VetsVan Requests
+  const [requestCurrentPage, setRequestCurrentPage] = useState(1);
+  const [requestItemsPerPage, setRequestItemsPerPage] = useState(10);
 
   // Clear Date Filters
   const clearFilters = () => {
@@ -982,6 +986,7 @@ export default function AdminDashboard() {
     setRequestSearchTerm('');
     setRequestFilterDateFrom(undefined);
     setRequestFilterDateTo(undefined);
+    setRequestCurrentPage(1); // Reset to first page when clearing filters
   };
 
   // Excel Export Function
@@ -1424,7 +1429,7 @@ export default function AdminDashboard() {
   });
 
   // Filter VetsVan requests based on search term and date
-  const vetsVanRequests = allVetsVanRequests?.filter(request => {
+  const filteredVetsVanRequests = allVetsVanRequests?.filter(request => {
     // Search filter - check name, phone, email, pets, vetsvan
     const searchMatch = !requestSearchTerm || 
       request.customerName.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
@@ -1452,6 +1457,28 @@ export default function AdminDashboard() {
 
     return searchMatch && dateMatch;
   });
+
+  // Pagination calculations for VetsVan requests
+  const totalRequestsCount = filteredVetsVanRequests?.length || 0;
+  const totalRequestPages = Math.ceil(totalRequestsCount / requestItemsPerPage);
+  const requestStartIndex = (requestCurrentPage - 1) * requestItemsPerPage;
+  const requestEndIndex = requestStartIndex + requestItemsPerPage;
+  const vetsVanRequests = filteredVetsVanRequests?.slice(requestStartIndex, requestEndIndex) || [];
+
+  // Pagination handlers for VetsVan requests
+  const handleRequestPageChange = (newPage: number) => {
+    setRequestCurrentPage(newPage);
+  };
+
+  const handleRequestItemsPerPageChange = (newItemsPerPage: number) => {
+    setRequestItemsPerPage(newItemsPerPage);
+    setRequestCurrentPage(1); // Reset to first page
+  };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setRequestCurrentPage(1);
+  }, [requestSearchTerm, requestFilterDateFrom, requestFilterDateTo]);
 
   // Monitor for new requests and trigger notifications
   useEffect(() => {
@@ -2601,8 +2628,8 @@ export default function AdminDashboard() {
 
                       <div className="text-sm text-gray-500">
                         {language === 'ar' 
-                          ? `عرض ${vetsVanRequests?.length || 0} من ${allVetsVanRequests?.length || 0} طلب` 
-                          : `Showing ${vetsVanRequests?.length || 0} of ${allVetsVanRequests?.length || 0} requests`
+                          ? `عرض ${requestStartIndex + 1}-${Math.min(requestEndIndex, totalRequestsCount)} من ${totalRequestsCount} طلب` 
+                          : `Showing ${requestStartIndex + 1}-${Math.min(requestEndIndex, totalRequestsCount)} of ${totalRequestsCount} requests`
                         }
                       </div>
                     </div>
@@ -2777,6 +2804,129 @@ export default function AdminDashboard() {
                       <p className="mt-1 text-sm text-gray-500">
                         {language === 'ar' ? 'لم يتم تقديم أي طلبات VETS VAN بعد' : 'No VetsVan requests have been made yet'}
                       </p>
+                    </div>
+                  )}
+
+                  {/* Pagination Controls for VetsVan Requests */}
+                  {vetsVanRequests && totalRequestsCount > 0 && (
+                    <div className="bg-white border-t px-4 py-3 flex items-center justify-between sm:px-6 mt-4">
+                      <div className="flex-1 flex justify-between sm:hidden">
+                        {/* Mobile Previous/Next */}
+                        <button
+                          onClick={() => handleRequestPageChange(requestCurrentPage - 1)}
+                          disabled={requestCurrentPage === 1}
+                          className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                            requestCurrentPage === 1
+                              ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {language === 'ar' ? 'السابق' : 'Previous'}
+                        </button>
+                        <button
+                          onClick={() => handleRequestPageChange(requestCurrentPage + 1)}
+                          disabled={requestCurrentPage === totalRequestPages}
+                          className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                            requestCurrentPage === totalRequestPages
+                              ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {language === 'ar' ? 'التالي' : 'Next'}
+                        </button>
+                      </div>
+
+                      <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between" style={{ direction: getDirection(language) }}>
+                        <div className="flex items-center gap-4">
+                          <div className="text-sm text-gray-700">
+                            {language === 'ar'
+                              ? `عرض ${requestStartIndex + 1} إلى ${Math.min(requestEndIndex, totalRequestsCount)} من ${totalRequestsCount} طلب`
+                              : `Showing ${requestStartIndex + 1} to ${Math.min(requestEndIndex, totalRequestsCount)} of ${totalRequestsCount} requests`
+                            }
+                          </div>
+                          
+                          {/* Items per page selector */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-700">
+                              {language === 'ar' ? 'عرض:' : 'Show:'}
+                            </span>
+                            <select
+                              value={requestItemsPerPage}
+                              onChange={(e) => handleRequestItemsPerPageChange(Number(e.target.value))}
+                              className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+                            >
+                              <option value={10}>10</option>
+                              <option value={50}>50</option>
+                              <option value={100}>100</option>
+                            </select>
+                            <span className="text-sm text-gray-700">
+                              {language === 'ar' ? 'طلب في الصفحة' : 'per page'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {/* Previous Button */}
+                          <button
+                            onClick={() => handleRequestPageChange(requestCurrentPage - 1)}
+                            disabled={requestCurrentPage === 1}
+                            className={`relative inline-flex items-center px-3 py-2 rounded-md border text-sm font-medium ${
+                              requestCurrentPage === 1
+                                ? 'bg-gray-50 text-gray-400 border-gray-300 cursor-not-allowed'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-purple-600'
+                            }`}
+                          >
+                            <ChevronDown className={`h-4 w-4 ${language === 'ar' ? 'rotate-90' : '-rotate-90'}`} />
+                            <span className="ml-1">{language === 'ar' ? 'السابق' : 'Previous'}</span>
+                          </button>
+
+                          {/* Page Numbers */}
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: totalRequestPages }, (_, i) => i + 1)
+                              .filter(page => {
+                                // Show first page, last page, current page, and pages around current
+                                return page === 1 || 
+                                       page === totalRequestPages || 
+                                       Math.abs(page - requestCurrentPage) <= 1;
+                              })
+                              .map((page, index, array) => {
+                                // Add ellipsis if there's a gap
+                                const showEllipsis = index > 0 && page - array[index - 1] > 1;
+                                return (
+                                  <div key={page} className="flex items-center">
+                                    {showEllipsis && (
+                                      <span className="px-2 py-1 text-gray-500">...</span>
+                                    )}
+                                    <button
+                                      onClick={() => handleRequestPageChange(page)}
+                                      className={`px-3 py-2 rounded-md text-sm font-medium ${
+                                        page === requestCurrentPage
+                                          ? 'bg-purple-600 text-white border border-purple-600'
+                                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-purple-600'
+                                      }`}
+                                    >
+                                      {page}
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                          </div>
+
+                          {/* Next Button */}
+                          <button
+                            onClick={() => handleRequestPageChange(requestCurrentPage + 1)}
+                            disabled={requestCurrentPage === totalRequestPages}
+                            className={`relative inline-flex items-center px-3 py-2 rounded-md border text-sm font-medium ${
+                              requestCurrentPage === totalRequestPages
+                                ? 'bg-gray-50 text-gray-400 border-gray-300 cursor-not-allowed'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-purple-600'
+                            }`}
+                          >
+                            <span className="mr-1">{language === 'ar' ? 'التالي' : 'Next'}</span>
+                            <ChevronDown className={`h-4 w-4 ${language === 'ar' ? '-rotate-90' : 'rotate-90'}`} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
