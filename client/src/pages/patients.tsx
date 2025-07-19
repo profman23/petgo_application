@@ -103,7 +103,7 @@ export default function Patients() {
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header - Exact same design as home.tsx */}
-        <div className="bg-white text-gray-800 px-3 py-2 h-10 border-b shadow-sm">
+        <div className="bg-white text-gray-800 px-3 py-3 h-12 shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
               <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
@@ -142,6 +142,9 @@ export default function Patients() {
             </div>
           </div>
         </div>
+
+        {/* Purple Divider Line */}
+        <div className="h-1 bg-purple-600 shadow-sm"></div>
 
         {/* Content */}
         <div className="p-4 pb-20">

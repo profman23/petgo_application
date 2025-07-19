@@ -73,6 +73,28 @@
   outline: none !important;
 }
 
+/* Contact Icon Shake Animation */
+@keyframes contactShake {
+  0%, 100% { 
+    transform: translateX(0) rotate(0deg);
+  }
+  25% { 
+    transform: translateX(5px) rotate(2deg);
+  }
+  50% { 
+    transform: translateX(-5px) rotate(-2deg);
+  }
+  75% { 
+    transform: translateX(5px) rotate(2deg);
+  }
+}
+
+.contact-shake {
+  animation: contactShake 1s ease-in-out infinite;
+  animation-iteration-count: infinite;
+  animation-delay: 0s;
+}
+
 /* Moderate Shake with Quarter Rotation - 1 second shake, 1 second pause */
 @keyframes moderateShake {
   0% { transform: translateX(0) rotate(0deg); }
