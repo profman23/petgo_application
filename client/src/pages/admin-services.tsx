@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Loader2, Plus, X } from "lucide-react";
+import { ArrowLeft, Edit, Loader2, Plus, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
@@ -17,6 +17,9 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Filter State
+  const [filterText, setFilterText] = useState('');
   
   // Add Service State
   const [showAddForm, setShowAddForm] = useState(false);
@@ -130,10 +133,28 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
     );
   }
 
+  // Filter services based on search text
+  const filteredServices = services?.filter(service => {
+    if (!filterText) return true;
+    const searchLower = filterText.toLowerCase();
+    return (
+      service.name.toLowerCase().includes(searchLower) ||
+      service.nameAr?.toLowerCase().includes(searchLower) ||
+      service.price.toString().includes(searchLower)
+    );
+  }) || [];
+
+  // Pagination calculations based on filtered results
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedServices = services?.slice(startIndex, endIndex) || [];
-  const totalPages = Math.ceil((services?.length || 0) / itemsPerPage);
+  const paginatedServices = filteredServices.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+
+  // Reset to page 1 when filter changes
+  const handleFilterChange = (value: string) => {
+    setFilterText(value);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="space-y-6">
@@ -154,6 +175,41 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
           <Plus className="h-4 w-4 mr-2" />
           {language === 'ar' ? 'إضافة خدمة' : 'Add Service'}
         </Button>
+      </div>
+
+      {/* Filter Field */}
+      <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            type="text"
+            placeholder={language === 'ar' ? 'البحث في الخدمات...' : 'Search services...'}
+            value={filterText}
+            onChange={(e) => handleFilterChange(e.target.value)}
+            className="pl-10 border-purple-300 focus:border-purple-500 focus:ring-purple-500"
+            style={{ 
+              direction: getDirection(language), 
+              textAlign: getTextAlign(language),
+              paddingLeft: language === 'ar' ? '12px' : '40px',
+              paddingRight: language === 'ar' ? '40px' : '12px'
+            }}
+          />
+          {language === 'ar' && (
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          )}
+        </div>
+        
+        {filterText && (
+          <div className="mt-2 text-sm text-gray-600" style={{ 
+            direction: getDirection(language), 
+            textAlign: getTextAlign(language) 
+          }}>
+            {language === 'ar' 
+              ? `عرض ${filteredServices.length} من ${services?.length || 0} خدمة`
+              : `Showing ${filteredServices.length} of ${services?.length || 0} services`
+            }
+          </div>
+        )}
       </div>
 
       {/* Add Service Form */}
