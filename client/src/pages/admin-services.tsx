@@ -422,15 +422,23 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
           </table>
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
-            <div className="flex items-center space-x-2" style={{ direction: getDirection(language) }}>
-              <span className="text-sm text-gray-700">
-                {language === 'ar' 
-                  ? `إظهار ${itemsPerPage} من أصل` 
-                  : `Show ${itemsPerPage} per page`
-                }
+        {/* Enhanced Pagination */}
+        <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4">
+          {/* Results Info & Items Per Page */}
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="text-sm text-gray-700" style={{ 
+              direction: getDirection(language), 
+              textAlign: getTextAlign(language) 
+            }}>
+              {language === 'ar' 
+                ? `عرض ${paginatedServices.length} من أصل ${filteredServices.length} خدمة (المجموع: ${services?.length || 0})`
+                : `Showing ${paginatedServices.length} of ${filteredServices.length} services (Total: ${services?.length || 0})`
+              }
+            </div>
+            
+            <div className="flex items-center gap-2" style={{ direction: getDirection(language) }}>
+              <span className="text-sm text-gray-600">
+                {language === 'ar' ? 'عرض:' : 'Show:'}
               </span>
               <select
                 value={itemsPerPage}
@@ -438,42 +446,53 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
                   setItemsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                className="border border-purple-300 rounded px-3 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white"
+                style={{ direction: 'ltr' }}
               >
                 <option value={10}>10</option>
-                <option value={25}>25</option>
                 <option value={50}>50</option>
+                <option value={100}>100</option>
               </select>
+              <span className="text-sm text-gray-600">
+                {language === 'ar' ? 'لكل صفحة' : 'per page'}
+              </span>
             </div>
-            
-            <div className="flex items-center space-x-2">
+          </div>
+          
+          {/* Navigation Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
+                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {language === 'ar' ? 'السابق' : 'Previous'}
               </Button>
               
-              <span className="text-sm text-gray-700">
-                {language === 'ar' 
-                  ? `صفحة ${currentPage} من ${totalPages}`
-                  : `Page ${currentPage} of ${totalPages}`
-                }
-              </span>
+              <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
+                <span className="text-sm font-medium text-purple-700">
+                  {language === 'ar' 
+                    ? `صفحة ${currentPage} من ${totalPages}`
+                    : `Page ${currentPage} of ${totalPages}`
+                  }
+                </span>
+              </div>
               
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
+                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {language === 'ar' ? 'التالي' : 'Next'}
               </Button>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
