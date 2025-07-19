@@ -15,9 +15,9 @@ import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753
 import newClinicImage from "@assets/freepik_assistant_1751363666289_1751363695395.png";
 import newestHouseImage from "@assets/freepik_assistant_1751364682430_1751364706224.png";
 import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-veterinary-clinic-bui__89216_1751368110471.png";
-// SVG icons without background
-const whatsappIcon = '/icons/whatsapp-3d.svg';
-import phoneIcon from '@assets/freepik__background__45618_1752165541475.png';
+// New purple theme icons
+import whatsappIcon from '@assets/freepik__background__20710_1752913557710.png';
+import phoneIcon from '@assets/freepik__a-modern-and-sleek-smartphone-icon-in-dark-mauve-c__20709_1752913557712.png';
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
@@ -769,14 +769,14 @@ export default function Home() {
                 href="https://wa.me/966535152250"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
+                className="flex items-center justify-center w-20 h-20 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 border border-purple-200"
               >
                 <img 
                   src={whatsappIcon}
                   alt="WhatsApp"
-                  className="w-12 h-12 object-contain"
+                  className="w-14 h-14 object-contain"
                   style={{
-                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
+                    filter: 'drop-shadow(0 4px 12px rgba(139, 47, 139, 0.3))'
                   }}
                 />
               </a>
@@ -784,14 +784,14 @@ export default function Home() {
               {/* Phone Call Button */}
               <a
                 href="tel:+966535152250"
-                className="flex items-center justify-center w-16 h-16 rounded-xl shadow-md hover:shadow-lg transform hover:scale-110 transition-all duration-300"
+                className="flex items-center justify-center w-20 h-20 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 border border-purple-200"
               >
                 <img 
                   src={phoneIcon}
                   alt="Phone Call"
-                  className="w-12 h-12 object-contain"
+                  className="w-14 h-14 object-contain"
                   style={{
-                    filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2))'
+                    filter: 'drop-shadow(0 4px 12px rgba(139, 47, 139, 0.3))'
                   }}
                 />
               </a>
