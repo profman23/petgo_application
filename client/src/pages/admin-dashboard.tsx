@@ -2666,9 +2666,9 @@ export default function AdminDashboard() {
                                 }
                                 className="text-xs px-1 py-0"
                               >
-                                {request.status === 'confirmed' && (language === 'ar' ? 'مؤكد' : 'OK')}
-                                {request.status === 'pending_review' && (language === 'ar' ? 'انتظار' : 'Wait')}
-                                {request.status === 'cancelled' && (language === 'ar' ? 'ملغي' : 'X')}
+                                {request.status === 'confirmed' && (language === 'ar' ? 'مؤكد' : 'Confirmed')}
+                                {request.status === 'pending_review' && (language === 'ar' ? 'قيد المراجعة' : 'Pending Review')}
+                                {request.status === 'cancelled' && (language === 'ar' ? 'ملغي' : 'Cancelled')}
                                 {!['confirmed', 'pending_review', 'cancelled'].includes(request.status) && request.status}
                               </UIBadge>
                             </div>
@@ -2741,13 +2741,13 @@ export default function AdminDashboard() {
                                 style={{ textAlign: getTextAlign(language) }}
                               >
                                 <option value="pending_review">
-                                  {language === 'ar' ? 'انتظار' : 'Wait'}
+                                  {language === 'ar' ? 'قيد المراجعة' : 'Pending Review'}
                                 </option>
                                 <option value="confirmed">
-                                  {language === 'ar' ? 'مؤكد' : 'OK'}
+                                  {language === 'ar' ? 'مؤكد' : 'Confirmed'}
                                 </option>
                                 <option value="cancelled">
-                                  {language === 'ar' ? 'ملغي' : 'X'}
+                                  {language === 'ar' ? 'ملغي' : 'Cancelled'}
                                 </option>
                               </select>
                             </div>
