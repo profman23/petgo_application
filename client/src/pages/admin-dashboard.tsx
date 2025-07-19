@@ -1437,11 +1437,18 @@ export default function AdminDashboard() {
         pet.type.toLowerCase().includes(requestSearchTerm.toLowerCase())
       );
 
-    // Date filter - check appointment date within range
+    // Date filter - check appointment date within range (compare dates only, ignore time)
     const appointmentDate = new Date(request.appointmentDate);
-    const dateMatch = (!requestFilterDateFrom && !requestFilterDateTo) ||
-      ((!requestFilterDateFrom || appointmentDate >= requestFilterDateFrom) &&
-       (!requestFilterDateTo || appointmentDate <= requestFilterDateTo));
+    const appointmentDateOnly = new Date(appointmentDate.getFullYear(), appointmentDate.getMonth(), appointmentDate.getDate());
+    
+    let dateMatch = true;
+    if (requestFilterDateFrom || requestFilterDateTo) {
+      const fromDateOnly = requestFilterDateFrom ? new Date(requestFilterDateFrom.getFullYear(), requestFilterDateFrom.getMonth(), requestFilterDateFrom.getDate()) : null;
+      const toDateOnly = requestFilterDateTo ? new Date(requestFilterDateTo.getFullYear(), requestFilterDateTo.getMonth(), requestFilterDateTo.getDate()) : null;
+      
+      dateMatch = (!fromDateOnly || appointmentDateOnly >= fromDateOnly) &&
+                  (!toDateOnly || appointmentDateOnly <= toDateOnly);
+    }
 
     return searchMatch && dateMatch;
   });
@@ -2518,7 +2525,14 @@ export default function AdminDashboard() {
                                 <CalendarComponent
                                   mode="single"
                                   selected={requestFilterDateFrom}
-                                  onSelect={setRequestFilterDateFrom}
+                                  onSelect={(date) => {
+                                    // If "To Date" is selected and new "From Date" is after "To Date", reset "To Date"
+                                    if (date && requestFilterDateTo && date > requestFilterDateTo) {
+                                      setRequestFilterDateTo(undefined);
+                                    }
+                                    setRequestFilterDateFrom(date);
+                                  }}
+                                  disabled={(date) => requestFilterDateTo ? date > requestFilterDateTo : false}
                                   initialFocus
                                 />
                               </PopoverContent>
@@ -2550,7 +2564,14 @@ export default function AdminDashboard() {
                                 <CalendarComponent
                                   mode="single"
                                   selected={requestFilterDateTo}
-                                  onSelect={setRequestFilterDateTo}
+                                  onSelect={(date) => {
+                                    // If "From Date" is selected and new "To Date" is before "From Date", reset "From Date"
+                                    if (date && requestFilterDateFrom && date < requestFilterDateFrom) {
+                                      setRequestFilterDateFrom(undefined);
+                                    }
+                                    setRequestFilterDateTo(date);
+                                  }}
+                                  disabled={(date) => requestFilterDateFrom ? date < requestFilterDateFrom : false}
                                   initialFocus
                                 />
                               </PopoverContent>
