@@ -2486,7 +2486,7 @@ export default function AdminDashboard() {
 
               {/* VetsVan Requests Tab - Cards Layout */}
               {activeTab === 'requests' && (
-                <div className="space-y-6" dir={getDirection(language)}>
+                <div className="space-y-3" dir={getDirection(language)}>
                   <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
                       {language === 'ar' ? 'جميع طلبات VETS VAN' : 'All VetsVan Requests'}
@@ -2497,14 +2497,14 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Filters Section */}
-                  <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4" style={{ textAlign: getTextAlign(language) }}>
+                  <div className="bg-white p-4 rounded-lg border-2 shadow-sm" style={{ borderColor: '#852085' }}>
+                    <h3 className="text-lg font-medium text-gray-900 mb-3" style={{ textAlign: getTextAlign(language) }}>
                       {language === 'ar' ? 'فلاتر البحث' : 'Search Filters'}
                     </h3>
                     
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                       {/* Search Field - Full Width */}
-                      <div className="space-y-2">
+                      <div className="space-y-1">
                         <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
                           {language === 'ar' ? 'البحث (اسم، هاتف، إيميل، حيوانات أليفة، VetsVan)' : 'Search (Name, Phone, Email, Pets, VetsVan)'}
                         </label>
@@ -2522,13 +2522,13 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* Date Range Filter - Full Width Below Search */}
-                      <div className="space-y-2">
+                      <div className="space-y-1">
                         <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
                           {language === 'ar' ? 'فلتر بتاريخ الموعد (من - إلى)' : 'Filter by Appointment Date (From - To)'}
                         </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {/* From Date */}
-                          <div className="space-y-2">
+                          <div className="space-y-1">
                             <label className="text-xs text-gray-500">
                               {language === 'ar' ? 'من تاريخ' : 'From Date'}
                             </label>
@@ -2567,7 +2567,7 @@ export default function AdminDashboard() {
                           </div>
 
                           {/* To Date */}
-                          <div className="space-y-2">
+                          <div className="space-y-1">
                             <label className="text-xs text-gray-500">
                               {language === 'ar' ? 'إلى تاريخ' : 'To Date'}
                             </label>
