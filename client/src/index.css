@@ -73,6 +73,41 @@
   outline: none !important;
 }
 
+/* Shaking Animation with Delay Loop */
+@keyframes shakeLoop {
+  0% { transform: translateX(0); }
+  2% { transform: translateX(-4px) rotate(-2deg); }
+  4% { transform: translateX(4px) rotate(2deg); }
+  6% { transform: translateX(-4px) rotate(-1deg); }
+  8% { transform: translateX(4px) rotate(1deg); }
+  10% { transform: translateX(-2px) rotate(-0.5deg); }
+  12% { transform: translateX(2px) rotate(0.5deg); }
+  14% { transform: translateX(0) rotate(0deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes shakeLoopDelayed {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(0); }
+  27% { transform: translateX(-4px) rotate(-2deg); }
+  29% { transform: translateX(4px) rotate(2deg); }
+  31% { transform: translateX(-4px) rotate(-1deg); }
+  33% { transform: translateX(4px) rotate(1deg); }
+  35% { transform: translateX(-2px) rotate(-0.5deg); }
+  37% { transform: translateX(2px) rotate(0.5deg); }
+  39% { transform: translateX(0) rotate(0deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* Apply shaking animation */
+.shake-animation {
+  animation: shakeLoop 6s infinite;
+}
+
+.shake-animation-delayed {
+  animation: shakeLoopDelayed 6s infinite;
+}
+
 /* Custom Select Pets Logo styling with transparent background */
 .select-pets-logo {
   background-color: transparent !important;
