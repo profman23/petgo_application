@@ -27,7 +27,7 @@ export function AdministrationSidebar({ currentPath }: AdministrationSidebarProp
   ];
 
   return (
-    <div className={`fixed ${language === 'ar' ? 'right-0' : 'left-0'} top-0 h-full w-64 bg-white shadow-lg ${language === 'ar' ? 'border-l' : 'border-r'} border-gray-200 z-40`}>
+    <div className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r border-gray-200 z-40" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Logo Section */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-center mb-4">

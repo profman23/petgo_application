@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { User, UserPlus, Upload, Mail, Phone, Lock, Shield, Camera } from 'lucide-react';
+import { User, UserPlus, ArrowLeft, Upload, Mail, Phone, Lock, Shield, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { AdministrationSidebar } from '@/components/administration-sidebar';
+import logoPath from '@assets/IMG-20250415-WA0047_1751986059751.jpg';
 
 interface NewUserData {
   firstName: string;
@@ -70,33 +70,49 @@ export default function UsersManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Sidebar */}
-      <AdministrationSidebar currentPath="/Administration/Users-Management" />
+    <div className="min-h-screen bg-gray-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Header Section */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            {/* Logo */}
+            <div className="absolute top-4 left-4 z-50">
+              <div className="w-16 h-12 bg-white rounded-lg shadow-lg border-2 border-purple-600 p-1 hover:shadow-xl transition-shadow duration-200">
+                <img 
+                  src={logoPath} 
+                  alt="Vets Van Logo" 
+                  className="w-full h-full object-contain rounded-md"
+                />
+              </div>
+            </div>
 
-      {/* Main Content Area */}
-      <div className={`flex-1 ${language === 'ar' ? 'mr-64' : 'ml-64'}`}>
-        {/* Header Section */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
-          <div className="px-6 py-4">
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-900">
+            {/* Title and Back Button */}
+            <div className="flex items-center">
+              <button
+                onClick={() => setLocation('/admin-dashboard')}
+                className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5 ml-2" />
+                {language === 'ar' ? 'العودة' : 'Back'}
+              </button>
+              <h1 className="text-2xl font-bold text-gray-900 mx-6">
                 {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
               </h1>
-              
-              {/* Logout Button */}
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-              >
-                {language === 'ar' ? 'تسجيل خروج' : 'Logout'}
-              </button>
             </div>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            >
+              {language === 'ar' ? 'تسجيل خروج' : 'Logout'}
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Main Content */}
-        <div className="p-6">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white shadow rounded-lg">
           {/* Header */}
           <div className="px-6 py-4 border-b border-gray-200">
@@ -297,7 +313,6 @@ export default function UsersManagement() {
                 {language === 'ar' ? 'استخدم زر "إضافة مستخدم جديد" لإضافة المستخدمين' : 'Use "Add New User" button to add users'}
               </p>
             </div>
-          </div>
           </div>
         </div>
       </div>
