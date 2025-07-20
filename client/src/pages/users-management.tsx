@@ -75,7 +75,7 @@ export default function UsersManagement() {
       <AdministrationSidebar currentPath="/Administration/Users-Management" />
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-64">
+      <div className={`flex-1 ${language === 'ar' ? 'mr-64' : 'ml-64'}`}>
         {/* Header Section */}
         <div className="bg-white shadow-sm border-b border-gray-200">
           <div className="px-6 py-4">
