@@ -298,6 +298,7 @@ export default function UsersManagement() {
               </p>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </div>

@@ -29,6 +29,7 @@ import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import UsersManagement from "@/pages/users-management";
+import Authorization from "@/pages/authorization";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -141,6 +142,7 @@ function Router() {
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
           <Route path="/Administration/Users-Management" component={UsersManagement} />
+          <Route path="/Administration/Authorization" component={Authorization} />
           <Route path="/sales-reports" component={SalesReports} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
