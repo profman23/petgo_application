@@ -1648,19 +1648,19 @@ export default function AdminDashboard() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => setActiveTab('users')}
-                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      activeTab === 'users'
-                        ? 'bg-purple-100 text-purple-600'
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
+                    onClick={() => setLocation('/Administration/Users-Management')}
+                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <User className="ml-3 h-5 w-5" />
                     {language === 'ar' ? 'المستخدمون' : 'Users'}
                   </button>
                   <button
-                    onClick={() => setLocation('/admin-dashboard/administration/authorization')}
-                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    onClick={() => setActiveTab('authorization')}
+                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full ${
+                      activeTab === 'authorization'
+                        ? 'bg-purple-100 text-purple-600'
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                    }`}
                   >
                     <Shield className="ml-3 h-5 w-5" />
                     {language === 'ar' ? 'التفويض' : 'Authorization'}
@@ -1983,7 +1983,27 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-
+              {/* Authorization Tab */}
+              {activeTab === 'authorization' && (
+                <div>
+                  <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        {language === 'ar' ? 'إدارة التفويض' : 'Authorization Management'}
+                      </h3>
+                      <div className="text-center py-12">
+                        <Shield className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-2 text-lg font-medium text-gray-900">
+                          {language === 'ar' ? 'قسم إدارة التفويض' : 'Authorization Management Section'}
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {language === 'ar' ? 'سيتم تطوير هذا القسم قريباً' : 'This section will be developed soon'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {activeTab === 'reports' && (
                 <div>
