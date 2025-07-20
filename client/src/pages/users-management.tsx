@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { User, UserPlus, ArrowLeft, Upload, Mail, Phone, Lock, Shield, Camera } from 'lucide-react';
+import { User, UserPlus, Upload, Mail, Phone, Lock, Shield, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import logoPath from '@assets/IMG-20250415-WA0047_1751986059751.jpg';
+import { AdministrationSidebar } from '@/components/administration-sidebar';
 
 interface NewUserData {
   firstName: string;
