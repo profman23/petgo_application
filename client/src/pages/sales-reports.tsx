@@ -243,41 +243,126 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
                     </tr>
                   </thead>
                   <tbody>
-                    {invoiceDetails.invoiceItems.map((item, index) => {
-                      const quantity = parseFloat(item.quantity || '0');
-                      const unitPrice = parseFloat(item.unitPrice || '0');
-                      const discount = parseFloat(item.discount || '0');
-                      const discountedPrice = unitPrice - discount;
-                      const totalBeforeVAT = quantity * discountedPrice;
-                      const vatAmount = totalBeforeVAT * 0.15;
-                      const totalAfterVAT = totalBeforeVAT + vatAmount;
-
-                      return (
-                        <tr key={index} className="border-b">
-                          {language === 'ar' ? (
-                            <>
-                              <td className="text-center py-2 px-2">{totalAfterVAT.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{totalBeforeVAT.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{vatAmount.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{discount.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{unitPrice.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{quantity}</td>
-                              <td className="text-right py-2 px-2">{item.description}</td>
-                            </>
-                          ) : (
-                            <>
-                              <td className="text-left py-2 px-2">{item.description}</td>
-                              <td className="text-center py-2 px-2">{quantity}</td>
-                              <td className="text-center py-2 px-2">{unitPrice.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{discount.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{vatAmount.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{totalBeforeVAT.toFixed(2)}</td>
-                              <td className="text-center py-2 px-2">{totalAfterVAT.toFixed(2)}</td>
-                            </>
-                          )}
-                        </tr>
-                      );
-                    })}
+                    {invoiceDetails.invoiceItems.map((item, index) => (
+                      <tr key={index} className="border-b">
+                        {/* Render cells in different order based on language */}
+                        {language === 'ar' ? (
+                          // Arabic RTL order: Total After VAT, Total Before VAT, VAT, Discount, Unit Price, Quantity, Description
+                          <>
+                            {/* Total After VAT */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-gray-100 p-2 rounded text-gray-700 font-semibold">
+                                {parseFloat(item.totalAfterVat || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Total Before VAT */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                {parseFloat(item.totalBeforeVat || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* VAT Amount */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-green-100 p-2 rounded text-green-700">
+                                {parseFloat(item.vatAmount || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Discount */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {item.discountType === 'none' 
+                                  ? (language === 'ar' ? 'بدون خصم' : 'No Discount')
+                                  : item.discountType === '10%' 
+                                    ? (language === 'ar' ? 'خصم 10%' : '10% Discount')
+                                    : (language === 'ar' ? 'خصم 100%' : '100% Discount')
+                                }
+                              </div>
+                            </td>
+                            
+                            {/* Unit Price */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {parseFloat(item.unitPrice || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Quantity */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {item.quantity}
+                              </div>
+                            </td>
+                            
+                            {/* Description */}
+                            <td className="py-2 px-2" style={{ width: '35%' }}>
+                              <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                {item.description || (language === 'ar' ? 'الوصف' : 'Description')}
+                              </div>
+                            </td>
+                          </>
+                        ) : (
+                          // English LTR order: Description, Quantity, Unit Price, Discount, VAT, Total Before VAT, Total After VAT
+                          <>
+                            {/* Description */}
+                            <td className="py-2 px-2" style={{ width: '35%' }}>
+                              <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                {item.description || (language === 'ar' ? 'الوصف' : 'Description')}
+                              </div>
+                            </td>
+                            
+                            {/* Quantity */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {item.quantity}
+                              </div>
+                            </td>
+                            
+                            {/* Unit Price */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {parseFloat(item.unitPrice || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Discount */}
+                            <td className="py-2 px-2">
+                              <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                {item.discountType === 'none' 
+                                  ? (language === 'ar' ? 'بدون خصم' : 'No Discount')
+                                  : item.discountType === '10%' 
+                                    ? (language === 'ar' ? 'خصم 10%' : '10% Discount')
+                                    : (language === 'ar' ? 'خصم 100%' : '100% Discount')
+                                }
+                              </div>
+                            </td>
+                            
+                            {/* VAT Amount */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-green-100 p-2 rounded text-green-700">
+                                {parseFloat(item.vatAmount || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Total Before VAT */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                {parseFloat(item.totalBeforeVat || '0').toFixed(2)}
+                              </div>
+                            </td>
+                            
+                            {/* Total After VAT */}
+                            <td className="py-2 px-2 text-center">
+                              <div className="bg-gray-100 p-2 rounded text-gray-700 font-semibold">
+                                {parseFloat(item.totalAfterVat || '0').toFixed(2)}
+                              </div>
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
