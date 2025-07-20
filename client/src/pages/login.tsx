@@ -14,6 +14,8 @@ import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart, Mail } from '
 import { useLocation } from 'wouter';
 import logoImage from "@assets/Screenshot 2025-07-10 182605_1752161515777.png";
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
+import { YouTubeTutorialModal } from '@/components/YouTubeTutorialModal';
+import { shouldShowTutorialVideo } from '@/lib/deviceDetection';
 
 interface LoginFormData {
   identifier: string;
@@ -33,6 +35,7 @@ interface AuthResponse {
 export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [captcha, setCaptcha] = useState({ question: '', answer: 0 });
+  const [showTutorialVideo, setShowTutorialVideo] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -88,15 +91,21 @@ export default function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       toast({
-        title: t('loginSuccess'),
-        description: `${t('welcomeNewUser')} ${data.user.name}`,
+        title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Login Successful',
+        description: language === 'ar' ? `مرحباً ${data.user.name}` : `Welcome ${data.user.name}`,
         variant: "default",
       });
-      setLocation('/home');
+      
+      // Check if tutorial video should be shown
+      if (shouldShowTutorialVideo()) {
+        setShowTutorialVideo(true);
+      } else {
+        setLocation('/home');
+      }
     },
     onError: (error: Error) => {
       toast({
-        title: t('errorOccurred'),
+        title: language === 'ar' ? 'خطأ' : 'Error',
         description: error.message,
         variant: "destructive",
       });
@@ -140,7 +149,7 @@ export default function Login() {
     },
     onError: (error: Error) => {
       toast({
-        title: t('errorOccurred'),
+        title: language === 'ar' ? 'خطأ' : 'Error',
         description: error.message,
         variant: "destructive",
       });
@@ -158,6 +167,11 @@ export default function Login() {
 
   const updateFormData = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleTutorialVideoClose = () => {
+    setShowTutorialVideo(false);
+    setLocation('/home');
   };
 
   return (
@@ -436,6 +450,12 @@ export default function Login() {
         </CardContent>
         </Card>
       </div>
+
+      {/* YouTube Tutorial Modal */}
+      <YouTubeTutorialModal 
+        isOpen={showTutorialVideo}
+        onClose={handleTutorialVideoClose}
+      />
     </div>
   );
 }
