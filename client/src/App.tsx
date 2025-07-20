@@ -140,7 +140,7 @@ function Router() {
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
-          <Route path="/administration/authorization" component={AdminAuthorization} />
+          <Route path="/admin-dashboard/administration/authorization" component={AdminAuthorization} />
           <Route path="/sales-reports" component={SalesReports} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />

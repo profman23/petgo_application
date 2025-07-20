@@ -1659,7 +1659,7 @@ export default function AdminDashboard() {
                     {language === 'ar' ? 'المستخدمون' : 'Users'}
                   </button>
                   <button
-                    onClick={() => setLocation('/administration/authorization')}
+                    onClick={() => setLocation('/admin-dashboard/administration/authorization')}
                     className="group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <Shield className="ml-3 h-5 w-5" />

@@ -43,7 +43,7 @@ export default function AdminAuthorization() {
     { name: language === 'ar' ? 'الإدارة' : 'Administration', href: '#', icon: Settings, current: true, 
       children: [
         { name: language === 'ar' ? 'المستخدمون' : 'Users', href: '/admin-dashboard', icon: User },
-        { name: language === 'ar' ? 'التفويض' : 'Authorization', href: '/administration/authorization', icon: Shield, current: true }
+        { name: language === 'ar' ? 'التفويض' : 'Authorization', href: '/admin-dashboard/administration/authorization', icon: Shield, current: true }
       ]
     },
     { name: language === 'ar' ? 'استيراد' : 'Import', href: '#', icon: Upload, current: false },
@@ -249,7 +249,7 @@ export default function AdminAuthorization() {
                         {language === 'ar' ? 'سيتم تطوير هذا القسم قريباً' : 'This section will be developed soon'}
                       </p>
                       <p className="mt-4 text-sm text-purple-600">
-                        {language === 'ar' ? 'المسار الحالي: /administration/authorization' : 'Current Path: /administration/authorization'}
+                        {language === 'ar' ? 'المسار الحالي: /admin-dashboard/administration/authorization' : 'Current Path: /admin-dashboard/administration/authorization'}
                       </p>
                     </div>
                   </div>
