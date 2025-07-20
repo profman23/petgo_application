@@ -141,6 +141,7 @@ function Router() {
           <Route path="/admin-dashboard/services" component={AdminServices} />
           <Route path="/sales-reports" component={SalesReports} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
+          <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />

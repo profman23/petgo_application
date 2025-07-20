@@ -683,6 +683,7 @@ export default function AdminDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
+  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
@@ -1651,13 +1652,36 @@ export default function AdminDashboard() {
               <BarChart3 className="ml-3 h-6 w-6" />
               {language === 'ar' ? 'التقارير' : 'Reports'}
             </button>
-            <button
-              onClick={() => setLocation('/new-reports-analytics')}
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <TrendingUp className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
-            </button>
+            {/* New Reports & Analytics Dropdown */}
+            <div className="mt-2">
+              <button
+                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <TrendingUp className="ml-3 h-6 w-6" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                </span>
+                {isNewReportsExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </button>
+              
+              {/* Dropdown Items */}
+              {isNewReportsExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
+                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="ml-3 h-5 w-5" />
+                    {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
+                  </button>
+                </div>
+              )}
+            </div>
             <button
               onClick={() => setActiveTab('requests')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
