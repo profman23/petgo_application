@@ -24,6 +24,7 @@ import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminServices from "@/pages/admin-services";
 import SalesReports from "@/pages/sales-reports";
+import NewReportsAnalytics from "@/pages/new-reports-analytics";
 import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
@@ -139,6 +140,7 @@ function Router() {
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
           <Route path="/sales-reports" component={SalesReports} />
+          <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />

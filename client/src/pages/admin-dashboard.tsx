@@ -2855,28 +2855,7 @@ export default function AdminDashboard() {
                 <ProductsManagementTable language={language} />
               )}
 
-              {/* New Reports & Analytics Tab */}
-              {activeTab === 'new-reports' && (
-                <div>
-                  <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">
-                        {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
-                      </h3>
-                      
-                      <div className="text-center py-12">
-                        <TrendingUp className="mx-auto h-12 w-12 text-purple-400" />
-                        <h3 className="mt-2 text-lg font-medium text-gray-900">
-                          {language === 'ar' ? 'قسم التقارير والتحليلات الجديد' : 'New Reports & Analytics Section'}
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {language === 'ar' ? 'سيتم إضافة المحتوى المطلوب هنا قريباً' : 'Required content will be added here soon'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+
 
             </div>
           </div>
