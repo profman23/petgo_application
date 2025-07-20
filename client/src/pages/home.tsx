@@ -103,6 +103,11 @@ export default function Home() {
   // Location permission modal state
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
+  
+  // New location detection states
+  const [isRequestingLocation, setIsRequestingLocation] = useState(false);
+  const [locationDetected, setLocationDetected] = useState(false);
+  const [showLocationHint, setShowLocationHint] = useState(true);
 
   // Simple location state management
   const [locationInfo, setLocationInfo] = useState({
@@ -145,6 +150,91 @@ export default function Home() {
     }
 
     return { city: closestCity, distance: minDistance };
+  };
+
+  // New function for manual location detection
+  const handleDetectLocation = () => {
+    // Check if geolocation is supported
+    if (!('geolocation' in navigator)) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 
+          'متصفحك لا يدعم تحديد الموقع الجغرافي' : 
+          'Your browser does not support geolocation',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsRequestingLocation(true);
+    setShowLocationHint(false);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        
+        // Success - location detected
+        setLocationDetected(true);
+        setIsRequestingLocation(false);
+        
+        // Save location data
+        const locationData = {
+          lat: latitude,
+          lon: longitude,
+          accuracy: accuracy,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('userLocation', JSON.stringify(locationData));
+        
+        toast({
+          title: language === 'ar' ? 'تم بنجاح!' : 'Success!',
+          description: language === 'ar' ? 
+            'تم تحديد موقعك بنجاح' : 
+            'Your location has been successfully detected',
+          variant: 'default'
+        });
+        
+        // Update location info for display
+        getCurrentLocation();
+      },
+      (error) => {
+        setIsRequestingLocation(false);
+        
+        let errorMessage = '';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = language === 'ar' ? 
+              '⚠️ لم نتمكن من تحديد موقعك. يرجى السماح بالوصول إلى الموقع من إعدادات المتصفح لتقديم الخدمة بشكل دقيق.' : 
+              '⚠️ We could not detect your location. Please allow location access in your browser settings to provide accurate service.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = language === 'ar' ? 
+              '⚠️ معلومات الموقع غير متاحة حالياً. يرجى التأكد من تفعيل خدمات الموقع والمحاولة مرة أخرى.' : 
+              '⚠️ Location information is currently unavailable. Please ensure location services are enabled and try again.';
+            break;
+          case error.TIMEOUT:
+            errorMessage = language === 'ar' ? 
+              '⚠️ انتهت مهلة تحديد الموقع. يرجى التأكد من اتصالك بالإنترنت والمحاولة مرة أخرى.' : 
+              '⚠️ Location detection timed out. Please check your internet connection and try again.';
+            break;
+          default:
+            errorMessage = language === 'ar' ? 
+              '⚠️ حدث خطأ أثناء تحديد الموقع. يرجى المحاولة مرة أخرى لاحقاً.' : 
+              '⚠️ An error occurred while detecting location. Please try again later.';
+        }
+        
+        toast({
+          title: language === 'ar' ? 'تعذر تحديد الموقع' : 'Location Detection Failed',
+          description: errorMessage,
+          variant: 'destructive'
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    );
   };
 
   // Get user location and detailed address
@@ -299,6 +389,22 @@ export default function Home() {
           setShowLocationModal(true);
         } else {
           setLocationPermissionGranted(true);
+        }
+        
+        // Check if location was previously detected
+        const savedLocation = localStorage.getItem('userLocation');
+        if (savedLocation) {
+          try {
+            const locationData = JSON.parse(savedLocation);
+            // Check if location data is not too old (24 hours)
+            if (locationData.timestamp && (Date.now() - locationData.timestamp) < 24 * 60 * 60 * 1000) {
+              setLocationDetected(true);
+              setShowLocationHint(false);
+            }
+          } catch (error) {
+            console.error('Error parsing saved location:', error);
+            localStorage.removeItem('userLocation');
+          }
         }
       } catch (error) {
         console.error('Error parsing user data:', error);
@@ -763,6 +869,87 @@ export default function Home() {
               </span>
             </div>
           </button>
+
+          {/* Location Detection Section */}
+          <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-purple-200 shadow-sm">
+            <div className="text-center">
+              {!locationDetected ? (
+                <>
+                  {/* Location Detection Button */}
+                  <button
+                    onClick={handleDetectLocation}
+                    disabled={isRequestingLocation}
+                    className={`w-full font-bold py-3 px-6 rounded-xl shadow-md transform hover:scale-105 transition-all duration-200 ${
+                      isRequestingLocation 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
+                    } text-white`}
+                  >
+                    <div className="flex flex-col items-center">
+                      {isRequestingLocation ? (
+                        <Loader2 className="w-6 h-6 mb-1 animate-spin" />
+                      ) : (
+                        <MapPin className="w-6 h-6 mb-1" />
+                      )}
+                      <span className="text-lg" style={{ textAlign }}>
+                        {isRequestingLocation 
+                          ? (language === 'ar' ? 'جاري تحديد موقعك...' : 'Detecting your location...') 
+                          : (language === 'ar' ? '📍 حدد موقعي الآن' : '📍 Detect My Location Now')
+                        }
+                      </span>
+                      {!isRequestingLocation && (
+                        <span className="text-sm opacity-90" style={{ textAlign }}>
+                          {language === 'ar' ? 'اكتشف موقعك لخدمة أفضل' : 'Discover your location for better service'}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Hint Message */}
+                  {showLocationHint && (
+                    <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-start space-x-2 rtl:space-x-reverse">
+                        <div className="text-yellow-600 mt-0.5">📌</div>
+                        <div className="text-sm text-yellow-800" style={{ textAlign }}>
+                          {language === 'ar' ? 
+                            'الرجاء الضغط على الزر لتحديد موقعك وتحسين تجربة الاستخدام.' : 
+                            'Please click the button to detect your location and improve your experience.'
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* Location Detected Success State */
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse mb-2">
+                    <CheckCircle className="w-6 h-6 text-green-600" />
+                    <span className="font-semibold text-green-800" style={{ textAlign }}>
+                      {language === 'ar' ? 'تم تحديد موقعك بنجاح!' : 'Location detected successfully!'}
+                    </span>
+                  </div>
+                  <div className="text-sm text-green-700" style={{ textAlign }}>
+                    {language === 'ar' ? 
+                      'يمكنك الآن طلب العيادة البيطرية المتنقلة بدقة أكبر' : 
+                      'You can now request the mobile veterinary clinic with better accuracy'
+                    }
+                  </div>
+                  
+                  {/* Option to re-detect location */}
+                  <button
+                    onClick={() => {
+                      setLocationDetected(false);
+                      setShowLocationHint(true);
+                    }}
+                    className="mt-2 text-sm text-green-600 hover:text-green-800 underline"
+                  >
+                    {language === 'ar' ? 'إعادة تحديد الموقع' : 'Re-detect location'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Contact Section - Icons Only */}
           <div className="mt-4 p-4 bg-white rounded-xl shadow-sm border border-purple-100">
