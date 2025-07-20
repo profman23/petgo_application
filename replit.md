@@ -770,6 +770,12 @@ Changelog:
 - July 19, 2025. IMPLEMENTED: POST /api/admin/services API endpoint for creating new services with validation
 - July 19, 2025. ENHANCED: Filter Field functionality added to Services Management screen
 - July 19, 2025. ADDED: Real-time search filtering supporting English names, Arabic names, and prices
+- July 20, 2025. IMPLEMENTED: Conditional YouTube tutorial video integration for iPhone Safari users
+- July 20, 2025. CREATED: Device detection system identifying iPhone Safari browsers specifically (excluding Google Chrome)
+- July 20, 2025. ADDED: YouTubeTutorialModal component with "don't show again" functionality and localStorage preferences
+- July 20, 2025. ENHANCED: Customer login flow with automatic tutorial video display for iPhone Safari users after successful authentication
+- July 20, 2025. COMPLETED: Tutorial video (https://youtube.com/shorts/KczqUnPUrzI) explaining location services setup for iPhone Safari users
+- July 20, 2025. SUCCESS: Conditional tutorial system fully operational - displays only for iPhone Safari users, skipped for all other browsers
 - July 19, 2025. IMPLEMENTED: Advanced Pagination system with Next/Previous buttons and 10-50-100 items per page options
 - July 19, 2025. COMPLETED: Enhanced pagination displaying filtered results count and total services count
 - July 19, 2025. ENHANCED: Purple theme design consistency (#852085) maintained throughout add service interface
