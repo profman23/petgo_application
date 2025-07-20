@@ -459,6 +459,16 @@ export default function DoctorActivity() {
           </Card>
         )}
 
+        {/* Add Record Button */}
+        <div className="mb-4">
+          <Button 
+            variant="default"
+            className="bg-purple-600 hover:bg-purple-700 text-white"
+          >
+            {language === 'ar' ? 'إضافة سجل' : 'Add Record'}
+          </Button>
+        </div>
+
         {/* Activity Title */}
         <div className="mb-6">
           <h2 className="text-xl font-bold text-gray-900 mb-2" style={{ textAlign }}>
