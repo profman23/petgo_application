@@ -39,6 +39,8 @@ export default function DoctorActivity() {
   const { language } = useLanguage();
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showMap, setShowMap] = useState(false);
+  const [showAddRecordDialog, setShowAddRecordDialog] = useState(false);
+  const [customerPhoneSearch, setCustomerPhoneSearch] = useState('');
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
   const { toast } = useToast();
@@ -464,6 +466,7 @@ export default function DoctorActivity() {
           <Button 
             variant="default"
             className="bg-purple-600 hover:bg-purple-700 text-white"
+            onClick={() => setShowAddRecordDialog(true)}
           >
             {language === 'ar' ? 'إضافة سجل' : 'Add Record'}
           </Button>
@@ -780,6 +783,32 @@ export default function DoctorActivity() {
               </p>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Record Dialog */}
+      <Dialog open={showAddRecordDialog} onOpenChange={setShowAddRecordDialog}>
+        <DialogContent className="sm:max-w-md" dir={direction}>
+          <DialogHeader>
+            <DialogTitle style={{ textAlign }}>
+              {language === 'ar' ? 'إضافة سجل جديد' : 'Add New Record'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700" style={{ textAlign }}>
+                {language === 'ar' ? 'رقم هاتف العميل' : 'Customer Phone Number'}
+              </label>
+              <input
+                type="text"
+                placeholder={language === 'ar' ? 'ابحث عن رقم الهاتف...' : 'Search phone number...'}
+                value={customerPhoneSearch}
+                onChange={(e) => setCustomerPhoneSearch(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                style={{ textAlign }}
+              />
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
