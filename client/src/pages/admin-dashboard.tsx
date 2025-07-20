@@ -682,9 +682,10 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
+  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', 'import', 'users', 'authorization'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false); // Administration dropdown state
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
@@ -1626,6 +1627,52 @@ export default function AdminDashboard() {
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-20 px-2">
+            {/* Administration Module Dropdown */}
+            <div className="mb-2">
+              <button
+                onClick={() => setIsAdministrationExpanded(!isAdministrationExpanded)}
+                className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <User className="ml-3 h-6 w-6" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'الإدارة' : 'Administration'}
+                </span>
+                {isAdministrationExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </button>
+              
+              {/* Administration Dropdown Items */}
+              {isAdministrationExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => setActiveTab('users')}
+                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full ${
+                      activeTab === 'users'
+                        ? 'bg-purple-100 text-purple-600'
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                    }`}
+                  >
+                    <User className="ml-3 h-5 w-5" />
+                    {language === 'ar' ? 'المستخدمون' : 'Users'}
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('authorization')}
+                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full ${
+                      activeTab === 'authorization'
+                        ? 'bg-purple-100 text-purple-600'
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                    }`}
+                  >
+                    <Shield className="ml-3 h-5 w-5" />
+                    {language === 'ar' ? 'التفويض' : 'Authorization'}
+                  </button>
+                </div>
+              )}
+            </div>
+
             <button
               onClick={() => setActiveTab('management')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full ${
@@ -1914,6 +1961,50 @@ export default function AdminDashboard() {
                         </li>
                       ))}
                     </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Users Tab */}
+              {activeTab === 'users' && (
+                <div>
+                  <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
+                      </h3>
+                      <div className="text-center py-12">
+                        <User className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-2 text-lg font-medium text-gray-900">
+                          {language === 'ar' ? 'قسم إدارة المستخدمين' : 'Users Management Section'}
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {language === 'ar' ? 'سيتم تطوير هذا القسم قريباً' : 'This section will be developed soon'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Authorization Tab */}
+              {activeTab === 'authorization' && (
+                <div>
+                  <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                        {language === 'ar' ? 'إدارة التفويض' : 'Authorization Management'}
+                      </h3>
+                      <div className="text-center py-12">
+                        <Shield className="mx-auto h-12 w-12 text-gray-400" />
+                        <h3 className="mt-2 text-lg font-medium text-gray-900">
+                          {language === 'ar' ? 'قسم إدارة التفويض' : 'Authorization Management Section'}
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {language === 'ar' ? 'سيتم تطوير هذا القسم قريباً' : 'This section will be developed soon'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
