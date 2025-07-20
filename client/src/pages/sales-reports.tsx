@@ -84,7 +84,7 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
       {/* Invoice Header */}
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
-          <div className="flex-1 grid grid-cols-7 gap-4 text-sm">
+          <div className="flex-1 grid grid-cols-8 gap-4 text-sm">
             <div>
               <span className="text-gray-500 block">{language === 'ar' ? 'رقم الفاتورة' : 'Invoice #'}</span>
               <span className="font-medium">{invoice.invoiceNumber}</span>
@@ -94,8 +94,12 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
               <span className="font-medium">{invoice.customerName}</span>
             </div>
             <div>
-              <span className="text-gray-500 block">{language === 'ar' ? 'VETS VAN' : 'VETS VAN'}</span>
-              <span className="font-medium">{invoice.vetsvanCode} - {invoice.vetsvanName}</span>
+              <span className="text-gray-500 block">{language === 'ar' ? 'الطبيب' : 'Doctor'}</span>
+              <span className="font-medium">{invoice.doctorName}</span>
+            </div>
+            <div>
+              <span className="text-gray-500 block">VetsVan</span>
+              <span className="font-medium">{invoice.vetsVanCode}</span>
             </div>
             <div>
               <span className="text-gray-500 block">{language === 'ar' ? 'إجمالي المبيعات' : 'Total Sales'}</span>
@@ -416,7 +420,7 @@ export default function SalesReports() {
   };
 
   // Fetch generated invoices
-  const { data: generatedInvoices, isLoading: isLoadingInvoices } = useQuery({
+  const { data: allInvoices, isLoading: isLoadingInvoices } = useQuery({
     queryKey: ["/api/admin/generated-invoices"],
     queryFn: async () => {
       const token = localStorage.getItem('adminToken');
@@ -429,6 +433,17 @@ export default function SalesReports() {
       return await response.json() as GeneratedInvoice[];
     },
     enabled: !!localStorage.getItem('adminToken'),
+  });
+
+  // Filter invoices by date range
+  const generatedInvoices = allInvoices?.filter(invoice => {
+    if (!dateFrom && !dateTo) return true;
+    
+    const invoiceDate = new Date(invoice.createdAt);
+    const fromMatch = !dateFrom || invoiceDate >= dateFrom;
+    const toMatch = !dateTo || invoiceDate <= dateTo;
+    
+    return fromMatch && toMatch;
   });
 
   const handleExportToExcel = async () => {
