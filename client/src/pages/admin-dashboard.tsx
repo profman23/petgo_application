@@ -1652,12 +1652,8 @@ export default function AdminDashboard() {
               {language === 'ar' ? 'التقارير' : 'Reports'}
             </button>
             <button
-              onClick={() => setActiveTab('new-reports')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                activeTab === 'new-reports'
-                  ? 'bg-purple-600 text-purple-600'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+              onClick={() => setLocation('/new-reports-analytics')}
+              className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <TrendingUp className="ml-3 h-6 w-6" />
               {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
