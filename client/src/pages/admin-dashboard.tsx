@@ -1566,17 +1566,19 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
+      {/* Logo positioned above sidebar */}
+      <div className="absolute top-0 left-0 z-10 p-4">
+        <img 
+          src="/attached_assets/Screenshot 2025-07-10 182605_1753012202060.png" 
+          alt="VETS VAN" 
+          className="h-16 w-auto object-contain"
+        />
+      </div>
+
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className={`flex items-center ${language === 'ar' ? 'ml-auto' : 'mr-auto'}`}>
-              <Shield className="h-8 w-8 text-purple-600 ml-3" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{t('adminDashboard')}</h1>
-                <p className="text-sm text-gray-500">{t('welcome')} {admin.name}</p>
-              </div>
-            </div>
+          <div className="flex justify-end items-center py-6">
             <div className="flex items-center gap-4">
               <LanguageSelector />
               
@@ -1622,7 +1624,7 @@ export default function AdminDashboard() {
       <div className="flex">
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
-          <nav className="mt-5 px-2">
+          <nav className="mt-20 px-2">
             <button
               onClick={() => setActiveTab('management')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full ${
