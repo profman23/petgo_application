@@ -16,6 +16,7 @@ import { playBookingNotification, testAudioNotification, audioNotification } fro
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 
 // Products Management Component
@@ -1569,7 +1570,7 @@ export default function AdminDashboard() {
       {/* Logo positioned above sidebar */}
       <div className="absolute top-0 left-0 z-10 p-4">
         <img 
-          src="/attached_assets/Screenshot 2025-07-10 182605_1753012202060.png" 
+          src={vetsVanLogo} 
           alt="VETS VAN" 
           className="h-16 w-auto object-contain"
         />
