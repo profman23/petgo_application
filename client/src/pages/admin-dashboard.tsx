@@ -1648,12 +1648,8 @@ export default function AdminDashboard() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => setActiveTab('users')}
-                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      activeTab === 'users'
-                        ? 'bg-purple-100 text-purple-600'
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
+                    onClick={() => setLocation('/Administration/Users-Management')}
+                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <User className="ml-3 h-5 w-5" />
                     {language === 'ar' ? 'المستخدمون' : 'Users'}
