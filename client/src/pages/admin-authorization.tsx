@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { useLanguage } from '@/hooks/useLanguage';
+import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { 
   Shield, 
   Bell,
@@ -23,7 +23,7 @@ import {
 import logoPath from '@assets/IMG-20250415-WA0047_1751986059751.jpg';
 
 export default function AdminAuthorization() {
-  const { language, toggleLanguage } = useLanguage();
+  const { t, language, toggleLanguage } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [, setLocation] = useLocation();
   const [showNotifications, setShowNotifications] = useState(false);

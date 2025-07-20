@@ -23,6 +23,7 @@ import CustomerActivity from "@/pages/customer-activity";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminServices from "@/pages/admin-services";
+import AdminAuthorization from "@/pages/admin-authorization";
 import SalesReports from "@/pages/sales-reports";
 import NewReportsAnalytics from "@/pages/new-reports-analytics";
 import VetsVanShifts from "@/pages/vets-van-shifts";
@@ -139,6 +140,7 @@ function Router() {
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
+          <Route path="/administration/authorization" component={AdminAuthorization} />
           <Route path="/sales-reports" component={SalesReports} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />

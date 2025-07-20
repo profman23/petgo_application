@@ -1983,27 +1983,7 @@ export default function AdminDashboard() {
                 </div>
               )}
 
-              {/* Authorization Tab */}
-              {activeTab === 'authorization' && (
-                <div>
-                  <div className="bg-white overflow-hidden shadow rounded-lg">
-                    <div className="px-4 py-5 sm:p-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                        {language === 'ar' ? 'إدارة التفويض' : 'Authorization Management'}
-                      </h3>
-                      <div className="text-center py-12">
-                        <Shield className="mx-auto h-12 w-12 text-gray-400" />
-                        <h3 className="mt-2 text-lg font-medium text-gray-900">
-                          {language === 'ar' ? 'قسم إدارة التفويض' : 'Authorization Management Section'}
-                        </h3>
-                        <p className="mt-1 text-sm text-gray-500">
-                          {language === 'ar' ? 'سيتم تطوير هذا القسم قريباً' : 'This section will be developed soon'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+
 
               {activeTab === 'reports' && (
                 <div>
