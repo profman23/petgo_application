@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -1652,6 +1652,17 @@ export default function AdminDashboard() {
               {language === 'ar' ? 'التقارير' : 'Reports'}
             </button>
             <button
+              onClick={() => setActiveTab('new-reports')}
+              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+                activeTab === 'new-reports'
+                  ? 'bg-purple-600 text-purple-600'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <TrendingUp className="ml-3 h-6 w-6" />
+              {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+            </button>
+            <button
               onClick={() => setActiveTab('requests')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'requests'
@@ -2846,6 +2857,29 @@ export default function AdminDashboard() {
               {/* Products Tab */}
               {activeTab === 'products' && (
                 <ProductsManagementTable language={language} />
+              )}
+
+              {/* New Reports & Analytics Tab */}
+              {activeTab === 'new-reports' && (
+                <div>
+                  <div className="bg-white overflow-hidden shadow rounded-lg">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6">
+                        {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                      </h3>
+                      
+                      <div className="text-center py-12">
+                        <TrendingUp className="mx-auto h-12 w-12 text-purple-400" />
+                        <h3 className="mt-2 text-lg font-medium text-gray-900">
+                          {language === 'ar' ? 'قسم التقارير والتحليلات الجديد' : 'New Reports & Analytics Section'}
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-500">
+                          {language === 'ar' ? 'سيتم إضافة المحتوى المطلوب هنا قريباً' : 'Required content will be added here soon'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
 
             </div>
