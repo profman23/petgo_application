@@ -30,6 +30,7 @@ import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import UsersManagement from "@/pages/users-management";
 import Authorization from "@/pages/authorization";
+import AdminUsers from "@/pages/admin-users";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -141,6 +142,7 @@ function Router() {
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
+          <Route path="/admin-users" component={AdminUsers} />
           <Route path="/Administration/Users-Management" component={UsersManagement} />
           <Route path="/Administration/Authorization" component={Authorization} />
           <Route path="/sales-reports" component={SalesReports} />
