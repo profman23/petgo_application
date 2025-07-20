@@ -30,6 +30,7 @@ export default function PaymentModal({
 }: PaymentModalProps) {
   const [amount, setAmount] = useState('');
   const [paymentType, setPaymentType] = useState('');
+  const [cardSubtype, setCardSubtype] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
