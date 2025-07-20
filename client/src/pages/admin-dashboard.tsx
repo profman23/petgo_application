@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -683,7 +683,6 @@ export default function AdminDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
-  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
@@ -1652,36 +1651,6 @@ export default function AdminDashboard() {
               <BarChart3 className="ml-3 h-6 w-6" />
               {language === 'ar' ? 'التقارير' : 'Reports'}
             </button>
-            {/* New Reports & Analytics Dropdown */}
-            <div className="mt-2">
-              <button
-                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
-                className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <TrendingUp className="ml-3 h-6 w-6" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
-                </span>
-                {isNewReportsExpanded ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </button>
-              
-              {/* Dropdown Items */}
-              {isNewReportsExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
-                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="ml-3 h-5 w-5" />
-                    {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
-                  </button>
-                </div>
-              )}
-            </div>
             <button
               onClick={() => setActiveTab('requests')}
               className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
@@ -1947,12 +1916,6 @@ export default function AdminDashboard() {
                               }`}
                             >
                               {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
-                            </button>
-                            <button
-                              onClick={() => setLocation('/sales-reports')}
-                              className="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                            >
-                              {language === 'ar' ? 'تقارير المبيعات' : 'Sales Reports'}
                             </button>
                           </nav>
                         </div>
@@ -2878,8 +2841,6 @@ export default function AdminDashboard() {
               {activeTab === 'products' && (
                 <ProductsManagementTable language={language} />
               )}
-
-
 
             </div>
           </div>
