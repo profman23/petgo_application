@@ -20,6 +20,7 @@ import { format } from "date-fns";
 import { type GeneratedInvoice } from "@shared/schema";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { toast } from "@/hooks/use-toast";
 
 interface InvoiceDetails {
   invoiceItems: any[];
@@ -441,62 +442,92 @@ export default function SalesReports() {
       });
       
       if (!response.ok) {
-        throw new Error('Export failed');
+        throw new Error('Failed to export data');
       }
       
-      const data = await response.json();
+      const { data, filename } = await response.json();
       
-      const worksheet = XLSX.utils.json_to_sheet(data);
+      // Create workbook
       const workbook = XLSX.utils.book_new();
       
-      // Auto-size columns
+      // Create worksheet from data
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      
+      // Set column widths (updated for individual payment columns - up to 5 payments)
       const columnWidths = [
         { wch: 15 }, // Invoice Number
         { wch: 20 }, // Customer Name
         { wch: 15 }, // Customer Phone
         { wch: 25 }, // Customer Email
-        { wch: 15 }, // VetsVan Code
-        { wch: 20 }, // VetsVan Name
-        { wch: 12 }, // Date
-        { wch: 12 }, // Time
+        { wch: 15 }, // Doctor Name
+        { wch: 12 }, // VetsVan Code
+        { wch: 15 }, // Appointment Date
+        { wch: 12 }, // Appointment Time
         { wch: 15 }, // Service Type
-        { wch: 15 }, // Pet Name
-        { wch: 10 }, // Pet Type
-        { wch: 30 }, // Description
-        { wch: 8 },  // Quantity
-        { wch: 12 }, // Unit Price
-        { wch: 10 }, // Discount
-        { wch: 10 }, // VAT
-        { wch: 15 }, // Total Before VAT
-        { wch: 15 }, // Total After VAT
-        { wch: 12 }, // Subtotal
-        { wch: 12 }, // Tax Amount
+        { wch: 15 }, // Total Sales
+        { wch: 15 }, // Total Paid
+        { wch: 12 }, // VAT Amount
         { wch: 15 }, // Discount Amount
-        { wch: 15 }, // Final Total
+        { wch: 15 }, // Generated Date
+        { wch: 20 }, // Notes
+        { wch: 15 }, // Pet Names
+        { wch: 12 }, // Pet Types
+        { wch: 8 },  // Item #
+        { wch: 25 }, // Description
+        { wch: 10 }, // Quantity
+        { wch: 15 }, // Unit Price (SAR)
+        { wch: 15 }, // Item Total (SAR)
+        { wch: 15 }, // Item Discount
+        // Payment columns for up to 5 payments
         { wch: 15 }, // Payment Type 1
-        { wch: 15 }, // Payment Amount 1
+        { wch: 15 }, // Payment Amount 1 (SAR)
+        { wch: 20 }, // Payment Description 1
+        { wch: 12 }, // Payment Date 1
+        { wch: 12 }, // Payment Time 1
         { wch: 15 }, // Payment Type 2
-        { wch: 15 }, // Payment Amount 2
+        { wch: 15 }, // Payment Amount 2 (SAR)
+        { wch: 20 }, // Payment Description 2
+        { wch: 12 }, // Payment Date 2
+        { wch: 12 }, // Payment Time 2
         { wch: 15 }, // Payment Type 3
-        { wch: 15 }, // Payment Amount 3
+        { wch: 15 }, // Payment Amount 3 (SAR)
+        { wch: 20 }, // Payment Description 3
+        { wch: 12 }, // Payment Date 3
+        { wch: 12 }, // Payment Time 3
         { wch: 15 }, // Payment Type 4
-        { wch: 15 }, // Payment Amount 4
+        { wch: 15 }, // Payment Amount 4 (SAR)
+        { wch: 20 }, // Payment Description 4
+        { wch: 12 }, // Payment Date 4
+        { wch: 12 }, // Payment Time 4
         { wch: 15 }, // Payment Type 5
-        { wch: 15 }  // Payment Amount 5
+        { wch: 15 }, // Payment Amount 5 (SAR)
+        { wch: 20 }, // Payment Description 5
+        { wch: 12 }, // Payment Date 5
+        { wch: 12 }  // Payment Time 5
       ];
-      
       worksheet['!cols'] = columnWidths;
-      
+
+      // Add worksheet to workbook
       XLSX.utils.book_append_sheet(workbook, worksheet, language === 'ar' ? 'تقرير المبيعات' : 'Sales Report');
-      
+
+      // Generate Excel file and download
       const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
       const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       
-      const filename = `sales-report-${new Date().toISOString().split('T')[0]}.xlsx`;
       saveAs(blob, filename);
-      
+
+      toast({
+        title: language === 'ar' ? 'تم التصدير بنجاح' : 'Export Successful',
+        description: language === 'ar' ? 'تم تحميل ملف Excel بنجاح' : 'Excel file downloaded successfully',
+      });
+
     } catch (error) {
       console.error('Export failed:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ في التصدير' : 'Export Error',
+        description: language === 'ar' ? 'فشل في تصدير البيانات' : 'Failed to export data',
+        variant: 'destructive',
+      });
     } finally {
       setIsExporting(false);
     }
