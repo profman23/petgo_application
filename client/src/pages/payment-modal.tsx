@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Trash2, CreditCard, Banknote, DollarSign } from 'lucide-react';
+import { Plus, Trash2, CreditCard, Banknote, DollarSign, Smartphone, ShoppingBag } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/lib/i18n';
@@ -41,10 +41,16 @@ export default function PaymentModal({
       addPayment: 'إضافة دفعة',
       amount: 'المبلغ',
       paymentType: 'نوع الدفعة',
+      cardType: 'نوع البطاقة',
       description: 'الوصف',
       cash: 'نقد',
       card: 'بطاقة',
       transfer: 'تحويل بنكي',
+      tabby: 'تابي',
+      tamara: 'تمارا',
+      madaPay: 'مدى باي',
+      masterCard: 'ماستر كارد',
+      visa: 'فيزا',
       cancel: 'إلغاء',
       save: 'حفظ',
       paymentHistory: 'سجل المدفوعات',
@@ -58,16 +64,23 @@ export default function PaymentModal({
       error: 'خطأ',
       delete: 'حذف',
       noPayments: 'لا توجد دفعات',
-      optional: 'اختياري'
+      optional: 'اختياري',
+      selectCardType: 'اختر نوع البطاقة'
     },
     en: {
       addPayment: 'Add Payment',
       amount: 'Amount',
       paymentType: 'Payment Type',
+      cardType: 'Card Type',
       description: 'Description',
       cash: 'Cash',
       card: 'Card',
       transfer: 'Bank Transfer',
+      tabby: 'Tabby',
+      tamara: 'Tamara',
+      madaPay: 'Mada Pay',
+      masterCard: 'Master Card',
+      visa: 'Visa',
       cancel: 'Cancel',
       save: 'Save',
       paymentHistory: 'Payment History',
@@ -81,7 +94,8 @@ export default function PaymentModal({
       error: 'Error',
       delete: 'Delete',
       noPayments: 'No payments',
-      optional: 'Optional'
+      optional: 'Optional',
+      selectCardType: 'Select card type'
     }
   };
 
@@ -90,7 +104,7 @@ export default function PaymentModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!amount || !paymentType) {
+    if (!amount || !paymentType || (paymentType === 'card' && !cardSubtype)) {
       toast({
         title: t.error,
         description: language === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة' : 'Please fill in all required fields',
@@ -101,13 +115,15 @@ export default function PaymentModal({
 
     setIsSubmitting(true);
     
+    const finalPaymentType = paymentType === 'card' ? `${paymentType}-${cardSubtype}` : paymentType;
+    
     try {
       await apiRequest('/api/invoice-payments', {
         method: 'POST',
         body: {
           bookingId,
           amount: parseFloat(amount),
-          paymentType,
+          paymentType: finalPaymentType,
           description: description || null
         }
       });
@@ -120,6 +136,7 @@ export default function PaymentModal({
       // Reset form
       setAmount('');
       setPaymentType('');
+      setCardSubtype('');
       setDescription('');
       
       // Refresh payments
@@ -164,6 +181,9 @@ export default function PaymentModal({
   const remainingBalance = totalAmount - totalPaid;
 
   const getPaymentIcon = (type: string) => {
+    if (type.startsWith('card-')) {
+      return <CreditCard className="h-4 w-4" />;
+    }
     switch (type) {
       case 'cash':
         return <Banknote className="h-4 w-4" />;
@@ -171,9 +191,27 @@ export default function PaymentModal({
         return <CreditCard className="h-4 w-4" />;
       case 'transfer':
         return <DollarSign className="h-4 w-4" />;
+      case 'tabby':
+        return <ShoppingBag className="h-4 w-4" />;
+      case 'tamara':
+        return <Smartphone className="h-4 w-4" />;
       default:
         return <Plus className="h-4 w-4" />;
     }
+  };
+
+  const getPaymentTypeDisplay = (paymentType: string) => {
+    if (paymentType.startsWith('card-')) {
+      const cardType = paymentType.split('-')[1];
+      const cardDisplay = {
+        'mada': t.madaPay,
+        'mastercard': t.masterCard,
+        'visa': t.visa
+      };
+      return `${t.card} - ${cardDisplay[cardType] || cardType}`;
+    }
+    
+    return t[paymentType] || paymentType;
   };
 
   return (
@@ -227,7 +265,10 @@ export default function PaymentModal({
             <label className="block text-sm font-medium mb-2">
               {t.paymentType} <span className="text-red-500">*</span>
             </label>
-            <Select value={paymentType} onValueChange={setPaymentType} required>
+            <Select value={paymentType} onValueChange={(value) => {
+              setPaymentType(value);
+              setCardSubtype(''); // Reset card subtype when payment type changes
+            }} required>
               <SelectTrigger>
                 <SelectValue placeholder={language === 'ar' ? 'اختر نوع الدفعة' : 'Select payment type'} />
               </SelectTrigger>
@@ -250,9 +291,55 @@ export default function PaymentModal({
                     {t.transfer}
                   </div>
                 </SelectItem>
+                <SelectItem value="tabby">
+                  <div className="flex items-center gap-2">
+                    <ShoppingBag className="h-4 w-4" />
+                    {t.tabby}
+                  </div>
+                </SelectItem>
+                <SelectItem value="tamara">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="h-4 w-4" />
+                    {t.tamara}
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {/* Card Subtype Selection - Only shown when Card is selected */}
+          {paymentType === 'card' && (
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                {t.cardType} <span className="text-red-500">*</span>
+              </label>
+              <Select value={cardSubtype} onValueChange={setCardSubtype} required>
+                <SelectTrigger>
+                  <SelectValue placeholder={t.selectCardType} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="mada">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      {t.madaPay}
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="mastercard">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      {t.masterCard}
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="visa">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4" />
+                      {t.visa}
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium mb-2">
@@ -291,7 +378,7 @@ export default function PaymentModal({
                     {getPaymentIcon(payment.paymentType)}
                     <div>
                       <p className="font-medium">
-                        {payment.amount} SAR - {t[payment.paymentType] || payment.paymentType}
+                        {payment.amount} SAR - {getPaymentTypeDisplay(payment.paymentType)}
                       </p>
                       {payment.description && (
                         <p className="text-sm text-gray-600">{payment.description}</p>
