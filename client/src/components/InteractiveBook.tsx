@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, BookOpen, X } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import HTMLFlipBook from 'react-pageflip';
@@ -15,8 +15,41 @@ interface InteractiveBookProps {
 export function InteractiveBook({ pages }: InteractiveBookProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [dimensions, setDimensions] = useState({ width: 400, height: 500 });
   const { language } = useLanguage();
   const bookRef = useRef<any>(null);
+
+  // Hook للتعامل مع تغيير حجم الشاشة
+  useEffect(() => {
+    const updateDimensions = () => {
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      
+      let bookWidth, bookHeight;
+      
+      if (screenWidth < 640) { // Mobile
+        bookWidth = Math.min(160, screenWidth * 0.35);
+        bookHeight = Math.min(220, screenHeight * 0.4);
+      } else if (screenWidth < 1024) { // Tablet
+        bookWidth = 280;
+        bookHeight = 380;
+      } else { // Desktop
+        bookWidth = 380;
+        bookHeight = 480;
+      }
+      
+      setDimensions({ width: bookWidth, height: bookHeight });
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    window.addEventListener('orientationchange', updateDimensions);
+    
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+      window.removeEventListener('orientationchange', updateDimensions);
+    };
+  }, []);
 
   const toggleBook = () => {
     setIsOpen(!isOpen);
@@ -53,26 +86,26 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
       style={{
         width: '100%',
         height: '100%',
-        minHeight: '500px',
+        minHeight: window.innerWidth < 640 ? '220px' : '400px',
         backgroundImage: `
-          linear-gradient(to bottom, transparent 0px, transparent 27px, #cbd5e1 27px, #cbd5e1 28px),
-          linear-gradient(to right, ${isLeft ? 'transparent 0px, transparent 70px, #ef4444 70px, #ef4444 72px, transparent 72px' : '#ef4444 70px, #ef4444 72px, transparent 72px'}),
-          radial-gradient(circle at 40px 40px, rgba(0,0,0,0.1) 1px, transparent 1px),
-          radial-gradient(circle at 120px 80px, rgba(0,0,0,0.05) 1px, transparent 1px)
+          linear-gradient(to bottom, transparent 0px, transparent 19px, #cbd5e1 19px, #cbd5e1 20px),
+          linear-gradient(to right, ${isLeft ? 'transparent 0px, transparent 50px, #ef4444 50px, #ef4444 52px, transparent 52px' : '#ef4444 50px, #ef4444 52px, transparent 52px'}),
+          radial-gradient(circle at 30px 30px, rgba(0,0,0,0.08) 1px, transparent 1px),
+          radial-gradient(circle at 80px 60px, rgba(0,0,0,0.04) 1px, transparent 1px)
         `,
-        backgroundSize: '100% 28px, 100% 100%, 200px 200px, 300px 300px',
+        backgroundSize: `100% ${window.innerWidth < 640 ? '20px' : '20px'}, 100% 100%, 150px 150px, 250px 250px`,
         backgroundRepeat: 'repeat-y, no-repeat, repeat, repeat',
       }}
     >
       <div 
         className={`p-6 ${language === 'ar' ? 'text-right' : 'text-left'}`}
         style={{ 
-          paddingLeft: isLeft ? '30px' : '90px',
-          paddingRight: isLeft ? '90px' : '30px',
-          paddingTop: '50px',
-          paddingBottom: '30px',
+          paddingLeft: isLeft ? (window.innerWidth < 640 ? '15px' : '30px') : (window.innerWidth < 640 ? '60px' : '90px'),
+          paddingRight: isLeft ? (window.innerWidth < 640 ? '60px' : '90px') : (window.innerWidth < 640 ? '15px' : '30px'),
+          paddingTop: window.innerWidth < 640 ? '25px' : '50px',
+          paddingBottom: window.innerWidth < 640 ? '15px' : '30px',
           minHeight: '100%',
-          lineHeight: '28px'
+          lineHeight: window.innerWidth < 640 ? '20px' : '28px'
         }}
         dir={language === 'ar' ? 'rtl' : 'ltr'}
       >
@@ -143,39 +176,41 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
         </div>
 
         {/* Book Container */}
-        <div className="p-8 pt-20">
-          <div className="w-full max-w-4xl mx-auto">
+        <div className="p-2 sm:p-4 md:p-8 pt-16 sm:pt-18 md:pt-20">
+          <div className="w-full max-w-7xl mx-auto">
             <HTMLFlipBook
               ref={bookRef}
-              width={400}
-              height={500}
-              size="stretch"
-              minWidth={300}
-              maxWidth={800}
-              minHeight={400}
-              maxHeight={600}
+              width={dimensions.width}
+              height={dimensions.height}
+              size="fixed"
+              minWidth={140}
+              maxWidth={500}
+              minHeight={180}
+              maxHeight={650}
               showCover={false}
-              flippingTime={800}
+              flippingTime={600}
               usePortrait={false}
               startZIndex={0}
-              autoSize={true}
-              maxShadowOpacity={0.5}
+              autoSize={false}
+              maxShadowOpacity={0.4}
               showPageCorners={true}
               disableFlipByClick={false}
               startPage={0}
               drawShadow={true}
-              mobileScrollSupport={false}
+              mobileScrollSupport={true}
               clickEventForward={false}
               useMouseEvents={true}
-              swipeDistance={30}
+              swipeDistance={15}
               onFlip={onFlip}
-              className="mx-auto"
+              className="mx-auto book-container"
               style={{ 
                 margin: '0 auto',
                 background: 'linear-gradient(45deg, #8b4513, #a0522d)',
-                borderRadius: '8px',
-                padding: '8px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                borderRadius: '6px',
+                padding: '3px',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                maxWidth: '100%',
+                maxHeight: '100%'
               }}
             >
               {pages.map((page, index) => (
@@ -184,10 +219,13 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
                   isLeft={index % 2 === 0}
                 >
                   <div className="h-full">
-                    <h3 className="text-lg font-bold mb-6" style={{ color: '#852085' }}>
+                    <h3 
+                      className={`font-bold mb-4 ${window.innerWidth < 640 ? 'text-sm' : 'text-lg'}`}
+                      style={{ color: '#852085' }}
+                    >
                       {language === 'ar' ? `الصفحة ${index + 1}` : `Page ${index + 1}`}
                     </h3>
-                    <p className={`text-sm leading-relaxed text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
+                    <p className={`${window.innerWidth < 640 ? 'text-xs' : 'text-sm'} leading-relaxed text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
                       {language === 'ar' ? page.arabic : page.english}
                     </p>
                   </div>
