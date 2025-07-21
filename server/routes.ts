@@ -4,6 +4,15 @@ import { storage } from "./storage";
 import path from "path";
 import { fileURLToPath } from 'url';
 
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: any;
+    }
+  }
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema } from "@shared/schema";
@@ -58,7 +67,7 @@ function getErrorMessage(key: string, language: string = 'ar') {
     }
   };
   
-  return messages[language]?.[key] || messages.ar[key];
+  return messages[language as keyof typeof messages]?.[key as keyof typeof messages.ar] || messages.ar[key as keyof typeof messages.ar];
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -240,7 +249,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store OTP in database
       await storage.createOtpVerification({
         email,
-        otpCode,
+        code: otpCode,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
       });
       
@@ -471,8 +480,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const distance = calculateDistance(
           parseFloat(latitude as string),
           parseFloat(longitude as string),
-          driver.latitude,
-          driver.longitude
+          driver.latitude || 0,
+          driver.longitude || 0
         );
         const eta = Math.ceil(distance * 2); // 2 minutes per km
         const { estimatedCost } = calculateRideEstimates(distance);
