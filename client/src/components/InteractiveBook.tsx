@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 
