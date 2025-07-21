@@ -22,7 +22,6 @@ import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
-import { InteractiveBook } from '@/components/InteractiveBook';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -765,27 +764,6 @@ export default function Home() {
             </div>
           </button>
 
-          {/* Interactive Educational Book */}
-          <InteractiveBook 
-            pages={[
-              {
-                arabic: "مرحباً",
-                english: "Hello"
-              },
-              {
-                arabic: "صحة",
-                english: "Health"
-              },
-              {
-                arabic: "رعاية",
-                english: "Care"
-              },
-              {
-                arabic: "حب",
-                english: "Love"
-              }
-            ]}
-          />
 
         </div>
 
