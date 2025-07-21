@@ -3315,6 +3315,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Handle root path redirect to login
+  app.get('/', (req, res) => {
+    res.redirect('/login');
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
