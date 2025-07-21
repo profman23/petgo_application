@@ -313,13 +313,10 @@
     z-index: 15;
   }
   
-  /* Light gray border around entire screen */
+  /* Screen border removed per user request */
   .screen-border {
-    border: 3px solid #9ca3af !important;
     min-height: 100vh;
-    margin: 8px;
     box-sizing: border-box;
-    border-radius: 8px;
   }
 
   /* Custom negative positioning classes for extreme placement */
