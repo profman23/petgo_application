@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Thick white border background -->
+  <rect width="512" height="512" fill="white" rx="50"/>
+  
+  <!-- Inner area with padding for border effect -->
+  <rect x="30" y="30" width="452" height="452" fill="white" rx="30"/>
+  
+  <!-- Embed your original image in the center with scaling -->
+  <image x="60" y="60" width="392" height="392" 
+         xlink:href="/icons/final-favicon.png" 
+         preserveAspectRatio="xMidYMid meet"/>
+</svg>
