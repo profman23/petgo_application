@@ -5,7 +5,7 @@ import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import logoPath from '@assets/Screenshot 2025-07-21 115341_1753088187495.png';
-import { FixedFooter } from '@/components/fixed-footer';
+
 import { LanguageSelector } from '@/components/language-selector';
 
 export default function Account() {
@@ -417,9 +417,6 @@ export default function Account() {
           </div>
         </div>
       )}
-        
-        {/* Fixed Footer */}
-        <FixedFooter />
       </div>
     </div>
   );

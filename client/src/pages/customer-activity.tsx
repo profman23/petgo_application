@@ -7,7 +7,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FixedFooter } from '@/components/fixed-footer';
+
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
@@ -561,8 +561,6 @@ export default function CustomerActivity() {
           }}
         />
       )}
-
-      <FixedFooter />
     </div>
   );
 }
