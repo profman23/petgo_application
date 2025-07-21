@@ -350,34 +350,34 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-white text-gray-800 px-2 py-2 h-10 shadow-sm">
+        <div className="bg-white text-gray-800 px-2 py-3 h-12 shadow-sm">
           <div className="flex items-center justify-between h-full">
-            <div className="flex items-center space-x-1">
-              <div className="h-6 bg-white rounded border border-purple-600 px-1 shadow-sm">
-                <img 
-                  src={logoImage} 
-                  alt="VETS VAN Logo" 
-                  className="h-full w-auto object-contain"
-                  style={{ 
-                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
-                    maxWidth: '40px'
-                  }}
-                />
-              </div>
-              <div className="text-xs font-semibold text-gray-800 truncate max-w-16">
-                {user?.name || (language === 'ar' ? 'مرحباً' : 'Hi')}
+            <div className="flex items-center">
+              <img 
+                src={logoImage} 
+                alt="VETS VAN Logo" 
+                className="h-6 w-auto object-contain"
+                style={{ 
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                  maxWidth: '40px'
+                }}
+              />
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <div className="text-sm font-semibold text-gray-800">
+                {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
               </div>
             </div>
-            <div className="flex items-center space-x-0.5">
+            <div className="flex items-center space-x-1">
               <LanguageSelector />
-              <Bell className="w-3.5 h-3.5 cursor-pointer text-gray-600 hover:text-gray-800" />
+              <Bell className="w-4 h-4 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-600 px-1.5 py-0.5 h-6 rounded text-xs"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-2 py-1 h-7 rounded text-xs"
               >
-                {language === 'ar' ? 'خروج' : 'Out'}
+                {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
             </div>
           </div>
