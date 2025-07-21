@@ -14,17 +14,28 @@ interface InteractiveBookProps {
 export function InteractiveBook({ pages }: InteractiveBookProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [isFlipping, setIsFlipping] = useState(false);
   const { language } = useLanguage();
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   const nextPage = () => {
     if (currentPage < pages.length - 1) {
-      setCurrentPage(currentPage + 1);
+      setIsFlipping(true);
+      setTimeout(() => {
+        setCurrentPage(currentPage + 1);
+        setIsFlipping(false);
+      }, 300);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
+      setIsFlipping(true);
+      setTimeout(() => {
+        setCurrentPage(currentPage - 1);
+        setIsFlipping(false);
+      }, 300);
     }
   };
 
@@ -32,47 +43,74 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
     setIsOpen(!isOpen);
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && currentPage < pages.length - 1) {
+      nextPage();
+    }
+    if (isRightSwipe && currentPage > 0) {
+      prevPage();
+    }
+  };
+
   if (!isOpen) {
     return (
-      <div className="flex justify-center my-4">
+      <div className="flex flex-col items-center justify-center my-4">
+        {/* Simple Book Icon */}
         <button
           onClick={toggleBook}
-          className="flex items-center justify-center w-24 h-20 bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
-          style={{ backgroundColor: '#852085' }}
+          className="transition-all duration-300 hover:scale-105"
         >
-          <div className="text-center">
-            <BookOpen className="w-10 h-10 text-white mx-auto mb-1" />
-            <div className="text-xs text-white font-semibold">
-              {language === 'ar' ? 'VetsVan Book' : 'VetsVan Book'}
-            </div>
-          </div>
+          <BookOpen 
+            className="w-16 h-16 mx-auto mb-2" 
+            style={{ color: '#852085' }}
+          />
         </button>
+        {/* Text below book */}
+        <div 
+          className="text-sm font-semibold"
+          style={{ color: '#852085' }}
+        >
+          VetsVan Book
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col items-center my-4 px-4">
-      {/* Book Container - No background, no frame */}
-      <div className="relative w-full max-w-sm" style={{ backgroundColor: '#852085' }}>
-        {/* Book Spine Effect */}
-        <div className="absolute left-0 top-0 bottom-0 w-3 bg-purple-900 rounded-l-2xl" style={{ backgroundColor: '#6b1a6b' }}></div>
-        
-        {/* Decorative Book Title */}
-        <div className="text-center py-2 mb-2">
-          <div className="text-xs font-bold text-white px-3 py-1 inline-block">
-            {language === 'ar' ? 'VetsVan Book' : 'VetsVan Book'}
-          </div>
-        </div>
-        
-        {/* Book Pages */}
-        <div className="flex min-h-[220px] bg-white rounded-xl overflow-hidden">
+      {/* Open Book - White Paper Design */}
+      <div className="relative w-full max-w-lg">
+        {/* Book Pages - White Paper */}
+        <div 
+          className={`flex min-h-[280px] bg-white shadow-lg transition-transform duration-300 ${isFlipping ? 'scale-95' : 'scale-100'}`}
+          style={{ 
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            border: '1px solid #f0f0f0'
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
           {/* Right Page - Arabic */}
-          <div className="flex-1 p-4">
-            <div className="h-full flex flex-col justify-center">
+          <div className="flex-1 p-6 border-r border-gray-200">
+            <div className="h-full flex flex-col">
               <div className="text-right" dir="rtl">
-                <div className="text-xs text-purple-600 mb-2 font-semibold">
-                  {language === 'ar' ? 'صفحة عربية' : 'Arabic Page'}
+                <div className="text-xs mb-3 font-semibold" style={{ color: '#852085' }}>
+                  صفحة عربية
                 </div>
                 <p className="text-sm leading-relaxed text-gray-800 font-arabic">
                   {pages[currentPage]?.arabic}
@@ -81,15 +119,12 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
             </div>
           </div>
           
-          {/* Center Binding */}
-          <div className="w-2 bg-purple-600" style={{ backgroundColor: '#852085' }}></div>
-          
           {/* Left Page - English */}
-          <div className="flex-1 p-4">
-            <div className="h-full flex flex-col justify-center">
+          <div className="flex-1 p-6">
+            <div className="h-full flex flex-col">
               <div className="text-left" dir="ltr">
-                <div className="text-xs text-purple-600 mb-2 font-semibold">
-                  {language === 'ar' ? 'صفحة إنجليزية' : 'English Page'}
+                <div className="text-xs mb-3 font-semibold" style={{ color: '#852085' }}>
+                  English Page
                 </div>
                 <p className="text-sm leading-relaxed text-gray-800">
                   {pages[currentPage]?.english}
@@ -99,42 +134,29 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
           </div>
         </div>
         
-        {/* Page Navigation */}
-        <div className="flex justify-between items-center mt-4 px-3">
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 0}
-            className="flex items-center justify-center w-10 h-10 rounded-full disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-            style={{ backgroundColor: '#852085' }}
-          >
-            <ChevronLeft className="w-5 h-5 text-white" />
-          </button>
-          
-          <div className="flex items-center space-x-3">
-            <span className="text-sm text-white font-bold rounded-full px-3 py-1" style={{ backgroundColor: '#852085' }}>
-              {currentPage + 1} / {pages.length}
-            </span>
-          </div>
-          
-          <button
-            onClick={nextPage}
-            disabled={currentPage === pages.length - 1}
-            className="flex items-center justify-center w-10 h-10 rounded-full disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
-            style={{ backgroundColor: '#852085' }}
-          >
-            <ChevronRight className="w-5 h-5 text-white" />
-          </button>
+        {/* Page Counter */}
+        <div className="flex justify-center mt-4">
+          <span className="text-xs font-medium px-3 py-1 rounded-full bg-white shadow-sm border" style={{ color: '#852085' }}>
+            {currentPage + 1} / {pages.length}
+          </span>
         </div>
         
         {/* Close Book Button */}
         <div className="flex justify-center mt-3">
           <button
             onClick={toggleBook}
-            className="text-sm font-medium text-white transition-all duration-200 px-4 py-2 rounded-full"
+            className="text-xs font-medium text-white px-4 py-2 rounded-full transition-all duration-200 hover:opacity-90"
             style={{ backgroundColor: '#852085' }}
           >
             {language === 'ar' ? 'إغلاق الكتاب' : 'Close Book'}
           </button>
+        </div>
+        
+        {/* Touch Instructions */}
+        <div className="text-center mt-2">
+          <span className="text-xs text-gray-500">
+            {language === 'ar' ? 'اسحب لتقليب الصفحات' : 'Swipe to turn pages'}
+          </span>
         </div>
       </div>
     </div>
