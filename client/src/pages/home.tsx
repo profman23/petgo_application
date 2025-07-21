@@ -769,6 +769,39 @@ export default function Home() {
           {/* Educational Section - Anti-Flea Prevention */}
           <div className="mt-6 mb-4 px-4">
             <div className="text-center">
+              {/* Weekly Tips Header */}
+              <div className="flex items-center justify-center mb-3">
+                <div className="flex items-center gap-2">
+                  {language === 'ar' ? (
+                    <>
+                      <span 
+                        className="text-sm font-bold"
+                        style={{
+                          fontFamily: '"Chewy", cursive',
+                          color: '#852085'
+                        }}
+                      >
+                        Weekly Tips
+                      </span>
+                      <span className="text-lg" style={{ color: '#852085' }}>📌</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-lg" style={{ color: '#852085' }}>📌</span>
+                      <span 
+                        className="text-sm font-bold"
+                        style={{
+                          fontFamily: '"Chewy", cursive',
+                          color: '#852085'
+                        }}
+                      >
+                        Weekly Tips
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+              
               {/* Dog & Cat Logo */}
               <div className="flex justify-center mb-4">
                 <img 
