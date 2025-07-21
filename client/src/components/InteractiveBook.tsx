@@ -188,9 +188,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
                 className={language === 'ar' ? 'text-right' : 'text-left'} 
                 dir={language === 'ar' ? 'rtl' : 'ltr'}
               >
-                <div className="text-xs mb-4 font-semibold" style={{ color: '#852085' }}>
-                  {language === 'ar' ? 'الصفحة اليمنى' : 'Right Page'}
-                </div>
+
                 <p className={`text-sm leading-relaxed text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
                   {language === 'ar' ? pages[currentPage]?.arabic : pages[currentPage]?.english}
                 </p>
@@ -199,12 +197,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
             
 
             
-            {/* Touch indicator for next page */}
-            {currentPage < pages.length - 1 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 opacity-50">
-                {language === 'ar' ? '← اسحب للصفحة التالية' : 'Swipe for next page →'}
-              </div>
-            )}
+
           </div>
 
           {/* Left Page */}
@@ -230,9 +223,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
                 className={language === 'ar' ? 'text-right' : 'text-left'} 
                 dir={language === 'ar' ? 'rtl' : 'ltr'}
               >
-                <div className="text-xs mb-4 font-semibold" style={{ color: '#852085' }}>
-                  {language === 'ar' ? 'الصفحة اليسرى' : 'Left Page'}
-                </div>
+
                 <p className={`text-sm leading-relaxed text-gray-600 italic ${language === 'ar' ? 'font-arabic' : ''}`}>
                   {language === 'ar' 
                     ? 'معلومات إضافية وإرشادات مفيدة حول العناية بالحيوانات الأليفة.'
@@ -244,12 +235,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
             
 
             
-            {/* Touch indicator for previous page */}
-            {currentPage > 0 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 opacity-50">
-                {language === 'ar' ? 'اسحب للصفحة السابقة →' : '← Swipe for previous page'}
-              </div>
-            )}
+
           </div>
         </div>
       </div>
