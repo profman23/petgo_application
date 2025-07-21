@@ -155,25 +155,6 @@ function Router() {
 }
 
 function App() {
-  const [isAppReady, setIsAppReady] = useState(false);
-
-  const handleLoadingComplete = () => {
-    setIsAppReady(true);
-  };
-
-  if (!isAppReady) {
-    setTimeout(() => setIsAppReady(true), 500);
-    return (
-      <QueryClientProvider client={queryClient}>
-        <div className="min-h-screen flex items-center justify-center bg-white">
-          <div className="text-center">
-            <p className="text-2xl font-bold text-purple-600">Loading...</p>
-          </div>
-        </div>
-      </QueryClientProvider>
-    );
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster />
