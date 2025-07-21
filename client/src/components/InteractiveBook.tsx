@@ -94,57 +94,149 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
     <div className="flex flex-col items-center my-4 px-4">
       {/* Open Book - White Paper Design */}
       <div className="relative w-full max-w-lg">
-        {/* Book Pages - White Paper - Single Language Based on System */}
+        {/* Real Book Design - Two Pages Side by Side */}
         <div 
-          className={`min-h-[280px] bg-white shadow-lg transition-transform duration-300 ${isFlipping ? 'scale-95' : 'scale-100'}`}
+          className={`flex min-h-[320px] bg-white transition-transform duration-300 ${isFlipping ? 'scale-95 rotate-1' : 'scale-100'} rounded-r-lg rounded-l-sm`}
           style={{ 
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            border: '1px solid #f0f0f0'
+            boxShadow: '0 8px 30px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8)',
+            border: '1px solid #e5e5e5',
+            background: 'linear-gradient(to bottom, #fefefe 0%, #f8f8f8 100%)'
           }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Single Page - Based on Language */}
-          <div className="w-full p-6">
-            <div className="h-full flex flex-col justify-center">
+          {/* Book Spine/Binding */}
+          <div 
+            className="w-2 bg-gradient-to-b from-gray-200 via-gray-300 to-gray-200 relative"
+            style={{ boxShadow: 'inset -2px 0 4px rgba(0,0,0,0.1)' }}
+          >
+            {/* Binding holes */}
+            <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-gray-400 rounded-full"></div>
+            <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-gray-400 rounded-full"></div>
+            <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-gray-400 rounded-full"></div>
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-gray-400 rounded-full"></div>
+          </div>
+
+          {/* Right Page */}
+          <div className="flex-1 p-6 bg-white relative" style={{ 
+            background: 'linear-gradient(to bottom right, #ffffff 0%, #fafafa 100%)',
+            boxShadow: 'inset 1px 0 2px rgba(0,0,0,0.05)'
+          }}>
+            {/* Page lines - subtle */}
+            <div className="absolute inset-0 opacity-5">
+              {Array.from({length: 15}).map((_, i) => (
+                <div key={i} className="border-b border-gray-300" style={{ marginTop: `${i * 20}px`, height: '1px' }}></div>
+              ))}
+            </div>
+            
+            <div className="h-full flex flex-col relative z-10">
               <div 
                 className={language === 'ar' ? 'text-right' : 'text-left'} 
                 dir={language === 'ar' ? 'rtl' : 'ltr'}
               >
-                <div className="text-xs mb-3 font-semibold" style={{ color: '#852085' }}>
-                  {language === 'ar' ? 'VetsVan Book' : 'VetsVan Book'}
+                <div className="text-xs mb-4 font-semibold" style={{ color: '#852085' }}>
+                  {language === 'ar' ? 'الصفحة اليمنى' : 'Right Page'}
                 </div>
                 <p className={`text-sm leading-relaxed text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
                   {language === 'ar' ? pages[currentPage]?.arabic : pages[currentPage]?.english}
                 </p>
               </div>
             </div>
+            
+            {/* Page number - right */}
+            <div className="absolute bottom-4 right-6 text-xs text-gray-400">
+              {(currentPage * 2) + 2}
+            </div>
+          </div>
+
+          {/* Left Page */}
+          <div className="flex-1 p-6 bg-white relative" style={{ 
+            background: 'linear-gradient(to bottom left, #ffffff 0%, #fafafa 100%)',
+            boxShadow: 'inset -1px 0 2px rgba(0,0,0,0.05)'
+          }}>
+            {/* Page lines - subtle */}
+            <div className="absolute inset-0 opacity-5">
+              {Array.from({length: 15}).map((_, i) => (
+                <div key={i} className="border-b border-gray-300" style={{ marginTop: `${i * 20}px`, height: '1px' }}></div>
+              ))}
+            </div>
+            
+            <div className="h-full flex flex-col justify-center relative z-10">
+              <div 
+                className={language === 'ar' ? 'text-right' : 'text-left'} 
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
+              >
+                <div className="text-xs mb-4 font-semibold" style={{ color: '#852085' }}>
+                  {language === 'ar' ? 'الصفحة اليسرى' : 'Left Page'}
+                </div>
+                <p className={`text-sm leading-relaxed text-gray-600 italic ${language === 'ar' ? 'font-arabic' : ''}`}>
+                  {language === 'ar' 
+                    ? 'معلومات إضافية وإرشادات مفيدة حول العناية بالحيوانات الأليفة.'
+                    : 'Additional information and helpful guidelines for pet care.'
+                  }
+                </p>
+              </div>
+            </div>
+            
+            {/* Page number - left */}
+            <div className="absolute bottom-4 left-6 text-xs text-gray-400">
+              {(currentPage * 2) + 1}
+            </div>
           </div>
         </div>
         
-        {/* Page Counter */}
+        {/* Page Counter - Book Style */}
         <div className="flex justify-center mt-4">
-          <span className="text-xs font-medium px-3 py-1 rounded-full bg-white shadow-sm border" style={{ color: '#852085' }}>
-            {currentPage + 1} / {pages.length}
-          </span>
+          <div className="bg-white shadow-lg rounded-sm px-4 py-2 border" style={{ 
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            background: 'linear-gradient(to bottom, #ffffff 0%, #f8f8f8 100%)'
+          }}>
+            <span className="text-xs font-medium" style={{ color: '#852085' }}>
+              {language === 'ar' ? `صفحة ${currentPage + 1} من ${pages.length}` : `Page ${currentPage + 1} of ${pages.length}`}
+            </span>
+          </div>
         </div>
         
-        {/* Close Book Button */}
-        <div className="flex justify-center mt-3">
+        {/* Page Navigation Buttons - Book Style */}
+        <div className="flex justify-center mt-3 space-x-4">
+          <button
+            onClick={prevPage}
+            disabled={currentPage === 0}
+            className="px-3 py-1 text-xs font-medium bg-white border rounded-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
+            style={{ 
+              color: '#852085',
+              borderColor: '#852085'
+            }}
+          >
+            {language === 'ar' ? '← السابق' : '← Previous'}
+          </button>
+          
           <button
             onClick={toggleBook}
-            className="text-xs font-medium text-white px-4 py-2 rounded-full transition-all duration-200 hover:opacity-90"
+            className="px-3 py-1 text-xs font-medium text-white rounded-sm transition-all duration-200 hover:opacity-90"
             style={{ backgroundColor: '#852085' }}
           >
-            {language === 'ar' ? 'إغلاق الكتاب' : 'Close Book'}
+            {language === 'ar' ? 'إغلاق' : 'Close'}
+          </button>
+          
+          <button
+            onClick={nextPage}
+            disabled={currentPage === pages.length - 1}
+            className="px-3 py-1 text-xs font-medium bg-white border rounded-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
+            style={{ 
+              color: '#852085',
+              borderColor: '#852085'
+            }}
+          >
+            {language === 'ar' ? 'التالي →' : 'Next →'}
           </button>
         </div>
         
         {/* Touch Instructions */}
         <div className="text-center mt-2">
           <span className="text-xs text-gray-500">
-            {language === 'ar' ? 'اسحب لتقليب الصفحات' : 'Swipe to turn pages'}
+            {language === 'ar' ? 'اسحب لتقليب الصفحات أو استخدم الأزرار' : 'Swipe to turn pages or use buttons'}
           </span>
         </div>
       </div>
