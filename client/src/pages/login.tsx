@@ -178,7 +178,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center p-4" dir={getDirection(language)}>
       <div className="w-full max-w-lg">
-        <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
+        <Card className="shadow-xl" style={{ boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
             
