@@ -51,16 +51,25 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
     touchEndX.current = e.targetTouches[0].clientX;
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEndRight = () => {
     if (!touchStartX.current || !touchEndX.current) return;
     
     const distance = touchStartX.current - touchEndX.current;
     const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
 
+    // Right side: swipe left to go to next page
     if (isLeftSwipe && currentPage < pages.length - 1) {
       nextPage();
     }
+  };
+
+  const handleTouchEndLeft = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const distance = touchStartX.current - touchEndX.current;
+    const isRightSwipe = distance < -50;
+
+    // Left side: swipe right to go to previous page
     if (isRightSwipe && currentPage > 0) {
       prevPage();
     }
@@ -102,9 +111,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
             border: '1px solid #e5e5e5',
             background: 'linear-gradient(to bottom, #fefefe 0%, #f8f8f8 100%)'
           }}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
+
         >
           {/* Book Spine/Binding */}
           <div 
@@ -119,10 +126,16 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
           </div>
 
           {/* Right Page */}
-          <div className="flex-1 p-6 bg-white relative" style={{ 
-            background: 'linear-gradient(to bottom right, #ffffff 0%, #fafafa 100%)',
-            boxShadow: 'inset 1px 0 2px rgba(0,0,0,0.05)'
-          }}>
+          <div 
+            className="flex-1 p-6 bg-white relative cursor-pointer" 
+            style={{ 
+              background: 'linear-gradient(to bottom right, #ffffff 0%, #fafafa 100%)',
+              boxShadow: 'inset 1px 0 2px rgba(0,0,0,0.05)'
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEndRight}
+          >
             {/* Page lines - subtle */}
             <div className="absolute inset-0 opacity-5">
               {Array.from({length: 15}).map((_, i) => (
@@ -148,13 +161,26 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
             <div className="absolute bottom-4 right-6 text-xs text-gray-400">
               {(currentPage * 2) + 2}
             </div>
+            
+            {/* Touch indicator for next page */}
+            {currentPage < pages.length - 1 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 opacity-50">
+                {language === 'ar' ? '← اسحب للصفحة التالية' : 'Swipe for next page →'}
+              </div>
+            )}
           </div>
 
           {/* Left Page */}
-          <div className="flex-1 p-6 bg-white relative" style={{ 
-            background: 'linear-gradient(to bottom left, #ffffff 0%, #fafafa 100%)',
-            boxShadow: 'inset -1px 0 2px rgba(0,0,0,0.05)'
-          }}>
+          <div 
+            className="flex-1 p-6 bg-white relative cursor-pointer" 
+            style={{ 
+              background: 'linear-gradient(to bottom left, #ffffff 0%, #fafafa 100%)',
+              boxShadow: 'inset -1px 0 2px rgba(0,0,0,0.05)'
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEndLeft}
+          >
             {/* Page lines - subtle */}
             <div className="absolute inset-0 opacity-5">
               {Array.from({length: 15}).map((_, i) => (
@@ -183,6 +209,13 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
             <div className="absolute bottom-4 left-6 text-xs text-gray-400">
               {(currentPage * 2) + 1}
             </div>
+            
+            {/* Touch indicator for previous page */}
+            {currentPage > 0 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-xs text-purple-400 opacity-50">
+                {language === 'ar' ? 'اسحب للصفحة السابقة →' : '← Swipe for previous page'}
+              </div>
+            )}
           </div>
         </div>
         
