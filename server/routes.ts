@@ -3319,6 +3319,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
+
+
+  // Serve static redirect page for root path
+  app.get('/', (req, res) => {
+    const indexPath = path.join(import.meta.dirname, '..', 'public', 'index.html');
+    res.sendFile(indexPath);
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

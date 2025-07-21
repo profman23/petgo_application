@@ -115,6 +115,7 @@ function Router() {
     <div className="min-h-screen flex flex-col screen-border">
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
+          <Route path="/app" component={Login} />
           <Route path="/" component={Login} />
           <Route path="/user-type-selection" component={UserTypeSelection} />
           <Route path="/login" component={Login} />
