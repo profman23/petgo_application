@@ -51,27 +51,67 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
     };
   }, []);
 
+  // تنظيف عند إغلاق المكون
+  useEffect(() => {
+    return () => {
+      if (bookRef.current) {
+        try {
+          bookRef.current = null;
+        } catch (error) {
+          console.warn('Cleanup error:', error);
+        }
+      }
+    };
+  }, [isOpen]);
+
   const toggleBook = () => {
-    setIsOpen(!isOpen);
-    if (!isOpen) {
-      setCurrentPage(0);
+    try {
+      if (isOpen && bookRef.current) {
+        // تنظيف مرجع الكتاب قبل الإغلاق
+        bookRef.current = null;
+      }
+      setIsOpen(!isOpen);
+      if (!isOpen) {
+        setCurrentPage(0);
+      }
+    } catch (error) {
+      console.warn('Toggle book error:', error);
+      setIsOpen(!isOpen);
     }
   };
 
   const nextPage = () => {
-    if (bookRef.current && currentPage < pages.length - 1) {
-      bookRef.current.getPageFlip().flipNext();
+    try {
+      if (bookRef.current && currentPage < pages.length - 1) {
+        bookRef.current.getPageFlip().flipNext();
+      }
+    } catch (error) {
+      console.warn('Next page error:', error);
+      if (currentPage < pages.length - 1) {
+        setCurrentPage(currentPage + 1);
+      }
     }
   };
 
   const prevPage = () => {
-    if (bookRef.current && currentPage > 0) {
-      bookRef.current.getPageFlip().flipPrev();
+    try {
+      if (bookRef.current && currentPage > 0) {
+        bookRef.current.getPageFlip().flipPrev();
+      }
+    } catch (error) {
+      console.warn('Previous page error:', error);
+      if (currentPage > 0) {
+        setCurrentPage(currentPage - 1);
+      }
     }
   };
 
   const onFlip = (e: any) => {
-    setCurrentPage(e.data);
+    try {
+      setCurrentPage(e.data);
+    } catch (error) {
+      console.warn('Flip event error:', error);
+    }
   };
 
   // Component for lined paper page
@@ -179,7 +219,17 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
         <div className="p-2 sm:p-4 md:p-8 pt-16 sm:pt-18 md:pt-20">
           <div className="w-full max-w-7xl mx-auto">
             <HTMLFlipBook
-              ref={bookRef}
+              ref={(el) => {
+                try {
+                  // تنظيف المرجع القديم إذا وجد
+                  if (bookRef.current && bookRef.current !== el) {
+                    bookRef.current = null;
+                  }
+                  bookRef.current = el;
+                } catch (error) {
+                  console.warn('Ref assignment error:', error);
+                }
+              }}
               width={dimensions.width}
               height={dimensions.height}
               size="fixed"
@@ -202,6 +252,20 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
               useMouseEvents={true}
               swipeDistance={15}
               onFlip={onFlip}
+              onChangeOrientation={() => {
+                try {
+                  setTimeout(updateDimensions, 100);
+                } catch (error) {
+                  console.warn('Orientation change error:', error);
+                }
+              }}
+              onChangeState={(e) => {
+                try {
+                  console.log('Book state changed:', e);
+                } catch (error) {
+                  console.warn('State change error:', error);
+                }
+              }}
               className="mx-auto book-container"
               style={{ 
                 margin: '0 auto',
