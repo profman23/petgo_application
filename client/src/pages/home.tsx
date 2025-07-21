@@ -778,7 +778,7 @@ export default function Home() {
                         className="text-sm font-bold"
                         style={{
                           fontFamily: '"Chewy", cursive',
-                          color: '#852085'
+                          color: '#6b7280'
                         }}
                       >
                         Weekly Tips
@@ -792,7 +792,7 @@ export default function Home() {
                         className="text-sm font-bold"
                         style={{
                           fontFamily: '"Chewy", cursive',
-                          color: '#852085'
+                          color: '#6b7280'
                         }}
                       >
                         Weekly Tips
