@@ -158,34 +158,34 @@ export default function Account() {
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header - Same design as home.tsx */}
-        <div className="bg-white text-gray-800 px-3 py-3 h-12 shadow-sm">
+        <div className="bg-white text-gray-800 px-2 py-3 h-12 shadow-sm">
           <div className="flex items-center justify-between h-full">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
-                <img 
-                  src={logoPath} 
-                  alt="VETS VAN Logo" 
-                  className="h-full w-auto object-contain"
-                  style={{ 
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
-                    maxWidth: '120px'
-                  }}
-                />
-              </div>
-              <div className="text-lg font-bold text-gray-800">
+            <div className="flex items-center">
+              <img 
+                src={logoPath} 
+                alt="VETS VAN Logo" 
+                className="h-6 w-auto object-contain"
+                style={{ 
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                  maxWidth: '40px'
+                }}
+              />
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <div className="text-sm font-semibold text-gray-800">
                 {language === 'ar' ? 'حسابي' : 'My Account'}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
               <LanguageSelector />
               <button
                 onClick={handleBack}
-                className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-sm"
+                className="flex items-center gap-1 text-gray-600 hover:text-gray-800 text-xs"
               >
                 {direction === 'rtl' ? (
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 ) : (
-                  <ArrowLeft className="w-4 h-4" />
+                  <ArrowLeft className="w-3.5 h-3.5" />
                 )}
                 {language === 'ar' ? 'العودة' : 'Back'}
               </button>
