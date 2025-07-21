@@ -120,7 +120,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
         {/* Close button */}
         <button
           onClick={toggleBook}
-          className="p-3 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="p-3 rounded-full bg-gray-500 text-white hover:bg-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl"
           style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
         >
           <X size={20} />
