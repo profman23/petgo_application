@@ -772,7 +772,7 @@ export default function Home() {
               {/* Weekly Tips Header */}
               <div className="flex items-center justify-start mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg" style={{ color: '#852085' }}>📌</span>
+                  <span className="text-lg" style={{ color: '#852085' }}>📍</span>
                   <span 
                     className="text-sm font-bold"
                     style={{
