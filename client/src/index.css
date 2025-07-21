@@ -509,3 +509,101 @@
     stroke: white !important;
   }
 }
+
+/* Interactive Book Styles */
+.flip-book {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.page-wrapper {
+  background: #ffffff;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.lined-page {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: 
+    /* Lined paper pattern */
+    linear-gradient(to bottom, 
+      transparent 0px, 
+      transparent 19px, 
+      #e5e7eb 20px, 
+      #e5e7eb 21px
+    );
+  background-size: 100% 20px;
+  /* Margin line */
+  background-image: 
+    linear-gradient(to right, 
+      transparent 0px, 
+      transparent 39px, 
+      #fbbf24 40px, 
+      #fbbf24 42px,
+      transparent 43px
+    );
+  /* Left margin holes */
+  background-position: 0 0, 0 0;
+  
+  /* Three hole punch effect */
+  position: relative;
+}
+
+.lined-page::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: 
+    radial-gradient(circle at center, transparent 6px, transparent 6px),
+    linear-gradient(to bottom, transparent 0%, transparent 100%);
+  background-size: 12px 60px;
+  background-position: 0 30px;
+}
+
+/* Three holes */
+.lined-page::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle 4px at 50% 80px, #d1d5db 50%, transparent 50%),
+    radial-gradient(circle 4px at 50% 250px, #d1d5db 50%, transparent 50%),
+    radial-gradient(circle 4px at 50% 420px, #d1d5db 50%, transparent 50%);
+  background-repeat: no-repeat;
+}
+
+/* Page flip animation */
+.flip-book .stf__parent {
+  perspective: 2000px;
+}
+
+.flip-book .stf__item {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* Enhance page shadow during flip */
+.flip-book .stf__item.--soft {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Page corner curl effect */
+.flip-book .stf__item.--fold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(-45deg, transparent 16px, rgba(0, 0, 0, 0.1) 16px);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
