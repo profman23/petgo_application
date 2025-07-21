@@ -115,6 +115,7 @@ function Router() {
     <div className="min-h-screen flex flex-col screen-border">
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
+          <Route path="/" component={Login} />
           <Route path="/user-type-selection" component={UserTypeSelection} />
           <Route path="/login" component={Login} />
           <Route path="/login/customer" component={Login} />
@@ -144,7 +145,6 @@ function Router() {
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
-          <Route path="/" component={Login} />
           <Route path="/login" component={Login} />
           <Route component={NotFound} />
         </Switch>
