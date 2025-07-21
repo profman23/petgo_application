@@ -13,6 +13,7 @@ import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
 import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart, Mail } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoImage from "@assets/Screenshot 2025-07-10 182605_1752161515777.png";
+import welcomeHandImage from "@assets/freepik__background__61417_1753095390676.png";
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 import { YouTubeTutorialModal } from '@/components/YouTubeTutorialModal';
 import { shouldShowTutorialVideo } from '@/lib/deviceDetection';
@@ -191,6 +192,26 @@ export default function Login() {
                   filter: 'brightness(1.02) contrast(1.1)',
                 }}
               />
+            </div>
+
+            {/* Welcome Message with Hand Logo */}
+            <div className={`mb-4 flex items-center justify-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+              {/* Welcome Hand Logo */}
+              <img 
+                src={welcomeHandImage} 
+                alt="Welcome Hand" 
+                className="w-8 h-8 object-contain"
+              />
+              
+              {/* Welcome Message */}
+              <div className={`text-center ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                <h2 className="text-lg font-bold text-purple-600">
+                  {language === 'ar' ? 'أهلاً وسهلاً بك' : 'Welcome'}
+                </h2>
+                <p className="text-sm text-gray-600">
+                  {language === 'ar' ? 'سعداء بوجودك معنا' : 'Happy to have you with us'}
+                </p>
+              </div>
             </div>
 
           </div>
