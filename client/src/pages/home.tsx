@@ -764,39 +764,41 @@ export default function Home() {
             </div>
           </button>
 
-          {/* Contact Section - Smaller Icons */}
-          <div className="mt-6 p-2">
-            <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
-              {/* WhatsApp Button */}
-              <a
-                href="https://wa.me/966535152250"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center w-12 h-12"
-              >
-                <img 
-                  src={whatsappIcon}
-                  alt="WhatsApp"
-                  className="w-10 h-10 object-contain"
-                />
-              </a>
-              
-              {/* Phone Call Button */}
-              <a
-                href="tel:+966535152250"
-                className="flex items-center justify-center w-12 h-12"
-              >
-                <img 
-                  src={phoneIcon}
-                  alt="Phone Call"
-                  className="w-10 h-10 object-contain"
-                />
-              </a>
-            </div>
-          </div>
+
         </div>
 
 
+      </div>
+
+      {/* Contact Section - Above Footer */}
+      <div className="pb-2 px-4">
+        <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
+          {/* WhatsApp Button */}
+          <a
+            href="https://wa.me/966535152250"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center w-12 h-12"
+          >
+            <img 
+              src={whatsappIcon}
+              alt="WhatsApp"
+              className="w-10 h-10 object-contain"
+            />
+          </a>
+          
+          {/* Phone Call Button */}
+          <a
+            href="tel:+966535152250"
+            className="flex items-center justify-center w-12 h-12"
+          >
+            <img 
+              src={phoneIcon}
+              alt="Phone Call"
+              className="w-10 h-10 object-contain"
+            />
+          </a>
+        </div>
       </div>
       
       {/* Location Permission Modal */}
