@@ -7,17 +7,6 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false }));
 
-// Add cache control headers to prevent caching issues  
-app.use((req, res, next) => {
-  // Disable caching for HTML files and API routes
-  if (req.url.endsWith('.html') || req.url.startsWith('/api/') || req.url === '/') {
-    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.set('Pragma', 'no-cache');
-    res.set('Expires', '0');
-  }
-  next();
-});
-
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

@@ -4,15 +4,6 @@ import { storage } from "./storage";
 import path from "path";
 import { fileURLToPath } from 'url';
 
-// Extend Express Request type to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: any;
-    }
-  }
-}
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema } from "@shared/schema";
@@ -67,7 +58,7 @@ function getErrorMessage(key: string, language: string = 'ar') {
     }
   };
   
-  return messages[language as keyof typeof messages]?.[key as keyof typeof messages.ar] || messages.ar[key as keyof typeof messages.ar];
+  return messages[language]?.[key] || messages.ar[key];
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -249,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store OTP in database
       await storage.createOtpVerification({
         email,
-        code: otpCode,
+        otpCode,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
       });
       
@@ -480,8 +471,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const distance = calculateDistance(
           parseFloat(latitude as string),
           parseFloat(longitude as string),
-          driver.latitude || 0,
-          driver.longitude || 0
+          driver.latitude,
+          driver.longitude
         );
         const eta = Math.ceil(distance * 2); // 2 minutes per km
         const { estimatedCost } = calculateRideEstimates(distance);
@@ -3322,18 +3313,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error exporting sales report:', error);
       res.status(500).json({ message: 'Failed to export sales report' });
     }
-  });
-
-
-
-
-
-
-
-  // Serve static redirect page for root path
-  app.get('/', (req, res) => {
-    const indexPath = path.join(import.meta.dirname, '..', 'public', 'index.html');
-    res.sendFile(indexPath);
   });
 
   const httpServer = createServer(app);

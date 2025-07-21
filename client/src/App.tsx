@@ -1,4 +1,4 @@
-import { Switch, Route, useLocation } from "wouter";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -31,6 +31,7 @@ import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 
 // Check for expired tokens on app start (skip for admin routes)
 const checkAndClearExpiredTokens = async () => {
@@ -115,8 +116,6 @@ function Router() {
     <div className="min-h-screen flex flex-col screen-border">
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
-          <Route path="/app" component={Login} />
-          <Route path="/" component={Login} />
           <Route path="/user-type-selection" component={UserTypeSelection} />
           <Route path="/login" component={Login} />
           <Route path="/login/customer" component={Login} />
@@ -146,7 +145,7 @@ function Router() {
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
-          <Route path="/login" component={Login} />
+          <Route path="/" component={Login} />
           <Route component={NotFound} />
         </Switch>
       </div>
@@ -156,6 +155,25 @@ function Router() {
 }
 
 function App() {
+  const [isAppReady, setIsAppReady] = useState(false);
+
+  const handleLoadingComplete = () => {
+    setIsAppReady(true);
+  };
+
+  if (!isAppReady) {
+    setTimeout(() => setIsAppReady(true), 500);
+    return (
+      <QueryClientProvider client={queryClient}>
+        <div className="min-h-screen flex items-center justify-center bg-white">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-purple-600">Loading...</p>
+          </div>
+        </div>
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster />
