@@ -164,11 +164,11 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="relative w-full max-w-6xl mx-auto bg-gradient-to-b from-amber-50 to-amber-100 rounded-xl shadow-2xl">
+    <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+      <div className="relative w-full h-full flex flex-col items-center justify-center">
         
         {/* Navigation Controls */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 z-10">
+        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 flex items-center gap-4 z-10">
           {/* Previous button */}
           <button
             onClick={prevPage}

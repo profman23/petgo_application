@@ -78,30 +78,41 @@ export const LinedPage = React.forwardRef<HTMLDivElement, LinedPageProps>(
       <LinedPageErrorBoundary language={language}>
         <div 
           ref={handleRef}
-          className={`relative bg-white border border-gray-300 shadow-md ${className}`}
+          className={`relative bg-white ${className}`}
           style={{
             width: '100%',
             height: '100%',
             minHeight: dimensions.width < 200 ? '220px' : '400px',
             backgroundImage: `
-              linear-gradient(to bottom, transparent 0px, transparent 19px, #cbd5e1 19px, #cbd5e1 20px),
-              linear-gradient(to right, ${isLeft ? 'transparent 0px, transparent 50px, #ef4444 50px, #ef4444 52px, transparent 52px' : '#ef4444 50px, #ef4444 52px, transparent 52px'}),
-              radial-gradient(circle at 30px 30px, rgba(0,0,0,0.08) 1px, transparent 1px),
-              radial-gradient(circle at 80px 60px, rgba(0,0,0,0.04) 1px, transparent 1px)
+              linear-gradient(to bottom, transparent 0px, transparent 24px, #cbd5e1 24px, #cbd5e1 25px),
+              linear-gradient(to right, ${isLeft ? 'transparent 0px, transparent 60px, #ef4444 60px, #ef4444 62px, transparent 62px' : '#ef4444 60px, #ef4444 62px, transparent 62px'}),
+              radial-gradient(circle at 40px 40px, rgba(0,0,0,0.06) 1px, transparent 1px),
+              radial-gradient(circle at 120px 80px, rgba(0,0,0,0.03) 1px, transparent 1px)
             `,
-            backgroundSize: '100% 20px, 100% 100%, 150px 150px, 250px 250px',
+            backgroundSize: '100% 25px, 100% 100%, 180px 180px, 300px 300px',
             backgroundRepeat: 'repeat-y, no-repeat, repeat, repeat',
+            boxShadow: `
+              0 8px 16px rgba(0,0,0,0.15),
+              0 4px 8px rgba(0,0,0,0.1),
+              inset 0 1px 2px rgba(255,255,255,0.8),
+              0 12px 24px rgba(0,0,0,0.08)
+            `,
+            border: '1px solid rgba(0,0,0,0.08)',
+            borderRadius: '2px',
           }}
         >
           <div 
-            className={`p-6 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+            className={`${language === 'ar' ? 'text-right' : 'text-left'}`}
             style={{ 
-              paddingLeft: isLeft ? (dimensions.width < 200 ? '15px' : '30px') : (dimensions.width < 200 ? '60px' : '90px'),
-              paddingRight: isLeft ? (dimensions.width < 200 ? '60px' : '90px') : (dimensions.width < 200 ? '15px' : '30px'),
-              paddingTop: dimensions.width < 200 ? '25px' : '50px',
-              paddingBottom: dimensions.width < 200 ? '15px' : '30px',
+              paddingLeft: isLeft ? (dimensions.width < 200 ? '20px' : '40px') : (dimensions.width < 200 ? '75px' : '105px'),
+              paddingRight: isLeft ? (dimensions.width < 200 ? '75px' : '105px') : (dimensions.width < 200 ? '20px' : '40px'),
+              paddingTop: dimensions.width < 200 ? '35px' : '60px',
+              paddingBottom: dimensions.width < 200 ? '25px' : '40px',
               minHeight: '100%',
-              lineHeight: dimensions.width < 200 ? '20px' : '28px'
+              lineHeight: dimensions.width < 200 ? '25px' : '30px',
+              maxWidth: '100%',
+              overflow: 'hidden',
+              wordWrap: 'break-word'
             }}
             dir={language === 'ar' ? 'rtl' : 'ltr'}
           >

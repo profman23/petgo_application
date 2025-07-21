@@ -769,20 +769,20 @@ export default function Home() {
           <InteractiveBook 
             pages={[
               {
-                arabic: "العلاج المنتظم للوقاية من البراغيث أمر مهم. الوقاية أفضل من العلاج، لأن البراغيث يمكن أن تنقل طفيليات الدم، وتعمل كناقل لبعض الأمراض، وقد تكون أيضًا مصدرًا للطفيليات الداخلية مثل الديدان الشريطية",
-                english: "Regular anti-flea treatment is important. Prophylaxis is better than treatment, as fleas can transmit blood parasites, act as vectors for certain diseases, and may also be a source of internal parasites like tapeworms."
+                arabic: "مرحباً",
+                english: "Hello"
               },
               {
-                arabic: "تساقط الشعر الموسمي أمر شائع لدى الحيوانات الأليفة، حيث تميل الكلاب والقطط إلى تساقط الشعر بشكل أكبر في فصل الربيع مقارنة بالخريف، نظرًا لأن فراء الشتاء يكون أكثر كثافة. ولكن، فإن التساقط المفاجئ أو المفرط الذي يسبب بقعًا خالية من الشعر قد يشير إلى وجود مشكلة صحية",
-                english: "Seasonal shedding is common in pets. Dogs and cats tend to shed more heavily in spring than in autumn, as their winter coats are generally much thicker. But sudden or excessive hair loss that causing bald spots may indicate a health problem."
+                arabic: "صحة",
+                english: "Health"
               },
               {
-                arabic: "جدول التطعيمات:\n\n• علاج الديدان عند عمر أسبوعين\n• جرعة تعزيزية بعد أسبوعين\n• جرعة تعزيزية بعد شهر\n• جرعة وقائية كل 3 أشهر\n• لقاح الفيروسات عند عمر شهرين\n• جرعات تعزيزية بعد 21 يومًا\n• جرعة تعزيزية سنوية\n• لقاح السُعار (داء الكلب) عند عمر 3 أشهر\n• جرعة تعزيزية سنوية للقاح السُعار",
-                english: "Vaccination Protocol:\n\n• Deworming at 2 weeks old age\n• Booster dose after 2 weeks\n• Booster dose after 1 month\n• Preventive dose every 3 months\n• Virus vaccine at 2 months\n• Booster doses after 21 days\n• Annual booster dose\n• Rabies vaccine at 3 months old\n• Annual booster dose for rabies vaccine"
+                arabic: "رعاية",
+                english: "Care"
               },
               {
-                arabic: "مضادات البراغيث:\n\n• سبوت أون (Spot-On): يُستخدم شهريًا ويعمل ضد البراغيث، العث، والديدان\n\n• سيمبريكا تريو (Simparica Trio): كل 35 يومًا ضد القراد، البراغيث، والديدان\n\n• برافكتو (Bravecto): كل 3 أشهر ضد القراد\n\nملاحظة: يجب استشارة الطبيب البيطري قبل استخدام أي علاج",
-                english: "Anti-flea Treatments:\n\n• Spot-On: Used monthly, works against fleas, mites, and worms\n\n• Simparica Trio: Every 35 days against ticks, fleas, and worms\n\n• Bravecto: Every 3 months against ticks\n\nNote: Consult your veterinarian before using any treatment"
+                arabic: "حب",
+                english: "Love"
               }
             ]}
           />
