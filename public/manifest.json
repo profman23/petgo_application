@@ -2,7 +2,7 @@
   "name": "VetsVan - العيادة البيطرية المتنقلة",
   "short_name": "VetsVan",
   "description": "خدمة العيادة البيطرية المتنقلة - رعاية شاملة لحيواناتك الأليفة",
-  "start_url": "/",
+  "start_url": "/login",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#852085",
