@@ -764,38 +764,32 @@ export default function Home() {
             </div>
           </button>
 
-          {/* Contact Section - Icons Only */}
-          <div className="mt-4 p-4 bg-white rounded-xl shadow-sm border border-purple-100">
-            <div className="flex items-center justify-center space-x-6 rtl:space-x-reverse">
+          {/* Contact Section - Smaller Icons */}
+          <div className="mt-6 p-2">
+            <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
               {/* WhatsApp Button */}
               <a
                 href="https://wa.me/966535152250"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center w-20 h-20 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 shake-animation"
+                className="flex items-center justify-center w-12 h-12"
               >
                 <img 
                   src={whatsappIcon}
                   alt="WhatsApp"
-                  className="w-14 h-14 object-contain"
-                  style={{
-                    filter: 'drop-shadow(0 4px 12px rgba(139, 47, 139, 0.3))'
-                  }}
+                  className="w-10 h-10 object-contain"
                 />
               </a>
               
               {/* Phone Call Button */}
               <a
                 href="tel:+966535152250"
-                className="flex items-center justify-center w-20 h-20 bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-300 shake-animation-delayed"
+                className="flex items-center justify-center w-12 h-12"
               >
                 <img 
                   src={phoneIcon}
                   alt="Phone Call"
-                  className="w-14 h-14 object-contain"
-                  style={{
-                    filter: 'drop-shadow(0 4px 12px rgba(139, 47, 139, 0.3))'
-                  }}
+                  className="w-10 h-10 object-contain"
                 />
               </a>
             </div>
