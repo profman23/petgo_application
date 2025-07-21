@@ -52,51 +52,27 @@ export function FixedFooter() {
                 onClick={() => handleNavigation(item.path)}
                 className={`
                   flex flex-col items-center justify-center 
-                  px-6 py-4 rounded-2xl min-w-[90px] relative
-                  transition-all duration-300 ease-in-out
-                  transform hover:scale-105 active:scale-95
-                  ${item.bgColor} ${item.hoverColor}
-                  shadow-lg hover:shadow-xl
-                  ${isActive 
-                    ? 'ring-4 ring-white ring-opacity-50 scale-105' 
-                    : 'hover:ring-2 hover:ring-white hover:ring-opacity-30'
-                  }
+                  px-6 py-4 rounded-2xl min-w-[90px]
+                  ${item.bgColor}
+                  ${isActive ? 'opacity-100' : 'opacity-80'}
                 `}
                 style={{ 
                   textAlign: 'center'
                 }}
               >
-                {/* 3D Icon Container */}
-                <div className={`
-                  w-12 h-12 rounded-xl flex items-center justify-center mb-2
-                  bg-white/20 backdrop-blur-sm border border-white/30
-                  shadow-inner transition-all duration-300
-                  ${isActive ? 'bg-white/30 shadow-lg' : ''}
-                `}>
-                  <span className={`text-2xl filter drop-shadow-sm ${
+                {/* Simple Icon Container */}
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-2">
+                  <span className={`text-2xl ${
                     item.id === 'activity' ? 'text-purple-600' : ''
                   }`}>
                     {item.icon}
                   </span>
                 </div>
 
-                {/* Label with 3D Effect */}
-                <span className={`
-                  text-sm font-bold text-white
-                  filter drop-shadow-md
-                  transition-all duration-300
-                  ${isActive ? 'text-shadow-lg' : ''}
-                `}>
+                {/* Simple Label */}
+                <span className="text-sm font-bold text-white">
                   {item.label}
                 </span>
-
-                {/* Shine Effect */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                
-                {/* Active Glow */}
-                {isActive && (
-                  <div className="absolute -inset-1 bg-gradient-to-r from-white/20 to-white/10 rounded-2xl blur-sm"></div>
-                )}
               </button>
             );
           })}
