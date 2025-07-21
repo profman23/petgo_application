@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, BookOpen, X } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 import HTMLFlipBook from 'react-pageflip';
+import { LinedPage } from '@/components/LinedPage';
 
 interface BookContent {
   arabic: string;
@@ -145,47 +146,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
     }
   };
 
-  // Component for lined paper page
-  const LinedPage = React.forwardRef<HTMLDivElement, { 
-    children: React.ReactNode; 
-    className?: string;
-    isLeft?: boolean;
-  }>(({ children, className = '', isLeft = false }, ref) => (
-    <div 
-      ref={ref} 
-      className={`relative bg-white border border-gray-300 shadow-md ${className}`}
-      style={{
-        width: '100%',
-        height: '100%',
-        minHeight: window.innerWidth < 640 ? '220px' : '400px',
-        backgroundImage: `
-          linear-gradient(to bottom, transparent 0px, transparent 19px, #cbd5e1 19px, #cbd5e1 20px),
-          linear-gradient(to right, ${isLeft ? 'transparent 0px, transparent 50px, #ef4444 50px, #ef4444 52px, transparent 52px' : '#ef4444 50px, #ef4444 52px, transparent 52px'}),
-          radial-gradient(circle at 30px 30px, rgba(0,0,0,0.08) 1px, transparent 1px),
-          radial-gradient(circle at 80px 60px, rgba(0,0,0,0.04) 1px, transparent 1px)
-        `,
-        backgroundSize: `100% ${window.innerWidth < 640 ? '20px' : '20px'}, 100% 100%, 150px 150px, 250px 250px`,
-        backgroundRepeat: 'repeat-y, no-repeat, repeat, repeat',
-      }}
-    >
-      <div 
-        className={`p-6 ${language === 'ar' ? 'text-right' : 'text-left'}`}
-        style={{ 
-          paddingLeft: isLeft ? (window.innerWidth < 640 ? '15px' : '30px') : (window.innerWidth < 640 ? '60px' : '90px'),
-          paddingRight: isLeft ? (window.innerWidth < 640 ? '60px' : '90px') : (window.innerWidth < 640 ? '15px' : '30px'),
-          paddingTop: window.innerWidth < 640 ? '25px' : '50px',
-          paddingBottom: window.innerWidth < 640 ? '15px' : '30px',
-          minHeight: '100%',
-          lineHeight: window.innerWidth < 640 ? '20px' : '28px'
-        }}
-        dir={language === 'ar' ? 'rtl' : 'ltr'}
-      >
-        {children}
-      </div>
-    </div>
-  ));
 
-  LinedPage.displayName = 'LinedPage';
 
   if (!isOpen) {
     return (
@@ -329,15 +290,18 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
                 <LinedPage 
                   key={index}
                   isLeft={index % 2 === 0}
+                  language={language}
+                  dimensions={dimensions}
+                  isCleanupRef={isCleanupRef}
                 >
                   <div className="h-full">
                     <h3 
-                      className={`font-bold mb-4 ${window.innerWidth < 640 ? 'text-sm' : 'text-lg'}`}
+                      className={`font-bold mb-4 ${dimensions.width < 200 ? 'text-sm' : 'text-lg'}`}
                       style={{ color: '#852085' }}
                     >
                       {language === 'ar' ? `الصفحة ${index + 1}` : `Page ${index + 1}`}
                     </h3>
-                    <p className={`${window.innerWidth < 640 ? 'text-xs' : 'text-sm'} leading-relaxed text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
+                    <p className={`${dimensions.width < 200 ? 'text-xs' : 'text-sm'} leading-relaxed text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
                       {language === 'ar' ? page.arabic : page.english}
                     </p>
                   </div>
