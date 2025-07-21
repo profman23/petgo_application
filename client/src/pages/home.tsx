@@ -783,7 +783,7 @@ export default function Home() {
                 className="text-xl font-bold mb-3"
                 style={{ 
                   textAlign,
-                  fontFamily: language === 'ar' ? '"Cairo Play", "Amiri", serif' : '"Comic Sans MS", "Marker Felt", cursive',
+                  fontFamily: language === 'ar' ? '"Cairo Play", serif' : '"Comic Neue", cursive',
                   color: '#852085'
                 }}
               >
@@ -798,7 +798,7 @@ export default function Home() {
                 className="text-sm leading-relaxed px-2"
                 style={{ 
                   textAlign,
-                  fontFamily: language === 'ar' ? '"Cairo Play", "Amiri", serif' : '"Comic Sans MS", "Marker Felt", cursive',
+                  fontFamily: language === 'ar' ? '"Cairo Play", serif' : '"Comic Neue", cursive',
                   color: '#4a4a4a',
                   lineHeight: '1.6'
                 }}
