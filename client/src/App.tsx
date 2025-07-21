@@ -1,4 +1,4 @@
-import { Switch, Route, Redirect } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -31,7 +31,6 @@ import PaymentProcessing from "@/pages/payment-processing";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
 
 // Check for expired tokens on app start (skip for admin routes)
 const checkAndClearExpiredTokens = async () => {
@@ -145,7 +144,7 @@ function Router() {
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
-          <Route path="/" component={() => <Redirect to="/login" />} />
+          <Route path="/" component={Login} />
           <Route path="/login" component={Login} />
           <Route component={NotFound} />
         </Switch>
