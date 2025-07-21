@@ -350,34 +350,34 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-white text-gray-800 px-2 py-2 h-11 shadow-sm">
+        <div className="bg-white text-gray-800 px-2 py-2 h-10 shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-1">
-              <div className="h-7 bg-white rounded-lg border-2 border-purple-600 px-1 py-0.5 shadow-sm hover:shadow-md transition-all duration-300">
+              <div className="h-6 bg-white rounded border border-purple-600 px-1 shadow-sm">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
                   className="h-full w-auto object-contain"
                   style={{ 
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
-                    maxWidth: '60px'
+                    filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                    maxWidth: '40px'
                   }}
                 />
               </div>
-              <div className="text-sm sm:text-lg font-bold text-gray-800 truncate max-w-20 sm:max-w-none">
-                {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
+              <div className="text-xs font-semibold text-gray-800 truncate max-w-16">
+                {user?.name || (language === 'ar' ? 'مرحباً' : 'Hi')}
               </div>
             </div>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-0.5">
               <LanguageSelector />
-              <Bell className="w-4 h-4 cursor-pointer text-gray-600 hover:text-gray-800" />
+              <Bell className="w-3.5 h-3.5 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-600 px-2 py-1 h-7 rounded-md font-medium transition-colors text-xs"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-1.5 py-0.5 h-6 rounded text-xs"
               >
-                {language === 'ar' ? 'خروج' : 'Logout'}
+                {language === 'ar' ? 'خروج' : 'Out'}
               </Button>
             </div>
           </div>
