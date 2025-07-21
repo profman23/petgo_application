@@ -1,7 +1,7 @@
 import { useLocation } from 'wouter';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 import newButtonsImage from '@assets/freepik__background__89215_1751365610576.png';
-import whatsappIcon from '@assets/freepik__a-3d-cartoon-style-whatsapp-icon-with-a-black-back__45613_1752162916171.png';
+import whatsappIcon from '@assets/freepik__background__20710_1752913557710.png';
 import phoneIcon from '@assets/freepik__a-modern-and-sleek-smartphone-icon-in-dark-mauve-c__20709_1752913557712.png';
 
 export function FixedFooter() {
