@@ -7,7 +7,7 @@ import { ArrowLeft, Plus, Heart, Calendar, PawPrint, Cat, Dog, Bird, Bell } from
 import { PatientForm } from '@/components/patient-form';
 import { EditPatientForm } from '@/components/edit-patient-form';
 import { useLocation } from 'wouter';
-import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import { FixedFooter } from '@/components/fixed-footer';
 import { LanguageSelector } from '@/components/language-selector';
 

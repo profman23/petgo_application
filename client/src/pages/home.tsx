@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2 } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
-import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import vetsVanImage from "@assets/image_1751292329902.png";
 import truckIcon from "@assets/10773561_1751295833176.png";
 import petsImage from "@assets/freepik_assistant_1751361910420_1751361937178.png";

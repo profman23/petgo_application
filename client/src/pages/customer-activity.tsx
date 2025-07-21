@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { FixedFooter } from '@/components/fixed-footer';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
-import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import { Button } from '@/components/ui/button';
 import { Bell } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
