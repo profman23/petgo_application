@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, X } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
 
 interface BookContent {
@@ -101,6 +101,46 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
 
   return (
     <div className="flex flex-col items-center my-4 px-4">
+      {/* Navigation buttons above book */}
+      <div className="flex items-center gap-4 mb-4">
+        {/* Previous button */}
+        <button
+          onClick={prevPage}
+          disabled={currentPage === 0}
+          className={`p-3 rounded-full transition-all duration-200 ${
+            currentPage === 0 
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+              : 'bg-white text-purple-600 hover:bg-purple-50 shadow-lg hover:shadow-xl'
+          }`}
+          style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
+        >
+          <ChevronLeft size={20} />
+        </button>
+
+        {/* Close button */}
+        <button
+          onClick={toggleBook}
+          className="p-3 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+          style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
+        >
+          <X size={20} />
+        </button>
+
+        {/* Next button */}
+        <button
+          onClick={nextPage}
+          disabled={currentPage === pages.length - 1}
+          className={`p-3 rounded-full transition-all duration-200 ${
+            currentPage === pages.length - 1 
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+              : 'bg-white text-purple-600 hover:bg-purple-50 shadow-lg hover:shadow-xl'
+          }`}
+          style={{ boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
+        >
+          <ChevronRight size={20} />
+        </button>
+      </div>
+
       {/* Open Book - White Paper Design */}
       <div className="relative w-full max-w-lg">
         {/* Real Book Design - Two Pages Side by Side */}
@@ -157,10 +197,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
               </div>
             </div>
             
-            {/* Page number - right */}
-            <div className="absolute bottom-4 right-6 text-xs text-gray-400">
-              {(currentPage * 2) + 2}
-            </div>
+
             
             {/* Touch indicator for next page */}
             {currentPage < pages.length - 1 && (
@@ -205,10 +242,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
               </div>
             </div>
             
-            {/* Page number - left */}
-            <div className="absolute bottom-4 left-6 text-xs text-gray-400">
-              {(currentPage * 2) + 1}
-            </div>
+
             
             {/* Touch indicator for previous page */}
             {currentPage > 0 && (
@@ -217,60 +251,6 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
               </div>
             )}
           </div>
-        </div>
-        
-        {/* Page Counter - Book Style */}
-        <div className="flex justify-center mt-4">
-          <div className="bg-white shadow-lg rounded-sm px-4 py-2 border" style={{ 
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            background: 'linear-gradient(to bottom, #ffffff 0%, #f8f8f8 100%)'
-          }}>
-            <span className="text-xs font-medium" style={{ color: '#852085' }}>
-              {language === 'ar' ? `صفحة ${currentPage + 1} من ${pages.length}` : `Page ${currentPage + 1} of ${pages.length}`}
-            </span>
-          </div>
-        </div>
-        
-        {/* Page Navigation Buttons - Book Style */}
-        <div className="flex justify-center mt-3 space-x-4">
-          <button
-            onClick={prevPage}
-            disabled={currentPage === 0}
-            className="px-3 py-1 text-xs font-medium bg-white border rounded-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
-            style={{ 
-              color: '#852085',
-              borderColor: '#852085'
-            }}
-          >
-            {language === 'ar' ? '← السابق' : '← Previous'}
-          </button>
-          
-          <button
-            onClick={toggleBook}
-            className="px-3 py-1 text-xs font-medium text-white rounded-sm transition-all duration-200 hover:opacity-90"
-            style={{ backgroundColor: '#852085' }}
-          >
-            {language === 'ar' ? 'إغلاق' : 'Close'}
-          </button>
-          
-          <button
-            onClick={nextPage}
-            disabled={currentPage === pages.length - 1}
-            className="px-3 py-1 text-xs font-medium bg-white border rounded-sm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
-            style={{ 
-              color: '#852085',
-              borderColor: '#852085'
-            }}
-          >
-            {language === 'ar' ? 'التالي →' : 'Next →'}
-          </button>
-        </div>
-        
-        {/* Touch Instructions */}
-        <div className="text-center mt-2">
-          <span className="text-xs text-gray-500">
-            {language === 'ar' ? 'اسحب لتقليب الصفحات أو استخدم الأزرار' : 'Swipe to turn pages or use buttons'}
-          </span>
         </div>
       </div>
     </div>
