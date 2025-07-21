@@ -16,8 +16,10 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [dimensions, setDimensions] = useState({ width: 400, height: 500 });
+  const [isBookReady, setIsBookReady] = useState(false);
   const { language } = useLanguage();
   const bookRef = useRef<any>(null);
+  const isCleanupRef = useRef(false);
 
   // Hook للتعامل مع تغيير حجم الشاشة
   useEffect(() => {
@@ -56,6 +58,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
     return () => {
       if (bookRef.current) {
         try {
+          isCleanupRef.current = true;
           bookRef.current = null;
         } catch (error) {
           console.warn('Cleanup error:', error);
@@ -64,15 +67,40 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
     };
   }, [isOpen]);
 
+  // تنظيف شامل عند unmount
+  useEffect(() => {
+    return () => {
+      isCleanupRef.current = true;
+      if (bookRef.current) {
+        try {
+          bookRef.current = null;
+        } catch (error) {
+          console.warn('Component unmount cleanup error:', error);
+        }
+      }
+    };
+  }, []);
+
   const toggleBook = () => {
     try {
-      if (isOpen && bookRef.current) {
-        // تنظيف مرجع الكتاب قبل الإغلاق
-        bookRef.current = null;
-      }
-      setIsOpen(!isOpen);
-      if (!isOpen) {
-        setCurrentPage(0);
+      if (isOpen) {
+        // تنظيف عند الإغلاق
+        isCleanupRef.current = true;
+        setIsBookReady(false);
+        setTimeout(() => {
+          if (bookRef.current) {
+            bookRef.current = null;
+          }
+          setIsOpen(false);
+          setCurrentPage(0);
+          isCleanupRef.current = false;
+        }, 100);
+      } else {
+        // فتح الكتاب
+        setIsOpen(true);
+        setTimeout(() => {
+          setIsBookReady(true);
+        }, 200);
       }
     } catch (error) {
       console.warn('Toggle book error:', error);
@@ -81,6 +109,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
   };
 
   const nextPage = () => {
+    if (isCleanupRef.current || !isBookReady) return; // منع التنفيذ أثناء التنظيف
     try {
       if (bookRef.current && currentPage < pages.length - 1) {
         bookRef.current.getPageFlip().flipNext();
@@ -94,6 +123,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
   };
 
   const prevPage = () => {
+    if (isCleanupRef.current || !isBookReady) return; // منع التنفيذ أثناء التنظيف
     try {
       if (bookRef.current && currentPage > 0) {
         bookRef.current.getPageFlip().flipPrev();
@@ -107,6 +137,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
   };
 
   const onFlip = (e: any) => {
+    if (isCleanupRef.current) return; // منع التنفيذ أثناء التنظيف
     try {
       setCurrentPage(e.data);
     } catch (error) {
@@ -215,17 +246,34 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
           </button>
         </div>
 
+        {/* Loading State */}
+        {!isBookReady && (
+          <div className="p-2 sm:p-4 md:p-8 pt-16 sm:pt-18 md:pt-20">
+            <div className="w-full max-w-7xl mx-auto flex items-center justify-center h-64">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">{language === 'ar' ? 'جاري تحميل الكتاب...' : 'Loading book...'}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Book Container */}
-        <div className="p-2 sm:p-4 md:p-8 pt-16 sm:pt-18 md:pt-20">
-          <div className="w-full max-w-7xl mx-auto">
-            <HTMLFlipBook
+        {isBookReady && (
+          <div className="p-2 sm:p-4 md:p-8 pt-16 sm:pt-18 md:pt-20">
+            <div className="w-full max-w-7xl mx-auto">
+              <HTMLFlipBook
               ref={(el) => {
+                if (isCleanupRef.current) return; // منع التحديث أثناء التنظيف
                 try {
                   // تنظيف المرجع القديم إذا وجد
                   if (bookRef.current && bookRef.current !== el) {
                     bookRef.current = null;
                   }
                   bookRef.current = el;
+                  if (el && !isBookReady) {
+                    setTimeout(() => setIsBookReady(true), 100);
+                  }
                 } catch (error) {
                   console.warn('Ref assignment error:', error);
                 }
@@ -298,6 +346,7 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
             </HTMLFlipBook>
           </div>
         </div>
+        )}
 
         {/* Page indicator */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-sm text-gray-600">
