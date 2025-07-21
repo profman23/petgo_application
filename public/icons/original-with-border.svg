@@ -8,6 +8,6 @@
   
   <!-- Embed your original image in the center with scaling -->
   <image x="60" y="60" width="392" height="392" 
-         xlink:href="/icons/final-favicon.png" 
+         href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" 
          preserveAspectRatio="xMidYMid meet"/>
 </svg>
