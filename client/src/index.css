@@ -517,6 +517,89 @@
   overflow: hidden;
 }
 
+/* Mobile Optimizations */
+.mobile-optimized {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+@media (max-width: 768px) {
+  .flip-book {
+    width: 100% !important;
+    max-width: calc(100vw - 20px) !important;
+    height: auto !important;
+    max-height: calc(100vh - 140px) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .page-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 400px;
+  }
+  
+  .lined-page {
+    font-size: 14px;
+    padding: 15px !important;
+    /* Adjust lined paper for mobile */
+    background-size: 100% 18px;
+    background-image: 
+      linear-gradient(to bottom, 
+        transparent 0px, 
+        transparent 17px, 
+        #e5e7eb 18px, 
+        #e5e7eb 19px
+      ),
+      linear-gradient(to right, 
+        transparent 0px, 
+        transparent 34px, 
+        #fbbf24 35px, 
+        #fbbf24 37px,
+        transparent 38px
+      );
+  }
+  
+  /* Touch-friendly buttons */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Disable text selection on mobile for better UX */
+  .flip-book * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Enable text selection for content only */
+  .flip-book p {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+}
+
+/* Better responsiveness for book container */
+@media (max-width: 480px) {
+  .flip-book {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100vh - 120px) !important;
+  }
+  
+  .lined-page {
+    font-size: 13px;
+    padding: 12px !important;
+    line-height: 1.4;
+  }
+}
+
 .page-wrapper {
   background: #ffffff;
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.05);
