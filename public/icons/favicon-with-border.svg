@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Thick white border background -->
+  <rect width="512" height="512" fill="white" rx="60"/>
+  
+  <!-- Inner container with padding for the border effect -->
+  <rect x="40" y="40" width="432" height="432" fill="white" rx="40"/>
+  
+  <!-- Medical cross and animals - centered and scaled -->
+  <g transform="translate(256, 256) scale(1.2)">
+    
+    <!-- Purple medical cross - matching the original image exactly -->
+    <g fill="#8B2F8B">
+      <!-- Horizontal bar of cross with rounded corners -->
+      <rect x="-120" y="-25" width="240" height="50" rx="25"/>
+      <!-- Vertical bar of cross with rounded corners -->
+      <rect x="-25" y="-120" width="50" height="240" rx="25"/>
+    </g>
+    
+    <!-- White dog silhouette on left side -->
+    <g fill="white" transform="translate(-60, 0)">
+      <!-- Dog head and face -->
+      <path d="M-10 -45 Q-20 -55 -35 -50 Q-45 -40 -40 -25 Q-35 -15 -25 -20 Q-15 -25 -5 -35 Q5 -40 0 -50 Q-5 -55 -10 -45 Z"/>
+      <!-- Dog ear -->
+      <ellipse cx="-25" cy="-50" rx="8" ry="12" transform="rotate(-15)"/>
+      <!-- Dog nose detail -->
+      <circle cx="-20" cy="-35" r="2"/>
+      <!-- Dog body -->
+      <ellipse cx="-10" cy="15" rx="18" ry="25"/>
+      <!-- Dog front legs -->
+      <ellipse cx="-25" cy="35" rx="4" ry="12"/>
+      <ellipse cx="-10" cy="38" rx="4" ry="10"/>
+      <!-- Dog back legs -->
+      <ellipse cx="5" cy="35" rx="4" ry="12"/>
+      <ellipse cx="15" cy="32" rx="3" ry="8"/>
+      <!-- Dog tail curved -->
+      <path d="M20 20 Q30 10 35 0 Q40 -10 35 -5 Q25 5 20 15" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </g>
+    
+    <!-- White cat silhouette on right side -->
+    <g fill="white" transform="translate(60, 0)">
+      <!-- Cat head -->
+      <ellipse cx="0" cy="-35" rx="15" ry="18"/>
+      <!-- Cat pointed ears -->
+      <path d="M-12 -48 L-5 -60 L2 -48 Z"/>
+      <path d="M2 -48 L9 -60 L16 -48 Z"/>
+      <!-- Cat whiskers -->
+      <line x1="-25" y1="-35" x2="-10" y2="-32" stroke="white" stroke-width="1"/>
+      <line x1="-25" y1="-30" x2="-10" y2="-30" stroke="white" stroke-width="1"/>
+      <line x1="10" y1="-32" x2="25" y2="-35" stroke="white" stroke-width="1"/>
+      <line x1="10" y1="-30" x2="25" y2="-30" stroke="white" stroke-width="1"/>
+      <!-- Cat body -->
+      <ellipse cx="0" cy="15" rx="12" ry="18"/>
+      <!-- Cat legs -->
+      <ellipse cx="-10" cy="30" rx="3" ry="8"/>
+      <ellipse cx="-3" cy="32" rx="3" ry="6"/>
+      <ellipse cx="3" cy="32" rx="3" ry="6"/>
+      <ellipse cx="10" cy="30" rx="3" ry="8"/>
+      <!-- Cat curved tail -->
+      <path d="M12 18 Q25 8 30 -8 Q35 -18 30 -12 Q20 -2 15 8" stroke="white" stroke-width="4" fill="none" stroke-linecap="round"/>
+    </g>
+    
+  </g>
+</svg>
