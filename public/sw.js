@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vetsvan-v1.0.0';
+const CACHE_NAME = 'vetsvan-v2.1.0';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -8,8 +8,12 @@ const urlsToCache = [
   '/icons/icon-512x512.png'
 ];
 
-// Install service worker
+// Install service worker with immediate activation
 self.addEventListener('install', event => {
+  console.log('Service Worker installing...');
+  // Skip waiting to activate immediately
+  self.skipWaiting();
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -19,19 +23,44 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch resources
+// Fetch resources with network-first strategy for CSS/JS files
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
+  const url = new URL(event.request.url);
+  
+  // Network-first strategy for CSS and JS files to ensure latest version
+  if (event.request.url.includes('.css') || 
+      event.request.url.includes('.js') || 
+      event.request.url.includes('/src/')) {
+    event.respondWith(
+      fetch(event.request).then(response => {
+        // If successful, update cache
+        if (response.ok) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return response;
+      }).catch(() => {
+        // If network fails, fall back to cache
+        return caches.match(event.request);
       })
-  );
+    );
+  } else {
+    // Cache-first for other resources
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          return response || fetch(event.request);
+        })
+    );
+  }
 });
 
-// Activate service worker
+// Activate service worker with immediate control
 self.addEventListener('activate', event => {
+  console.log('Service Worker activating...');
+  // Take control of all pages immediately
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -42,6 +71,9 @@ self.addEventListener('activate', event => {
           }
         })
       );
+    }).then(() => {
+      // Take control of all pages immediately
+      return self.clients.claim();
     })
   );
 });
