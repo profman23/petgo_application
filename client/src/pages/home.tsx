@@ -350,32 +350,32 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-white text-gray-800 px-3 py-3 h-12 shadow-sm">
+        <div className="bg-white text-gray-800 px-2 py-2 h-11 shadow-sm">
           <div className="flex items-center justify-between h-full">
-            <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex items-center space-x-1">
+              <div className="h-7 bg-white rounded-lg border-2 border-purple-600 px-1 py-0.5 shadow-sm hover:shadow-md transition-all duration-300">
                 <img 
                   src={logoImage} 
                   alt="VETS VAN Logo" 
                   className="h-full w-auto object-contain"
                   style={{ 
                     filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
-                    maxWidth: '120px'
+                    maxWidth: '60px'
                   }}
                 />
               </div>
-              <div className="text-lg font-bold text-gray-800">
+              <div className="text-sm sm:text-lg font-bold text-gray-800 truncate max-w-20 sm:max-w-none">
                 {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
               <LanguageSelector />
-              <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
+              <Bell className="w-4 h-4 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-2 py-1 h-7 rounded-md font-medium transition-colors text-xs"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
