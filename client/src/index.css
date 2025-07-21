@@ -73,6 +73,39 @@
   outline: none !important;
 }
 
+/* Interactive Book Styling */
+.font-arabic {
+  font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+}
+
+/* Book page flip animation */
+.book-page {
+  transition: transform 0.6s ease-in-out;
+  transform-style: preserve-3d;
+}
+
+.book-page.flipping {
+  transform: rotateY(-180deg);
+}
+
+/* Book shadow effects */
+.book-shadow {
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.1),
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Enhanced colors for book */
+.from-cream-50 {
+  background: #fefdf8;
+}
+
+.to-amber-50 {
+  background: #fffbeb;
+}
+
 /* Contact Icon Shake Animation */
 @keyframes contactShake {
   0%, 100% { 

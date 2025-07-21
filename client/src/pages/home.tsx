@@ -22,6 +22,7 @@ import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
+import { InteractiveBook } from '@/components/InteractiveBook';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -764,6 +765,15 @@ export default function Home() {
             </div>
           </button>
 
+          {/* Interactive Educational Book */}
+          <InteractiveBook 
+            pages={[
+              {
+                arabic: "العلاج المنتظم للوقاية من البراغيث أمر مهم. الوقاية أفضل من العلاج، لأن البراغيث يمكن أن تنقل طفيليات الدم، وتعمل كناقل لبعض الأمراض، وقد تكون أيضًا مصدرًا للطفيليات الداخلية مثل الديدان الشريطية",
+                english: "Regular anti-flea treatment is important. Prophylaxis is better than treatment, as fleas can transmit blood parasites, act as vectors for certain diseases, and may also be a source of internal parasites like tapeworms."
+              }
+            ]}
+          />
 
         </div>
 
