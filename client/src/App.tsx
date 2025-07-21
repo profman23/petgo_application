@@ -105,18 +105,7 @@ function AuthCheck({ children }: { children: React.ReactNode }) {
 }
 
 function Router() {
-  const [location, setLocation] = useLocation();
-  
-  // Debug logging for routing
-  console.log('Current location:', location);
-  
-  // Handle root path redirect
-  useEffect(() => {
-    if (location === '/') {
-      console.log('Root path detected, redirecting to /login');
-      setLocation('/login');
-    }
-  }, [location, setLocation]);
+  const [location] = useLocation();
   
   // Pages that should show the footer
   const pagesWithFooter = ['/home', '/account', '/activity', '/customer-activity', '/patients', '/ride-request'];
@@ -126,6 +115,7 @@ function Router() {
     <div className="min-h-screen flex flex-col screen-border">
       <div className={shouldShowFooter ? 'flex-1 pb-20' : 'flex-1'}>
         <Switch>
+          <Route path="/" component={Login} />
           <Route path="/user-type-selection" component={UserTypeSelection} />
           <Route path="/login" component={Login} />
           <Route path="/login/customer" component={Login} />

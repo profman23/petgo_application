@@ -3317,11 +3317,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // Handle root path specifically before Vite middleware
-  app.get('/', (req, res, next) => {
-    // Let Vite handle it but ensure it goes through properly
-    next();
-  });
+
 
   const httpServer = createServer(app);
   return httpServer;
