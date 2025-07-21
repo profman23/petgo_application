@@ -771,6 +771,10 @@ export default function Home() {
               {
                 arabic: "العلاج المنتظم للوقاية من البراغيث أمر مهم. الوقاية أفضل من العلاج، لأن البراغيث يمكن أن تنقل طفيليات الدم، وتعمل كناقل لبعض الأمراض، وقد تكون أيضًا مصدرًا للطفيليات الداخلية مثل الديدان الشريطية",
                 english: "Regular anti-flea treatment is important. Prophylaxis is better than treatment, as fleas can transmit blood parasites, act as vectors for certain diseases, and may also be a source of internal parasites like tapeworms."
+              },
+              {
+                arabic: "تساقط الشعر الموسمي أمر شائع لدى الحيوانات الأليفة، حيث تميل الكلاب والقطط إلى تساقط الشعر بشكل أكبر في فصل الربيع مقارنة بالخريف، نظرًا لأن فراء الشتاء يكون أكثر كثافة. ولكن، فإن التساقط المفاجئ أو المفرط الذي يسبب بقعًا خالية من الشعر قد يشير إلى وجود مشكلة صحية",
+                english: "Seasonal shedding is common in pets. Dogs and cats tend to shed more heavily in spring than in autumn, as their winter coats are generally much thicker. But sudden or excessive hair loss that causing bald spots may indicate a health problem."
               }
             ]}
           />

@@ -94,9 +94,9 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
     <div className="flex flex-col items-center my-4 px-4">
       {/* Open Book - White Paper Design */}
       <div className="relative w-full max-w-lg">
-        {/* Book Pages - White Paper */}
+        {/* Book Pages - White Paper - Single Language Based on System */}
         <div 
-          className={`flex min-h-[280px] bg-white shadow-lg transition-transform duration-300 ${isFlipping ? 'scale-95' : 'scale-100'}`}
+          className={`min-h-[280px] bg-white shadow-lg transition-transform duration-300 ${isFlipping ? 'scale-95' : 'scale-100'}`}
           style={{ 
             boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
             border: '1px solid #f0f0f0'
@@ -105,29 +105,18 @@ export function InteractiveBook({ pages }: InteractiveBookProps) {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {/* Right Page - Arabic */}
-          <div className="flex-1 p-6 border-r border-gray-200">
-            <div className="h-full flex flex-col">
-              <div className="text-right" dir="rtl">
+          {/* Single Page - Based on Language */}
+          <div className="w-full p-6">
+            <div className="h-full flex flex-col justify-center">
+              <div 
+                className={language === 'ar' ? 'text-right' : 'text-left'} 
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
+              >
                 <div className="text-xs mb-3 font-semibold" style={{ color: '#852085' }}>
-                  صفحة عربية
+                  {language === 'ar' ? 'VetsVan Book' : 'VetsVan Book'}
                 </div>
-                <p className="text-sm leading-relaxed text-gray-800 font-arabic">
-                  {pages[currentPage]?.arabic}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Left Page - English */}
-          <div className="flex-1 p-6">
-            <div className="h-full flex flex-col">
-              <div className="text-left" dir="ltr">
-                <div className="text-xs mb-3 font-semibold" style={{ color: '#852085' }}>
-                  English Page
-                </div>
-                <p className="text-sm leading-relaxed text-gray-800">
-                  {pages[currentPage]?.english}
+                <p className={`text-sm leading-relaxed text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
+                  {language === 'ar' ? pages[currentPage]?.arabic : pages[currentPage]?.english}
                 </p>
               </div>
             </div>
