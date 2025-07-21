@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, BookOpen } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 interface BookContent {
   arabic: string;
@@ -13,6 +14,7 @@ interface InteractiveBookProps {
 export function InteractiveBook({ pages }: InteractiveBookProps) {
   const [currentPage, setCurrentPage] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const language = useLanguage();
 
   const nextPage = () => {
     if (currentPage < pages.length - 1) {
