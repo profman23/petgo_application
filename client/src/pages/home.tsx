@@ -18,6 +18,8 @@ import newVetClinicImage from "@assets/freepik__a-different-3d-cartoon-style-vet
 // New purple theme icons
 import whatsappIcon from '@assets/freepik__background__20710_1752913557710.png';
 import phoneIcon from '@assets/freepik__a-modern-and-sleek-smartphone-icon-in-dark-mauve-c__20709_1752913557712.png';
+// Educational content logo
+import dogCatLogo from '@assets/freepik__3d-cartoon-style-logo-of-a-happy-dog-and-cat-playi__69263_1753113793648.png';
 import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
@@ -764,6 +766,50 @@ export default function Home() {
             </div>
           </button>
 
+          {/* Educational Section - Anti-Flea Prevention */}
+          <div className="mt-6 mb-4 px-4">
+            <div className="text-center">
+              {/* Dog & Cat Logo */}
+              <div className="flex justify-center mb-4">
+                <img 
+                  src={dogCatLogo}
+                  alt="Dog and Cat Logo" 
+                  className="w-24 h-24 object-contain"
+                />
+              </div>
+              
+              {/* Title */}
+              <h2 
+                className="text-xl font-bold mb-3"
+                style={{ 
+                  textAlign,
+                  fontFamily: language === 'ar' ? '"Cairo Play", "Amiri", serif' : '"Comic Sans MS", "Marker Felt", cursive',
+                  color: '#852085'
+                }}
+              >
+                {language === 'ar' 
+                  ? 'العلاج المنتظم للوقاية من البراغيث' 
+                  : 'Regular anti-flea treatment is important'
+                }
+              </h2>
+              
+              {/* Educational Content */}
+              <p 
+                className="text-sm leading-relaxed px-2"
+                style={{ 
+                  textAlign,
+                  fontFamily: language === 'ar' ? '"Cairo Play", "Amiri", serif' : '"Comic Sans MS", "Marker Felt", cursive',
+                  color: '#4a4a4a',
+                  lineHeight: '1.6'
+                }}
+              >
+                {language === 'ar' 
+                  ? 'العلاج المنتظم للوقاية من البراغيث أمر مهم. الوقاية أفضل من العلاج، لأن البراغيث يمكن أن تنقل طفيليات الدم، وتعمل كناقل لبعض الأمراض، وقد تكون أيضًا مصدرًا للطفيليات الداخلية مثل الديدان الشريطية.'
+                  : 'Regular anti-flea treatment is important. Prophylaxis is better than treatment, as fleas can transmit blood parasites, act as vectors for certain diseases, and may also be a source of internal parasites like tapeworms.'
+                }
+              </p>
+            </div>
+          </div>
 
         </div>
 
