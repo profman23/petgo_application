@@ -37,7 +37,6 @@ export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [captcha, setCaptcha] = useState({ question: '', answer: 0 });
   const [showTutorialVideo, setShowTutorialVideo] = useState(false);
-  const [returningUser, setReturningUser] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -79,21 +78,6 @@ export default function Login() {
 
   useEffect(() => {
     generateCaptcha();
-  }, []);
-
-  // Check for returning user
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      try {
-        const user = JSON.parse(userData);
-        setReturningUser(user.name);
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-      }
-    }
   }, []);
 
   const loginMutation = useMutation({
@@ -224,15 +208,9 @@ export default function Login() {
                 <h2 className="text-lg font-bold text-purple-600">
                   {language === 'ar' ? 'أهلاً وسهلاً بك' : 'Welcome'}
                 </h2>
-                {returningUser ? (
-                  <p className="text-sm font-semibold text-gray-800 mt-1">
-                    {returningUser}
-                  </p>
-                ) : (
-                  <p className="text-sm text-gray-600">
-                    {language === 'ar' ? 'سعداء بوجودك معنا' : 'Happy to have you with us'}
-                  </p>
-                )}
+                <p className="text-sm text-gray-600">
+                  {language === 'ar' ? 'سعداء بوجودك معنا' : 'Happy to have you with us'}
+                </p>
               </div>
             </div>
 
