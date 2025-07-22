@@ -9,6 +9,8 @@ import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import vetsVanImage from "@assets/image_1751292329902.png";
 import truckIcon from "@assets/10773561_1751295833176.png";
+import snapchatIcon from "@assets/freepik__a-simple-and-clean-cartoonstyle-logo-inspired-by-s__62952_1753187857021.png";
+import xIcon from "@assets/f065fd7d-6dd1-4688-a3d8-2fc13e5b0cde_1753187919935.png";
 import snapchatLogo from "@assets/freepik__a-simple-and-clean-cartoonstyle-logo-inspired-by-s__62952_1753187857021.png";
 import xLogo from "@assets/f065fd7d-6dd1-4688-a3d8-2fc13e5b0cde_1753187919935.png";
 import petsImage from "@assets/freepik_assistant_1751361910420_1751361937178.png";
