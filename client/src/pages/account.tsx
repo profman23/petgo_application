@@ -260,7 +260,7 @@ export default function Account() {
             textAlign,
             fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
           }}>
-            {t('accountDetails')}
+            Account Details
           </span>
           {isAccountDetailsOpen ? (
             <ChevronUp className="text-purple-600" size={20} />
@@ -278,7 +278,7 @@ export default function Account() {
             textAlign,
             fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
           }}>
-            {t('patients')}
+            Patients
           </span>
           <ArrowIcon className="text-purple-600" size={20} />
         </button>
@@ -374,7 +374,7 @@ export default function Account() {
               textAlign,
               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
             }}>
-              {language === 'ar' ? 'تاريخ الميلاد' : 'Birthdate'}
+              {language === 'ar' ? 'تاريخ الميلاد' : 'Birth Date'}
             </label>
             <div className="relative">
               <Calendar className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
