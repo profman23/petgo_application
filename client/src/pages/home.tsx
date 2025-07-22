@@ -366,7 +366,9 @@ export default function Home() {
               />
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <div className="text-sm font-semibold text-gray-800">
+              <div className="text-sm font-semibold text-gray-800" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
               </div>
             </div>
@@ -442,7 +444,10 @@ export default function Home() {
         {/* Enhanced Progress Animation for Active Ride */}
         {actualActiveRide && (
           <div className="p-3 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border-b">
-            <div className="text-sm font-bold text-purple-600 mb-3 text-center" style={{ textAlign }}>
+            <div className="text-sm font-bold text-purple-600 mb-3 text-center" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               {language === 'ar' ? 'تتبع العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic Tracking'}
             </div>
             
@@ -607,7 +612,10 @@ export default function Home() {
                             </div>
                             <div className={`mt-1 text-xs font-medium ${
                               isActive || isCurrent ? 'text-purple-600' : 'text-gray-400'
-                            }`} style={{ textAlign }}>
+                            }`} style={{ 
+                              textAlign,
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
                               {step.status === 'processing' && (language === 'ar' ? 'معالجة' : 'Processing')}
                               {step.status === 'enroute' && (language === 'ar' ? 'في الطريق' : 'On the Way')}
                               {step.status === 'arrived' && (language === 'ar' ? 'وصل' : 'Arrived')}
@@ -622,10 +630,16 @@ export default function Home() {
 
                 {/* Status Description */}
                 <div className="text-center p-2 bg-gray-50 rounded-lg">
-                  <div className="text-sm text-gray-700" style={{ textAlign }}>
+                  <div className="text-sm text-gray-700" style={{ 
+                    textAlign,
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                  }}>
                     {getStatusDescription(actualActiveRide.status, language)}
                   </div>
-                  <div className="text-xs text-blue-600 mt-1" style={{ textAlign }}>
+                  <div className="text-xs text-blue-600 mt-1" style={{ 
+                    textAlign,
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                  }}>
                     {language === 'ar' ? 'رقم الطلب: ' : 'Request ID: '}{actualActiveRide.id}
                   </div>
                 </div>
@@ -692,7 +706,10 @@ export default function Home() {
           {!actualActiveRide && (
             <div className="mb-3 p-3 bg-white rounded-2xl border-2 border-purple-600 shadow-lg">
               <div className="text-center">
-                <div className="text-sm font-semibold text-gray-800 mb-2" style={{ textAlign }}>
+                <div className="text-sm font-semibold text-gray-800 mb-2" style={{ 
+                  textAlign,
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
                   {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
                 </div>
                 
@@ -761,10 +778,18 @@ export default function Home() {
           >
             <div className="flex flex-col items-center">
               <Truck className="w-6 h-6 mb-1 !text-white" style={{ color: 'white' }} />
-              <span className="text-lg !text-white" style={{ textAlign, color: 'white' }}>
+              <span className="text-lg !text-white" style={{ 
+                textAlign, 
+                color: 'white',
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request'}
               </span>
-              <span className="text-sm opacity-90 !text-white" style={{ textAlign, color: 'white' }}>
+              <span className="text-sm opacity-90 !text-white" style={{ 
+                textAlign, 
+                color: 'white',
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Vetsvan Mobile Clinic'}
               </span>
             </div>

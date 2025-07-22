@@ -117,7 +117,9 @@ export default function Patients() {
               />
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <div className="text-sm font-semibold text-gray-800">
+              <div className="text-sm font-semibold text-gray-800" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'حيواناتي الأليفة' : 'My Pets'}
               </div>
             </div>
@@ -169,10 +171,14 @@ export default function Patients() {
                   <div className="w-24 h-24 mx-auto mb-4 bg-purple-600 rounded-full flex items-center justify-center">
                     <PawPrint className="h-12 w-12 text-purple-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2" style={{
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                  }}>
                     {t('noPatients')}
                   </h3>
-                  <p className="text-gray-500 mb-6">
+                  <p className="text-gray-500 mb-6" style={{
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                  }}>
                     {t('addFirstPatient')}
                   </p>
                   <Button
@@ -215,27 +221,35 @@ export default function Patients() {
 
                         {/* Patient Info */}
                         <div className="flex-1 min-w-0">
-                          <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
+                          <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate" style={{
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}>
                             {patient.name}
                           </h3>
                           
                           <div className="flex items-center gap-2 mb-2">
                             <IconComponent className="h-4 w-4 text-purple-600" />
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-gray-600" style={{
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
                               {t(patient.type.toLowerCase() as 'cat' | 'dog' | 'bird')}
                             </span>
                           </div>
 
                           <div className="flex items-center gap-2 mb-2">
                             <Calendar className="h-4 w-4 text-purple-600" />
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-gray-600" style={{
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
                               {formatAge(patient)}
                             </span>
                           </div>
 
                           <div className="flex items-center gap-2">
                             <Heart className="h-4 w-4 text-purple-600" />
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500" style={{
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
                               {new Date(patient.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                             </span>
                           </div>

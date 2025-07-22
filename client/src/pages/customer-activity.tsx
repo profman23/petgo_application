@@ -322,7 +322,9 @@ export default function CustomerActivity() {
               />
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <div className="text-sm font-semibold text-gray-800">
+              <div className="text-sm font-semibold text-gray-800" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'نشاطي' : 'My Activity'}
               </div>
             </div>
@@ -361,10 +363,16 @@ export default function CustomerActivity() {
           ) : bookings.length === 0 ? (
             <div className="text-center py-12">
               <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600 mb-2" style={{ textAlign }}>
+              <h3 className="text-lg font-semibold text-gray-600 mb-2" style={{ 
+                textAlign,
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'لا توجد حجوزات' : 'No Bookings'}
               </h3>
-              <p className="text-gray-500" style={{ textAlign }}>
+              <p className="text-gray-500" style={{ 
+                textAlign,
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' 
                   ? 'لم تقم بحجز أي مواعيد بعد. ابدأ بحجز موعدك الأول!'
                   : 'You haven\'t booked any appointments yet. Start by booking your first appointment!'

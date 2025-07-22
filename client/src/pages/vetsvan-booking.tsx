@@ -471,7 +471,9 @@ export default function VetsVanBooking() {
                   }}
                 />
               </div>
-              <div className="text-lg font-bold text-gray-800">
+              <div className="text-lg font-bold text-gray-800" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'حجز موعد' : 'Book Appointment'}
               </div>
             </div>
@@ -504,7 +506,10 @@ export default function VetsVanBooking() {
         {/* معلومات الطلب */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2" style={{ textAlign }}>
+            <CardTitle className="text-base flex items-center gap-2" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               <User className="w-4 h-4 text-purple-600" />
               {language === 'ar' ? 'تفاصيل الطلب' : 'Request Details'}
             </CardTitle>
@@ -564,7 +569,10 @@ export default function VetsVanBooking() {
           <Card className="border-2 border-purple-600">
             <CardContent className="p-4">
               <div className="mb-4 text-center">
-                <h3 className="text-lg font-semibold text-purple-600 mb-2" style={{ textAlign }}>
+                <h3 className="text-lg font-semibold text-purple-600 mb-2" style={{ 
+                  textAlign,
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
                   {language === 'ar' ? 'مراجعة الحجز' : 'Review Booking'}
                 </h3>
                 <div className="space-y-1 text-sm text-gray-600">
@@ -583,7 +591,9 @@ export default function VetsVanBooking() {
                   />
                   
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-white font-medium">
+                    <span className="text-white font-medium" style={{
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
                       {isSlideComplete ? (
                         language === 'ar' ? '✓ تم التأكيد' : '✓ Confirmed'
                       ) : (
@@ -669,7 +679,9 @@ export default function VetsVanBooking() {
                 
                 {isCreatingBooking && (
                   <div className="mt-2 text-center">
-                    <p className="text-sm text-purple-600">
+                    <p className="text-sm text-purple-600" style={{
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
                       {language === 'ar' ? 'جاري إنشاء الحجز...' : 'Creating booking...'}
                     </p>
                   </div>

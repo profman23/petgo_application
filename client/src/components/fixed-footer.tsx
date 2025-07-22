@@ -103,7 +103,9 @@ export function FixedFooter() {
                 </div>
 
                 {/* Simple Label */}
-                <span className="text-sm font-bold text-white">
+                <span className="text-sm font-bold text-white" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
                   {item.label}
                 </span>
               </button>

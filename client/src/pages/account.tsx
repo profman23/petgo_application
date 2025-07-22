@@ -172,7 +172,9 @@ export default function Account() {
               />
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
-              <div className="text-sm font-semibold text-gray-800">
+              <div className="text-sm font-semibold text-gray-800" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'حسابي' : 'My Account'}
               </div>
             </div>
@@ -227,10 +229,14 @@ export default function Account() {
 
             {/* User Name */}
             <div className="flex-1" style={{ textAlign }}>
-              <h1 className="text-2xl font-bold text-gray-800 mb-1">
+              <h1 className="text-2xl font-bold text-gray-800 mb-1" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {userProfile?.name || t('accountTitle')}
               </h1>
-              <p className="text-sm text-gray-600">{t('accountSubtitle')}</p>
+              <p className="text-sm text-gray-600" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>{t('accountSubtitle')}</p>
             </div>
           </div>
         </div>
@@ -240,7 +246,10 @@ export default function Account() {
           onClick={() => setIsAccountDetailsOpen(!isAccountDetailsOpen)}
           className="w-full bg-white rounded-xl shadow-lg p-4 mb-4 flex items-center justify-between hover:bg-purple-100 transition-colors"
         >
-          <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
+          <span className="text-lg font-semibold text-gray-800" style={{ 
+            textAlign,
+            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+          }}>
             {t('accountDetails')}
           </span>
           {isAccountDetailsOpen ? (
@@ -255,7 +264,10 @@ export default function Account() {
           onClick={handlePatientsClick}
           className="w-full bg-white rounded-xl shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-purple-100 transition-colors"
         >
-          <span className="text-lg font-semibold text-gray-800" style={{ textAlign }}>
+          <span className="text-lg font-semibold text-gray-800" style={{ 
+            textAlign,
+            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+          }}>
             {t('patients')}
           </span>
           <ArrowIcon className="text-purple-600" size={20} />

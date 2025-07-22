@@ -565,7 +565,9 @@ export default function RideRequest() {
                   }}
                 />
               </div>
-              <div className="text-lg font-bold text-gray-800">
+              <div className="text-lg font-bold text-gray-800" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
               </div>
             </div>
@@ -591,10 +593,16 @@ export default function RideRequest() {
         {/* Pet Selection Section */}
         <Card className="mb-6">
           <CardContent className="p-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-3" style={{ textAlign }}>
+            <h2 className="text-lg font-semibold text-gray-900 mb-3" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               {t('selectPatients')}
             </h2>
-            <p className="text-sm text-gray-600 mb-4" style={{ textAlign }}>
+            <p className="text-sm text-gray-600 mb-4" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               {t('selectPatientsDesc')}
             </p>
             
@@ -689,7 +697,10 @@ export default function RideRequest() {
                   {/* Display Selected Pets */}
                   <div className="min-h-[48px] border border-gray-300 rounded-md p-2 bg-white flex flex-wrap gap-2 items-center">
                     {selectedPatients.length === 0 ? (
-                      <span className="text-gray-500 text-sm" style={{ textAlign }}>
+                      <span className="text-gray-500 text-sm" style={{ 
+                        textAlign,
+                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                      }}>
                         {language === 'ar' ? 'لم يتم اختيار حيوانات بعد...' : 'No pets selected yet...'}
                       </span>
                     ) : (
@@ -744,7 +755,10 @@ export default function RideRequest() {
                 alt="Service Type" 
                 className="w-6 h-6 object-contain"
               />
-              <h2 className="text-lg font-semibold text-gray-900" style={{ textAlign }}>
+              <h2 className="text-lg font-semibold text-gray-900" style={{ 
+                textAlign,
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {t('selectServiceType')}
               </h2>
             </div>
