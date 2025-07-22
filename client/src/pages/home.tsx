@@ -26,7 +26,6 @@ import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
-import { FixedFooter } from '@/components/fixed-footer';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -989,9 +988,6 @@ export default function Home() {
       
       {/* PWA Install Banner */}
       <PWAInstallBanner />
-      
-      {/* Fixed Footer Navigation */}
-      <FixedFooter />
     </div>
   );
 }
