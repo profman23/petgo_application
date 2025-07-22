@@ -822,6 +822,10 @@ Changelog:
 - July 22, 2025. COMPLETED: Patient form field names updated with proper Arabic translations (اسم الأليف، نوع الأليف، etc.)
 - July 22, 2025. FIXED: Database birthdate column issue - added missing columns to users and patients tables
 - July 22, 2025. SUCCESS: Login system restored - authentication working properly after database schema update
+- July 22, 2025. COMPLETED: Additional button standardization - Reset Password and Save Profile updated with Comic Relief font
+- July 22, 2025. ENHANCED: All Account Details buttons now use consistent typography with proper spacing and capitalization
+- July 22, 2025. FINALIZED: Complete field and button standardization project across Account Details section
+- July 22, 2025. SUCCESS: User confirmed all typography updates working perfectly - consistent Comic Relief font applied throughout
 - July 22, 2025. ADDED: Five social media icons (WhatsApp, Phone, YouTube, Instagram, Facebook) in expanded horizontal bar
 - July 22, 2025. ENHANCED: Text animation on "Contact Us" instead of border animation for better visual appeal
 - July 22, 2025. REMOVED: All borders from contact button for clean transparent design
