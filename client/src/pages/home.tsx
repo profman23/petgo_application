@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2, Phone, MessageCircle } from 'lucide-react';
+import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2, Phone, MessageCircle, Youtube, Instagram, Facebook } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import vetsVanImage from "@assets/image_1751292329902.png";
