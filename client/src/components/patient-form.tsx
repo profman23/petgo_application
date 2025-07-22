@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Camera, Cat, Dog, Bird, ArrowLeft } from 'lucide-react';
+import { Camera, Cat, Dog, Bird, ArrowLeft, Calendar } from 'lucide-react';
 
 // Patient form schema - only name and type are required
 const patientFormSchema = z.object({
@@ -23,6 +23,7 @@ const patientFormSchema = z.object({
   ageMonth: z.string().optional(),
   ageDay: z.string().optional(),
   photo: z.string().optional(),
+  birthdate: z.string().optional(),
 });
 
 type PatientFormData = z.infer<typeof patientFormSchema>;
@@ -53,6 +54,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
       ageMonth: '',
       ageDay: '',
       photo: '',
+      birthdate: '',
     },
   });
 
@@ -102,6 +104,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
       ageMonth: data.ageMonth && data.ageMonth !== '' ? Number(data.ageMonth) : undefined,
       ageDay: data.ageDay && data.ageDay !== '' ? Number(data.ageDay) : undefined,
       photo: data.photo || undefined,
+      birthdate: data.birthdate || undefined,
     };
     addPatientMutation.mutate(cleanData);
   };
@@ -131,8 +134,10 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
               
               {/* Patient Name */}
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-                  {t('patientName')} <span className="text-red-500">*</span>
+                <Label htmlFor="name" className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'اسم الأليف' : 'Patient Name'} <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="name"
@@ -148,8 +153,10 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
 
               {/* Patient Type */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
-                  {t('patientType')} <span className="text-red-500">*</span>
+                <Label className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'نوع الأليف' : 'Patient Type'} <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   onValueChange={(value) => form.setValue('type', value as 'Cat' | 'Dog' | 'Bird')}
@@ -179,8 +186,10 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
 
               {/* Patient Age */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
-                  {t('patientAge')} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                <Label className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'عمر الأليف' : 'Patient Age'} <span className="text-gray-400 text-xs">({t('optional')})</span>
                 </Label>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
@@ -228,10 +237,30 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 </div>
               </div>
 
+              {/* Birthdate */}
+              <div className="space-y-2">
+                <Label htmlFor="birthdate" className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'تاريخ الميلاد' : 'Birthdate'} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                </Label>
+                <div className="relative">
+                  <Calendar className="absolute top-3 w-4 h-4 text-gray-400" style={{ [isRTL ? 'right' : 'left']: '12px' }} />
+                  <Input
+                    id="birthdate"
+                    type="date"
+                    {...form.register('birthdate')}
+                    className={`border-2 border-purple-600 focus:border-purple-600 rounded-lg ${isRTL ? 'pr-10 text-right' : 'pl-10'}`}
+                  />
+                </div>
+              </div>
+
               {/* Patient Photo */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
-                  {t('patientPhoto')} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                <Label className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'صورة الأليف' : 'Patient Photo'} <span className="text-gray-400 text-xs">({t('optional')})</span>
                 </Label>
                 <div className="flex flex-col items-center gap-4">
                   {selectedPhoto ? (

@@ -13,6 +13,7 @@ export const users = pgTable("users", {
   petName: text("pet_name"),
   petType: text("pet_type"), // كلب، قطة، طير
   address: text("address"),
+  birthdate: text("birthdate"),
   membershipType: text("membership_type").notNull().default("bronze"),
 });
 
@@ -84,6 +85,7 @@ export const patients = pgTable("patients", {
   ageDay: integer("age_day"),
   photo: text("photo"),
   condition: text("condition"),
+  birthdate: text("birthdate"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -95,6 +97,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   lastName: true,
   email: true,
   address: true,
+  birthdate: true,
   membershipType: true,
 });
 

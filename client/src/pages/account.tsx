@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp, Mail, Calendar } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -18,6 +18,8 @@ export default function Account() {
   // Form states
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [birthdate, setBirthdate] = useState('');
   
   // Password reset modal state
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -40,6 +42,8 @@ export default function Account() {
     if (userProfile) {
       setFirstName(userProfile.firstName || '');
       setLastName(userProfile.lastName || '');
+      setEmail(userProfile.email || '');
+      setBirthdate(userProfile.birthdate || '');
     }
   }, [userProfile]);
 
@@ -105,6 +109,8 @@ export default function Account() {
     updateProfileMutation.mutate({
       firstName,
       lastName,
+      email,
+      birthdate,
       name: fullName,
     });
   };
@@ -282,8 +288,11 @@ export default function Account() {
           <div className="bg-white rounded-xl shadow-lg p-6 space-y-6 mb-6">
             {/* First Name */}
             <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
-              {t('firstName')}
+            <label className="block text-sm font-medium text-gray-700" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'الاسم الأول' : 'First Name'}
             </label>
             <div className="relative">
               <User className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
@@ -299,8 +308,11 @@ export default function Account() {
 
           {/* Last Name */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
-              {t('lastName')}
+            <label className="block text-sm font-medium text-gray-700" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'الاسم الأخير' : 'Last Name'}
             </label>
             <div className="relative">
               <User className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
@@ -316,10 +328,33 @@ export default function Account() {
 
 
 
+          {/* Email */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'الإيميل' : 'Email'}
+            </label>
+            <div className="relative">
+              <Mail className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                placeholder={language === 'ar' ? 'أدخل الإيميل' : 'Enter Email'}
+              />
+            </div>
+          </div>
+
           {/* Phone Number (Read Only) */}
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
-              {t('phone')}
+            <label className="block text-sm font-medium text-gray-700" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
             </label>
             <div className="relative">
               <Phone className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
@@ -329,6 +364,25 @@ export default function Account() {
                 readOnly
                 className={`w-full h-10 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-500 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('phonePlaceholder')}
+              />
+            </div>
+          </div>
+
+          {/* Birthdate */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'تاريخ الميلاد' : 'Birthdate'}
+            </label>
+            <div className="relative">
+              <Calendar className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
+              <input
+                type="date"
+                value={birthdate}
+                onChange={(e) => setBirthdate(e.target.value)}
+                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
               />
             </div>
           </div>
@@ -365,8 +419,11 @@ export default function Account() {
 
             {/* Current Password */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
-                {t('currentPassword')}
+              <label className="block text-sm font-medium text-gray-700" style={{ 
+                textAlign,
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
+                {language === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}
               </label>
               <div className="relative">
                 <Lock className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
@@ -382,8 +439,11 @@ export default function Account() {
 
             {/* New Password */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
-                {t('newPassword')}
+              <label className="block text-sm font-medium text-gray-700" style={{ 
+                textAlign,
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
+                {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
               </label>
               <div className="relative">
                 <Lock className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
@@ -399,8 +459,11 @@ export default function Account() {
 
             {/* Confirm New Password */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700" style={{ textAlign }}>
-                {t('confirmNewPassword')}
+              <label className="block text-sm font-medium text-gray-700" style={{ 
+                textAlign,
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
+                {language === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}
               </label>
               <div className="relative">
                 <Lock className="absolute top-3 w-4 h-4 text-gray-400" style={{ [direction === 'rtl' ? 'right' : 'left']: '12px' }} />
