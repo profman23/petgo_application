@@ -106,6 +106,16 @@ export default function Home() {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
   const [showContactPopup, setShowContactPopup] = useState(false);
+  
+  // Auto-close after 2 seconds
+  useEffect(() => {
+    if (showContactPopup) {
+      const timer = setTimeout(() => {
+        setShowContactPopup(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showContactPopup]);
 
   // Simple location state management
   const [locationInfo, setLocationInfo] = useState({
