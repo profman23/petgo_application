@@ -9,6 +9,8 @@ import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import vetsVanImage from "@assets/image_1751292329902.png";
 import truckIcon from "@assets/10773561_1751295833176.png";
+import snapchatLogo from "@assets/freepik__a-simple-and-clean-cartoonstyle-logo-inspired-by-s__62952_1753187857021.png";
+import xLogo from "@assets/f065fd7d-6dd1-4688-a3d8-2fc13e5b0cde_1753187919935.png";
 import petsImage from "@assets/freepik_assistant_1751361910420_1751361937178.png";
 import newVetVanImage from "@assets/freepik__background__70346_1751363211262.png";
 import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753.jpeg";
@@ -878,11 +880,11 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-yellow-50 transition-colors"
                   >
-                    <div className="w-6 h-6 text-yellow-500">
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.419-6.02 1.419-6.02s-.362-.724-.362-1.794c0-1.681.974-2.938 2.184-2.938 1.031 0 1.529.773 1.529 1.699 0 1.035-.659 2.584-.998 4.02-.284 1.195.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.562-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.888-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.357-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24c6.624 0 11.99-5.367 11.99-12.013C24.007 5.367 18.641.001 12.017.001z"/>
-                      </svg>
-                    </div>
+                    <img 
+                      src={snapchatLogo} 
+                      alt="Snapchat" 
+                      className="w-6 h-6 object-contain"
+                    />
                     <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
                       Snapchat
                     </span>
@@ -895,11 +897,11 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    <div className="w-6 h-6 text-gray-800">
-                      <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                      </svg>
-                    </div>
+                    <img 
+                      src={xLogo} 
+                      alt="X" 
+                      className="w-6 h-6 object-contain"
+                    />
                     <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
                       X
                     </span>
