@@ -815,7 +815,7 @@ export default function Home() {
           {/* Contact Us Button - Expandable horizontally */}
           <div 
             className="fixed right-0 z-50 cursor-pointer transition-all duration-500 ease-in-out"
-            style={{ top: '60%', transform: 'translateY(-50%)' }}
+            style={{ top: '65%', transform: 'translateY(-50%)' }}
             onClick={() => setShowContactPopup(!showContactPopup)}
           >
             {!showContactPopup ? (
