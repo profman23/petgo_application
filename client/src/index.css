@@ -73,6 +73,22 @@
   color: #374151 !important;
 }
 
+/* Contact button animation */
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: #9ca3af;
+    opacity: 1;
+  }
+  50% {
+    border-color: #852085;
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
 .select-item-custom[data-state="checked"] {
   background-color: #e5e7eb !important;
   color: #111827 !important;

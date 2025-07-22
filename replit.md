@@ -809,6 +809,9 @@ Changelog:
 - July 22, 2025. ADDED: Transparent contact button with Comic Relief font and vertical text orientation
 - July 22, 2025. CREATED: Contact popup with WhatsApp and Phone call options using Lucide icons
 - July 22, 2025. POSITIONED: Button in Weekly Tips section area as requested with proper z-index and hover effects
+- July 22, 2025. ENHANCED: Contact button positioning moved to 60% (below image level in Weekly Tips section)
+- July 22, 2025. UPDATED: Text color changed to gray (text-gray-500) for subtler appearance
+- July 22, 2025. IMPLEMENTED: Animated border with pulse effect - transitions between gray and purple (#852085) every 2 seconds
 - July 21, 2025. SUCCESS: Weekly Tips element confirmed working - displays properly above educational content
 - July 21, 2025. IMPLEMENTED: Complete automatic PWA update system eliminating manual user intervention
 - July 21, 2025. ENHANCED: Service Worker with skipWaiting(), clients.claim(), and network-first strategy for CSS/JS files
