@@ -550,10 +550,10 @@ export default function RideRequest() {
   return (
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
-        {/* Header */}
-        <div className="bg-white text-gray-800 px-3 py-3 h-12 shadow-sm">
+        {/* Header - Same as home.tsx */}
+        <div className="bg-white text-gray-800 px-2 py-3 h-12 shadow-sm">
           <div className="flex items-center justify-between h-full">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center">
               <img 
                 src={logoImage} 
                 alt="VETS VAN Logo" 
@@ -567,20 +567,22 @@ export default function RideRequest() {
                   background: 'transparent !important'
                 }}
               />
-              <div className="text-lg font-bold text-gray-800" style={{
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <div className="text-sm font-semibold text-gray-800" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
                 {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
               <LanguageSelector />
-              <Bell className="w-5 h-5 cursor-pointer text-gray-600 hover:text-gray-800" />
+              <Bell className="w-4 h-4 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                className="bg-purple-600 text-white hover:bg-purple-600 px-2 py-1 h-7 rounded text-xs"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
