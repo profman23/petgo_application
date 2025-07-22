@@ -733,7 +733,7 @@ export default function Home() {
                 </div>
                 
                 {/* Enhanced Road Animation */}
-                <div className="relative h-16 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2 overflow-hidden shadow-inner">
+                <div className="relative h-24 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2">
                   {/* Road markings */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-full h-2 bg-purple-600 opacity-50 animate-pulse rounded-full"></div>
@@ -750,21 +750,21 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* 3D Veterinary Clinic - Start Position */}
-                  <div className={`absolute top-0 ${language === 'ar' ? '-right-4' : '-left-4'} z-10`}>
+                  {/* 3D Veterinary Clinic - Start Position - Fully Visible */}
+                  <div className={`absolute -top-2 ${language === 'ar' ? '-right-8' : '-left-8'} z-10`}>
                     <img 
                       src={newVetClinicImage}
                       alt="Veterinary Clinic" 
-                      className="w-16 h-16 drop-shadow-xl"
+                      className="w-20 h-20 drop-shadow-xl"
                     />
                   </div>
                   
-                  {/* Custom House - End Position - Same Level as Clinic */}
-                  <div className={`absolute top-0 ${language === 'ar' ? '-left-6' : '-right-6'} z-10`}>
+                  {/* Custom House - End Position - Fully Visible */}
+                  <div className={`absolute -top-4 ${language === 'ar' ? '-left-8' : '-right-8'} z-10`}>
                     <img 
                       src={newestHouseImage}
                       alt="House" 
-                      className="w-20 h-20 drop-shadow-xl"
+                      className="w-24 h-24 drop-shadow-xl"
                     />
                   </div>
                 </div>
