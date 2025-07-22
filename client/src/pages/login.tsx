@@ -183,7 +183,7 @@ export default function Login() {
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
             
             {/* Logo Container - VETS VAN في الأعلى */}
-            <div className="mb-8 flex justify-center">
+            <div className="mb-16 flex justify-center">
               <img 
                 src={logoImage} 
                 alt="VETS VAN - Mobile Veterinary Clinic" 
@@ -195,7 +195,7 @@ export default function Login() {
             </div>
 
             {/* Hand Logo في المنتصف */}
-            <div className="mb-12 flex justify-center">
+            <div className="mb-6 flex justify-center">
               <img 
                 src={welcomeHandImage} 
                 alt="Welcome Hand" 
@@ -204,7 +204,7 @@ export default function Login() {
             </div>
 
             {/* Welcome Message في الأسفل */}
-            <div className="mb-10 text-center">
+            <div className="mb-4 text-center">
               <h2 className="text-xl font-bold text-purple-600 mb-2" style={{ 
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
