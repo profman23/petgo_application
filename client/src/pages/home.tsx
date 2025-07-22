@@ -834,14 +834,18 @@ export default function Home() {
             ) : (
               /* Expanded state - horizontal bar */
               <div 
-                className="bg-white bg-opacity-95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-lg px-4 py-3 transition-all duration-300"
+                className="bg-white bg-opacity-95 backdrop-blur-sm border border-gray-200 shadow-lg px-4 py-3 transition-all duration-300"
                 style={{ 
                   width: '100vw', 
                   right: '0',
-                  transform: 'translateX(0)'
+                  transform: 'translateX(0)',
+                  borderTopLeftRadius: '20px',
+                  borderBottomLeftRadius: '20px',
+                  borderTopRightRadius: '0px',
+                  borderBottomRightRadius: '0px'
                 }}
               >
-                <div className="flex items-center justify-center gap-8">
+                <div className="flex items-center justify-center gap-4">
                   {/* WhatsApp */}
                   <a 
                     href="https://wa.me/966548336693" 
