@@ -885,7 +885,7 @@ export default function Home() {
                     <img 
                       src={snapchatLogo} 
                       alt="Snapchat" 
-                      className="w-6 h-6 object-contain"
+                      className="w-7 h-7 object-contain"
                     />
                     <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
                       Snapchat
@@ -902,7 +902,7 @@ export default function Home() {
                     <img 
                       src={xLogo} 
                       alt="X" 
-                      className="w-6 h-6 object-contain"
+                      className="w-7 h-7 object-contain"
                     />
                     <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
                       X
