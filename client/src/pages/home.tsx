@@ -759,8 +759,8 @@ export default function Home() {
                     />
                   </div>
                   
-                  {/* Custom House - End Position - Fully Visible */}
-                  <div className={`absolute -top-4 ${language === 'ar' ? '-left-8' : '-right-8'} z-10`}>
+                  {/* Custom House - End Position - Fully Visible - More to the Right */}
+                  <div className={`absolute -top-4 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
                     <img 
                       src={newestHouseImage}
                       alt="House" 

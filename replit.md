@@ -831,6 +831,7 @@ Changelog:
 - July 22, 2025. SMOOTHED: Contact Us collapse animation - slower (0.8s) with cubic-bezier easing for smoother closing
 - July 22, 2025. ENHANCED: Road Animation elements - clinic and house now fully visible without blur frame, increased section height and adjusted positioning for complete visibility
 - July 22, 2025. CLEANED: Removed all blur frames, shadows, and pink background gradient from Road Animation section - now clean transparent background with only essential elements
+- July 22, 2025. REPOSITIONED: Moved house further to the right (-right-12) to position at screen edge while maintaining full visibility and design
 - July 22, 2025. ENHANCED: Replaced SVG icons with custom logo images for Snapchat (yellow cartoon-style) and X (black square logo)
 - July 22, 2025. MAINTAINED: All original design elements, animations, spacing, and hover effects while using authentic brand logos
 - July 21, 2025. SUCCESS: Weekly Tips element confirmed working - displays properly above educational content
