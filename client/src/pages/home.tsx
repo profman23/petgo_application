@@ -764,7 +764,7 @@ export default function Home() {
                     <img 
                       src={newestHouseImage}
                       alt="House" 
-                      className="w-26 h-26 drop-shadow-xl"
+                      className="w-24 h-24 drop-shadow-xl"
                     />
                   </div>
                 </div>
