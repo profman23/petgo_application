@@ -814,15 +814,19 @@ export default function Home() {
 
           {/* Contact Us Button - Expandable horizontally */}
           <div 
-            className="fixed right-0 z-50 cursor-pointer transition-all duration-500 ease-in-out"
+            className="fixed right-0 z-50 cursor-pointer"
             style={{ top: '65%', transform: 'translateY(-50%)' }}
             onClick={() => setShowContactPopup(!showContactPopup)}
           >
             {!showContactPopup ? (
               /* Collapsed state - vertical button */
               <div 
-                className="bg-transparent px-2 py-6 hover:bg-gray-50 hover:bg-opacity-50 transition-all duration-500 ease-in-out"
-                style={{ width: '45px', height: '140px' }}
+                className="bg-transparent px-2 py-6 hover:bg-gray-50 hover:bg-opacity-50"
+                style={{ 
+                  width: '45px', 
+                  height: '140px',
+                  transition: 'all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0)'
+                }}
               >
                 <div 
                   className="writing-vertical-rl text-gray-500 font-semibold text-sm h-full flex items-center justify-center animate-pulse-text"
@@ -838,7 +842,7 @@ export default function Home() {
             ) : (
               /* Expanded state - horizontal bar */
               <div 
-                className="bg-white bg-opacity-95 backdrop-blur-sm border-2 border-purple-200 shadow-xl px-6 py-3 transition-all duration-500 ease-in-out"
+                className="bg-white bg-opacity-95 backdrop-blur-sm border-2 border-purple-200 shadow-xl px-6 py-3"
                 style={{ 
                   width: '100vw', 
                   right: '0',
@@ -847,7 +851,8 @@ export default function Home() {
                   borderBottomLeftRadius: '30px',
                   borderTopRightRadius: '0px',
                   borderBottomRightRadius: '0px',
-                  borderLeft: '4px solid #852085'
+                  borderLeft: '4px solid #852085',
+                  transition: 'all 0.5s ease-in-out'
                 }}
               >
                 <div className="flex items-center justify-center gap-4">
