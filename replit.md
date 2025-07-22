@@ -813,6 +813,15 @@ Changelog:
 - July 22, 2025. UPDATED: Text color changed to gray (text-gray-500) for subtler appearance
 - July 22, 2025. IMPLEMENTED: Animated border with pulse effect - transitions between gray and purple (#852085) every 2 seconds
 - July 22, 2025. REDESIGNED: Contact Us button with horizontal expansion - removes popup, creates full-width expandable bar
+- July 22, 2025. COMPLETED: Account Details field standardization with Comic Relief typography and proper field naming
+- July 22, 2025. ENHANCED: All field labels now use capital first letters and proper spacing (First Name, Last Name, etc.)
+- July 22, 2025. ADDED: Email field integration in Account Details section with Mail icon and validation
+- July 22, 2025. ADDED: Birthdate field integration in both Account Details and Patient forms with Calendar icon
+- July 22, 2025. UPDATED: Database schema to support birthdate fields for both users and patients tables
+- July 22, 2025. STANDARDIZED: Comic Relief font family applied consistently across all form labels in Arabic and English
+- July 22, 2025. COMPLETED: Patient form field names updated with proper Arabic translations (اسم الأليف، نوع الأليف، etc.)
+- July 22, 2025. FIXED: Database birthdate column issue - added missing columns to users and patients tables
+- July 22, 2025. SUCCESS: Login system restored - authentication working properly after database schema update
 - July 22, 2025. ADDED: Five social media icons (WhatsApp, Phone, YouTube, Instagram, Facebook) in expanded horizontal bar
 - July 22, 2025. ENHANCED: Text animation on "Contact Us" instead of border animation for better visual appeal
 - July 22, 2025. REMOVED: All borders from contact button for clean transparent design
