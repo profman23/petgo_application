@@ -557,7 +557,7 @@ export default function RideRequest() {
               <img 
                 src={logoImage} 
                 alt="VETS VAN Logo" 
-                className="h-8 w-auto object-contain logo-clean"
+                className="h-8 w-auto object-contain"
                 style={{ 
                   maxWidth: '60px',
                   border: 'none !important',

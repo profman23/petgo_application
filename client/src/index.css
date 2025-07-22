@@ -27,9 +27,6 @@
   box-shadow: none !important;
   filter: none !important;
   background: transparent !important;
-  height: 32px !important;
-  width: auto !important;
-  max-width: 60px !important;
 }
 
 /* Custom button override to remove shadcn/ui styling */
