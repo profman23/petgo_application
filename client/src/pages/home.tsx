@@ -853,7 +853,7 @@ export default function Home() {
                 <div className="flex items-center justify-center gap-4">
                   {/* WhatsApp */}
                   <a 
-                    href="https://wa.me/00966535152250" 
+                    href="https://wa.me/966535152250" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-green-50 transition-colors"
