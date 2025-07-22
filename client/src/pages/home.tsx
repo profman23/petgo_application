@@ -26,6 +26,7 @@ import { useTranslation, getDirection, getTextAlign, useLanguage } from '@/lib/i
 import { LanguageSelector } from '@/components/language-selector';
 import { LocationPermissionModal } from '@/components/LocationPermissionModal';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
+import { FixedFooter } from '@/components/fixed-footer';
 
 // Helper functions for status handling
 const getStatusOrder = (status: string): number => {
@@ -849,6 +850,30 @@ export default function Home() {
                 }}
               >
                 <div className="flex items-center justify-center gap-4">
+                  {/* WhatsApp */}
+                  <a 
+                    href="https://wa.me/00966535152250" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-green-50 transition-colors"
+                  >
+                    <MessageCircle className="w-6 h-6 text-green-600" />
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                      WhatsApp
+                    </span>
+                  </a>
+                  
+                  {/* Phone Call */}
+                  <a 
+                    href="tel:920011626"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                  >
+                    <Phone className="w-6 h-6 text-blue-600" />
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                      Call
+                    </span>
+                  </a>
+                  
                   {/* Snapchat */}
                   <a 
                     href="https://www.snapchat.com/@vetsvan?share_id=60cdgfm7ZO0" 
@@ -964,6 +989,9 @@ export default function Home() {
       
       {/* PWA Install Banner */}
       <PWAInstallBanner />
+      
+      {/* Fixed Footer Navigation */}
+      <FixedFooter />
     </div>
   );
 }
