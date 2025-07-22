@@ -776,7 +776,7 @@ export default function Home() {
                   <span 
                     className="text-sm font-bold"
                     style={{
-                      fontFamily: '"Chewy", cursive',
+                      fontFamily: '"Delius", cursive',
                       color: '#6b7280'
                     }}
                   >
@@ -799,7 +799,7 @@ export default function Home() {
                 className="text-xl font-bold mb-3"
                 style={{ 
                   textAlign,
-                  fontFamily: language === 'ar' ? '"Cairo Play", serif' : '"Chewy", cursive',
+                  fontFamily: language === 'ar' ? '"Cairo Play", serif' : '"Delius", cursive',
                   color: '#852085'
                 }}
               >
@@ -814,7 +814,7 @@ export default function Home() {
                 className="text-sm leading-relaxed px-2"
                 style={{ 
                   textAlign,
-                  fontFamily: language === 'ar' ? '"Cairo Play", serif' : '"Chewy", cursive',
+                  fontFamily: language === 'ar' ? '"Cairo Play", serif' : '"Delius", cursive',
                   color: '#4a4a4a',
                   lineHeight: '1.6'
                 }}
