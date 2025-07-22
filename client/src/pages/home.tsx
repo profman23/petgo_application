@@ -798,18 +798,18 @@ export default function Home() {
             </div>
           </button>
 
-          {/* Contact Us Button - Fixed on right side */}
+          {/* Contact Us Button - Fixed on right side, positioned lower */}
           <div 
             className="fixed right-0 z-50 cursor-pointer"
-            style={{ top: '40%', transform: 'translateY(-50%)' }}
+            style={{ top: '60%', transform: 'translateY(-50%)' }}
             onClick={() => setShowContactPopup(!showContactPopup)}
           >
             <div 
-              className="bg-transparent border-l border-gray-300 px-2 py-6 hover:bg-gray-50 hover:bg-opacity-50 transition-all duration-200"
+              className="bg-transparent border-l-2 border-gray-400 px-2 py-6 hover:bg-gray-50 hover:bg-opacity-50 transition-all duration-200 animate-pulse-border"
               style={{ width: '45px', height: '140px' }}
             >
               <div 
-                className="writing-vertical-rl text-gray-700 font-semibold text-sm h-full flex items-center justify-center"
+                className="writing-vertical-rl text-gray-500 font-semibold text-sm h-full flex items-center justify-center"
                 style={{ 
                   fontFamily: '"Comic Relief", cursive',
                   writingMode: 'vertical-rl',
