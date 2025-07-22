@@ -760,7 +760,7 @@ export default function Home() {
                   </div>
                   
                   {/* Custom House - End Position - Fully Visible - More to the Right */}
-                  <div className={`absolute -top-4 ${language === 'ar' ? '-left-16' : '-right-16'} z-10`}>
+                  <div className={`absolute -top-4 ${language === 'ar' ? '-left-12' : '-right-12'} z-10`}>
                     <img 
                       src={newestHouseImage}
                       alt="House" 
