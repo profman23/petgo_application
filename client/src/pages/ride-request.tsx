@@ -550,7 +550,7 @@ export default function RideRequest() {
   return (
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
-        {/* Header - Same as home.tsx */}
+        {/* Header - Exact copy from home.tsx */}
         <div className="bg-white text-gray-800 px-2 py-3 h-12 shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center">
@@ -560,8 +560,6 @@ export default function RideRequest() {
                 className="h-8 w-auto object-contain logo-clean"
                 style={{ 
                   maxWidth: '60px',
-                  height: '32px !important',
-                  width: 'auto !important',
                   border: 'none !important',
                   outline: 'none !important',
                   boxShadow: 'none !important',
@@ -574,7 +572,7 @@ export default function RideRequest() {
               <div className="text-sm font-semibold text-gray-800" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
-                {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
+                {language === 'ar' ? 'طلب الخدمة' : 'Ride Request'}
               </div>
             </div>
             <div className="flex items-center space-x-1">
