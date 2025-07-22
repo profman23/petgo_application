@@ -89,6 +89,22 @@
   animation: pulse-border 2s ease-in-out infinite;
 }
 
+/* Text animation for Contact Us */
+@keyframes pulse-text {
+  0%, 100% {
+    color: #6b7280;
+    opacity: 1;
+  }
+  50% {
+    color: #852085;
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-text {
+  animation: pulse-text 2s ease-in-out infinite;
+}
+
 .select-item-custom[data-state="checked"] {
   background-color: #e5e7eb !important;
   color: #111827 !important;

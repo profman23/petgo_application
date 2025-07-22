@@ -812,6 +812,10 @@ Changelog:
 - July 22, 2025. ENHANCED: Contact button positioning moved to 60% (below image level in Weekly Tips section)
 - July 22, 2025. UPDATED: Text color changed to gray (text-gray-500) for subtler appearance
 - July 22, 2025. IMPLEMENTED: Animated border with pulse effect - transitions between gray and purple (#852085) every 2 seconds
+- July 22, 2025. REDESIGNED: Contact Us button with horizontal expansion - removes popup, creates full-width expandable bar
+- July 22, 2025. ADDED: Five social media icons (WhatsApp, Phone, YouTube, Instagram, Facebook) in expanded horizontal bar
+- July 22, 2025. ENHANCED: Text animation on "Contact Us" instead of border animation for better visual appeal
+- July 22, 2025. REMOVED: All borders from contact button for clean transparent design
 - July 21, 2025. SUCCESS: Weekly Tips element confirmed working - displays properly above educational content
 - July 21, 2025. IMPLEMENTED: Complete automatic PWA update system eliminating manual user intervention
 - July 21, 2025. ENHANCED: Service Worker with skipWaiting(), clients.claim(), and network-first strategy for CSS/JS files
