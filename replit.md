@@ -805,6 +805,10 @@ Changelog:
 - July 22, 2025. SIMPLIFIED: Pet image display in Home screen - removed purple gradient frame and border effects
 - July 22, 2025. RESTORED: Clean white background for pet image above "Click Here to Request" button
 - July 22, 2025. REMOVED: All frame styling, borders, shadows, and backdrop blur effects from pet image container
+- July 22, 2025. IMPLEMENTED: Contact Us button - vertical fixed button on right side of screen
+- July 22, 2025. ADDED: Transparent contact button with Comic Relief font and vertical text orientation
+- July 22, 2025. CREATED: Contact popup with WhatsApp and Phone call options using Lucide icons
+- July 22, 2025. POSITIONED: Button in Weekly Tips section area as requested with proper z-index and hover effects
 - July 21, 2025. SUCCESS: Weekly Tips element confirmed working - displays properly above educational content
 - July 21, 2025. IMPLEMENTED: Complete automatic PWA update system eliminating manual user intervention
 - July 21, 2025. ENHANCED: Service Worker with skipWaiting(), clients.claim(), and network-first strategy for CSS/JS files

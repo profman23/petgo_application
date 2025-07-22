@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2 } from 'lucide-react';
+import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2, Phone, MessageCircle } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import vetsVanImage from "@assets/image_1751292329902.png";
@@ -105,6 +105,7 @@ export default function Home() {
   // Location permission modal state
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
+  const [showContactPopup, setShowContactPopup] = useState(false);
 
   // Simple location state management
   const [locationInfo, setLocationInfo] = useState({
@@ -796,6 +797,63 @@ export default function Home() {
               </span>
             </div>
           </button>
+
+          {/* Contact Us Button - Fixed on right side */}
+          <div 
+            className="fixed right-0 z-50 cursor-pointer"
+            style={{ top: '40%', transform: 'translateY(-50%)' }}
+            onClick={() => setShowContactPopup(!showContactPopup)}
+          >
+            <div 
+              className="bg-transparent border-l border-gray-300 px-2 py-6 hover:bg-gray-50 hover:bg-opacity-50 transition-all duration-200"
+              style={{ width: '45px', height: '140px' }}
+            >
+              <div 
+                className="writing-vertical-rl text-gray-700 font-semibold text-sm h-full flex items-center justify-center"
+                style={{ 
+                  fontFamily: '"Comic Relief", cursive',
+                  writingMode: 'vertical-rl',
+                  textOrientation: 'mixed'
+                }}
+              >
+                Contact Us
+              </div>
+            </div>
+            
+            {/* Contact Popup */}
+            {showContactPopup && (
+              <div 
+                className="absolute right-12 top-0 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-60"
+                style={{ width: '150px' }}
+              >
+                <div className="flex flex-col gap-2">
+                  {/* WhatsApp */}
+                  <a 
+                    href="https://wa.me/966548336693" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-green-50 transition-colors"
+                  >
+                    <MessageCircle className="w-5 h-5 text-green-600" />
+                    <span className="text-sm font-medium" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                      WhatsApp
+                    </span>
+                  </a>
+                  
+                  {/* Phone Call */}
+                  <a 
+                    href="tel:+966548336693"
+                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                  >
+                    <Phone className="w-5 h-5 text-blue-600" />
+                    <span className="text-sm font-medium" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                      Call Us
+                    </span>
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Educational Section - Anti-Flea Prevention */}
           <div className="mt-6 mb-4 px-4">
