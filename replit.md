@@ -829,6 +829,7 @@ Changelog:
 - July 22, 2025. RESIZED: Snapchat and X logos increased from w-6 h-6 to w-7 h-7 for better visibility and consistency with other icons
 - July 22, 2025. REPOSITIONED: Contact Us button moved down from top: 60% to top: 65% for better screen positioning
 - July 22, 2025. SMOOTHED: Contact Us collapse animation - slower (0.8s) with cubic-bezier easing for smoother closing
+- July 22, 2025. ENHANCED: Road Animation elements - clinic and house now fully visible without blur frame, increased section height and adjusted positioning for complete visibility
 - July 22, 2025. ENHANCED: Replaced SVG icons with custom logo images for Snapchat (yellow cartoon-style) and X (black square logo)
 - July 22, 2025. MAINTAINED: All original design elements, animations, spacing, and hover effects while using authentic brand logos
 - July 21, 2025. SUCCESS: Weekly Tips element confirmed working - displays properly above educational content
