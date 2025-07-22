@@ -391,9 +391,10 @@ export default function Account() {
           <button 
             onClick={() => setShowPasswordDialog(true)}
             className="w-full border border-purple-600 text-purple-600 hover:bg-purple-100 hover:border-purple-600 flex items-center justify-center gap-2 py-3 rounded-md transition-colors"
+            style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}
           >
             <Lock size={16} />
-            {t('resetPassword')}
+            Reset Password
           </button>
 
           {/* Save Button */}
@@ -401,8 +402,9 @@ export default function Account() {
             onClick={handleSaveProfile}
             disabled={updateProfileMutation.isPending}
             className="w-full bg-purple-600 hover:bg-purple-600 disabled:bg-purple-600 text-white font-medium py-3 rounded-md transition-colors"
+            style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}
           >
-            {updateProfileMutation.isPending ? t('loading') : t('saveProfile')}
+            {updateProfileMutation.isPending ? 'Loading...' : 'Save Profile'}
           </button>
           </div>
         )}
