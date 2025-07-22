@@ -44,36 +44,7 @@ export function FixedFooter() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-transparent">
       <div className="max-w-md mx-auto">
-        {/* Contact Section - Above Navigation Buttons */}
-        <div className="pb-2 px-4">
-          <div className="flex items-center justify-center space-x-4 rtl:space-x-reverse">
-            {/* WhatsApp Button */}
-            <a
-              href="https://wa.me/966535152250"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center w-12 h-12"
-            >
-              <img 
-                src={whatsappIcon}
-                alt="WhatsApp"
-                className="w-10 h-10 object-contain"
-              />
-            </a>
-            
-            {/* Phone Call Button */}
-            <a
-              href="tel:+966535152250"
-              className="flex items-center justify-center w-12 h-12"
-            >
-              <img 
-                src={phoneIcon}
-                alt="Phone Call"
-                className="w-10 h-10 object-contain"
-              />
-            </a>
-          </div>
-        </div>
+
         
         <div className="flex items-center justify-around py-3 px-6">
           {navigationItems.map((item) => {
