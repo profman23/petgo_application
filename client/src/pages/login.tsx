@@ -182,8 +182,8 @@ export default function Login() {
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
             
-            {/* Logo Container - Clean White Background */}
-            <div className="mb-6 flex justify-center">
+            {/* Logo Container - VETS VAN في الأعلى */}
+            <div className="mb-8 flex justify-center">
               <img 
                 src={logoImage} 
                 alt="VETS VAN - Mobile Veterinary Clinic" 
@@ -194,24 +194,23 @@ export default function Login() {
               />
             </div>
 
-            {/* Welcome Message with Hand Logo */}
-            <div className={`mb-4 flex items-center justify-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-              {/* Welcome Hand Logo */}
+            {/* Hand Logo في المنتصف */}
+            <div className="mb-8 flex justify-center">
               <img 
                 src={welcomeHandImage} 
                 alt="Welcome Hand" 
-                className="w-8 h-8 object-contain"
+                className="w-20 h-20 object-contain mx-auto transition-all duration-300 hover:scale-110"
               />
-              
-              {/* Welcome Message */}
-              <div className={`text-center ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                <h2 className="text-lg font-bold text-purple-600">
-                  {language === 'ar' ? 'أهلاً وسهلاً بك' : 'Welcome'}
-                </h2>
-                <p className="text-sm text-gray-600">
-                  {language === 'ar' ? 'سعداء بوجودك معنا' : 'Happy to have you with us'}
-                </p>
-              </div>
+            </div>
+
+            {/* Welcome Message في الأسفل */}
+            <div className="mb-6 text-center">
+              <h2 className="text-xl font-bold text-purple-600 mb-2">
+                {language === 'ar' ? 'أهلاً وسهلاً بك' : 'Welcome'}
+              </h2>
+              <p className="text-sm text-gray-600">
+                {language === 'ar' ? 'سعداء بوجودك معنا' : 'Happy to have you with us'}
+              </p>
             </div>
 
           </div>
