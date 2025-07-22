@@ -725,12 +725,7 @@ export default function Home() {
           {!actualActiveRide && (
             <div className="mb-3 p-3 bg-white rounded-2xl">
               <div className="text-center">
-                <div className="text-sm font-semibold text-gray-800 mb-2" style={{ 
-                  textAlign,
-                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                }}>
-                  {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
-                </div>
+
                 
                 {/* Enhanced Road Animation */}
                 <div className="relative h-24 mb-2">
