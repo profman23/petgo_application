@@ -560,6 +560,8 @@ export default function RideRequest() {
                 className="h-8 w-auto object-contain logo-clean"
                 style={{ 
                   maxWidth: '60px',
+                  height: '32px !important',
+                  width: 'auto !important',
                   border: 'none !important',
                   outline: 'none !important',
                   boxShadow: 'none !important',
