@@ -821,6 +821,9 @@ Changelog:
 - July 22, 2025. ADDED: Soft left-edge termination with rounded corners (20px border-radius) for better visual finish
 - July 22, 2025. ENHANCED: Improved visual finish with larger rounded corners (30px), purple left border (4px), and enhanced shadow
 - July 22, 2025. SMOOTHED: Slower, gentler animation timing (500ms duration with ease-in-out) for more peaceful expand/collapse
+- July 22, 2025. UPDATED: Social media links and contact information - removed YouTube and Facebook
+- July 22, 2025. ADDED: Snapchat and X (Twitter) icons with custom SVG designs
+- July 22, 2025. CONFIGURED: New contact details - Phone: 920011626, WhatsApp: 00966535152250, Snapchat and X links updated
 - July 21, 2025. SUCCESS: Weekly Tips element confirmed working - displays properly above educational content
 - July 21, 2025. IMPLEMENTED: Complete automatic PWA update system eliminating manual user intervention
 - July 21, 2025. ENHANCED: Service Worker with skipWaiting(), clients.claim(), and network-first strategy for CSS/JS files
