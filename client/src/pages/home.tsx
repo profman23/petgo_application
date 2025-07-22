@@ -794,7 +794,6 @@ export default function Home() {
             disabled={!!actualActiveRide}
           >
             <div className="flex flex-col items-center">
-              <Truck className="w-6 h-6 mb-1 !text-white" style={{ color: 'white' }} />
               <span className="text-lg !text-white" style={{ 
                 textAlign, 
                 color: 'white',
@@ -807,7 +806,7 @@ export default function Home() {
                 color: 'white',
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
-                {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Vetsvan Mobile Clinic'}
+                Vetsvan
               </span>
             </div>
           </button>
