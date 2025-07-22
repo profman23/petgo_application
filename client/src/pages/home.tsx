@@ -723,7 +723,7 @@ export default function Home() {
           
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
-            <div className="mb-3 p-3 bg-white rounded-2xl border-2 border-purple-600 shadow-lg">
+            <div className="mb-3 p-3 bg-white rounded-2xl">
               <div className="text-center">
                 <div className="text-sm font-semibold text-gray-800 mb-2" style={{ 
                   textAlign,
@@ -733,7 +733,7 @@ export default function Home() {
                 </div>
                 
                 {/* Enhanced Road Animation */}
-                <div className="relative h-24 bg-gradient-to-r from-pink-100 via-pink-50 to-pink-100 rounded-xl mb-2">
+                <div className="relative h-24 mb-2">
                   {/* Road markings */}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-full h-2 bg-purple-600 opacity-50 animate-pulse rounded-full"></div>
