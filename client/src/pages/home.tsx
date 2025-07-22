@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
-import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2, Phone, MessageCircle, Youtube, Instagram, Facebook } from 'lucide-react';
+import { Bell, Settings, User, Car, Star, Truck, CheckCircle, Clock, MapPin, Stethoscope, Loader2, Phone, MessageCircle, Instagram } from 'lucide-react';
 import { MEMBERSHIP_TYPES } from '@/lib/constants';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import vetsVanImage from "@assets/image_1751292329902.png";
@@ -849,7 +849,7 @@ export default function Home() {
                 <div className="flex items-center justify-center gap-4">
                   {/* WhatsApp */}
                   <a 
-                    href="https://wa.me/966548336693" 
+                    href="https://wa.me/00966535152250" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-green-50 transition-colors"
@@ -862,7 +862,7 @@ export default function Home() {
                   
                   {/* Phone Call */}
                   <a 
-                    href="tel:+966548336693"
+                    href="tel:920011626"
                     className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-blue-50 transition-colors"
                   >
                     <Phone className="w-6 h-6 text-blue-600" />
@@ -871,42 +871,37 @@ export default function Home() {
                     </span>
                   </a>
                   
-                  {/* YouTube */}
+                  {/* Snapchat */}
                   <a 
-                    href="https://youtube.com/@vetsvan" 
+                    href="https://www.snapchat.com/@vetsvan?share_id=60cdgfm7ZO0" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-yellow-50 transition-colors"
                   >
-                    <Youtube className="w-6 h-6 text-red-600" />
+                    <div className="w-6 h-6 text-yellow-500">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.419-6.02 1.419-6.02s-.362-.724-.362-1.794c0-1.681.974-2.938 2.184-2.938 1.031 0 1.529.773 1.529 1.699 0 1.035-.659 2.584-.998 4.02-.284 1.195.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.562-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.888-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.357-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24c6.624 0 11.99-5.367 11.99-12.013C24.007 5.367 18.641.001 12.017.001z"/>
+                      </svg>
+                    </div>
                     <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
-                      YouTube
+                      Snapchat
                     </span>
                   </a>
                   
-                  {/* Instagram */}
+                  {/* X (Twitter) */}
                   <a 
-                    href="https://instagram.com/vetsvan" 
+                    href="https://x.com/vetvan276742" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-pink-50 transition-colors"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    <Instagram className="w-6 h-6 text-pink-600" />
+                    <div className="w-6 h-6 text-gray-800">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                      </svg>
+                    </div>
                     <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
-                      Instagram
-                    </span>
-                  </a>
-                  
-                  {/* Facebook */}
-                  <a 
-                    href="https://facebook.com/vetsvan" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-blue-50 transition-colors"
-                  >
-                    <Facebook className="w-6 h-6 text-blue-700" />
-                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
-                      Facebook
+                      X
                     </span>
                   </a>
                 </div>
