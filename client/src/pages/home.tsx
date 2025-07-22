@@ -798,44 +798,49 @@ export default function Home() {
             </div>
           </button>
 
-          {/* Contact Us Button - Fixed on right side, positioned lower */}
+          {/* Contact Us Button - Expandable horizontally */}
           <div 
-            className="fixed right-0 z-50 cursor-pointer"
+            className="fixed right-0 z-50 cursor-pointer transition-all duration-300"
             style={{ top: '60%', transform: 'translateY(-50%)' }}
             onClick={() => setShowContactPopup(!showContactPopup)}
           >
-            <div 
-              className="bg-transparent border-l-2 border-gray-400 px-2 py-6 hover:bg-gray-50 hover:bg-opacity-50 transition-all duration-200 animate-pulse-border"
-              style={{ width: '45px', height: '140px' }}
-            >
+            {!showContactPopup ? (
+              /* Collapsed state - vertical button */
               <div 
-                className="writing-vertical-rl text-gray-500 font-semibold text-sm h-full flex items-center justify-center"
+                className="bg-transparent px-2 py-6 hover:bg-gray-50 hover:bg-opacity-50 transition-all duration-200"
+                style={{ width: '45px', height: '140px' }}
+              >
+                <div 
+                  className="writing-vertical-rl text-gray-500 font-semibold text-sm h-full flex items-center justify-center animate-pulse-text"
+                  style={{ 
+                    fontFamily: '"Comic Relief", cursive',
+                    writingMode: 'vertical-rl',
+                    textOrientation: 'mixed'
+                  }}
+                >
+                  Contact Us
+                </div>
+              </div>
+            ) : (
+              /* Expanded state - horizontal bar */
+              <div 
+                className="bg-white bg-opacity-95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-lg px-4 py-3 transition-all duration-300"
                 style={{ 
-                  fontFamily: '"Comic Relief", cursive',
-                  writingMode: 'vertical-rl',
-                  textOrientation: 'mixed'
+                  width: '100vw', 
+                  right: '0',
+                  transform: 'translateX(0)'
                 }}
               >
-                Contact Us
-              </div>
-            </div>
-            
-            {/* Contact Popup */}
-            {showContactPopup && (
-              <div 
-                className="absolute right-12 top-0 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-60"
-                style={{ width: '150px' }}
-              >
-                <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-center gap-8">
                   {/* WhatsApp */}
                   <a 
                     href="https://wa.me/966548336693" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-green-50 transition-colors"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-green-50 transition-colors"
                   >
-                    <MessageCircle className="w-5 h-5 text-green-600" />
-                    <span className="text-sm font-medium" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                    <MessageCircle className="w-6 h-6 text-green-600" />
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
                       WhatsApp
                     </span>
                   </a>
@@ -843,11 +848,50 @@ export default function Home() {
                   {/* Phone Call */}
                   <a 
                     href="tel:+966548336693"
-                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-blue-50 transition-colors"
                   >
-                    <Phone className="w-5 h-5 text-blue-600" />
-                    <span className="text-sm font-medium" style={{ fontFamily: '"Comic Relief", cursive' }}>
-                      Call Us
+                    <Phone className="w-6 h-6 text-blue-600" />
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                      Call
+                    </span>
+                  </a>
+                  
+                  {/* YouTube */}
+                  <a 
+                    href="https://youtube.com/@vetsvan" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    <Youtube className="w-6 h-6 text-red-600" />
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                      YouTube
+                    </span>
+                  </a>
+                  
+                  {/* Instagram */}
+                  <a 
+                    href="https://instagram.com/vetsvan" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-pink-50 transition-colors"
+                  >
+                    <Instagram className="w-6 h-6 text-pink-600" />
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                      Instagram
+                    </span>
+                  </a>
+                  
+                  {/* Facebook */}
+                  <a 
+                    href="https://facebook.com/vetsvan" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-blue-50 transition-colors"
+                  >
+                    <Facebook className="w-6 h-6 text-blue-700" />
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
+                      Facebook
                     </span>
                   </a>
                 </div>
