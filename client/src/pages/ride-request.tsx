@@ -16,7 +16,7 @@ import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
-import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
 import selectPetsLogo from "@/assets/select-pets-logo-new.png";
 import serviceTypeIcon from "@assets/freepik_assistant_1751437667818_1751437676533.png";
