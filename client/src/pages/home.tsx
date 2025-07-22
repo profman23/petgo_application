@@ -723,7 +723,7 @@ export default function Home() {
           
           {/* Animated Car Coming Soon - Only show when no active ride */}
           {!actualActiveRide && (
-            <div className="mb-3 p-3 bg-white rounded-2xl">
+            <div className="mb-2 p-3 bg-white rounded-2xl">
               <div className="text-center">
 
                 
@@ -767,8 +767,8 @@ export default function Home() {
             </div>
           )}
 
-          {/* Custom Dog and Cat Image */}
-          <div className="flex justify-center mb-3">
+          {/* Custom Dog and Cat Image - Moved Up */}
+          <div className="flex justify-center mb-2 -mt-2">
             <img 
               src={petsImage}
               alt="Dogs and Cats" 
