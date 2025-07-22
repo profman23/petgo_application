@@ -759,13 +759,11 @@ export default function Home() {
 
           {/* Custom Dog and Cat Image */}
           <div className="flex justify-center mb-3">
-            <div className="relative w-48 h-32 bg-gradient-to-br from-purple-600 to-blue-100 rounded-2xl overflow-hidden shadow-lg backdrop-blur-sm border border-purple-600">
-              <img 
-                src={petsImage}
-                alt="Dogs and Cats" 
-                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300 drop-shadow-lg"
-              />
-            </div>
+            <img 
+              src={petsImage}
+              alt="Dogs and Cats" 
+              className="w-48 h-32 object-contain hover:scale-105 transition-transform duration-300"
+            />
           </div>
 
           {/* Request Button */}

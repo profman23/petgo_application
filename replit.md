@@ -802,6 +802,9 @@ Changelog:
 - July 22, 2025. APPLIED: Comic Relief/Delius fonts to all form fields, labels, buttons, and text elements
 - July 22, 2025. ENHANCED: Login screen spacing optimization - increased gap between VETS VAN logo and hand logo
 - July 22, 2025. REPOSITIONED: Hand logo and Welcome section moved closer to input fields for better visual hierarchy
+- July 22, 2025. SIMPLIFIED: Pet image display in Home screen - removed purple gradient frame and border effects
+- July 22, 2025. RESTORED: Clean white background for pet image above "Click Here to Request" button
+- July 22, 2025. REMOVED: All frame styling, borders, shadows, and backdrop blur effects from pet image container
 - July 21, 2025. SUCCESS: Weekly Tips element confirmed working - displays properly above educational content
 - July 21, 2025. IMPLEMENTED: Complete automatic PWA update system eliminating manual user intervention
 - July 21, 2025. ENHANCED: Service Worker with skipWaiting(), clients.claim(), and network-first strategy for CSS/JS files
