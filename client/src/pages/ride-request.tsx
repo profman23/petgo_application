@@ -554,17 +554,15 @@ export default function RideRequest() {
         <div className="bg-white text-gray-800 px-3 py-3 h-12 shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center space-x-2">
-              <div className="h-8 bg-white rounded-lg border-2 border-purple-600 px-2 py-1 shadow-sm hover:shadow-md transition-all duration-300">
-                <img 
-                  src={logoImage} 
-                  alt="VETS VAN Logo" 
-                  className="h-full w-auto object-contain"
-                  style={{ 
-                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
-                    maxWidth: '120px'
-                  }}
-                />
-              </div>
+              <img 
+                src={logoImage} 
+                alt="VETS VAN Logo" 
+                className="h-8 w-auto object-contain"
+                style={{ 
+                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                  maxWidth: '60px'
+                }}
+              />
               <div className="text-lg font-bold text-gray-800" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>

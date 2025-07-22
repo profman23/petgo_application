@@ -358,10 +358,10 @@ export default function Home() {
               <img 
                 src={logoImage} 
                 alt="VETS VAN Logo" 
-                className="h-6 w-auto object-contain"
+                className="h-8 w-auto object-contain"
                 style={{ 
                   filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
-                  maxWidth: '40px'
+                  maxWidth: '60px'
                 }}
               />
             </div>
