@@ -195,7 +195,7 @@ export default function Login() {
             </div>
 
             {/* Hand Logo في المنتصف */}
-            <div className="mb-8 flex justify-center">
+            <div className="mb-12 flex justify-center">
               <img 
                 src={welcomeHandImage} 
                 alt="Welcome Hand" 
@@ -204,7 +204,7 @@ export default function Login() {
             </div>
 
             {/* Welcome Message في الأسفل */}
-            <div className="mb-6 text-center">
+            <div className="mb-10 text-center">
               <h2 className="text-xl font-bold text-purple-600 mb-2" style={{ 
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
@@ -229,7 +229,9 @@ export default function Login() {
                   name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 font-semibold">
+                      <FormLabel className="text-gray-700 font-semibold" style={{ 
+                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                      }}>
                         {language === 'ar' ? 'رقم الهاتف أو الإيميل' : 'Phone Number or Email'}
                       </FormLabel>
                       <FormControl>
@@ -244,7 +246,8 @@ export default function Login() {
                             style={{ 
                               borderColor: 'var(--purple-primary)', 
                               '--tw-ring-color': 'var(--purple-primary)',
-                              fontSize: '16px'
+                              fontSize: '16px',
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                             } as any}
                           />
                           <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
@@ -265,7 +268,9 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 font-semibold">{t('password')}</FormLabel>
+                      <FormLabel className="text-gray-700 font-semibold" style={{ 
+                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                      }}>{t('password')}</FormLabel>
                       <FormControl>
                         <div className="relative group">
                           <Input
@@ -278,7 +283,8 @@ export default function Login() {
                             style={{ 
                               borderColor: 'var(--purple-primary)', 
                               '--tw-ring-color': 'var(--purple-primary)',
-                              fontSize: '16px'
+                              fontSize: '16px',
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                             } as any}
                           />
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
@@ -303,7 +309,9 @@ export default function Login() {
                 >
                   <div className="flex items-center justify-center space-x-2">
                     {loginMutation.isPending && <RefreshCw className="w-4 h-4 animate-spin" />}
-                    <span>{loginMutation.isPending ? t('loading') : t('login')}</span>
+                    <span style={{ 
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>{loginMutation.isPending ? t('loading') : t('login')}</span>
                   </div>
                 </Button>
 
@@ -318,12 +326,16 @@ export default function Login() {
                   >
                     <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
                       <UserPlus className="w-5 h-5" />
-                      <span>Create New Account</span>
+                      <span style={{ 
+                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                      }}>Create New Account</span>
                     </div>
                   </Button>
                   
                   <div className="mt-6 pt-4 border-t border-gray-200">
-                    <p className="text-sm text-gray-500 font-medium tracking-wide">
+                    <p className="text-sm text-gray-500 font-medium tracking-wide" style={{ 
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
                       Powered By Ghazala Software
                     </p>
                   </div>
