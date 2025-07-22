@@ -205,10 +205,14 @@ export default function Login() {
 
             {/* Welcome Message في الأسفل */}
             <div className="mb-6 text-center">
-              <h2 className="text-xl font-bold text-purple-600 mb-2">
+              <h2 className="text-xl font-bold text-purple-600 mb-2" style={{ 
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'أهلاً وسهلاً بك' : 'Welcome'}
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600" style={{ 
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'سعداء بوجودك معنا' : 'Happy to have you with us'}
               </p>
             </div>
