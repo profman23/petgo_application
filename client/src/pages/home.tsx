@@ -680,7 +680,11 @@ export default function Home() {
 
         {/* Request Status and Actions */}
         <div className="p-3">
-          <h2 className="text-lg font-bold text-gray-900 mb-2" style={{ textAlign }}>
+          <h2 className="text-lg font-bold mb-2" style={{ 
+            textAlign, 
+            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+            color: '#6b7280'
+          }}>
             {language === 'ar' ? 'طلب العيادة البيطرية المتنقلة' : 'Request Mobile Veterinary Clinic'}
           </h2>
           
