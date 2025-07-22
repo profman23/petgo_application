@@ -314,10 +314,14 @@ export default function CustomerActivity() {
               <img 
                 src={logoImage} 
                 alt="VETS VAN Logo" 
-                className="h-8 w-auto object-contain"
+                className="h-8 w-auto object-contain logo-clean"
                 style={{ 
-                  filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
-                  maxWidth: '60px'
+                  maxWidth: '60px',
+                  border: 'none !important',
+                  outline: 'none !important',
+                  boxShadow: 'none !important',
+                  filter: 'none !important',
+                  background: 'transparent !important'
                 }}
               />
             </div>

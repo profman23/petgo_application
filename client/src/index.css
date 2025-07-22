@@ -20,6 +20,15 @@
   background: white;
 }
 
+/* Logo clean styling - Remove all borders and shadows */
+.logo-clean {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  background: transparent !important;
+}
+
 /* Custom button override to remove shadcn/ui styling */
 .custom-purple-button {
   background: linear-gradient(to right, #852085, #732073) !important;
