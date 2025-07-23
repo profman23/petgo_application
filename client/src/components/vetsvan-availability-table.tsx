@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomerLocation } from "@/hooks/useCustomerLocation";
+import petsTableImage from '@assets/freepik__assistant__41519_1753271453187.png';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -616,7 +617,18 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         </p>
       </div>
 
-
+      {/* Pets Table Image */}
+      <div className="flex justify-center mb-4">
+        <img 
+          src={petsTableImage} 
+          alt="Pets Table" 
+          className="w-full max-w-md h-auto rounded-lg"
+          style={{
+            maxHeight: '200px',
+            objectFit: 'contain'
+          }}
+        />
+      </div>
 
       {/* Available Appointments Table */}
       <div className="overflow-x-auto">
