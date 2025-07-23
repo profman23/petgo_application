@@ -12,12 +12,12 @@ export function FixedFooter() {
 
   const navigationItems = [
     {
-      id: 'home',
-      path: '/home',
-      label: language === 'ar' ? 'الرئيسية' : 'Home',
+      id: 'account',
+      path: '/account',
+      label: language === 'ar' ? 'الحساب' : 'Account',
       bgColor: 'bg-gradient-to-br from-purple-600 via-#852085 to-purple-600',
       hoverColor: 'hover:from-purple-600 hover:via-#852085 hover:#852085950',
-      icon: '🏠'
+      icon: '🐱'
     },
     {
       id: 'activity',
@@ -28,12 +28,12 @@ export function FixedFooter() {
       icon: '🐾'
     },
     {
-      id: 'account',
-      path: '/account',
-      label: language === 'ar' ? 'الحساب' : 'Account',
+      id: 'home',
+      path: '/home',
+      label: language === 'ar' ? 'الرئيسية' : 'Home',
       bgColor: 'bg-gradient-to-br from-purple-600 via-#852085 to-purple-600',
       hoverColor: 'hover:from-purple-600 hover:via-#852085 hover:#852085950',
-      icon: '🐱'
+      icon: '🏠'
     }
   ];
 

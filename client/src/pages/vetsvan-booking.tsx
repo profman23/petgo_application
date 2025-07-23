@@ -490,7 +490,7 @@ export default function VetsVanBooking() {
               <div className="text-sm font-semibold text-gray-800" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
-                {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
+                {language === 'ar' ? 'حجز موعد' : 'Book Appointment'}
               </div>
             </div>
             <div className="flex items-center space-x-1">
