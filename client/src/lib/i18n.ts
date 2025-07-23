@@ -89,10 +89,10 @@ export const translations = {
     noRegisteredPatients: 'لا توجد حيوانات مسجلة',
     registerPetsFirst: 'يرجى تسجيل حيواناتك الأليفة أولاً',
     goToPatients: 'انتقل لتسجيل الحيوانات',
-    selectServiceType: 'اختر نوع الخدمة',
+    selectServiceType: 'اختر نوع الخدمة: ',
     generalCheckUp: 'فحص عام',
     grooming: 'تنظيف وتجميل',
-    yourLocation: 'موقعك الحالي',
+    yourLocation: 'موقعك الحالي: ',
     
     // Patient Form
     patientName: 'اسم الحيوان الأليف',
@@ -284,10 +284,10 @@ export const translations = {
     noRegisteredPatients: 'No registered pets',
     registerPetsFirst: 'Please register your pets first',
     goToPatients: 'Go to register pets',
-    selectServiceType: 'Select Service Type',
+    selectServiceType: 'Select Service Type: ',
     generalCheckUp: 'General Check Up',
     grooming: 'Grooming',
-    yourLocation: 'Your Location',
+    yourLocation: 'Your Location: ',
     
     // Patient Form
     patientName: 'Patient Name',
