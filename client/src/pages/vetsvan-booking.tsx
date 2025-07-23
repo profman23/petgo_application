@@ -4,10 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
+import { LanguageSelector } from '@/components/language-selector';
+import { FixedFooter } from '@/components/fixed-footer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Calendar, Clock, CheckCircle, User, MapPin, Loader2 } from 'lucide-react';
-import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import { ArrowLeft, Calendar, Clock, CheckCircle, User, MapPin, Loader2, Bell } from 'lucide-react';
+import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import { VetsVanAvailabilityTable } from '@/components/vetsvan-availability-table';
 import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 
@@ -432,6 +434,16 @@ export default function VetsVanBooking() {
     }
   };
 
+  const [user, setUser] = useState<any>(null);
+
+  // Load user data
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -456,10 +468,10 @@ export default function VetsVanBooking() {
   return (
     <div className="min-h-screen bg-gray-50" dir={direction} style={{ fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif' }}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
-        {/* Header - Same as ride-request */}
-        <div className="bg-white text-gray-800 px-3 py-3 h-12 shadow-sm">
+        {/* Header - Same as HOME */}
+        <div className="bg-white text-gray-800 px-2 py-3 h-12 shadow-sm">
           <div className="flex items-center justify-between h-full">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center">
               <img 
                 src={logoImage} 
                 alt="VETS VAN Logo" 
@@ -473,30 +485,22 @@ export default function VetsVanBooking() {
                   background: 'transparent !important'
                 }}
               />
-              <div className="text-lg font-bold text-gray-800" style={{
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <div className="text-sm font-semibold text-gray-800" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
-                {language === 'ar' ? 'حجز موعد' : 'Book Appointment'}
+                {user?.name || (language === 'ar' ? 'مرحباً' : 'Welcome')}
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBack}
-                className="text-gray-600 hover:bg-gray-100 px-2 py-1 h-8"
-              >
-                <ArrowLeft className={`w-4 h-4 ${language === 'ar' ? 'rotate-180' : ''}`} />
-                <span style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
-                  {language === 'ar' ? 'رجوع' : 'Back'}
-                </span>
-              </Button>
+            <div className="flex items-center space-x-1">
+              <LanguageSelector />
+              <Bell className="w-4 h-4 cursor-pointer text-gray-600 hover:text-gray-800" />
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
-                style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}
+                className="bg-purple-600 text-white hover:bg-purple-600 px-2 py-1 h-7 rounded text-xs"
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -507,7 +511,7 @@ export default function VetsVanBooking() {
         {/* Purple Divider Line */}
         <div className="h-1 bg-purple-600 shadow-sm"></div>
 
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 pb-24">
         {/* معلومات الطلب */}
         <Card>
           <CardHeader className="pb-3">
@@ -704,6 +708,9 @@ export default function VetsVanBooking() {
         )}
         </div>
       </div>
+
+      {/* Footer Navigation */}
+      <FixedFooter />
     </div>
   );
 }
