@@ -795,6 +795,7 @@ Changelog:
 - July 23, 2025. TABLE FURTHER ADJUSTMENT: Increased table margin from mt-6 to mt-10 to move table further down while keeping pets image in raised position
 - July 23, 2025. WIDTH EXPANSION: Added -mx-6 to both pets image and table containers to extend width beyond normal boundaries, with calc(100% + 48px) for wider coverage
 - July 23, 2025. PETS IMAGE FURTHER EXPANSION: Increased pets image margin from -mx-6 to -mx-10 and width from calc(100% + 48px) to calc(100% + 80px) to eliminate unwanted line on right side
+- July 23, 2025. MAXIMUM PETS IMAGE EXPANSION: Extended pets image margin from -mx-10 to -mx-16 and width from calc(100% + 80px) to calc(100% + 128px) for full side coverage
 - July 23, 2025. ADVANCED UPDATE: Replaced with transparent background image (new (1)_1753285754506.png) and applied CSS mix-blend-mode: multiply to make black background transparent while keeping pets visible
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
