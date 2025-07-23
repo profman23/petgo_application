@@ -487,13 +487,16 @@ export default function VetsVanBooking() {
                 className="text-gray-600 hover:bg-gray-100 px-2 py-1 h-8"
               >
                 <ArrowLeft className={`w-4 h-4 ${language === 'ar' ? 'rotate-180' : ''}`} />
-                {language === 'ar' ? 'رجوع' : 'Back'}
+                <span style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
+                  {language === 'ar' ? 'رجوع' : 'Back'}
+                </span>
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
                 className="bg-purple-600 text-white hover:bg-purple-600 px-3 py-1 h-8 rounded-md font-medium transition-colors"
+                style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}
               >
                 {language === 'ar' ? 'خروج' : 'Logout'}
               </Button>
@@ -516,7 +519,7 @@ export default function VetsVanBooking() {
               {language === 'ar' ? 'تفاصيل الطلب' : 'Request Details'}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2 text-sm">
+          <CardContent className="space-y-2 text-sm" style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-gray-500" />
               <span className="text-gray-600">{requestData.location}</span>
@@ -539,14 +542,19 @@ export default function VetsVanBooking() {
         {/* اختيار التاريخ */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2" style={{ textAlign }}>
+            <CardTitle className="text-base flex items-center gap-2" style={{ 
+              textAlign,
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               <Calendar className="w-4 h-4 text-purple-600" />
               {language === 'ar' ? 'التاريخ' : 'Date'}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="#85208550 p-3 rounded-lg text-center">
-              <span className="text-purple-600 font-medium">
+              <span className="text-purple-600 font-medium" style={{ 
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {new Date(selectedDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
                   weekday: 'long',
                   year: 'numeric',
@@ -577,7 +585,9 @@ export default function VetsVanBooking() {
                 }}>
                   {language === 'ar' ? 'مراجعة الحجز' : 'Review Booking'}
                 </h3>
-                <div className="space-y-1 text-sm text-gray-600">
+                <div className="space-y-1 text-sm text-gray-600" style={{ 
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
                   <p>{language === 'ar' ? `VetsVan: ${selectedVetsVan}` : `VetsVan: ${selectedVetsVan}`}</p>
                   <p>{language === 'ar' ? `الوقت: ${selectedTime}` : `Time: ${selectedTime}`}</p>
                   <p>{language === 'ar' ? `التاريخ: ${selectedDate}` : `Date: ${selectedDate}`}</p>

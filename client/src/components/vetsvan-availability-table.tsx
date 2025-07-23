@@ -354,7 +354,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
       <div className="bg-white border border-gray-200 rounded-lg p-6">
         <div className="flex items-center justify-center">
           <Loader2 className="w-6 h-6 animate-spin mr-2" />
-          <span>{language === 'ar' ? 'جاري تحميل المواعيد...' : 'Loading appointments...'}</span>
+          <span style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
+            {language === 'ar' ? 'جاري تحميل المواعيد...' : 'Loading appointments...'}
+          </span>
         </div>
       </div>
     );
@@ -363,7 +365,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   if (error) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-700 text-center">{t('error')}</p>
+        <p className="text-red-700 text-center" style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
+          {t('error')}
+        </p>
       </div>
     );
   }
@@ -371,7 +375,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   if (!vetsvanData || !Array.isArray(vetsvanData) || vetsvanData.length === 0) {
     return (
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <p className="text-gray-600 text-center">
+        <p className="text-gray-600 text-center" style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
           {language === 'ar' ? 'لا توجد VetsVan متاحة حالياً' : 'No VetsVan available currently'}
         </p>
       </div>
@@ -563,7 +567,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     >
       {/* Header with Date Navigation */}
       <div className="mb-4">
-        <h3 className={`text-lg font-semibold text-gray-800 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
+        <h3 className={`text-lg font-semibold text-gray-800 ${textAlign === 'right' ? 'text-right' : 'text-left'}`} style={{
+          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+        }}>
           {language === 'ar' ? 'المواعيد المتاحة - VetsVan' : 'Available Appointments - VetsVan'}
         </h3>
         
@@ -574,14 +580,18 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
           >
             {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               {language === 'ar' ? 'السابق' : 'Previous'}
             </span>
           </button>
           
           <div className="flex items-center gap-2 px-4 py-2 #85208550 border border-purple-600 rounded-lg">
             <Calendar className="w-4 h-4 text-purple-600" />
-            <span className="text-sm font-semibold text-purple-600">
+            <span className="text-sm font-semibold text-purple-600" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               {formatDate(selectedDate)}
             </span>
           </div>
@@ -590,14 +600,18 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             onClick={goToNextDay}
             className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
           >
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               {language === 'ar' ? 'التالي' : 'Next'}
             </span>
             {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           </button>
         </div>
         
-        <p className={`text-sm text-gray-600 mt-2 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
+        <p className={`text-sm text-gray-600 mt-2 ${textAlign === 'right' ? 'text-right' : 'text-left'}`} style={{
+          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+        }}>
           {language === 'ar' ? 'اختر الوقت المناسب لك' : 'Select a suitable time for you'}
         </p>
       </div>
@@ -610,7 +624,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           {/* VetsVan Header Row */}
           <thead>
             <tr className="bg-purple-600">
-              <th className="border border-gray-300 p-2 text-sm font-medium text-white">
+              <th className="border border-gray-300 p-2 text-sm font-medium text-white" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
                 {language === 'ar' ? 'الوقت' : 'Time'}
               </th>
               {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => (
@@ -618,7 +634,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                   key={vetsvan.id} 
                   className="border border-gray-300 p-2 text-sm font-medium text-white min-w-[120px]"
                 >
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center" style={{
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                  }}>
                     <span className="font-semibold">{vetsvan.vetsvanName}</span>
                     <span className="text-xs text-white opacity-80">({vetsvan.vetsvanCode})</span>
                     
@@ -631,7 +649,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                         {vetsvan.isClosest && (
                           <div className="flex items-center justify-center mt-1">
                             <Navigation className="h-3 w-3 text-white mr-1" />
-                            <span className="text-xs text-white font-bold">
+                            <span className="text-xs text-white font-bold" style={{
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
                               {language === 'ar' ? 'الأقرب إليك' : 'Closest to you'}
                             </span>
                           </div>
@@ -654,7 +674,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           <tbody>
             {timeSlots.map((timeSlot) => (
               <tr key={timeSlot} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50">
+                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
                   {timeSlot}
                 </td>
                 {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => {
@@ -673,7 +695,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                           <div className={`
                             w-full text-xs px-2 py-1 rounded border text-center
                             ${getStatusColor(userBooking.status)}
-                          `}>
+                          `} style={{
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}>
                             {getStatusText(userBooking.status)}
                           </div>
                         ) : (
@@ -693,6 +717,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                               }
                               ${isLoading ? 'opacity-50' : ''}
                             `}
+                            style={{
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}
                           >
                             {isLoading ? (
                               <Loader2 className="w-3 h-3 animate-spin mx-auto" />
@@ -720,10 +747,14 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           style={{ direction: isRTL ? 'rtl' : 'ltr' }}
         >
           <AlertDialogHeader>
-            <AlertDialogTitle className={`text-lg font-semibold ${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
+            <AlertDialogTitle className={`text-lg font-semibold ${textAlign === 'right' ? 'text-right' : 'text-left'}`} style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               {language === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking'}
             </AlertDialogTitle>
-            <AlertDialogDescription className={`${textAlign === 'right' ? 'text-right' : 'text-left'}`}>
+            <AlertDialogDescription className={`${textAlign === 'right' ? 'text-right' : 'text-left'}`} style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
               {confirmationDialog.vetsvan && (
                 <>
                   <div className="mb-2">
@@ -749,6 +780,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             <AlertDialogCancel 
               onClick={cancelConfirmation}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg"
+              style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}
             >
               {language === 'ar' ? 'إلغاء' : 'Cancel'}
             </AlertDialogCancel>
@@ -756,6 +790,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
               onClick={confirmBooking}
               disabled={directBookingMutation.isPending}
               className="px-4 py-2 bg-purple-600 hover:bg-purple-600 text-white rounded-lg disabled:opacity-50"
+              style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}
             >
               {directBookingMutation.isPending ? (
                 <>
