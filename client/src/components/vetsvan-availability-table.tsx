@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomerLocation } from "@/hooks/useCustomerLocation";
-import tableHeaderImage from "@assets/new_1753284908890.png";
+import tableHeaderImage from "@assets/new (1)_1753285754506.png";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -631,7 +631,8 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             marginBottom: '-37px',
             paddingBottom: 0,
             borderRadius: '8px 8px 0 0',
-            verticalAlign: 'bottom'
+            verticalAlign: 'bottom',
+            mixBlendMode: 'multiply'
           }}
         />
       </div>
