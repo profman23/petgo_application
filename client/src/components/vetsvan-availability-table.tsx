@@ -622,14 +622,14 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
       {/* Available Appointments Table */}
       <div className="overflow-x-auto">
         {/* صورة الحيوانات الأليفة أعلى الجدول */}
-        <div className="w-full relative" style={{ marginBottom: '-1px', paddingBottom: 0 }}>
+        <div className="w-full relative" style={{ marginBottom: '-3px', paddingBottom: 0 }}>
           <img 
             src={tableHeaderImage} 
             alt="Pets Header" 
             className="w-full h-auto block"
             style={{ 
               display: 'block',
-              marginBottom: '-1px',
+              marginBottom: '-3px',
               paddingBottom: 0,
               borderRadius: '8px 8px 0 0',
               verticalAlign: 'bottom'
@@ -637,7 +637,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           />
         </div>
         
-        <table className="w-full border-collapse border border-gray-300" style={{ marginTop: 0, borderTop: 'none' }}>
+        <table className="w-full border-collapse border border-gray-300" style={{ marginTop: '-3px', borderTop: 'none' }}>
           {/* VetsVan Header Row */}
           <thead>
             <tr className="bg-white">
