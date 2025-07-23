@@ -786,6 +786,7 @@ Changelog:
 - July 23, 2025. OPTIMIZED: Pets header image positioning - moved outside overflow container to remain fixed during horizontal scrolling and increased negative margin to -37px for -75px total overlap with table border eliminating all gaps
 - July 23, 2025. ENHANCED: Added 50% transparency to pets header image (opacity: 0.5) to allow table text visibility through the image
 - July 23, 2025. UPDATED: Replaced pets header image with new background image (freepik__background__41522_1753275618714.png) featuring cute cartoon pets with maintained positioning and transparency
+- July 23, 2025. FINAL UPDATE: Changed to latest pets header image (new_1753284908890.png) and removed transparency (opacity) for full visibility with -75px overlap maintained
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
 - July 22, 2025. COMPLETED: Comprehensive Comic Relief font standardization across all customer interface screens
