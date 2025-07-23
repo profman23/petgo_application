@@ -610,7 +610,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           </button>
         </div>
         
-        <p className={`text-sm text-gray-600 mt-2 ${textAlign === 'right' ? 'text-right' : 'text-left'}`} style={{
+        <p className={`text-sm text-gray-600 mt-6 ${textAlign === 'right' ? 'text-right' : 'text-left'}`} style={{
           fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
         }}>
           {language === 'ar' ? 'اختر الوقت المناسب لك' : 'Select a suitable time for you'}
@@ -826,6 +826,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* مساحة إضافية لمنع التداخل مع العناصر التالية */}
+      <div className="mt-8"></div>
     </div>
   );
 }
