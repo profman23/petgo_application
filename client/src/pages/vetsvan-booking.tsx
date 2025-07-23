@@ -541,18 +541,18 @@ export default function VetsVanBooking() {
 
         {/* اختيار التاريخ */}
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base flex items-center gap-2" style={{ 
+          <CardHeader className="pb-1">
+            <CardTitle className="text-sm flex items-center gap-1" style={{ 
               textAlign,
               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
             }}>
-              <Calendar className="w-4 h-4 text-purple-600" />
+              <Calendar className="w-3 h-3 text-purple-600" />
               {language === 'ar' ? 'التاريخ' : 'Date'}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="#85208550 p-3 rounded-lg text-center">
-              <span className="text-purple-600 font-medium" style={{ 
+          <CardContent className="pt-1">
+            <div className="#85208550 p-2 rounded-lg text-center">
+              <span className="text-purple-600 font-medium text-sm" style={{ 
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
                 {new Date(selectedDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US', {
