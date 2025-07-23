@@ -101,20 +101,65 @@ export const insertUserSchema = createInsertSchema(users).pick({
   membershipType: true,
 });
 
-export const loginSchema = z.object({
-  identifier: z.string().min(1, "رقم الهاتف أو الإيميل مطلوب"),
-  password: z.string().min(1, "كلمة المرور مطلوبة"),
-});
+// Dynamic login schema based on language
+export const createLoginSchema = (language: string = 'en') => {
+  const messages: Record<string, any> = {
+    ar: {
+      identifierRequired: "رقم الهاتف أو الإيميل مطلوب",
+      passwordRequired: "كلمة المرور مطلوبة"
+    },
+    en: {
+      identifierRequired: "Phone number or email is required",
+      passwordRequired: "Password is required"
+    }
+  };
+  
+  const msg = messages[language] || messages.en;
+  
+  return z.object({
+    identifier: z.string().min(1, msg.identifierRequired),
+    password: z.string().min(1, msg.passwordRequired),
+  });
+};
 
-export const registerSchema = z.object({
-  firstName: z.string().min(2, "الاسم الأول مطلوب (حد أدنى حرفين)"),
-  lastName: z.string().min(2, "الاسم الثاني مطلوب (حد أدنى حرفين)"),
-  email: z.string().email("البريد الإلكتروني غير صحيح"),
-  phone: z.string()
-    .regex(/^05\d{8}$/, "رقم الهاتف يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام"),
-  password: z.string().min(6, "كلمة المرور يجب أن تكون 6 أحرف على الأقل"),
-  captcha: z.string().min(1, "يرجى إدخال رمز التحقق"),
-});
+// Default login schema for backward compatibility
+export const loginSchema = createLoginSchema('en');
+
+// Dynamic register schema based on language  
+export const createRegisterSchema = (language: string = 'en') => {
+  const messages: Record<string, any> = {
+    ar: {
+      firstNameRequired: "الاسم الأول مطلوب (حد أدنى حرفين)",
+      lastNameRequired: "الاسم الثاني مطلوب (حد أدنى حرفين)", 
+      emailInvalid: "البريد الإلكتروني غير صحيح",
+      phoneInvalid: "رقم الهاتف يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام",
+      passwordTooShort: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+      captchaRequired: "يرجى إدخال رمز التحقق"
+    },
+    en: {
+      firstNameRequired: "First name is required (minimum 2 characters)",
+      lastNameRequired: "Last name is required (minimum 2 characters)",
+      emailInvalid: "Invalid email address", 
+      phoneInvalid: "Phone number must start with 05 and contain 10 digits",
+      passwordTooShort: "Password must be at least 6 characters long",
+      captchaRequired: "Please enter verification code"
+    }
+  };
+  
+  const msg = messages[language] || messages.en;
+  
+  return z.object({
+    firstName: z.string().min(2, msg.firstNameRequired),
+    lastName: z.string().min(2, msg.lastNameRequired),
+    email: z.string().email(msg.emailInvalid),
+    phone: z.string().regex(/^05\d{8}$/, msg.phoneInvalid),
+    password: z.string().min(6, msg.passwordTooShort),
+    captcha: z.string().min(1, msg.captchaRequired),
+  });
+};
+
+// Default register schema for backward compatibility
+export const registerSchema = createRegisterSchema('en');
 
 // OTP verification schema
 export const otpVerificationSchema = z.object({

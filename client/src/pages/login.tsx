@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { loginSchema, registerSchema, type RegisterUser } from '@shared/schema';
+import { createLoginSchema, createRegisterSchema, type RegisterUser } from '@shared/schema';
 import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart, Mail } from 'lucide-react';
 import { useLocation } from 'wouter';
 import logoImage from "@assets/Screenshot 2025-07-10 182605_1752161515777.png";
@@ -50,7 +50,7 @@ export default function Login() {
   const { t, language } = useTranslation();
 
   const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(language)),
     defaultValues: {
       identifier: '',
       password: '',
@@ -115,14 +115,18 @@ export default function Login() {
 
   const registerMutation = useMutation({
     mutationFn: async (data: any) => {
+      // Validate with dynamic schema
+      const registerSchema = createRegisterSchema(language);
+      const validatedData = registerSchema.parse(data);
+      
       // Validate captcha first
-      if (parseInt(data.captcha) !== captcha.answer) {
+      if (parseInt(validatedData.captcha) !== captcha.answer) {
         throw new Error(language === 'ar' ? 'رمز التحقق غير صحيح' : 'Invalid verification code');
       }
       
       // Add language to registration data
       const dataWithLanguage = {
-        ...data,
+        ...validatedData,
         preferredLanguage: language
       };
       
