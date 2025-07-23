@@ -640,34 +640,37 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         <table className="w-full border-collapse border border-gray-300" style={{ marginTop: 0, borderTop: 'none' }}>
           {/* VetsVan Header Row */}
           <thead>
-            <tr className="bg-purple-600">
-              <th className="border border-gray-300 p-2 text-sm font-medium text-white" style={{
-                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            <tr className="bg-white">
+              <th className="border border-gray-300 p-2 text-sm font-medium" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+                color: '#852085'
               }}>
                 {language === 'ar' ? 'الوقت' : 'Time'}
               </th>
               {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => (
                 <th 
                   key={vetsvan.id} 
-                  className="border border-gray-300 p-2 text-sm font-medium text-white min-w-[120px]"
+                  className="border border-gray-300 p-2 text-sm font-medium min-w-[120px]"
+                  style={{ color: '#852085' }}
                 >
                   <div className="flex flex-col items-center" style={{
                     fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                   }}>
                     <span className="font-semibold">{vetsvan.vetsvanName}</span>
-                    <span className="text-xs text-white opacity-80">({vetsvan.vetsvanCode})</span>
+                    <span className="text-xs opacity-80" style={{ color: '#852085' }}>({vetsvan.vetsvanCode})</span>
                     
                     {/* Distance and closest indicator */}
                     {vetsvan.distanceFromCustomer && (
                       <div className="mt-1 text-center">
-                        <span className="text-xs text-white font-medium">
+                        <span className="text-xs font-medium" style={{ color: '#852085' }}>
                           {vetsvan.distanceFromCustomer} {language === 'ar' ? 'كم' : 'km'}
                         </span>
                         {vetsvan.isClosest && (
                           <div className="flex items-center justify-center mt-1">
-                            <Navigation className="h-3 w-3 text-white mr-1" />
-                            <span className="text-xs text-white font-bold" style={{
-                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            <Navigation className="h-3 w-3 mr-1" style={{ color: '#852085' }} />
+                            <span className="text-xs font-bold" style={{
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+                              color: '#852085'
                             }}>
                               {language === 'ar' ? 'الأقرب إليك' : 'Closest to you'}
                             </span>
@@ -677,9 +680,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                     )}
                     
                     {vetsvan.isAvailable ? (
-                      <CheckCircle className="h-4 w-4 text-white mt-1" />
+                      <CheckCircle className="h-4 w-4 mt-1" style={{ color: '#852085' }} />
                     ) : (
-                      <Clock className="h-4 w-4 text-white mt-1" />
+                      <Clock className="h-4 w-4 mt-1" style={{ color: '#852085' }} />
                     )}
                   </div>
                 </th>
