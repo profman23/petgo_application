@@ -783,6 +783,7 @@ Changelog:
 - July 23, 2025. STREAMLINED: Removed Date Section from VetsVan booking page and moved Available Appointments table up to its position for cleaner interface layout
 - July 23, 2025. ENHANCED: Added cute pets header image directly above VetsVan availability table - positioned to be touching the table's top border without affecting table functionality or content
 - July 23, 2025. UPDATED: VetsVan table header styling - changed background from purple to white and text color from white to purple (#852085) for better visual contrast while maintaining all icons and functionality
+- July 23, 2025. OPTIMIZED: Pets header image positioning - moved outside overflow container to remain fixed during horizontal scrolling and increased negative margin to -6px for perfect alignment with table border
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
 - July 22, 2025. COMPLETED: Comprehensive Comic Relief font standardization across all customer interface screens
