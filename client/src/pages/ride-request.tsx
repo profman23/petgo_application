@@ -652,7 +652,10 @@ export default function RideRequest() {
                       alt="Select Pets Logo" 
                       className="w-6 h-6 select-pets-logo object-cover"
                     />
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-lg font-semibold text-gray-900" style={{ 
+                      textAlign,
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
                       {language === 'ar' ? 'اختر الحيوانات الأليفة:' : 'Select Pets:'}
                     </label>
                   </div>
@@ -814,7 +817,10 @@ export default function RideRequest() {
                           alt="Location" 
                           className="w-5 h-5 object-contain"
                         />
-                        <FormLabel style={{ textAlign }}>{t('yourLocation')}</FormLabel>
+                        <FormLabel className="text-lg font-semibold text-gray-900" style={{ 
+                          textAlign,
+                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                        }}>{t('yourLocation')}</FormLabel>
                       </div>
                       <FormControl>
                         <div className="flex items-center gap-3">
