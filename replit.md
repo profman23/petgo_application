@@ -781,6 +781,7 @@ Changelog:
 - July 23, 2025. ENHANCED: Language change notifications now automatically disappear after 2 seconds instead of requiring manual X button click
 - July 23, 2025. STANDARDIZED: VetsVan booking page Header and Footer to match HOME screen design exactly - replaced username with "Book Appointment" text, added LanguageSelector and Bell icon, corrected Footer button order (Account, Activity, Home from right to left)
 - July 23, 2025. STREAMLINED: Removed Date Section from VetsVan booking page and moved Available Appointments table up to its position for cleaner interface layout
+- July 23, 2025. ENHANCED: Added cute pets header image directly above VetsVan availability table - positioned to be touching the table's top border without affecting table functionality or content
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
 - July 22, 2025. COMPLETED: Comprehensive Comic Relief font standardization across all customer interface screens
