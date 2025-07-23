@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomerLocation } from "@/hooks/useCustomerLocation";
-import tableHeaderImage from "@assets/freepik__assistant__41521_1753273148967.png";
+import tableHeaderImage from "@assets/freepik__background__41522_1753275618714.png";
 import {
   AlertDialog,
   AlertDialogAction,

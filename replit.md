@@ -784,6 +784,8 @@ Changelog:
 - July 23, 2025. ENHANCED: Added cute pets header image directly above VetsVan availability table - positioned to be touching the table's top border without affecting table functionality or content
 - July 23, 2025. UPDATED: VetsVan table header styling - changed background from purple to white and text color from white to purple (#852085) for better visual contrast while maintaining all icons and functionality
 - July 23, 2025. OPTIMIZED: Pets header image positioning - moved outside overflow container to remain fixed during horizontal scrolling and increased negative margin to -37px for -75px total overlap with table border eliminating all gaps
+- July 23, 2025. ENHANCED: Added 50% transparency to pets header image (opacity: 0.5) to allow table text visibility through the image
+- July 23, 2025. UPDATED: Replaced pets header image with new background image (freepik__background__41522_1753275618714.png) featuring cute cartoon pets with maintained positioning and transparency
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
 - July 22, 2025. COMPLETED: Comprehensive Comic Relief font standardization across all customer interface screens
