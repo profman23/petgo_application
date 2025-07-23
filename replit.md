@@ -777,6 +777,10 @@ Changelog:
 - July 21, 2025. ADDED: "Weekly Tips" header element with pin icon in educational section
 - July 21, 2025. IMPLEMENTED: Location pin icon (📍) pointing to text with left alignment
 - July 21, 2025. ENHANCED: Gray color for "Weekly Tips" text and purple pin icon with Chewy font
+- July 23, 2025. IMPLEMENTED: Auto-dismissing notification system for language change messages
+- July 23, 2025. ENHANCED: Language change notifications now automatically disappear after 2 seconds instead of requiring manual X button click
+- July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
+- July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
 - July 22, 2025. COMPLETED: Comprehensive Comic Relief font standardization across all customer interface screens
 - July 22, 2025. IMPLEMENTED: Conditional font application - Comic Relief for English text, Delius for Arabic text throughout customer UI
 - July 22, 2025. UPDATED: All customer screens (home.tsx, account.tsx, customer-activity.tsx, patients.tsx, fixed-footer.tsx, ride-request.tsx, vetsvan-booking.tsx)

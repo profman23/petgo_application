@@ -17,13 +17,18 @@ export function LanguageSelector() {
   const handleLanguageChange = (newLanguage: 'ar' | 'en') => {
     setLanguage(newLanguage);
     
-    // Show success notification
+    // Show success notification with auto-dismiss after 2 seconds
     setTimeout(() => {
-      toast({
+      const toastInstance = toast({
         title: newLanguage === 'ar' ? 'تم تغيير اللغة بنجاح' : 'Language changed successfully',
         description: newLanguage === 'ar' ? 'تم تطبيق اللغة العربية' : 'English language applied',
         variant: 'default',
       });
+      
+      // Auto-dismiss after 2 seconds
+      setTimeout(() => {
+        toastInstance.dismiss();
+      }, 2000);
     }, 100);
   };
 
