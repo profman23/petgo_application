@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomerLocation } from "@/hooks/useCustomerLocation";
+import newTableImage from '@assets/freepik__assistant__41519_1753271453187.png';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -618,126 +619,152 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
 
 
 
-      {/* Available Appointments Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
-          {/* VetsVan Header Row */}
-          <thead>
-            <tr className="bg-purple-600">
-              <th className="border border-gray-300 p-2 text-sm font-medium text-white" style={{
-                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-              }}>
-                {language === 'ar' ? 'الوقت' : 'Time'}
-              </th>
-              {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => (
-                <th 
-                  key={vetsvan.id} 
-                  className="border border-gray-300 p-2 text-sm font-medium text-white min-w-[120px]"
-                >
-                  <div className="flex flex-col items-center" style={{
-                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                  }}>
-                    <span className="font-semibold">{vetsvan.vetsvanName}</span>
-                    <span className="text-xs text-white opacity-80">({vetsvan.vetsvanCode})</span>
-                    
-                    {/* Distance and closest indicator */}
-                    {vetsvan.distanceFromCustomer && (
-                      <div className="mt-1 text-center">
-                        <span className="text-xs text-white font-medium">
-                          {vetsvan.distanceFromCustomer} {language === 'ar' ? 'كم' : 'km'}
-                        </span>
+      {/* Available Appointments Table with Custom Design */}
+      <div className="relative overflow-x-auto">
+        {/* Table Container with Background Image */}
+        <div 
+          className="relative rounded-lg p-6 bg-white bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(${newTableImage})`,
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            minHeight: '400px'
+          }}
+        >
+          {/* Overlay for better readability */}
+          <div className="absolute inset-0 bg-white/10 rounded-lg"></div>
+          
+          {/* Table Content */}
+          <div className="relative z-10">
+            {/* Header Row for VetsVan Information */}
+            <div className="flex justify-center mb-4 mt-16">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-4xl">
+                {(vetsvanData as VetsVanWithShifts[]).map((vetsvan, index) => (
+                  <div 
+                    key={vetsvan.id} 
+                    className="bg-white/90 backdrop-blur-sm rounded-lg p-4 border-2 border-purple-200 shadow-lg"
+                  >
+                    <div className="text-center" style={{
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
+                      <h4 className="font-bold text-purple-700 text-lg mb-1">{vetsvan.vetsvanName}</h4>
+                      <p className="text-xs text-purple-600 mb-2">({vetsvan.vetsvanCode})</p>
+                      
+                      {/* Distance and Status */}
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        {vetsvan.distanceFromCustomer && (
+                          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                            {vetsvan.distanceFromCustomer} {language === 'ar' ? 'كم' : 'km'}
+                          </span>
+                        )}
                         {vetsvan.isClosest && (
-                          <div className="flex items-center justify-center mt-1">
-                            <Navigation className="h-3 w-3 text-white mr-1" />
-                            <span className="text-xs text-white font-bold" style={{
-                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                            }}>
-                              {language === 'ar' ? 'الأقرب إليك' : 'Closest to you'}
+                          <div className="flex items-center text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                            <Navigation className="h-3 w-3 mr-1" />
+                            {language === 'ar' ? 'الأقرب' : 'Closest'}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Availability Status */}
+                      <div className="flex items-center justify-center">
+                        {vetsvan.isAvailable ? (
+                          <div className="flex items-center text-green-600">
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            <span className="text-xs font-medium">
+                              {language === 'ar' ? 'متاح' : 'Available'}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center text-gray-500">
+                            <Clock className="h-4 w-4 mr-1" />
+                            <span className="text-xs font-medium">
+                              {language === 'ar' ? 'غير متاح' : 'Unavailable'}
                             </span>
                           </div>
                         )}
                       </div>
-                    )}
-                    
-                    {vetsvan.isAvailable ? (
-                      <CheckCircle className="h-4 w-4 text-white mt-1" />
-                    ) : (
-                      <Clock className="h-4 w-4 text-white mt-1" />
-                    )}
+                    </div>
                   </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
+                ))}
+              </div>
+            </div>
 
-          {/* Time Slots Body */}
-          <tbody>
-            {timeSlots.map((timeSlot) => (
-              <tr key={timeSlot} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50" style={{
-                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                }}>
-                  {timeSlot}
-                </td>
-                {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => {
-                  const status = getTimeSlotStatus(vetsvan, timeSlot);
-                  const isLoading = false;
-                  
-                  // Check if this is a user booking
-                  const isUserBooking = status && typeof status === 'object' && status.type === 'user_booking';
-                  const userBooking = isUserBooking ? status.booking : null;
-                  
-                  return (
-                    <td key={`${vetsvan.id}-${timeSlot}`} className="border border-gray-300 p-2">
-                      <div className="flex justify-center">
-                        {isUserBooking ? (
-                          // Show user booking status
-                          <div className={`
-                            w-full text-xs px-2 py-1 rounded border text-center
-                            ${getStatusColor(userBooking.status)}
-                          `} style={{
-                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                          }}>
-                            {getStatusText(userBooking.status)}
-                          </div>
-                        ) : (
-                          // Show normal booking button
-                          <button
-                            onClick={() => handleTimeSlotClick(vetsvan, timeSlot)}
-                            disabled={status !== 'available' || isLoading}
-                            className={`
-                              w-full text-xs px-2 py-1 rounded transition-colors
-                              ${status === 'available'
-                                ? 'bg-green-100 text-green-800 hover:bg-green-200 cursor-pointer'
-                                : status === 'booked'
-                                ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
-                                : status === 'past_time'
-                                ? 'bg-red-100 text-red-600 cursor-not-allowed opacity-60'
-                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              }
-                              ${isLoading ? 'opacity-50' : ''}
-                            `}
-                            style={{
-                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                            }}
-                          >
-                            {isLoading ? (
-                              <Loader2 className="w-3 h-3 animate-spin mx-auto" />
+            {/* Time Slots Grid */}
+            <div className="grid grid-cols-1 gap-3 max-w-6xl mx-auto">
+              {timeSlots.map((timeSlot) => (
+                <div key={timeSlot} className="bg-white/90 backdrop-blur-sm rounded-lg p-3 border border-gray-200 shadow-sm">
+                  <div className="flex items-center gap-4">
+                    {/* Time Label */}
+                    <div className="w-20 text-center">
+                      <span className="text-sm font-bold text-purple-700" style={{
+                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                      }}>
+                        {timeSlot}
+                      </span>
+                    </div>
+                    
+                    {/* VetsVan Slots */}
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => {
+                        const status = getTimeSlotStatus(vetsvan, timeSlot);
+                        const isLoading = false;
+                        
+                        // Check if this is a user booking
+                        const isUserBooking = status && typeof status === 'object' && status.type === 'user_booking';
+                        const userBooking = isUserBooking ? status.booking : null;
+                        
+                        return (
+                          <div key={`${vetsvan.id}-${timeSlot}`} className="flex justify-center">
+                            {isUserBooking ? (
+                              // Show user booking status
+                              <div className={`
+                                w-full text-xs px-3 py-2 rounded-lg border text-center font-medium
+                                ${getStatusColor(userBooking.status)}
+                              `} style={{
+                                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                              }}>
+                                {getStatusText(userBooking.status)}
+                              </div>
                             ) : (
-                              status === 'available' ? '✓' : 
-                              status === 'booked' ? (language === 'ar' ? 'محجوز' : 'Booked') :
-                              status === 'past_time' ? (language === 'ar' ? 'منتهي' : 'Past') : '✗'
+                              // Show normal booking button
+                              <button
+                                onClick={() => handleTimeSlotClick(vetsvan, timeSlot)}
+                                disabled={status !== 'available' || isLoading}
+                                className={`
+                                  w-full text-xs px-3 py-2 rounded-lg transition-all duration-200 font-medium
+                                  ${status === 'available'
+                                    ? 'bg-green-100 text-green-800 hover:bg-green-200 hover:scale-105 cursor-pointer border-2 border-green-200'
+                                    : status === 'booked'
+                                    ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed border-2 border-yellow-200'
+                                    : status === 'past_time'
+                                    ? 'bg-red-100 text-red-600 cursor-not-allowed opacity-60 border-2 border-red-200'
+                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed border-2 border-gray-200'
+                                  }
+                                  ${isLoading ? 'opacity-50' : ''}
+                                `}
+                                style={{
+                                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                                }}
+                              >
+                                {isLoading ? (
+                                  <Loader2 className="w-3 h-3 animate-spin mx-auto" />
+                                ) : (
+                                  status === 'available' ? (language === 'ar' ? 'متاح ✓' : 'Available ✓') : 
+                                  status === 'booked' ? (language === 'ar' ? 'محجوز' : 'Booked') :
+                                  status === 'past_time' ? (language === 'ar' ? 'منتهي' : 'Past') : (language === 'ar' ? 'غير متاح ✗' : 'Unavailable ✗')
+                                )}
+                              </button>
                             )}
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Dialog التأكيد */}
