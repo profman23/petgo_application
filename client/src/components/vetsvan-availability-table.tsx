@@ -621,7 +621,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
 
       {/* Available Appointments Table */}
       {/* صورة الحيوانات الأليفة أعلى الجدول - ثابتة */}
-      <div className="w-full relative" style={{ marginBottom: '-20px', paddingBottom: 0 }}>
+      <div className="w-full relative mt-4" style={{ marginBottom: '-20px', paddingBottom: 0 }}>
         <img 
           src={tableHeaderImage} 
           alt="Pets Header" 
