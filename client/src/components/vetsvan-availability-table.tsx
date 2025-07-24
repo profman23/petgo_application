@@ -628,15 +628,21 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
       </div>
 
       {/* Available Appointments Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto relative">
         <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden">
           {/* VetsVan Header Row */}
           <thead>
             <tr className="bg-white">
-              <th className="border border-gray-300 p-2 text-sm font-medium text-purple-600" style={{
+              <th className="border border-gray-300 p-2 text-sm font-medium text-purple-600 sticky left-0 bg-white z-10" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
-                {language === 'ar' ? 'الوقت' : 'Time'}
+                <div className="flex items-center justify-center">
+                  <img 
+                    src="/attached_assets/freepik__background__58757_1753361376767.png"
+                    alt={language === 'ar' ? 'الوقت' : 'Time'}
+                    className="w-6 h-6 object-contain"
+                  />
+                </div>
               </th>
               {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => (
                 <th 
@@ -683,7 +689,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           <tbody>
             {timeSlots.map((timeSlot) => (
               <tr key={timeSlot} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50" style={{
+                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10" style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                 }}>
                   {timeSlot}
