@@ -632,12 +632,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             paddingBottom: 0,
             borderRadius: '8px 8px 0 0',
             verticalAlign: 'bottom',
-            width: 'calc(100% + 96px)',
-            backgroundColor: 'transparent',
-            mixBlendMode: 'multiply',
-            filter: 'brightness(1.2) contrast(1.1)',
-            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 100%)',
-            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 100%)'
+            width: 'calc(100% + 96px)'
           }}
         />
       </div>
