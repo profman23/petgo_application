@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomerLocation } from "@/hooks/useCustomerLocation";
-import tableHeaderImage from "@assets/freepik__3d-cartoon-style-happy-pets-including-a-dog-cats-a__60802_1753349110435.png";
+import tableHeaderImage from "@assets/Screenshot 2025-07-23 185916_1753286443154.png";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -621,10 +621,10 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
 
       {/* Available Appointments Table */}
       {/* صورة الحيوانات الأليفة أعلى الجدول - ثابتة */}
-      <div className="w-full relative -mt-2 -mx-8" style={{ marginBottom: '-20px', paddingBottom: 0, overflow: 'hidden' }}>
+      <div className="w-full relative -mt-4 -mx-8" style={{ marginBottom: '-20px', paddingBottom: 0, overflow: 'hidden' }}>
         <img 
           src={tableHeaderImage} 
-          alt="Happy Pets Header" 
+          alt="Pets Header" 
           className="w-full block"
           style={{ 
             display: 'block',
@@ -633,9 +633,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             borderRadius: '8px 8px 0 0',
             verticalAlign: 'bottom',
             width: 'calc(100% + 64px)',
-            height: '100px',
+            height: '120px',
             objectFit: 'cover',
-            objectPosition: 'center bottom'
+            objectPosition: 'center center'
           }}
         />
       </div>
