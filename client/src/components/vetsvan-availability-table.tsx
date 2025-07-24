@@ -622,8 +622,8 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         <img 
           src={petsImage} 
           alt="Cute Pets"
-          className="h-auto object-contain"
-          style={{ width: '350px' }}
+          className="object-contain"
+          style={{ width: '350px', height: '200px' }}
         />
       </div>
 
