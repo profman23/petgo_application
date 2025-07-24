@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Calendar, Clock, CheckCircle, User, MapPin, Loader2, Bell } from 'lucide-react';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
+import petsImage from "@assets/freepik__a-group-of-5-cheerful-cute-cartoonstyle-3d-pet-ani__58756_1753359168230.png";
 import { VetsVanAvailabilityTable } from '@/components/vetsvan-availability-table';
 import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 
@@ -571,6 +572,15 @@ export default function VetsVanBooking() {
         </Card>
 
 
+
+        {/* صورة الحيوانات الأليفة */}
+        <div className="w-full flex justify-center mb-0">
+          <img 
+            src={petsImage} 
+            alt="Cute Pets"
+            className="w-full max-w-sm h-auto object-contain"
+          />
+        </div>
 
         {/* جدول التوافر مع الحجز الفوري */}
         <VetsVanAvailabilityTable 
