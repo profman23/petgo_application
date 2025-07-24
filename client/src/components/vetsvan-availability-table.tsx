@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useCustomerLocation } from "@/hooks/useCustomerLocation";
-import tableHeaderImage from "@assets/Screenshot 2025-07-23 185916_1753286443154.png";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -610,7 +609,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           </button>
         </div>
         
-        <p className={`text-sm text-gray-600 mt-6 ${textAlign === 'right' ? 'text-right' : 'text-left'}`} style={{
+        <p className={`text-sm text-gray-600 mt-2 ${textAlign === 'right' ? 'text-right' : 'text-left'}`} style={{
           fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
         }}>
           {language === 'ar' ? 'اختر الوقت المناسب لك' : 'Select a suitable time for you'}
@@ -620,52 +619,38 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
 
 
       {/* Available Appointments Table */}
-      {/* مكان الصورة - تم إزالتها */}
-      
-      {/* قياس أبعاد الشاشة والعناصر */}
-      <div className="bg-yellow-100 p-4 mb-4 rounded border" style={{ fontFamily: 'monospace', fontSize: '12px' }}>
-        <div>عرض الشاشة: {typeof window !== 'undefined' ? window.innerWidth : 'غير متاح'} بكسل</div>
-        <div>ارتفاع الشاشة: {typeof window !== 'undefined' ? window.innerHeight : 'غير متاح'} بكسل</div>
-        <div>عرض الجدول: 100vw (عرض الشاشة الكامل)</div>
-        <div>Container: تمدد كامل للشاشة</div>
-        <div>Table width: 100vw (عرض الشاشة)</div>
-      </div>
-      
-      <div className="overflow-x-auto" style={{ margin: '0 -100vw', width: '200vw', position: 'relative', left: '50%', transform: 'translateX(-50%)' }}>
-        <table className="border-collapse border border-gray-300 mt-20" style={{ marginTop: '18px', borderTop: 'none', width: '100vw' }}>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border border-gray-300">
           {/* VetsVan Header Row */}
           <thead>
-            <tr className="bg-white">
-              <th className="border border-gray-300 p-2 text-sm font-medium" style={{
-                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
-                color: '#852085'
+            <tr className="bg-purple-600">
+              <th className="border border-gray-300 p-2 text-sm font-medium text-white" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
                 {language === 'ar' ? 'الوقت' : 'Time'}
               </th>
               {(vetsvanData as VetsVanWithShifts[]).map((vetsvan) => (
                 <th 
                   key={vetsvan.id} 
-                  className="border border-gray-300 p-2 text-sm font-medium min-w-[120px]"
-                  style={{ color: '#852085' }}
+                  className="border border-gray-300 p-2 text-sm font-medium text-white min-w-[120px]"
                 >
                   <div className="flex flex-col items-center" style={{
                     fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                   }}>
                     <span className="font-semibold">{vetsvan.vetsvanName}</span>
-                    <span className="text-xs opacity-80" style={{ color: '#852085' }}>({vetsvan.vetsvanCode})</span>
+                    <span className="text-xs text-white opacity-80">({vetsvan.vetsvanCode})</span>
                     
                     {/* Distance and closest indicator */}
                     {vetsvan.distanceFromCustomer && (
                       <div className="mt-1 text-center">
-                        <span className="text-xs font-medium" style={{ color: '#852085' }}>
+                        <span className="text-xs text-white font-medium">
                           {vetsvan.distanceFromCustomer} {language === 'ar' ? 'كم' : 'km'}
                         </span>
                         {vetsvan.isClosest && (
                           <div className="flex items-center justify-center mt-1">
-                            <Navigation className="h-3 w-3 mr-1" style={{ color: '#852085' }} />
-                            <span className="text-xs font-bold" style={{
-                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
-                              color: '#852085'
+                            <Navigation className="h-3 w-3 text-white mr-1" />
+                            <span className="text-xs text-white font-bold" style={{
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                             }}>
                               {language === 'ar' ? 'الأقرب إليك' : 'Closest to you'}
                             </span>
@@ -675,9 +660,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
                     )}
                     
                     {vetsvan.isAvailable ? (
-                      <CheckCircle className="h-4 w-4 mt-1" style={{ color: '#852085' }} />
+                      <CheckCircle className="h-4 w-4 text-white mt-1" />
                     ) : (
-                      <Clock className="h-4 w-4 mt-1" style={{ color: '#852085' }} />
+                      <Clock className="h-4 w-4 text-white mt-1" />
                     )}
                   </div>
                 </th>
@@ -821,9 +806,6 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      {/* مساحة إضافية لمنع التداخل مع العناصر التالية */}
-      <div className="mt-8"></div>
     </div>
   );
 }
