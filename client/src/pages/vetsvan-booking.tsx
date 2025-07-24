@@ -573,20 +573,20 @@ export default function VetsVanBooking() {
 
 
 
+        {/* جدول التوافر مع الحجز الفوري */}
+        <VetsVanAvailabilityTable 
+          enableDirectBooking={true}
+          onSelectTimeSlot={handleTimeSlotSelection} 
+        />
+
         {/* صورة الحيوانات الأليفة */}
-        <div className="w-full flex justify-center mb-0">
+        <div className="w-full flex justify-center mb-0 mt-4">
           <img 
             src={petsImage} 
             alt="Cute Pets"
             className="w-full max-w-sm h-auto object-contain"
           />
         </div>
-
-        {/* جدول التوافر مع الحجز الفوري */}
-        <VetsVanAvailabilityTable 
-          enableDirectBooking={true}
-          onSelectTimeSlot={handleTimeSlotSelection} 
-        />
 
         {/* Slide to Confirm */}
         {selectedVetsVan && selectedTime && (
