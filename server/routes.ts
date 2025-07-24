@@ -83,6 +83,11 @@ function calculateRideEstimates(distance: number) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Redirect root path to login
+  app.get('/', (req, res) => {
+    res.redirect(302, '/login');
+  });
+
   // PWA Routes - Serve Service Worker and Manifest
   app.get('/sw.js', (req, res) => {
     res.setHeader('Content-Type', 'application/javascript');
