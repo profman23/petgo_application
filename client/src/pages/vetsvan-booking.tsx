@@ -573,15 +573,6 @@ export default function VetsVanBooking() {
 
 
 
-        {/* صورة الحيوانات الأليفة */}
-        <div className="w-full flex justify-center mb-0">
-          <img 
-            src={petsImage} 
-            alt="Cute Pets"
-            className="w-full max-w-sm h-auto object-contain"
-          />
-        </div>
-
         {/* جدول التوافر مع الحجز الفوري */}
         <VetsVanAvailabilityTable 
           enableDirectBooking={true}

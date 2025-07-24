@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { Loader2, Clock, CheckCircle, ChevronLeft, ChevronRight, Calendar, X, Navigation } from "lucide-react";
+import petsImage from "@assets/freepik__a-group-of-5-cheerful-cute-cartoonstyle-3d-pet-ani__58756_1753359168230.png";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -616,7 +617,14 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         </p>
       </div>
 
-
+      {/* صورة الحيوانات الأليفة */}
+      <div className="w-full flex justify-center mb-4">
+        <img 
+          src={petsImage} 
+          alt="Cute Pets"
+          className="w-full max-w-xs h-20 object-contain"
+        />
+      </div>
 
       {/* Available Appointments Table */}
       <div className="overflow-x-auto">
