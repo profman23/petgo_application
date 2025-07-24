@@ -59,7 +59,7 @@ export default function RideRequest() {
   const textAlign = getTextAlign(language);
 
   // خدمات تتطلب شركاء
-  const specializedServices = ['neutering', 'surgery', 'ct-scan'];
+  const specializedServices = ['neutering', 'surgery', 'ct-scan', 'grooming'];
 
   const handleServiceTypeChange = (value: string) => {
     setServiceType(value);
