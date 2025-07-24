@@ -985,34 +985,36 @@ export default function RideRequest() {
           <div className="space-y-4 p-4">
             {/* Partners Logos */}
             <div className="flex justify-center items-start gap-8 mb-6">
-              {/* Dr. Paws */}
-              <div className="flex flex-col items-center">
-                <img 
-                  src={drPawsLogo} 
-                  alt="Dr. Paws Logo" 
-                  className="w-16 h-16 object-contain mb-2"
-                />
-                <div className="flex gap-2">
-                  {/* Phone Icon */}
-                  <button
-                    onClick={() => window.open('tel:+9669200030345', '_self')}
-                    className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
-                    title="Call Dr. Paws"
-                  >
-                    <Phone className="w-4 h-4 text-green-600" />
-                  </button>
-                  {/* WhatsApp Icon */}
-                  <button
-                    onClick={() => window.open('https://wa.me/9669200030345', '_blank')}
-                    className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
-                    title="WhatsApp Dr. Paws"
-                  >
-                    <MessageCircle className="w-4 h-4 text-green-600" />
-                  </button>
+              {/* Dr. Paws - Hidden for CT-Scan */}
+              {serviceType !== 'ct-scan' && (
+                <div className="flex flex-col items-center">
+                  <img 
+                    src={drPawsLogo} 
+                    alt="Dr. Paws Logo" 
+                    className="w-16 h-16 object-contain mb-2"
+                  />
+                  <div className="flex gap-2">
+                    {/* Phone Icon */}
+                    <button
+                      onClick={() => window.open('tel:+96692003045', '_self')}
+                      className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
+                      title="Call Dr. Paws"
+                    >
+                      <Phone className="w-4 h-4 text-green-600" />
+                    </button>
+                    {/* WhatsApp Icon */}
+                    <button
+                      onClick={() => window.open('https://wa.me/96692003045', '_blank')}
+                      className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
+                      title="WhatsApp Dr. Paws"
+                    >
+                      <MessageCircle className="w-4 h-4 text-green-600" />
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Elite Vet */}
+              {/* Elite Vet - Always visible */}
               <div className="flex flex-col items-center">
                 <img 
                   src={eliteVetLogo} 
