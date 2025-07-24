@@ -640,8 +640,8 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         />
       </div>
       
-      <div className="overflow-x-auto -mx-6">
-        <table className="border-collapse border border-gray-300 mt-20" style={{ marginTop: '18px', borderTop: 'none', width: 'calc(100% + 48px)' }}>
+      <div className="overflow-x-auto -mx-8">
+        <table className="border-collapse border border-gray-300 mt-20" style={{ marginTop: '18px', borderTop: 'none', width: 'calc(100% + 64px)' }}>
           {/* VetsVan Header Row */}
           <thead>
             <tr className="bg-white">

@@ -805,6 +805,7 @@ Changelog:
 - July 24, 2025. ENHANCED WIDTH COVERAGE: Increased image container expansion from -mx-6 to -mx-8 with calc(100% + 64px) for complete edge-to-edge coverage
 - July 24, 2025. IMAGE RIGHT POSITIONING: Adjusted objectPosition from 'center center' to '60% center' to shift image slightly to the right
 - July 24, 2025. ENHANCED RIGHT SHIFT: Increased objectPosition from '60% center' to '80% center' for more noticeable rightward movement
+- July 24, 2025. TABLE ALIGNMENT FIX: Matched table container (-mx-8) and width (calc(100% + 64px)) to image dimensions to prevent blocking right side
 - July 23, 2025. ADVANCED UPDATE: Replaced with transparent background image (new (1)_1753285754506.png) and applied CSS mix-blend-mode: multiply to make black background transparent while keeping pets visible
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
