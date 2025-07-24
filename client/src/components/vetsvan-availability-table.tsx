@@ -271,11 +271,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     lon: 46.6753 // Default Riyadh location for testing realistic distances
   });
 
-  // Get user bookings to check current bookings
-  const { data: userBookings = [] } = useQuery({
-    queryKey: ['/api/user/bookings'],
-    enabled: true,
-  });
+
 
   const { data: vetsvanData, isLoading, error } = useQuery({
     queryKey: ['/api/vetsvan/availability', userLocation],
@@ -298,7 +294,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   });
 
   // جلب حجوزات العميل الحالية
-  const { data: userBookings = [] } = useQuery({
+  const { data: userBookings = [] } = useQuery<any[]>({
     queryKey: ['/api/user/bookings'],
     retry: false,
     refetchInterval: 2000, // تحديث كل ثانيتين لرؤية تحديثات الحالة
@@ -660,7 +656,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             <tr className="bg-white">
               <th style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
-                position: 'sticky !important',
+                position: 'sticky' as const,
                 left: '0 !important',
                 backgroundColor: 'white !important',
                 zIndex: '1000 !important',
@@ -730,7 +726,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
               <tr key={timeSlot} className="hover:bg-gray-50">
                 <td style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
-                  position: 'sticky !important',
+                  position: 'sticky' as const,
                   left: '0 !important',
                   backgroundColor: '#f9fafb !important',
                   zIndex: '1000 !important',
