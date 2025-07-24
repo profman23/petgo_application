@@ -800,6 +800,7 @@ Changelog:
 - July 24, 2025. TABLE POSITION FINE-TUNING: Adjusted table margin from mt-18 to mt-16 for optimal spacing between pets image and table
 - July 24, 2025. FINAL TABLE POSITIONING: Increased table margin from mt-16 to mt-20 for maximum spacing while keeping pets image in fixed position
 - July 24, 2025. IMAGE WIDTH ALIGNMENT: Matched pets image width exactly to table width using calc(100% + 48px) and same -mx-6 container for perfect alignment
+- July 24, 2025. SCROLL BAR FIX: Removed overflow-x-auto from image container and added maxHeight + objectFit to prevent scrollbars while maintaining image proportions
 - July 23, 2025. ADVANCED UPDATE: Replaced with transparent background image (new (1)_1753285754506.png) and applied CSS mix-blend-mode: multiply to make black background transparent while keeping pets visible
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
