@@ -634,14 +634,14 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           {/* VetsVan Header Row */}
           <thead>
             <tr className="bg-white">
-              <th className="border border-gray-300 p-2 text-sm font-medium text-purple-600 sticky left-0 bg-white z-10" style={{
+              <th className="border border-gray-300 p-2 text-sm font-medium text-purple-600 sticky left-0 bg-white z-20 shadow-sm" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
                 <div className="flex items-center justify-center">
                   <img 
                     src={timeClockIcon}
                     alt={language === 'ar' ? 'الوقت' : 'Time'}
-                    className="w-8 h-8 object-contain"
+                    className="w-10 h-10 object-contain"
                   />
                 </div>
               </th>
@@ -690,7 +690,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           <tbody>
             {timeSlots.map((timeSlot) => (
               <tr key={timeSlot} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-10" style={{
+                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-20 shadow-sm" style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                 }}>
                   {timeSlot}
