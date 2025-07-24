@@ -626,14 +626,16 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           <img 
             src={tableHeaderImage} 
             alt="Pets Header" 
-            className="h-auto block"
+            className="block"
             style={{ 
               display: 'block',
               marginBottom: '-20px',
               paddingBottom: 0,
               borderRadius: '8px 8px 0 0',
               verticalAlign: 'bottom',
-              width: 'calc(100% + 48px)'
+              width: 'calc(100% + 48px)',
+              height: '80px',
+              objectFit: 'cover'
             }}
           />
         </div>
