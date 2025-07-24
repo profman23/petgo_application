@@ -622,6 +622,15 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
       {/* Available Appointments Table */}
       {/* مكان الصورة - تم إزالتها */}
       
+      {/* قياس أبعاد الشاشة والعناصر */}
+      <div className="bg-yellow-100 p-4 mb-4 rounded border" style={{ fontFamily: 'monospace', fontSize: '12px' }}>
+        <div>عرض الشاشة: {typeof window !== 'undefined' ? window.innerWidth : 'غير متاح'} بكسل</div>
+        <div>ارتفاع الشاشة: {typeof window !== 'undefined' ? window.innerHeight : 'غير متاح'} بكسل</div>
+        <div>عرض العنصر الحالي: {typeof window !== 'undefined' ? 'سيتم حسابه' : 'غير متاح'} بكسل</div>
+        <div>Container margin: -mx-12 = -48px يساراً و -48px يميناً</div>
+        <div>Table width: calc(100% + 96px)</div>
+      </div>
+      
       <div className="overflow-x-auto -mx-12">
         <table className="border-collapse border border-gray-300 mt-20" style={{ marginTop: '18px', borderTop: 'none', width: 'calc(100% + 96px)' }}>
           {/* VetsVan Header Row */}
