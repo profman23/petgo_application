@@ -804,6 +804,7 @@ Changelog:
 - July 24, 2025. IMAGE OPTIMIZATION: Set fixed height (120px) with objectFit cover and objectPosition center for optimal display across all devices without scrollbars
 - July 24, 2025. ENHANCED WIDTH COVERAGE: Increased image container expansion from -mx-6 to -mx-8 with calc(100% + 64px) for complete edge-to-edge coverage
 - July 24, 2025. NEW PETS IMAGE: Replaced with professional 3D cartoon-style happy pets image (freepik__3d-cartoon-style-happy-pets-including-a-dog-cats-a__60802_1753349110435.png) with optimized 100px height and center-bottom positioning
+- July 24, 2025. IMAGE POSITION ADJUSTMENT: Moved pets image down slightly by changing container margin from -mt-4 to -mt-2 for better visual spacing
 - July 23, 2025. ADVANCED UPDATE: Replaced with transparent background image (new (1)_1753285754506.png) and applied CSS mix-blend-mode: multiply to make black background transparent while keeping pets visible
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
