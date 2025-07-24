@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -984,17 +984,60 @@ export default function RideRequest() {
           
           <div className="space-y-4 p-4">
             {/* Partners Logos */}
-            <div className="flex justify-center items-center gap-6 mb-6">
-              <img 
-                src={drPawsLogo} 
-                alt="Dr. Paws Logo" 
-                className="w-16 h-16 object-contain"
-              />
-              <img 
-                src={eliteVetLogo} 
-                alt="Elite Vet Logo" 
-                className="w-16 h-16 object-contain"
-              />
+            <div className="flex justify-center items-start gap-8 mb-6">
+              {/* Dr. Paws */}
+              <div className="flex flex-col items-center">
+                <img 
+                  src={drPawsLogo} 
+                  alt="Dr. Paws Logo" 
+                  className="w-16 h-16 object-contain mb-2"
+                />
+                <div className="flex gap-2">
+                  {/* Phone Icon */}
+                  <button
+                    onClick={() => window.open('tel:+96692003045', '_self')}
+                    className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
+                    title="Call Dr. Paws"
+                  >
+                    <Phone className="w-4 h-4 text-green-600" />
+                  </button>
+                  {/* WhatsApp Icon */}
+                  <button
+                    onClick={() => window.open('https://wa.me/96692003045', '_blank')}
+                    className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
+                    title="WhatsApp Dr. Paws"
+                  >
+                    <MessageCircle className="w-4 h-4 text-green-600" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Elite Vet */}
+              <div className="flex flex-col items-center">
+                <img 
+                  src={eliteVetLogo} 
+                  alt="Elite Vet Logo" 
+                  className="w-16 h-16 object-contain mb-2"
+                />
+                <div className="flex gap-2">
+                  {/* Phone Icon */}
+                  <button
+                    onClick={() => window.open('tel:+966920011626', '_self')}
+                    className="p-2 bg-purple-100 hover:bg-purple-200 rounded-full transition-colors"
+                    title="Call Elite Vet"
+                  >
+                    <Phone className="w-4 h-4 text-purple-600" />
+                  </button>
+                  {/* WhatsApp Icon */}
+                  <button
+                    onClick={() => window.open('https://wa.me/966920011626', '_blank')}
+                    className="p-2 bg-purple-100 hover:bg-purple-200 rounded-full transition-colors"
+                    title="WhatsApp Elite Vet"
+                  >
+                    <MessageCircle className="w-4 h-4 text-purple-600" />
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Message */}
