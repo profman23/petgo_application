@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
@@ -22,6 +23,8 @@ import selectPetsLogo from "@/assets/select-pets-logo-new.png";
 import serviceTypeIcon from "@assets/freepik_assistant_1751437667818_1751437676533.png";
 import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.png";
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
+import drPawsLogo from "@assets/Dr.Paws Logo_1753364291004.png";
+import eliteVetLogo from "@assets/Final LogoLogo_1753364291004.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -48,11 +51,22 @@ export default function RideRequest() {
   const [isSliding, setIsSliding] = useState(false);
   const [isSlideComplete, setIsSlideComplete] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [showPartnersDialog, setShowPartnersDialog] = useState(false);
   
   const { t } = useTranslation();
   const { language } = useLanguage();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
+
+  // خدمات تتطلب شركاء
+  const specializedServices = ['neutering', 'surgery', 'ct-scan'];
+
+  const handleServiceTypeChange = (value: string) => {
+    setServiceType(value);
+    if (specializedServices.includes(value)) {
+      setShowPartnersDialog(true);
+    }
+  };
   
   // جلب الحيوانات الأليفة المسجلة بتحسين الأداء
   const { data: patients = [], isLoading: isLoadingPatients } = useQuery<Patient[]>({
@@ -772,7 +786,7 @@ export default function RideRequest() {
             <Select
               value={serviceType}
               onValueChange={(value) => {
-                setServiceType(value);
+                handleServiceTypeChange(value);
                 form.setValue('serviceType', value);
               }}
             >
@@ -956,6 +970,65 @@ export default function RideRequest() {
 
         </div>
       </div>
+
+      {/* Partners Dialog */}
+      <Dialog open={showPartnersDialog} onOpenChange={setShowPartnersDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl font-bold text-gray-800" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'شركاؤونا' : 'Our Partners'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 p-4">
+            {/* Partners Logos */}
+            <div className="flex justify-center items-center gap-6 mb-6">
+              <img 
+                src={drPawsLogo} 
+                alt="Dr. Paws Logo" 
+                className="w-16 h-16 object-contain"
+              />
+              <img 
+                src={eliteVetLogo} 
+                alt="Elite Vet Logo" 
+                className="w-16 h-16 object-contain"
+              />
+            </div>
+
+            {/* Message */}
+            <div className="text-center">
+              <p className="text-gray-700 leading-relaxed" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+                textAlign: language === 'ar' ? 'right' : 'left',
+                direction: language === 'ar' ? 'rtl' : 'ltr'
+              }}>
+                {language === 'ar' 
+                  ? 'اننا لا نقوم بالخدمات هذه في عياداتنا المتنقله ولكن ممكن عند اي من شركائنا الحاليين'
+                  : 'We do not provide these services in our mobile clinics, but they are available at any of our current partners'
+                }
+              </p>
+            </div>
+
+            {/* Close Button */}
+            <div className="flex justify-center mt-6">
+              <Button 
+                onClick={() => {
+                  setShowPartnersDialog(false);
+                  setServiceType(''); // إعادة تعيين الخدمة
+                }}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
+                style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}
+              >
+                {language === 'ar' ? 'موافق' : 'OK'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
