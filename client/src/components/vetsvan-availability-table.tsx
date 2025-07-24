@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { Loader2, Clock, CheckCircle, ChevronLeft, ChevronRight, Calendar, X, Navigation } from "lucide-react";
 import petsImage from "@assets/freepik__a-group-of-5-cheerful-cute-cartoonstyle-3d-pet-ani__58756_1753359168230.png";
+import timeClockIcon from "@assets/freepik__background__58757_1753361376767.png";
 import { useState, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -638,9 +639,9 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
               }}>
                 <div className="flex items-center justify-center">
                   <img 
-                    src="/attached_assets/freepik__background__58757_1753361376767.png"
+                    src={timeClockIcon}
                     alt={language === 'ar' ? 'الوقت' : 'Time'}
-                    className="w-6 h-6 object-contain"
+                    className="w-8 h-8 object-contain"
                   />
                 </div>
               </th>
