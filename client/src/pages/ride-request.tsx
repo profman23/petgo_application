@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -784,14 +784,32 @@ export default function RideRequest() {
               <SelectContent>
                 <SelectItem value="general-checkup" className="select-item-custom">
                   <div className="flex items-center gap-2">
-                    <span>🩺</span>
+                    <Stethoscope className="w-4 h-4 text-blue-600" />
                     <span>{t('generalCheckUp')}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="grooming" className="select-item-custom">
                   <div className="flex items-center gap-2">
-                    <span>✂️</span>
+                    <Scissors className="w-4 h-4 text-pink-600" />
                     <span>{t('grooming')}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="neutering" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-red-600" />
+                    <span>{language === 'ar' ? 'خصي/تعقيم' : 'Neutering'}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="surgery" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-orange-600" />
+                    <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="ct-scan" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Scan className="w-4 h-4 text-green-600" />
+                    <span>{language === 'ar' ? 'أشعة مقطعية' : 'CT-Scan'}</span>
                   </div>
                 </SelectItem>
               </SelectContent>
