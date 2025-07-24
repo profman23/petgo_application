@@ -995,7 +995,7 @@ export default function RideRequest() {
                 <div className="flex gap-2">
                   {/* Phone Icon */}
                   <button
-                    onClick={() => window.open('tel:+96692003045', '_self')}
+                    onClick={() => window.open('tel:+9669200030345', '_self')}
                     className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
                     title="Call Dr. Paws"
                   >
@@ -1003,7 +1003,7 @@ export default function RideRequest() {
                   </button>
                   {/* WhatsApp Icon */}
                   <button
-                    onClick={() => window.open('https://wa.me/96692003045', '_blank')}
+                    onClick={() => window.open('https://wa.me/9669200030345', '_blank')}
                     className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
                     title="WhatsApp Dr. Paws"
                   >
