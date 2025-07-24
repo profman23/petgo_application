@@ -630,12 +630,17 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
 
       {/* Available Appointments Table */}
       <div className="overflow-x-auto relative">
-        <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden">
+        <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden" style={{ position: 'relative' }}>
           {/* VetsVan Header Row */}
           <thead>
             <tr className="bg-white">
-              <th className="border border-gray-300 p-2 text-sm font-medium text-purple-600 sticky left-0 bg-white z-20 shadow-sm" style={{
-                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              <th className="border border-gray-300 p-2 text-sm font-medium text-purple-600" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+                position: 'sticky',
+                left: 0,
+                backgroundColor: 'white',
+                zIndex: 30,
+                boxShadow: '2px 0 4px rgba(0,0,0,0.1)'
               }}>
                 <div className="flex items-center justify-center">
                   <img 
@@ -690,8 +695,13 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           <tbody>
             {timeSlots.map((timeSlot) => (
               <tr key={timeSlot} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-20 shadow-sm" style={{
-                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+                  position: 'sticky',
+                  left: 0,
+                  backgroundColor: '#f9fafb',
+                  zIndex: 30,
+                  boxShadow: '2px 0 4px rgba(0,0,0,0.1)'
                 }}>
                   {timeSlot}
                 </td>
