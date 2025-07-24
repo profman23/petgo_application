@@ -635,7 +635,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             width: 'calc(100% + 64px)',
             height: '120px',
             objectFit: 'cover',
-            objectPosition: 'center center'
+            objectPosition: '60% center'
           }}
         />
       </div>
