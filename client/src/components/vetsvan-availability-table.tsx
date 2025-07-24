@@ -271,8 +271,6 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
     lon: 46.6753 // Default Riyadh location for testing realistic distances
   });
 
-
-
   const { data: vetsvanData, isLoading, error } = useQuery({
     queryKey: ['/api/vetsvan/availability', userLocation],
     queryFn: () => {
@@ -294,7 +292,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   });
 
   // جلب حجوزات العميل الحالية
-  const { data: userBookings = [] } = useQuery<any[]>({
+  const { data: userBookings = [] } = useQuery({
     queryKey: ['/api/user/bookings'],
     retry: false,
     refetchInterval: 2000, // تحديث كل ثانيتين لرؤية تحديثات الحالة
@@ -631,45 +629,13 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
       </div>
 
       {/* Available Appointments Table */}
-      <div className="relative">
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            .sticky-time-column {
-              position: sticky !important;
-              left: 0 !important;
-              z-index: 1000 !important;
-            }
-            .table-container {
-              position: relative;
-              overflow-x: auto;
-            }
-            .table-container table {
-              table-layout: fixed;
-            }
-          `
-        }} />
-        <div className="table-container">
-          <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden"
-                 style={{ minWidth: '800px', tableLayout: 'fixed' }}>
+      <div className="overflow-x-auto relative">
+        <table className="w-full border-collapse border border-gray-300 rounded-lg overflow-hidden">
           {/* VetsVan Header Row */}
           <thead>
             <tr className="bg-white">
-              <th style={{
-                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
-                position: 'sticky' as const,
-                left: '0 !important',
-                backgroundColor: 'white !important',
-                zIndex: '1000 !important',
-                minWidth: '100px',
-                maxWidth: '100px',
-                width: '100px',
-                boxShadow: '2px 0 8px rgba(0,0,0,0.2)',
-                border: '1px solid #d1d5db',
-                padding: '8px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: '#852085',
-                borderTopLeftRadius: '8px'
+              <th className="border border-gray-300 p-2 text-sm font-medium text-purple-600 sticky left-0 bg-white z-20 shadow-sm" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
                 <div className="flex items-center justify-center">
                   <img 
@@ -724,21 +690,8 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
           <tbody>
             {timeSlots.map((timeSlot) => (
               <tr key={timeSlot} className="hover:bg-gray-50">
-                <td style={{
-                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
-                  position: 'sticky' as const,
-                  left: '0 !important',
-                  backgroundColor: '#f9fafb !important',
-                  zIndex: '1000 !important',
-                  minWidth: '100px',
-                  maxWidth: '100px',
-                  width: '100px',
-                  boxShadow: '2px 0 8px rgba(0,0,0,0.2)',
-                  border: '1px solid #d1d5db',
-                  padding: '8px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151'
+                <td className="border border-gray-300 p-2 text-sm font-medium text-gray-700 bg-gray-50 sticky left-0 z-20 shadow-sm" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                 }}>
                   {timeSlot}
                 </td>
@@ -800,8 +753,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
               </tr>
             ))}
           </tbody>
-          </table>
-        </div>
+        </table>
       </div>
 
       {/* Dialog التأكيد */}
