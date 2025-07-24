@@ -145,7 +145,10 @@ function Router() {
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
-          <Route path="/" component={Login} />
+          <Route path="/" component={() => {
+            window.location.href = '/login';
+            return null;
+          }} />
           <Route component={NotFound} />
         </Switch>
       </div>
