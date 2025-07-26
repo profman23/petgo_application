@@ -119,8 +119,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         }
         
         .logo-section {
-          flex: 1;
-          text-align: center;
+          text-align: right;
         }
         
         .logo-image {
@@ -130,7 +129,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         }
         
         .spacer {
-          width: 192px;
+          flex: 1;
         }
         
 
@@ -138,7 +137,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
     </head>
     <body>
       <div class="invoice-container">
-        <!-- Header with Date (left) and Logo (center) -->
+        <!-- Header with Date (left) and Logo (right) -->
         <div class="header-section">
           <!-- Date on the left -->
           <div class="date-section">
@@ -147,7 +146,10 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             </p>
           </div>
           
-          <!-- Logo in the center -->
+          <!-- Empty space to balance the layout -->
+          <div class="spacer"></div>
+          
+          <!-- Logo on the right -->
           <div class="logo-section">
             <img 
               class="logo-image" 
@@ -155,9 +157,6 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               alt="Vets Van Logo" 
             />
           </div>
-          
-          <!-- Empty space to balance the layout -->
-          <div class="spacer"></div>
         </div>
       </div>
     </body>
