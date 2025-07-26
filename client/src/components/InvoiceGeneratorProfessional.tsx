@@ -488,45 +488,43 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
   const downloadInvoice = async () => {
     setIsGenerating(true);
     try {
-      // Create a formatted HTML version for download
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
-          <head>
-            <meta charset="utf-8">
-            <title>VETS VAN Invoice #${invoiceData.invoiceNumber || invoiceData.bookingId}</title>
-            <style>
-              /* Include all the print styles here */
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body { font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; }
-              /* ... rest of styles ... */
-            </style>
-          </head>
-          <body>
-            ${invoiceRef.current?.innerHTML}
-          </body>
-        </html>
-      `;
+      // Make API call to generate PDF
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/generate-pdf/invoice/${invoiceData.bookingId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ language })
+      });
 
-      const blob = new Blob([htmlContent], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      // Get the PDF blob
+      const pdfBlob = await response.blob();
+      
+      // Create download link
+      const url = URL.createObjectURL(pdfBlob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `VETSVAN-Invoice-${invoiceData.invoiceNumber || invoiceData.bookingId}.html`;
+      link.download = `Invoice_${invoiceData.invoiceNumber || invoiceData.bookingId}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
       toast({
-        title: language === 'ar' ? 'تم التحميل بنجاح' : 'Download Successful',
-        description: language === 'ar' ? 'تم تحميل الفاتورة بنجاح' : 'Invoice downloaded successfully',
+        title: language === 'ar' ? 'تم تحميل الـ PDF بنجاح' : 'PDF Downloaded Successfully',
+        description: language === 'ar' ? 'تم تحميل الفاتورة كملف PDF' : 'Invoice downloaded as PDF file',
       });
     } catch (error) {
-      console.error('Error downloading invoice:', error);
+      console.error('Error downloading PDF:', error);
       toast({
-        title: language === 'ar' ? 'خطأ في التحميل' : 'Download Error',
-        description: language === 'ar' ? 'فشل في تحميل الفاتورة' : 'Failed to download invoice',
+        title: language === 'ar' ? 'خطأ في تحميل PDF' : 'PDF Download Error',
+        description: language === 'ar' ? 'فشل في تحميل الفاتورة كـ PDF' : 'Failed to download invoice as PDF',
         variant: 'destructive'
       });
     }
@@ -549,7 +547,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             </Button>
             <Button onClick={downloadInvoice} disabled={isGenerating} size="sm" className="bg-white text-purple-600 hover:bg-gray-100">
               <Download className="h-4 w-4 mr-2" />
-              {language === 'ar' ? 'تحميل' : 'Download'}
+              {isGenerating ? (language === 'ar' ? 'جاري التحميل...' : 'Generating...') : (language === 'ar' ? 'تحميل PDF' : 'Download PDF')}
             </Button>
             <Button onClick={onClose} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
               <X className="h-4 w-4" />

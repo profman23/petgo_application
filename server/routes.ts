@@ -10,6 +10,7 @@ import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVe
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
+import { generateInvoicePDF } from "./pdf-generator";
 // Payment service removed per user request
 
 // Simple session middleware
@@ -3312,6 +3313,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error exporting sales report:', error);
       res.status(500).json({ message: 'Failed to export sales report' });
+    }
+  });
+
+  // PDF Generation endpoints
+  app.post('/api/generate-pdf/invoice/:bookingId', requireAuth, async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const { language = 'en' } = req.body;
+      
+      // Get booking details
+      const booking = await storage.getBookingWithDetails(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Get invoice items
+      const invoiceItems = await storage.getInvoiceItems(bookingId);
+      
+      // Get invoice status
+      const invoiceStatus = await storage.getInvoiceStatus(bookingId);
+      
+      // Get payments
+      const payments = await storage.getInvoicePaymentsByBooking(bookingId);
+
+      // Prepare invoice data
+      const invoiceData = {
+        bookingId: booking.id,
+        invoiceNumber: invoiceStatus?.invoiceNumber || `Vets${String(bookingId).padStart(8, '0')}`,
+        language,
+        customer: {
+          firstName: booking.customerFirstName,
+          lastName: booking.customerLastName,
+          phone: booking.customerPhone,
+          email: booking.customerEmail || ''
+        },
+        pets: booking.pets || [],
+        appointmentDate: booking.appointmentDate,
+        appointmentTime: booking.appointmentTime,
+        serviceType: booking.serviceType || 'General Service',
+        items: invoiceItems || [],
+        subtotal: invoiceItems?.reduce((sum, item) => sum + (item.totalBeforeVat || 0), 0) || 0,
+        discount: invoiceItems?.reduce((sum, item) => sum + (item.discount || 0), 0) || 0,
+        tax: invoiceItems?.reduce((sum, item) => sum + (item.vatAmount || 0), 0) || 0,
+        total: invoiceItems?.reduce((sum, item) => sum + (item.totalAfterVat || 0), 0) || 0,
+        notes: invoiceStatus?.notes || '',
+        doctorName: booking.doctorName || 'Dr. VetsVan',
+        vetsVanCode: booking.vetsVanCode || 'VETS001',
+        paymentMethods: payments || []
+      };
+
+      // Generate PDF
+      const pdfBuffer = await generateInvoicePDF(invoiceData);
+      
+      // Set response headers
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoiceData.invoiceNumber}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      // Send PDF
+      res.send(pdfBuffer);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      res.status(500).json({ message: 'Failed to generate PDF' });
+    }
+  });
+
+  // Invoice view PDF endpoint (for customer links)
+  app.get('/api/invoice-pdf/:bookingId', async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const language = req.query.lang as string || 'en';
+      
+      // Get booking details
+      const booking = await storage.getBookingWithDetails(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Invoice not found' });
+      }
+
+      // Get invoice items
+      const invoiceItems = await storage.getInvoiceItems(bookingId);
+      
+      // Get invoice status
+      const invoiceStatus = await storage.getInvoiceStatus(bookingId);
+      
+      // Get payments
+      const payments = await storage.getInvoicePaymentsByBooking(bookingId);
+
+      // Prepare invoice data
+      const invoiceData = {
+        bookingId: booking.id,
+        invoiceNumber: invoiceStatus?.invoiceNumber || `Vets${String(bookingId).padStart(8, '0')}`,
+        language,
+        customer: {
+          firstName: booking.customerFirstName,
+          lastName: booking.customerLastName,
+          phone: booking.customerPhone,
+          email: booking.customerEmail || ''
+        },
+        pets: booking.pets || [],
+        appointmentDate: booking.appointmentDate,
+        appointmentTime: booking.appointmentTime,
+        serviceType: booking.serviceType || 'General Service',
+        items: invoiceItems || [],
+        subtotal: invoiceItems?.reduce((sum, item) => sum + (item.totalBeforeVat || 0), 0) || 0,
+        discount: invoiceItems?.reduce((sum, item) => sum + (item.discount || 0), 0) || 0,
+        tax: invoiceItems?.reduce((sum, item) => sum + (item.vatAmount || 0), 0) || 0,
+        total: invoiceItems?.reduce((sum, item) => sum + (item.totalAfterVat || 0), 0) || 0,
+        notes: invoiceStatus?.notes || '',
+        doctorName: booking.doctorName || 'Dr. VetsVan',
+        vetsVanCode: booking.vetsVanCode || 'VETS001',
+        paymentMethods: payments || []
+      };
+
+      // Generate PDF
+      const pdfBuffer = await generateInvoicePDF(invoiceData);
+      
+      // Set response headers
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename="Invoice_${invoiceData.invoiceNumber}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      // Send PDF
+      res.send(pdfBuffer);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      res.status(500).json({ message: 'Failed to generate PDF' });
     }
   });
 
