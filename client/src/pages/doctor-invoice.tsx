@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
-import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
+import InvoiceGeneratorNew from '@/components/InvoiceGeneratorNew';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -1938,7 +1938,7 @@ export default function DoctorInvoice() {
 
       {/* Invoice Generator */}
       {showInvoiceGenerator && booking && doctorInfo && (
-        <InvoiceGeneratorProfessional
+        <InvoiceGeneratorNew
           invoiceData={{
             bookingId: booking.id,
             invoiceNumber: invoiceStatus?.invoiceNumber,
