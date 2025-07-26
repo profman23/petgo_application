@@ -2117,7 +2117,7 @@ export default function DoctorInvoice() {
                 {/* Date on the left */}
                 <div className="text-left">
                   <p className="text-sm font-semibold">
-                    <strong>التاريخ:</strong> {new Date().toLocaleDateString('en-US')}
+                    {new Date().toLocaleDateString('en-US')}
                   </p>
                 </div>
                 
@@ -2135,7 +2135,7 @@ export default function DoctorInvoice() {
               </div>
               
               {/* Light separator line */}
-              <div className="w-full h-px bg-purple-500 opacity-30 my-4"></div>
+              <div className="w-full h-px opacity-30 my-4" style={{backgroundColor: '#8B5CF6'}}></div>
               
               {/* Customer Information Section */}
               <div className="text-left mb-4">

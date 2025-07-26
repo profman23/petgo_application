@@ -121,7 +121,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         .separator-line {
           width: 100%;
           height: 1px;
-          background-color: #a855f7;
+          background-color: #8B5CF6;
           opacity: 0.3;
           margin: 16px 0;
         }
@@ -167,7 +167,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <!-- Date on the left -->
           <div class="date-section">
             <p class="date-text">
-              <strong>التاريخ:</strong> ${new Date().toLocaleDateString('en-US')}
+              ${new Date().toLocaleDateString('en-US')}
             </p>
           </div>
           
