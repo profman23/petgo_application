@@ -130,19 +130,23 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           margin-bottom: 20px;
         }
         
-        .customer-info-arabic {
-          text-align: right;
-          font-size: 12px;
-          font-weight: 600;
-          color: #000;
-          margin-bottom: 4px;
+        .customer-info-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
         }
         
         .customer-info-english {
           text-align: left;
           font-size: 10px;
           color: #666;
-          margin-bottom: 8px;
+        }
+        
+        .customer-info-arabic {
+          text-align: right;
+          font-size: 10px;
+          color: #666;
         }
         
         .logo-section {
@@ -191,21 +195,25 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         
         <!-- Customer Information Section -->
         <div class="customer-info-section">
-          <!-- Arabic sections - Right aligned -->
-          <p class="customer-info-arabic">
-            <strong>اسم العميل:</strong> ${invoiceData.customer?.name || ''}
-          </p>
-          <p class="customer-info-arabic">
-            <strong>تليفون العميل:</strong> ${invoiceData.customer?.phone || ''}
-          </p>
+          <!-- Name row - English left, Arabic right, same level -->
+          <div class="customer-info-row">
+            <p class="customer-info-english">
+              Customer Name: ${invoiceData.customer?.name || ''}
+            </p>
+            <p class="customer-info-arabic">
+              ${invoiceData.customer?.name || ''} :اسم العميل
+            </p>
+          </div>
           
-          <!-- English sections - Left aligned -->
-          <p class="customer-info-english">
-            Customer Name: ${invoiceData.customer?.name || ''}
-          </p>
-          <p class="customer-info-english">
-            Customer Phone: ${invoiceData.customer?.phone || ''}
-          </p>
+          <!-- Phone row - English left, Arabic right, same level -->
+          <div class="customer-info-row">
+            <p class="customer-info-english">
+              Customer Phone: ${invoiceData.customer?.phone || ''}
+            </p>
+            <p class="customer-info-arabic">
+              ${invoiceData.customer?.phone || ''} :تليفون العميل
+            </p>
+          </div>
         </div>
       </div>
     </body>
