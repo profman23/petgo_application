@@ -2135,7 +2135,7 @@ export default function DoctorInvoice() {
               </div>
               
               {/* Light separator line */}
-              <div className="w-full h-px bg-purple-400 opacity-30 my-4"></div>
+              <div className="w-full h-px bg-purple-500 opacity-30 my-4"></div>
               
               {/* Customer Information Section */}
               <div className="text-left mb-4">

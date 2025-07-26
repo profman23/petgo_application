@@ -114,21 +114,14 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         }
         
         .date-text {
-          font-size: 18px;
+          font-size: 14px;
           font-weight: 600;
-          margin-bottom: 4px;
-        }
-        
-        .date-text-arabic {
-          font-size: 16px;
-          color: #666;
-          margin-top: 2px;
         }
         
         .separator-line {
           width: 100%;
           height: 1px;
-          background-color: #8B5CF6;
+          background-color: #a855f7;
           opacity: 0.3;
           margin: 16px 0;
         }
@@ -139,13 +132,13 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         }
         
         .customer-info-text {
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
           margin-bottom: 4px;
         }
         
         .customer-info-text-arabic {
-          font-size: 14px;
+          font-size: 12px;
           color: #666;
           margin-bottom: 8px;
         }
@@ -175,9 +168,6 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <div class="date-section">
             <p class="date-text">
               <strong>التاريخ:</strong> ${new Date().toLocaleDateString('en-US')}
-            </p>
-            <p class="date-text-arabic">
-              ${new Date().toLocaleDateString('ar-SA')}
             </p>
           </div>
           
