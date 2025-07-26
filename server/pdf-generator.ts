@@ -130,6 +130,13 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           margin-bottom: 20px;
         }
         
+        .thick-separator-line {
+          width: 100%;
+          height: 4px;
+          background-color: #8B2F8B;
+          margin-top: 16px;
+        }
+        
         .customer-info-row {
           display: flex;
           justify-content: space-between;
@@ -214,6 +221,9 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               ${invoiceData.customer?.phone || ''} :تليفون العميل
             </p>
           </div>
+          
+          <!-- Thick separator line after customer info -->
+          <div class="thick-separator-line"></div>
         </div>
       </div>
     </body>

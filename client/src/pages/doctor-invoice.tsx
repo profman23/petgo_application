@@ -2158,6 +2158,9 @@ export default function DoctorInvoice() {
                     {booking?.customerPhone || ''} :تليفون العميل
                   </p>
                 </div>
+                
+                {/* Thick separator line after customer info */}
+                <div className="w-full h-1 mt-4" style={{backgroundColor: '#8B2F8B'}}></div>
               </div>
             </div>
           </div>
