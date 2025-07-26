@@ -2122,7 +2122,7 @@ export default function DoctorInvoice() {
                 
                 {/* Logo in the center */}
                 <div className="flex-1 text-center">
-                  <div className="bg-purple-600 text-white h-16 w-48 mx-auto flex items-center justify-center rounded-lg font-bold text-lg">
+                  <div style={{backgroundColor: '#9333ea', color: 'white', height: '64px', width: '192px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', fontWeight: 'bold', fontSize: '18px'}}>
                     VETS VAN
                   </div>
                 </div>
