@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, Download, FileText, Calendar } from 'lucide-react';
-import { useLanguageStore } from '../lib/languageStore';
+import { useLanguage } from '../lib/i18n';
 
 interface Customer {
   firstName: string;
@@ -67,7 +67,7 @@ interface InvoiceGeneratorNewProps {
 }
 
 const InvoiceGeneratorNew: React.FC<InvoiceGeneratorNewProps> = ({ invoiceData, onClose }) => {
-  const { language } = useLanguageStore();
+  const { language } = useLanguage();
   const [isGenerating, setIsGenerating] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 

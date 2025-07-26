@@ -116,6 +116,7 @@ export default function DoctorInvoice() {
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState('');
+  const [applyDiscount, setApplyDiscount] = useState(false);
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -198,7 +199,7 @@ export default function DoctorInvoice() {
       return response;
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 
   // Fetch services for invoice item selection
@@ -209,7 +210,7 @@ export default function DoctorInvoice() {
       return response;
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
-    cacheTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 
   // Load saved invoice items when data is available
@@ -579,7 +580,7 @@ export default function DoctorInvoice() {
     try {
       await apiRequest(`/api/invoice-items/${booking.id}`, {
         method: 'POST',
-        body: { items: itemsToSave }
+        body: JSON.stringify({ items: itemsToSave })
       });
     } catch (error) {
       console.error('Error auto-saving invoice items:', error);
@@ -780,7 +781,7 @@ export default function DoctorInvoice() {
         // Update existing vitals
         await apiRequest(`/api/pet-vitals/${existingVitalId}`, {
           method: 'PUT',
-          body: vitalsPayload
+          body: JSON.stringify(vitalsPayload)
         });
         
         toast({
@@ -791,7 +792,7 @@ export default function DoctorInvoice() {
         // Create new vitals
         await apiRequest('/api/pet-vitals', {
           method: 'POST',
-          body: vitalsPayload
+          body: JSON.stringify(vitalsPayload)
         });
         
         toast({
@@ -846,19 +847,19 @@ export default function DoctorInvoice() {
       // Save invoice items to database
       await apiRequest(`/api/invoice-items/${booking.id}`, {
         method: 'POST',
-        body: { items: invoiceItems }
+        body: JSON.stringify({ items: invoiceItems })
       });
 
       // Save invoice status to database
       await apiRequest(`/api/invoice-status/${booking.id}`, {
         method: 'POST',
-        body: {
+        body: JSON.stringify({
           subtotal,
           taxAmount,
           discountAmount: totalDiscountAmount,
           finalTotal,
           notes
-        }
+        })
       });
 
       // Lock the record (make invoice items read-only)
