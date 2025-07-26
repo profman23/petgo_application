@@ -91,11 +91,18 @@ export default function Login() {
     onSuccess: (data) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      toast({
+      
+      // إظهار الإشعار مع اختفاء تلقائي بعد ثانية واحدة
+      const { dismiss } = toast({
         title: language === 'ar' ? 'تم تسجيل الدخول بنجاح' : 'Login Successful',
         description: language === 'ar' ? `مرحباً ${data.user.name}` : `Welcome ${data.user.name}`,
         variant: "default",
       });
+      
+      // إخفاء الإشعار تلقائياً بعد 1000ms (ثانية واحدة)
+      setTimeout(() => {
+        dismiss();
+      }, 1000);
       
       // Check if tutorial video should be shown
       if (shouldShowTutorialVideo()) {
