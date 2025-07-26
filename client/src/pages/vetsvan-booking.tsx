@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Calendar, Clock, CheckCircle, User, MapPin, Loader2, Bell } from 'lucide-react';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik__a-group-of-5-cheerful-cute-cartoonstyle-3d-pet-ani__58756_1753359168230.png";
+import requestDetailsIcon from "@assets/freepik__a-3d-cartoonstyle-logo-with-a-green-circular-base-__69154_1753523660424.png";
 import { VetsVanAvailabilityTable } from '@/components/vetsvan-availability-table';
 import { useCustomerLocation } from '@/hooks/useCustomerLocation';
 
@@ -61,6 +62,14 @@ export default function VetsVanBooking() {
   const [selectedVetsVan, setSelectedVetsVan] = useState<number | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedShift, setSelectedShift] = useState<number | null>(null);
+
+  // دالة لتحويل النص إلى Title Case (أول حرف من كل كلمة كبير)
+  const toTitleCase = (str: string) => {
+    if (!str) return str;
+    return str.replace(/\w\S*/g, (txt) => 
+      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    );
+  };
 
   // جلب بيانات الحيوانات الأليفة للعميل
   const { data: allPatients = [], isLoading: patientsLoading, error: patientsError } = useQuery({
@@ -520,7 +529,11 @@ export default function VetsVanBooking() {
               textAlign,
               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
             }}>
-              <User className="w-4 h-4 text-purple-600" />
+              <img 
+                src={requestDetailsIcon} 
+                alt="Request Details" 
+                className="w-4 h-4"
+              />
               {language === 'ar' ? 'تفاصيل الطلب' : 'Request Details'}
             </CardTitle>
           </CardHeader>
@@ -533,7 +546,7 @@ export default function VetsVanBooking() {
               <span className="text-gray-500">
                 {language === 'ar' ? 'نوع الخدمة: ' : 'Service Type: '}
               </span>
-              <span className="font-medium">{requestData.serviceType}</span>
+              <span className="font-medium">{toTitleCase(requestData.serviceType)}</span>
             </div>
             <div>
               <span className="text-gray-500">
