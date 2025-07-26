@@ -88,6 +88,13 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           padding: 32px;
         }
         
+        .header-section {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+        
         .date-section {
           text-align: left;
         }
@@ -97,16 +104,46 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           font-weight: 600;
         }
         
+        .logo-section {
+          flex: 1;
+          text-align: center;
+        }
+        
+        .logo-image {
+          height: 64px;
+          width: auto;
+          object-fit: contain;
+        }
+        
+        .spacer {
+          width: 192px;
+        }
+        
 
       </style>
     </head>
     <body>
       <div class="invoice-container">
-        <!-- Only Date on the left side -->
-        <div class="date-section">
-          <p class="date-text">
-            <strong>${isArabic ? 'التاريخ:' : 'Date:'}</strong> ${new Date().toLocaleDateString(isArabic ? 'ar-SA' : 'en-US')}
-          </p>
+        <!-- Header with Date (left) and Logo (center) -->
+        <div class="header-section">
+          <!-- Date on the left -->
+          <div class="date-section">
+            <p class="date-text">
+              <strong>${isArabic ? 'التاريخ:' : 'Date:'}</strong> ${new Date().toLocaleDateString(isArabic ? 'ar-SA' : 'en-US')}
+            </p>
+          </div>
+          
+          <!-- Logo in the center -->
+          <div class="logo-section">
+            <img 
+              src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAEsASwDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAor//Z" 
+              alt="Vets Van Logo" 
+              class="logo-image"
+            />
+          </div>
+          
+          <!-- Empty space to balance the layout -->
+          <div class="spacer"></div>
         </div>
       </div>
     </body>

@@ -2111,11 +2111,26 @@ export default function DoctorInvoice() {
           {/* Invoice Preview Content - Simplified */}
           <div className="invoice-preview" style={{ direction: getDirection(language) }}>
             <div className="bg-white p-8 rounded-lg border shadow-sm">
-              {/* Only Date on the left side */}
-              <div className="text-left">
-                <p className="text-lg font-semibold">
-                  <strong>{language === 'ar' ? 'التاريخ:' : 'Date:'}</strong> {new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                </p>
+              {/* Header with Date (left) and Logo (center) */}
+              <div className="flex justify-between items-center mb-4">
+                {/* Date on the left */}
+                <div className="text-left">
+                  <p className="text-lg font-semibold">
+                    <strong>{language === 'ar' ? 'التاريخ:' : 'Date:'}</strong> {new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                  </p>
+                </div>
+                
+                {/* Logo in the center */}
+                <div className="flex-1 text-center">
+                  <img 
+                    src="/attached_assets/IMG-20250415-WA0047_1751986059751.jpg" 
+                    alt="Vets Van Logo" 
+                    className="h-16 w-auto mx-auto object-contain"
+                  />
+                </div>
+                
+                {/* Empty space to balance the layout */}
+                <div className="w-48"></div>
               </div>
             </div>
           </div>
