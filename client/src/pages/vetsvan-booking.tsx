@@ -532,7 +532,7 @@ export default function VetsVanBooking() {
               <img 
                 src={requestDetailsIcon} 
                 alt="Request Details" 
-                className="w-4 h-4"
+                className="w-6 h-6"
               />
               {language === 'ar' ? 'تفاصيل الطلب' : 'Request Details'}
             </CardTitle>
