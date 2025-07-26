@@ -2162,6 +2162,40 @@ export default function DoctorInvoice() {
                 {/* Thick separator line after customer info */}
                 <div className="w-full h-1 mt-4" style={{backgroundColor: '#8B2F8B'}}></div>
               </div>
+
+              {/* Invoice Items Header Table */}
+              <div className="mt-4">
+                <div className="grid grid-cols-7 gap-1 border-b pb-2 mb-2" style={{borderColor: '#8B2F8B'}}>
+                  <div className="text-center">
+                    <p className="text-xs font-semibold text-gray-800">Item Description</p>
+                    <p className="text-xs text-gray-600">الصنف</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-semibold text-gray-800">Quantity</p>
+                    <p className="text-xs text-gray-600">الكمية</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-semibold text-gray-800">Unit Price</p>
+                    <p className="text-xs text-gray-600">سعر الوحدة</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-semibold text-gray-800">Discount</p>
+                    <p className="text-xs text-gray-600">الخصم</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-semibold text-gray-800">VAT</p>
+                    <p className="text-xs text-gray-600">الضريبة</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-semibold text-gray-800">Total B.Vat</p>
+                    <p className="text-xs text-gray-600">المجموع قبل الضريبة</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-semibold text-gray-800">Total A.Vat</p>
+                    <p className="text-xs text-gray-600">المجموع بعد الضريبة</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </DialogContent>

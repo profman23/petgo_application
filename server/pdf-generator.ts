@@ -137,6 +137,43 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           margin-top: 16px;
         }
         
+        .invoice-items-header {
+          margin-top: 20px;
+          border-bottom: 2px solid #8B2F8B;
+          padding-bottom: 12px;
+          margin-bottom: 12px;
+        }
+        
+        .header-table {
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+        }
+        
+        .header-row {
+          display: table-row;
+        }
+        
+        .header-cell {
+          display: table-cell;
+          text-align: center;
+          vertical-align: top;
+          width: 14.28%; /* 100/7 columns */
+          padding: 4px;
+        }
+        
+        .header-english {
+          font-size: 10px;
+          font-weight: bold;
+          color: #374151;
+          margin-bottom: 2px;
+        }
+        
+        .header-arabic {
+          font-size: 9px;
+          color: #6B7280;
+        }
+        
         .customer-info-row {
           display: flex;
           justify-content: space-between;
@@ -224,6 +261,42 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           
           <!-- Thick separator line after customer info -->
           <div class="thick-separator-line"></div>
+        </div>
+
+        <!-- Invoice Items Header Table -->
+        <div class="invoice-items-header">
+          <div class="header-table">
+            <div class="header-row">
+              <div class="header-cell">
+                <div class="header-english">Item Description</div>
+                <div class="header-arabic">الصنف</div>
+              </div>
+              <div class="header-cell">
+                <div class="header-english">Quantity</div>
+                <div class="header-arabic">الكمية</div>
+              </div>
+              <div class="header-cell">
+                <div class="header-english">Unit Price</div>
+                <div class="header-arabic">سعر الوحدة</div>
+              </div>
+              <div class="header-cell">
+                <div class="header-english">Discount</div>
+                <div class="header-arabic">الخصم</div>
+              </div>
+              <div class="header-cell">
+                <div class="header-english">VAT</div>
+                <div class="header-arabic">الضريبة</div>
+              </div>
+              <div class="header-cell">
+                <div class="header-english">Total B.Vat</div>
+                <div class="header-arabic">المجموع قبل الضريبة</div>
+              </div>
+              <div class="header-cell">
+                <div class="header-english">Total A.Vat</div>
+                <div class="header-arabic">المجموع بعد الضريبة</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </body>
