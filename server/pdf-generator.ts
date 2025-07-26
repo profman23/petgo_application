@@ -116,6 +116,38 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         .date-text {
           font-size: 18px;
           font-weight: 600;
+          margin-bottom: 4px;
+        }
+        
+        .date-text-arabic {
+          font-size: 16px;
+          color: #666;
+          margin-top: 2px;
+        }
+        
+        .separator-line {
+          width: 100%;
+          height: 1px;
+          background-color: #8B5CF6;
+          opacity: 0.3;
+          margin: 16px 0;
+        }
+        
+        .customer-info-section {
+          text-align: left;
+          margin-bottom: 20px;
+        }
+        
+        .customer-info-text {
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+        
+        .customer-info-text-arabic {
+          font-size: 14px;
+          color: #666;
+          margin-bottom: 8px;
         }
         
         .logo-section {
@@ -168,16 +200,16 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         <!-- Customer Information Section -->
         <div class="customer-info-section">
           <p class="customer-info-text">
-            <strong>اسم العميل:</strong> ${booking.customer.firstName} ${booking.customer.lastName}
+            <strong>اسم العميل:</strong> ${invoiceData.customer?.firstName || ''} ${invoiceData.customer?.lastName || ''}
           </p>
           <p class="customer-info-text-arabic">
-            Customer Name: ${booking.customer.firstName} ${booking.customer.lastName}
+            Customer Name: ${invoiceData.customer?.firstName || ''} ${invoiceData.customer?.lastName || ''}
           </p>
           <p class="customer-info-text">
-            <strong>تليفون العميل:</strong> ${booking.customer.phone}
+            <strong>تليفون العميل:</strong> ${invoiceData.customer?.phone || ''}
           </p>
           <p class="customer-info-text-arabic">
-            Customer Phone: ${booking.customer.phone}
+            Customer Phone: ${invoiceData.customer?.phone || ''}
           </p>
         </div>
       </div>
