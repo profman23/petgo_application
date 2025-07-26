@@ -198,10 +198,10 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <!-- Name row - English left, Arabic right, same level -->
           <div class="customer-info-row">
             <p class="customer-info-english">
-              Customer Name: ${invoiceData.customer?.name || ''}
+              Customer Name: ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
             </p>
             <p class="customer-info-arabic">
-              ${invoiceData.customer?.name || ''} :اسم العميل
+              ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''} :اسم العميل
             </p>
           </div>
           
