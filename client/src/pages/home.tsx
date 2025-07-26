@@ -980,9 +980,9 @@ export default function Home() {
 
 
       
-      {/* Location Permission Modal */}
+      {/* Location Permission Modal - Hidden from customer view while preserving functionality */}
       <LocationPermissionModal
-        isOpen={showLocationModal}
+        isOpen={false}
         onClose={handleLocationPermissionSkip}
         onAllow={handleLocationPermissionAllow}
       />
