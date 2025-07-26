@@ -36,23 +36,23 @@ const InvoiceView = () => {
   });
 
   const booking = invoiceData?.booking;
-  const items = invoiceData?.invoiceItems || invoiceData?.generatedInvoice?.items || [];
+  const items = invoiceData?.invoiceItems || [];
   const isGenerated = invoiceData?.isGenerated || false;
 
   useEffect(() => {
-    if (items && items.length > 0) {
+    if (items) {
       setInvoiceItems(items);
     }
-  }, [items.length]); // Use items.length instead of items array
+  }, [items]);
 
   useEffect(() => {
     if (invoiceData?.invoiceStatus) {
       setInvoiceStatus(invoiceData.invoiceStatus);
     }
-  }, [invoiceData?.invoiceStatus?.id]); // Use specific property
+  }, [invoiceData]);
 
   useEffect(() => {
-    if (booking && booking.id) {
+    if (booking) {
       // Set doctor info based on booking
       const doctorData = {
         name: booking.vetsVan?.name || 'VETS VAN Doctor',
@@ -63,7 +63,7 @@ const InvoiceView = () => {
       };
       setDoctorInfo(doctorData);
     }
-  }, [booking?.id, language]); // Use booking.id instead of booking object
+  }, [booking, language]);
 
   const translations = {
     ar: {

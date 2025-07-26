@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, Download } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -35,8 +35,6 @@ interface Booking {
     address?: string;
   };
   createdAt: string;
-  hasInvoice?: boolean;
-  invoiceNumber?: string;
 }
 
 export default function CustomerActivity() {
@@ -85,13 +83,6 @@ export default function CustomerActivity() {
   const { data: userReviews = [] } = useQuery<any[]>({
     queryKey: ['/api/user/reviews'],
     retry: false,
-  });
-
-  // Fetch invoice statuses for all bookings to show invoice links
-  const { data: invoiceStatuses = [] } = useQuery<any[]>({
-    queryKey: ['/api/user/invoice-statuses'],
-    retry: false,
-    staleTime: 60000, // 1 minute
   });
 
 
@@ -178,57 +169,6 @@ export default function CustomerActivity() {
   // Check if booking has been reviewed
   const isBookingReviewed = (bookingId: number) => {
     return userReviews.some((review: any) => review.bookingId === bookingId);
-  };
-
-  // Check if booking has generated invoice
-  const getBookingInvoice = (bookingId: number) => {
-    return invoiceStatuses.find((status: any) => status.bookingId === bookingId && status.isGenerated);
-  };
-
-  // Download invoice directly
-  const downloadInvoice = async (bookingId: number, invoiceNumber: string) => {
-    try {
-      // Make API call to download invoice
-      const response = await fetch(`/api/download-invoice/${bookingId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to download invoice');
-      }
-
-      // Get the PDF blob
-      const blob = await response.blob();
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Invoice_${invoiceNumber}.pdf`;
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      
-      // Cleanup
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      toast({
-        title: language === 'ar' ? 'تم التحميل' : 'Downloaded',
-        description: language === 'ar' ? 'تم تحميل الفاتورة - ستفتح نافذة الطباعة تلقائياً' : 'Invoice downloaded - Print dialog will open automatically',
-      });
-    } catch (error) {
-      console.error('Error downloading invoice:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ' : 'Error',
-        description: language === 'ar' ? 'فشل في تحميل الفاتورة' : 'Failed to download invoice',
-        variant: 'destructive',
-      });
-    }
   };
 
   // Open tracking dialog
@@ -519,21 +459,6 @@ export default function CustomerActivity() {
                                   {language === 'ar' ? 'تتبع الوصول' : 'Track Arrival'}
                                 </Button>
                               )}
-
-                              {/* Invoice Download Button for Generated Invoices */}
-                              {(() => {
-                                const invoiceData = getBookingInvoice(booking.id);
-                                return invoiceData && invoiceData.invoiceNumber ? (
-                                  <Button
-                                    onClick={() => downloadInvoice(booking.id, invoiceData.invoiceNumber)}
-                                    variant="outline"
-                                    className="w-full font-semibold py-2 px-4 text-purple-600 border-purple-200 hover:bg-purple-50"
-                                  >
-                                    <Download className="w-4 h-4 mr-2" />
-                                    {language === 'ar' ? 'تحميل الفاتورة' : 'Download Invoice'}
-                                  </Button>
-                                ) : null;
-                              })()}
 
                               {/* Rate Service Button for Completed Services */}
                               {booking.status === 'completed' && (
