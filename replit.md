@@ -789,7 +789,9 @@ Changelog:
 - July 26, 2025. UPDATED: InvoiceGenerator.tsx to use PDF API instead of HTML blob generation
 - July 26, 2025. UPDATED: InvoiceGeneratorNew.tsx to use PDF API instead of HTML blob generation
 - July 26, 2025. RESOLVED: User reported HTML download issue - all invoice components now consistently generate PDF files
-- July 26, 2025. SUCCESS: Unified PDF download system across all invoice components (InvoiceGenerator, InvoiceGeneratorNew, InvoiceGeneratorProfessional) 2025. SUCCESS: PDF system fully operational with professional formatting and bilingual layout support
+- July 26, 2025. SUCCESS: Unified PDF download system across all invoice components (InvoiceGenerator, InvoiceGeneratorNew, InvoiceGeneratorProfessional)
+- July 26, 2025. FIXED: Puppeteer Chrome dependencies issue - installed system Chromium and configured proper executable path
+- July 26, 2025. CONFIGURED: Puppeteer to use Nix-store Chromium with headless mode and required security flags for Replit environment 2025. SUCCESS: PDF system fully operational with professional formatting and bilingual layout support
 - July 23, 2025. COMPLETED: Dynamic validation schemas for login/register forms that display error messages in the selected system language (Arabic/English)
 - July 23, 2025. FIXED: Login screen error messages now properly localized - shows English errors when English is selected, Arabic when Arabic is selected
 - July 22, 2025. COMPLETED: Comprehensive Comic Relief font standardization across all customer interface screens

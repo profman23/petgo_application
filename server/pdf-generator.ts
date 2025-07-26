@@ -1,5 +1,4 @@
 import puppeteer from 'puppeteer';
-import { InvoiceData } from './types';
 
 export const generateInvoicePDF = async (invoiceData: any): Promise<Buffer> => {
   let browser;
@@ -7,7 +6,20 @@ export const generateInvoicePDF = async (invoiceData: any): Promise<Buffer> => {
   try {
     browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+      executablePath: '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+        '--single-process',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding'
+      ]
     });
     
     const page = await browser.newPage();
@@ -32,7 +44,7 @@ export const generateInvoicePDF = async (invoiceData: any): Promise<Buffer> => {
       preferCSSPageSize: true
     });
     
-    return pdfBuffer;
+    return Buffer.from(pdfBuffer);
     
   } catch (error) {
     console.error('Error generating PDF:', error);
