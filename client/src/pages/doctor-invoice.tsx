@@ -2195,6 +2195,33 @@ export default function DoctorInvoice() {
                     <p className="text-xs text-gray-600">المجموع بعد الضريبة</p>
                   </div>
                 </div>
+
+                {/* Invoice Items Data Rows */}
+                {invoiceItems.map((item, index) => (
+                  <div key={index} className="grid grid-cols-7 gap-1 py-2 border-b border-gray-200">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-700">{item.description}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-700">{item.quantity}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-700">{item.unitPrice} SAR</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-700">{item.discount} SAR</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-700">{item.vatAmount} SAR</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-700">{item.totalBeforeVat} SAR</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-700">{item.totalAfterVat} SAR</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

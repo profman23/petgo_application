@@ -174,6 +174,27 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           color: #6B7280;
         }
         
+        .items-data-table {
+          display: table;
+          width: 100%;
+          table-layout: fixed;
+        }
+        
+        .data-row {
+          display: table-row;
+          border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .data-cell {
+          display: table-cell;
+          text-align: center;
+          vertical-align: middle;
+          width: 14.28%; /* 100/7 columns */
+          padding: 8px 4px;
+          font-size: 9px;
+          color: #374151;
+        }
+        
         .customer-info-row {
           display: flex;
           justify-content: space-between;
@@ -297,6 +318,21 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Invoice Items Data Table -->
+        <div class="items-data-table">
+          ${invoiceData.items?.map(item => `
+            <div class="data-row">
+              <div class="data-cell">${item.description || ''}</div>
+              <div class="data-cell">${item.quantity || ''}</div>
+              <div class="data-cell">${item.unitPrice || ''} SAR</div>
+              <div class="data-cell">${item.discount || ''} SAR</div>
+              <div class="data-cell">${item.vatAmount || ''} SAR</div>
+              <div class="data-cell">${item.totalBeforeVat || ''} SAR</div>
+              <div class="data-cell">${item.totalAfterVat || ''} SAR</div>
+            </div>
+          `).join('') || ''}
         </div>
       </div>
     </body>
