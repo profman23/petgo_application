@@ -2138,19 +2138,30 @@ export default function DoctorInvoice() {
               <div className="w-full h-px opacity-30 my-4" style={{backgroundColor: '#8B2F8B'}}></div>
               
               {/* Customer Information Section */}
-              <div className="text-left mb-4">
-                <p className="text-xs font-semibold mb-1">
-                  <strong>اسم العميل:</strong> {booking?.customerName || ''}
-                </p>
-                <p className="text-xs text-gray-600 mb-2">
-                  Customer Name: {booking?.customerName || ''}
-                </p>
-                <p className="text-xs font-semibold mb-1">
-                  <strong>تليفون العميل:</strong> {booking?.customerPhone || ''}
-                </p>
-                <p className="text-xs text-gray-600 mb-2">
-                  Customer Phone: {booking?.customerPhone || ''}
-                </p>
+              <div className="mb-4">
+                {/* Arabic sections - Right aligned */}
+                <div className="text-right mb-1">
+                  <p className="text-xs font-semibold text-black">
+                    <strong>اسم العميل:</strong> {booking?.customerName || ''}
+                  </p>
+                </div>
+                <div className="text-right mb-2">
+                  <p className="text-xs font-semibold text-black">
+                    <strong>تليفون العميل:</strong> {booking?.customerPhone || ''}
+                  </p>
+                </div>
+                
+                {/* English sections - Left aligned */}
+                <div className="text-left mb-1">
+                  <p className="text-xs text-gray-500">
+                    Customer Name: {booking?.customerName || ''}
+                  </p>
+                </div>
+                <div className="text-left mb-2">
+                  <p className="text-xs text-gray-500">
+                    Customer Phone: {booking?.customerPhone || ''}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
