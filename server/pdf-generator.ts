@@ -142,7 +142,10 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <!-- Date on the left -->
           <div class="date-section">
             <p class="date-text">
-              <strong>${isArabic ? 'التاريخ:' : 'Date:'}</strong> ${new Date().toLocaleDateString(isArabic ? 'ar-SA' : 'en-US')}
+              <strong>التاريخ:</strong> ${new Date().toLocaleDateString('en-US')}
+            </p>
+            <p class="date-text-arabic">
+              ${new Date().toLocaleDateString('ar-SA')}
             </p>
           </div>
           
@@ -157,6 +160,25 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               alt="Vets Van Logo" 
             />
           </div>
+        </div>
+        
+        <!-- Light separator line -->
+        <div class="separator-line"></div>
+        
+        <!-- Customer Information Section -->
+        <div class="customer-info-section">
+          <p class="customer-info-text">
+            <strong>اسم العميل:</strong> ${booking.customer.firstName} ${booking.customer.lastName}
+          </p>
+          <p class="customer-info-text-arabic">
+            Customer Name: ${booking.customer.firstName} ${booking.customer.lastName}
+          </p>
+          <p class="customer-info-text">
+            <strong>تليفون العميل:</strong> ${booking.customer.phone}
+          </p>
+          <p class="customer-info-text-arabic">
+            Customer Phone: ${booking.customer.phone}
+          </p>
         </div>
       </div>
     </body>
