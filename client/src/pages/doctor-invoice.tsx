@@ -2122,11 +2122,9 @@ export default function DoctorInvoice() {
                 
                 {/* Logo in the center */}
                 <div className="flex-1 text-center">
-                  <img 
-                    src="/attached_assets/IMG-20250415-WA0047_1751986059751.jpg" 
-                    alt="Vets Van Logo" 
-                    className="h-16 w-auto mx-auto object-contain"
-                  />
+                  <div className="bg-purple-600 text-white h-16 w-48 mx-auto flex items-center justify-center rounded-lg font-bold text-lg">
+                    VETS VAN
+                  </div>
                 </div>
                 
                 {/* Empty space to balance the layout */}
