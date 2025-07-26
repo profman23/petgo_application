@@ -2413,8 +2413,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         invoiceStatus = await storage.getInvoiceStatus(bookingId);
       }
 
-      // Generate compact PDF-ready HTML content
-      const invoiceHTML = generateCompactPDFHTML(booking, invoiceItems, invoiceStatus);
+      // Generate invoice HTML using existing function
+      const invoiceHTML = generateInvoiceHTML(booking, invoiceItems, invoiceStatus);
       
       // Set response headers for PDF download
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -2429,7 +2429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Helper function to generate invoice HTML
+  // Helper function to generate professional invoice HTML matching doctor interface
   function generateInvoiceHTML(booking: any, invoiceItems: any[], invoiceStatus: any) {
     const subtotal = invoiceItems.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
     const taxRate = 0.15;
@@ -2439,242 +2439,480 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     return `
       <!DOCTYPE html>
-      <html>
+      <html dir="ltr">
       <head>
         <meta charset="utf-8">
         <title>Invoice ${invoiceStatus?.invoiceNumber || booking.id}</title>
-        <style>
-          @media print {
-            body { margin: 0; }
-            .invoice-container { box-shadow: none; margin: 0; padding: 20px; }
+        <script>
+          // Auto-trigger print dialog after page loads
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+            }, 1000);
           }
           
-          body { 
-            font-family: Arial, sans-serif; 
-            margin: 0; 
-            padding: 20px; 
-            background: white;
-            line-height: 1.4;
+          function printToPDF() {
+            window.print();
           }
+        </script>
+        <style>
+          /* Professional VETS VAN Invoice Styles - Matching Doctor Interface */
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          
+          body { 
+            font-family: "Comic Relief", Arial, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+            padding: 20px;
+          }
+          
           .invoice-container { 
-            max-width: 800px; 
+            max-width: 210mm;
+            min-height: 297mm;
             margin: 0 auto; 
             background: white; 
-            padding: 30px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            position: relative;
           }
-          .header { 
-            text-align: center; 
-            margin-bottom: 30px; 
-            border-bottom: 2px solid #8B2F8B;
-            padding-bottom: 20px;
+          
+          .print-instruction {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8B2F8B 0%, #A855F7 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(139, 47, 139, 0.3);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
           }
-          .company-name { 
-            font-size: 32px; 
-            font-weight: bold; 
-            color: #8B2F8B; 
+          
+          .print-instruction:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(139, 47, 139, 0.4);
+          }
+          
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+          }
+          
+          /* Header Section */
+          .invoice-header {
+            background: linear-gradient(135deg, #8B2F8B 0%, #A855F7 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+          }
+          
+          .invoice-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s infinite linear;
+          }
+          
+          @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-50px, -50px); }
+          }
+          
+          .company-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+          }
+          
+          .company-name {
+            font-size: 42px;
+            font-weight: 900;
             margin-bottom: 10px;
-            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 3px;
+            position: relative;
+            z-index: 1;
           }
+          
           .company-subtitle {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 20px;
+            font-size: 18px;
+            opacity: 0.9;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
           }
-          .invoice-info { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 30px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
+          
+          /* Invoice Info Section */
+          .invoice-details {
+            padding: 30px 40px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-bottom: 4px solid #8B2F8B;
           }
-          .invoice-info div {
-            flex: 1;
+          
+          .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
           }
-          .section { 
-            margin-bottom: 25px; 
-            padding: 20px; 
-            border: 2px solid #e5e7eb; 
-            border-radius: 8px;
-            background: #fefefe;
-          }
-          .section-title { 
-            font-size: 20px; 
-            font-weight: bold; 
-            margin-bottom: 15px; 
+          
+          .detail-section h3 {
             color: #8B2F8B;
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: 700;
             border-bottom: 2px solid #8B2F8B;
-            padding-bottom: 10px;
-            text-transform: uppercase;
+            padding-bottom: 8px;
           }
-          .info-row { 
-            margin-bottom: 10px; 
-            display: flex; 
+          
+          .detail-item {
+            display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(139, 47, 139, 0.1);
           }
-          .label { 
-            font-weight: bold; 
-            color: #374151;
-            min-width: 120px;
+          
+          .detail-label {
+            font-weight: 600;
+            color: #475569;
           }
-          .value { 
-            color: #6b7280;
+          
+          .detail-value {
+            font-weight: 500;
+            color: #1e293b;
             text-align: right;
           }
-          .items-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 15px;
+          
+          /* Content Sections */
+          .content-section {
+            padding: 40px;
+          }
+          
+          .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #8B2F8B;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #8B2F8B;
+            position: relative;
+          }
+          
+          .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #A855F7 0%, #EC4899 100%);
+          }
+          
+          /* Pet Information */
+          .pet-card {
+            background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%);
+            border: 2px solid #8B2F8B;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+          }
+          
+          .pet-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #8B2F8B;
+            margin-bottom: 10px;
+          }
+          
+          /* Service Items Table */
+          .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+          }
+          
+          .services-table th {
+            background: linear-gradient(135deg, #8B2F8B 0%, #A855F7 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: left;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             font-size: 14px;
           }
-          .items-table th, .items-table td { 
-            border: 2px solid #e5e7eb; 
-            padding: 15px; 
-            text-align: left;
+          
+          .services-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 500;
           }
-          .items-table th { 
-            background: #8B2F8B; 
-            font-weight: bold; 
-            color: white;
-            text-transform: uppercase;
+          
+          .services-table tr:nth-child(even) {
+            background: #f8fafc;
           }
-          .items-table tr:nth-child(even) {
-            background: #f8f9fa;
+          
+          .services-table tr:hover {
+            background: #f1f5f9;
           }
-          .totals { 
-            margin-top: 30px; 
-            text-align: right;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            border: 2px solid #e5e7eb;
+          
+          /* Totals Section */
+          .totals-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #8B2F8B;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
           }
-          .total-row { 
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 10px; 
+          
+          .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
             padding: 8px 0;
             font-size: 16px;
+            font-weight: 600;
           }
-          .total-final { 
-            border-top: 3px solid #8B2F8B; 
-            padding-top: 15px; 
-            font-size: 22px; 
-            font-weight: bold; 
-            color: #8B2F8B;
-            background: white;
-            margin: 10px -20px -20px -20px;
-            padding: 20px;
+          
+          .total-label {
+            color: #475569;
           }
-          .footer { 
-            margin-top: 40px; 
-            text-align: center; 
-            color: #6b7280; 
-            font-size: 14px;
-            border-top: 1px solid #e5e7eb;
+          
+          .total-value {
+            color: #1e293b;
+            font-weight: 700;
+          }
+          
+          .final-total {
+            border-top: 3px solid #8B2F8B;
             padding-top: 20px;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(139, 47, 139, 0.1);
           }
-          .print-instruction {
-            text-align: center;
+          
+          .final-total .total-label,
+          .final-total .total-value {
+            font-size: 24px;
+            font-weight: 900;
             color: #8B2F8B;
-            font-weight: bold;
-            margin-bottom: 20px;
-            font-size: 18px;
           }
-          @media screen {
-            .print-instruction:after {
-              content: " - Press Ctrl+P to save as PDF";
+          
+          /* Footer */
+          .invoice-footer {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+          }
+          
+          .footer-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+          }
+          
+          .footer-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+          }
+          
+          .footer-contact {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.8;
+          }
+          
+          /* Print Styles */
+          @media print {
+            body { 
+              background: white; 
+              padding: 0; 
             }
+            
+            .invoice-container { 
+              box-shadow: none; 
+              margin: 0; 
+              border-radius: 0;
+            }
+            
+            .print-instruction { 
+              display: none; 
+            }
+            
+            .invoice-header::before {
+              display: none;
+            }
+          }
+          
+          @page {
+            size: A4;
+            margin: 10mm;
           }
         </style>
       </head>
       <body>
+        <div class="print-instruction" onclick="printToPDF()">🖨️ PRINT TO PDF</div>
         <div class="invoice-container">
-          <div class="print-instruction">INVOICE DOCUMENT</div>
-          <div class="header">
+          <!-- Header Section -->
+          <div class="invoice-header">
             <div class="company-name">VETS VAN</div>
             <div class="company-subtitle">Mobile Veterinary Services</div>
           </div>
 
-          <div class="invoice-info">
-            <div>
-              <strong>Invoice #:</strong> ${invoiceStatus?.invoiceNumber || `INV-${booking.id}`}<br>
-              <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
-              <strong>VetsVan:</strong> ${booking.vetsVan?.name || 'VETS VAN'}
-            </div>
-            <div>
-              <strong>Customer:</strong> ${booking.customerName || 'N/A'}<br>
-              <strong>Phone:</strong> ${booking.customerPhone || 'N/A'}<br>
-              <strong>Service Date:</strong> ${new Date(booking.appointmentDate).toLocaleDateString()}
+          <!-- Invoice Details Section -->
+          <div class="invoice-details">
+            <div class="details-grid">
+              <div class="detail-section">
+                <h3>Invoice Information</h3>
+                <div class="detail-item">
+                  <span class="detail-label">Invoice Number:</span>
+                  <span class="detail-value">${invoiceStatus?.invoiceNumber || booking.id}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Date:</span>
+                  <span class="detail-value">${invoiceStatus?.generatedAt ? new Date(invoiceStatus.generatedAt).toLocaleDateString() : new Date().toLocaleDateString()}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Booking ID:</span>
+                  <span class="detail-value">${booking.id}</span>
+                </div>
+              </div>
+              <div class="detail-section">
+                <h3>Customer Information</h3>
+                <div class="detail-item">
+                  <span class="detail-label">Name:</span>
+                  <span class="detail-value">${booking.user.firstName} ${booking.user.lastName}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Phone:</span>
+                  <span class="detail-value">${booking.user.phone}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Email:</span>
+                  <span class="detail-value">${booking.user.email || 'N/A'}</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div class="section">
-            <div class="section-title">Pet Information</div>
-            ${booking.selectedPets?.map((pet: any) => `
-              <div class="info-row">
-                <span class="label">Pet Name:</span>
-                <span class="value">${pet.name}</span>
+          <!-- Pet Information Section -->
+          ${booking.pets && booking.pets.length > 0 ? `
+          <div class="content-section">
+            <h2 class="section-title">Pet Information</h2>
+            ${booking.pets.map(pet => `
+              <div class="pet-card">
+                <div class="pet-name">🐾 ${pet.name}</div>
+                <div class="detail-item">
+                  <span class="detail-label">Type:</span>
+                  <span class="detail-value">${pet.type}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Age:</span>
+                  <span class="detail-value">${pet.ageYear || 0} Years, ${pet.ageMonth || 0} Months, ${pet.ageDay || 0} Days</span>
+                </div>
               </div>
-              <div class="info-row">
-                <span class="label">Type:</span>
-                <span class="value">${pet.type}</span>
-              </div>
-              <div class="info-row">
-                <span class="label">Age:</span>
-                <span class="value">${pet.ageYear || 0}Y ${pet.ageMonth || 0}M ${pet.ageDay || 0}D</span>
-              </div>
-            `).join('') || 'No pet information available'}
+            `).join('')}
           </div>
+          ` : ''}
 
-          <div class="section">
-            <div class="section-title">Service Details</div>
-            <table class="items-table">
+          <!-- Service Details Section -->
+          <div class="content-section">
+            <h2 class="section-title">Service Details</h2>
+            <table class="services-table">
               <thead>
                 <tr>
                   <th>Description</th>
                   <th>Quantity</th>
-                  <th>Unit Price (SAR)</th>
-                  <th>Total (SAR)</th>
+                  <th>Unit Price</th>
+                  <th>Total</th>
                 </tr>
               </thead>
               <tbody>
-                ${invoiceItems.map(item => `
+                ${invoiceItems.length > 0 ? invoiceItems.map(item => `
                   <tr>
-                    <td>${item.description}</td>
-                    <td>${item.quantity}</td>
-                    <td>${parseFloat(item.unitPrice || 0).toFixed(2)}</td>
-                    <td>${parseFloat(item.total || 0).toFixed(2)}</td>
+                    <td>${item.description || 'Veterinary Service'}</td>
+                    <td>${item.quantity || 1}</td>
+                    <td>${parseFloat(item.unitPrice || 0).toFixed(2)} SAR</td>
+                    <td>${parseFloat(item.total || 0).toFixed(2)} SAR</td>
                   </tr>
-                `).join('')}
+                `).join('') : `
+                  <tr>
+                    <td>General Veterinary Service</td>
+                    <td>1</td>
+                    <td>0.00 SAR</td>
+                    <td>0.00 SAR</td>
+                  </tr>
+                `}
               </tbody>
             </table>
+
+            <!-- Totals Section -->
+            <div class="totals-section">
+              ${(() => {
+                const subtotal = invoiceItems.reduce((sum, item) => sum + parseFloat(item.total || 0), 0);
+                const taxAmount = subtotal * 0.15;
+                const discountAmount = 0; // No discount by default
+                const finalTotal = subtotal + taxAmount - discountAmount;
+                
+                return `
+                  <div class="total-row">
+                    <span class="total-label">Subtotal:</span>
+                    <span class="total-value">${subtotal.toFixed(2)} SAR</span>
+                  </div>
+                  <div class="total-row">
+                    <span class="total-label">Tax (15%):</span>
+                    <span class="total-value">${taxAmount.toFixed(2)} SAR</span>
+                  </div>
+                  <div class="total-row">
+                    <span class="total-label">Discount:</span>
+                    <span class="total-value">${discountAmount.toFixed(2)} SAR</span>
+                  </div>
+                  <div class="total-row final-total">
+                    <span class="total-label">TOTAL AMOUNT:</span>
+                    <span class="total-value">${finalTotal.toFixed(2)} SAR</span>
+                  </div>
+                `;
+              })()}
+            </div>
           </div>
 
-          <div class="totals">
-            <div class="total-row">
-              <span>Subtotal:</span>
-              <span>${subtotal.toFixed(2)} SAR</span>
+          <!-- Footer Section -->
+          <div class="invoice-footer">
+            <div class="footer-title">VETS VAN</div>
+            <div class="footer-subtitle">Mobile Veterinary Services</div>
+            <div class="footer-contact">
+              Thank you for choosing our professional veterinary services!<br>
+              For inquiries: contact@vetsvan.com | Phone: +966-920-XXX-XXX<br>
+              Visit us: www.vetsvan.com
             </div>
-            <div class="total-row">
-              <span>Tax (15%):</span>
-              <span>${taxAmount.toFixed(2)} SAR</span>
-            </div>
-            <div class="total-row">
-              <span>Discount:</span>
-              <span>-${discountAmount.toFixed(2)} SAR</span>
-            </div>
-            <div class="total-row total-final">
-              <span>Total:</span>
-              <span>${finalTotal.toFixed(2)} SAR</span>
-            </div>
-          </div>
-
-          <div class="footer">
-            <p>Thank you for choosing VETS VAN Mobile Veterinary Services</p>
-            <p>For any questions, please contact us at: +966 50 123 4567</p>
           </div>
         </div>
       </body>
