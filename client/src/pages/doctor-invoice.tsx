@@ -1941,6 +1941,7 @@ export default function DoctorInvoice() {
         <InvoiceGeneratorProfessional
           invoiceData={{
             bookingId: booking.id,
+            invoiceNumber: invoiceStatus?.invoiceNumber,
             customer: {
               firstName: booking.customerName?.split(' ')[0] || '',
               lastName: booking.customerName?.split(' ').slice(1).join(' ') || '',

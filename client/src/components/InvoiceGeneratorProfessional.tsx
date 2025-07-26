@@ -47,6 +47,7 @@ interface PaymentMethod {
 
 interface InvoiceData {
   bookingId: number;
+  invoiceNumber?: string;
   customer: Customer;
   pets: Pet[];
   appointmentDate: string;
@@ -118,7 +119,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     const generateQRCode = async () => {
       try {
         const qrData = {
-          invoice: `VETSVAN-${invoiceData.bookingId}`,
+          invoice: invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`,
           customer: `${invoiceData.customer.firstName} ${invoiceData.customer.lastName}`,
           total: invoiceData.total,
           date: invoiceData.appointmentDate,
@@ -157,7 +158,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
       <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
         <head>
           <meta charset="utf-8">
-          <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
+          <title>VETS VAN Invoice #${invoiceData.invoiceNumber || invoiceData.bookingId}</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { 
@@ -493,7 +494,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
         <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
           <head>
             <meta charset="utf-8">
-            <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
+            <title>VETS VAN Invoice #${invoiceData.invoiceNumber || invoiceData.bookingId}</title>
             <style>
               /* Include all the print styles here */
               * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -511,7 +512,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `VETSVAN-Invoice-${invoiceData.bookingId}.html`;
+      link.download = `VETSVAN-Invoice-${invoiceData.invoiceNumber || invoiceData.bookingId}.html`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -595,7 +596,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             
             <div className="invoice-details text-center">
               <div className="invoice-number text-2xl font-bold text-purple-600 mb-2">
-                {language === 'ar' ? 'فاتورة رقم' : 'Invoice'} #VETSVAN-{invoiceData.bookingId}
+                {language === 'ar' ? 'فاتورة رقم' : 'Invoice'} #{invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
               </div>
               <div className="invoice-date text-gray-600 mb-2 flex items-center justify-center">
                 <Calendar className="h-4 w-4 mr-2 text-purple-600" />
