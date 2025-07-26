@@ -146,343 +146,50 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     generateQRCode();
   }, [invoiceData]);
 
-  const printInvoice = () => {
-    const printContent = invoiceRef.current;
-    if (!printContent) return;
+  const printInvoice = async () => {
+    setIsGenerating(true);
+    try {
+      // Make API call to generate PDF for printing
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/generate-pdf/invoice/${invoiceData.bookingId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ language })
+      });
 
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
-        <head>
-          <meta charset="utf-8">
-          <title>VETS VAN Invoice #${invoiceData.invoiceNumber || invoiceData.bookingId}</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { 
-              font-family: 'Arial', 'Helvetica', sans-serif; 
-              font-size: 14px; 
-              line-height: 1.6; 
-              color: #333;
-              background: white;
-            }
-            .invoice-container { 
-              max-width: 210mm; 
-              margin: 0 auto; 
-              padding: 20mm;
-              background: white;
-            }
-            .header { 
-              display: flex; 
-              justify-content: space-between; 
-              align-items: flex-start; 
-              margin-bottom: 15px; 
-              padding-bottom: 15px; 
-              border-bottom: 3px solid #8B2F8B;
-            }
-            .logo-header {
-              text-align: center;
-              margin-bottom: 15px;
-            }
-            .logo-header img {
-              height: 60px !important;
-              width: auto !important;
-              max-width: 200px !important;
-              object-fit: contain !important;
-            }
-            .logo-section { flex: 1.5; }
-            .company-name { 
-              font-size: 32px; 
-              font-weight: 900; 
-              color: #8B2F8B; 
-              margin-bottom: 8px;
-              text-shadow: 1px 1px 2px rgba(139, 47, 139, 0.1);
-            }
-            .company-tagline { 
-              font-size: 16px; 
-              color: #666; 
-              font-style: italic;
-              margin-bottom: 10px;
-            }
-            .contact-info { 
-              font-size: 12px; 
-              color: #888; 
-              line-height: 1.4;
-            }
-            .invoice-details { 
-              flex: 1; 
-              text-align: center; 
-              padding: 0 20px;
-            }
-            .invoice-number { 
-              font-size: 24px; 
-              font-weight: bold; 
-              color: #8B2F8B; 
-              margin-bottom: 10px;
-            }
-            .invoice-date { 
-              font-size: 14px; 
-              color: #666; 
-              margin-bottom: 5px;
-            }
-            .qr-section { 
-              flex: 1; 
-              text-align: ${language === 'ar' ? 'left' : 'right'};
-            }
-            .qr-code { 
-              width: 120px; 
-              height: 120px; 
-              border: 2px solid #000; 
-              border-radius: 8px;
-            }
-            .section { 
-              margin-bottom: 25px; 
-              padding: 20px; 
-              background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); 
-              border-radius: 10px; 
-              border-left: 5px solid #8B2F8B;
-            }
-            .section-title { 
-              font-size: 18px; 
-              font-weight: bold; 
-              color: #8B2F8B; 
-              margin-bottom: 15px; 
-              border-bottom: 1px solid #e9ecef; 
-              padding-bottom: 8px;
-            }
-            .customer-info { 
-              display: grid; 
-              grid-template-columns: 1fr 1fr; 
-              gap: 20px; 
-              margin-top: 15px;
-            }
-            .info-item { 
-              margin-bottom: 8px; 
-            }
-            .info-label { 
-              font-weight: bold; 
-              color: #555; 
-              display: inline-block; 
-              min-width: 80px;
-            }
-            .pets-grid { 
-              display: grid; 
-              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-              gap: 15px; 
-              margin-top: 15px;
-            }
-            .pet-card { 
-              padding: 15px; 
-              background: white; 
-              border-radius: 8px; 
-              border: 2px solid #e9ecef; 
-              text-align: center;
-            }
-            .pet-name { 
-              font-size: 16px; 
-              font-weight: bold; 
-              color: #8B2F8B; 
-              margin-bottom: 8px;
-            }
-            .pet-details { 
-              font-size: 12px; 
-              color: #666; 
-              line-height: 1.4;
-            }
-            .services-table { 
-              width: 100%; 
-              border-collapse: collapse; 
-              margin: 15px 0; 
-              border-radius: 8px; 
-              overflow: hidden; 
-              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            }
-            .services-table th { 
-              background: linear-gradient(135deg, #8B2F8B 0%, #a855f7 100%); 
-              color: white; 
-              padding: 12px 8px; 
-              text-align: center; 
-              font-weight: bold; 
-              font-size: 12px;
-            }
-            .services-table td { 
-              padding: 10px 8px; 
-              border: 1px solid #e9ecef; 
-              text-align: center;
-              font-size: 12px;
-            }
-            .services-table tbody tr:nth-child(even) { 
-              background: #f8f9fa;
-            }
-            .total-section { 
-              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
-              padding: 25px; 
-              border-radius: 12px; 
-              border: 3px solid #8B2F8B; 
-              margin-top: 20px;
-            }
-            .total-row { 
-              display: flex; 
-              justify-content: space-between; 
-              padding: 8px 0; 
-              border-bottom: 1px solid #d1d5db; 
-              font-size: 15px;
-            }
-            .total-row:last-child { 
-              border-bottom: none;
-            }
-            .final-total { 
-              font-size: 20px; 
-              font-weight: bold; 
-              color: #8B2F8B; 
-              border-top: 2px solid #8B2F8B; 
-              padding-top: 15px; 
-              margin-top: 10px; 
-              background: white; 
-              padding: 15px; 
-              border-radius: 8px; 
-              text-align: center;
-            }
-            .notes-section { 
-              margin-top: 25px; 
-              padding: 20px; 
-              background: #fff8dc; 
-              border-radius: 8px; 
-              border: 2px solid #d4af37;
-            }
-            .footer { 
-              margin-top: 40px; 
-              padding-top: 20px; 
-              border-top: 2px solid #8B2F8B; 
-              text-align: center; 
-              font-size: 12px; 
-              color: #666;
-            }
-            .thank-you { 
-              font-size: 18px; 
-              font-weight: bold; 
-              color: #8B2F8B; 
-              margin-bottom: 10px;
-            }
-            .logo-header img {
-              height: 60px !important;
-              width: auto !important;
-              max-width: 200px !important;
-              object-fit: contain !important;
-            }
-            @media print {
-              .logo-header img {
-                height: 50px !important;
-                width: auto !important;
-                max-width: 180px !important;
-                object-fit: contain !important;
-              }
-              .section {
-                margin-bottom: 6px !important;
-                padding: 6px !important;
-                font-size: 11px !important;
-              }
-              .section-title {
-                font-size: 13px !important;
-                padding: 4px !important;
-                margin-bottom: 4px !important;
-              }
-              .info-item {
-                padding: 1px 0 !important;
-                font-size: 10px !important;
-                line-height: 1.2 !important;
-              }
-              .info-label {
-                font-size: 10px !important;
-              }
-              .pet-card {
-                padding: 4px !important;
-                margin-bottom: 4px !important;
-              }
-              .pet-name {
-                font-size: 12px !important;
-              }
-              .pet-detail {
-                font-size: 9px !important;
-              }
-              .header {
-                margin-bottom: 8px !important;
-                padding-bottom: 6px !important;
-              }
-              .company-name {
-                font-size: 20px !important;
-              }
-              .company-tagline {
-                font-size: 10px !important;
-              }
-              .invoice-details {
-                font-size: 11px !important;
-              }
-              .invoice-number {
-                font-size: 16px !important;
-              }
-              .contact-info {
-                font-size: 9px !important;
-              }
-              .qr-section {
-                margin: 8px 0 !important;
-              }
-              .qr-code {
-                width: 80px !important;
-                height: 80px !important;
-              }
-              .services-table th {
-                font-size: 8px !important;
-                padding: 3px !important;
-              }
-              .services-table td {
-                font-size: 7px !important;
-                padding: 2px !important;
-              }
-              .totals-section {
-                margin-top: 8px !important;
-                padding: 6px !important;
-              }
-              .total-row {
-                font-size: 10px !important;
-                padding: 2px 0 !important;
-              }
-              .final-total {
-                font-size: 14px !important;
-                padding: 8px !important;
-                margin-top: 6px !important;
-              }
-              .notes-section {
-                margin-top: 8px !important;
-                padding: 6px !important;
-                font-size: 10px !important;
-              }
-              .footer {
-                margin-top: 8px !important;
-                padding-top: 6px !important;
-                font-size: 9px !important;
-              }
-              .thank-you {
-                font-size: 12px !important;
-              }
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
+      // Get the PDF blob
+      const pdfBlob = await response.blob();
+      
+      // Create download link for PDF
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice_${invoiceData.invoiceNumber || invoiceData.bookingId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-    printWindow.document.close();
-    printWindow.focus();
-    
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 500);
+      toast({
+        title: language === 'ar' ? 'تم تحميل الـ PDF بنجاح' : 'PDF Downloaded Successfully',
+        description: language === 'ar' ? 'تم تحميل الفاتورة كملف PDF' : 'Invoice downloaded as PDF file',
+      });
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ في تحميل PDF' : 'PDF Download Error',
+        description: language === 'ar' ? 'فشل في تحميل الفاتورة كـ PDF' : 'Failed to download invoice as PDF',
+        variant: 'destructive'
+      });
+    }
+    setIsGenerating(false);
   };
 
   const downloadInvoice = async () => {
@@ -541,9 +248,9 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
           </h3>
           <div className="flex gap-3">
-            <Button onClick={printInvoice} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
+            <Button onClick={printInvoice} disabled={isGenerating} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
               <Printer className="h-4 w-4 mr-2" />
-              {language === 'ar' ? 'طباعة' : 'Print'}
+              {isGenerating ? (language === 'ar' ? 'جاري التحميل...' : 'Generating...') : (language === 'ar' ? 'تحميل PDF' : 'Download PDF')}
             </Button>
             <Button onClick={downloadInvoice} disabled={isGenerating} size="sm" className="bg-white text-purple-600 hover:bg-gray-100">
               <Download className="h-4 w-4 mr-2" />
