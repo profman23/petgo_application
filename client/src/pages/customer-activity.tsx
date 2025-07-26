@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, ExternalLink } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -35,6 +35,8 @@ interface Booking {
     address?: string;
   };
   createdAt: string;
+  hasInvoice?: boolean;
+  invoiceNumber?: string;
 }
 
 export default function CustomerActivity() {
@@ -83,6 +85,13 @@ export default function CustomerActivity() {
   const { data: userReviews = [] } = useQuery<any[]>({
     queryKey: ['/api/user/reviews'],
     retry: false,
+  });
+
+  // Fetch invoice statuses for all bookings to show invoice links
+  const { data: invoiceStatuses = [] } = useQuery<any[]>({
+    queryKey: ['/api/user/invoice-statuses'],
+    retry: false,
+    staleTime: 60000, // 1 minute
   });
 
 
@@ -169,6 +178,17 @@ export default function CustomerActivity() {
   // Check if booking has been reviewed
   const isBookingReviewed = (bookingId: number) => {
     return userReviews.some((review: any) => review.bookingId === bookingId);
+  };
+
+  // Check if booking has generated invoice
+  const getBookingInvoice = (bookingId: number) => {
+    return invoiceStatuses.find((status: any) => status.bookingId === bookingId && status.isGenerated);
+  };
+
+  // Open invoice in new window
+  const openInvoice = (bookingId: number, invoiceNumber: string) => {
+    const invoiceUrl = `/invoice-view?invoiceNumber=${invoiceNumber}&bookingId=${bookingId}`;
+    window.open(invoiceUrl, '_blank');
   };
 
   // Open tracking dialog
@@ -459,6 +479,21 @@ export default function CustomerActivity() {
                                   {language === 'ar' ? 'تتبع الوصول' : 'Track Arrival'}
                                 </Button>
                               )}
+
+                              {/* Invoice Link Button for Generated Invoices */}
+                              {(() => {
+                                const invoiceData = getBookingInvoice(booking.id);
+                                return invoiceData && invoiceData.invoiceNumber ? (
+                                  <Button
+                                    onClick={() => openInvoice(booking.id, invoiceData.invoiceNumber)}
+                                    variant="outline"
+                                    className="w-full font-semibold py-2 px-4 text-purple-600 border-purple-200 hover:bg-purple-50"
+                                  >
+                                    <ExternalLink className="w-4 h-4 mr-2" />
+                                    {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
+                                  </Button>
+                                ) : null;
+                              })()}
 
                               {/* Rate Service Button for Completed Services */}
                               {booking.status === 'completed' && (
