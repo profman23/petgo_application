@@ -2382,7 +2382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Download invoice as PDF endpoint
+  // Download invoice as HTML (temporary solution)
   app.get('/api/download-invoice/:bookingId', requireAuth, async (req, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
@@ -2413,34 +2413,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         invoiceStatus = await storage.getInvoiceStatus(bookingId);
       }
 
-      // Generate HTML content for PDF
+      // Generate HTML content
       const invoiceHTML = generateInvoiceHTML(booking, invoiceItems, invoiceStatus);
       
-      // Set response headers for PDF download
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoiceStatus?.invoiceNumber || bookingId}.pdf"`);
+      // Set response headers for HTML download that can be printed as PDF
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoiceStatus?.invoiceNumber || bookingId}.html"`);
       
-      // For now, convert HTML to PDF using a simple approach
-      // In production, you might want to use puppeteer or similar
-      const pdf = require('html-pdf');
-      const options = {
-        format: 'A4',
-        border: {
-          top: "0.5in",
-          right: "0.5in",
-          bottom: "0.5in",
-          left: "0.5in"
-        }
-      };
-
-      pdf.create(invoiceHTML, options).toBuffer((err: any, buffer: Buffer) => {
-        if (err) {
-          console.error('Error generating PDF:', err);
-          return res.status(500).json({ message: 'Failed to generate PDF' });
-        }
-        
-        res.send(buffer);
-      });
+      res.send(invoiceHTML);
 
     } catch (error) {
       console.error('Error downloading invoice:', error);
@@ -2463,17 +2443,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         <meta charset="utf-8">
         <title>Invoice ${invoiceStatus?.invoiceNumber || booking.id}</title>
         <style>
+          @media print {
+            body { margin: 0; }
+            .invoice-container { box-shadow: none; margin: 0; padding: 20px; }
+          }
+          
           body { 
             font-family: Arial, sans-serif; 
             margin: 0; 
             padding: 20px; 
             background: white;
+            line-height: 1.4;
           }
           .invoice-container { 
             max-width: 800px; 
             margin: 0 auto; 
             background: white; 
             padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
           }
           .header { 
             text-align: center; 
@@ -2482,87 +2469,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
             padding-bottom: 20px;
           }
           .company-name { 
-            font-size: 28px; 
+            font-size: 32px; 
             font-weight: bold; 
             color: #8B2F8B; 
             margin-bottom: 10px;
+            text-transform: uppercase;
+          }
+          .company-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
           }
           .invoice-info { 
             display: flex; 
             justify-content: space-between; 
             margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+          }
+          .invoice-info div {
+            flex: 1;
           }
           .section { 
             margin-bottom: 25px; 
-            padding: 15px; 
-            border: 1px solid #e5e7eb; 
+            padding: 20px; 
+            border: 2px solid #e5e7eb; 
             border-radius: 8px;
+            background: #fefefe;
           }
           .section-title { 
-            font-size: 18px; 
+            font-size: 20px; 
             font-weight: bold; 
             margin-bottom: 15px; 
             color: #8B2F8B;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 2px solid #8B2F8B;
             padding-bottom: 10px;
+            text-transform: uppercase;
           }
           .info-row { 
-            margin-bottom: 8px; 
+            margin-bottom: 10px; 
             display: flex; 
             justify-content: space-between;
+            padding: 5px 0;
           }
           .label { 
             font-weight: bold; 
             color: #374151;
+            min-width: 120px;
           }
           .value { 
             color: #6b7280;
+            text-align: right;
           }
           .items-table { 
             width: 100%; 
             border-collapse: collapse; 
             margin-top: 15px;
+            font-size: 14px;
           }
           .items-table th, .items-table td { 
-            border: 1px solid #e5e7eb; 
-            padding: 12px; 
+            border: 2px solid #e5e7eb; 
+            padding: 15px; 
             text-align: left;
           }
           .items-table th { 
-            background: #f9fafb; 
+            background: #8B2F8B; 
             font-weight: bold; 
-            color: #374151;
+            color: white;
+            text-transform: uppercase;
+          }
+          .items-table tr:nth-child(even) {
+            background: #f8f9fa;
           }
           .totals { 
             margin-top: 30px; 
             text-align: right;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
           }
           .total-row { 
             display: flex; 
             justify-content: space-between; 
-            margin-bottom: 8px; 
-            padding: 5px 0;
+            margin-bottom: 10px; 
+            padding: 8px 0;
+            font-size: 16px;
           }
           .total-final { 
-            border-top: 2px solid #8B2F8B; 
-            padding-top: 10px; 
-            font-size: 18px; 
+            border-top: 3px solid #8B2F8B; 
+            padding-top: 15px; 
+            font-size: 22px; 
             font-weight: bold; 
             color: #8B2F8B;
+            background: white;
+            margin: 10px -20px -20px -20px;
+            padding: 20px;
           }
           .footer { 
             margin-top: 40px; 
             text-align: center; 
             color: #6b7280; 
             font-size: 14px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+          }
+          .print-instruction {
+            text-align: center;
+            color: #8B2F8B;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+          }
+          @media screen {
+            .print-instruction:after {
+              content: " - Press Ctrl+P to save as PDF";
+            }
           }
         </style>
       </head>
       <body>
         <div class="invoice-container">
+          <div class="print-instruction">INVOICE DOCUMENT</div>
           <div class="header">
             <div class="company-name">VETS VAN</div>
-            <div>Mobile Veterinary Services</div>
+            <div class="company-subtitle">Mobile Veterinary Services</div>
           </div>
 
           <div class="invoice-info">
