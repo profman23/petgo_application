@@ -2210,7 +2210,9 @@ export default function DoctorInvoice() {
                     </div>
                     <div className="text-center">
                       <p className="text-xs text-gray-700">
-                        {item.discount && item.discount > 0 ? `${item.discount} SAR` : '0.00 SAR'}
+                        {item.discountType && item.discountType !== 'none' && item.discountType !== 'No Discount'
+                          ? `${item.discountType} Discount`
+                          : 'No Discount'}
                       </p>
                     </div>
                     <div className="text-center">
