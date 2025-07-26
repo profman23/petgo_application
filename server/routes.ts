@@ -2382,6 +2382,273 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Download invoice as PDF endpoint
+  app.get('/api/download-invoice/:bookingId', requireAuth, async (req, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      
+      // Get booking details
+      const booking = await storage.getBookingWithDetails(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      // Check for generated invoice first (new system)
+      const generatedInvoice = await storage.getGeneratedInvoiceByBooking(bookingId);
+      
+      let invoiceItems = [];
+      let invoiceStatus = null;
+      
+      if (generatedInvoice) {
+        // Use generated invoice data
+        invoiceItems = generatedInvoice.items || [];
+        invoiceStatus = {
+          isGenerated: true,
+          invoiceNumber: generatedInvoice.invoiceNumber,
+          generatedAt: generatedInvoice.generatedAt
+        };
+      } else {
+        // Fallback to old system
+        invoiceItems = await storage.getInvoiceItems(bookingId);
+        invoiceStatus = await storage.getInvoiceStatus(bookingId);
+      }
+
+      // Generate HTML content for PDF
+      const invoiceHTML = generateInvoiceHTML(booking, invoiceItems, invoiceStatus);
+      
+      // Set response headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoiceStatus?.invoiceNumber || bookingId}.pdf"`);
+      
+      // For now, convert HTML to PDF using a simple approach
+      // In production, you might want to use puppeteer or similar
+      const pdf = require('html-pdf');
+      const options = {
+        format: 'A4',
+        border: {
+          top: "0.5in",
+          right: "0.5in",
+          bottom: "0.5in",
+          left: "0.5in"
+        }
+      };
+
+      pdf.create(invoiceHTML, options).toBuffer((err: any, buffer: Buffer) => {
+        if (err) {
+          console.error('Error generating PDF:', err);
+          return res.status(500).json({ message: 'Failed to generate PDF' });
+        }
+        
+        res.send(buffer);
+      });
+
+    } catch (error) {
+      console.error('Error downloading invoice:', error);
+      res.status(500).json({ message: 'Failed to download invoice' });
+    }
+  });
+
+  // Helper function to generate invoice HTML
+  function generateInvoiceHTML(booking: any, invoiceItems: any[], invoiceStatus: any) {
+    const subtotal = invoiceItems.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+    const taxRate = 0.15;
+    const taxAmount = subtotal * taxRate;
+    const discountAmount = 0; // Default no discount
+    const finalTotal = subtotal + taxAmount - discountAmount;
+
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Invoice ${invoiceStatus?.invoiceNumber || booking.id}</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: white;
+          }
+          .invoice-container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px;
+          }
+          .header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            border-bottom: 2px solid #8B2F8B;
+            padding-bottom: 20px;
+          }
+          .company-name { 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: #8B2F8B; 
+            margin-bottom: 10px;
+          }
+          .invoice-info { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 30px;
+          }
+          .section { 
+            margin-bottom: 25px; 
+            padding: 15px; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 8px;
+          }
+          .section-title { 
+            font-size: 18px; 
+            font-weight: bold; 
+            margin-bottom: 15px; 
+            color: #8B2F8B;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+          }
+          .info-row { 
+            margin-bottom: 8px; 
+            display: flex; 
+            justify-content: space-between;
+          }
+          .label { 
+            font-weight: bold; 
+            color: #374151;
+          }
+          .value { 
+            color: #6b7280;
+          }
+          .items-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 15px;
+          }
+          .items-table th, .items-table td { 
+            border: 1px solid #e5e7eb; 
+            padding: 12px; 
+            text-align: left;
+          }
+          .items-table th { 
+            background: #f9fafb; 
+            font-weight: bold; 
+            color: #374151;
+          }
+          .totals { 
+            margin-top: 30px; 
+            text-align: right;
+          }
+          .total-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 8px; 
+            padding: 5px 0;
+          }
+          .total-final { 
+            border-top: 2px solid #8B2F8B; 
+            padding-top: 10px; 
+            font-size: 18px; 
+            font-weight: bold; 
+            color: #8B2F8B;
+          }
+          .footer { 
+            margin-top: 40px; 
+            text-align: center; 
+            color: #6b7280; 
+            font-size: 14px;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="invoice-container">
+          <div class="header">
+            <div class="company-name">VETS VAN</div>
+            <div>Mobile Veterinary Services</div>
+          </div>
+
+          <div class="invoice-info">
+            <div>
+              <strong>Invoice #:</strong> ${invoiceStatus?.invoiceNumber || `INV-${booking.id}`}<br>
+              <strong>Date:</strong> ${new Date().toLocaleDateString()}<br>
+              <strong>VetsVan:</strong> ${booking.vetsVan?.name || 'VETS VAN'}
+            </div>
+            <div>
+              <strong>Customer:</strong> ${booking.customerName || 'N/A'}<br>
+              <strong>Phone:</strong> ${booking.customerPhone || 'N/A'}<br>
+              <strong>Service Date:</strong> ${new Date(booking.appointmentDate).toLocaleDateString()}
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Pet Information</div>
+            ${booking.selectedPets?.map((pet: any) => `
+              <div class="info-row">
+                <span class="label">Pet Name:</span>
+                <span class="value">${pet.name}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Type:</span>
+                <span class="value">${pet.type}</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Age:</span>
+                <span class="value">${pet.ageYear || 0}Y ${pet.ageMonth || 0}M ${pet.ageDay || 0}D</span>
+              </div>
+            `).join('') || 'No pet information available'}
+          </div>
+
+          <div class="section">
+            <div class="section-title">Service Details</div>
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Quantity</th>
+                  <th>Unit Price (SAR)</th>
+                  <th>Total (SAR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${invoiceItems.map(item => `
+                  <tr>
+                    <td>${item.description}</td>
+                    <td>${item.quantity}</td>
+                    <td>${parseFloat(item.unitPrice || 0).toFixed(2)}</td>
+                    <td>${parseFloat(item.total || 0).toFixed(2)}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="totals">
+            <div class="total-row">
+              <span>Subtotal:</span>
+              <span>${subtotal.toFixed(2)} SAR</span>
+            </div>
+            <div class="total-row">
+              <span>Tax (15%):</span>
+              <span>${taxAmount.toFixed(2)} SAR</span>
+            </div>
+            <div class="total-row">
+              <span>Discount:</span>
+              <span>-${discountAmount.toFixed(2)} SAR</span>
+            </div>
+            <div class="total-row total-final">
+              <span>Total:</span>
+              <span>${finalTotal.toFixed(2)} SAR</span>
+            </div>
+          </div>
+
+          <div class="footer">
+            <p>Thank you for choosing VETS VAN Mobile Veterinary Services</p>
+            <p>For any questions, please contact us at: +966 50 123 4567</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
   // Pet vitals API endpoints
   app.post('/api/pet-vitals', async (req, res) => {
     try {

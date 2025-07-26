@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, ExternalLink } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, Download } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -185,10 +185,50 @@ export default function CustomerActivity() {
     return invoiceStatuses.find((status: any) => status.bookingId === bookingId && status.isGenerated);
   };
 
-  // Open invoice in new window
-  const openInvoice = (bookingId: number, invoiceNumber: string) => {
-    const invoiceUrl = `/invoice-view?bookingId=${bookingId}&invoiceNumber=${invoiceNumber}`;
-    window.open(invoiceUrl, '_blank');
+  // Download invoice directly
+  const downloadInvoice = async (bookingId: number, invoiceNumber: string) => {
+    try {
+      // Make API call to download invoice
+      const response = await fetch(`/api/download-invoice/${bookingId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download invoice');
+      }
+
+      // Get the PDF blob
+      const blob = await response.blob();
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice_${invoiceNumber}.pdf`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: language === 'ar' ? 'تم التحميل' : 'Downloaded',
+        description: language === 'ar' ? 'تم تحميل الفاتورة بنجاح' : 'Invoice downloaded successfully',
+      });
+    } catch (error) {
+      console.error('Error downloading invoice:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في تحميل الفاتورة' : 'Failed to download invoice',
+        variant: 'destructive',
+      });
+    }
   };
 
   // Open tracking dialog
@@ -480,17 +520,17 @@ export default function CustomerActivity() {
                                 </Button>
                               )}
 
-                              {/* Invoice Link Button for Generated Invoices */}
+                              {/* Invoice Download Button for Generated Invoices */}
                               {(() => {
                                 const invoiceData = getBookingInvoice(booking.id);
                                 return invoiceData && invoiceData.invoiceNumber ? (
                                   <Button
-                                    onClick={() => openInvoice(booking.id, invoiceData.invoiceNumber)}
+                                    onClick={() => downloadInvoice(booking.id, invoiceData.invoiceNumber)}
                                     variant="outline"
                                     className="w-full font-semibold py-2 px-4 text-purple-600 border-purple-200 hover:bg-purple-50"
                                   >
-                                    <ExternalLink className="w-4 h-4 mr-2" />
-                                    {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
+                                    <Download className="w-4 h-4 mr-2" />
+                                    {language === 'ar' ? 'تحميل الفاتورة' : 'Download Invoice'}
                                   </Button>
                                 ) : null;
                               })()}
