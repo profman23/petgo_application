@@ -1,4 +1,6 @@
 import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 
 export const generateInvoicePDF = async (invoiceData: any): Promise<Buffer> => {
   let browser;
@@ -53,6 +55,18 @@ export const generateInvoicePDF = async (invoiceData: any): Promise<Buffer> => {
     if (browser) {
       await browser.close();
     }
+  }
+};
+
+const getLogoBase64 = (): string => {
+  try {
+    const logoPath = path.join(process.cwd(), 'attached_assets', 'Screenshot 2025-07-10 181936_1753542080451.png');
+    const imageBuffer = fs.readFileSync(logoPath);
+    return imageBuffer.toString('base64');
+  } catch (error) {
+    console.error('Error reading logo file:', error);
+    // Fallback to empty string if file not found
+    return '';
   }
 };
 
@@ -135,9 +149,11 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           
           <!-- Logo in the center -->
           <div class="logo-section">
-            <div style="background-color: #9333ea; color: white; height: 64px; width: 192px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: bold; font-size: 18px;">
-              VETS VAN
-            </div>
+            <img 
+              class="logo-image" 
+              src="data:image/png;base64,${getLogoBase64()}"
+              alt="Vets Van Logo" 
+            />
           </div>
           
           <!-- Empty space to balance the layout -->
