@@ -2382,7 +2382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Download invoice as HTML (temporary solution)
+  // Download invoice as PDF using Puppeteer
   app.get('/api/download-invoice/:bookingId', requireAuth, async (req, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
@@ -2416,11 +2416,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate HTML content
       const invoiceHTML = generateInvoiceHTML(booking, invoiceItems, invoiceStatus);
       
-      // Set response headers for HTML download that can be printed as PDF
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoiceStatus?.invoiceNumber || bookingId}.html"`);
+      // Use Puppeteer to generate PDF
+      const puppeteer = await import('puppeteer');
+      const browser = await puppeteer.default.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      });
       
-      res.send(invoiceHTML);
+      const page = await browser.newPage();
+      await page.setContent(invoiceHTML, { waitUntil: 'networkidle0' });
+      
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '20px',
+          right: '20px',
+          bottom: '20px',
+          left: '20px'
+        }
+      });
+      
+      await browser.close();
+      
+      // Set response headers for PDF download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoiceStatus?.invoiceNumber || bookingId}.pdf"`);
+      
+      res.send(pdfBuffer);
 
     } catch (error) {
       console.error('Error downloading invoice:', error);
