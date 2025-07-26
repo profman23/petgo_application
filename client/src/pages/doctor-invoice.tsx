@@ -2139,27 +2139,23 @@ export default function DoctorInvoice() {
               
               {/* Customer Information Section */}
               <div className="mb-4">
-                {/* Arabic sections - Right aligned */}
-                <div className="text-right mb-1">
-                  <p className="text-xs font-semibold text-black">
-                    <strong>اسم العميل:</strong> {booking?.customerName || ''}
-                  </p>
-                </div>
-                <div className="text-right mb-2">
-                  <p className="text-xs font-semibold text-black">
-                    <strong>تليفون العميل:</strong> {booking?.customerPhone || ''}
-                  </p>
-                </div>
-                
-                {/* English sections - Left aligned */}
-                <div className="text-left mb-1">
+                {/* Name row - Arabic right, English left, same level */}
+                <div className="flex justify-between items-center mb-2">
                   <p className="text-xs text-gray-500">
                     Customer Name: {booking?.customerName || ''}
                   </p>
+                  <p className="text-xs text-gray-500">
+                    {booking?.customerName || ''} :اسم العميل
+                  </p>
                 </div>
-                <div className="text-left mb-2">
+                
+                {/* Phone row - Arabic right, English left, same level */}
+                <div className="flex justify-between items-center mb-2">
                   <p className="text-xs text-gray-500">
                     Customer Phone: {booking?.customerPhone || ''}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {booking?.customerPhone || ''} :تليفون العميل
                   </p>
                 </div>
               </div>
