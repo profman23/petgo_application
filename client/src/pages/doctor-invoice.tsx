@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
-import InvoiceGeneratorNew from '@/components/InvoiceGeneratorNew';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -885,14 +885,24 @@ export default function DoctorInvoice() {
         }))
       };
 
-      // Call PDF download API
-      const response = await apiRequest('/api/download-invoice-pdf', {
+      // Call PDF download API using fetch directly to get PDF blob
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/download-invoice-pdf', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify(invoiceData)
       });
 
-      // Create blob and download
-      const blob = new Blob([response], { type: 'application/pdf' });
+      if (!response.ok) {
+        throw new Error('Failed to download PDF');
+      }
+
+      // Get the PDF as blob
+      const blob = await response.blob();
+      
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -2030,49 +2040,7 @@ export default function DoctorInvoice() {
         />
       )}
 
-      {/* Invoice Generator */}
-      {showInvoiceGenerator && booking && doctorInfo && (
-        <InvoiceGeneratorNew
-          invoiceData={{
-            bookingId: booking.id,
-            invoiceNumber: invoiceStatus?.invoiceNumber,
-            customer: {
-              firstName: booking.customerName?.split(' ')[0] || '',
-              lastName: booking.customerName?.split(' ').slice(1).join(' ') || '',
-              phone: booking.customerPhone || '',
-              email: booking.customerEmail || ''
-            },
-            pets: booking.pets,
-            appointmentDate: booking.appointmentDate,
-            appointmentTime: booking.appointmentTime,
-            serviceType: booking.serviceType,
-            items: invoiceItems.map(item => ({
-              ...item,
-              discount: item.discount || 0,
-              discountType: item.discountType || 'none',
-              vatRate: 15,
-              vatAmount: item.vatAmount || 0,
-              totalBeforeVat: item.totalBeforeVat || 0,
-              totalAfterVat: item.totalAfterVat || 0
-            })),
-            subtotal: subtotal,
-            discount: totalDiscountAmount,
-            tax: taxAmount,
-            total: finalTotal,
-            notes: notes,
-            doctorName: doctorInfo.name || 'Dr. VETS VAN',
-            vetsVanCode: doctorInfo.vetsvanCode || 'VETS001',
-            paymentMethods: invoicePayments.map(payment => ({
-              id: payment.id.toString(),
-              method: payment.paymentMethod,
-              amount: payment.amount,
-              date: payment.paymentDate,
-              reference: payment.reference
-            }))
-          }}
-          onClose={() => setShowInvoiceGenerator(false)}
-        />
-      )}
+
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
