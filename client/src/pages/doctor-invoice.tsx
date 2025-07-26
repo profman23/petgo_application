@@ -2116,11 +2116,8 @@ export default function DoctorInvoice() {
               <div className="flex justify-between items-center mb-4">
                 {/* Date on the left */}
                 <div className="text-left">
-                  <p className="text-lg font-semibold mb-1">
+                  <p className="text-sm font-semibold">
                     <strong>التاريخ:</strong> {new Date().toLocaleDateString('en-US')}
-                  </p>
-                  <p className="text-base text-gray-600">
-                    {new Date().toLocaleDateString('ar-SA')}
                   </p>
                 </div>
                 
@@ -2141,17 +2138,17 @@ export default function DoctorInvoice() {
               <div className="w-full h-px bg-purple-400 opacity-30 my-4"></div>
               
               {/* Customer Information Section */}
-              <div className="text-left mb-5">
-                <p className="text-base font-semibold mb-1">
+              <div className="text-left mb-4">
+                <p className="text-sm font-semibold mb-1">
                   <strong>اسم العميل:</strong> {booking?.customerFirstName} {booking?.customerLastName}
                 </p>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-xs text-gray-600 mb-2">
                   Customer Name: {booking?.customerFirstName} {booking?.customerLastName}
                 </p>
-                <p className="text-base font-semibold mb-1">
+                <p className="text-sm font-semibold mb-1">
                   <strong>تليفون العميل:</strong> {booking?.customerPhone}
                 </p>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-xs text-gray-600 mb-2">
                   Customer Phone: {booking?.customerPhone}
                 </p>
               </div>
