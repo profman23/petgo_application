@@ -59,7 +59,7 @@ export default function RideRequest() {
   const textAlign = getTextAlign(language);
 
   // خدمات تتطلب شركاء (الكل) و خدمات خاصة بالنخبة فقط
-  const specializedServices = ['neutering', 'surgery', 'grooming'];
+  const specializedServices = ['neutering', 'surgery', 'grooming', 'pickup-drop'];
   const eliteOnlyServices = ['ct-scan'];
 
   const handleServiceTypeChange = (value: string) => {
