@@ -2135,15 +2135,15 @@ export default function DoctorInvoice() {
               </div>
               
               {/* Light separator line */}
-              <div className="w-full h-px opacity-30 my-4" style={{backgroundColor: '#8B5CF6'}}></div>
+              <div className="w-full h-px opacity-30 my-4" style={{backgroundColor: '#8B2F8B'}}></div>
               
               {/* Customer Information Section */}
               <div className="text-left mb-4">
                 <p className="text-xs font-semibold mb-1">
-                  <strong>اسم العميل:</strong> {booking?.customerFirstName || ''} {booking?.customerLastName || ''}
+                  <strong>اسم العميل:</strong> {booking?.customerName || ''}
                 </p>
                 <p className="text-xs text-gray-600 mb-2">
-                  Customer Name: {booking?.customerFirstName || ''} {booking?.customerLastName || ''}
+                  Customer Name: {booking?.customerName || ''}
                 </p>
                 <p className="text-xs font-semibold mb-1">
                   <strong>تليفون العميل:</strong> {booking?.customerPhone || ''}

@@ -788,6 +788,10 @@ Changelog:
 - July 26, 2025. FIXED: Complete HTML download system removal - replaced all HTML generation code across all invoice components
 - July 26, 2025. UPDATED: InvoiceGenerator.tsx to use PDF API instead of HTML blob generation
 - July 26, 2025. UPDATED: InvoiceGeneratorNew.tsx to use PDF API instead of HTML blob generation
+- July 26, 2025. FIXED: Customer name display issue in VIEW dialog - changed from customerFirstName/lastName to customerName for proper data binding
+- July 26, 2025. UPDATED: Separator line color from #8B5CF6 to #8B2F8B (company brand purple) in both VIEW and PDF
+- July 26, 2025. REMOVED: "Date:" label completely - now shows only date value in English format
+- July 26, 2025. REDUCED: Font sizes in both VIEW (text-xs) and PDF (12px/10px) for better formatting consistency
 - July 26, 2025. COMPLETED: Logo positioning system implementation - Logo now appears correctly on the right side of invoice header
 - July 26, 2025. FIXED: PDF generator updated to position logo on right side with proper flexbox layout (date left, spacer center, logo right)
 - July 26, 2025. RESOLVED: Logo display issue in View Invoice dialog by replacing problematic Base64 string with logoImage import

@@ -121,7 +121,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         .separator-line {
           width: 100%;
           height: 1px;
-          background-color: #8B5CF6;
+          background-color: #8B2F8B;
           opacity: 0.3;
           margin: 16px 0;
         }
@@ -190,10 +190,10 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         <!-- Customer Information Section -->
         <div class="customer-info-section">
           <p class="customer-info-text">
-            <strong>اسم العميل:</strong> ${invoiceData.customer?.firstName || ''} ${invoiceData.customer?.lastName || ''}
+            <strong>اسم العميل:</strong> ${invoiceData.customer?.name || ''}
           </p>
           <p class="customer-info-text-arabic">
-            Customer Name: ${invoiceData.customer?.firstName || ''} ${invoiceData.customer?.lastName || ''}
+            Customer Name: ${invoiceData.customer?.name || ''}
           </p>
           <p class="customer-info-text">
             <strong>تليفون العميل:</strong> ${invoiceData.customer?.phone || ''}
