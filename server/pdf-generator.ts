@@ -114,7 +114,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         }
         
         .date-text {
-          font-size: 14px;
+          font-size: 12px;
           font-weight: 600;
         }
         
@@ -132,13 +132,13 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         }
         
         .customer-info-text {
-          font-size: 14px;
+          font-size: 12px;
           font-weight: 600;
           margin-bottom: 4px;
         }
         
         .customer-info-text-arabic {
-          font-size: 12px;
+          font-size: 10px;
           color: #666;
           margin-bottom: 8px;
         }
