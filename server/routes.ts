@@ -2382,7 +2382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Download invoice as PDF using Puppeteer
+  // Download invoice as PDF using simple HTML-to-PDF solution
   app.get('/api/download-invoice/:bookingId', requireAuth, async (req, res) => {
     try {
       const bookingId = parseInt(req.params.bookingId);
@@ -2413,37 +2413,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         invoiceStatus = await storage.getInvoiceStatus(bookingId);
       }
 
-      // Generate HTML content
-      const invoiceHTML = generateInvoiceHTML(booking, invoiceItems, invoiceStatus);
-      
-      // Use Puppeteer to generate PDF
-      const puppeteer = await import('puppeteer');
-      const browser = await puppeteer.default.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-      
-      const page = await browser.newPage();
-      await page.setContent(invoiceHTML, { waitUntil: 'networkidle0' });
-      
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: {
-          top: '20px',
-          right: '20px',
-          bottom: '20px',
-          left: '20px'
-        }
-      });
-      
-      await browser.close();
+      // Generate compact PDF-ready HTML content
+      const invoiceHTML = generateCompactPDFHTML(booking, invoiceItems, invoiceStatus);
       
       // Set response headers for PDF download
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoiceStatus?.invoiceNumber || bookingId}.pdf"`);
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="Invoice_${invoiceStatus?.invoiceNumber || bookingId}.html"`);
+      res.setHeader('Cache-Control', 'no-cache');
       
-      res.send(pdfBuffer);
+      res.send(invoiceHTML);
 
     } catch (error) {
       console.error('Error downloading invoice:', error);

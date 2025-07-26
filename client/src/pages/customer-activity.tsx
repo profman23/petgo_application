@@ -219,7 +219,7 @@ export default function CustomerActivity() {
 
       toast({
         title: language === 'ar' ? 'تم التحميل' : 'Downloaded',
-        description: language === 'ar' ? 'تم تحميل الفاتورة كملف PDF بنجاح' : 'Invoice downloaded as PDF successfully',
+        description: language === 'ar' ? 'تم تحميل الفاتورة - ستفتح نافذة الطباعة تلقائياً' : 'Invoice downloaded - Print dialog will open automatically',
       });
     } catch (error) {
       console.error('Error downloading invoice:', error);
