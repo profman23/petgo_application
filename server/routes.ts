@@ -2348,18 +2348,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Booking not found' });
       }
 
-      // Get invoice items
-      const invoiceItems = await storage.getInvoiceItems(bookingId);
+      // Check for generated invoice first (new system)
+      const generatedInvoice = await storage.getGeneratedInvoiceByBooking(bookingId);
       
-      // Get invoice status
-      const invoiceStatus = await storage.getInvoiceStatus(bookingId);
-      
-      res.json({
-        booking,
-        invoiceItems,
-        invoiceStatus,
-        isGenerated: invoiceStatus?.isGenerated || false
-      });
+      if (generatedInvoice) {
+        // Use generated invoice data
+        res.json({
+          booking,
+          invoiceItems: generatedInvoice.items || [],
+          invoiceStatus: {
+            isGenerated: true,
+            invoiceNumber: generatedInvoice.invoiceNumber,
+            generatedAt: generatedInvoice.generatedAt
+          },
+          isGenerated: true,
+          generatedInvoice
+        });
+      } else {
+        // Fallback to old system
+        const invoiceItems = await storage.getInvoiceItems(bookingId);
+        const invoiceStatus = await storage.getInvoiceStatus(bookingId);
+        
+        res.json({
+          booking,
+          invoiceItems,
+          invoiceStatus,
+          isGenerated: invoiceStatus?.isGenerated || false
+        });
+      }
     } catch (error) {
       console.error('Error fetching invoice view:', error);
       res.status(500).json({ message: 'Failed to fetch invoice' });

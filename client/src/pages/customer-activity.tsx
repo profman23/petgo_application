@@ -187,7 +187,7 @@ export default function CustomerActivity() {
 
   // Open invoice in new window
   const openInvoice = (bookingId: number, invoiceNumber: string) => {
-    const invoiceUrl = `/invoice-view?invoiceNumber=${invoiceNumber}&bookingId=${bookingId}`;
+    const invoiceUrl = `/invoice-view?bookingId=${bookingId}&invoiceNumber=${invoiceNumber}`;
     window.open(invoiceUrl, '_blank');
   };
 
