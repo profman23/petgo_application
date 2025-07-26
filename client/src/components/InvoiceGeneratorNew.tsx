@@ -71,139 +71,78 @@ const InvoiceGeneratorNew: React.FC<InvoiceGeneratorNewProps> = ({ invoiceData, 
   const [isGenerating, setIsGenerating] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
-  const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
+  const handlePrint = async () => {
+    setIsGenerating(true);
+    try {
+      // Make API call to generate PDF for printing
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/generate-pdf/invoice/${invoiceData.bookingId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ language })
+      });
 
-    const printContent = printRef.current;
-    if (!printContent) return;
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
-        <head>
-          <meta charset="utf-8">
-          <title>Invoice</title>
-          <style>
-            * { 
-              margin: 0; 
-              padding: 0; 
-              box-sizing: border-box; 
-            }
-            body { 
-              font-family: Arial, sans-serif;
-              background: white;
-              color: #333;
-              direction: ${language === 'ar' ? 'rtl' : 'ltr'};
-            }
-            .invoice-container {
-              max-width: 800px;
-              margin: 20px auto;
-              padding: 40px;
-              border: 2px solid #e5e7eb;
-              border-radius: 12px;
-              background: white;
-            }
-            .date-section {
-              text-align: center;
-              padding: 20px;
-              border: 1px solid #d1d5db;
-              border-radius: 8px;
-              background: #f9fafb;
-            }
-            .date-label {
-              font-size: 18px;
-              font-weight: bold;
-              color: #374151;
-              margin-bottom: 10px;
-            }
-            .date-value {
-              font-size: 24px;
-              font-weight: bold;
-              color: #1f2937;
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
+      // Get the PDF blob
+      const pdfBlob = await response.blob();
+      
+      // Create download link for PDF
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice_${invoiceData.invoiceNumber || invoiceData.bookingId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-    printWindow.document.close();
-    printWindow.focus();
-    
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 500);
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+    }
+    setIsGenerating(false);
   };
 
-  const handleDownload = () => {
-    const printContent = printRef.current;
-    if (!printContent) return;
+  const handleDownload = async () => {
+    setIsGenerating(true);
+    try {
+      // Make API call to generate PDF
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/generate-pdf/invoice/${invoiceData.bookingId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ language })
+      });
 
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
-        <head>
-          <meta charset="utf-8">
-          <title>Invoice</title>
-          <style>
-            * { 
-              margin: 0; 
-              padding: 0; 
-              box-sizing: border-box; 
-            }
-            body { 
-              font-family: Arial, sans-serif;
-              background: white;
-              color: #333;
-              direction: ${language === 'ar' ? 'rtl' : 'ltr'};
-            }
-            .invoice-container {
-              max-width: 800px;
-              margin: 20px auto;
-              padding: 40px;
-              border: 2px solid #e5e7eb;
-              border-radius: 12px;
-              background: white;
-            }
-            .date-section {
-              text-align: center;
-              padding: 20px;
-              border: 1px solid #d1d5db;
-              border-radius: 8px;
-              background: #f9fafb;
-            }
-            .date-label {
-              font-size: 18px;
-              font-weight: bold;
-              color: #374151;
-              margin-bottom: 10px;
-            }
-            .date-value {
-              font-size: 24px;
-              font-weight: bold;
-              color: #1f2937;
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `;
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
 
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Invoice-${invoiceData.invoiceNumber || invoiceData.bookingId}.html`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      // Get the PDF blob
+      const pdfBlob = await response.blob();
+      
+      // Create download link
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice_${invoiceData.invoiceNumber || invoiceData.bookingId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Error downloading PDF:', error);
+    }
+    setIsGenerating(false);
   };
 
   return (
