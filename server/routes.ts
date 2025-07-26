@@ -3444,6 +3444,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // New download invoice PDF endpoint for doctor interface
+  app.post('/api/download-invoice-pdf', requireAuth, async (req, res) => {
+    try {
+      const invoiceData = req.body;
+      
+      console.log('Received invoice data for PDF download:', {
+        bookingId: invoiceData.bookingId,
+        invoiceNumber: invoiceData.invoiceNumber,
+        language: invoiceData.language || 'ar'
+      });
+
+      // Generate PDF using the provided invoice data
+      const pdfBuffer = await generateInvoicePDF(invoiceData);
+      
+      // Set response headers for download
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="VETS_Invoice_${invoiceData.invoiceNumber || invoiceData.bookingId}.pdf"`);
+      res.setHeader('Content-Length', pdfBuffer.length);
+      
+      console.log('PDF generated successfully, sending response');
+      
+      // Send PDF as response
+      res.send(pdfBuffer);
+      
+    } catch (error) {
+      console.error('Error downloading invoice PDF:', error);
+      res.status(500).json({ message: 'Failed to download invoice PDF' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

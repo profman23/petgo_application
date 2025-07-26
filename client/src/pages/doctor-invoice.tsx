@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -418,6 +418,7 @@ export default function DoctorInvoice() {
       sortByName: 'الاسم',
       sortByPrice: 'السعر',
       clearFilters: 'مسح الفلاتر',
+      downloadInvoice: 'تحميل الفاتورة',
     },
     en: {
       invoiceTitle: 'VETS VAN Service Invoice',
@@ -484,6 +485,7 @@ export default function DoctorInvoice() {
       sortByName: 'Name',
       sortByPrice: 'Price',
       clearFilters: 'Clear Filters',
+      downloadInvoice: 'Download Invoice',
     }
   };
 
@@ -832,6 +834,89 @@ export default function DoctorInvoice() {
     setShowConfirmDialog(true);
   };
 
+  // Handle download invoice function
+  const handleDownloadInvoice = async () => {
+    if (!booking || !doctorInfo) {
+      toast({
+        title: language === 'ar' ? 'بيانات غير مكتملة' : 'Incomplete data',
+        description: language === 'ar' ? 'يرجى التأكد من توفر جميع البيانات' : 'Please ensure all data is available',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      // Prepare invoice data
+      const invoiceData = {
+        bookingId: booking.id,
+        invoiceNumber: invoiceStatus?.invoiceNumber,
+        customer: {
+          firstName: booking.customerName?.split(' ')[0] || '',
+          lastName: booking.customerName?.split(' ').slice(1).join(' ') || '',
+          phone: booking.customerPhone || '',
+          email: booking.customerEmail || ''
+        },
+        pets: booking.pets,
+        appointmentDate: booking.appointmentDate,
+        appointmentTime: booking.appointmentTime,
+        serviceType: booking.serviceType,
+        items: invoiceItems.map(item => ({
+          ...item,
+          discount: item.discount || 0,
+          discountType: item.discountType || 'none',
+          vatRate: 15,
+          vatAmount: item.vatAmount || 0,
+          totalBeforeVat: item.totalBeforeVat || 0,
+          totalAfterVat: item.totalAfterVat || 0
+        })),
+        subtotal: subtotal,
+        discount: totalDiscountAmount,
+        tax: taxAmount,
+        total: finalTotal,
+        notes: notes,
+        doctorName: doctorInfo.name || 'Dr. VETS VAN',
+        vetsVanCode: doctorInfo.vetsvanCode || 'VETS001',
+        paymentMethods: invoicePayments.map(payment => ({
+          id: payment.id.toString(),
+          method: payment.paymentMethod,
+          amount: payment.amount,
+          date: payment.paymentDate,
+          reference: payment.reference
+        }))
+      };
+
+      // Call PDF download API
+      const response = await apiRequest('/api/download-invoice-pdf', {
+        method: 'POST',
+        body: JSON.stringify(invoiceData)
+      });
+
+      // Create blob and download
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `VETS_Invoice_${invoiceData.invoiceNumber || booking.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      toast({
+        title: language === 'ar' ? 'تم تحميل الفاتورة' : 'Invoice Downloaded',
+        description: language === 'ar' ? 'تم تحميل الفاتورة بنجاح' : 'Invoice downloaded successfully',
+        variant: 'default',
+      });
+    } catch (error) {
+      console.error('Error downloading invoice:', error);
+      toast({
+        title: language === 'ar' ? '❌ خطأ في تحميل الفاتورة' : '❌ Error downloading invoice',
+        description: language === 'ar' ? 'حدث خطأ أثناء تحميل الفاتورة' : 'An error occurred while downloading the invoice',
+        variant: 'destructive',
+      });
+    }
+  };
+
   // Generate invoice after confirmation
   const confirmGenerateInvoice = async () => {
     try {
@@ -865,7 +950,6 @@ export default function DoctorInvoice() {
       // Lock the record (make invoice items read-only)
       setIsRecordLocked(true);
       setShowConfirmDialog(false);
-      setShowInvoiceGenerator(true);
 
       // Send invoice link via email
       try {
@@ -1811,7 +1895,7 @@ export default function DoctorInvoice() {
         )}
 
         {/* Actions */}
-        <div className="flex justify-center mb-6">
+        <div className="flex flex-col items-center gap-4 mb-6">
           <Button
             onClick={handleGenerateInvoiceClick}
             disabled={isRecordLocked}
@@ -1823,6 +1907,15 @@ export default function DoctorInvoice() {
           >
             <Receipt className="h-6 w-6 ml-2" />
             {isRecordLocked ? `${t('generateInvoice')} ✓` : t('generateInvoice')}
+          </Button>
+
+          {/* Download Invoice Button */}
+          <Button
+            onClick={handleDownloadInvoice}
+            className="px-8 py-3 text-lg bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Download className="h-6 w-6 ml-2" />
+            {t('downloadInvoice')}
           </Button>
         </div>
       </div>
