@@ -2209,7 +2209,9 @@ export default function DoctorInvoice() {
                       <p className="text-xs text-gray-700">{item.unitPrice} SAR</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-xs text-gray-700">{item.discount} SAR</p>
+                      <p className="text-xs text-gray-700">
+                        {item.discount && item.discount > 0 ? `${item.discount} SAR` : '0.00 SAR'}
+                      </p>
                     </div>
                     <div className="text-center">
                       <p className="text-xs text-gray-700">{item.vatAmount} SAR</p>

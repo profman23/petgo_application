@@ -327,7 +327,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               <div class="data-cell">${item.description || ''}</div>
               <div class="data-cell">${item.quantity || ''}</div>
               <div class="data-cell">${item.unitPrice || ''} SAR</div>
-              <div class="data-cell">${item.discount || ''} SAR</div>
+              <div class="data-cell">${item.discount && item.discount > 0 ? item.discount + ' SAR' : '0.00 SAR'}</div>
               <div class="data-cell">${item.vatAmount || ''} SAR</div>
               <div class="data-cell">${item.totalBeforeVat || ''} SAR</div>
               <div class="data-cell">${item.totalAfterVat || ''} SAR</div>
