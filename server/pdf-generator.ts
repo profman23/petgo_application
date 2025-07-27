@@ -263,8 +263,12 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             </p>
           </div>
           
-          <!-- Empty space to balance the layout -->
-          <div class="spacer"></div>
+          <!-- Test Label in Center -->
+          <div style="text-align: center; flex: 0 0 auto;">
+            <h2 style="font-size: 18px; font-weight: bold; color: #8B5CF6; margin: 0;">
+              ${getTranslation('testLabel', invoiceData.language || 'en')}
+            </h2>
+          </div>
           
           <!-- Logo on the right -->
           <div class="logo-section">

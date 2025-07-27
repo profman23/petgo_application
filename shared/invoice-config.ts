@@ -56,6 +56,7 @@ export const invoiceTranslations: InvoiceTranslations = {
     // Header
     companyName: '🚐 VETS VAN المحدث',
     companyTagline: '🐾 خدمات بيطرية متنقلة محدثة في منزلك',
+    testLabel: 'TEST',
     
     // Invoice Details
     invoiceLabel: 'فاتورة:',
@@ -116,6 +117,7 @@ export const invoiceTranslations: InvoiceTranslations = {
     // Header
     companyName: '🚐 VETS VAN UPDATED',
     companyTagline: '🐾 Updated Mobile Veterinary Services at Your Home',
+    testLabel: 'TEST',
     
     // Invoice Details
     invoiceLabel: 'Invoice:',
