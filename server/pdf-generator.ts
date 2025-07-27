@@ -281,7 +281,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               Customer Name: ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
             </p>
             <p class="customer-info-arabic">
-              :اسم العميل ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
+              اسم العميل: ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
             </p>
           </div>
           
@@ -291,7 +291,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               Customer Phone: ${invoiceData.customer?.phone || ''}
             </p>
             <p class="customer-info-arabic">
-              :تليفون العميل ${invoiceData.customer?.phone || ''}
+              تليفون العميل: ${invoiceData.customer?.phone || ''}
             </p>
           </div>
           
@@ -448,7 +448,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  :المجموع قبل الضريبة
+                  المجموع قبل الضريبة:
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
@@ -461,7 +461,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  :ضريبة القيمة المضافة (15%)
+                  ضريبة القيمة المضافة (15%):
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
@@ -474,7 +474,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  :المجموع النهائي
+                  المجموع النهائي:
                 </span>
                 <span style="font-size: 12px; font-weight: 700; color: #8B2F8B; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
@@ -487,7 +487,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  :المبلغ المدفوع
+                  المبلغ المدفوع:
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #059669; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
@@ -499,7 +499,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  :الرصيد المتبقي
+                  الرصيد المتبقي:
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #DC2626; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
