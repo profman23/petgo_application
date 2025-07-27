@@ -409,7 +409,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <!-- Arabic Totals - Right Side -->
           <div style="background: white; border: 1px solid #D1D5DB; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 16px; width: 320px; direction: rtl;">
             <h3 style="font-size: 16px; font-weight: 600; color: #1F2937; margin-bottom: 16px; text-align: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 8px;">
-              مجاميع الفاتورة
+              مجموع الفاتورة
             </h3>
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">

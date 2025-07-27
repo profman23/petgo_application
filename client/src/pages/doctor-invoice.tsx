@@ -2288,7 +2288,7 @@ export default function DoctorInvoice() {
                   {/* Arabic Totals - Right Side */}
                   <div className="bg-white border border-gray-300 rounded-lg shadow-md p-4 w-80" dir="rtl">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center border-b border-gray-200 pb-2">
-                      مجاميع الفاتورة
+                      مجموع الفاتورة
                     </h3>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center py-2">
