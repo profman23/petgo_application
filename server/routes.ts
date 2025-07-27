@@ -10,7 +10,7 @@ import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVe
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
-import { generateSimplePDF } from "./simple-pdf-generator";
+import { generateFinalPDF } from "./final-pdf-generator";
 // Payment service removed per user request
 
 // Simple session middleware
@@ -3427,8 +3427,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentMethods: payments || []
       };
 
-      // Generate PDF using simple generator (avoiding Chrome/Puppeteer issues)
-      const pdfBuffer = await generateSimplePDF(invoiceData, language as 'ar' | 'en');
+      // Generate PDF using Final PDF generator (no Chrome/Puppeteer dependencies)
+      const pdfBuffer = await generateFinalPDF(invoiceData, language as 'ar' | 'en');
       
       // Set response headers
       res.setHeader('Content-Type', 'application/pdf');
@@ -3447,16 +3447,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // New download invoice PDF endpoint for doctor interface
   app.post('/api/download-invoice-pdf', requireAuth, async (req, res) => {
     try {
-      const invoiceData = req.body;
+      const { bookingId, invoiceNumber, language } = req.body;
       
-      console.log('Received invoice data for PDF download:', {
-        bookingId: invoiceData.bookingId,
-        invoiceNumber: invoiceData.invoiceNumber,
-        language: invoiceData.language || 'ar'
+      console.log('Received invoice data for PDF download:', { bookingId, invoiceNumber, language });
+
+      // Get complete booking details from database
+      const booking = await storage.getBookingWithDetails(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+
+      console.log('Booking details:', {
+        customerFirstName: booking.customerFirstName,
+        customerLastName: booking.customerLastName,
+        customerPhone: booking.customerPhone,
+        pets: booking.pets?.length || 0
       });
 
-      // Generate PDF using simple generator (avoiding Chrome/Puppeteer issues)
-      const pdfBuffer = await generateSimplePDF(invoiceData, (invoiceData.language || 'ar') as 'ar' | 'en');
+      // Get invoice items
+      const invoiceItems = await storage.getInvoiceItems(bookingId);
+      
+      // Get invoice status
+      const invoiceStatus = await storage.getInvoiceStatus(bookingId);
+      
+      // Get payments
+      const payments = await storage.getInvoicePaymentsByBooking(bookingId);
+
+      // Prepare complete invoice data
+      const invoiceData = {
+        invoiceNumber: invoiceNumber || invoiceStatus?.invoiceNumber || `Vets${String(bookingId).padStart(8, '0')}`,
+        bookingId: booking.id.toString(),
+        appointmentDate: booking.appointmentDate,
+        appointmentTime: booking.appointmentTime,
+        doctorName: booking.doctorName || 'Dr. VetsVan',
+        vetsVanCode: booking.vetsVanCode || 'VETS001',
+        customer: {
+          firstName: booking.user?.first_name || booking.user?.firstName || 'Unknown',
+          lastName: booking.user?.last_name || booking.user?.lastName || '',
+          phone: booking.user?.phone || booking.customerPhone || '',
+          email: booking.user?.email || booking.customerEmail || ''
+        },
+        pets: booking.selectedPets || booking.pets || [],
+        serviceType: booking.serviceType || 'General Service',
+        items: invoiceItems || [],
+        subtotal: invoiceItems?.reduce((sum, item) => sum + (item.totalBeforeVat || 0), 0) || 0,
+        discount: invoiceItems?.reduce((sum, item) => sum + (item.discount || 0), 0) || 0,
+        tax: invoiceItems?.reduce((sum, item) => sum + (item.vatAmount || 0), 0) || 0,
+        total: invoiceItems?.reduce((sum, item) => sum + (item.totalAfterVat || 0), 0) || 0,
+        paymentMethods: payments || []
+      };
+
+      // Generate PDF using Final PDF generator (no Chrome/Puppeteer dependencies)
+      const pdfBuffer = await generateFinalPDF(invoiceData, (language || 'ar') as 'ar' | 'en');
       
       // Set response headers for download
       res.setHeader('Content-Type', 'application/pdf');

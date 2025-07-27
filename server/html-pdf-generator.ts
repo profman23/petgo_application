@@ -52,8 +52,9 @@ export async function generateHtmlPDF(invoiceData: InvoiceData, language: 'ar' |
         : date.toLocaleDateString('en-US');
     };
 
-    const formatCurrency = (amount: number) => {
-      return amount.toFixed(2);
+    const formatCurrency = (amount: number | string) => {
+      const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+      return (isNaN(numAmount) ? 0 : numAmount).toFixed(2);
     };
 
     const totalPaid = (invoiceData.paymentMethods || []).reduce(
