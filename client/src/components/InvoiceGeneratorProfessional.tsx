@@ -311,10 +311,10 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 <Clock className="h-4 w-4 mr-2 text-purple-600" />
                 {formatTime(invoiceData.appointmentTime)}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                 <span className="font-semibold" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الطبيب:' : 'Doctor:'}</span> {invoiceData.doctorName}
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                 <span className="font-semibold" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'المركبة:' : 'Vehicle:'}</span> {invoiceData.vetsVanCode}
               </div>
             </div>
@@ -350,23 +350,23 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             </h3>
             <div className="customer-info">
               <div>
-                <div className="info-item">
+                <div className="info-item" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                   <span className="info-label" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الاسم:' : 'Name:'}</span>
                   <span>{invoiceData.customer.firstName} {invoiceData.customer.lastName}</span>
                 </div>
-                <div className="info-item">
+                <div className="info-item" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                   <span className="info-label" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الهاتف:' : 'Phone:'}</span>
                   <span>{invoiceData.customer.phone}</span>
                 </div>
               </div>
               <div>
                 {invoiceData.customer.email && (
-                  <div className="info-item">
+                  <div className="info-item" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                     <span className="info-label" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الإيميل:' : 'Email:'}</span>
                     <span>{invoiceData.customer.email}</span>
                   </div>
                 )}
-                <div className="info-item">
+                <div className="info-item" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                   <span className="info-label" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الخدمة:' : 'Service:'}</span>
                   <span>{invoiceData.serviceType}</span>
                 </div>
@@ -496,7 +496,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             <div className="bg-white border border-gray-300 rounded-lg shadow-md p-4 w-80">
               <div className="space-y-2">
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold', direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                     {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
                   </span>
                   <span className="text-sm font-semibold text-gray-800" style={{ fontWeight: 'bold' }}>
@@ -506,7 +506,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 <div className="border-b border-gray-200"></div>
                 
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold', direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                     {language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT:'}
                   </span>
                   <span className="text-sm font-semibold text-gray-800" style={{ fontWeight: 'bold' }}>
@@ -516,7 +516,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 <div className="border-b border-gray-200"></div>
                 
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold', direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                     {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
                   </span>
                   <span className="text-sm font-bold text-purple-600" style={{ fontWeight: 'bold' }}>
@@ -526,7 +526,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 <div className="border-b border-gray-200"></div>
                 
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold', direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                     {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
                   </span>
                   <span className="text-sm font-semibold text-green-600" style={{ fontWeight: 'bold' }}>
@@ -535,7 +535,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 </div>
                 
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold', direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}>
                     {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
                   </span>
                   <span className="text-sm font-semibold text-red-600" style={{ fontWeight: 'bold' }}>

@@ -30,6 +30,10 @@ const InvoiceView = () => {
     queryKey: ['invoice-view', bookingId],
     queryFn: async () => {
       const response = await apiRequest(`/api/invoice-view/${bookingId}`);
+      // Ensure invoice number is set
+      if (response && !response.invoiceNumber && response.booking) {
+        response.invoiceNumber = response.booking.invoiceNumber || `VETSVAN-${bookingId}`;
+      }
       return response;
     },
     enabled: !!bookingId
