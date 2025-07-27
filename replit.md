@@ -843,6 +843,14 @@ Changelog:
 - July 22, 2025. POSITIONED: Button in Weekly Tips section area as requested with proper z-index and hover effects
 - July 22, 2025. ENHANCED: Contact button positioning moved to 60% (below image level in Weekly Tips section)
 - July 22, 2025. UPDATED: Text color changed to gray (text-gray-500) for subtler appearance
+- July 27, 2025. IMPLEMENTED: Complete Saudi Riyal symbol replacement system across entire invoice infrastructure
+- July 27, 2025. ADDED: New black Saudi Riyal PNG symbol (Screenshot 2025-07-27 144314_1753616612709.png) to replace all "SAR" text
+- July 27, 2025. UPDATED: doctor-invoice.tsx search dropdowns to display new Riyal symbol instead of text for products and services pricing
+- July 27, 2025. ENHANCED: PDF generator (server/pdf-generator.ts) with getRiyalSymbolBase64() function for proper symbol conversion
+- July 27, 2025. REPLACED: All "SAR" occurrences in PDF invoice table items and totals sections with base64-encoded Riyal symbol
+- July 27, 2025. COMPLETED: Bilingual invoice system now uses consistent Riyal symbol across View Dialog and PDF formats
+- July 27, 2025. FINALIZED: Arabic text layout properly displays symbol on left, value on right for natural reading flow
+- July 27, 2025. SUCCESS: Complete currency symbol standardization - no more "SAR" text anywhere in the system
 - July 22, 2025. IMPLEMENTED: Animated border with pulse effect - transitions between gray and purple (#852085) every 2 seconds
 - July 22, 2025. REDESIGNED: Contact Us button with horizontal expansion - removes popup, creates full-width expandable bar
 - July 22, 2025. COMPLETED: Account Details field standardization with Comic Relief typography and proper field naming

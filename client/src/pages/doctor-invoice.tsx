@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
 import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Download } from 'lucide-react';
 import logoImage from '@assets/Screenshot 2025-07-10 181936_1753542080451.png';
+import riyalSymbol from '@assets/Screenshot 2025-07-27 144314_1753616612709.png';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -1608,8 +1609,9 @@ export default function DoctorInvoice() {
                                                         <div className="text-sm font-medium text-gray-900 truncate max-w-40">
                                                           {product.name}
                                                         </div>
-                                                        <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded">
-                                                          {product.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                        <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                          {product.price}
+                                                          <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
                                                         </div>
                                                       </div>
                                                     </div>
@@ -1652,8 +1654,9 @@ export default function DoctorInvoice() {
                                                         <div className="text-sm font-medium text-gray-900 truncate max-w-40">
                                                           {service.name}
                                                         </div>
-                                                        <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded">
-                                                          {service.price} {language === 'ar' ? 'ر.س' : 'SAR'}
+                                                        <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                          {service.price}
+                                                          <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
                                                         </div>
                                                       </div>
                                                     </div>
@@ -1806,21 +1809,33 @@ export default function DoctorInvoice() {
               <div className="w-80">
                 <div className="flex justify-between mb-2">
                   <span>{t('subtotal')}:</span>
-                  <span>{subtotal.toFixed(2)} {t('sar')}</span>
+                  <span className="flex items-center gap-1">
+                    {subtotal.toFixed(2)}
+                    <img src={riyalSymbol} alt="ر.س" className="w-4 h-4" />
+                  </span>
                 </div>
                 {totalDiscountAmount > 0 && (
                   <div className="flex justify-between mb-2 text-green-600">
                     <span>{t('discount')}:</span>
-                    <span>-{totalDiscountAmount.toFixed(2)} {t('sar')}</span>
+                    <span className="flex items-center gap-1">
+                      -{totalDiscountAmount.toFixed(2)}
+                      <img src={riyalSymbol} alt="ر.س" className="w-4 h-4" />
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between mb-2">
                   <span>{t('tax')}:</span>
-                  <span>{taxAmount.toFixed(2)} {t('sar')}</span>
+                  <span className="flex items-center gap-1">
+                    {taxAmount.toFixed(2)}
+                    <img src={riyalSymbol} alt="ر.س" className="w-4 h-4" />
+                  </span>
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
                   <span>{t('finalTotal')}:</span>
-                  <span>{finalTotal.toFixed(2)} {t('sar')}</span>
+                  <span className="flex items-center gap-1">
+                    {finalTotal.toFixed(2)}
+                    <img src={riyalSymbol} alt="ر.س" className="w-4 h-4" />
+                  </span>
                 </div>
 
                 {/* Payment Summary */}
@@ -2205,8 +2220,9 @@ export default function DoctorInvoice() {
                     <div className="text-center">
                       <p className="text-xs text-gray-700">{item.quantity}</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-700">{item.unitPrice} SAR</p>
+                    <div className="text-center flex items-center justify-center gap-1">
+                      <p className="text-xs text-gray-700">{item.unitPrice}</p>
+                      <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
                     </div>
                     <div className="text-center">
                       <p className="text-xs text-gray-700">
@@ -2215,14 +2231,17 @@ export default function DoctorInvoice() {
                           : 'No Discount'}
                       </p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-700">{item.vatAmount} SAR</p>
+                    <div className="text-center flex items-center justify-center gap-1">
+                      <p className="text-xs text-gray-700">{item.vatAmount}</p>
+                      <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
                     </div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-700">{item.totalBeforeVat} SAR</p>
+                    <div className="text-center flex items-center justify-center gap-1">
+                      <p className="text-xs text-gray-700">{item.totalBeforeVat}</p>
+                      <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
                     </div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-700">{item.totalAfterVat} SAR</p>
+                    <div className="text-center flex items-center justify-center gap-1">
+                      <p className="text-xs text-gray-700">{item.totalAfterVat}</p>
+                      <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
                     </div>
                   </div>
                 ))}
@@ -2239,8 +2258,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           Total Before VAT:
                         </span>
-                        <span className="text-sm font-semibold text-gray-800">
-                          {(subtotal - totalDiscountAmount).toFixed(2)} SAR
+                        <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
+                          {(subtotal - totalDiscountAmount).toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
@@ -2249,8 +2269,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           VAT (15%):
                         </span>
-                        <span className="text-sm font-semibold text-gray-800">
-                          {taxAmount.toFixed(2)} SAR
+                        <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
+                          {taxAmount.toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
@@ -2259,8 +2280,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           Final Total:
                         </span>
-                        <span className="text-sm font-bold text-purple-600">
-                          {finalTotal.toFixed(2)} SAR
+                        <span className="text-sm font-bold text-purple-600 flex items-center gap-1">
+                          {finalTotal.toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
@@ -2269,8 +2291,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           Total Paid:
                         </span>
-                        <span className="text-sm font-semibold text-green-600">
-                          {totalPaid.toFixed(2)} SAR
+                        <span className="text-sm font-semibold text-green-600 flex items-center gap-1">
+                          {totalPaid.toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                       
@@ -2278,8 +2301,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           Remaining Balance:
                         </span>
-                        <span className="text-sm font-semibold text-red-600">
-                          {remainingBalance.toFixed(2)} SAR
+                        <span className="text-sm font-semibold text-red-600 flex items-center gap-1">
+                          {remainingBalance.toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                     </div>
@@ -2295,8 +2319,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           :المجموع قبل الضريبة
                         </span>
-                        <span className="text-sm font-semibold text-gray-800">
-                          {(subtotal - totalDiscountAmount).toFixed(2)} SAR
+                        <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
+                          {(subtotal - totalDiscountAmount).toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
@@ -2305,8 +2330,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           :ضريبة القيمة المضافة (15%)
                         </span>
-                        <span className="text-sm font-semibold text-gray-800">
-                          {taxAmount.toFixed(2)} SAR
+                        <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
+                          {taxAmount.toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
@@ -2315,8 +2341,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           :المجموع النهائي
                         </span>
-                        <span className="text-sm font-bold text-purple-600">
-                          {finalTotal.toFixed(2)} SAR
+                        <span className="text-sm font-bold text-purple-600 flex items-center gap-1">
+                          {finalTotal.toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
@@ -2325,8 +2352,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           :المبلغ المدفوع
                         </span>
-                        <span className="text-sm font-semibold text-green-600">
-                          {totalPaid.toFixed(2)} SAR
+                        <span className="text-sm font-semibold text-green-600 flex items-center gap-1">
+                          {totalPaid.toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                       
@@ -2334,8 +2362,9 @@ export default function DoctorInvoice() {
                         <span className="text-sm font-medium text-gray-700">
                           :الرصيد المتبقي
                         </span>
-                        <span className="text-sm font-semibold text-red-600">
-                          {remainingBalance.toFixed(2)} SAR
+                        <span className="text-sm font-semibold text-red-600 flex items-center gap-1">
+                          {remainingBalance.toFixed(2)}
+                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
                         </span>
                       </div>
                     </div>
