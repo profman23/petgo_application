@@ -72,7 +72,7 @@ const getLogoBase64 = (): string => {
 
 const getRiyalSymbolBase64 = (): string => {
   try {
-    const symbolPath = path.join(process.cwd(), 'server', 'riyal-symbol.png');
+    const symbolPath = path.join(process.cwd(), 'attached_assets', 'Screenshot 2025-07-27 144314_1753616612709.png');
     const imageBuffer = fs.readFileSync(symbolPath);
     return imageBuffer.toString('base64');
   } catch (error) {
@@ -249,6 +249,9 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         <div class="header-section">
           <!-- Date on the left -->
           <div class="date-section">
+            <p style="font-size: 10px; color: #666; margin-bottom: 4px;">
+              Invoice: ${invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
+            </p>
             <p class="date-text">
               ${new Date().toLocaleDateString('en-US')}
             </p>
@@ -278,7 +281,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               Customer Name: ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
             </p>
             <p class="customer-info-arabic">
-              ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''} :اسم العميل
+              :اسم العميل ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
             </p>
           </div>
           
@@ -288,7 +291,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               Customer Phone: ${invoiceData.customer?.phone || ''}
             </p>
             <p class="customer-info-arabic">
-              ${invoiceData.customer?.phone || ''} :تليفون العميل
+              :تليفون العميل ${invoiceData.customer?.phone || ''}
             </p>
           </div>
           
