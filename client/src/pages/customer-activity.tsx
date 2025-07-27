@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, FileText, Download } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -55,9 +55,6 @@ export default function CustomerActivity() {
   const [showTrackingDialog, setShowTrackingDialog] = useState(false);
   const [selectedTrackingBooking, setSelectedTrackingBooking] = useState<Booking | null>(null);
   const [trackingData, setTrackingData] = useState<any>(null);
-
-  // PDF download state
-  const [downloadingPDF, setDownloadingPDF] = useState<number | null>(null);
 
   // Handle logout
   const handleLogout = () => {
@@ -118,49 +115,6 @@ export default function CustomerActivity() {
       });
     },
   });
-
-  // Download PDF invoice
-  const downloadInvoicePDF = async (bookingId: number) => {
-    setDownloadingPDF(bookingId);
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/generate-pdf/invoice/${bookingId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ language })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-
-      const pdfBlob = await response.blob();
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Invoice_${bookingId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast({
-        title: language === 'ar' ? 'تم تحميل الفاتورة' : 'Invoice Downloaded',
-        description: language === 'ar' ? 'تم تحميل الفاتورة بنجاح' : 'Invoice downloaded successfully',
-      });
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ' : 'Error',
-        description: language === 'ar' ? 'فشل في تحميل الفاتورة' : 'Failed to download invoice',
-        variant: 'destructive',
-      });
-    }
-    setDownloadingPDF(null);
-  };
 
   // Open review dialog
   const openReviewDialog = (booking: Booking) => {
@@ -508,44 +462,24 @@ export default function CustomerActivity() {
 
                               {/* Rate Service Button for Completed Services */}
                               {booking.status === 'completed' && (
-                                <>
-                                  <Button
-                                    onClick={() => openReviewDialog(booking)}
-                                    variant="outline"
-                                    disabled={isBookingReviewed(booking.id)}
-                                    className={`w-full font-semibold py-2 px-4 ${
-                                      isBookingReviewed(booking.id) 
-                                        ? 'text-green-600 border-green-200 bg-green-50 cursor-not-allowed opacity-75' 
-                                        : 'text-purple-600 border-purple-600 hover:bg-purple-100'
-                                    }`}
-                                  >
-                                    <Star className={`w-4 h-4 mr-2 ${
-                                      isBookingReviewed(booking.id) ? 'fill-current text-green-600' : 'fill-current'
-                                    }`} />
-                                    {isBookingReviewed(booking.id) 
-                                      ? (language === 'ar' ? 'تم التقييم' : 'Rated')
-                                      : (language === 'ar' ? 'تقييم الخدمة' : 'Rate Service')
-                                    }
-                                  </Button>
-
-                                  {/* Download Invoice Button */}
-                                  <Button
-                                    onClick={() => downloadInvoicePDF(booking.id)}
-                                    variant="outline"
-                                    disabled={downloadingPDF === booking.id}
-                                    className="w-full font-semibold py-2 px-4 text-blue-600 border-blue-600 hover:bg-blue-50"
-                                  >
-                                    {downloadingPDF === booking.id ? (
-                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                                    ) : (
-                                      <Download className="w-4 h-4 mr-2" />
-                                    )}
-                                    {downloadingPDF === booking.id 
-                                      ? (language === 'ar' ? 'جاري التحميل...' : 'Downloading...')
-                                      : (language === 'ar' ? 'تحميل الفاتورة' : 'Download Invoice')
-                                    }
-                                  </Button>
-                                </>
+                                <Button
+                                  onClick={() => openReviewDialog(booking)}
+                                  variant="outline"
+                                  disabled={isBookingReviewed(booking.id)}
+                                  className={`w-full font-semibold py-2 px-4 ${
+                                    isBookingReviewed(booking.id) 
+                                      ? 'text-green-600 border-green-200 bg-green-50 cursor-not-allowed opacity-75' 
+                                      : 'text-purple-600 border-purple-600 hover:bg-purple-100'
+                                  }`}
+                                >
+                                  <Star className={`w-4 h-4 mr-2 ${
+                                    isBookingReviewed(booking.id) ? 'fill-current text-green-600' : 'fill-current'
+                                  }`} />
+                                  {isBookingReviewed(booking.id) 
+                                    ? (language === 'ar' ? 'تم التقييم' : 'Rated')
+                                    : (language === 'ar' ? 'تقييم الخدمة' : 'Rate Service')
+                                  }
+                                </Button>
                               )}
                             </div>
                           </div>

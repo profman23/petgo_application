@@ -2,10 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { getTranslation } from '../../../shared/invoice-config';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Download } from 'lucide-react';
-import logoImage from '@assets/Screenshot 2025-07-10 181936_1753542080451.png';
-import riyalSymbol from '@assets/Screenshot 2025-07-27 144314_1753616612709.png';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,7 +12,6 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
 import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
-
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -82,8 +78,6 @@ export default function DoctorInvoice() {
   const { language } = useLanguage();
   const { toast } = useToast();
   
-  const bookingId = params?.bookingId;
-  
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([
     { 
       id: '1', 
@@ -122,8 +116,6 @@ export default function DoctorInvoice() {
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState('');
-  const [applyDiscount, setApplyDiscount] = useState(false);
-  const [showInvoicePreview, setShowInvoicePreview] = useState(false);
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -206,7 +198,7 @@ export default function DoctorInvoice() {
       return response;
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    cacheTime: 30 * 60 * 1000, // 30 minutes
   });
 
   // Fetch services for invoice item selection
@@ -217,7 +209,7 @@ export default function DoctorInvoice() {
       return response;
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
+    cacheTime: 30 * 60 * 1000, // 30 minutes
   });
 
   // Load saved invoice items when data is available
@@ -372,10 +364,10 @@ export default function DoctorInvoice() {
       total: 'المجموع',
       addItem: 'إضافة صنف',
       removeItem: 'حذف الصنف',
-      subtotal: 'المجموع الفرعي',
+      subtotal: 'المجموع قبل الضريبة',
       tax: 'ضريبة القيمة المضافة 15%',
       discount: 'الخصم',
-      finalTotal: 'المبلغ الإجمالي',
+      finalTotal: 'المجموع النهائي',
       addPayment: 'إضافة دفعة',
       paymentAdded: 'تمت إضافة الدفعة',
       paymentSuccess: 'تمت إضافة الدفعة بنجاح',
@@ -425,7 +417,6 @@ export default function DoctorInvoice() {
       sortByName: 'الاسم',
       sortByPrice: 'السعر',
       clearFilters: 'مسح الفلاتر',
-      downloadInvoice: 'تحميل الفاتورة',
     },
     en: {
       invoiceTitle: 'VETS VAN Service Invoice',
@@ -439,10 +430,10 @@ export default function DoctorInvoice() {
       total: 'Total',
       addItem: 'Add Item',
       removeItem: 'Remove Item',
-      subtotal: 'Subtotal',
+      subtotal: 'Total Before VAT',
       tax: 'VAT 15%',
       discount: 'Discount',
-      finalTotal: 'Total Amount',
+      finalTotal: 'Final Total',
       addPayment: 'Add Payment',
       paymentAdded: 'Payment Added',
       paymentSuccess: 'Payment has been added successfully',
@@ -492,7 +483,6 @@ export default function DoctorInvoice() {
       sortByName: 'Name',
       sortByPrice: 'Price',
       clearFilters: 'Clear Filters',
-      downloadInvoice: 'Download Invoice',
     }
   };
 
@@ -589,7 +579,7 @@ export default function DoctorInvoice() {
     try {
       await apiRequest(`/api/invoice-items/${booking.id}`, {
         method: 'POST',
-        body: JSON.stringify({ items: itemsToSave })
+        body: { items: itemsToSave }
       });
     } catch (error) {
       console.error('Error auto-saving invoice items:', error);
@@ -790,7 +780,7 @@ export default function DoctorInvoice() {
         // Update existing vitals
         await apiRequest(`/api/pet-vitals/${existingVitalId}`, {
           method: 'PUT',
-          body: JSON.stringify(vitalsPayload)
+          body: vitalsPayload
         });
         
         toast({
@@ -801,7 +791,7 @@ export default function DoctorInvoice() {
         // Create new vitals
         await apiRequest('/api/pet-vitals', {
           method: 'POST',
-          body: JSON.stringify(vitalsPayload)
+          body: vitalsPayload
         });
         
         toast({
@@ -841,99 +831,6 @@ export default function DoctorInvoice() {
     setShowConfirmDialog(true);
   };
 
-  // Handle download invoice function
-  const handleDownloadInvoice = async () => {
-    if (!booking || !doctorInfo) {
-      toast({
-        title: language === 'ar' ? 'بيانات غير مكتملة' : 'Incomplete data',
-        description: language === 'ar' ? 'يرجى التأكد من توفر جميع البيانات' : 'Please ensure all data is available',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      // Prepare invoice data
-      const invoiceData = {
-        bookingId: booking.id,
-        invoiceNumber: invoiceStatus?.invoiceNumber,
-        customer: {
-          firstName: booking.customerName?.split(' ')[0] || '',
-          lastName: booking.customerName?.split(' ').slice(1).join(' ') || '',
-          phone: booking.customerPhone || '',
-          email: booking.customerEmail || ''
-        },
-        pets: booking.pets,
-        appointmentDate: booking.appointmentDate,
-        appointmentTime: booking.appointmentTime,
-        serviceType: booking.serviceType,
-        items: invoiceItems.map(item => ({
-          ...item,
-          discount: item.discount || 0,
-          discountType: item.discountType || 'none',
-          vatRate: 15,
-          vatAmount: item.vatAmount || 0,
-          totalBeforeVat: item.totalBeforeVat || 0,
-          totalAfterVat: item.totalAfterVat || 0
-        })),
-        subtotal: subtotal,
-        discount: totalDiscountAmount,
-        tax: taxAmount,
-        total: finalTotal,
-        notes: notes,
-        doctorName: doctorInfo.name || 'Dr. VETS VAN',
-        vetsVanCode: doctorInfo.vetsvanCode || 'VETS001',
-        paymentMethods: invoicePayments.map(payment => ({
-          id: payment.id.toString(),
-          method: payment.paymentMethod,
-          amount: payment.amount,
-          date: payment.paymentDate,
-          reference: payment.reference
-        }))
-      };
-
-      // Call PDF download API using fetch directly to get PDF blob
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/download-invoice-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(invoiceData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to download PDF');
-      }
-
-      // Get the PDF as blob
-      const blob = await response.blob();
-      
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `VETS_Invoice_${invoiceData.invoiceNumber || booking.id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
-      toast({
-        title: language === 'ar' ? 'تم تحميل الفاتورة' : 'Invoice Downloaded',
-        description: language === 'ar' ? 'تم تحميل الفاتورة بنجاح' : 'Invoice downloaded successfully',
-        variant: 'default',
-      });
-    } catch (error) {
-      console.error('Error downloading invoice:', error);
-      toast({
-        title: language === 'ar' ? '❌ خطأ في تحميل الفاتورة' : '❌ Error downloading invoice',
-        description: language === 'ar' ? 'حدث خطأ أثناء تحميل الفاتورة' : 'An error occurred while downloading the invoice',
-        variant: 'destructive',
-      });
-    }
-  };
-
   // Generate invoice after confirmation
   const confirmGenerateInvoice = async () => {
     try {
@@ -949,24 +846,25 @@ export default function DoctorInvoice() {
       // Save invoice items to database
       await apiRequest(`/api/invoice-items/${booking.id}`, {
         method: 'POST',
-        body: JSON.stringify({ items: invoiceItems })
+        body: { items: invoiceItems }
       });
 
       // Save invoice status to database
       await apiRequest(`/api/invoice-status/${booking.id}`, {
         method: 'POST',
-        body: JSON.stringify({
+        body: {
           subtotal,
           taxAmount,
           discountAmount: totalDiscountAmount,
           finalTotal,
           notes
-        })
+        }
       });
 
       // Lock the record (make invoice items read-only)
       setIsRecordLocked(true);
       setShowConfirmDialog(false);
+      setShowInvoiceGenerator(true);
 
       // Send invoice link via email
       try {
@@ -1193,10 +1091,10 @@ export default function DoctorInvoice() {
                     // Arabic RTL order
                     <>
                       <th className="text-center py-2 px-2 w-32">
-                        {getTranslation('totalAfterVat', language)} ({t('sar')})
+                        {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} ({t('sar')})
                       </th>
                       <th className="text-center py-2 px-2 w-32">
-                        {getTranslation('totalBeforeVat', language)} ({t('sar')})
+                        {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} ({t('sar')})
                       </th>
                       <th className="text-center py-2 px-2 w-24">
                         {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)
@@ -1234,10 +1132,10 @@ export default function DoctorInvoice() {
                         {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)
                       </th>
                       <th className="text-center py-2 px-2 w-32">
-                        {getTranslation('totalBeforeVat', language)} ({t('sar')})
+                        {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} ({t('sar')})
                       </th>
                       <th className="text-center py-2 px-2 w-32">
-                        {getTranslation('totalAfterVat', language)} ({t('sar')})
+                        {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} ({t('sar')})
                       </th>
                       <th className="w-16"></th>
                     </>
@@ -1613,9 +1511,8 @@ export default function DoctorInvoice() {
                                                         <div className="text-sm font-medium text-gray-900 truncate max-w-40">
                                                           {product.name}
                                                         </div>
-                                                        <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded flex items-center gap-1">
-                                                          {product.price}
-                                                          <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
+                                                        <div className="text-xs font-bold text-purple-600 ml-1 bg-purple-100 px-1.5 py-0.5 rounded">
+                                                          {product.price} {language === 'ar' ? 'ر.س' : 'SAR'}
                                                         </div>
                                                       </div>
                                                     </div>
@@ -1658,9 +1555,8 @@ export default function DoctorInvoice() {
                                                         <div className="text-sm font-medium text-gray-900 truncate max-w-40">
                                                           {service.name}
                                                         </div>
-                                                        <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded flex items-center gap-1">
-                                                          {service.price}
-                                                          <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
+                                                        <div className="text-xs font-bold text-blue-600 ml-1 bg-blue-100 px-1.5 py-0.5 rounded">
+                                                          {service.price} {language === 'ar' ? 'ر.س' : 'SAR'}
                                                         </div>
                                                       </div>
                                                     </div>
@@ -1813,33 +1709,21 @@ export default function DoctorInvoice() {
               <div className="w-80">
                 <div className="flex justify-between mb-2">
                   <span>{t('subtotal')}:</span>
-                  <span className="flex items-center gap-1">
-                    {subtotal.toFixed(2)}
-                    <img src={riyalSymbol} alt="ر.س" className="w-4 h-4" />
-                  </span>
+                  <span>{subtotal.toFixed(2)} {t('sar')}</span>
                 </div>
                 {totalDiscountAmount > 0 && (
                   <div className="flex justify-between mb-2 text-green-600">
                     <span>{t('discount')}:</span>
-                    <span className="flex items-center gap-1">
-                      -{totalDiscountAmount.toFixed(2)}
-                      <img src={riyalSymbol} alt="ر.س" className="w-4 h-4" />
-                    </span>
+                    <span>-{totalDiscountAmount.toFixed(2)} {t('sar')}</span>
                   </div>
                 )}
                 <div className="flex justify-between mb-2">
                   <span>{t('tax')}:</span>
-                  <span className="flex items-center gap-1">
-                    {taxAmount.toFixed(2)}
-                    <img src={riyalSymbol} alt="ر.س" className="w-4 h-4" />
-                  </span>
+                  <span>{taxAmount.toFixed(2)} {t('sar')}</span>
                 </div>
                 <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
                   <span>{t('finalTotal')}:</span>
-                  <span className="flex items-center gap-1">
-                    {finalTotal.toFixed(2)}
-                    <img src={riyalSymbol} alt="ر.س" className="w-4 h-4" />
-                  </span>
+                  <span>{finalTotal.toFixed(2)} {t('sar')}</span>
                 </div>
 
                 {/* Payment Summary */}
@@ -1926,7 +1810,7 @@ export default function DoctorInvoice() {
         )}
 
         {/* Actions */}
-        <div className="flex flex-col items-center gap-4 mb-6">
+        <div className="flex justify-center mb-6">
           <Button
             onClick={handleGenerateInvoiceClick}
             disabled={isRecordLocked}
@@ -1938,24 +1822,6 @@ export default function DoctorInvoice() {
           >
             <Receipt className="h-6 w-6 ml-2" />
             {isRecordLocked ? `${t('generateInvoice')} ✓` : t('generateInvoice')}
-          </Button>
-
-          {/* Download Invoice Button */}
-          <Button
-            onClick={handleDownloadInvoice}
-            className="px-8 py-3 text-lg bg-green-600 hover:bg-green-700 text-white"
-          >
-            <Download className="h-6 w-6 ml-2" />
-            {t('downloadInvoice')}
-          </Button>
-
-          {/* View Invoice Button */}
-          <Button
-            onClick={() => setShowInvoicePreview(true)}
-            className="px-8 py-3 text-lg bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <FileText className="h-6 w-6 ml-2" />
-            {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
           </Button>
         </div>
       </div>
@@ -2070,7 +1936,48 @@ export default function DoctorInvoice() {
         />
       )}
 
-
+      {/* Invoice Generator */}
+      {showInvoiceGenerator && booking && doctorInfo && (
+        <InvoiceGeneratorProfessional
+          invoiceData={{
+            bookingId: booking.id,
+            customer: {
+              firstName: booking.customerName?.split(' ')[0] || '',
+              lastName: booking.customerName?.split(' ').slice(1).join(' ') || '',
+              phone: booking.customerPhone || '',
+              email: booking.customerEmail || ''
+            },
+            pets: booking.pets,
+            appointmentDate: booking.appointmentDate,
+            appointmentTime: booking.appointmentTime,
+            serviceType: booking.serviceType,
+            items: invoiceItems.map(item => ({
+              ...item,
+              discount: item.discount || 0,
+              discountType: item.discountType || 'none',
+              vatRate: 15,
+              vatAmount: item.vatAmount || 0,
+              totalBeforeVat: item.totalBeforeVat || 0,
+              totalAfterVat: item.totalAfterVat || 0
+            })),
+            subtotal: subtotal,
+            discount: totalDiscountAmount,
+            tax: taxAmount,
+            total: finalTotal,
+            notes: notes,
+            doctorName: doctorInfo.name || 'Dr. VETS VAN',
+            vetsVanCode: doctorInfo.vetsvanCode || 'VETS001',
+            paymentMethods: invoicePayments.map(payment => ({
+              id: payment.id.toString(),
+              method: payment.paymentMethod,
+              amount: payment.amount,
+              date: payment.paymentDate,
+              reference: payment.reference
+            }))
+          }}
+          onClose={() => setShowInvoiceGenerator(false)}
+        />
+      )}
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
@@ -2104,57 +2011,6 @@ export default function DoctorInvoice() {
               {t('confirm')}
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Invoice Preview Dialog */}
-      <Dialog open={showInvoicePreview} onOpenChange={setShowInvoicePreview}>
-        <DialogContent 
-          className="max-w-4xl max-h-[90vh] overflow-auto"
-          dir={getDirection(language)}
-        >
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              <span>{language === 'ar' ? 'معاينة الفاتورة' : 'Invoice Preview'}</span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleDownloadInvoice}
-                className="bg-green-600 text-white hover:bg-green-700"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'تحميل' : 'Download'}
-              </Button>
-            </DialogTitle>
-          </DialogHeader>
-          
-          {/* Invoice Preview with InvoiceGeneratorProfessional */}
-          <InvoiceGeneratorProfessional
-            invoiceData={{
-              bookingId: parseInt(bookingId || '0'),
-              invoiceNumber: invoiceStatus?.invoiceNumber,
-              customer: {
-                firstName: booking?.customerName?.split(' ')[0] || '',
-                lastName: booking?.customerName?.split(' ').slice(1).join(' ') || '',
-                phone: booking?.customerPhone || '',
-                email: booking?.customerEmail || ''
-              },
-              pets: booking?.pets || [],
-              appointmentDate: booking?.appointmentDate || '',
-              appointmentTime: booking?.appointmentTime || '',
-              serviceType: booking?.serviceType || 'General Service',
-              items: invoiceItems || [],
-              subtotal: subtotal || 0,
-              discount: totalDiscountAmount || 0,
-              tax: taxAmount || 0,
-              total: finalTotal || 0,
-              notes: '',
-              doctorName: 'Dr. VetsVan',
-              vetsVanCode: 'VETS001',
-              paymentMethods: payments || []
-            }}
-            onClose={() => setShowInvoicePreview(false)}
-          />
         </DialogContent>
       </Dialog>
     </div>

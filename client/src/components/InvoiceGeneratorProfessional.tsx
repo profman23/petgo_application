@@ -6,14 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
 import logoImage from "@assets/IMG-20250415-WA0047_1751986059751.jpg";
 import riyalLogo from "@assets/Screenshot 2025-07-08 171929_1751985624644.png";
-import { 
-  getTranslation, 
-  formatCurrency as sharedFormatCurrency, 
-  invoiceStyles, 
-  invoiceLayout, 
-  companyInfo,
-  qrCodeConfig 
-} from '@shared/invoice-config';
 
 interface InvoiceItem {
   id: string;
@@ -55,7 +47,6 @@ interface PaymentMethod {
 
 interface InvoiceData {
   bookingId: number;
-  invoiceNumber?: string;
   customer: Customer;
   pets: Pet[];
   appointmentDate: string;
@@ -127,7 +118,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     const generateQRCode = async () => {
       try {
         const qrData = {
-          invoice: invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`,
+          invoice: `VETSVAN-${invoiceData.bookingId}`,
           customer: `${invoiceData.customer.firstName} ${invoiceData.customer.lastName}`,
           total: invoiceData.total,
           date: invoiceData.appointmentDate,
@@ -154,92 +145,387 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
     generateQRCode();
   }, [invoiceData]);
 
-  const printInvoice = async () => {
-    setIsGenerating(true);
-    try {
-      // Make API call to generate PDF for printing
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/generate-pdf/invoice/${invoiceData.bookingId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ language })
-      });
+  const printInvoice = () => {
+    const printContent = invoiceRef.current;
+    if (!printContent) return;
 
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
 
-      // Get the PDF blob
-      const pdfBlob = await response.blob();
-      
-      // Create download link for PDF
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Invoice_${invoiceData.invoiceNumber || invoiceData.bookingId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
+        <head>
+          <meta charset="utf-8">
+          <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: 'Arial', 'Helvetica', sans-serif; 
+              font-size: 14px; 
+              line-height: 1.6; 
+              color: #333;
+              background: white;
+            }
+            .invoice-container { 
+              max-width: 210mm; 
+              margin: 0 auto; 
+              padding: 20mm;
+              background: white;
+            }
+            .header { 
+              display: flex; 
+              justify-content: space-between; 
+              align-items: flex-start; 
+              margin-bottom: 15px; 
+              padding-bottom: 15px; 
+              border-bottom: 3px solid #8B2F8B;
+            }
+            .logo-header {
+              text-align: center;
+              margin-bottom: 15px;
+            }
+            .logo-header img {
+              height: 60px !important;
+              width: auto !important;
+              max-width: 200px !important;
+              object-fit: contain !important;
+            }
+            .logo-section { flex: 1.5; }
+            .company-name { 
+              font-size: 32px; 
+              font-weight: 900; 
+              color: #8B2F8B; 
+              margin-bottom: 8px;
+              text-shadow: 1px 1px 2px rgba(139, 47, 139, 0.1);
+            }
+            .company-tagline { 
+              font-size: 16px; 
+              color: #666; 
+              font-style: italic;
+              margin-bottom: 10px;
+            }
+            .contact-info { 
+              font-size: 12px; 
+              color: #888; 
+              line-height: 1.4;
+            }
+            .invoice-details { 
+              flex: 1; 
+              text-align: center; 
+              padding: 0 20px;
+            }
+            .invoice-number { 
+              font-size: 24px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              margin-bottom: 10px;
+            }
+            .invoice-date { 
+              font-size: 14px; 
+              color: #666; 
+              margin-bottom: 5px;
+            }
+            .qr-section { 
+              flex: 1; 
+              text-align: ${language === 'ar' ? 'left' : 'right'};
+            }
+            .qr-code { 
+              width: 120px; 
+              height: 120px; 
+              border: 2px solid #000; 
+              border-radius: 8px;
+            }
+            .section { 
+              margin-bottom: 25px; 
+              padding: 20px; 
+              background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); 
+              border-radius: 10px; 
+              border-left: 5px solid #8B2F8B;
+            }
+            .section-title { 
+              font-size: 18px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              margin-bottom: 15px; 
+              border-bottom: 1px solid #e9ecef; 
+              padding-bottom: 8px;
+            }
+            .customer-info { 
+              display: grid; 
+              grid-template-columns: 1fr 1fr; 
+              gap: 20px; 
+              margin-top: 15px;
+            }
+            .info-item { 
+              margin-bottom: 8px; 
+            }
+            .info-label { 
+              font-weight: bold; 
+              color: #555; 
+              display: inline-block; 
+              min-width: 80px;
+            }
+            .pets-grid { 
+              display: grid; 
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+              gap: 15px; 
+              margin-top: 15px;
+            }
+            .pet-card { 
+              padding: 15px; 
+              background: white; 
+              border-radius: 8px; 
+              border: 2px solid #e9ecef; 
+              text-align: center;
+            }
+            .pet-name { 
+              font-size: 16px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              margin-bottom: 8px;
+            }
+            .pet-details { 
+              font-size: 12px; 
+              color: #666; 
+              line-height: 1.4;
+            }
+            .services-table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin: 15px 0; 
+              border-radius: 8px; 
+              overflow: hidden; 
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .services-table th { 
+              background: linear-gradient(135deg, #8B2F8B 0%, #a855f7 100%); 
+              color: white; 
+              padding: 12px 8px; 
+              text-align: center; 
+              font-weight: bold; 
+              font-size: 12px;
+            }
+            .services-table td { 
+              padding: 10px 8px; 
+              border: 1px solid #e9ecef; 
+              text-align: center;
+              font-size: 12px;
+            }
+            .services-table tbody tr:nth-child(even) { 
+              background: #f8f9fa;
+            }
+            .total-section { 
+              background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+              padding: 25px; 
+              border-radius: 12px; 
+              border: 3px solid #8B2F8B; 
+              margin-top: 20px;
+            }
+            .total-row { 
+              display: flex; 
+              justify-content: space-between; 
+              padding: 8px 0; 
+              border-bottom: 1px solid #d1d5db; 
+              font-size: 15px;
+            }
+            .total-row:last-child { 
+              border-bottom: none;
+            }
+            .final-total { 
+              font-size: 20px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              border-top: 2px solid #8B2F8B; 
+              padding-top: 15px; 
+              margin-top: 10px; 
+              background: white; 
+              padding: 15px; 
+              border-radius: 8px; 
+              text-align: center;
+            }
+            .notes-section { 
+              margin-top: 25px; 
+              padding: 20px; 
+              background: #fff8dc; 
+              border-radius: 8px; 
+              border: 2px solid #d4af37;
+            }
+            .footer { 
+              margin-top: 40px; 
+              padding-top: 20px; 
+              border-top: 2px solid #8B2F8B; 
+              text-align: center; 
+              font-size: 12px; 
+              color: #666;
+            }
+            .thank-you { 
+              font-size: 18px; 
+              font-weight: bold; 
+              color: #8B2F8B; 
+              margin-bottom: 10px;
+            }
+            .logo-header img {
+              height: 60px !important;
+              width: auto !important;
+              max-width: 200px !important;
+              object-fit: contain !important;
+            }
+            @media print {
+              .logo-header img {
+                height: 50px !important;
+                width: auto !important;
+                max-width: 180px !important;
+                object-fit: contain !important;
+              }
+              .section {
+                margin-bottom: 6px !important;
+                padding: 6px !important;
+                font-size: 11px !important;
+              }
+              .section-title {
+                font-size: 13px !important;
+                padding: 4px !important;
+                margin-bottom: 4px !important;
+              }
+              .info-item {
+                padding: 1px 0 !important;
+                font-size: 10px !important;
+                line-height: 1.2 !important;
+              }
+              .info-label {
+                font-size: 10px !important;
+              }
+              .pet-card {
+                padding: 4px !important;
+                margin-bottom: 4px !important;
+              }
+              .pet-name {
+                font-size: 12px !important;
+              }
+              .pet-detail {
+                font-size: 9px !important;
+              }
+              .header {
+                margin-bottom: 8px !important;
+                padding-bottom: 6px !important;
+              }
+              .company-name {
+                font-size: 20px !important;
+              }
+              .company-tagline {
+                font-size: 10px !important;
+              }
+              .invoice-details {
+                font-size: 11px !important;
+              }
+              .invoice-number {
+                font-size: 16px !important;
+              }
+              .contact-info {
+                font-size: 9px !important;
+              }
+              .qr-section {
+                margin: 8px 0 !important;
+              }
+              .qr-code {
+                width: 80px !important;
+                height: 80px !important;
+              }
+              .services-table th {
+                font-size: 8px !important;
+                padding: 3px !important;
+              }
+              .services-table td {
+                font-size: 7px !important;
+                padding: 2px !important;
+              }
+              .totals-section {
+                margin-top: 8px !important;
+                padding: 6px !important;
+              }
+              .total-row {
+                font-size: 10px !important;
+                padding: 2px 0 !important;
+              }
+              .final-total {
+                font-size: 14px !important;
+                padding: 8px !important;
+                margin-top: 6px !important;
+              }
+              .notes-section {
+                margin-top: 8px !important;
+                padding: 6px !important;
+                font-size: 10px !important;
+              }
+              .footer {
+                margin-top: 8px !important;
+                padding-top: 6px !important;
+                font-size: 9px !important;
+              }
+              .thank-you {
+                font-size: 12px !important;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `);
 
-      toast({
-        title: language === 'ar' ? 'تم تحميل الـ PDF بنجاح' : 'PDF Downloaded Successfully',
-        description: language === 'ar' ? 'تم تحميل الفاتورة كملف PDF' : 'Invoice downloaded as PDF file',
-      });
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ في تحميل PDF' : 'PDF Download Error',
-        description: language === 'ar' ? 'فشل في تحميل الفاتورة كـ PDF' : 'Failed to download invoice as PDF',
-        variant: 'destructive'
-      });
-    }
-    setIsGenerating(false);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
   };
 
   const downloadInvoice = async () => {
     setIsGenerating(true);
     try {
-      // Make API call to generate PDF
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/generate-pdf/invoice/${invoiceData.bookingId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ language })
-      });
+      // Create a formatted HTML version for download
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
+          <head>
+            <meta charset="utf-8">
+            <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
+            <style>
+              /* Include all the print styles here */
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body { font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #333; }
+              /* ... rest of styles ... */
+            </style>
+          </head>
+          <body>
+            ${invoiceRef.current?.innerHTML}
+          </body>
+        </html>
+      `;
 
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-
-      // Get the PDF blob
-      const pdfBlob = await response.blob();
-      
-      // Create download link
-      const url = URL.createObjectURL(pdfBlob);
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Invoice_${invoiceData.invoiceNumber || invoiceData.bookingId}.pdf`;
+      link.download = `VETSVAN-Invoice-${invoiceData.bookingId}.html`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
       toast({
-        title: language === 'ar' ? 'تم تحميل الـ PDF بنجاح' : 'PDF Downloaded Successfully',
-        description: language === 'ar' ? 'تم تحميل الفاتورة كملف PDF' : 'Invoice downloaded as PDF file',
+        title: language === 'ar' ? 'تم التحميل بنجاح' : 'Download Successful',
+        description: language === 'ar' ? 'تم تحميل الفاتورة بنجاح' : 'Invoice downloaded successfully',
       });
     } catch (error) {
-      console.error('Error downloading PDF:', error);
+      console.error('Error downloading invoice:', error);
       toast({
-        title: language === 'ar' ? 'خطأ في تحميل PDF' : 'PDF Download Error',
-        description: language === 'ar' ? 'فشل في تحميل الفاتورة كـ PDF' : 'Failed to download invoice as PDF',
+        title: language === 'ar' ? 'خطأ في التحميل' : 'Download Error',
+        description: language === 'ar' ? 'فشل في تحميل الفاتورة' : 'Failed to download invoice',
         variant: 'destructive'
       });
     }
@@ -256,13 +542,13 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
           </h3>
           <div className="flex gap-3">
-            <Button onClick={printInvoice} disabled={isGenerating} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
+            <Button onClick={printInvoice} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
               <Printer className="h-4 w-4 mr-2" />
-              {isGenerating ? (language === 'ar' ? 'جاري التحميل...' : 'Generating...') : (language === 'ar' ? 'تحميل PDF' : 'Download PDF')}
+              {language === 'ar' ? 'طباعة' : 'Print'}
             </Button>
             <Button onClick={downloadInvoice} disabled={isGenerating} size="sm" className="bg-white text-purple-600 hover:bg-gray-100">
               <Download className="h-4 w-4 mr-2" />
-              {isGenerating ? (language === 'ar' ? 'جاري التحميل...' : 'Generating...') : (language === 'ar' ? 'تحميل PDF' : 'Download PDF')}
+              {language === 'ar' ? 'تحميل' : 'Download'}
             </Button>
             <Button onClick={onClose} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
               <X className="h-4 w-4" />
@@ -281,47 +567,37 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             />
           </div>
           
-          {/* Test Label */}
-          <div className="text-center my-4">
-            <h2 className="text-lg font-bold text-purple-600">
-              {getTranslation('testLabel', language) || 'TEST FALLBACK'} - DEBUG: {language}
-            </h2>
-            <div className="text-xs text-gray-500">
-              Type: {typeof getTranslation} | Result: "{getTranslation('testLabel', language)}"
-            </div>
-          </div>
-          
           {/* Header Section */}
           <div className="header mb-4">
             <div className="logo-section">
               <div className="mb-3">
                 <div className="company-name text-3xl font-black text-purple-600">
-                  {getTranslation('companyName', language)}
+                  VETS VAN
                 </div>
                 <div className="company-tagline text-gray-600 font-medium">
-                  {getTranslation('companyTagline', language)}
+                  {language === 'ar' ? 'خدمات بيطرية متنقلة في منزلك' : 'Mobile Veterinary Services at Your Home'}
                 </div>
               </div>
               <div className="contact-info text-sm text-gray-600 space-y-1">
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-purple-600" />
-                  <span>{companyInfo.phone}</span>
+                  <span>+966 50 123 4567</span>
                 </div>
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-purple-600" />
-                  <span>{companyInfo.email}</span>
+                  <span>info@vetsvan.com</span>
                 </div>
                 <div>
-                  <span>{companyInfo.address[language]}</span>
+                  <span>{language === 'ar' ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia'}</span>
                 </div>
               </div>
             </div>
             
-            <div className="invoice-details text-left">
-              <div className="text-sm text-gray-600 mb-1">
-                {getTranslation('invoiceLabel', language)} {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
+            <div className="invoice-details text-center">
+              <div className="invoice-number text-2xl font-bold text-purple-600 mb-2">
+                {language === 'ar' ? 'فاتورة رقم' : 'Invoice'} #VETSVAN-{invoiceData.bookingId}
               </div>
-              <div className="invoice-date text-gray-600 mb-2 flex items-center">
+              <div className="invoice-date text-gray-600 mb-2 flex items-center justify-center">
                 <Calendar className="h-4 w-4 mr-2 text-purple-600" />
                 {formatDate(invoiceData.appointmentDate)}
               </div>
@@ -330,10 +606,10 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 {formatTime(invoiceData.appointmentTime)}
               </div>
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">{getTranslation('doctor', language)}</span> {invoiceData.doctorName}
+                <span className="font-semibold">{language === 'ar' ? 'الطبيب:' : 'Doctor:'}</span> {invoiceData.doctorName}
               </div>
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">{getTranslation('vehicle', language)}</span> {invoiceData.vetsVanCode}
+                <span className="font-semibold">{language === 'ar' ? 'المركبة:' : 'Vehicle:'}</span> {invoiceData.vetsVanCode}
               </div>
             </div>
             
@@ -346,7 +622,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                     className="qr-code w-32 h-32 mx-auto border-2 border-black rounded-lg shadow-md"
                   />
                   <p className="text-xs text-gray-600 mt-2 font-medium">
-                    {getTranslation('scanToVerify', language)}
+                    {language === 'ar' ? 'امسح للتحقق' : 'Scan to verify'}
                   </p>
                 </div>
               ) : (
@@ -364,28 +640,28 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           <div className="section border-2 border-purple-600 shadow-lg">
             <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg">
               <User className="h-5 w-5 mr-2" />
-              {getTranslation('customerInfo', language)}
+              {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
             </h3>
             <div className="customer-info">
               <div>
                 <div className="info-item">
-                  <span className="info-label">{getTranslation('customerName', language)}</span>
+                  <span className="info-label">{language === 'ar' ? 'الاسم:' : 'Name:'}</span>
                   <span>{invoiceData.customer.firstName} {invoiceData.customer.lastName}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">{getTranslation('customerPhone', language)}</span>
+                  <span className="info-label">{language === 'ar' ? 'الهاتف:' : 'Phone:'}</span>
                   <span>{invoiceData.customer.phone}</span>
                 </div>
               </div>
               <div>
                 {invoiceData.customer.email && (
                   <div className="info-item">
-                    <span className="info-label">{getTranslation('customerEmail', language)}</span>
+                    <span className="info-label">{language === 'ar' ? 'الإيميل:' : 'Email:'}</span>
                     <span>{invoiceData.customer.email}</span>
                   </div>
                 )}
                 <div className="info-item">
-                  <span className="info-label">{getTranslation('service', language)}</span>
+                  <span className="info-label">{language === 'ar' ? 'الخدمة:' : 'Service:'}</span>
                   <span>{invoiceData.serviceType}</span>
                 </div>
               </div>
@@ -399,15 +675,15 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           <div className="section border-2 border-purple-600 shadow-lg">
             <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
               <PawPrint className="h-5 w-5 mr-2" />
-              {getTranslation('petInfo', language)}
+              {language === 'ar' ? 'معلومات الحيوانات الأليفة' : 'Pet Information'}
             </h3>
             <div className="pets-grid">
               {invoiceData.pets.map((pet) => (
                 <div key={pet.id} className="pet-card border-2 border-purple-600 shadow-md rounded-lg p-4 bg-gradient-to-r from-purple-50 to-white">
                   <div className="pet-name text-lg font-bold text-purple-600 mb-2">{pet.name}</div>
                   <div className="pet-details text-sm text-gray-700 space-y-1">
-                    <div><strong>{getTranslation('petType', language)}</strong> {pet.type}</div>
-                    <div><strong>{getTranslation('petAge', language)}</strong> {pet.ageYear || 0} {getTranslation('years', language)} {pet.ageMonth || 0} {getTranslation('months', language)}</div>
+                    <div><strong>{language === 'ar' ? 'النوع:' : 'Type:'}</strong> {pet.type}</div>
+                    <div><strong>{language === 'ar' ? 'العمر:' : 'Age:'}</strong> {pet.ageYear || 0} {language === 'ar' ? 'سنوات' : 'years'} {pet.ageMonth || 0} {language === 'ar' ? 'شهور' : 'months'}</div>
                   </div>
                 </div>
               ))}
@@ -421,32 +697,32 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           <div className="section border-2 border-purple-600 shadow-lg">
             <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
               <FileText className="h-5 w-5 mr-2" />
-              {getTranslation('serviceDetails', language)}
+              {language === 'ar' ? 'تفاصيل الخدمات' : 'Service Details'}
             </h3>
             <div className="overflow-x-auto">
               <table className="services-table w-full border-2 border-purple-600 rounded-lg overflow-hidden shadow-md">
                 <thead>
                   <tr className="bg-gradient-to-r from-purple-600 to-purple-600">
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {getTranslation('serviceItem', language)}
+                      {language === 'ar' ? 'الخدمة' : 'Service'}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {getTranslation('quantity', language)}
+                      {language === 'ar' ? 'الكمية' : 'Qty'}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {getTranslation('unitPrice', language)}
+                      {language === 'ar' ? 'السعر' : 'Unit Price'}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {getTranslation('discount', language)}
+                      {language === 'ar' ? 'الخصم' : 'Discount'}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {getTranslation('vat', language)}
+                      {language === 'ar' ? 'ضريبة' : 'VAT'}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {getTranslation('totalBeforeVat', language)}
+                      {language === 'ar' ? 'قبل الضريبة' : 'Before VAT'}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center text-xs">
-                      {getTranslation('totalAfterVat', language)}
+                      {language === 'ar' ? 'بعد الضريبة' : 'After VAT'}
                     </th>
                   </tr>
                 </thead>
@@ -509,100 +785,45 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             </div>
           </div>
 
-          {/* Totals Section - Right Side */}
-          <div className="flex justify-end mb-6">
-            <div className="bg-white border border-gray-300 rounded-lg shadow-md p-4 w-80">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {getTranslation('subtotalBeforeVat', language)}
-                  </span>
-                  <span className="text-sm font-semibold text-gray-800">
-                    {formatCurrency(invoiceData.subtotal - (invoiceData.discount || 0))}
-                  </span>
-                </div>
-                <div className="border-b border-gray-200"></div>
-                
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {getTranslation('vatAmount', language)}
-                  </span>
-                  <span className="text-sm font-semibold text-gray-800">
-                    {formatCurrency(invoiceData.tax)}
-                  </span>
-                </div>
-                <div className="border-b border-gray-200"></div>
-                
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {getTranslation('finalTotal', language)}
-                  </span>
-                  <span className="text-sm font-bold text-purple-600">
-                    {formatCurrency(invoiceData.total)}
-                  </span>
-                </div>
-                <div className="border-b border-gray-200"></div>
-                
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {getTranslation('totalPaid', language)}
-                  </span>
-                  <span className="text-sm font-semibold text-green-600">
-                    {formatCurrency((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))}
-                  </span>
-                </div>
-                
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
-                    {getTranslation('remainingBalance', language)}
-                  </span>
-                  <span className="text-sm font-semibold text-red-600">
-                    {formatCurrency(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))))}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Separator Line */}
           <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
 
           {/* Enhanced Invoice Summary */}
           <div className="total-section border-4 border-purple-600 shadow-xl bg-gradient-to-br from-purple-50 to-white rounded-lg">
             <h3 className="section-title text-center text-xl bg-purple-600 -m-6 mb-6 p-4 rounded-t-lg text-white">
-              {getTranslation('totalsTitle', language)}
+              {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
             </h3>
             <div className="space-y-4">
               {/* Subtotal */}
               <div className="total-row border-b border-purple-600 pb-3 bg-gray-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-gray-700">{getTranslation('subtotal', language)}</span>
+                <span className="font-semibold text-lg text-gray-700">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
                 <span className="font-bold text-lg text-purple-600">{formatCurrency(invoiceData.subtotal)}</span>
               </div>
               
               {/* Discount Section */}
               {invoiceData.discount > 0 && (
                 <div className="total-row text-green-600 border-b border-purple-600 pb-3 bg-green-50 rounded-lg p-3">
-                  <span className="font-semibold text-lg">{getTranslation('totalDiscount', language)}</span>
+                  <span className="font-semibold text-lg">{language === 'ar' ? 'إجمالي الخصم:' : 'Total Discount:'}</span>
                   <span className="font-bold text-lg">-{formatCurrency(invoiceData.discount)}</span>
                 </div>
               )}
               
               {/* VAT Section */}
               <div className="total-row border-b border-purple-600 pb-3 bg-blue-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-blue-700">{getTranslation('vatFull', language)}</span>
+                <span className="font-semibold text-lg text-blue-700">{language === 'ar' ? 'ضريبة القيمة المضافة (15%):' : 'Value Added Tax (15%):'}</span>
                 <span className="font-bold text-lg text-blue-600">{formatCurrency(invoiceData.tax)}</span>
               </div>
               
               {/* Amount After Discount */}
               <div className="total-row border-b border-purple-600 pb-3 bg-purple-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-purple-700">{getTranslation('amountAfterDiscount', language)}</span>
+                <span className="font-semibold text-lg text-purple-700">{language === 'ar' ? 'المجموع بعد الخصم:' : 'Amount After Discount:'}</span>
                 <span className="font-bold text-lg text-purple-600">{formatCurrency(invoiceData.subtotal - invoiceData.discount)}</span>
               </div>
               
               {/* Final Total */}
               <div className="final-total bg-gradient-to-r from-purple-600 to-purple-600 border-3 border-purple-600 rounded-lg shadow-lg p-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-2xl font-black text-white">{getTranslation('totalAmount', language)}</span>
+                  <span className="text-2xl font-black text-white">{language === 'ar' ? 'المبلغ الإجمالي:' : 'TOTAL AMOUNT:'}</span>
                   <span className="text-3xl font-black text-white">{formatCurrency(invoiceData.total)}</span>
                 </div>
               </div>
@@ -617,7 +838,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             <div className="section border-2 border-green-600 shadow-lg">
               <h3 className="section-title flex items-center bg-green-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
                 <FileText className="h-5 w-5 mr-2" />
-                {getTranslation('paymentDetails', language)}
+                {language === 'ar' ? 'تفاصيل الدفع' : 'Payment Details'}
               </h3>
               <div className="space-y-3">
                 {invoiceData.paymentMethods.map((payment) => (

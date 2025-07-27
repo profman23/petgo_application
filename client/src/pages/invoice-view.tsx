@@ -88,26 +88,8 @@ const InvoiceView = () => {
 
   const t = (key: string) => translations[language as keyof typeof translations][key as keyof typeof translations['ar']];
 
-  const handleDownloadPDF = async () => {
-    try {
-      const response = await fetch(`/api/invoice-pdf/${bookingId}?lang=${language}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-
-      const pdfBlob = await response.blob();
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Invoice_${invoiceStatus?.invoiceNumber || bookingId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-    }
+  const handlePrint = () => {
+    window.print();
   };
 
   if (invoiceLoading) {
@@ -160,7 +142,7 @@ const InvoiceView = () => {
                 {t('viewInvoice')}
               </Button>
               <Button
-                onClick={handleDownloadPDF}
+                onClick={handlePrint}
                 variant="outline"
                 className="border-purple-600 text-purple-600 hover:bg-purple-100"
               >
@@ -177,30 +159,14 @@ const InvoiceView = () => {
         {showInvoice && (
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <InvoiceGeneratorProfessional
-              invoiceData={{
-                bookingId: parseInt(bookingId),
-                invoiceNumber: invoiceStatus?.invoiceNumber,
-                customer: {
-                  firstName: booking.customerFirstName,
-                  lastName: booking.customerLastName,
-                  phone: booking.customerPhone,
-                  email: booking.customerEmail || ''
-                },
-                pets: booking.pets || [],
-                appointmentDate: booking.appointmentDate,
-                appointmentTime: booking.appointmentTime,
-                serviceType: booking.serviceType || 'General Service',
-                items: invoiceItems || [],
-                subtotal: invoiceStatus?.subtotal || 0,
-                discount: invoiceStatus?.discountAmount || 0,
-                tax: invoiceStatus?.taxAmount || 0,
-                total: invoiceStatus?.finalTotal || 0,
-                notes: invoiceStatus?.notes || '',
-                doctorName: booking.doctorName || doctorInfo?.name || 'Dr. VetsVan',
-                vetsVanCode: booking.vetsVanCode || 'VETS001',
-                paymentMethods: invoiceData?.payments || []
-              }}
-              onClose={() => setShowInvoice(false)}
+              booking={booking}
+              doctorInfo={doctorInfo}
+              invoiceItems={invoiceItems}
+              subtotal={invoiceStatus?.subtotal || 0}
+              taxAmount={invoiceStatus?.taxAmount || 0}
+              discountAmount={invoiceStatus?.discountAmount || 0}
+              finalTotal={invoiceStatus?.finalTotal || 0}
+              notes={invoiceStatus?.notes || ''}
             />
           </div>
         )}

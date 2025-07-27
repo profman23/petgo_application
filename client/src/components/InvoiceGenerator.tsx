@@ -115,96 +115,200 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
     generateQRCode();
   }, [invoiceData]);
 
-  const printInvoice = async () => {
-    setIsGenerating(true);
-    try {
-      // Make API call to generate PDF for printing
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/generate-pdf/invoice/${invoiceData.bookingId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ language })
-      });
+  const printInvoice = () => {
+    const printContent = invoiceRef.current;
+    if (!printContent) return;
 
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
 
-      // Get the PDF blob
-      const pdfBlob = await response.blob();
-      
-      // Create download link for PDF
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Invoice_${invoiceData.bookingId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Invoice VETSVAN-${invoiceData.bookingId}</title>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 0; 
+              padding: 20px; 
+              background: white;
+              direction: ${language === 'ar' ? 'rtl' : 'ltr'};
+            }
+            .invoice-container { 
+              max-width: 800px; 
+              margin: 0 auto; 
+              background: white; 
+              border: 1px solid #ddd;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+            .header { 
+              background: linear-gradient(135deg, #8B2F8B, #9333EA); 
+              color: white; 
+              padding: 20px; 
+              text-align: center;
+            }
+            .logo { 
+              width: 80px; 
+              height: 80px; 
+              margin: 0 auto 10px; 
+              background: white; 
+              border-radius: 50%; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+              font-weight: bold;
+              color: #8B2F8B;
+            }
+            .content { padding: 20px; }
+            .section { margin-bottom: 20px; }
+            .flex { display: flex; justify-content: space-between; align-items: center; }
+            .table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+            .table th, .table td { 
+              border: 1px solid #ddd; 
+              padding: 8px; 
+              text-align: ${language === 'ar' ? 'right' : 'left'}; 
+            }
+            .table th { background: #f5f5f5; }
+            .total-section { 
+              background: #f9f9f9; 
+              padding: 15px; 
+              border-radius: 8px; 
+              margin-top: 20px;
+            }
+            .qr-code { 
+              width: 100px; 
+              height: 100px; 
+              border: 1px solid #ddd; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+              background: #f0f0f0;
+              margin: 0 auto;
+            }
+            @media print {
+              body { margin: 0; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          ${printContent.innerHTML}
+        </body>
+      </html>
+    `);
 
-      toast({
-        title: language === 'ar' ? 'تم تحميل الـ PDF بنجاح' : 'PDF Downloaded Successfully',
-        description: language === 'ar' ? 'تم تحميل الفاتورة كملف PDF' : 'Invoice downloaded as PDF file',
-      });
-    } catch (error) {
-      console.error('Error downloading PDF:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ في تحميل PDF' : 'PDF Download Error',
-        description: language === 'ar' ? 'فشل في تحميل الفاتورة كـ PDF' : 'Failed to download invoice as PDF',
-        variant: 'destructive'
-      });
-    }
-    setIsGenerating(false);
+    printWindow.document.close();
+    printWindow.focus();
+    
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
 
   const downloadInvoice = async () => {
     setIsGenerating(true);
     try {
-      // Make API call to generate PDF
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/generate-pdf/invoice/${invoiceData.bookingId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ language })
-      });
+      // Generate HTML content for PDF
+      const htmlContent = invoiceRef.current?.innerHTML;
+      if (!htmlContent) return;
 
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
+      // Create a blob with the invoice HTML
+      const blob = new Blob([`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Invoice VETSVAN-${invoiceData.bookingId}</title>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 0; 
+              padding: 20px; 
+              direction: ${language === 'ar' ? 'rtl' : 'ltr'};
+            }
+            .invoice-container { 
+              max-width: 800px; 
+              margin: 0 auto; 
+              background: white; 
+              border: 1px solid #ddd;
+              border-radius: 8px;
+              overflow: hidden;
+            }
+            .header { 
+              background: linear-gradient(135deg, #8B2F8B, #9333EA); 
+              color: white; 
+              padding: 20px; 
+              text-align: center;
+            }
+            .logo { 
+              width: 80px; 
+              height: 80px; 
+              margin: 0 auto 10px; 
+              background: white; 
+              border-radius: 50%; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+              font-weight: bold;
+              color: #8B2F8B;
+            }
+            .content { padding: 20px; }
+            .section { margin-bottom: 20px; }
+            .flex { display: flex; justify-content: space-between; align-items: center; }
+            .table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+            .table th, .table td { 
+              border: 1px solid #ddd; 
+              padding: 8px; 
+              text-align: ${language === 'ar' ? 'right' : 'left'}; 
+            }
+            .table th { background: #f5f5f5; }
+            .total-section { 
+              background: #f9f9f9; 
+              padding: 15px; 
+              border-radius: 8px; 
+              margin-top: 20px;
+            }
+            .qr-code { 
+              width: 100px; 
+              height: 100px; 
+              border: 1px solid #ddd; 
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+              background: #f0f0f0;
+              margin: 0 auto;
+            }
+          </style>
+        </head>
+        <body>
+          ${htmlContent}
+        </body>
+        </html>
+      `], { type: 'text/html' });
 
-      // Get the PDF blob
-      const pdfBlob = await response.blob();
-      
-      // Create download link
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Invoice_${invoiceData.bookingId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Invoice-VETSVAN-${invoiceData.bookingId}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
       toast({
-        title: language === 'ar' ? 'تم تحميل الـ PDF بنجاح' : 'PDF Downloaded Successfully',
-        description: language === 'ar' ? 'تم تحميل الفاتورة كملف PDF' : 'Invoice downloaded as PDF file',
+        title: language === 'ar' ? 'تم تحميل الفاتورة بنجاح' : 'Invoice downloaded successfully',
+        variant: 'default',
       });
     } catch (error) {
-      console.error('Error downloading PDF:', error);
       toast({
-        title: language === 'ar' ? 'خطأ في تحميل PDF' : 'PDF Download Error',
-        description: language === 'ar' ? 'فشل في تحميل الفاتورة كـ PDF' : 'Failed to download invoice as PDF',
-        variant: 'destructive'
+        title: language === 'ar' ? 'خطأ في تحميل الفاتورة' : 'Error downloading invoice',
+        variant: 'destructive',
       });
+    } finally {
+      setIsGenerating(false);
     }
-    setIsGenerating(false);
   };
 
   return (
