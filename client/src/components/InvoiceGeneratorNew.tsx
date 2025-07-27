@@ -150,9 +150,11 @@ const InvoiceGeneratorNew: React.FC<InvoiceGeneratorNewProps> = ({ invoiceData, 
       <DialogContent 
         className="max-w-4xl w-full max-h-[90vh] overflow-y-auto"
         dir={language === 'ar' ? 'rtl' : 'ltr'}
+        aria-labelledby="invoice-dialog-title"
+        aria-describedby="invoice-dialog-description"
       >
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
+          <DialogTitle id="invoice-dialog-title" className="flex items-center justify-between">
             <div className="flex items-center">
               <FileText className="h-5 w-5 mr-2" />
               {language === 'ar' ? 'فاتورة' : 'Invoice'}
@@ -166,6 +168,9 @@ const InvoiceGeneratorNew: React.FC<InvoiceGeneratorNewProps> = ({ invoiceData, 
               <X className="h-4 w-4" />
             </Button>
           </DialogTitle>
+          <div id="invoice-dialog-description" className="sr-only">
+            {language === 'ar' ? 'نافذة عرض الفاتورة للطباعة والتحميل' : 'Invoice view dialog for printing and downloading'}
+          </div>
         </DialogHeader>
 
         {/* Invoice Content */}

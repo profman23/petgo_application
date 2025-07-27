@@ -5,7 +5,9 @@ import { useLanguage } from '@/lib/i18n';
 import { InvoiceGeneratorProfessional } from '@/components/InvoiceGeneratorProfessional';
 import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ArrowRight, Download, Eye } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Download, Eye, Phone, Mail, Calendar, Clock, PawPrint } from 'lucide-react';
+import riyalLogo from '@assets/Screenshot 2025-07-08 171929_1751985624644.png';
+import logoImage from '@assets/Screenshot 2025-07-10 181936_1753542080451.png';
 
 const InvoiceView = () => {
   const [, navigate] = useLocation();

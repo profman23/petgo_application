@@ -642,10 +642,11 @@ export default function DoctorActivity() {
       <Dialog open={showMap} onOpenChange={setShowMap}>
         <DialogContent 
           className="max-w-4xl max-h-[90vh]"
+          aria-labelledby="map-dialog-title"
           aria-describedby="map-dialog-description"
         >
           <DialogHeader>
-            <DialogTitle style={{ textAlign }}>
+            <DialogTitle id="map-dialog-title" style={{ textAlign }}>
               {language === 'ar' ? 'موقع العميل' : 'Customer Location'}
               {selectedBooking && (
                 <span className="text-sm font-normal text-gray-600 mr-2">
@@ -796,10 +797,11 @@ export default function DoctorActivity() {
         <DialogContent 
           className="sm:max-w-md" 
           dir={direction}
+          aria-labelledby="add-record-title"
           aria-describedby="add-record-description"
         >
           <DialogHeader>
-            <DialogTitle style={{ textAlign }}>
+            <DialogTitle id="add-record-title" style={{ textAlign }}>
               {language === 'ar' ? 'إضافة سجل جديد' : 'Add New Record'}
             </DialogTitle>
           </DialogHeader>

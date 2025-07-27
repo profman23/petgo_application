@@ -2073,15 +2073,16 @@ export default function DoctorInvoice() {
         <DialogContent 
           className="sm:max-w-md"
           dir={getDirection(language)}
+          aria-labelledby="confirm-dialog-title"
           aria-describedby="confirm-dialog-description"
           style={{ textAlign: getTextAlign(language) }}
         >
           <DialogHeader>
-            <DialogTitle className="flex items-center">
+            <DialogTitle id="confirm-dialog-title" className="flex items-center">
               <AlertTriangle className="h-5 w-5 text-orange-500 mr-2" />
               {t('confirmTitle')}
             </DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogDescription id="confirm-dialog-description" className="text-gray-600">
               {t('confirmMessage')}
             </DialogDescription>
           </DialogHeader>
@@ -2109,10 +2110,11 @@ export default function DoctorInvoice() {
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-auto"
           dir={getDirection(language)}
+          aria-labelledby="invoice-preview-title"
           aria-describedby="invoice-preview-description"
         >
           <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
+            <DialogTitle id="invoice-preview-title" className="flex items-center justify-between">
               <span>{language === 'ar' ? 'معاينة الفاتورة' : 'Invoice Preview'}</span>
               <Button
                 variant="outline"

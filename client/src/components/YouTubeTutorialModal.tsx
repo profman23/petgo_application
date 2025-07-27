@@ -50,7 +50,11 @@ export function YouTubeTutorialModal({ isOpen, onClose }: YouTubeTutorialModalPr
   
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className={`max-w-lg mx-auto ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+      <DialogContent 
+        className={`max-w-lg mx-auto ${language === 'ar' ? 'text-right' : 'text-left'}`}
+        aria-labelledby="tutorial-dialog-title"
+        aria-describedby="tutorial-dialog-description"
+      >
         <DialogHeader className="relative">
           <button
             onClick={handleClose}
@@ -59,13 +63,16 @@ export function YouTubeTutorialModal({ isOpen, onClose }: YouTubeTutorialModalPr
             <X className="h-4 w-4" />
           </button>
           
-          <DialogTitle className="flex items-center gap-3 mb-4">
+          <DialogTitle id="tutorial-dialog-title" className="flex items-center gap-3 mb-4">
             <div className="flex items-center gap-2 text-purple-600">
               <Smartphone className="h-6 w-6" />
               <MapPin className="h-5 w-5" />
             </div>
             <span className="text-lg font-bold">{t.title}</span>
           </DialogTitle>
+          <div id="tutorial-dialog-description" className="sr-only">
+            {t.description}
+          </div>
         </DialogHeader>
 
         <div className="space-y-4">

@@ -216,12 +216,20 @@ export default function PaymentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      <DialogContent 
+        className="max-w-2xl max-h-[80vh] overflow-y-auto" 
+        dir={language === 'ar' ? 'rtl' : 'ltr'}
+        aria-labelledby="payment-dialog-title"
+        aria-describedby="payment-dialog-description"
+      >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle id="payment-dialog-title" className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
             {t.addPayment}
           </DialogTitle>
+          <div id="payment-dialog-description" className="sr-only">
+            {language === 'ar' ? 'نافذة إضافة دفعة جديدة للفاتورة' : 'Add new payment dialog for invoice'}
+          </div>
         </DialogHeader>
 
         {/* Payment Summary */}
