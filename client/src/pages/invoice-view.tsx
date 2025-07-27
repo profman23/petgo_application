@@ -436,7 +436,7 @@ const DirectInvoiceViewer = ({ invoiceData, onClose }: any) => {
                   display: 'inline-block'
                 }}
               >
-                {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT:'}
+                {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
               </span>
               <span className="text-sm font-semibold text-gray-800">
                 {formatCurrency(invoiceData.subtotal - (invoiceData.discount || 0))}
@@ -455,7 +455,7 @@ const DirectInvoiceViewer = ({ invoiceData, onClose }: any) => {
                   display: 'inline-block'
                 }}
               >
-                {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT:'}
+                {language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT:'}
               </span>
               <span className="text-sm font-semibold text-gray-800">
                 {formatCurrency(invoiceData.tax)}
@@ -474,7 +474,7 @@ const DirectInvoiceViewer = ({ invoiceData, onClose }: any) => {
                   display: 'inline-block'
                 }}
               >
-                {language === 'ar' ? 'المجموع النهائي' : 'Final Total:'}
+                {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
               </span>
               <span className="text-sm font-bold text-purple-600">
                 {formatCurrency(invoiceData.total)}
@@ -493,7 +493,7 @@ const DirectInvoiceViewer = ({ invoiceData, onClose }: any) => {
                   display: 'inline-block'
                 }}
               >
-                {language === 'ar' ? 'المبلغ المدفوع' : 'Total Paid:'}
+                {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
               </span>
               <span className="text-sm font-semibold text-green-600">
                 {formatCurrency((invoiceData.paymentMethods || []).reduce((sum: number, p: any) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))}
@@ -511,7 +511,7 @@ const DirectInvoiceViewer = ({ invoiceData, onClose }: any) => {
                   display: 'inline-block'
                 }}
               >
-                {language === 'ar' ? 'الرصيد المتبقي' : 'Remaining Balance:'}
+                {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
               </span>
               <span className="text-sm font-semibold text-red-600">
                 {formatCurrency(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum: number, p: any) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))))}
