@@ -54,8 +54,8 @@ export interface InvoiceLayout {
 export const invoiceTranslations: InvoiceTranslations = {
   ar: {
     // Header
-    companyName: 'VETS VAN',
-    companyTagline: 'خدمات بيطرية متنقلة في منزلك',
+    companyName: '🚐 VETS VAN المحدث',
+    companyTagline: '🐾 خدمات بيطرية متنقلة محدثة في منزلك',
     
     // Invoice Details
     invoiceLabel: 'فاتورة:',
@@ -90,7 +90,7 @@ export const invoiceTranslations: InvoiceTranslations = {
     totalAfterVat: 'بعد الضريبة',
     
     // Totals
-    totalsTitle: 'مجموع الفاتورة',
+    totalsTitle: '🧾 ملخص الفاتورة المالي',
     subtotalBeforeVat: 'المجموع قبل الضريبة:',
     vatAmount: 'ضريبة القيمة المضافة (15%):',
     finalTotal: 'المجموع النهائي:',
@@ -108,8 +108,8 @@ export const invoiceTranslations: InvoiceTranslations = {
   },
   en: {
     // Header
-    companyName: 'VETS VAN',
-    companyTagline: 'Mobile Veterinary Services at Your Home',
+    companyName: '🚐 VETS VAN UPDATED',
+    companyTagline: '🐾 Updated Mobile Veterinary Services at Your Home',
     
     // Invoice Details
     invoiceLabel: 'Invoice:',
@@ -144,7 +144,7 @@ export const invoiceTranslations: InvoiceTranslations = {
     totalAfterVat: 'After VAT',
     
     // Totals
-    totalsTitle: 'Invoice Summary',
+    totalsTitle: '💰 Financial Invoice Summary',
     subtotalBeforeVat: 'Total Before VAT:',
     vatAmount: 'VAT (15%):',
     finalTotal: 'Final Total:',
