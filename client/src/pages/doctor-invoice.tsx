@@ -2292,50 +2292,50 @@ export default function DoctorInvoice() {
                     </h3>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-semibold text-gray-800">
-                          {(subtotal - totalDiscountAmount).toFixed(2)} SAR
-                        </span>
                         <span className="text-sm font-medium text-gray-700">
                           :المجموع قبل الضريبة
                         </span>
+                        <span className="text-sm font-semibold text-gray-800">
+                          {(subtotal - totalDiscountAmount).toFixed(2)} SAR
+                        </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
                       
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-semibold text-gray-800">
-                          {taxAmount.toFixed(2)} SAR
-                        </span>
                         <span className="text-sm font-medium text-gray-700">
                           :ضريبة القيمة المضافة (15%)
                         </span>
+                        <span className="text-sm font-semibold text-gray-800">
+                          {taxAmount.toFixed(2)} SAR
+                        </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
                       
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-bold text-purple-600">
-                          {finalTotal.toFixed(2)} SAR
-                        </span>
                         <span className="text-sm font-medium text-gray-700">
                           :المجموع النهائي
                         </span>
+                        <span className="text-sm font-bold text-purple-600">
+                          {finalTotal.toFixed(2)} SAR
+                        </span>
                       </div>
                       <div className="border-b border-gray-200"></div>
                       
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-semibold text-green-600">
-                          {totalPaid.toFixed(2)} SAR
-                        </span>
                         <span className="text-sm font-medium text-gray-700">
                           :المبلغ المدفوع
+                        </span>
+                        <span className="text-sm font-semibold text-green-600">
+                          {totalPaid.toFixed(2)} SAR
                         </span>
                       </div>
                       
                       <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-semibold text-red-600">
-                          {remainingBalance.toFixed(2)} SAR
-                        </span>
                         <span className="text-sm font-medium text-gray-700">
                           :الرصيد المتبقي
+                        </span>
+                        <span className="text-sm font-semibold text-red-600">
+                          {remainingBalance.toFixed(2)} SAR
                         </span>
                       </div>
                     </div>

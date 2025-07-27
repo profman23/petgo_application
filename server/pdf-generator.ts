@@ -337,6 +337,9 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           `).join('') || ''}
         </div>
 
+        <!-- Spacing between items table and totals -->
+        <div style="margin-bottom: 48px;"></div>
+
         <!-- Totals Section - Bilingual Side by Side -->
         <div style="display: flex; justify-content: space-between; gap: 24px; margin-bottom: 24px;">
           <!-- English Totals - Left Side -->
@@ -410,58 +413,58 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             </h3>
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
-                <span style="font-size: 12px; font-weight: 600; color: #1F2937;">
-                  ${((invoiceData.subtotal || 0) - (invoiceData.discount || 0)).toFixed(2)} SAR
-                </span>
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
                   :المجموع قبل الضريبة
                 </span>
+                <span style="font-size: 12px; font-weight: 600; color: #1F2937;">
+                  ${((invoiceData.subtotal || 0) - (invoiceData.discount || 0)).toFixed(2)} SAR
+                </span>
               </div>
               <div style="border-bottom: 1px solid #E5E7EB;"></div>
             </div>
             
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
-                <span style="font-size: 12px; font-weight: 600; color: #1F2937;">
-                  ${(invoiceData.tax || 0).toFixed(2)} SAR
-                </span>
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
                   :ضريبة القيمة المضافة (15%)
                 </span>
+                <span style="font-size: 12px; font-weight: 600; color: #1F2937;">
+                  ${(invoiceData.tax || 0).toFixed(2)} SAR
+                </span>
               </div>
               <div style="border-bottom: 1px solid #E5E7EB;"></div>
             </div>
             
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
-                <span style="font-size: 12px; font-weight: 700; color: #8B2F8B;">
-                  ${(invoiceData.total || 0).toFixed(2)} SAR
-                </span>
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
                   :المجموع النهائي
                 </span>
+                <span style="font-size: 12px; font-weight: 700; color: #8B2F8B;">
+                  ${(invoiceData.total || 0).toFixed(2)} SAR
+                </span>
               </div>
               <div style="border-bottom: 1px solid #E5E7EB;"></div>
             </div>
             
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
-                <span style="font-size: 12px; font-weight: 600; color: #059669;">
-                  ${((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)).toFixed(2)} SAR
-                </span>
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
                   :المبلغ المدفوع
+                </span>
+                <span style="font-size: 12px; font-weight: 600; color: #059669;">
+                  ${((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)).toFixed(2)} SAR
                 </span>
               </div>
             </div>
             
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
-                <span style="font-size: 12px; font-weight: 600; color: #DC2626;">
-                  ${(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)))).toFixed(2)} SAR
-                </span>
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
                   :الرصيد المتبقي
+                </span>
+                <span style="font-size: 12px; font-weight: 600; color: #DC2626;">
+                  ${(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)))).toFixed(2)} SAR
                 </span>
               </div>
             </div>
