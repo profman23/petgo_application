@@ -2162,7 +2162,7 @@ export default function DoctorInvoice() {
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <strong>Invoice: {invoiceStatus.invoiceNumber}</strong>
-                        <strong style={{ direction: 'rtl' }}>فاتورة رقم {invoiceStatus.invoiceNumber}</strong>
+                        <strong style={{ direction: 'rtl' }}>فاتورة رقم: {invoiceStatus.invoiceNumber}</strong>
                       </div>
                     </div>
                   )}
@@ -2192,7 +2192,7 @@ export default function DoctorInvoice() {
                     Customer Name: {booking?.customerName || ''}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {booking?.customerName || ''} :اسم العميل
+                    اسم العميل: {booking?.customerName || ''}
                   </p>
                 </div>
                 
@@ -2202,7 +2202,7 @@ export default function DoctorInvoice() {
                     Customer Phone: {booking?.customerPhone || ''}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {booking?.customerPhone || ''} :تليفون العميل
+                    تليفون العميل: {booking?.customerPhone || ''}
                   </p>
                 </div>
                 
