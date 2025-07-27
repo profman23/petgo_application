@@ -329,7 +329,10 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                   borderRadius: '4px'
                 }}
               >
-                <strong>Invoice: {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}</strong>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <strong>Invoice: {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}</strong>
+                  <strong style={{ direction: 'rtl' }}>فاتورة رقم {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}</strong>
+                </div>
               </div>
               <div className="invoice-date text-gray-600 mb-2 flex items-center">
                 <Calendar className="h-4 w-4 mr-2 text-purple-600" />
@@ -534,7 +537,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                       display: 'inline-block !important' 
                     }}
                   >
-                    {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
+                    {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT:'}
                   </span>
                   <span className="text-sm font-semibold text-gray-800" style={{ fontWeight: 'bold' }}>
                     {formatCurrency(invoiceData.subtotal - (invoiceData.discount || 0))}
@@ -553,7 +556,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                       display: 'inline-block !important' 
                     }}
                   >
-                    {language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT:'}
+                    {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT:'}
                   </span>
                   <span className="text-sm font-semibold text-gray-800" style={{ fontWeight: 'bold' }}>
                     {formatCurrency(invoiceData.tax)}
@@ -572,7 +575,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                       display: 'inline-block !important' 
                     }}
                   >
-                    {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
+                    {language === 'ar' ? 'المجموع النهائي' : 'Final Total:'}
                   </span>
                   <span className="text-sm font-bold text-purple-600" style={{ fontWeight: 'bold' }}>
                     {formatCurrency(invoiceData.total)}
@@ -591,7 +594,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                       display: 'inline-block !important' 
                     }}
                   >
-                    {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
+                    {language === 'ar' ? 'المبلغ المدفوع' : 'Total Paid:'}
                   </span>
                   <span className="text-sm font-semibold text-green-600" style={{ fontWeight: 'bold' }}>
                     {formatCurrency((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))}
@@ -609,7 +612,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                       display: 'inline-block !important' 
                     }}
                   >
-                    {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
+                    {language === 'ar' ? 'الرصيد المتبقي' : 'Remaining Balance:'}
                   </span>
                   <span className="text-sm font-semibold text-red-600" style={{ fontWeight: 'bold' }}>
                     {formatCurrency(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))))}
