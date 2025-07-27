@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
+import { getTranslation } from '../../../shared/invoice-config';
 import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Download } from 'lucide-react';
 import logoImage from '@assets/Screenshot 2025-07-10 181936_1753542080451.png';
 import riyalSymbol from '@assets/Screenshot 2025-07-27 144314_1753616612709.png';
@@ -368,10 +369,10 @@ export default function DoctorInvoice() {
       total: 'المجموع',
       addItem: 'إضافة صنف',
       removeItem: 'حذف الصنف',
-      subtotal: 'المجموع قبل الضريبة',
+      subtotal: 'المجموع الفرعي',
       tax: 'ضريبة القيمة المضافة 15%',
       discount: 'الخصم',
-      finalTotal: 'المجموع النهائي',
+      finalTotal: 'المبلغ الإجمالي',
       addPayment: 'إضافة دفعة',
       paymentAdded: 'تمت إضافة الدفعة',
       paymentSuccess: 'تمت إضافة الدفعة بنجاح',
@@ -435,10 +436,10 @@ export default function DoctorInvoice() {
       total: 'Total',
       addItem: 'Add Item',
       removeItem: 'Remove Item',
-      subtotal: 'Total Before VAT',
+      subtotal: 'Subtotal',
       tax: 'VAT 15%',
       discount: 'Discount',
-      finalTotal: 'Final Total',
+      finalTotal: 'Total Amount',
       addPayment: 'Add Payment',
       paymentAdded: 'Payment Added',
       paymentSuccess: 'Payment has been added successfully',
@@ -1189,10 +1190,10 @@ export default function DoctorInvoice() {
                     // Arabic RTL order
                     <>
                       <th className="text-center py-2 px-2 w-32">
-                        {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} ({t('sar')})
+                        {getTranslation('totalAfterVat', language)} ({t('sar')})
                       </th>
                       <th className="text-center py-2 px-2 w-32">
-                        {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} ({t('sar')})
+                        {getTranslation('totalBeforeVat', language)} ({t('sar')})
                       </th>
                       <th className="text-center py-2 px-2 w-24">
                         {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)
@@ -1230,10 +1231,10 @@ export default function DoctorInvoice() {
                         {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'} (15%)
                       </th>
                       <th className="text-center py-2 px-2 w-32">
-                        {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'} ({t('sar')})
+                        {getTranslation('totalBeforeVat', language)} ({t('sar')})
                       </th>
                       <th className="text-center py-2 px-2 w-32">
-                        {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'} ({t('sar')})
+                        {getTranslation('totalAfterVat', language)} ({t('sar')})
                       </th>
                       <th className="w-16"></th>
                     </>
@@ -2203,11 +2204,11 @@ export default function DoctorInvoice() {
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Total B.Vat</p>
-                    <p className="text-xs text-gray-600">المجموع قبل الضريبة</p>
+                    <p className="text-xs text-gray-600">{getTranslation('subtotalBeforeVat', 'ar')}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Total A.Vat</p>
-                    <p className="text-xs text-gray-600">المجموع بعد الضريبة</p>
+                    <p className="text-xs text-gray-600">{getTranslation('totalAfterVat', 'ar')}</p>
                   </div>
                 </div>
 
@@ -2256,7 +2257,7 @@ export default function DoctorInvoice() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center py-2">
                         <span className="text-sm font-medium text-gray-700">
-                          Total Before VAT:
+                          {getTranslation('subtotalBeforeVat', 'en')}
                         </span>
                         <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                           {(subtotal - totalDiscountAmount).toFixed(2)}
@@ -2278,7 +2279,7 @@ export default function DoctorInvoice() {
                       
                       <div className="flex justify-between items-center py-2">
                         <span className="text-sm font-medium text-gray-700">
-                          Final Total:
+                          {getTranslation('finalTotal', 'en')}
                         </span>
                         <span className="text-sm font-bold text-purple-600 flex items-center gap-1">
                           {finalTotal.toFixed(2)}
@@ -2317,7 +2318,7 @@ export default function DoctorInvoice() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center py-2">
                         <span className="text-sm font-medium text-gray-700">
-                          :المجموع قبل الضريبة
+                          {getTranslation('subtotalBeforeVat', 'ar')}
                         </span>
                         <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                           {(subtotal - totalDiscountAmount).toFixed(2)}
@@ -2339,7 +2340,7 @@ export default function DoctorInvoice() {
                       
                       <div className="flex justify-between items-center py-2">
                         <span className="text-sm font-medium text-gray-700">
-                          :المجموع النهائي
+                          {getTranslation('finalTotal', 'ar')}
                         </span>
                         <span className="text-sm font-bold text-purple-600 flex items-center gap-1">
                           {finalTotal.toFixed(2)}
