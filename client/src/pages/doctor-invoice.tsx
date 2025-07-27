@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
+import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
@@ -2125,255 +2126,33 @@ export default function DoctorInvoice() {
             </DialogTitle>
           </DialogHeader>
           
-          {/* Invoice Preview Content - Simplified */}
-          <div className="invoice-preview" style={{ direction: getDirection(language) }}>
-            <div className="bg-white p-8 rounded-lg border shadow-sm">
-              {/* Header with Date (left) and Logo (right) */}
-              <div className="flex justify-between items-center mb-4">
-                {/* Date on the left */}
-                <div className="text-left">
-                  <p className="text-xs font-semibold">
-                    {new Date().toLocaleDateString('en-US')}
-                  </p>
-                </div>
-                
-                {/* Empty space in the middle */}
-                <div className="flex-1"></div>
-                
-                {/* Logo on the right */}
-                <div className="text-right">
-                  <img 
-                    src={logoImage} 
-                    alt="Vets Van Logo" 
-                    style={{height: '80px', width: 'auto', objectFit: 'contain'}}
-                  />
-                </div>
-              </div>
-              
-              {/* Light separator line */}
-              <div className="w-full h-px opacity-30 my-4" style={{backgroundColor: '#8B2F8B'}}></div>
-              
-              {/* Customer Information Section */}
-              <div className="mb-4">
-                {/* Name row - Arabic right, English left, same level */}
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-xs text-gray-500">
-                    Customer Name: {booking?.customerName || ''}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {booking?.customerName || ''} :اسم العميل
-                  </p>
-                </div>
-                
-                {/* Phone row - Arabic right, English left, same level */}
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-xs text-gray-500">
-                    Customer Phone: {booking?.customerPhone || ''}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {booking?.customerPhone || ''} :تليفون العميل
-                  </p>
-                </div>
-                
-                {/* Thick separator line after customer info */}
-                <div className="w-full h-1 mt-4" style={{backgroundColor: '#8B2F8B'}}></div>
-              </div>
-
-              {/* Invoice Items Header Table */}
-              <div className="mt-4">
-                <div className="grid grid-cols-7 gap-1 border-b pb-2 mb-2" style={{borderColor: '#8B2F8B'}}>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-gray-800">Item Description</p>
-                    <p className="text-xs text-gray-600">الصنف</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-gray-800">Quantity</p>
-                    <p className="text-xs text-gray-600">الكمية</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-gray-800">Unit Price</p>
-                    <p className="text-xs text-gray-600">سعر الوحدة</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-gray-800">Discount</p>
-                    <p className="text-xs text-gray-600">الخصم</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-gray-800">VAT</p>
-                    <p className="text-xs text-gray-600">الضريبة</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-gray-800">Total B.Vat</p>
-                    <p className="text-xs text-gray-600">{getTranslation('subtotalBeforeVat', 'ar')}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-gray-800">Total A.Vat</p>
-                    <p className="text-xs text-gray-600">{getTranslation('totalAfterVat', 'ar')}</p>
-                  </div>
-                </div>
-
-                {/* Invoice Items Data Rows */}
-                {invoiceItems.map((item, index) => (
-                  <div key={index} className="grid grid-cols-7 gap-1 py-2 border-b border-gray-200">
-                    <div className="text-center">
-                      <p className="text-xs text-gray-700">{item.description}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-700">{item.quantity}</p>
-                    </div>
-                    <div className="text-center flex items-center justify-center gap-1">
-                      <p className="text-xs text-gray-700">{item.unitPrice}</p>
-                      <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-gray-700">
-                        {item.discountType && item.discountType !== 'none' && item.discountType !== 'No Discount'
-                          ? `${item.discountType} Discount`
-                          : 'No Discount'}
-                      </p>
-                    </div>
-                    <div className="text-center flex items-center justify-center gap-1">
-                      <p className="text-xs text-gray-700">{item.vatAmount}</p>
-                      <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
-                    </div>
-                    <div className="text-center flex items-center justify-center gap-1">
-                      <p className="text-xs text-gray-700">{item.totalBeforeVat}</p>
-                      <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
-                    </div>
-                    <div className="text-center flex items-center justify-center gap-1">
-                      <p className="text-xs text-gray-700">{item.totalAfterVat}</p>
-                      <img src={riyalSymbol} alt="ر.س" className="w-2 h-2" />
-                    </div>
-                  </div>
-                ))}
-
-                {/* Totals Section - Bilingual Side by Side */}
-                <div className="flex justify-between gap-6 mt-6">
-                  {/* English Totals - Left Side */}
-                  <div className="bg-white border border-gray-300 rounded-lg shadow-md p-4 w-80">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center border-b border-gray-200 pb-2">
-                      Invoice Totals
-                    </h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          {getTranslation('subtotalBeforeVat', 'en')}
-                        </span>
-                        <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                          {(subtotal - totalDiscountAmount).toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                      <div className="border-b border-gray-200"></div>
-                      
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          VAT (15%):
-                        </span>
-                        <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                          {taxAmount.toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                      <div className="border-b border-gray-200"></div>
-                      
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          {getTranslation('finalTotal', 'en')}
-                        </span>
-                        <span className="text-sm font-bold text-purple-600 flex items-center gap-1">
-                          {finalTotal.toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                      <div className="border-b border-gray-200"></div>
-                      
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          Total Paid:
-                        </span>
-                        <span className="text-sm font-semibold text-green-600 flex items-center gap-1">
-                          {totalPaid.toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          Remaining Balance:
-                        </span>
-                        <span className="text-sm font-semibold text-red-600 flex items-center gap-1">
-                          {remainingBalance.toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Arabic Totals - Right Side */}
-                  <div className="bg-white border border-gray-300 rounded-lg shadow-md p-4 w-80" dir="rtl">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center border-b border-gray-200 pb-2">
-                      🧾 ملخص الفاتورة المالي
-                    </h3>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          {getTranslation('subtotalBeforeVat', 'ar')}
-                        </span>
-                        <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                          {(subtotal - totalDiscountAmount).toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                      <div className="border-b border-gray-200"></div>
-                      
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          :ضريبة القيمة المضافة (15%)
-                        </span>
-                        <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                          {taxAmount.toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                      <div className="border-b border-gray-200"></div>
-                      
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          {getTranslation('finalTotal', 'ar')}
-                        </span>
-                        <span className="text-sm font-bold text-purple-600 flex items-center gap-1">
-                          {finalTotal.toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                      <div className="border-b border-gray-200"></div>
-                      
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          :المبلغ المدفوع
-                        </span>
-                        <span className="text-sm font-semibold text-green-600 flex items-center gap-1">
-                          {totalPaid.toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm font-medium text-gray-700">
-                          :الرصيد المتبقي
-                        </span>
-                        <span className="text-sm font-semibold text-red-600 flex items-center gap-1">
-                          {remainingBalance.toFixed(2)}
-                          <img src={riyalSymbol} alt="ر.س" className="w-3 h-3" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Invoice Preview with InvoiceGeneratorProfessional */}
+          <InvoiceGeneratorProfessional
+            invoiceData={{
+              bookingId: parseInt(bookingId),
+              invoiceNumber: invoiceStatus?.invoiceNumber,
+              customer: {
+                firstName: booking?.customerFirstName || '',
+                lastName: booking?.customerLastName || '',
+                phone: booking?.customerPhone || '',
+                email: booking?.customerEmail || ''
+              },
+              pets: booking?.pets || [],
+              appointmentDate: booking?.appointmentDate || '',
+              appointmentTime: booking?.appointmentTime || '',
+              serviceType: booking?.serviceType || 'General Service',
+              items: invoiceItems || [],
+              subtotal: subtotal || 0,
+              discount: totalDiscountAmount || 0,
+              tax: taxAmount || 0,
+              total: finalTotal || 0,
+              notes: '',
+              doctorName: booking?.doctorName || 'Dr. VetsVan',
+              vetsVanCode: booking?.vetsVanCode || 'VETS001',
+              paymentMethods: invoiceData?.payments || []
+            }}
+            onClose={() => setShowInvoicePreview(false)}
+          />
         </DialogContent>
       </Dialog>
     </div>
