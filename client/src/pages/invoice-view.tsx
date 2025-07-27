@@ -179,7 +179,7 @@ const InvoiceView = () => {
             <InvoiceGeneratorProfessional
               invoiceData={{
                 bookingId: parseInt(bookingId),
-                invoiceNumber: invoiceStatus?.invoiceNumber,
+                invoiceNumber: invoiceStatus?.invoiceNumber || booking?.invoiceNumber || `VETSVAN-${bookingId}`,
                 customer: {
                   firstName: booking.customerFirstName,
                   lastName: booking.customerLastName,
