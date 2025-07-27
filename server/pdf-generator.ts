@@ -1,6 +1,12 @@
 import puppeteer from 'puppeteer';
 import fs from 'fs';
 import path from 'path';
+import { 
+  getTranslation, 
+  formatCurrency as sharedFormatCurrency, 
+  invoiceStyles, 
+  companyInfo 
+} from '../shared/invoice-config';
 
 export const generateInvoicePDF = async (invoiceData: any): Promise<Buffer> => {
   let browser;
@@ -250,7 +256,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <!-- Date on the left -->
           <div class="date-section">
             <p style="font-size: 10px; color: #666; margin-bottom: 4px;">
-              Invoice: ${invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
+              ${getTranslation('invoiceLabel', invoiceData.language || 'en')} ${invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
             </p>
             <p class="date-text">
               ${new Date().toLocaleDateString('en-US')}
@@ -278,20 +284,20 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <!-- Name row - English left, Arabic right, same level -->
           <div class="customer-info-row">
             <p class="customer-info-english">
-              Customer Name: ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
+              ${getTranslation('customerName', 'en')} ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
             </p>
             <p class="customer-info-arabic">
-              اسم العميل: ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
+              ${getTranslation('customerName', 'ar')} ${(invoiceData.customer?.firstName || '') + ' ' + (invoiceData.customer?.lastName || '') || invoiceData.customer?.name || ''}
             </p>
           </div>
           
           <!-- Phone row - English left, Arabic right, same level -->
           <div class="customer-info-row">
             <p class="customer-info-english">
-              Customer Phone: ${invoiceData.customer?.phone || ''}
+              ${getTranslation('customerPhone', 'en')} ${invoiceData.customer?.phone || ''}
             </p>
             <p class="customer-info-arabic">
-              تليفون العميل: ${invoiceData.customer?.phone || ''}
+              ${getTranslation('customerPhone', 'ar')} ${invoiceData.customer?.phone || ''}
             </p>
           </div>
           
@@ -304,32 +310,32 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <div class="header-table">
             <div class="header-row">
               <div class="header-cell">
-                <div class="header-english">Item Description</div>
-                <div class="header-arabic">الصنف</div>
+                <div class="header-english">${getTranslation('serviceItem', 'en')}</div>
+                <div class="header-arabic">${getTranslation('serviceItem', 'ar')}</div>
               </div>
               <div class="header-cell">
-                <div class="header-english">Quantity</div>
-                <div class="header-arabic">الكمية</div>
+                <div class="header-english">${getTranslation('quantity', 'en')}</div>
+                <div class="header-arabic">${getTranslation('quantity', 'ar')}</div>
               </div>
               <div class="header-cell">
-                <div class="header-english">Unit Price</div>
-                <div class="header-arabic">سعر الوحدة</div>
+                <div class="header-english">${getTranslation('unitPrice', 'en')}</div>
+                <div class="header-arabic">${getTranslation('unitPrice', 'ar')}</div>
               </div>
               <div class="header-cell">
-                <div class="header-english">Discount</div>
-                <div class="header-arabic">الخصم</div>
+                <div class="header-english">${getTranslation('discount', 'en')}</div>
+                <div class="header-arabic">${getTranslation('discount', 'ar')}</div>
               </div>
               <div class="header-cell">
-                <div class="header-english">VAT</div>
-                <div class="header-arabic">الضريبة</div>
+                <div class="header-english">${getTranslation('vat', 'en')}</div>
+                <div class="header-arabic">${getTranslation('vat', 'ar')}</div>
               </div>
               <div class="header-cell">
-                <div class="header-english">Total B.Vat</div>
-                <div class="header-arabic">المجموع قبل الضريبة</div>
+                <div class="header-english">${getTranslation('totalBeforeVat', 'en')}</div>
+                <div class="header-arabic">${getTranslation('totalBeforeVat', 'ar')}</div>
               </div>
               <div class="header-cell">
-                <div class="header-english">Total A.Vat</div>
-                <div class="header-arabic">المجموع بعد الضريبة</div>
+                <div class="header-english">${getTranslation('totalAfterVat', 'en')}</div>
+                <div class="header-arabic">${getTranslation('totalAfterVat', 'ar')}</div>
               </div>
             </div>
           </div>
@@ -374,12 +380,12 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <!-- English Totals - Left Side -->
           <div style="background: white; border: 1px solid #D1D5DB; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 16px; width: 320px;">
             <h3 style="font-size: 16px; font-weight: 600; color: #1F2937; margin-bottom: 16px; text-align: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 8px;">
-              Invoice Totals
+              ${getTranslation('totalsTitle', 'en')}
             </h3>
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  Total Before VAT:
+                  ${getTranslation('subtotalBeforeVat', 'en')}
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
                   ${((invoiceData.subtotal || 0) - (invoiceData.discount || 0)).toFixed(2)} 
@@ -392,7 +398,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  VAT (15%):
+                  ${getTranslation('vatAmount', 'en')}
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
                   ${(invoiceData.tax || 0).toFixed(2)} 
@@ -405,7 +411,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  Final Total:
+                  ${getTranslation('finalTotal', 'en')}
                 </span>
                 <span style="font-size: 12px; font-weight: 700; color: #8B2F8B; display: flex; align-items: center; gap: 4px;">
                   ${(invoiceData.total || 0).toFixed(2)} 
@@ -418,7 +424,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  Total Paid:
+                  ${getTranslation('totalPaid', 'en')}
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #059669; display: flex; align-items: center; gap: 4px;">
                   ${((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)).toFixed(2)} 
@@ -430,7 +436,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  Remaining Balance:
+                  ${getTranslation('remainingBalance', 'en')}
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #DC2626; display: flex; align-items: center; gap: 4px;">
                   ${(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)))).toFixed(2)} 
@@ -443,12 +449,12 @@ const generateInvoiceHTML = (invoiceData: any): string => {
           <!-- Arabic Totals - Right Side -->
           <div style="background: white; border: 1px solid #D1D5DB; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 16px; width: 320px; direction: rtl;">
             <h3 style="font-size: 16px; font-weight: 600; color: #1F2937; margin-bottom: 16px; text-align: center; border-bottom: 1px solid #E5E7EB; padding-bottom: 8px;">
-              مجموع الفاتورة
+              ${getTranslation('totalsTitle', 'ar')}
             </h3>
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  المجموع قبل الضريبة:
+                  ${getTranslation('subtotalBeforeVat', 'ar')}
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
@@ -461,7 +467,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  ضريبة القيمة المضافة (15%):
+                  ${getTranslation('vatAmount', 'ar')}
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
@@ -474,7 +480,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  المجموع النهائي:
+                  ${getTranslation('finalTotal', 'ar')}
                 </span>
                 <span style="font-size: 12px; font-weight: 700; color: #8B2F8B; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
@@ -487,7 +493,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div style="margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  المبلغ المدفوع:
+                  ${getTranslation('totalPaid', 'ar')}
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #059669; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
@@ -499,7 +505,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             <div>
               <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
                 <span style="font-size: 12px; font-weight: 500; color: #374151;">
-                  الرصيد المتبقي:
+                  ${getTranslation('remainingBalance', 'ar')}
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #DC2626; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />

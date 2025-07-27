@@ -6,6 +6,14 @@ import { useToast } from '@/hooks/use-toast';
 import QRCode from 'qrcode';
 import logoImage from "@assets/IMG-20250415-WA0047_1751986059751.jpg";
 import riyalLogo from "@assets/Screenshot 2025-07-08 171929_1751985624644.png";
+import { 
+  getTranslation, 
+  formatCurrency as sharedFormatCurrency, 
+  invoiceStyles, 
+  invoiceLayout, 
+  companyInfo,
+  qrCodeConfig 
+} from '@shared/invoice-config';
 
 interface InvoiceItem {
   id: string;
@@ -278,30 +286,30 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             <div className="logo-section">
               <div className="mb-3">
                 <div className="company-name text-3xl font-black text-purple-600">
-                  VETS VAN
+                  {getTranslation('companyName', language)}
                 </div>
                 <div className="company-tagline text-gray-600 font-medium">
-                  {language === 'ar' ? 'خدمات بيطرية متنقلة في منزلك' : 'Mobile Veterinary Services at Your Home'}
+                  {getTranslation('companyTagline', language)}
                 </div>
               </div>
               <div className="contact-info text-sm text-gray-600 space-y-1">
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-purple-600" />
-                  <span>+966 50 123 4567</span>
+                  <span>{companyInfo.phone}</span>
                 </div>
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-purple-600" />
-                  <span>info@vetsvan.com</span>
+                  <span>{companyInfo.email}</span>
                 </div>
                 <div>
-                  <span>{language === 'ar' ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia'}</span>
+                  <span>{companyInfo.address[language]}</span>
                 </div>
               </div>
             </div>
             
             <div className="invoice-details text-left">
               <div className="text-sm text-gray-600 mb-1">
-                Invoice: {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
+                {getTranslation('invoiceLabel', language)} {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
               </div>
               <div className="invoice-date text-gray-600 mb-2 flex items-center">
                 <Calendar className="h-4 w-4 mr-2 text-purple-600" />
@@ -312,10 +320,10 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 {formatTime(invoiceData.appointmentTime)}
               </div>
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">{language === 'ar' ? 'الطبيب:' : 'Doctor:'}</span> {invoiceData.doctorName}
+                <span className="font-semibold">{getTranslation('doctor', language)}</span> {invoiceData.doctorName}
               </div>
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">{language === 'ar' ? 'المركبة:' : 'Vehicle:'}</span> {invoiceData.vetsVanCode}
+                <span className="font-semibold">{getTranslation('vehicle', language)}</span> {invoiceData.vetsVanCode}
               </div>
             </div>
             
@@ -328,7 +336,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                     className="qr-code w-32 h-32 mx-auto border-2 border-black rounded-lg shadow-md"
                   />
                   <p className="text-xs text-gray-600 mt-2 font-medium">
-                    {language === 'ar' ? 'امسح للتحقق' : 'Scan to verify'}
+                    {getTranslation('scanToVerify', language)}
                   </p>
                 </div>
               ) : (
@@ -346,28 +354,28 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           <div className="section border-2 border-purple-600 shadow-lg">
             <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg">
               <User className="h-5 w-5 mr-2" />
-              {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
+              {getTranslation('customerInfo', language)}
             </h3>
             <div className="customer-info">
               <div>
                 <div className="info-item">
-                  <span className="info-label">{language === 'ar' ? 'الاسم:' : 'Name:'}</span>
+                  <span className="info-label">{getTranslation('customerName', language)}</span>
                   <span>{invoiceData.customer.firstName} {invoiceData.customer.lastName}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">{language === 'ar' ? 'الهاتف:' : 'Phone:'}</span>
+                  <span className="info-label">{getTranslation('customerPhone', language)}</span>
                   <span>{invoiceData.customer.phone}</span>
                 </div>
               </div>
               <div>
                 {invoiceData.customer.email && (
                   <div className="info-item">
-                    <span className="info-label">{language === 'ar' ? 'الإيميل:' : 'Email:'}</span>
+                    <span className="info-label">{getTranslation('customerEmail', language)}</span>
                     <span>{invoiceData.customer.email}</span>
                   </div>
                 )}
                 <div className="info-item">
-                  <span className="info-label">{language === 'ar' ? 'الخدمة:' : 'Service:'}</span>
+                  <span className="info-label">{getTranslation('service', language)}</span>
                   <span>{invoiceData.serviceType}</span>
                 </div>
               </div>
@@ -381,15 +389,15 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           <div className="section border-2 border-purple-600 shadow-lg">
             <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
               <PawPrint className="h-5 w-5 mr-2" />
-              {language === 'ar' ? 'معلومات الحيوانات الأليفة' : 'Pet Information'}
+              {getTranslation('petInfo', language)}
             </h3>
             <div className="pets-grid">
               {invoiceData.pets.map((pet) => (
                 <div key={pet.id} className="pet-card border-2 border-purple-600 shadow-md rounded-lg p-4 bg-gradient-to-r from-purple-50 to-white">
                   <div className="pet-name text-lg font-bold text-purple-600 mb-2">{pet.name}</div>
                   <div className="pet-details text-sm text-gray-700 space-y-1">
-                    <div><strong>{language === 'ar' ? 'النوع:' : 'Type:'}</strong> {pet.type}</div>
-                    <div><strong>{language === 'ar' ? 'العمر:' : 'Age:'}</strong> {pet.ageYear || 0} {language === 'ar' ? 'سنوات' : 'years'} {pet.ageMonth || 0} {language === 'ar' ? 'شهور' : 'months'}</div>
+                    <div><strong>{getTranslation('petType', language)}</strong> {pet.type}</div>
+                    <div><strong>{getTranslation('petAge', language)}</strong> {pet.ageYear || 0} {getTranslation('years', language)} {pet.ageMonth || 0} {getTranslation('months', language)}</div>
                   </div>
                 </div>
               ))}
