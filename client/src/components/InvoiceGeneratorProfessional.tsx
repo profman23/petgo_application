@@ -565,34 +565,34 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             <div className="space-y-4">
               {/* Subtotal */}
               <div className="total-row border-b border-purple-600 pb-3 bg-gray-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-gray-700">{language === 'ar' ? 'المجموع الفرعي:' : 'Subtotal:'}</span>
+                <span className="font-semibold text-lg text-gray-700">{getTranslation('subtotal', language)}</span>
                 <span className="font-bold text-lg text-purple-600">{formatCurrency(invoiceData.subtotal)}</span>
               </div>
               
               {/* Discount Section */}
               {invoiceData.discount > 0 && (
                 <div className="total-row text-green-600 border-b border-purple-600 pb-3 bg-green-50 rounded-lg p-3">
-                  <span className="font-semibold text-lg">{language === 'ar' ? 'إجمالي الخصم:' : 'Total Discount:'}</span>
+                  <span className="font-semibold text-lg">{getTranslation('totalDiscount', language)}</span>
                   <span className="font-bold text-lg">-{formatCurrency(invoiceData.discount)}</span>
                 </div>
               )}
               
               {/* VAT Section */}
               <div className="total-row border-b border-purple-600 pb-3 bg-blue-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-blue-700">{language === 'ar' ? 'ضريبة القيمة المضافة (15%):' : 'Value Added Tax (15%):'}</span>
+                <span className="font-semibold text-lg text-blue-700">{getTranslation('vatFull', language)}</span>
                 <span className="font-bold text-lg text-blue-600">{formatCurrency(invoiceData.tax)}</span>
               </div>
               
               {/* Amount After Discount */}
               <div className="total-row border-b border-purple-600 pb-3 bg-purple-50 rounded-lg p-3">
-                <span className="font-semibold text-lg text-purple-700">{language === 'ar' ? 'المجموع بعد الخصم:' : 'Amount After Discount:'}</span>
+                <span className="font-semibold text-lg text-purple-700">{getTranslation('amountAfterDiscount', language)}</span>
                 <span className="font-bold text-lg text-purple-600">{formatCurrency(invoiceData.subtotal - invoiceData.discount)}</span>
               </div>
               
               {/* Final Total */}
               <div className="final-total bg-gradient-to-r from-purple-600 to-purple-600 border-3 border-purple-600 rounded-lg shadow-lg p-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-2xl font-black text-white">{language === 'ar' ? 'المبلغ الإجمالي:' : 'TOTAL AMOUNT:'}</span>
+                  <span className="text-2xl font-black text-white">{getTranslation('totalAmount', language)}</span>
                   <span className="text-3xl font-black text-white">{formatCurrency(invoiceData.total)}</span>
                 </div>
               </div>
@@ -607,7 +607,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             <div className="section border-2 border-green-600 shadow-lg">
               <h3 className="section-title flex items-center bg-green-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
                 <FileText className="h-5 w-5 mr-2" />
-                {language === 'ar' ? 'تفاصيل الدفع' : 'Payment Details'}
+                {getTranslation('paymentDetails', language)}
               </h3>
               <div className="space-y-3">
                 {invoiceData.paymentMethods.map((payment) => (

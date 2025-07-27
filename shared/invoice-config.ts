@@ -92,19 +92,25 @@ export const invoiceTranslations: InvoiceTranslations = {
     // Totals
     totalsTitle: '🧾 ملخص الفاتورة المالي',
     subtotalBeforeVat: 'المجموع قبل الضريبة:',
-    vatAmount: 'ضريبة القيمة المضافة (15%):',
+    vatAmount: 'ضريبة القيمة المضافة:',
     finalTotal: 'المجموع النهائي:',
     totalPaid: 'المبلغ المدفوع:',
     remainingBalance: 'الرصيد المتبقي:',
+    subtotal: 'المجموع الفرعي:',
+    totalDiscount: 'إجمالي الخصم:',
+    vatFull: 'ضريبة القيمة المضافة (15%):',
+    amountAfterDiscount: 'المجموع بعد الخصم:',
+    totalAmount: 'المبلغ الإجمالي:',
+    paymentDetails: 'تفاصيل الدفع',
     
     // Actions
     viewInvoice: 'عرض الفاتورة',
     downloadInvoice: 'تحميل الفاتورة',
     printInvoice: 'طباعة الفاتورة',
+    scanToVerify: 'امسح للتحقق',
     
     // Status
-    noDiscount: 'لا يوجد',
-    scanToVerify: 'امسح للتحقق'
+    noDiscount: 'لا يوجد'
   },
   en: {
     // Header
@@ -146,19 +152,25 @@ export const invoiceTranslations: InvoiceTranslations = {
     // Totals
     totalsTitle: '💰 Financial Invoice Summary',
     subtotalBeforeVat: 'Total Before VAT:',
-    vatAmount: 'VAT (15%):',
+    vatAmount: 'VAT:',
     finalTotal: 'Final Total:',
     totalPaid: 'Total Paid:',
     remainingBalance: 'Remaining Balance:',
+    subtotal: 'Subtotal:',
+    totalDiscount: 'Total Discount:',
+    vatFull: 'Value Added Tax (15%):',
+    amountAfterDiscount: 'Amount After Discount:',
+    totalAmount: 'TOTAL AMOUNT:',
+    paymentDetails: 'Payment Details',
     
     // Actions
     viewInvoice: 'View Invoice',
     downloadInvoice: 'Download Invoice',
     printInvoice: 'Print Invoice',
+    scanToVerify: 'Scan to verify',
     
     // Status
-    noDiscount: 'None',
-    scanToVerify: 'Scan to verify'
+    noDiscount: 'None'
   }
 };
 
