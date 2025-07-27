@@ -300,7 +300,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             </div>
             
             <div className="invoice-details text-left">
-              <div className="text-sm text-gray-800 mb-1 font-bold">
+              <div className="text-sm text-gray-800 mb-1 font-bold" style={{ fontSize: '14px', fontWeight: 'bold', color: '#374151' }}>
                 Invoice: {invoiceData.invoiceNumber || invoiceData.booking?.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
               </div>
               <div className="invoice-date text-gray-600 mb-2 flex items-center">
@@ -312,10 +312,10 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 {formatTime(invoiceData.appointmentTime)}
               </div>
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">{language === 'ar' ? 'الطبيب:' : 'Doctor:'}</span> {invoiceData.doctorName}
+                <span className="font-semibold" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الطبيب:' : 'Doctor:'}</span> {invoiceData.doctorName}
               </div>
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">{language === 'ar' ? 'المركبة:' : 'Vehicle:'}</span> {invoiceData.vetsVanCode}
+                <span className="font-semibold" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'المركبة:' : 'Vehicle:'}</span> {invoiceData.vetsVanCode}
               </div>
             </div>
             
@@ -351,23 +351,23 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             <div className="customer-info">
               <div>
                 <div className="info-item">
-                  <span className="info-label" lang={language}>{language === 'ar' ? 'الاسم' : 'Name:'}</span>
+                  <span className="info-label" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الاسم:' : 'Name:'}</span>
                   <span>{invoiceData.customer.firstName} {invoiceData.customer.lastName}</span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label" lang={language}>{language === 'ar' ? 'الهاتف' : 'Phone:'}</span>
+                  <span className="info-label" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الهاتف:' : 'Phone:'}</span>
                   <span>{invoiceData.customer.phone}</span>
                 </div>
               </div>
               <div>
                 {invoiceData.customer.email && (
                   <div className="info-item">
-                    <span className="info-label" lang={language}>{language === 'ar' ? 'الإيميل' : 'Email:'}</span>
+                    <span className="info-label" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الإيميل:' : 'Email:'}</span>
                     <span>{invoiceData.customer.email}</span>
                   </div>
                 )}
                 <div className="info-item">
-                  <span className="info-label" lang={language}>{language === 'ar' ? 'الخدمة' : 'Service:'}</span>
+                  <span className="info-label" style={{ fontWeight: 'bold' }}>{language === 'ar' ? 'الخدمة:' : 'Service:'}</span>
                   <span>{invoiceData.serviceType}</span>
                 </div>
               </div>
@@ -388,8 +388,8 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 <div key={pet.id} className="pet-card border-2 border-purple-600 shadow-md rounded-lg p-4 bg-gradient-to-r from-purple-50 to-white">
                   <div className="pet-name text-lg font-bold text-purple-600 mb-2">{pet.name}</div>
                   <div className="pet-details text-sm text-gray-700 space-y-1">
-                    <div><strong lang={language}>{language === 'ar' ? 'النوع' : 'Type:'}</strong> {pet.type}</div>
-                    <div><strong lang={language}>{language === 'ar' ? 'العمر' : 'Age:'}</strong> {pet.ageYear || 0} {language === 'ar' ? 'سنوات' : 'years'} {pet.ageMonth || 0} {language === 'ar' ? 'شهور' : 'months'}</div>
+                    <div><strong>{language === 'ar' ? 'النوع:' : 'Type:'}</strong> {pet.type}</div>
+                    <div><strong>{language === 'ar' ? 'العمر:' : 'Age:'}</strong> {pet.ageYear || 0} {language === 'ar' ? 'سنوات' : 'years'} {pet.ageMonth || 0} {language === 'ar' ? 'شهور' : 'months'}</div>
                   </div>
                 </div>
               ))}
@@ -496,49 +496,49 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             <div className="bg-white border border-gray-300 rounded-lg shadow-md p-4 w-80">
               <div className="space-y-2">
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
                     {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
                   </span>
-                  <span className="text-sm font-semibold text-gray-800">
+                  <span className="text-sm font-semibold text-gray-800" style={{ fontWeight: 'bold' }}>
                     {formatCurrency(invoiceData.subtotal - (invoiceData.discount || 0))}
                   </span>
                 </div>
                 <div className="border-b border-gray-200"></div>
                 
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
                     {language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT:'}
                   </span>
-                  <span className="text-sm font-semibold text-gray-800">
+                  <span className="text-sm font-semibold text-gray-800" style={{ fontWeight: 'bold' }}>
                     {formatCurrency(invoiceData.tax)}
                   </span>
                 </div>
                 <div className="border-b border-gray-200"></div>
                 
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
                     {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
                   </span>
-                  <span className="text-sm font-bold text-purple-600">
+                  <span className="text-sm font-bold text-purple-600" style={{ fontWeight: 'bold' }}>
                     {formatCurrency(invoiceData.total)}
                   </span>
                 </div>
                 <div className="border-b border-gray-200"></div>
                 
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
                     {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
                   </span>
-                  <span className="text-sm font-semibold text-green-600">
+                  <span className="text-sm font-semibold text-green-600" style={{ fontWeight: 'bold' }}>
                     {formatCurrency((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))}
                   </span>
                 </div>
                 
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700" style={{ fontWeight: 'bold' }}>
                     {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
                   </span>
-                  <span className="text-sm font-semibold text-red-600">
+                  <span className="text-sm font-semibold text-red-600" style={{ fontWeight: 'bold' }}>
                     {formatCurrency(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))))}
                   </span>
                 </div>

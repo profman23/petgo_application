@@ -520,46 +520,24 @@
   }
 }
 
-/* Arabic colon positioning fix for invoice viewer */
+/* Invoice viewer consistency fixes */
+.invoice-container {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
 .invoice-container .info-label {
-  position: relative;
+  font-weight: bold;
+  color: #374151;
 }
 
-.invoice-container .info-label:lang(ar)::before {
-  content: "";
+.invoice-container .invoice-details {
+  text-align: left;
 }
 
-.invoice-container .info-label:lang(ar)::after {
-  content: " :";
-  position: absolute;
-  left: -8px;
-}
-
-/* Remove default colons from Arabic labels */
-.invoice-container .info-label:lang(ar) {
-  direction: rtl;
-}
-
-/* Ensure correct positioning of Invoice number in view mode */
-.invoice-details .text-sm {
+.invoice-container .invoice-details .text-sm {
   font-weight: bold !important;
   color: #374151 !important;
   font-size: 14px !important;
-}
-
-/* Fix Invoice number display specifically */
-.invoice-details div:first-child {
-  visibility: visible !important;
   display: block !important;
-  opacity: 1 !important;
-}
-
-/* Arabic colon fix for strong tags */
-strong:lang(ar)::after {
-  content: " :";
-}
-
-/* Remove default colons for Arabic strong tags */
-strong:lang(ar) {
-  direction: rtl;
+  visibility: visible !important;
 }
