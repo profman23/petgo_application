@@ -183,6 +183,14 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         .data-row {
           display: table-row;
           border-bottom: 2px solid #9CA3AF;
+          margin-bottom: 2px;
+        }
+        
+        .row-separator {
+          height: 2px;
+          background-color: #9CA3AF;
+          width: 100%;
+          margin: 2px 0;
         }
         
         .data-cell {
@@ -322,7 +330,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
 
         <!-- Invoice Items Data Table -->
         <div class="items-data-table">
-          ${invoiceData.items?.map(item => `
+          ${invoiceData.items?.map((item, index) => `
             <div class="data-row">
               <div class="data-cell">${item.description || ''}</div>
               <div class="data-cell">${item.quantity || ''}</div>
@@ -336,6 +344,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               <div class="data-cell">${item.totalBeforeVat || ''} SAR</div>
               <div class="data-cell">${item.totalAfterVat || ''} SAR</div>
             </div>
+            ${index < (invoiceData.items?.length || 0) - 1 ? '<div class="row-separator"></div>' : ''}
           `).join('') || ''}
         </div>
       </div>
