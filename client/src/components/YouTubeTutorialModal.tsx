@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { X, Smartphone, MapPin } from 'lucide-react';
@@ -70,9 +70,9 @@ export function YouTubeTutorialModal({ isOpen, onClose }: YouTubeTutorialModalPr
             </div>
             <span className="text-lg font-bold">{t.title}</span>
           </DialogTitle>
-          <div id="tutorial-dialog-description" className="sr-only">
+          <DialogDescription id="tutorial-dialog-description" className="sr-only">
             {t.description}
-          </div>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

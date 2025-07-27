@@ -2141,25 +2141,28 @@ export default function DoctorInvoice() {
                   <p className="text-xs font-semibold">
                     {new Date().toLocaleDateString('en-US')}
                   </p>
-                  {/* Invoice Number Display */}
+                  {/* Invoice Number Display - PDF Matching Format */}
                   {invoiceStatus?.invoiceNumber && (
                     <div 
-                      className="text-lg font-bold mt-2"
+                      className="text-sm text-gray-800 mb-1 font-bold invoice-number"
                       style={{ 
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        color: '#000000',
-                        backgroundColor: '#f0f0f0',
+                        fontSize: '18px !important', 
+                        fontWeight: 'bold !important', 
+                        color: '#000000 !important', 
+                        display: 'block !important', 
+                        visibility: 'visible !important',
+                        position: 'relative',
+                        zIndex: 999,
+                        backgroundColor: '#f9f9f9',
                         padding: '8px',
-                        border: '2px solid #333',
-                        borderRadius: '8px',
-                        display: 'block',
-                        textAlign: 'center'
+                        border: '2px solid #e5e5e5',
+                        borderRadius: '4px',
+                        marginTop: '8px'
                       }}
                     >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <strong>Invoice: {invoiceStatus.invoiceNumber}</strong>
-                        <strong style={{ direction: 'rtl' }}>فاتورة رقم: {invoiceStatus.invoiceNumber}</strong>
+                        <strong style={{ direction: 'rtl' }}>فاتورة رقم {invoiceStatus.invoiceNumber}</strong>
                       </div>
                     </div>
                   )}

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, Download, FileText, Calendar } from 'lucide-react';
 import { useLanguage } from '../lib/i18n';
@@ -168,9 +168,9 @@ const InvoiceGeneratorNew: React.FC<InvoiceGeneratorNewProps> = ({ invoiceData, 
               <X className="h-4 w-4" />
             </Button>
           </DialogTitle>
-          <div id="invoice-dialog-description" className="sr-only">
+          <DialogDescription id="invoice-dialog-description" className="sr-only">
             {language === 'ar' ? 'نافذة عرض الفاتورة للطباعة والتحميل' : 'Invoice view dialog for printing and downloading'}
-          </div>
+          </DialogDescription>
         </DialogHeader>
 
         {/* Invoice Content */}
