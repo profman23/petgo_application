@@ -516,10 +516,10 @@ export default function DoctorInvoice() {
   };
 
   // Calculate totals - Total Before VAT = Quantity * Unit Price (without discount)
-  const subtotal = invoiceItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
-  const taxAmount = invoiceItems.reduce((sum, item) => sum + item.vatAmount, 0);
+  const subtotal = Math.round(invoiceItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0) * 100) / 100;
+  const taxAmount = Math.round(invoiceItems.reduce((sum, item) => sum + item.vatAmount, 0) * 100) / 100;
   // Calculate total discount amount from all items
-  const totalDiscountAmount = invoiceItems.reduce((sum, item) => {
+  const totalDiscountAmount = Math.round(invoiceItems.reduce((sum, item) => {
     const itemSubtotal = item.unitPrice * item.quantity;
     if (item.discountType === '10%') {
       return sum + (itemSubtotal * 0.10);
@@ -527,9 +527,9 @@ export default function DoctorInvoice() {
       return sum + itemSubtotal;
     }
     return sum;
-  }, 0);
+  }, 0) * 100) / 100;
   // Final Total = (Total Before VAT - Discount) + VAT
-  const finalTotal = (subtotal - totalDiscountAmount) + taxAmount;
+  const finalTotal = Math.round(((subtotal - totalDiscountAmount) + taxAmount) * 100) / 100;
   const remainingBalance = finalTotal - totalPaid;
   
   // Calculate values for each item automatically
@@ -550,10 +550,10 @@ export default function DoctorInvoice() {
     const totalBeforeVat = subtotal - discountAmount;
     
     // Calculate VAT amount (15% of total before VAT)
-    const vatAmount = totalBeforeVat * (item.vatRate / 100);
+    const vatAmount = Math.round(totalBeforeVat * (item.vatRate / 100) * 100) / 100;
     
     // Calculate total after VAT
-    const totalAfterVat = totalBeforeVat + vatAmount;
+    const totalAfterVat = Math.round((totalBeforeVat + vatAmount) * 100) / 100;
     
     return {
       ...item,

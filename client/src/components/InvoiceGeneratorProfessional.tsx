@@ -331,7 +331,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <strong>Invoice: {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}</strong>
-                  <strong style={{ direction: 'rtl' }}>فاتورة رقم: {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}</strong>
+                  <strong style={{ direction: 'rtl' }}>فاتورة رقم: {invoiceData.invoiceNumber || `Vets${invoiceData.bookingId.toString().padStart(7, '0')}`}</strong>
                 </div>
               </div>
               <div className="invoice-date text-gray-600 mb-2 flex items-center">
