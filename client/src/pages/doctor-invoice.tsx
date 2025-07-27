@@ -82,6 +82,8 @@ export default function DoctorInvoice() {
   const { language } = useLanguage();
   const { toast } = useToast();
   
+  const bookingId = params?.bookingId;
+  
   const [invoiceItems, setInvoiceItems] = useState<InvoiceItem[]>([
     { 
       id: '1', 
@@ -2129,11 +2131,11 @@ export default function DoctorInvoice() {
           {/* Invoice Preview with InvoiceGeneratorProfessional */}
           <InvoiceGeneratorProfessional
             invoiceData={{
-              bookingId: parseInt(bookingId),
+              bookingId: parseInt(bookingId || '0'),
               invoiceNumber: invoiceStatus?.invoiceNumber,
               customer: {
-                firstName: booking?.customerFirstName || '',
-                lastName: booking?.customerLastName || '',
+                firstName: booking?.customerName?.split(' ')[0] || '',
+                lastName: booking?.customerName?.split(' ').slice(1).join(' ') || '',
                 phone: booking?.customerPhone || '',
                 email: booking?.customerEmail || ''
               },
@@ -2147,9 +2149,9 @@ export default function DoctorInvoice() {
               tax: taxAmount || 0,
               total: finalTotal || 0,
               notes: '',
-              doctorName: booking?.doctorName || 'Dr. VetsVan',
-              vetsVanCode: booking?.vetsVanCode || 'VETS001',
-              paymentMethods: invoiceData?.payments || []
+              doctorName: 'Dr. VetsVan',
+              vetsVanCode: 'VETS001',
+              paymentMethods: payments || []
             }}
             onClose={() => setShowInvoicePreview(false)}
           />

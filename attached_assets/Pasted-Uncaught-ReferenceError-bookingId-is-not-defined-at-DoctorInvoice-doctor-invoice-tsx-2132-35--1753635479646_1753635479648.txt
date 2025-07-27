@@ -1,0 +1,166 @@
+Uncaught ReferenceError: bookingId is not defined
+    at DoctorInvoice (doctor-invoice.tsx:2132:35)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=5b897786:11548:26)
+    at updateFunctionComponent (chunk-RPCDYKBN.js?v=5b897786:14582:28)
+    at beginWork (chunk-RPCDYKBN.js?v=5b897786:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=5b897786:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=5b897786:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=5b897786:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=5b897786:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=5b897786:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=5b897786:19137:13)
+DoctorInvoice @ doctor-invoice.tsx:2132
+renderWithHooks @ chunk-RPCDYKBN.js?v=5b897786:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=5b897786:14582
+beginWork @ chunk-RPCDYKBN.js?v=5b897786:15924
+callCallback2 @ chunk-RPCDYKBN.js?v=5b897786:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=5b897786:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=5b897786:3733
+beginWork$1 @ chunk-RPCDYKBN.js?v=5b897786:19765
+performUnitOfWork @ chunk-RPCDYKBN.js?v=5b897786:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=5b897786:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=5b897786:19116
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=5b897786:18874
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=5b897786:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=5b897786:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=5b897786:555
+flush @ @tanstack_react-query.js?v=5b897786:569
+batch @ @tanstack_react-query.js?v=5b897786:587
+dispatch_fn @ @tanstack_react-query.js?v=5b897786:996
+setData @ @tanstack_react-query.js?v=5b897786:696
+onSuccess @ @tanstack_react-query.js?v=5b897786:897
+resolve @ @tanstack_react-query.js?v=5b897786:456
+Promise.then
+run @ @tanstack_react-query.js?v=5b897786:498
+start @ @tanstack_react-query.js?v=5b897786:536
+fetch @ @tanstack_react-query.js?v=5b897786:926
+executeFetch_fn @ @tanstack_react-query.js?v=5b897786:2211
+onSubscribe @ @tanstack_react-query.js?v=5b897786:1898
+subscribe @ @tanstack_react-query.js?v=5b897786:24
+(anonymous) @ @tanstack_react-query.js?v=5b897786:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=5b897786:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=5b897786:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=5b897786:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=5b897786:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=5b897786:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=5b897786:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=5b897786:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=5b897786:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=5b897786:19416
+commitRoot @ chunk-RPCDYKBN.js?v=5b897786:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=5b897786:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=5b897786:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=5b897786:18627Understand this error
+doctor-invoice.tsx:2132 Uncaught ReferenceError: bookingId is not defined
+    at DoctorInvoice (doctor-invoice.tsx:2132:35)
+    at renderWithHooks (chunk-RPCDYKBN.js?v=5b897786:11548:26)
+    at updateFunctionComponent (chunk-RPCDYKBN.js?v=5b897786:14582:28)
+    at beginWork (chunk-RPCDYKBN.js?v=5b897786:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-RPCDYKBN.js?v=5b897786:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-RPCDYKBN.js?v=5b897786:3699:24)
+    at invokeGuardedCallback (chunk-RPCDYKBN.js?v=5b897786:3733:39)
+    at beginWork$1 (chunk-RPCDYKBN.js?v=5b897786:19765:15)
+    at performUnitOfWork (chunk-RPCDYKBN.js?v=5b897786:19198:20)
+    at workLoopSync (chunk-RPCDYKBN.js?v=5b897786:19137:13)
+DoctorInvoice @ doctor-invoice.tsx:2132
+renderWithHooks @ chunk-RPCDYKBN.js?v=5b897786:11548
+updateFunctionComponent @ chunk-RPCDYKBN.js?v=5b897786:14582
+beginWork @ chunk-RPCDYKBN.js?v=5b897786:15924
+callCallback2 @ chunk-RPCDYKBN.js?v=5b897786:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=5b897786:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=5b897786:3733
+beginWork$1 @ chunk-RPCDYKBN.js?v=5b897786:19765
+performUnitOfWork @ chunk-RPCDYKBN.js?v=5b897786:19198
+workLoopSync @ chunk-RPCDYKBN.js?v=5b897786:19137
+renderRootSync @ chunk-RPCDYKBN.js?v=5b897786:19116
+recoverFromConcurrentError @ chunk-RPCDYKBN.js?v=5b897786:18736
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=5b897786:18879
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=5b897786:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=5b897786:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=5b897786:555
+flush @ @tanstack_react-query.js?v=5b897786:569
+batch @ @tanstack_react-query.js?v=5b897786:587
+dispatch_fn @ @tanstack_react-query.js?v=5b897786:996
+setData @ @tanstack_react-query.js?v=5b897786:696
+onSuccess @ @tanstack_react-query.js?v=5b897786:897
+resolve @ @tanstack_react-query.js?v=5b897786:456
+Promise.then
+run @ @tanstack_react-query.js?v=5b897786:498
+start @ @tanstack_react-query.js?v=5b897786:536
+fetch @ @tanstack_react-query.js?v=5b897786:926
+executeFetch_fn @ @tanstack_react-query.js?v=5b897786:2211
+onSubscribe @ @tanstack_react-query.js?v=5b897786:1898
+subscribe @ @tanstack_react-query.js?v=5b897786:24
+(anonymous) @ @tanstack_react-query.js?v=5b897786:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=5b897786:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=5b897786:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=5b897786:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=5b897786:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=5b897786:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=5b897786:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=5b897786:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=5b897786:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=5b897786:19416
+commitRoot @ chunk-RPCDYKBN.js?v=5b897786:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=5b897786:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=5b897786:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=5b897786:18627Understand this error
+chunk-RPCDYKBN.js?v=5b897786:14032 The above error occurred in the <DoctorInvoice> component:
+
+    at DoctorInvoice (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/doctor-invoice.tsx:38:22)
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=5b897786:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=5b897786:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=1TxSeItESleXxYA7NvX7e:119:22)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=5b897786:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=1TxSeItESleXxYA7NvX7e:369:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-RPCDYKBN.js?v=5b897786:14032
+update.callback @ chunk-RPCDYKBN.js?v=5b897786:14052
+callCallback @ chunk-RPCDYKBN.js?v=5b897786:11248
+commitUpdateQueue @ chunk-RPCDYKBN.js?v=5b897786:11265
+commitLayoutEffectOnFiber @ chunk-RPCDYKBN.js?v=5b897786:17093
+commitLayoutMountEffects_complete @ chunk-RPCDYKBN.js?v=5b897786:17980
+commitLayoutEffects_begin @ chunk-RPCDYKBN.js?v=5b897786:17969
+commitLayoutEffects @ chunk-RPCDYKBN.js?v=5b897786:17920
+commitRootImpl @ chunk-RPCDYKBN.js?v=5b897786:19353
+commitRoot @ chunk-RPCDYKBN.js?v=5b897786:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=5b897786:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=5b897786:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=5b897786:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=5b897786:555
+flush @ @tanstack_react-query.js?v=5b897786:569
+batch @ @tanstack_react-query.js?v=5b897786:587
+dispatch_fn @ @tanstack_react-query.js?v=5b897786:996
+setData @ @tanstack_react-query.js?v=5b897786:696
+onSuccess @ @tanstack_react-query.js?v=5b897786:897
+resolve @ @tanstack_react-query.js?v=5b897786:456
+Promise.then
+run @ @tanstack_react-query.js?v=5b897786:498
+start @ @tanstack_react-query.js?v=5b897786:536
+fetch @ @tanstack_react-query.js?v=5b897786:926
+executeFetch_fn @ @tanstack_react-query.js?v=5b897786:2211
+onSubscribe @ @tanstack_react-query.js?v=5b897786:1898
+subscribe @ @tanstack_react-query.js?v=5b897786:24
+(anonymous) @ @tanstack_react-query.js?v=5b897786:3022
+subscribeToStore @ chunk-RPCDYKBN.js?v=5b897786:11984
+commitHookEffectListMount @ chunk-RPCDYKBN.js?v=5b897786:16915
+commitPassiveMountOnFiber @ chunk-RPCDYKBN.js?v=5b897786:18156
+commitPassiveMountEffects_complete @ chunk-RPCDYKBN.js?v=5b897786:18129
+commitPassiveMountEffects_begin @ chunk-RPCDYKBN.js?v=5b897786:18119
+commitPassiveMountEffects @ chunk-RPCDYKBN.js?v=5b897786:18109
+flushPassiveEffectsImpl @ chunk-RPCDYKBN.js?v=5b897786:19490
+flushPassiveEffects @ chunk-RPCDYKBN.js?v=5b897786:19447
+commitRootImpl @ chunk-RPCDYKBN.js?v=5b897786:19416
+commitRoot @ chunk-RPCDYKBN.js?v=5b897786:19277
+performSyncWorkOnRoot @ chunk-RPCDYKBN.js?v=5b897786:18895
+flushSyncCallbacks @ chunk-RPCDYKBN.js?v=5b897786:9119
+(anonymous) @ chunk-RPCDYKBN.js?v=5b897786:18627Understand this error
+chunk-RPCDYKBN.js?v=5b897786:9129 Uncaught ReferenceError: bookingId is not defined
+    at DoctorInvoice (doctor-invoice.tsx:2132:35)
