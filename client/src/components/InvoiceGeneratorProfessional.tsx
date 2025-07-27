@@ -284,8 +284,11 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           {/* Test Label */}
           <div className="text-center my-4">
             <h2 className="text-lg font-bold text-purple-600">
-              {getTranslation('testLabel', language)}
+              {getTranslation('testLabel', language) || 'TEST FALLBACK'} - DEBUG: {language}
             </h2>
+            <div className="text-xs text-gray-500">
+              Type: {typeof getTranslation} | Result: "{getTranslation('testLabel', language)}"
+            </div>
           </div>
           
           {/* Header Section */}
