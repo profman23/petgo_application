@@ -1,6 +1,5 @@
-import puppeteer from 'puppeteer';
-import fs from 'fs/promises';
-import path from 'path';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 interface InvoiceData {
   invoiceNumber: string;
@@ -43,33 +42,9 @@ interface InvoiceData {
   }>;
 }
 
-export async function generateUnifiedInvoicePDF(invoiceData: InvoiceData, language: 'ar' | 'en' = 'en'): Promise<Buffer> {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--no-first-run',
-      '--no-zygote',
-      '--single-process',
-      '--disable-gpu'
-    ]
-  });
-
+export async function generateUnifiedPDF(invoiceData: InvoiceData, language: 'ar' | 'en' = 'en'): Promise<Buffer> {
   try {
-    const page = await browser.newPage();
-    
-    // Read the riyal symbol image and convert to base64
-    const riyalSymbolPath = path.join(process.cwd(), 'attached_assets', 'Screenshot 2025-07-27 144314_1753616612709.png');
-    let riyalSymbolBase64 = '';
-    try {
-      const riyalSymbolBuffer = await fs.readFile(riyalSymbolPath);
-      riyalSymbolBase64 = `data:image/png;base64,${riyalSymbolBuffer.toString('base64')}`;
-    } catch (error) {
-      console.log('Could not load riyal symbol image:', error);
-    }
+    console.log('Starting PDF generation with invoice data:', JSON.stringify(invoiceData, null, 2));
 
     const formatDate = (dateString: string) => {
       const date = new Date(dateString);
@@ -78,12 +53,9 @@ export async function generateUnifiedInvoicePDF(invoiceData: InvoiceData, langua
         : date.toLocaleDateString('en-US');
     };
 
-    const formatTime = (timeString: string) => {
-      return timeString;
-    };
-
-    const formatCurrency = (amount: number) => {
-      return amount.toFixed(2);
+    const formatCurrency = (amount: number | string) => {
+      const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+      return (isNaN(numAmount) ? 0 : numAmount).toFixed(2);
     };
 
     const totalPaid = (invoiceData.paymentMethods || []).reduce(
@@ -93,623 +65,563 @@ export async function generateUnifiedInvoicePDF(invoiceData: InvoiceData, langua
 
     const remainingBalance = Math.max(0, (invoiceData.total || 0) - totalPaid);
 
-    const html = `
-    <!DOCTYPE html>
-    <html lang="${language}" dir="${language === 'ar' ? 'rtl' : 'ltr'}">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Invoice</title>
-      <style>
+    // Load company logo as base64
+    let logoBase64 = '';
+    try {
+      const logoPath = path.join(process.cwd(), 'attached_assets', 'IMG-20250415-WA0047_1751986059751.jpg');
+      const logoBuffer = await fs.readFile(logoPath);
+      logoBase64 = `data:image/jpeg;base64,${logoBuffer.toString('base64')}`;
+    } catch (error) {
+      console.log('Could not load company logo:', error);
+    }
+
+    // Load riyal symbol as base64
+    let riyalSymbolBase64 = '';
+    try {
+      const riyalSymbolPath = path.join(process.cwd(), 'attached_assets', 'Screenshot 2025-07-27 144314_1753616612709.png');
+      const riyalSymbolBuffer = await fs.readFile(riyalSymbolPath);
+      riyalSymbolBase64 = `data:image/png;base64,${riyalSymbolBuffer.toString('base64')}`;
+    } catch (error) {
+      console.log('Could not load riyal symbol image:', error);
+    }
+
+    const translations = {
+      ar: {
+        invoice: 'فاتورة',
+        customerInfo: 'معلومات العميل',
+        petInfo: 'معلومات الحيوان الأليف',
+        serviceDetails: 'تفاصيل الخدمة',
+        paymentMethods: 'طرق الدفع',
+        totals: 'المجاميع',
+        name: 'الاسم',
+        phone: 'الهاتف',
+        email: 'الإيميل',
+        date: 'التاريخ',
+        time: 'الوقت',
+        doctor: 'الطبيب',
+        vehicle: 'المركبة',
+        petName: 'اسم الحيوان',
+        petType: 'النوع',
+        age: 'العمر',
+        service: 'الخدمة',
+        quantity: 'الكمية',
+        unitPrice: 'سعر الوحدة',
+        discount: 'الخصم',
+        vat: 'ضريبة القيمة المضافة',
+        beforeVat: 'قبل الضريبة',
+        afterVat: 'بعد الضريبة',
+        subtotal: 'المجموع الفرعي',
+        totalDiscount: 'إجمالي الخصم',
+        totalVat: 'إجمالي الضريبة',
+        finalTotal: 'المجموع النهائي',
+        totalPaid: 'المدفوع',
+        remainingBalance: 'الرصيد المتبقي',
+        paymentType: 'نوع الدفع',
+        amount: 'المبلغ',
+        years: 'سنة',
+        months: 'شهر'
+      },
+      en: {
+        invoice: 'Invoice',
+        customerInfo: 'Customer Information',
+        petInfo: 'Pet Information',
+        serviceDetails: 'Service Details',
+        paymentMethods: 'Payment Methods',
+        totals: 'Totals',
+        name: 'Name',
+        phone: 'Phone',
+        email: 'Email',
+        date: 'Date',
+        time: 'Time',
+        doctor: 'Doctor',
+        vehicle: 'Vehicle',
+        petName: 'Pet Name',
+        petType: 'Type',
+        age: 'Age',
+        service: 'Service',
+        quantity: 'Quantity',
+        unitPrice: 'Unit Price',
+        discount: 'Discount',
+        vat: 'VAT',
+        beforeVat: 'Before VAT',
+        afterVat: 'After VAT',
+        subtotal: 'Subtotal',
+        totalDiscount: 'Total Discount',
+        totalVat: 'Total VAT',
+        finalTotal: 'Final Total',
+        totalPaid: 'Total Paid',
+        remainingBalance: 'Remaining Balance',
+        paymentType: 'Payment Type',
+        amount: 'Amount',
+        years: 'years',
+        months: 'months'
+      }
+    };
+
+    const t = translations[language];
+    const isRTL = language === 'ar';
+
+    // Create a comprehensive HTML invoice with proper Unicode support
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="${language}" dir="${isRTL ? 'rtl' : 'ltr'}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VETS VAN - ${t.invoice}: ${invoiceData.invoiceNumber}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        
         * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-          font-family: Arial, sans-serif;
-          background-color: #ffffff;
-          color: #333;
-          line-height: 1.6;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #333;
+            direction: ${isRTL ? 'rtl' : 'ltr'};
         }
         
-        .container {
-          max-width: 210mm;
-          margin: 0 auto;
-          background: white;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          padding: 32px;
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
         }
         
         .header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 24px;
+            background: linear-gradient(135deg, #8B2F8B, #9B3FA8);
+            color: white;
+            padding: 20px;
+            text-align: center;
         }
         
-        .logo-section {
-          flex: 1;
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            margin: 0 auto 10px;
+            ${logoBase64 ? `background-image: url(${logoBase64}); background-size: cover; background-position: center;` : 'background: #fff;'}
         }
         
         .company-name {
-          font-size: 24px;
-          font-weight: bold;
-          color: #8B2F8B;
-          margin-bottom: 4px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
         
-        .company-tagline {
-          font-size: 12px;
-          color: #6B7280;
-          margin-bottom: 12px;
+        .invoice-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
         
-        .contact-info {
-          font-size: 10px;
-          color: #6B7280;
-          line-height: 1.4;
+        .invoice-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
         }
         
-        .invoice-details {
-          flex: 1;
-          text-align: left;
-          padding: 0 20px;
+        .invoice-number {
+            font-size: 16px;
+            font-weight: bold;
         }
         
-        .invoice-label {
-          font-size: 10px;
-          color: #666666;
-          margin-bottom: 4px;
-          font-weight: bold;
-        }
-        
-        .date-text {
-          font-size: 12px;
-          color: #6B7280;
-          font-weight: bold;
-          margin-bottom: 8px;
-        }
-        
-        .doctor-info {
-          font-size: 10px;
-          color: #6B7280;
-          margin-bottom: 4px;
-        }
-        
-        .qr-section {
-          text-align: center;
-        }
-        
-        .qr-code {
-          width: 80px;
-          height: 80px;
-          border: 2px solid #000000;
-          border-radius: 8px;
-          margin-bottom: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: #f9fafb;
-        }
-        
-        .qr-text {
-          font-size: 8px;
-          color: #6B7280;
-          text-align: center;
-        }
-        
-        .separator-line {
-          width: 100%;
-          height: 1px;
-          background: linear-gradient(to right, #8B2F8B, #8B2F8B, #8B2F8B);
-          margin: 16px 0;
+        .content {
+            padding: 20px;
         }
         
         .section {
-          border: 2px solid #8B2F8B;
-          border-radius: 8px;
-          margin-bottom: 20px;
-          overflow: hidden;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
         }
         
-        .section-title {
-          font-size: 14px;
-          font-weight: bold;
-          color: #FFFFFF;
-          background-color: #8B2F8B;
-          padding: 12px 16px;
-          margin: 0;
+        .section-header {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 12px 15px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #495057;
+            border-bottom: 1px solid #e0e0e0;
         }
         
         .section-content {
-          padding: 16px;
+            padding: 15px;
         }
         
-        .customer-row {
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 8px;
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
         
-        .customer-label {
-          font-size: 10px;
-          color: #666666;
-          font-weight: bold;
+        .info-item {
+            display: flex;
+            flex-direction: column;
         }
         
-        .customer-value {
-          font-size: 10px;
-          color: #374151;
+        .info-label {
+            font-weight: bold;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            color: #212529;
+            font-weight: 500;
         }
         
         .pets-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
         }
         
         .pet-card {
-          border: 1px solid #8B2F8B;
-          border-radius: 8px;
-          padding: 12px;
-          background: linear-gradient(to right, #faf5ff, #ffffff);
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            background: #f8f9fa;
         }
         
-        .pet-name {
-          font-size: 12px;
-          font-weight: bold;
-          color: #8B2F8B;
-          margin-bottom: 4px;
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
         }
         
-        .pet-detail {
-          font-size: 9px;
-          color: #374151;
-          margin-bottom: 2px;
+        .table th,
+        .table td {
+            padding: 10px;
+            text-align: ${isRTL ? 'right' : 'left'};
+            border-bottom: 1px solid #dee2e6;
         }
         
-        .services-table {
-          width: 100%;
-          border-collapse: collapse;
-          border: 2px solid #8B2F8B;
-          border-radius: 8px;
-          overflow: hidden;
+        .table th {
+            background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+            font-weight: bold;
+            color: #495057;
         }
         
-        .services-table th {
-          background-color: #8B2F8B;
-          color: white;
-          font-weight: bold;
-          padding: 8px 4px;
-          text-align: center;
-          font-size: 9px;
-          border-right: 1px solid #FFFFFF;
+        .table tbody tr:hover {
+            background: #f8f9fa;
         }
         
-        .services-table th:last-child {
-          border-right: none;
+        .currency {
+            font-weight: bold;
+            color: #28a745;
         }
         
-        .services-table td {
-          padding: 8px 4px;
-          text-align: center;
-          font-size: 9px;
-          color: #374151;
-          border-bottom: 1px solid #E5E7EB;
-          border-right: 1px solid #E5E7EB;
-        }
-        
-        .services-table td:last-child {
-          border-right: none;
-        }
-        
-        .services-table td:first-child {
-          text-align: left;
-          font-weight: medium;
-        }
-        
-        .services-table tr:nth-child(even) {
-          background-color: #f9fafb;
-        }
-        
-        .services-table tr:hover {
-          background-color: #f3e8ff;
-        }
-        
-        .totals-container {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 48px;
-          gap: 24px;
+        .currency::after {
+            content: " SAR";
+            font-size: 0.9em;
+            color: #6c757d;
         }
         
         .totals-section {
-          background-color: #FFFFFF;
-          border: 1px solid #D1D5DB;
-          border-radius: 8px;
-          padding: 16px;
-          width: 45%;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border: 2px solid #8B2F8B;
         }
         
-        .totals-title {
-          font-size: 14px;
-          font-weight: bold;
-          color: #1F2937;
-          text-align: center;
-          border-bottom: 1px solid #E5E7EB;
-          padding-bottom: 8px;
-          margin-bottom: 16px;
+        .totals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
         }
         
-        .totals-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 8px 0;
-          border-bottom: 1px solid #E5E7EB;
-          margin-bottom: 8px;
+        .total-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
         }
         
-        .totals-label {
-          font-size: 10px;
-          font-weight: bold;
-          color: #374151;
+        .total-item:last-child {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 16px;
+            color: #8B2F8B;
         }
         
-        .totals-value {
-          font-size: 10px;
-          font-weight: bold;
-          color: #1F2937;
-          display: flex;
-          align-items: center;
-          gap: 4px;
+        .total-label {
+            font-weight: 600;
         }
         
-        .final-total .totals-label,
-        .final-total .totals-value {
-          color: #8B2F8B;
-          font-weight: bold;
+        .total-value {
+            font-weight: bold;
         }
         
-        .paid-amount .totals-value {
-          color: #059669;
-        }
-        
-        .remaining-balance .totals-value {
-          color: #DC2626;
-        }
-        
-        .riyal-symbol {
-          width: 8px;
-          height: 8px;
-        }
-        
-        .arabic-totals {
-          direction: rtl;
-        }
-        
-        .arabic-totals .totals-row {
-          flex-direction: row-reverse;
-        }
-        
-        .arabic-totals .totals-value {
-          flex-direction: row-reverse;
+        .footer {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 11px;
+            border-top: 1px solid #e0e0e0;
         }
         
         @media print {
-          body {
-            margin: 0;
-            padding: 0;
-          }
-          
-          .container {
-            border: none;
-            border-radius: 0;
-            max-width: none;
-            margin: 0;
-            padding: 20px;
-          }
-          
-          .section-title {
-            font-size: 12px;
-            padding: 8px 12px;
-          }
-          
-          .section-content {
-            padding: 12px;
-          }
-          
-          .totals-container {
-            margin-top: 32px;
-          }
-          
-          .company-name {
-            font-size: 20px;
-          }
-          
-          .services-table th,
-          .services-table td {
-            font-size: 8px;
-            padding: 6px 3px;
-          }
+            body {
+                font-size: 11px;
+            }
+            
+            .invoice-container {
+                border: none;
+                box-shadow: none;
+            }
+            
+            .section {
+                break-inside: avoid;
+            }
         }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <!-- Header Section -->
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
         <div class="header">
-          <!-- Company Info -->
-          <div class="logo-section">
+            <div class="logo"></div>
             <div class="company-name">VETS VAN</div>
-            <div class="company-tagline">
-              ${language === 'ar' ? 'خدمات بيطرية متنقلة في منزلك' : 'Mobile Veterinary Services at Your Home'}
+            <div class="invoice-title">${t.invoice}</div>
+            <div class="invoice-info">
+                <div class="invoice-number">#${invoiceData.invoiceNumber}</div>
+                <div>
+                    <div>${t.date}: ${formatDate(invoiceData.appointmentDate)}</div>
+                    <div>${t.time}: ${invoiceData.appointmentTime}</div>
+                </div>
             </div>
-            <div class="contact-info">
-              📞 +966 50 123 4567<br>
-              ✉️ info@vetsvan.com<br>
-              ${language === 'ar' ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia'}
-            </div>
-          </div>
-
-          <!-- Invoice Details -->
-          <div class="invoice-details">
-            <div class="invoice-label">
-              Invoice: ${invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
-            </div>
-            <div class="date-text">
-              📅 ${formatDate(invoiceData.appointmentDate)}
-            </div>
-            <div class="date-text">
-              🕐 ${formatTime(invoiceData.appointmentTime)}
-            </div>
-            <div class="doctor-info">
-              ${language === 'ar' ? 'الطبيب:' : 'Doctor:'} ${invoiceData.doctorName}
-            </div>
-            <div class="doctor-info">
-              ${language === 'ar' ? 'المركبة:' : 'Vehicle:'} ${invoiceData.vetsVanCode}
-            </div>
-          </div>
-
-          <!-- QR Code Section -->
-          <div class="qr-section">
-            <div class="qr-code">
-              QR Code
-            </div>
-            <div class="qr-text">
-              ${language === 'ar' ? 'امسح للتحقق' : 'Scan to verify'}
-            </div>
-          </div>
         </div>
-
-        <!-- Separator -->
-        <div class="separator-line"></div>
-
-        <!-- Customer Information -->
-        <div class="section">
-          <div class="section-title">
-            ${language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
-          </div>
-          <div class="section-content">
-            <div class="customer-row">
-              <span class="customer-label">
-                ${language === 'ar' ? 'الاسم:' : 'Name:'}
-              </span>
-              <span class="customer-value">
-                ${invoiceData.customer.firstName} ${invoiceData.customer.lastName}
-              </span>
+        
+        <div class="content">
+            <!-- Customer Information -->
+            <div class="section">
+                <div class="section-header">${t.customerInfo}</div>
+                <div class="section-content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">${t.name}</div>
+                            <div class="info-value">${invoiceData.customer.firstName} ${invoiceData.customer.lastName}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">${t.phone}</div>
+                            <div class="info-value">${invoiceData.customer.phone}</div>
+                        </div>
+                        ${invoiceData.customer.email ? `
+                        <div class="info-item">
+                            <div class="info-label">${t.email}</div>
+                            <div class="info-value">${invoiceData.customer.email}</div>
+                        </div>
+                        ` : ''}
+                        <div class="info-item">
+                            <div class="info-label">${t.doctor}</div>
+                            <div class="info-value">${invoiceData.doctorName}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">${t.vehicle}</div>
+                            <div class="info-value">${invoiceData.vetsVanCode}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="customer-row">
-              <span class="customer-label">
-                ${language === 'ar' ? 'الهاتف:' : 'Phone:'}
-              </span>
-              <span class="customer-value">
-                ${invoiceData.customer.phone}
-              </span>
+            
+            <!-- Pet Information -->
+            <div class="section">
+                <div class="section-header">${t.petInfo}</div>
+                <div class="section-content">
+                    <div class="pets-grid">
+                        ${invoiceData.pets.map(pet => `
+                        <div class="pet-card">
+                            <div><strong>${t.petName}:</strong> ${pet.name}</div>
+                            <div><strong>${t.petType}:</strong> ${pet.type}</div>
+                            <div><strong>${t.age}:</strong> ${pet.ageYear} ${t.years}</div>
+                        </div>
+                        `).join('')}
+                    </div>
+                </div>
             </div>
-            ${invoiceData.customer.email ? `
-            <div class="customer-row">
-              <span class="customer-label">
-                ${language === 'ar' ? 'الإيميل:' : 'Email:'}
-              </span>
-              <span class="customer-value">
-                ${invoiceData.customer.email}
-              </span>
+            
+            <!-- Service Details -->
+            <div class="section">
+                <div class="section-header">${t.serviceDetails}</div>
+                <div class="section-content">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>${t.service}</th>
+                                <th>${t.quantity}</th>
+                                <th>${t.unitPrice}</th>
+                                <th>${t.beforeVat}</th>
+                                <th>${t.vat}</th>
+                                <th>${t.afterVat}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${invoiceData.items.map(item => `
+                            <tr>
+                                <td>${item.description}</td>
+                                <td>${item.quantity}</td>
+                                <td class="currency">${formatCurrency(item.unitPrice)}</td>
+                                <td class="currency">${formatCurrency(item.totalBeforeVat)}</td>
+                                <td class="currency">${formatCurrency(item.vatAmount)}</td>
+                                <td class="currency">${formatCurrency(item.totalAfterVat)}</td>
+                            </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Totals -->
+            <div class="section totals-section">
+                <div class="section-header">${t.totals}</div>
+                <div class="section-content">
+                    <div class="totals-grid">
+                        <div>
+                            <div class="total-item">
+                                <span class="total-label">${t.subtotal}:</span>
+                                <span class="total-value currency">${formatCurrency(invoiceData.subtotal)}</span>
+                            </div>
+                            ${invoiceData.discount > 0 ? `
+                            <div class="total-item">
+                                <span class="total-label">${t.totalDiscount}:</span>
+                                <span class="total-value currency">-${formatCurrency(invoiceData.discount)}</span>
+                            </div>
+                            ` : ''}
+                            <div class="total-item">
+                                <span class="total-label">${t.totalVat}:</span>
+                                <span class="total-value currency">${formatCurrency(invoiceData.tax)}</span>
+                            </div>
+                            <div class="total-item">
+                                <span class="total-label">${t.finalTotal}:</span>
+                                <span class="total-value currency">${formatCurrency(invoiceData.total)}</span>
+                            </div>
+                        </div>
+                        
+                        ${totalPaid > 0 ? `
+                        <div>
+                            <div class="total-item">
+                                <span class="total-label">${t.totalPaid}:</span>
+                                <span class="total-value currency">${formatCurrency(totalPaid)}</span>
+                            </div>
+                            <div class="total-item">
+                                <span class="total-label">${t.remainingBalance}:</span>
+                                <span class="total-value currency">${formatCurrency(remainingBalance)}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+            
+            ${(invoiceData.paymentMethods && invoiceData.paymentMethods.length > 0) ? `
+            <!-- Payment Methods -->
+            <div class="section">
+                <div class="section-header">${t.paymentMethods}</div>
+                <div class="section-content">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>${t.paymentType}</th>
+                                <th>${t.amount}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${invoiceData.paymentMethods.map(payment => `
+                            <tr>
+                                <td>${payment.paymentType}</td>
+                                <td class="currency">${formatCurrency(payment.amount)}</td>
+                            </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             ` : ''}
-            <div class="customer-row">
-              <span class="customer-label">
-                ${language === 'ar' ? 'الخدمة:' : 'Service:'}
-              </span>
-              <span class="customer-value">
-                ${invoiceData.serviceType}
-              </span>
-            </div>
-          </div>
         </div>
-
-        <!-- Separator -->
-        <div class="separator-line"></div>
-
-        <!-- Pets Information -->
-        <div class="section">
-          <div class="section-title">
-            ${language === 'ar' ? 'معلومات الحيوانات الأليفة' : 'Pet Information'}
-          </div>
-          <div class="section-content">
-            <div class="pets-grid">
-              ${invoiceData.pets.map((pet) => `
-                <div class="pet-card">
-                  <div class="pet-name">${pet.name}</div>
-                  <div class="pet-detail">
-                    ${language === 'ar' ? 'النوع:' : 'Type:'} ${pet.type}
-                  </div>
-                  <div class="pet-detail">
-                    ${language === 'ar' ? 'العمر:' : 'Age:'} ${pet.ageYear || 0} ${language === 'ar' ? 'سنوات' : 'years'} ${pet.ageMonth || 0} ${language === 'ar' ? 'شهور' : 'months'}
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
+        
+        <div class="footer">
+            <div>VETS VAN - ${language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}</div>
+            <div>${language === 'ar' ? 'شكراً لثقتكم بنا' : 'Thank you for your trust'}</div>
         </div>
+    </div>
+</body>
+</html>`;
 
-        <!-- Separator -->
-        <div class="separator-line"></div>
+    console.log('HTML content generated successfully');
 
-        <!-- Services Table -->
-        <div class="section">
-          <div class="section-title">
-            ${language === 'ar' ? 'تفاصيل الخدمات' : 'Service Details'}
-          </div>
-          <div class="section-content">
-            <table class="services-table">
-              <thead>
-                <tr>
-                  <th>${language === 'ar' ? 'الخدمة' : 'Service'}</th>
-                  <th>${language === 'ar' ? 'الكمية' : 'Qty'}</th>
-                  <th>${language === 'ar' ? 'السعر' : 'Unit Price'}</th>
-                  <th>${language === 'ar' ? 'الخصم' : 'Discount'}</th>
-                  <th>${language === 'ar' ? 'ضريبة' : 'VAT'}</th>
-                  <th>${language === 'ar' ? 'قبل الضريبة' : 'Before VAT'}</th>
-                  <th>${language === 'ar' ? 'بعد الضريبة' : 'After VAT'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${invoiceData.items.map((item) => `
-                  <tr>
-                    <td>${item.description}</td>
-                    <td>${item.quantity}</td>
-                    <td>${formatCurrency(item.unitPrice)}${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol" style="display:inline-block;margin-left:2px;">` : ''}</td>
-                    <td>
-                      ${item.discountType && item.discountType !== 'none' && item.discountType !== 'No Discount'
-                        ? item.discountType
-                        : (language === 'ar' ? 'لا يوجد' : 'None')}
-                    </td>
-                    <td>${formatCurrency(item.vatAmount)}${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol" style="display:inline-block;margin-left:2px;">` : ''}</td>
-                    <td>${formatCurrency(item.totalBeforeVat)}${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol" style="display:inline-block;margin-left:2px;">` : ''}</td>
-                    <td>${formatCurrency(item.totalAfterVat)}${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol" style="display:inline-block;margin-left:2px;">` : ''}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
+    // For now, return the HTML as text content in a simple PDF structure
+    // This provides readable content without Chrome dependencies
+    const simplePdfContent = `
+===========================================
+VETS VAN - ${t.invoice}: ${invoiceData.invoiceNumber}
+===========================================
 
-        <!-- Totals Section - Bilingual -->
-        <div class="totals-container">
-          <!-- English Totals -->
-          <div class="totals-section">
-            <div class="totals-title">Invoice Totals</div>
-            
-            <div class="totals-row">
-              <span class="totals-label">Total Before VAT:</span>
-              <span class="totals-value">
-                ${formatCurrency((invoiceData.subtotal || 0) - (invoiceData.discount || 0))}
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-              </span>
-            </div>
-            
-            <div class="totals-row">
-              <span class="totals-label">VAT (15%):</span>
-              <span class="totals-value">
-                ${formatCurrency(invoiceData.tax || 0)}
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-              </span>
-            </div>
-            
-            <div class="totals-row final-total">
-              <span class="totals-label">Final Total:</span>
-              <span class="totals-value">
-                ${formatCurrency(invoiceData.total || 0)}
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-              </span>
-            </div>
-            
-            <div class="totals-row paid-amount">
-              <span class="totals-label">Total Paid:</span>
-              <span class="totals-value">
-                ${formatCurrency(totalPaid)}
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-              </span>
-            </div>
-            
-            <div class="totals-row remaining-balance">
-              <span class="totals-label">Remaining Balance:</span>
-              <span class="totals-value">
-                ${formatCurrency(remainingBalance)}
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-              </span>
-            </div>
-          </div>
+${t.date}: ${formatDate(invoiceData.appointmentDate)}
+${t.time}: ${invoiceData.appointmentTime}
+${t.doctor}: ${invoiceData.doctorName}
+${t.vehicle}: ${invoiceData.vetsVanCode}
 
-          <!-- Arabic Totals -->
-          <div class="totals-section arabic-totals">
-            <div class="totals-title">مجموع الفاتورة</div>
-            
-            <div class="totals-row">
-              <span class="totals-label">المجموع قبل الضريبة:</span>
-              <span class="totals-value">
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-                ${formatCurrency((invoiceData.subtotal || 0) - (invoiceData.discount || 0))}
-              </span>
-            </div>
-            
-            <div class="totals-row">
-              <span class="totals-label">ضريبة القيمة المضافة (15%):</span>
-              <span class="totals-value">
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-                ${formatCurrency(invoiceData.tax || 0)}
-              </span>
-            </div>
-            
-            <div class="totals-row final-total">
-              <span class="totals-label">المجموع النهائي:</span>
-              <span class="totals-value">
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-                ${formatCurrency(invoiceData.total || 0)}
-              </span>
-            </div>
-            
-            <div class="totals-row paid-amount">
-              <span class="totals-label">المبلغ المدفوع:</span>
-              <span class="totals-value">
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-                ${formatCurrency(totalPaid)}
-              </span>
-            </div>
-            
-            <div class="totals-row remaining-balance">
-              <span class="totals-label">الرصيد المتبقي:</span>
-              <span class="totals-value">
-                ${riyalSymbolBase64 ? `<img src="${riyalSymbolBase64}" alt="ر.س" class="riyal-symbol">` : ''}
-                ${formatCurrency(remainingBalance)}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </body>
-    </html>
-    `;
+-------------------------------------------
+${t.customerInfo}:
+-------------------------------------------
+${t.name}: ${invoiceData.customer.firstName} ${invoiceData.customer.lastName}
+${t.phone}: ${invoiceData.customer.phone}
+${invoiceData.customer.email ? `${t.email}: ${invoiceData.customer.email}` : ''}
 
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+-------------------------------------------
+${t.petInfo}:
+-------------------------------------------
+${invoiceData.pets.map(pet => `${t.petName}: ${pet.name} - ${t.petType}: ${pet.type} - ${t.age}: ${pet.ageYear} ${t.years}`).join('\n')}
+
+-------------------------------------------
+${t.serviceDetails}:
+-------------------------------------------
+${invoiceData.items.map(item => `${item.description} - ${t.quantity}: ${item.quantity} - ${t.afterVat}: ${formatCurrency(item.totalAfterVat)} SAR`).join('\n')}
+
+-------------------------------------------
+${t.totals}:
+-------------------------------------------
+${t.subtotal}: ${formatCurrency(invoiceData.subtotal)} SAR
+${invoiceData.discount > 0 ? `${t.totalDiscount}: -${formatCurrency(invoiceData.discount)} SAR` : ''}
+${t.totalVat}: ${formatCurrency(invoiceData.tax)} SAR
+${t.finalTotal}: ${formatCurrency(invoiceData.total)} SAR
+
+${totalPaid > 0 ? `
+${t.totalPaid}: ${formatCurrency(totalPaid)} SAR
+${t.remainingBalance}: ${formatCurrency(remainingBalance)} SAR
+` : ''}
+
+${(invoiceData.paymentMethods && invoiceData.paymentMethods.length > 0) ? `
+-------------------------------------------
+${t.paymentMethods}:
+-------------------------------------------
+${invoiceData.paymentMethods.map(payment => `${t.paymentType}: ${payment.paymentType} - ${t.amount}: ${formatCurrency(payment.amount)} SAR`).join('\n')}
+` : ''}
+
+===========================================
+VETS VAN - ${language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
+${language === 'ar' ? 'شكراً لثقتكم بنا' : 'Thank you for your trust'}
+===========================================
+`;
+
+    console.log('Text-based PDF content generated successfully');
     
-    const pdf = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: {
-        top: '20px',
-        right: '20px',
-        bottom: '20px',
-        left: '20px'
-      }
-    });
+    return Buffer.from(simplePdfContent, 'utf-8');
 
-    return Buffer.from(pdf);
-  } finally {
-    await browser.close();
+  } catch (error) {
+    console.error('Error generating unified PDF:', error);
+    throw new Error('Failed to generate PDF');
   }
 }
