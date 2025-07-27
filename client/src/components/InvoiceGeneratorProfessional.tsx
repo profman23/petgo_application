@@ -411,32 +411,32 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           <div className="section border-2 border-purple-600 shadow-lg">
             <h3 className="section-title flex items-center bg-purple-600 -m-5 mb-4 p-4 rounded-t-lg text-white">
               <FileText className="h-5 w-5 mr-2" />
-              {language === 'ar' ? 'تفاصيل الخدمات' : 'Service Details'}
+              {getTranslation('serviceDetails', language)}
             </h3>
             <div className="overflow-x-auto">
               <table className="services-table w-full border-2 border-purple-600 rounded-lg overflow-hidden shadow-md">
                 <thead>
                   <tr className="bg-gradient-to-r from-purple-600 to-purple-600">
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'الخدمة' : 'Service'}
+                      {getTranslation('serviceItem', language)}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'الكمية' : 'Qty'}
+                      {getTranslation('quantity', language)}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'السعر' : 'Unit Price'}
+                      {getTranslation('unitPrice', language)}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'الخصم' : 'Discount'}
+                      {getTranslation('discount', language)}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'ضريبة' : 'VAT'}
+                      {getTranslation('vat', language)}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center border-r border-purple-600 text-xs">
-                      {language === 'ar' ? 'قبل الضريبة' : 'Before VAT'}
+                      {getTranslation('totalBeforeVat', language)}
                     </th>
                     <th className="text-white font-bold py-3 px-3 text-center text-xs">
-                      {language === 'ar' ? 'بعد الضريبة' : 'After VAT'}
+                      {getTranslation('totalAfterVat', language)}
                     </th>
                   </tr>
                 </thead>
@@ -505,7 +505,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               <div className="space-y-2">
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
+                    {getTranslation('subtotalBeforeVat', language)}
                   </span>
                   <span className="text-sm font-semibold text-gray-800">
                     {formatCurrency(invoiceData.subtotal - (invoiceData.discount || 0))}
@@ -515,7 +515,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT:'}
+                    {getTranslation('vatAmount', language)}
                   </span>
                   <span className="text-sm font-semibold text-gray-800">
                     {formatCurrency(invoiceData.tax)}
@@ -525,7 +525,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
+                    {getTranslation('finalTotal', language)}
                   </span>
                   <span className="text-sm font-bold text-purple-600">
                     {formatCurrency(invoiceData.total)}
@@ -535,7 +535,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
+                    {getTranslation('totalPaid', language)}
                   </span>
                   <span className="text-sm font-semibold text-green-600">
                     {formatCurrency((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))}
@@ -544,7 +544,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                 
                 <div className="flex justify-between items-center py-2">
                   <span className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
+                    {getTranslation('remainingBalance', language)}
                   </span>
                   <span className="text-sm font-semibold text-red-600">
                     {formatCurrency(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))))}
@@ -560,7 +560,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           {/* Enhanced Invoice Summary */}
           <div className="total-section border-4 border-purple-600 shadow-xl bg-gradient-to-br from-purple-50 to-white rounded-lg">
             <h3 className="section-title text-center text-xl bg-purple-600 -m-6 mb-6 p-4 rounded-t-lg text-white">
-              {language === 'ar' ? 'ملخص الفاتورة' : 'Invoice Summary'}
+              {getTranslation('totalsTitle', language)}
             </h3>
             <div className="space-y-4">
               {/* Subtotal */}
