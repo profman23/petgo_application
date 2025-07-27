@@ -1,0 +1,36 @@
+POST https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/api/download-invoice-pdf 500 (Internal Server Error)
+handleDownloadInvoice @ doctor-invoice.tsx:894
+callCallback2 @ chunk-RPCDYKBN.js?v=a632c0fa:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=a632c0fa:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=a632c0fa:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=a632c0fa:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=a632c0fa:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=a632c0fa:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=a632c0fa:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=a632c0fa:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=a632c0fa:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=a632c0fa:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=a632c0fa:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=a632c0fa:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=a632c0fa:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=a632c0fa:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=a632c0fa:5449Understand this error
+doctor-invoice.tsx:925 Error downloading invoice: Error: Failed to download PDF
+    at handleDownloadInvoice (doctor-invoice.tsx:904:15)
+handleDownloadInvoice @ doctor-invoice.tsx:925
+await in handleDownloadInvoice
+callCallback2 @ chunk-RPCDYKBN.js?v=a632c0fa:3674
+invokeGuardedCallbackDev @ chunk-RPCDYKBN.js?v=a632c0fa:3699
+invokeGuardedCallback @ chunk-RPCDYKBN.js?v=a632c0fa:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-RPCDYKBN.js?v=a632c0fa:3736
+executeDispatch @ chunk-RPCDYKBN.js?v=a632c0fa:7014
+processDispatchQueueItemsInOrder @ chunk-RPCDYKBN.js?v=a632c0fa:7034
+processDispatchQueue @ chunk-RPCDYKBN.js?v=a632c0fa:7043
+dispatchEventsForPlugins @ chunk-RPCDYKBN.js?v=a632c0fa:7051
+(anonymous) @ chunk-RPCDYKBN.js?v=a632c0fa:7174
+batchedUpdates$1 @ chunk-RPCDYKBN.js?v=a632c0fa:18913
+batchedUpdates @ chunk-RPCDYKBN.js?v=a632c0fa:3579
+dispatchEventForPluginEventSystem @ chunk-RPCDYKBN.js?v=a632c0fa:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-RPCDYKBN.js?v=a632c0fa:5478
+dispatchEvent @ chunk-RPCDYKBN.js?v=a632c0fa:5472
+dispatchDiscreteEvent @ chunk-RPCDYKBN.js?v=a632c0fa:5449Understand this error
