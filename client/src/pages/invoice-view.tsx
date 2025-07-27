@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { InvoiceGeneratorProfessional } from '@/components/InvoiceGeneratorProfessional';
+import UnifiedInvoiceViewer from '@/components/UnifiedInvoiceViewer';
 import { apiRequest } from '@/lib/queryClient';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight, Download, Eye } from 'lucide-react';
@@ -176,31 +176,48 @@ const InvoiceView = () => {
       <div className="max-w-6xl mx-auto p-4">
         {showInvoice && (
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <InvoiceGeneratorProfessional
+            <UnifiedInvoiceViewer
               invoiceData={{
-                bookingId: parseInt(bookingId),
-                invoiceNumber: invoiceStatus?.invoiceNumber,
+                invoiceNumber: invoiceStatus?.invoiceNumber || `Vets${String(bookingId).padStart(8, '0')}`,
+                bookingId: String(bookingId || ''),
+                appointmentDate: booking.appointmentDate,
+                appointmentTime: booking.appointmentTime,
+                doctorName: booking.doctorName || doctorInfo?.name || 'Dr. VetsVan',
+                vetsVanCode: booking.vetsVanCode || 'VETS001',
                 customer: {
                   firstName: booking.customerFirstName,
                   lastName: booking.customerLastName,
                   phone: booking.customerPhone,
                   email: booking.customerEmail || ''
                 },
-                pets: booking.pets || [],
-                appointmentDate: booking.appointmentDate,
-                appointmentTime: booking.appointmentTime,
-                serviceType: booking.serviceType || 'General Service',
-                items: invoiceItems || [],
+                pets: (booking.pets || []).map((pet: any) => ({
+                  id: String(pet.id),
+                  name: pet.name,
+                  type: pet.type,
+                  ageYear: pet.ageYear || 0,
+                  ageMonth: pet.ageMonth || 0
+                })),
+                items: (invoiceItems || []).map(item => ({
+                  id: item.id,
+                  description: item.description,
+                  quantity: item.quantity,
+                  unitPrice: item.unitPrice,
+                  discountType: item.discountType,
+                  vatAmount: item.vatAmount,
+                  totalBeforeVat: item.totalBeforeVat,
+                  totalAfterVat: item.totalAfterVat
+                })),
                 subtotal: invoiceStatus?.subtotal || 0,
-                discount: invoiceStatus?.discountAmount || 0,
                 tax: invoiceStatus?.taxAmount || 0,
+                discount: invoiceStatus?.discountAmount || 0,
                 total: invoiceStatus?.finalTotal || 0,
-                notes: invoiceStatus?.notes || '',
-                doctorName: booking.doctorName || doctorInfo?.name || 'Dr. VetsVan',
-                vetsVanCode: booking.vetsVanCode || 'VETS001',
-                paymentMethods: invoiceData?.payments || []
+                serviceType: booking.serviceType || 'General Service',
+                paymentMethods: (invoiceData?.payments || []).map((payment: any) => ({
+                  amount: payment.amount,
+                  paymentType: payment.paymentType
+                }))
               }}
-              onClose={() => setShowInvoice(false)}
+              language={language}
             />
           </div>
         )}

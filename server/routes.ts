@@ -10,7 +10,7 @@ import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVe
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
-import { generateInvoicePDF } from "./pdf-generator";
+import { generateUnifiedInvoicePDF } from "./unified-pdf-generator";
 // Payment service removed per user request
 
 // Simple session middleware
@@ -3364,7 +3364,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Generate PDF
-      const pdfBuffer = await generateInvoicePDF(invoiceData);
+      const pdfBuffer = await generateUnifiedInvoicePDF(invoiceData, language as 'ar' | 'en');
       
       // Set response headers
       res.setHeader('Content-Type', 'application/pdf');
@@ -3428,7 +3428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Generate PDF
-      const pdfBuffer = await generateInvoicePDF(invoiceData);
+      const pdfBuffer = await generateUnifiedInvoicePDF(invoiceData, language as 'ar' | 'en');
       
       // Set response headers
       res.setHeader('Content-Type', 'application/pdf');
@@ -3456,7 +3456,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Generate PDF using the provided invoice data
-      const pdfBuffer = await generateInvoicePDF(invoiceData);
+      const pdfBuffer = await generateUnifiedInvoicePDF(invoiceData, (invoiceData.language || 'ar') as 'ar' | 'en');
       
       // Set response headers for download
       res.setHeader('Content-Type', 'application/pdf');
