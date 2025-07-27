@@ -2226,6 +2226,61 @@ export default function DoctorInvoice() {
                     </div>
                   </div>
                 ))}
+
+                {/* Totals Section - Right Side */}
+                <div className="flex justify-end mt-6">
+                  <div className="bg-white border border-gray-300 rounded-lg shadow-md p-4 w-80">
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-800">
+                          {(subtotal - totalDiscountAmount).toFixed(2)} SAR
+                        </span>
+                      </div>
+                      <div className="border-b border-gray-200"></div>
+                      
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          {language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT:'}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-800">
+                          {taxAmount.toFixed(2)} SAR
+                        </span>
+                      </div>
+                      <div className="border-b border-gray-200"></div>
+                      
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
+                        </span>
+                        <span className="text-sm font-bold text-purple-600">
+                          {finalTotal.toFixed(2)} SAR
+                        </span>
+                      </div>
+                      <div className="border-b border-gray-200"></div>
+                      
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
+                        </span>
+                        <span className="text-sm font-semibold text-green-600">
+                          {totalPaid.toFixed(2)} SAR
+                        </span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
+                        </span>
+                        <span className="text-sm font-semibold text-red-600">
+                          {remainingBalance.toFixed(2)} SAR
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

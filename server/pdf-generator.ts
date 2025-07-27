@@ -382,7 +382,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                   Total Paid:
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #059669;">
-                  ${(invoiceData.totalPaid || 0).toFixed(2)} SAR
+                  ${((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)).toFixed(2)} SAR
                 </span>
               </div>
             </div>
@@ -393,7 +393,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                   Remaining Balance:
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #DC2626;">
-                  ${((invoiceData.total || 0) - (invoiceData.totalPaid || 0)).toFixed(2)} SAR
+                  ${(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)))).toFixed(2)} SAR
                 </span>
               </div>
             </div>

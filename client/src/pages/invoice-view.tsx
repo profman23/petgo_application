@@ -197,7 +197,8 @@ const InvoiceView = () => {
                 total: invoiceStatus?.finalTotal || 0,
                 notes: invoiceStatus?.notes || '',
                 doctorName: booking.doctorName || doctorInfo?.name || 'Dr. VetsVan',
-                vetsVanCode: booking.vetsVanCode || 'VETS001'
+                vetsVanCode: booking.vetsVanCode || 'VETS001',
+                paymentMethods: invoiceData?.payments || []
               }}
               onClose={() => setShowInvoice(false)}
             />

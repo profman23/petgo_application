@@ -530,7 +530,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                     {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
                   </span>
                   <span className="text-sm font-semibold text-green-600">
-                    {formatCurrency(invoiceData.totalPaid || 0)}
+                    {formatCurrency((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))}
                   </span>
                 </div>
                 
@@ -539,7 +539,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
                     {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
                   </span>
                   <span className="text-sm font-semibold text-red-600">
-                    {formatCurrency((invoiceData.total || 0) - (invoiceData.totalPaid || 0))}
+                    {formatCurrency(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0))))}
                   </span>
                 </div>
               </div>
