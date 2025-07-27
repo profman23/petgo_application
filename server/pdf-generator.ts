@@ -182,7 +182,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         
         .data-row {
           display: table-row;
-          border-bottom: 1px solid #E5E7EB;
+          border-bottom: 1px solid #D1D5DB;
         }
         
         .data-cell {
