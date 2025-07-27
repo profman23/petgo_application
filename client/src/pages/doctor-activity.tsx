@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DoctorFooter } from '@/components/doctor-footer';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck } from 'lucide-react';
@@ -640,13 +640,9 @@ export default function DoctorActivity() {
 
       {/* Customer Location Map Dialog */}
       <Dialog open={showMap} onOpenChange={setShowMap}>
-        <DialogContent 
-          className="max-w-4xl max-h-[90vh]"
-          aria-labelledby="map-dialog-title"
-          aria-describedby="map-dialog-description"
-        >
+        <DialogContent className="max-w-4xl max-h-[90vh]">
           <DialogHeader>
-            <DialogTitle id="map-dialog-title" style={{ textAlign }}>
+            <DialogTitle style={{ textAlign }}>
               {language === 'ar' ? 'موقع العميل' : 'Customer Location'}
               {selectedBooking && (
                 <span className="text-sm font-normal text-gray-600 mr-2">
@@ -654,12 +650,8 @@ export default function DoctorActivity() {
                 </span>
               )}
             </DialogTitle>
-            <DialogDescription className="sr-only">
-              {language === 'ar' ? 'عرض موقع العميل على الخريطة' : 'Display customer location on map'}
-            </DialogDescription>
           </DialogHeader>
           
-          <div id="map-dialog-description">
           {selectedBooking && selectedBooking.customerLocation ? (
             <div className="space-y-4">
               {/* Address Display */}
@@ -791,27 +783,18 @@ export default function DoctorActivity() {
               </p>
             </div>
           )}
-          </div>
         </DialogContent>
       </Dialog>
 
       {/* Add Record Dialog */}
       <Dialog open={showAddRecordDialog} onOpenChange={setShowAddRecordDialog}>
-        <DialogContent 
-          className="sm:max-w-md" 
-          dir={direction}
-          aria-labelledby="add-record-title"
-          aria-describedby="add-record-description"
-        >
+        <DialogContent className="sm:max-w-md" dir={direction}>
           <DialogHeader>
-            <DialogTitle id="add-record-title" style={{ textAlign }}>
+            <DialogTitle style={{ textAlign }}>
               {language === 'ar' ? 'إضافة سجل جديد' : 'Add New Record'}
             </DialogTitle>
-            <DialogDescription className="sr-only">
-              {language === 'ar' ? 'إضافة سجل جديد لعميل' : 'Add new record for customer'}
-            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4" id="add-record-description">
+          <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700" style={{ textAlign }}>
                 {language === 'ar' ? 'رقم هاتف العميل' : 'Customer Phone Number'}

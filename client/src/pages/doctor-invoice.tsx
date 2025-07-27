@@ -516,10 +516,10 @@ export default function DoctorInvoice() {
   };
 
   // Calculate totals - Total Before VAT = Quantity * Unit Price (without discount)
-  const subtotal = Math.round(invoiceItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0) * 100) / 100;
-  const taxAmount = Math.round(invoiceItems.reduce((sum, item) => sum + item.vatAmount, 0) * 100) / 100;
+  const subtotal = invoiceItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+  const taxAmount = invoiceItems.reduce((sum, item) => sum + item.vatAmount, 0);
   // Calculate total discount amount from all items
-  const totalDiscountAmount = Math.round(invoiceItems.reduce((sum, item) => {
+  const totalDiscountAmount = invoiceItems.reduce((sum, item) => {
     const itemSubtotal = item.unitPrice * item.quantity;
     if (item.discountType === '10%') {
       return sum + (itemSubtotal * 0.10);
@@ -527,9 +527,9 @@ export default function DoctorInvoice() {
       return sum + itemSubtotal;
     }
     return sum;
-  }, 0) * 100) / 100;
+  }, 0);
   // Final Total = (Total Before VAT - Discount) + VAT
-  const finalTotal = Math.round(((subtotal - totalDiscountAmount) + taxAmount) * 100) / 100;
+  const finalTotal = (subtotal - totalDiscountAmount) + taxAmount;
   const remainingBalance = finalTotal - totalPaid;
   
   // Calculate values for each item automatically
@@ -550,10 +550,10 @@ export default function DoctorInvoice() {
     const totalBeforeVat = subtotal - discountAmount;
     
     // Calculate VAT amount (15% of total before VAT)
-    const vatAmount = Math.round(totalBeforeVat * (item.vatRate / 100) * 100) / 100;
+    const vatAmount = totalBeforeVat * (item.vatRate / 100);
     
     // Calculate total after VAT
-    const totalAfterVat = Math.round((totalBeforeVat + vatAmount) * 100) / 100;
+    const totalAfterVat = totalBeforeVat + vatAmount;
     
     return {
       ...item,
@@ -2073,16 +2073,14 @@ export default function DoctorInvoice() {
         <DialogContent 
           className="sm:max-w-md"
           dir={getDirection(language)}
-          aria-labelledby="confirm-dialog-title"
-          aria-describedby="confirm-dialog-description"
           style={{ textAlign: getTextAlign(language) }}
         >
           <DialogHeader>
-            <DialogTitle id="confirm-dialog-title" className="flex items-center">
+            <DialogTitle className="flex items-center">
               <AlertTriangle className="h-5 w-5 text-orange-500 mr-2" />
               {t('confirmTitle')}
             </DialogTitle>
-            <DialogDescription id="confirm-dialog-description" className="text-gray-600">
+            <DialogDescription className="text-gray-600">
               {t('confirmMessage')}
             </DialogDescription>
           </DialogHeader>
@@ -2110,11 +2108,9 @@ export default function DoctorInvoice() {
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-auto"
           dir={getDirection(language)}
-          aria-labelledby="invoice-preview-title"
-          aria-describedby="invoice-preview-description"
         >
           <DialogHeader>
-            <DialogTitle id="invoice-preview-title" className="flex items-center justify-between">
+            <DialogTitle className="flex items-center justify-between">
               <span>{language === 'ar' ? 'معاينة الفاتورة' : 'Invoice Preview'}</span>
               <Button
                 variant="outline"
@@ -2126,13 +2122,10 @@ export default function DoctorInvoice() {
                 {language === 'ar' ? 'تحميل' : 'Download'}
               </Button>
             </DialogTitle>
-            <DialogDescription className="sr-only">
-              {language === 'ar' ? 'معاينة وطباعة الفاتورة' : 'Preview and print invoice'}
-            </DialogDescription>
           </DialogHeader>
           
           {/* Invoice Preview Content - Simplified */}
-          <div className="invoice-preview" style={{ direction: getDirection(language) }} id="invoice-preview-description">
+          <div className="invoice-preview" style={{ direction: getDirection(language) }}>
             <div className="bg-white p-8 rounded-lg border shadow-sm">
               {/* Header with Date (left) and Logo (right) */}
               <div className="flex justify-between items-center mb-4">
@@ -2141,31 +2134,6 @@ export default function DoctorInvoice() {
                   <p className="text-xs font-semibold">
                     {new Date().toLocaleDateString('en-US')}
                   </p>
-                  {/* Invoice Number Display - PDF Matching Format */}
-                  {invoiceStatus?.invoiceNumber && (
-                    <div 
-                      className="text-sm text-gray-800 mb-1 font-bold invoice-number"
-                      style={{ 
-                        fontSize: '18px !important', 
-                        fontWeight: 'bold !important', 
-                        color: '#000000 !important', 
-                        display: 'block !important', 
-                        visibility: 'visible !important',
-                        position: 'relative',
-                        zIndex: 999,
-                        backgroundColor: '#f9f9f9',
-                        padding: '8px',
-                        border: '2px solid #e5e5e5',
-                        borderRadius: '4px',
-                        marginTop: '8px'
-                      }}
-                    >
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <strong>Invoice: {invoiceStatus.invoiceNumber}</strong>
-                        <strong style={{ direction: 'rtl' }}>فاتورة رقم: {invoiceStatus.invoiceNumber}</strong>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 
                 {/* Empty space in the middle */}
@@ -2192,7 +2160,7 @@ export default function DoctorInvoice() {
                     Customer Name: {booking?.customerName || ''}
                   </p>
                   <p className="text-xs text-gray-500">
-                    اسم العميل: {booking?.customerName || ''}
+                    {booking?.customerName || ''} :اسم العميل
                   </p>
                 </div>
                 
@@ -2202,7 +2170,7 @@ export default function DoctorInvoice() {
                     Customer Phone: {booking?.customerPhone || ''}
                   </p>
                   <p className="text-xs text-gray-500">
-                    تليفون العميل: {booking?.customerPhone || ''}
+                    {booking?.customerPhone || ''} :تليفون العميل
                   </p>
                 </div>
                 
@@ -2215,31 +2183,31 @@ export default function DoctorInvoice() {
                 <div className="grid grid-cols-7 gap-1 border-b pb-2 mb-2" style={{borderColor: '#8B2F8B'}}>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Item Description</p>
-                    <p className="text-xs text-gray-600">الصنف:</p>
+                    <p className="text-xs text-gray-600">الصنف</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Quantity</p>
-                    <p className="text-xs text-gray-600">الكمية:</p>
+                    <p className="text-xs text-gray-600">الكمية</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Unit Price</p>
-                    <p className="text-xs text-gray-600">سعر الوحدة:</p>
+                    <p className="text-xs text-gray-600">سعر الوحدة</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Discount</p>
-                    <p className="text-xs text-gray-600">الخصم:</p>
+                    <p className="text-xs text-gray-600">الخصم</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">VAT</p>
-                    <p className="text-xs text-gray-600">الضريبة:</p>
+                    <p className="text-xs text-gray-600">الضريبة</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Total B.Vat</p>
-                    <p className="text-xs text-gray-600">المجموع قبل الضريبة:</p>
+                    <p className="text-xs text-gray-600">المجموع قبل الضريبة</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Total A.Vat</p>
-                    <p className="text-xs text-gray-600">المجموع بعد الضريبة:</p>
+                    <p className="text-xs text-gray-600">المجموع بعد الضريبة</p>
                   </div>
                 </div>
 

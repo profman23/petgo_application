@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
@@ -980,23 +980,16 @@ export default function RideRequest() {
 
       {/* Partners Dialog */}
       <Dialog open={showPartnersDialog} onOpenChange={setShowPartnersDialog}>
-        <DialogContent 
-          className="sm:max-w-md"
-          aria-labelledby="partners-dialog-title"
-          aria-describedby="partners-dialog-description"
-        >
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle id="partners-dialog-title" className="text-center text-xl font-bold text-gray-800" style={{
+            <DialogTitle className="text-center text-xl font-bold text-gray-800" style={{
               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
             }}>
               {language === 'ar' ? 'شركاؤونا' : 'Our Partners'}
             </DialogTitle>
-            <DialogDescription className="sr-only">
-              {language === 'ar' ? 'نافذة عرض شركائنا للخدمات المتخصصة' : 'Partners dialog for specialized services'}
-            </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 p-4" id="partners-dialog-description">
+          <div className="space-y-4 p-4">
             {/* Partners Logos */}
             <div className="flex justify-center items-start gap-8 mb-6">
               {/* Show Dr. Paws only for non-CT-Scan services */}

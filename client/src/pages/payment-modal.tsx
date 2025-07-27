@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -216,20 +216,12 @@ export default function PaymentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="max-w-2xl max-h-[80vh] overflow-y-auto" 
-        dir={language === 'ar' ? 'rtl' : 'ltr'}
-        aria-labelledby="payment-dialog-title"
-        aria-describedby="payment-dialog-description"
-      >
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <DialogHeader>
-          <DialogTitle id="payment-dialog-title" className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5" />
             {t.addPayment}
           </DialogTitle>
-          <DialogDescription id="payment-dialog-description" className="sr-only">
-            {language === 'ar' ? 'نافذة إضافة دفعة جديدة للفاتورة' : 'Add new payment dialog for invoice'}
-          </DialogDescription>
         </DialogHeader>
 
         {/* Payment Summary */}
