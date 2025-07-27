@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DoctorFooter } from '@/components/doctor-footer';
 import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck } from 'lucide-react';
@@ -654,6 +654,9 @@ export default function DoctorActivity() {
                 </span>
               )}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {language === 'ar' ? 'عرض موقع العميل على الخريطة' : 'Display customer location on map'}
+            </DialogDescription>
           </DialogHeader>
           
           <div id="map-dialog-description">
@@ -804,6 +807,9 @@ export default function DoctorActivity() {
             <DialogTitle id="add-record-title" style={{ textAlign }}>
               {language === 'ar' ? 'إضافة سجل جديد' : 'Add New Record'}
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {language === 'ar' ? 'إضافة سجل جديد لعميل' : 'Add new record for customer'}
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4" id="add-record-description">
             <div className="space-y-2">

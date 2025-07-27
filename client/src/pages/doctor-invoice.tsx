@@ -2126,6 +2126,9 @@ export default function DoctorInvoice() {
                 {language === 'ar' ? 'تحميل' : 'Download'}
               </Button>
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {language === 'ar' ? 'معاينة وطباعة الفاتورة' : 'Preview and print invoice'}
+            </DialogDescription>
           </DialogHeader>
           
           {/* Invoice Preview Content - Simplified */}
@@ -2138,6 +2141,28 @@ export default function DoctorInvoice() {
                   <p className="text-xs font-semibold">
                     {new Date().toLocaleDateString('en-US')}
                   </p>
+                  {/* Invoice Number Display */}
+                  {invoiceStatus?.invoiceNumber && (
+                    <div 
+                      className="text-lg font-bold mt-2"
+                      style={{ 
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        color: '#000000',
+                        backgroundColor: '#f0f0f0',
+                        padding: '8px',
+                        border: '2px solid #333',
+                        borderRadius: '8px',
+                        display: 'block',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <strong>Invoice: {invoiceStatus.invoiceNumber}</strong>
+                        <strong style={{ direction: 'rtl' }}>فاتورة رقم: {invoiceStatus.invoiceNumber}</strong>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Empty space in the middle */}
@@ -2187,31 +2212,31 @@ export default function DoctorInvoice() {
                 <div className="grid grid-cols-7 gap-1 border-b pb-2 mb-2" style={{borderColor: '#8B2F8B'}}>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Item Description</p>
-                    <p className="text-xs text-gray-600">الصنف</p>
+                    <p className="text-xs text-gray-600">الصنف:</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Quantity</p>
-                    <p className="text-xs text-gray-600">الكمية</p>
+                    <p className="text-xs text-gray-600">الكمية:</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Unit Price</p>
-                    <p className="text-xs text-gray-600">سعر الوحدة</p>
+                    <p className="text-xs text-gray-600">سعر الوحدة:</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Discount</p>
-                    <p className="text-xs text-gray-600">الخصم</p>
+                    <p className="text-xs text-gray-600">الخصم:</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">VAT</p>
-                    <p className="text-xs text-gray-600">الضريبة</p>
+                    <p className="text-xs text-gray-600">الضريبة:</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Total B.Vat</p>
-                    <p className="text-xs text-gray-600">المجموع قبل الضريبة</p>
+                    <p className="text-xs text-gray-600">المجموع قبل الضريبة:</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-semibold text-gray-800">Total A.Vat</p>
-                    <p className="text-xs text-gray-600">المجموع بعد الضريبة</p>
+                    <p className="text-xs text-gray-600">المجموع بعد الضريبة:</p>
                   </div>
                 </div>
 

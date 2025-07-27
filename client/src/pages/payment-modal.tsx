@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -227,9 +227,9 @@ export default function PaymentModal({
             <Plus className="h-5 w-5" />
             {t.addPayment}
           </DialogTitle>
-          <div id="payment-dialog-description" className="sr-only">
+          <DialogDescription id="payment-dialog-description" className="sr-only">
             {language === 'ar' ? 'نافذة إضافة دفعة جديدة للفاتورة' : 'Add new payment dialog for invoice'}
-          </div>
+          </DialogDescription>
         </DialogHeader>
 
         {/* Payment Summary */}
