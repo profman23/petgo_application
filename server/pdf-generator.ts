@@ -175,32 +175,22 @@ const generateInvoiceHTML = (invoiceData: any): string => {
         }
         
         .items-data-table {
-          display: table;
           width: 100%;
-          table-layout: fixed;
         }
         
         .data-row {
-          display: table-row;
-          border-bottom: 2px solid #9CA3AF;
-          margin-bottom: 2px;
-        }
-        
-        .row-separator {
-          height: 2px;
-          background-color: #9CA3AF;
-          width: 100%;
-          margin: 2px 0;
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 4px;
+          padding: 8px 0;
+          border-bottom: 1px solid #E5E7EB;
         }
         
         .data-cell {
-          display: table-cell;
           text-align: center;
-          vertical-align: middle;
-          width: 14.28%; /* 100/7 columns */
-          padding: 8px 4px;
           font-size: 9px;
           color: #374151;
+          padding: 4px;
         }
         
         .customer-info-row {
@@ -344,7 +334,6 @@ const generateInvoiceHTML = (invoiceData: any): string => {
               <div class="data-cell">${item.totalBeforeVat || ''} SAR</div>
               <div class="data-cell">${item.totalAfterVat || ''} SAR</div>
             </div>
-            ${index < (invoiceData.items?.length || 0) - 1 ? '<div class="row-separator"></div>' : ''}
           `).join('') || ''}
         </div>
       </div>
