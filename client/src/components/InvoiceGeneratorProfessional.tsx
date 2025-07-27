@@ -300,8 +300,8 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             </div>
             
             <div className="invoice-details text-left">
-              <div className="text-sm text-gray-600 mb-1">
-                Invoice: {invoiceData.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
+              <div className="text-sm text-gray-600 mb-1 font-semibold">
+                Invoice: {invoiceData.invoiceNumber || invoiceData.booking?.invoiceNumber || `VETSVAN-${invoiceData.bookingId}`}
               </div>
               <div className="invoice-date text-gray-600 mb-2 flex items-center">
                 <Calendar className="h-4 w-4 mr-2 text-purple-600" />

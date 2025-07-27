@@ -382,7 +382,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                   Total Before VAT:
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
-                  ${((invoiceData.subtotal || 0) - (invoiceData.discount || 0)).toFixed(2)} 
+                  ${(Number(invoiceData.subtotal || 0) - Number(invoiceData.discount || 0)).toFixed(2)} 
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
                 </span>
               </div>
@@ -395,7 +395,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                   VAT (15%):
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
-                  ${(invoiceData.tax || 0).toFixed(2)} 
+                  ${Number(invoiceData.tax || 0).toFixed(2)} 
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
                 </span>
               </div>
@@ -408,7 +408,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                   Final Total:
                 </span>
                 <span style="font-size: 12px; font-weight: 700; color: #8B2F8B; display: flex; align-items: center; gap: 4px;">
-                  ${(invoiceData.total || 0).toFixed(2)} 
+                  ${Number(invoiceData.total || 0).toFixed(2)} 
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
                 </span>
               </div>
@@ -433,7 +433,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                   Remaining Balance:
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #DC2626; display: flex; align-items: center; gap: 4px;">
-                  ${(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)))).toFixed(2)} 
+                  ${(Math.max(0, Number(invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)))).toFixed(2)} 
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
                 </span>
               </div>
@@ -452,7 +452,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
-                  ${((invoiceData.subtotal || 0) - (invoiceData.discount || 0)).toFixed(2)}
+                  ${(Number(invoiceData.subtotal || 0) - Number(invoiceData.discount || 0)).toFixed(2)}
                 </span>
               </div>
               <div style="border-bottom: 1px solid #E5E7EB;"></div>
@@ -465,7 +465,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #1F2937; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
-                  ${(invoiceData.tax || 0).toFixed(2)}
+                  ${Number(invoiceData.tax || 0).toFixed(2)}
                 </span>
               </div>
               <div style="border-bottom: 1px solid #E5E7EB;"></div>
@@ -478,7 +478,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                 </span>
                 <span style="font-size: 12px; font-weight: 700; color: #8B2F8B; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
-                  ${(invoiceData.total || 0).toFixed(2)}
+                  ${Number(invoiceData.total || 0).toFixed(2)}
                 </span>
               </div>
               <div style="border-bottom: 1px solid #E5E7EB;"></div>
@@ -503,7 +503,7 @@ const generateInvoiceHTML = (invoiceData: any): string => {
                 </span>
                 <span style="font-size: 12px; font-weight: 600; color: #DC2626; display: flex; align-items: center; gap: 4px;">
                   <img src="data:image/png;base64,${riyalSymbolBase64}" alt="ر.س" style="width: 10px; height: 10px;" />
-                  ${(Math.max(0, (invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)))).toFixed(2)}
+                  ${(Math.max(0, Number(invoiceData.total || 0) - ((invoiceData.paymentMethods || []).reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0)))).toFixed(2)}
                 </span>
               </div>
             </div>
