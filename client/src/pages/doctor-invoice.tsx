@@ -2159,7 +2159,7 @@ export default function DoctorInvoice() {
               })),
               subtotal: subtotal,
               tax: taxAmount,
-              discount: discountAmount,
+              discount: totalDiscountAmount,
               total: finalTotal,
               serviceType: booking?.serviceType || 'General Service',
               paymentMethods: invoicePayments.map(payment => ({
