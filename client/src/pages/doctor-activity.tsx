@@ -640,7 +640,10 @@ export default function DoctorActivity() {
 
       {/* Customer Location Map Dialog */}
       <Dialog open={showMap} onOpenChange={setShowMap}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
+        <DialogContent 
+          className="max-w-4xl max-h-[90vh]"
+          aria-describedby="map-dialog-description"
+        >
           <DialogHeader>
             <DialogTitle style={{ textAlign }}>
               {language === 'ar' ? 'موقع العميل' : 'Customer Location'}
@@ -652,6 +655,7 @@ export default function DoctorActivity() {
             </DialogTitle>
           </DialogHeader>
           
+          <div id="map-dialog-description">
           {selectedBooking && selectedBooking.customerLocation ? (
             <div className="space-y-4">
               {/* Address Display */}
@@ -783,18 +787,23 @@ export default function DoctorActivity() {
               </p>
             </div>
           )}
+          </div>
         </DialogContent>
       </Dialog>
 
       {/* Add Record Dialog */}
       <Dialog open={showAddRecordDialog} onOpenChange={setShowAddRecordDialog}>
-        <DialogContent className="sm:max-w-md" dir={direction}>
+        <DialogContent 
+          className="sm:max-w-md" 
+          dir={direction}
+          aria-describedby="add-record-description"
+        >
           <DialogHeader>
             <DialogTitle style={{ textAlign }}>
               {language === 'ar' ? 'إضافة سجل جديد' : 'Add New Record'}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4" id="add-record-description">
             <div className="space-y-2">
               <label className="text-sm font-medium text-gray-700" style={{ textAlign }}>
                 {language === 'ar' ? 'رقم هاتف العميل' : 'Customer Phone Number'}

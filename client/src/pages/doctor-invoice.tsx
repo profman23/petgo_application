@@ -2073,6 +2073,7 @@ export default function DoctorInvoice() {
         <DialogContent 
           className="sm:max-w-md"
           dir={getDirection(language)}
+          aria-describedby="confirm-dialog-description"
           style={{ textAlign: getTextAlign(language) }}
         >
           <DialogHeader>
@@ -2108,6 +2109,7 @@ export default function DoctorInvoice() {
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-auto"
           dir={getDirection(language)}
+          aria-describedby="invoice-preview-description"
         >
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
@@ -2125,7 +2127,7 @@ export default function DoctorInvoice() {
           </DialogHeader>
           
           {/* Invoice Preview Content - Simplified */}
-          <div className="invoice-preview" style={{ direction: getDirection(language) }}>
+          <div className="invoice-preview" style={{ direction: getDirection(language) }} id="invoice-preview-description">
             <div className="bg-white p-8 rounded-lg border shadow-sm">
               {/* Header with Date (left) and Logo (right) */}
               <div className="flex justify-between items-center mb-4">
