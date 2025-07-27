@@ -491,6 +491,61 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             </div>
           </div>
 
+          {/* Totals Section - Right Side */}
+          <div className="flex justify-end mb-6">
+            <div className="bg-white border border-gray-300 rounded-lg shadow-md p-4 w-80">
+              <div className="space-y-2">
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
+                  </span>
+                  <span className="text-sm font-semibold text-gray-800">
+                    {formatCurrency(invoiceData.subtotal - (invoiceData.discount || 0))}
+                  </span>
+                </div>
+                <div className="border-b border-gray-200"></div>
+                
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'ضريبة القيمة المضافة:' : 'VAT:'}
+                  </span>
+                  <span className="text-sm font-semibold text-gray-800">
+                    {formatCurrency(invoiceData.tax)}
+                  </span>
+                </div>
+                <div className="border-b border-gray-200"></div>
+                
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
+                  </span>
+                  <span className="text-sm font-bold text-purple-600">
+                    {formatCurrency(invoiceData.total)}
+                  </span>
+                </div>
+                <div className="border-b border-gray-200"></div>
+                
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'المبلغ المدفوع:' : 'Total Paid:'}
+                  </span>
+                  <span className="text-sm font-semibold text-green-600">
+                    {formatCurrency(invoiceData.totalPaid || 0)}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'الرصيد المتبقي:' : 'Remaining Balance:'}
+                  </span>
+                  <span className="text-sm font-semibold text-red-600">
+                    {formatCurrency((invoiceData.total || 0) - (invoiceData.totalPaid || 0))}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Separator Line */}
           <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
 

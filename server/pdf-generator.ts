@@ -336,6 +336,69 @@ const generateInvoiceHTML = (invoiceData: any): string => {
             </div>
           `).join('') || ''}
         </div>
+
+        <!-- Totals Section - Right Side -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
+          <div style="background: white; border: 1px solid #D1D5DB; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 16px; width: 320px;">
+            <div style="margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                <span style="font-size: 12px; font-weight: 500; color: #374151;">
+                  Total Before VAT:
+                </span>
+                <span style="font-size: 12px; font-weight: 600; color: #1F2937;">
+                  ${((invoiceData.subtotal || 0) - (invoiceData.discount || 0)).toFixed(2)} SAR
+                </span>
+              </div>
+              <div style="border-bottom: 1px solid #E5E7EB;"></div>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                <span style="font-size: 12px; font-weight: 500; color: #374151;">
+                  VAT:
+                </span>
+                <span style="font-size: 12px; font-weight: 600; color: #1F2937;">
+                  ${(invoiceData.tax || 0).toFixed(2)} SAR
+                </span>
+              </div>
+              <div style="border-bottom: 1px solid #E5E7EB;"></div>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                <span style="font-size: 12px; font-weight: 500; color: #374151;">
+                  Final Total:
+                </span>
+                <span style="font-size: 12px; font-weight: 700; color: #8B2F8B;">
+                  ${(invoiceData.total || 0).toFixed(2)} SAR
+                </span>
+              </div>
+              <div style="border-bottom: 1px solid #E5E7EB;"></div>
+            </div>
+            
+            <div style="margin-bottom: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                <span style="font-size: 12px; font-weight: 500; color: #374151;">
+                  Total Paid:
+                </span>
+                <span style="font-size: 12px; font-weight: 600; color: #059669;">
+                  ${(invoiceData.totalPaid || 0).toFixed(2)} SAR
+                </span>
+              </div>
+            </div>
+            
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                <span style="font-size: 12px; font-weight: 500; color: #374151;">
+                  Remaining Balance:
+                </span>
+                <span style="font-size: 12px; font-weight: 600; color: #DC2626;">
+                  ${((invoiceData.total || 0) - (invoiceData.totalPaid || 0)).toFixed(2)} SAR
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </body>
     </html>
