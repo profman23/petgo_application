@@ -382,7 +382,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               </div>
               
               <div className="flex items-center justify-between mb-1">
-                <span className="text-gray-600 font-medium text-sm">المجموع قبل الضريبة :</span>
+                <span className="text-gray-600 font-bold text-sm">المجموع قبل الضريبة :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totals.totalBeforeVat.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
@@ -390,7 +390,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               </div>
               
               <div className="flex items-center justify-between mb-1">
-                <span className="text-green-600 font-medium text-sm">الخصم :</span>
+                <span className="text-green-600 font-bold text-sm">الخصم :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-green-600 font-semibold text-sm">{totals.totalDiscount.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
@@ -398,7 +398,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               </div>
               
               <div className="flex items-center justify-between mb-2">
-                <span className="text-gray-600 font-medium text-sm">ضريبة القيمة المضافة 15% :</span>
+                <span className="text-gray-600 font-bold text-sm">ضريبة القيمة المضافة 15% :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totals.totalVat.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
@@ -420,7 +420,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               <div className="w-full h-px bg-gray-300 mb-2"></div>
               
               <div className="flex items-center justify-between mb-1">
-                <span className="text-green-600 font-medium text-sm">المبلغ المدفوع :</span>
+                <span className="text-green-600 font-bold text-sm">المبلغ المدفوع :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-green-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
@@ -428,7 +428,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-red-600 font-medium text-sm">الرصيد المتبقي :</span>
+                <span className="text-red-600 font-bold text-sm">الرصيد المتبقي :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-red-600 font-semibold text-sm">{remainingBalance.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
