@@ -927,7 +927,7 @@ export default function DoctorInvoice() {
   };
 
   const handlePrintInvoice = useReactToPrint({
-    content: () => invoiceRef.current,
+    contentRef: invoiceRef,
     documentTitle: `Invoice-${booking?.id || 'unknown'}`,
     onAfterPrint: () => {
       console.log('Print completed');
@@ -935,14 +935,25 @@ export default function DoctorInvoice() {
         title: language === 'ar' ? 'تم طباعة الفاتورة' : 'Invoice printed successfully',
         variant: 'default',
       });
+    },
+    onPrintError: (error) => {
+      console.error('Print error:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ في الطباعة' : 'Print Error',
+        description: language === 'ar' ? 'فشل في طباعة الفاتورة' : 'Failed to print invoice',
+        variant: 'destructive',
+      });
     }
   });
 
   const handleDownloadInvoice = async () => {
     console.log('Starting PDF download...');
+    console.log('InvoiceRef current:', invoiceRef.current);
+    console.log('Booking data:', booking);
     
     if (!invoiceRef.current || !booking) {
       console.error('Invoice ref or booking not available');
+      
       toast({
         title: language === 'ar' ? 'خطأ في التحميل' : 'Download Error',
         description: language === 'ar' ? 'لا يمكن تحميل الفاتورة حالياً' : 'Cannot download invoice at this time',
@@ -953,6 +964,8 @@ export default function DoctorInvoice() {
 
     try {
       const element = invoiceRef.current;
+      console.log('Element for PDF:', element);
+      
       const opt = {
         margin: 0.5,
         filename: `Invoice-${booking.id}.pdf`,
@@ -960,7 +973,8 @@ export default function DoctorInvoice() {
         html2canvas: { 
           scale: 2,
           useCORS: true,
-          allowTaint: true
+          allowTaint: true,
+          logging: true
         },
         jsPDF: { 
           unit: 'in', 
@@ -2045,6 +2059,15 @@ export default function DoctorInvoice() {
         />
       )}
 
+      {/* Hidden Invoice for Print/PDF Reference */}
+      {booking && (
+        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+          <div ref={invoiceRef}>
+            <UnifiedInvoice bookingId={booking.id} mode="print" />
+          </div>
+        </div>
+      )}
+
       {/* Invoice View Modal */}
       {showInvoiceView && booking && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -2061,7 +2084,7 @@ export default function DoctorInvoice() {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <div ref={invoiceRef}>
+            <div>
               <UnifiedInvoice bookingId={booking.id} mode="view" />
             </div>
           </div>
