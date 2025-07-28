@@ -135,6 +135,36 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             </div>
           </div>
           
+          {/* QR Code في المنتصف */}
+          <div className="qr-code-container flex justify-center items-center">
+            {(() => {
+              // إنشاء بيانات QR Code مشفرة
+              const qrData = {
+                companyName: "شركة فن النخبة البيطرية",
+                vatNumber: "300848569100003",
+                taxAmount: totals.totalVat.toFixed(2),
+                totalAmount: totals.finalTotal.toFixed(2),
+                invoiceNumber: realInvoiceNumber,
+                issueDateTime: new Date().toISOString()
+              };
+              
+              // تشفير البيانات بـ Base64
+              const encodedData = btoa(JSON.stringify(qrData));
+              
+              // إنشاء QR Code باستخدام Google Charts API
+              const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(encodedData)}`;
+              
+              return (
+                <img 
+                  src={qrCodeUrl}
+                  alt="Invoice QR Code"
+                  className="w-20 h-20 object-contain"
+                  style={{ maxWidth: '80px', maxHeight: '80px' }}
+                />
+              );
+            })()}
+          </div>
+          
           {/* اللوجو في أقصى اليمين */}
           <div className="company-logo">
             <img 
