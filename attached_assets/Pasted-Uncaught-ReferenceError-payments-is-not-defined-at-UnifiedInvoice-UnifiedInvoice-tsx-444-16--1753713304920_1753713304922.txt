@@ -1,0 +1,179 @@
+Uncaught ReferenceError: payments is not defined
+    at UnifiedInvoice (UnifiedInvoice.tsx:444:16)
+    at renderWithHooks (chunk-276SZO74.js?v=c1b205ad:11548:26)
+    at mountIndeterminateComponent (chunk-276SZO74.js?v=c1b205ad:14926:21)
+    at beginWork (chunk-276SZO74.js?v=c1b205ad:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-276SZO74.js?v=c1b205ad:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-276SZO74.js?v=c1b205ad:3699:24)
+    at invokeGuardedCallback (chunk-276SZO74.js?v=c1b205ad:3733:39)
+    at beginWork$1 (chunk-276SZO74.js?v=c1b205ad:19765:15)
+    at performUnitOfWork (chunk-276SZO74.js?v=c1b205ad:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=c1b205ad:19137:13)
+UnifiedInvoice @ UnifiedInvoice.tsx:444
+renderWithHooks @ chunk-276SZO74.js?v=c1b205ad:11548
+mountIndeterminateComponent @ chunk-276SZO74.js?v=c1b205ad:14926
+beginWork @ chunk-276SZO74.js?v=c1b205ad:15914
+callCallback2 @ chunk-276SZO74.js?v=c1b205ad:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=c1b205ad:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=c1b205ad:3733
+beginWork$1 @ chunk-276SZO74.js?v=c1b205ad:19765
+performUnitOfWork @ chunk-276SZO74.js?v=c1b205ad:19198
+workLoopSync @ chunk-276SZO74.js?v=c1b205ad:19137
+renderRootSync @ chunk-276SZO74.js?v=c1b205ad:19116
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=c1b205ad:18874
+flushSyncCallbacks @ chunk-276SZO74.js?v=c1b205ad:9119
+(anonymous) @ chunk-276SZO74.js?v=c1b205ad:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=c1b205ad:555
+flush @ @tanstack_react-query.js?v=c1b205ad:569
+batch @ @tanstack_react-query.js?v=c1b205ad:587
+dispatch_fn @ @tanstack_react-query.js?v=c1b205ad:996
+setData @ @tanstack_react-query.js?v=c1b205ad:696
+onSuccess @ @tanstack_react-query.js?v=c1b205ad:897
+resolve @ @tanstack_react-query.js?v=c1b205ad:456
+Promise.then
+run @ @tanstack_react-query.js?v=c1b205ad:498
+start @ @tanstack_react-query.js?v=c1b205ad:536
+fetch @ @tanstack_react-query.js?v=c1b205ad:926
+executeFetch_fn @ @tanstack_react-query.js?v=c1b205ad:2211
+onSubscribe @ @tanstack_react-query.js?v=c1b205ad:1898
+subscribe @ @tanstack_react-query.js?v=c1b205ad:24
+(anonymous) @ @tanstack_react-query.js?v=c1b205ad:3022
+subscribeToStore @ chunk-276SZO74.js?v=c1b205ad:11984
+commitHookEffectListMount @ chunk-276SZO74.js?v=c1b205ad:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=c1b205ad:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=c1b205ad:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=c1b205ad:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=c1b205ad:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=c1b205ad:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=c1b205ad:19447
+commitRootImpl @ chunk-276SZO74.js?v=c1b205ad:19416
+commitRoot @ chunk-276SZO74.js?v=c1b205ad:19277
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=c1b205ad:18895
+flushSyncCallbacks @ chunk-276SZO74.js?v=c1b205ad:9119
+(anonymous) @ chunk-276SZO74.js?v=c1b205ad:18627Understand this error
+UnifiedInvoice.tsx:444 Uncaught ReferenceError: payments is not defined
+    at UnifiedInvoice (UnifiedInvoice.tsx:444:16)
+    at renderWithHooks (chunk-276SZO74.js?v=c1b205ad:11548:26)
+    at mountIndeterminateComponent (chunk-276SZO74.js?v=c1b205ad:14926:21)
+    at beginWork (chunk-276SZO74.js?v=c1b205ad:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-276SZO74.js?v=c1b205ad:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-276SZO74.js?v=c1b205ad:3699:24)
+    at invokeGuardedCallback (chunk-276SZO74.js?v=c1b205ad:3733:39)
+    at beginWork$1 (chunk-276SZO74.js?v=c1b205ad:19765:15)
+    at performUnitOfWork (chunk-276SZO74.js?v=c1b205ad:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=c1b205ad:19137:13)
+UnifiedInvoice @ UnifiedInvoice.tsx:444
+renderWithHooks @ chunk-276SZO74.js?v=c1b205ad:11548
+mountIndeterminateComponent @ chunk-276SZO74.js?v=c1b205ad:14926
+beginWork @ chunk-276SZO74.js?v=c1b205ad:15914
+callCallback2 @ chunk-276SZO74.js?v=c1b205ad:3674
+invokeGuardedCallbackDev @ chunk-276SZO74.js?v=c1b205ad:3699
+invokeGuardedCallback @ chunk-276SZO74.js?v=c1b205ad:3733
+beginWork$1 @ chunk-276SZO74.js?v=c1b205ad:19765
+performUnitOfWork @ chunk-276SZO74.js?v=c1b205ad:19198
+workLoopSync @ chunk-276SZO74.js?v=c1b205ad:19137
+renderRootSync @ chunk-276SZO74.js?v=c1b205ad:19116
+recoverFromConcurrentError @ chunk-276SZO74.js?v=c1b205ad:18736
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=c1b205ad:18879
+flushSyncCallbacks @ chunk-276SZO74.js?v=c1b205ad:9119
+(anonymous) @ chunk-276SZO74.js?v=c1b205ad:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=c1b205ad:555
+flush @ @tanstack_react-query.js?v=c1b205ad:569
+batch @ @tanstack_react-query.js?v=c1b205ad:587
+dispatch_fn @ @tanstack_react-query.js?v=c1b205ad:996
+setData @ @tanstack_react-query.js?v=c1b205ad:696
+onSuccess @ @tanstack_react-query.js?v=c1b205ad:897
+resolve @ @tanstack_react-query.js?v=c1b205ad:456
+Promise.then
+run @ @tanstack_react-query.js?v=c1b205ad:498
+start @ @tanstack_react-query.js?v=c1b205ad:536
+fetch @ @tanstack_react-query.js?v=c1b205ad:926
+executeFetch_fn @ @tanstack_react-query.js?v=c1b205ad:2211
+onSubscribe @ @tanstack_react-query.js?v=c1b205ad:1898
+subscribe @ @tanstack_react-query.js?v=c1b205ad:24
+(anonymous) @ @tanstack_react-query.js?v=c1b205ad:3022
+subscribeToStore @ chunk-276SZO74.js?v=c1b205ad:11984
+commitHookEffectListMount @ chunk-276SZO74.js?v=c1b205ad:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=c1b205ad:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=c1b205ad:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=c1b205ad:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=c1b205ad:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=c1b205ad:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=c1b205ad:19447
+commitRootImpl @ chunk-276SZO74.js?v=c1b205ad:19416
+commitRoot @ chunk-276SZO74.js?v=c1b205ad:19277
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=c1b205ad:18895
+flushSyncCallbacks @ chunk-276SZO74.js?v=c1b205ad:9119
+(anonymous) @ chunk-276SZO74.js?v=c1b205ad:18627Understand this error
+chunk-276SZO74.js?v=c1b205ad:14032 The above error occurred in the <UnifiedInvoice> component:
+
+    at UnifiedInvoice (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/UnifiedInvoice.tsx?t=1753713129664:43:3)
+    at div
+    at div
+    at div
+    at DoctorInvoice (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/doctor-invoice.tsx?t=1753713129664:38:22)
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c1b205ad:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=c1b205ad:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?t=1753713129664&v=J0EEQT84iMMkJeYMP27BR:119:22)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=c1b205ad:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?t=1753713129664&v=J0EEQT84iMMkJeYMP27BR:369:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=c1b205ad:14032
+update.callback @ chunk-276SZO74.js?v=c1b205ad:14052
+callCallback @ chunk-276SZO74.js?v=c1b205ad:11248
+commitUpdateQueue @ chunk-276SZO74.js?v=c1b205ad:11265
+commitLayoutEffectOnFiber @ chunk-276SZO74.js?v=c1b205ad:17093
+commitLayoutMountEffects_complete @ chunk-276SZO74.js?v=c1b205ad:17980
+commitLayoutEffects_begin @ chunk-276SZO74.js?v=c1b205ad:17969
+commitLayoutEffects @ chunk-276SZO74.js?v=c1b205ad:17920
+commitRootImpl @ chunk-276SZO74.js?v=c1b205ad:19353
+commitRoot @ chunk-276SZO74.js?v=c1b205ad:19277
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=c1b205ad:18895
+flushSyncCallbacks @ chunk-276SZO74.js?v=c1b205ad:9119
+(anonymous) @ chunk-276SZO74.js?v=c1b205ad:18627
+setTimeout
+scheduleFn @ @tanstack_react-query.js?v=c1b205ad:555
+flush @ @tanstack_react-query.js?v=c1b205ad:569
+batch @ @tanstack_react-query.js?v=c1b205ad:587
+dispatch_fn @ @tanstack_react-query.js?v=c1b205ad:996
+setData @ @tanstack_react-query.js?v=c1b205ad:696
+onSuccess @ @tanstack_react-query.js?v=c1b205ad:897
+resolve @ @tanstack_react-query.js?v=c1b205ad:456
+Promise.then
+run @ @tanstack_react-query.js?v=c1b205ad:498
+start @ @tanstack_react-query.js?v=c1b205ad:536
+fetch @ @tanstack_react-query.js?v=c1b205ad:926
+executeFetch_fn @ @tanstack_react-query.js?v=c1b205ad:2211
+onSubscribe @ @tanstack_react-query.js?v=c1b205ad:1898
+subscribe @ @tanstack_react-query.js?v=c1b205ad:24
+(anonymous) @ @tanstack_react-query.js?v=c1b205ad:3022
+subscribeToStore @ chunk-276SZO74.js?v=c1b205ad:11984
+commitHookEffectListMount @ chunk-276SZO74.js?v=c1b205ad:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=c1b205ad:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=c1b205ad:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=c1b205ad:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=c1b205ad:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=c1b205ad:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=c1b205ad:19447
+commitRootImpl @ chunk-276SZO74.js?v=c1b205ad:19416
+commitRoot @ chunk-276SZO74.js?v=c1b205ad:19277
+performSyncWorkOnRoot @ chunk-276SZO74.js?v=c1b205ad:18895
+flushSyncCallbacks @ chunk-276SZO74.js?v=c1b205ad:9119
+(anonymous) @ chunk-276SZO74.js?v=c1b205ad:18627Understand this error
+chunk-276SZO74.js?v=c1b205ad:9129 Uncaught ReferenceError: payments is not defined
+    at UnifiedInvoice (UnifiedInvoice.tsx:444:16)
+    at renderWithHooks (chunk-276SZO74.js?v=c1b205ad:11548:26)
+    at mountIndeterminateComponent (chunk-276SZO74.js?v=c1b205ad:14926:21)
+    at beginWork (chunk-276SZO74.js?v=c1b205ad:15914:22)
+    at beginWork$1 (chunk-276SZO74.js?v=c1b205ad:19753:22)
+    at performUnitOfWork (chunk-276SZO74.js?v=c1b205ad:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=c1b205ad:19137:13)
+    at renderRootSync (chunk-276SZO74.js?v=c1b205ad:19116:15)
+    at recoverFromConcurrentError (chunk-276SZO74.js?v=c1b205ad:18736:28)
+    at performSyncWorkOnRoot (chunk-276SZO74.js?v=c1b205ad:18879:28)

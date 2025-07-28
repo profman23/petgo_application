@@ -62,6 +62,9 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
     enabled: !!bookingId
   });
   
+  // Rename for consistency in payment types section
+  const payments = invoicePayments;
+  
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
 
@@ -441,8 +444,8 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
                 Payment Types
               </div>
               
-              {payments && payments.length > 0 ? (
-                payments.map((payment, index) => (
+              {payments && (payments as any[]).length > 0 ? (
+                (payments as any[]).map((payment: any, index: number) => (
                   <div key={index} className="flex items-center justify-between mb-2">
                     <span className="text-gray-600 font-medium text-sm">
                       {payment.paymentType === 'cash' ? 'Cash' : 'Card'}:
@@ -466,8 +469,8 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
                 أنواع الدفع
               </div>
               
-              {payments && payments.length > 0 ? (
-                payments.map((payment, index) => (
+              {payments && (payments as any[]).length > 0 ? (
+                (payments as any[]).map((payment: any, index: number) => (
                   <div key={index} className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-1">
                       <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
