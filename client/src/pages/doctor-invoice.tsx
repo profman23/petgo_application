@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Eye, Printer, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,6 +11,9 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
+import UnifiedInvoice from '@/components/UnifiedInvoice';
+import { useReactToPrint } from 'react-to-print';
+import html2pdf from 'html2pdf.js';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
@@ -116,6 +119,10 @@ export default function DoctorInvoice() {
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState('');
+  
+  // Invoice viewing states
+  const [showInvoiceView, setShowInvoiceView] = useState(false);
+  const invoiceRef = React.useRef<HTMLDivElement>(null);
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -909,6 +916,30 @@ export default function DoctorInvoice() {
   const closeUploadModal = () => {
     setShowUploadModal(false);
     setSelectedPetForUpload(null);
+  };
+
+  // Invoice functions
+  const handleViewInvoice = () => {
+    setShowInvoiceView(true);
+  };
+
+  const handlePrintInvoice = useReactToPrint({
+    content: () => invoiceRef.current,
+    documentTitle: `Invoice-${booking?.id || 'unknown'}`,
+  });
+
+  const handleDownloadInvoice = () => {
+    if (!invoiceRef.current || !booking) return;
+    
+    const opt = {
+      margin: 1,
+      filename: `Invoice-${booking.id}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(invoiceRef.current).save();
   };
 
   if (isLoading) {
@@ -1808,7 +1839,8 @@ export default function DoctorInvoice() {
         )}
 
         {/* Actions */}
-        <div className="flex justify-center mb-6">
+        <div className="flex flex-col items-center gap-3 mb-6">
+          {/* Generate Invoice Button */}
           <Button
             onClick={handleGenerateInvoiceClick}
             disabled={isRecordLocked}
@@ -1821,6 +1853,38 @@ export default function DoctorInvoice() {
             <Receipt className="h-6 w-6 ml-2" />
             {isRecordLocked ? `${t('generateInvoice')} ✓` : t('generateInvoice')}
           </Button>
+
+          {/* Invoice Action Buttons */}
+          {isRecordLocked && (
+            <div className="flex flex-col gap-2 w-full max-w-sm">
+              {/* View Invoice Button */}
+              <Button
+                onClick={handleViewInvoice}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+              >
+                <Eye className="h-5 w-5 ml-2" />
+                {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
+              </Button>
+
+              {/* Print Invoice Button */}
+              <Button
+                onClick={handlePrintInvoice}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+              >
+                <Printer className="h-5 w-5 ml-2" />
+                {language === 'ar' ? 'طباعة الفاتورة' : 'Print Invoice'}
+              </Button>
+
+              {/* Download Invoice Button */}
+              <Button
+                onClick={handleDownloadInvoice}
+                className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-2"
+              >
+                <Download className="h-5 w-5 ml-2" />
+                {language === 'ar' ? 'تحميل الفاتورة' : 'Download Invoice'}
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1934,7 +1998,28 @@ export default function DoctorInvoice() {
         />
       )}
 
-
+      {/* Invoice View Modal */}
+      {showInvoiceView && booking && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-semibold">
+                {language === 'ar' ? 'عرض الفاتورة' : 'Invoice View'}
+              </h2>
+              <Button
+                variant="ghost"
+                onClick={() => setShowInvoiceView(false)}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div ref={invoiceRef}>
+              <UnifiedInvoice bookingId={booking.id} mode="view" />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
