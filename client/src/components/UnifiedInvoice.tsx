@@ -146,6 +146,23 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           </div>
         </div>
         
+        {/* VAT Number Section - أسفل اللوجو */}
+        <div className="vat-number-section mb-2">
+          <div className="flex justify-between items-center">
+            {/* VAT Number بالإنجليزية - الجهة اليسرى */}
+            <div className="vat-en text-left">
+              <span className="text-gray-600 font-medium text-xs">VAT Number: </span>
+              <span className="text-gray-600 font-semibold text-xs">300848569100003</span>
+            </div>
+
+            {/* VAT Number بالعربية - الجهة اليمنى */}
+            <div className="vat-ar text-right" dir="rtl">
+              <span className="text-gray-600 font-medium text-xs">الرقم الضريبي : </span>
+              <span className="text-gray-600 font-semibold text-xs">300848569100003</span>
+            </div>
+          </div>
+        </div>
+        
         {/* خط فاصل بعرض الفاتورة - نفس لون الموف في اللوجو */}
         <div 
           className="w-full h-0.5 my-2"
