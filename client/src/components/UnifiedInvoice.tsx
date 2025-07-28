@@ -187,7 +187,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
 
       {/* Invoice Items Table Header */}
       <div className="invoice-items-section mb-4">
-        <div className="grid grid-cols-7 gap-4 border-b border-gray-300 pb-2 mb-2">
+        <div className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 border-b border-gray-300 pb-2 mb-2">
           {/* Description */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">Description</div>
@@ -245,7 +245,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             const totalAfterVat = totalBeforeVat + vatAmount;
 
             return (
-              <div key={index} className="grid grid-cols-7 gap-4 py-1 border-b border-gray-100">
+              <div key={index} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 py-1 border-b border-gray-100">
                 {/* Item Description */}
                 <div className="text-center">
                   <span className="text-gray-600 text-sm">{item.description || 'Service'}</span>
