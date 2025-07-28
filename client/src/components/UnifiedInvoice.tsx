@@ -410,8 +410,14 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           </div>
         )}
         
+        {/* خط فاصل قبل المجاميع */}
+        <div 
+          className="w-full h-0.5 mt-6 mb-4"
+          style={{ backgroundColor: '#8B2F8B' }}
+        ></div>
+        
         {/* Invoice Totals Section - ثنائي اللغة */}
-        <div className="invoice-totals mt-6">
+        <div className="invoice-totals">
           <div className="flex justify-between items-start gap-6">
             {/* المجاميع بالإنجليزية - الجهة اليسرى */}
             <div className="totals-en text-left w-80 border border-gray-300 rounded-lg p-4">
