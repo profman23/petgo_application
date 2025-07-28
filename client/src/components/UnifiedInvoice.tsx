@@ -27,6 +27,12 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
     queryKey: [`/api/generated-invoice/Vets9000020`],
     enabled: !!bookingId
   });
+
+  // Fetch invoice items
+  const { data: invoiceItems } = useQuery({
+    queryKey: [`/api/invoice-items/${bookingId}`],
+    enabled: !!bookingId
+  });
   
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
@@ -158,10 +164,65 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           </div>
         </div>
         
-        {/* Placeholder for invoice items */}
-        <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
-          <p className="text-sm">{language === 'ar' ? 'بيانات الأصناف ستظهر هنا' : 'Invoice items will appear here'}</p>
-        </div>
+        {/* Invoice Items Data */}
+        {invoiceItems && (invoiceItems as any[]).length > 0 ? (
+          (invoiceItems as any[]).map((item: any, index: number) => {
+            // Calculate values
+            const quantity = parseFloat(item.quantity || '1');
+            const unitPrice = parseFloat(item.unitPrice || '0');
+            const subtotal = quantity * unitPrice;
+            const discountPercent = item.discountType === '10%' ? 10 : item.discountType === '100%' ? 100 : 0;
+            const discountAmount = (subtotal * discountPercent) / 100;
+            const totalBeforeVat = subtotal - discountAmount;
+            const vatAmount = totalBeforeVat * 0.15; // 15% VAT
+            const totalAfterVat = totalBeforeVat + vatAmount;
+
+            return (
+              <div key={index} className="grid grid-cols-7 gap-4 py-3 border-b border-gray-100">
+                {/* Item Description */}
+                <div className="text-center">
+                  <span className="text-gray-600 text-sm">{item.description || 'Service'}</span>
+                </div>
+                
+                {/* Quantity */}
+                <div className="text-center">
+                  <span className="text-gray-600 text-sm">{quantity}</span>
+                </div>
+                
+                {/* Unit Price */}
+                <div className="text-center">
+                  <span className="text-gray-600 text-sm">{unitPrice.toFixed(2)} SAR</span>
+                </div>
+                
+                {/* Discount */}
+                <div className="text-center">
+                  <span className="text-gray-600 text-sm">
+                    {discountPercent > 0 ? `Discount ${discountPercent}%` : 'No Discount'}
+                  </span>
+                </div>
+                
+                {/* VAT */}
+                <div className="text-center">
+                  <span className="text-gray-600 text-sm">{vatAmount.toFixed(2)} SAR</span>
+                </div>
+                
+                {/* Total B.Vat */}
+                <div className="text-center">
+                  <span className="text-gray-600 text-sm">{totalBeforeVat.toFixed(2)} SAR</span>
+                </div>
+                
+                {/* Total A.Vat */}
+                <div className="text-center">
+                  <span className="text-gray-600 text-sm font-semibold">{totalAfterVat.toFixed(2)} SAR</span>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+            <p className="text-sm">{language === 'ar' ? 'بيانات الأصناف ستظهر هنا' : 'Invoice items will appear here'}</p>
+          </div>
+        )}
       </div>
     </div>
   );
