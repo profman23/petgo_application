@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '@/lib/i18n';
 import { invoiceConfig, generateInvoiceNumber } from '@shared/invoice-config';
+import logoImage from '@assets/Screenshot 2025-07-10 181936_1753696339125.png';
 
 interface UnifiedInvoiceProps {
   bookingId: number;
@@ -27,9 +28,10 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         fontFamily: language === 'ar' ? 'Delius, Arial, sans-serif' : 'Comic Relief, Arial, sans-serif'
       }}
     >
-      {/* Invoice Header - رقم الفاتورة في أقصى اليسار */}
+      {/* Invoice Header - رقم الفاتورة في اليسار واللوجو في أقصى اليمين */}
       <div className="invoice-header mb-8">
         <div className="flex justify-between items-start">
+          {/* رقم الفاتورة في اليسار */}
           <div className="invoice-number">
             <h1 
               className="text-lg font-semibold text-gray-800"
@@ -40,6 +42,16 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             >
               {texts.invoice}: {invoiceNumber}
             </h1>
+          </div>
+          
+          {/* اللوجو في أقصى اليمين */}
+          <div className="company-logo">
+            <img 
+              src={logoImage} 
+              alt="VETS VAN Logo" 
+              className="h-20 w-auto object-contain"
+              style={{ maxHeight: '80px' }}
+            />
           </div>
         </div>
       </div>
