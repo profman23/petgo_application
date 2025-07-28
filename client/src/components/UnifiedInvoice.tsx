@@ -330,9 +330,9 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               <div className="w-full h-px bg-gray-300 mb-2"></div>
               
               <div className="flex items-center justify-between mb-1">
-                <span className="text-red-600 font-medium text-sm">Total Paid:</span>
+                <span className="text-green-600 font-medium text-sm">Total Paid:</span>
                 <div className="flex items-center gap-1">
-                  <span className="text-red-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
+                  <span className="text-green-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
               </div>
@@ -387,9 +387,9 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               <div className="w-full h-px bg-gray-300 mb-2"></div>
               
               <div className="flex items-center justify-between mb-1">
-                <span className="text-red-600 font-medium text-sm">المبلغ المدفوع :</span>
+                <span className="text-green-600 font-medium text-sm">المبلغ المدفوع :</span>
                 <div className="flex items-center gap-1">
-                  <span className="text-red-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
+                  <span className="text-green-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
               </div>
