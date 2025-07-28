@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Eye, Printer, Download } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Eye, Printer, Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,13 +12,15 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
 import UnifiedInvoice from '@/components/UnifiedInvoice';
+
+// Import libraries for print and PDF functionality
 import { useReactToPrint } from 'react-to-print';
 import html2pdf from 'html2pdf.js';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronDown, Search, X } from "lucide-react";
+import { Check, ChevronDown, Search } from "lucide-react";
 
 interface InvoiceItem {
   id: string;
@@ -122,7 +124,7 @@ export default function DoctorInvoice() {
   
   // Invoice viewing states
   const [showInvoiceView, setShowInvoiceView] = useState(false);
-  const invoiceRef = React.useRef<HTMLDivElement>(null);
+  const invoiceRef = useRef<HTMLDivElement>(null);
 
   // Fetch booking details
   const { data: booking, isLoading } = useQuery({
@@ -920,26 +922,71 @@ export default function DoctorInvoice() {
 
   // Invoice functions
   const handleViewInvoice = () => {
+    console.log('Opening invoice view modal');
     setShowInvoiceView(true);
   };
 
   const handlePrintInvoice = useReactToPrint({
     content: () => invoiceRef.current,
     documentTitle: `Invoice-${booking?.id || 'unknown'}`,
+    onAfterPrint: () => {
+      console.log('Print completed');
+      toast({
+        title: language === 'ar' ? 'تم طباعة الفاتورة' : 'Invoice printed successfully',
+        variant: 'default',
+      });
+    }
   });
 
-  const handleDownloadInvoice = () => {
-    if (!invoiceRef.current || !booking) return;
+  const handleDownloadInvoice = async () => {
+    console.log('Starting PDF download...');
     
-    const opt = {
-      margin: 1,
-      filename: `Invoice-${booking.id}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
+    if (!invoiceRef.current || !booking) {
+      console.error('Invoice ref or booking not available');
+      toast({
+        title: language === 'ar' ? 'خطأ في التحميل' : 'Download Error',
+        description: language === 'ar' ? 'لا يمكن تحميل الفاتورة حالياً' : 'Cannot download invoice at this time',
+        variant: 'destructive',
+      });
+      return;
+    }
 
-    html2pdf().set(opt).from(invoiceRef.current).save();
+    try {
+      const element = invoiceRef.current;
+      const opt = {
+        margin: 0.5,
+        filename: `Invoice-${booking.id}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2,
+          useCORS: true,
+          allowTaint: true
+        },
+        jsPDF: { 
+          unit: 'in', 
+          format: 'a4', 
+          orientation: 'portrait' 
+        }
+      };
+
+      console.log('Generating PDF with options:', opt);
+      
+      await html2pdf().set(opt).from(element).save();
+      
+      console.log('PDF download completed');
+      toast({
+        title: language === 'ar' ? 'تم تحميل الفاتورة' : 'Invoice downloaded successfully',
+        variant: 'default',
+      });
+      
+    } catch (error) {
+      console.error('PDF download error:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ في التحميل' : 'Download Error',
+        description: language === 'ar' ? 'فشل في تحميل ملف PDF' : 'Failed to download PDF',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (isLoading) {
