@@ -440,7 +440,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           <div className="flex justify-between items-start gap-6">
             {/* Payment Types بالإنجليزية - الجهة اليسرى */}
             <div className="payment-en text-left w-80 border border-gray-300 rounded-lg p-4">
-              <div className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-200">
+              <div className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-200 text-center">
                 Payment Types
               </div>
               
@@ -465,7 +465,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
 
             {/* Payment Types بالعربية - الجهة اليمنى */}
             <div className="payment-ar text-right w-80 border border-gray-300 rounded-lg p-4">
-              <div className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-200">
+              <div className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-200 text-center">
                 أنواع الدفع
               </div>
               
