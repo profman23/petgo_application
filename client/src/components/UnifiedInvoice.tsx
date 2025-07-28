@@ -156,11 +156,11 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           {/* معلومات العميل بالإنجليزية - الجهة اليسرى */}
           <div className="customer-info-en text-left">
             <div className="mb-1">
-              <span className="text-gray-600 font-medium">Customer : </span>
+              <span className="text-gray-600 font-medium text-xs">Customer : </span>
               <span className="text-gray-600 font-semibold text-xs">{(booking as any)?.customerName || 'Not specified'}</span>
             </div>
             <div>
-              <span className="text-gray-600 font-medium">Phone : </span>
+              <span className="text-gray-600 font-medium text-xs">Phone : </span>
               <span className="text-gray-600 font-semibold text-xs">{(booking as any)?.customerPhone || 'Not specified'}</span>
             </div>
           </div>
@@ -168,11 +168,11 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           {/* معلومات العميل بالعربية - الجهة اليمنى */}
           <div className="customer-info-ar text-right" dir="rtl">
             <div className="mb-1">
-              <span className="text-gray-600 font-medium">العميل : </span>
+              <span className="text-gray-600 font-medium text-xs">العميل : </span>
               <span className="text-gray-600 font-semibold text-xs">{(booking as any)?.customerName || 'غير محدد'}</span>
             </div>
             <div>
-              <span className="text-gray-600 font-medium">الجوال : </span>
+              <span className="text-gray-600 font-medium text-xs">الجوال : </span>
               <span className="text-gray-600 font-semibold text-xs">{(booking as any)?.customerPhone || 'غير محدد'}</span>
             </div>
           </div>
