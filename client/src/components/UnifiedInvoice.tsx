@@ -31,17 +31,16 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
       {/* Invoice Header - رقم الفاتورة في اليسار واللوجو في أقصى اليمين */}
       <div className="invoice-header mb-8">
         <div className="flex justify-between items-start">
-          {/* رقم الفاتورة في اليسار */}
-          <div className="invoice-number">
-            <h1 
-              className="text-lg font-semibold text-gray-800"
-              style={{ 
-                fontSize: invoiceConfig.styles.headerFontSize,
-                color: invoiceConfig.styles.primaryColor 
-              }}
-            >
-              {texts.invoice}: {invoiceNumber}
-            </h1>
+          {/* رقم الفاتورة والتاريخ في اليسار */}
+          <div className="invoice-details">
+            <div className="mb-2">
+              <span className="text-gray-500 font-medium">Invoice : </span>
+              <span className="text-gray-800 font-semibold">{invoiceNumber}</span>
+            </div>
+            <div>
+              <span className="text-gray-500 font-medium">Date : </span>
+              <span className="text-gray-800 font-semibold">{new Date().toLocaleDateString('en-GB')}</span>
+            </div>
           </div>
           
           {/* اللوجو في أقصى اليمين */}
