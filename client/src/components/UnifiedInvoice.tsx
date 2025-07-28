@@ -54,10 +54,10 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           </div>
         </div>
         
-        {/* خط فاصل بعرض الفاتورة - لون موف غامق كلاسيكي */}
+        {/* خط فاصل بعرض الفاتورة - نفس لون الموف في اللوجو */}
         <div 
-          className="w-full h-0.5 bg-purple-800"
-          style={{ backgroundColor: '#581c87' }}
+          className="w-full h-0.5"
+          style={{ backgroundColor: '#8B2F8B' }}
         ></div>
       </div>
 
