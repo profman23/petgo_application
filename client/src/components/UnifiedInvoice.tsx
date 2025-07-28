@@ -8,6 +8,12 @@ import sarIcon from '@assets/Screenshot 2025-07-27 144314_1753699402447.png';
 // CSS للطباعة لضمان التناسق
 const printStyles = `
   @media print {
+    .unified-invoice-container {
+      width: 800px !important;
+      max-width: 800px !important;
+      margin: 0 auto !important;
+      padding: 20px !important;
+    }
     .table-header-cell {
       display: flex !important;
       flex-direction: column !important;
@@ -108,9 +114,11 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
 
   return (
     <div 
-      className="unified-invoice bg-white p-6 min-h-screen"
+      className="unified-invoice-container bg-white p-6 min-h-screen mx-auto"
       dir={getDirection()}
       style={{ 
+        width: '800px',
+        maxWidth: '800px',
         textAlign: getTextAlign(),
         fontFamily: 'Roboto, Arial, sans-serif'
       }}
