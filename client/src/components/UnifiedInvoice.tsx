@@ -124,14 +124,14 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
       <div className="invoice-header mb-4">
         <div className="flex justify-between items-start mb-2">
           {/* معلومات الفاتورة في أقصى اليسار */}
-          <div className="invoice-details">
+          <div className="invoice-details mt-4">
             <div className="mb-2">
-              <span className="text-gray-600 font-medium">Invoice : </span>
-              <span className="text-gray-600 font-semibold text-sm">{realInvoiceNumber}</span>
+              <span className="text-gray-600 font-medium text-xs">Invoice : </span>
+              <span className="text-gray-600 font-semibold text-xs">{realInvoiceNumber}</span>
             </div>
             <div>
-              <span className="text-gray-600 font-medium">Date : </span>
-              <span className="text-gray-600 font-semibold text-sm">{realDate}</span>
+              <span className="text-gray-600 font-medium text-xs">Date : </span>
+              <span className="text-gray-600 font-semibold text-xs">{realDate}</span>
             </div>
           </div>
           
