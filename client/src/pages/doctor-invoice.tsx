@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import PaymentModal from './payment-modal';
 import UploadAttachmentModal from '@/components/UploadAttachmentModal';
-import InvoiceGeneratorProfessional from '@/components/InvoiceGeneratorProfessional';
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -110,7 +110,7 @@ export default function DoctorInvoice() {
   });
   const [totalPaid, setTotalPaid] = useState(0);
   const [payments, setPayments] = useState<any[]>([]);
-  const [showInvoiceGenerator, setShowInvoiceGenerator] = useState(false);
+
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isRecordLocked, setIsRecordLocked] = useState(false);
   const [invoiceSubTab, setInvoiceSubTab] = useState<'products' | 'services'>('products');
@@ -282,7 +282,6 @@ export default function DoctorInvoice() {
         if (invoiceStatus.invoiceNumber) {
           console.log('✅ Invoice found:', invoiceStatus.invoiceNumber);
           // Invoice is permanently generated - show as read-only
-          setShowInvoiceGenerator(true);
           
           // Load the complete generated invoice data
           loadGeneratedInvoiceData(invoiceStatus.invoiceNumber);
@@ -864,7 +863,6 @@ export default function DoctorInvoice() {
       // Lock the record (make invoice items read-only)
       setIsRecordLocked(true);
       setShowConfirmDialog(false);
-      setShowInvoiceGenerator(true);
 
       // Send invoice link via email
       try {
@@ -1936,48 +1934,7 @@ export default function DoctorInvoice() {
         />
       )}
 
-      {/* Invoice Generator */}
-      {showInvoiceGenerator && booking && doctorInfo && (
-        <InvoiceGeneratorProfessional
-          invoiceData={{
-            bookingId: booking.id,
-            customer: {
-              firstName: booking.customerName?.split(' ')[0] || '',
-              lastName: booking.customerName?.split(' ').slice(1).join(' ') || '',
-              phone: booking.customerPhone || '',
-              email: booking.customerEmail || ''
-            },
-            pets: booking.pets,
-            appointmentDate: booking.appointmentDate,
-            appointmentTime: booking.appointmentTime,
-            serviceType: booking.serviceType,
-            items: invoiceItems.map(item => ({
-              ...item,
-              discount: item.discount || 0,
-              discountType: item.discountType || 'none',
-              vatRate: 15,
-              vatAmount: item.vatAmount || 0,
-              totalBeforeVat: item.totalBeforeVat || 0,
-              totalAfterVat: item.totalAfterVat || 0
-            })),
-            subtotal: subtotal,
-            discount: totalDiscountAmount,
-            tax: taxAmount,
-            total: finalTotal,
-            notes: notes,
-            doctorName: doctorInfo.name || 'Dr. VETS VAN',
-            vetsVanCode: doctorInfo.vetsvanCode || 'VETS001',
-            paymentMethods: invoicePayments.map(payment => ({
-              id: payment.id.toString(),
-              method: payment.paymentMethod,
-              amount: payment.amount,
-              date: payment.paymentDate,
-              reference: payment.reference
-            }))
-          }}
-          onClose={() => setShowInvoiceGenerator(false)}
-        />
-      )}
+
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
