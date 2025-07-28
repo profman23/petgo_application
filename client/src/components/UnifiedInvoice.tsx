@@ -198,6 +198,14 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
                   {(booking as any)?.selectedPets?.[0]?.name || 'N/A'}
                 </span>
               </div>
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-xs">Pet Type: </span>
+                <span className="text-gray-600 font-semibold text-xs">
+                  {(booking as any)?.selectedPets?.[0]?.type === 'cat' ? 'Cat' : 
+                   (booking as any)?.selectedPets?.[0]?.type === 'dog' ? 'Dog' : 
+                   (booking as any)?.selectedPets?.[0]?.type === 'bird' ? 'Bird' : 'N/A'}
+                </span>
+              </div>
               <div>
                 <span className="text-gray-600 font-medium text-xs">Pet Gender: </span>
                 <span className="text-gray-600 font-semibold text-xs">
@@ -209,18 +217,24 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             {/* Pet Info بالعربية - الجهة اليمنى */}
             <div className="pet-ar text-right flex-1">
               <div className="mb-1">
-                <span className="text-gray-600 font-medium text-xs">اسم الأليف : </span>
                 <span className="text-gray-600 font-semibold text-xs">
                   {(booking as any)?.selectedPets?.[0]?.name || 'غير محدد'}
                 </span>
+                <span className="text-gray-600 font-medium text-xs"> : اسم الأليف</span>
               </div>
-              <div>
-                <span className="text-gray-600 font-medium text-xs">نوع الأليف : </span>
+              <div className="mb-1">
                 <span className="text-gray-600 font-semibold text-xs">
                   {(booking as any)?.selectedPets?.[0]?.type === 'cat' ? 'قطة' : 
                    (booking as any)?.selectedPets?.[0]?.type === 'dog' ? 'كلب' : 
                    (booking as any)?.selectedPets?.[0]?.type === 'bird' ? 'طائر' : 'غير محدد'}
                 </span>
+                <span className="text-gray-600 font-medium text-xs"> : نوع الأليف</span>
+              </div>
+              <div>
+                <span className="text-gray-600 font-semibold text-xs">
+                  {(booking as any)?.selectedPets?.[0]?.gender || 'غير محدد'}
+                </span>
+                <span className="text-gray-600 font-medium text-xs"> : جنس الأليف</span>
               </div>
             </div>
           </div>
