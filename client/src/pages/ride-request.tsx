@@ -803,6 +803,12 @@ export default function RideRequest() {
                     <span>{t('generalCheckUp')}</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="pickup-drop" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Car className="w-4 h-4 text-indigo-600" />
+                    <span>{language === 'ar' ? 'نقل وتوصيل' : 'Pickup & Drop'}</span>
+                  </div>
+                </SelectItem>
                 <SelectItem value="grooming" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Scissors className="w-4 h-4 text-pink-600" />
@@ -825,12 +831,6 @@ export default function RideRequest() {
                   <div className="flex items-center gap-2">
                     <Scan className="w-4 h-4 text-green-600" />
                     <span>{language === 'ar' ? 'أشعة مقطعية' : 'CT-Scan'}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="pickup-drop" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Car className="w-4 h-4 text-indigo-600" />
-                    <span>{language === 'ar' ? 'نقل وتوصيل' : 'Pickup & Drop'}</span>
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -1003,7 +1003,7 @@ export default function RideRequest() {
                   <div className="flex gap-2">
                     {/* Phone Icon */}
                     <button
-                      onClick={() => window.open('tel:+9669200030345', '_self')}
+                      onClick={() => window.open('tel:+966920003045', '_self')}
                       className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
                       title="Call Dr. Paws"
                     >
@@ -1011,7 +1011,7 @@ export default function RideRequest() {
                     </button>
                     {/* WhatsApp Icon */}
                     <button
-                      onClick={() => window.open('https://wa.me/9669200030345', '_blank')}
+                      onClick={() => window.open('https://wa.me/966920003045', '_blank')}
                       className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
                       title="WhatsApp Dr. Paws"
                     >
