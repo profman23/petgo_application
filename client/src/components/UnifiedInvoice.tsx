@@ -50,12 +50,12 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           {/* معلومات الفاتورة في أقصى اليسار */}
           <div className="invoice-details">
             <div className="mb-2">
-              <span className="text-gray-700 font-medium">Invoice : </span>
-              <span className="text-gray-900 font-semibold text-sm">{realInvoiceNumber}</span>
+              <span className="text-gray-600 font-medium">Invoice : </span>
+              <span className="text-gray-600 font-semibold text-sm">{realInvoiceNumber}</span>
             </div>
             <div>
-              <span className="text-gray-700 font-medium">Date : </span>
-              <span className="text-gray-900 font-semibold text-sm">{realDate}</span>
+              <span className="text-gray-600 font-medium">Date : </span>
+              <span className="text-gray-600 font-semibold text-sm">{realDate}</span>
             </div>
           </div>
           
@@ -83,24 +83,24 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           {/* معلومات العميل بالإنجليزية - الجهة اليسرى */}
           <div className="customer-info-en text-left">
             <div className="mb-1">
-              <span className="text-gray-700 font-medium">Customer : </span>
-              <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerName || 'Not specified'}</span>
+              <span className="text-gray-600 font-medium">Customer : </span>
+              <span className="text-gray-600 font-semibold text-sm">{(booking as any)?.customerName || 'Not specified'}</span>
             </div>
             <div>
-              <span className="text-gray-700 font-medium">Phone : </span>
-              <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerPhone || 'Not specified'}</span>
+              <span className="text-gray-600 font-medium">Phone : </span>
+              <span className="text-gray-600 font-semibold text-sm">{(booking as any)?.customerPhone || 'Not specified'}</span>
             </div>
           </div>
 
           {/* معلومات العميل بالعربية - الجهة اليمنى */}
           <div className="customer-info-ar text-right" dir="rtl">
             <div className="mb-1">
-              <span className="text-gray-700 font-medium">العميل : </span>
-              <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerName || 'غير محدد'}</span>
+              <span className="text-gray-600 font-medium">العميل : </span>
+              <span className="text-gray-600 font-semibold text-sm">{(booking as any)?.customerName || 'غير محدد'}</span>
             </div>
             <div>
-              <span className="text-gray-700 font-medium">الجوال : </span>
-              <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerPhone || 'غير محدد'}</span>
+              <span className="text-gray-600 font-medium">الجوال : </span>
+              <span className="text-gray-600 font-semibold text-sm">{(booking as any)?.customerPhone || 'غير محدد'}</span>
             </div>
           </div>
         </div>
