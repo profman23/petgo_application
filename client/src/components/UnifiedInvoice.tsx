@@ -288,7 +288,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         
         {/* Invoice Totals Section - ثنائي اللغة */}
         <div className="invoice-totals">
-          <div className="flex justify-between items-start gap-8">
+          <div className="flex justify-between items-start gap-6">
             {/* المجاميع بالإنجليزية - الجهة اليسرى */}
             <div className="totals-en text-left w-80">
               <div className="flex items-center justify-between mb-1">
@@ -349,57 +349,57 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             {/* المجاميع بالعربية - الجهة اليمنى */}
             <div className="totals-ar text-right flex-1" dir="rtl">
               <div className="flex items-center justify-between mb-1">
+                <span className="text-gray-600 font-medium text-sm">المجموع قبل الضريبة :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totals.totalBeforeVat.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
-                <span className="text-gray-600 font-medium text-sm">: المجموع قبل الضريبة</span>
               </div>
               
               <div className="flex items-center justify-between mb-1">
+                <span className="text-gray-600 font-medium text-sm">الخصم :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totals.totalDiscount.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
-                <span className="text-gray-600 font-medium text-sm">: الخصم</span>
               </div>
               
               <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-600 font-medium text-sm">ضريبة القيمة المضافة 15% :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totals.totalVat.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
-                <span className="text-gray-600 font-medium text-sm">: ضريبة القيمة المضافة 15%</span>
               </div>
               
               {/* خط رمادي بسيط */}
               <div className="w-full h-px bg-gray-300 mb-2"></div>
               
               <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-600 font-bold text-sm">المجموع النهائي :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-bold text-sm">{totals.finalTotal.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
-                <span className="text-gray-600 font-bold text-sm">: المجموع النهائي</span>
               </div>
               
               {/* خط رمادي بسيط */}
               <div className="w-full h-px bg-gray-300 mb-2"></div>
               
               <div className="flex items-center justify-between mb-1">
+                <span className="text-gray-600 font-medium text-sm">المبلغ المدفوع :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
-                <span className="text-gray-600 font-medium text-sm">: المبلغ المدفوع</span>
               </div>
               
               <div className="flex items-center justify-between">
+                <span className="text-gray-600 font-medium text-sm">الرصيد المتبقي :</span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{remainingBalance.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
-                <span className="text-gray-600 font-medium text-sm">: الرصيد المتبقي</span>
               </div>
             </div>
           </div>
