@@ -80,18 +80,6 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
       {/* Customer Information Section - ثنائي اللغة */}
       <div className="customer-info mb-8">
         <div className="flex justify-between items-start">
-          {/* معلومات العميل بالعربية - الجهة اليمنى */}
-          <div className="customer-info-ar text-right">
-            <div className="mb-2">
-              <span className="text-gray-700 font-medium">العميل : </span>
-              <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerName || 'غير محدد'}</span>
-            </div>
-            <div>
-              <span className="text-gray-700 font-medium">الجوال : </span>
-              <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerPhone || 'غير محدد'}</span>
-            </div>
-          </div>
-          
           {/* معلومات العميل بالإنجليزية - الجهة اليسرى */}
           <div className="customer-info-en text-left">
             <div className="mb-2">
@@ -101,6 +89,18 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             <div>
               <span className="text-gray-700 font-medium">Phone : </span>
               <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerPhone || 'Not specified'}</span>
+            </div>
+          </div>
+
+          {/* معلومات العميل بالعربية - الجهة اليمنى */}
+          <div className="customer-info-ar text-right">
+            <div className="mb-2">
+              <span className="text-gray-700 font-medium">العميل : </span>
+              <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerName || 'غير محدد'}</span>
+            </div>
+            <div>
+              <span className="text-gray-700 font-medium">الجوال : </span>
+              <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerPhone || 'غير محدد'}</span>
             </div>
           </div>
         </div>
