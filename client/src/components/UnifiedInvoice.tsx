@@ -82,7 +82,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         <div className="flex justify-between items-start">
           {/* معلومات العميل بالإنجليزية - الجهة اليسرى */}
           <div className="customer-info-en text-left">
-            <div className="mb-2">
+            <div className="mb-1">
               <span className="text-gray-700 font-medium">Customer : </span>
               <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerName || 'Not specified'}</span>
             </div>
@@ -94,7 +94,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
 
           {/* معلومات العميل بالعربية - الجهة اليمنى */}
           <div className="customer-info-ar text-right" dir="rtl">
-            <div className="mb-2">
+            <div className="mb-1">
               <span className="text-gray-700 font-medium">العميل : </span>
               <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerName || 'غير محدد'}</span>
             </div>
