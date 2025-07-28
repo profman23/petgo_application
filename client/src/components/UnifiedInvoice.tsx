@@ -8,12 +8,6 @@ import sarIcon from '@assets/Screenshot 2025-07-27 144314_1753699402447.png';
 // CSS للطباعة لضمان التناسق
 const printStyles = `
   @media print {
-    .unified-invoice-container {
-      width: 800px !important;
-      max-width: 800px !important;
-      margin: 0 auto !important;
-      padding: 20px !important;
-    }
     .table-header-cell {
       display: flex !important;
       flex-direction: column !important;
@@ -114,11 +108,9 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
 
   return (
     <div 
-      className="unified-invoice-container bg-white p-6 min-h-screen mx-auto"
+      className="unified-invoice bg-white p-6 min-h-screen"
       dir={getDirection()}
       style={{ 
-        width: '800px',
-        maxWidth: '800px',
         textAlign: getTextAlign(),
         fontFamily: 'Roboto, Arial, sans-serif'
       }}
@@ -318,10 +310,10 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         ></div>
         
         {/* Invoice Totals Section - ثنائي اللغة */}
-        <div className="invoice-totals">
-          <div className="flex justify-between items-start gap-6">
+        <div className="invoice-totals print:flex-col print:gap-4">
+          <div className="flex justify-between items-start gap-6 print:flex-col print:gap-4">
             {/* المجاميع بالإنجليزية - الجهة اليسرى */}
-            <div className="totals-en text-left w-80 border border-gray-300 rounded-lg p-4">
+            <div className="totals-en text-left w-80 border border-gray-300 rounded-lg p-4 print:w-full print:mb-4">
               {/* عنوان القسم الإنجليزي */}
               <div className="mb-3">
                 <h3 className="text-gray-700 font-bold text-sm border-b border-gray-200 pb-2 text-center">Total Invoice</h3>
@@ -383,7 +375,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             </div>
 
             {/* المجاميع بالعربية - الجهة اليمنى */}
-            <div className="totals-ar text-right w-80 border border-gray-300 rounded-lg p-4" dir="rtl">
+            <div className="totals-ar text-right w-80 border border-gray-300 rounded-lg p-4 print:w-full print:mb-4" dir="rtl">
               {/* عنوان القسم العربي */}
               <div className="mb-3">
                 <h3 className="text-gray-700 font-bold text-sm border-b border-gray-200 pb-2 text-center font-bold">مجموع الفاتورة</h3>

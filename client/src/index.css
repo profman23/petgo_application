@@ -116,6 +116,67 @@
   outline: none !important;
 }
 
+/* PDF and Print Optimization for Invoice */
+@media print {
+  .invoice-totals {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .totals-en, .totals-ar {
+    width: 100% !important;
+    max-width: none !important;
+    margin-bottom: 1rem !important;
+    page-break-inside: avoid !important;
+  }
+  
+  .invoice-items-section {
+    page-break-inside: avoid !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .grid {
+    display: grid !important;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr !important;
+    gap: 0.5rem !important;
+  }
+  
+  .grid > div {
+    padding: 0.25rem !important;
+    text-align: center !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+  
+  .totals-ar {
+    direction: rtl !important;
+    text-align: right !important;
+  }
+  
+  .invoice-header {
+    margin-bottom: 1rem !important;
+    page-break-after: avoid !important;
+  }
+  
+  body {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+  }
+  
+  h1, h2, h3 {
+    font-size: 14px !important;
+    margin: 0.5rem 0 !important;
+  }
+  
+  .text-sm {
+    font-size: 11px !important;
+  }
+  
+  .text-xs {
+    font-size: 10px !important;
+  }
+}
+
 /* Contact Icon Shake Animation */
 @keyframes contactShake {
   0%, 100% { 
