@@ -5,6 +5,27 @@ import { invoiceConfig, generateInvoiceNumber } from '@shared/invoice-config';
 import logoImage from '@assets/Screenshot 2025-07-10 181936_1753696339125.png';
 import sarIcon from '@assets/Screenshot 2025-07-27 144314_1753699402447.png';
 
+// CSS للطباعة لضمان التناسق
+const printStyles = `
+  @media print {
+    .table-header-cell {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      text-align: center !important;
+      gap: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .table-header-cell > div {
+      display: block !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      line-height: 1.2 !important;
+    }
+  }
+`;
+
 interface UnifiedInvoiceProps {
   bookingId: number;
   mode?: 'view' | 'print' | 'pdf';
@@ -94,6 +115,8 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         fontFamily: 'Roboto, Arial, sans-serif'
       }}
     >
+      {/* إضافة CSS للطباعة */}
+      <style dangerouslySetInnerHTML={{ __html: printStyles }} />
       {/* Invoice Header - تخطيط فاتورة رسمية كلاسيكية */}
       <div className="invoice-header mb-4">
         <div className="flex justify-between items-start mb-2">
@@ -166,43 +189,43 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
       <div className="invoice-items-section mb-4">
         <div className="grid grid-cols-7 gap-4 border-b border-gray-300 pb-2 mb-2">
           {/* Item Description */}
-          <div className="text-center">
+          <div className="text-center table-header-cell">
             <div className="text-gray-600 font-semibold text-sm">Item Description</div>
             <div className="text-gray-600 font-medium text-xs">وصف الصنف</div>
           </div>
           
           {/* Quantity */}
-          <div className="text-center">
+          <div className="text-center table-header-cell">
             <div className="text-gray-600 font-semibold text-sm">Quantity</div>
             <div className="text-gray-600 font-medium text-xs">الكمية</div>
           </div>
           
           {/* Unit Price */}
-          <div className="text-center">
+          <div className="text-center table-header-cell">
             <div className="text-gray-600 font-semibold text-sm">Unit Price</div>
             <div className="text-gray-600 font-medium text-xs">سعر الوحدة</div>
           </div>
           
           {/* Discount */}
-          <div className="text-center">
+          <div className="text-center table-header-cell">
             <div className="text-gray-600 font-semibold text-sm">Discount</div>
             <div className="text-gray-600 font-medium text-xs">الخصم</div>
           </div>
           
           {/* VAT */}
-          <div className="text-center">
+          <div className="text-center table-header-cell">
             <div className="text-gray-600 font-semibold text-sm">VAT</div>
             <div className="text-gray-600 font-medium text-xs">ض.ق.م</div>
           </div>
           
           {/* Total B.Vat */}
-          <div className="text-center">
+          <div className="text-center table-header-cell">
             <div className="text-gray-600 font-semibold text-sm">Total B.Vat</div>
             <div className="text-gray-600 font-medium text-xs">المجموع ق.ض</div>
           </div>
           
           {/* Total A.Vat */}
-          <div className="text-center">
+          <div className="text-center table-header-cell">
             <div className="text-gray-600 font-semibold text-sm">Total A.Vat</div>
             <div className="text-gray-600 font-medium text-xs">المجموع ب.ض</div>
           </div>
