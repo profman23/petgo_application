@@ -41,7 +41,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
       dir={getDirection()}
       style={{ 
         textAlign: getTextAlign(),
-        fontFamily: language === 'ar' ? 'Delius, Arial, sans-serif' : 'Comic Relief, Arial, sans-serif'
+        fontFamily: 'Roboto, Arial, sans-serif'
       }}
     >
       {/* Invoice Header - تخطيط فاتورة رسمية كلاسيكية */}
