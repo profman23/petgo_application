@@ -347,28 +347,25 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             </div>
 
             {/* المجاميع بالعربية - الجهة اليمنى */}
-            <div className="totals-ar text-right flex-1 px-4" dir="rtl">
-              <div className="flex items-center mb-1">
+            <div className="totals-ar text-right w-80" dir="rtl">
+              <div className="flex items-center justify-between mb-1">
                 <span className="text-gray-600 font-medium text-sm">المجموع قبل الضريبة :</span>
-                <span className="ml-6"></span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totals.totalBeforeVat.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
               </div>
               
-              <div className="flex items-center mb-1">
+              <div className="flex items-center justify-between mb-1">
                 <span className="text-gray-600 font-medium text-sm">الخصم :</span>
-                <span className="ml-6"></span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totals.totalDiscount.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
               </div>
               
-              <div className="flex items-center mb-2">
+              <div className="flex items-center justify-between mb-2">
                 <span className="text-gray-600 font-medium text-sm">ضريبة القيمة المضافة 15% :</span>
-                <span className="ml-6"></span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totals.totalVat.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
@@ -378,9 +375,8 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               {/* خط رمادي بسيط */}
               <div className="w-full h-px bg-gray-300 mb-2"></div>
               
-              <div className="flex items-center mb-2">
+              <div className="flex items-center justify-between mb-2">
                 <span className="text-gray-600 font-bold text-sm">المجموع النهائي :</span>
-                <span className="ml-6"></span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-bold text-sm">{totals.finalTotal.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
@@ -390,18 +386,16 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
               {/* خط رمادي بسيط */}
               <div className="w-full h-px bg-gray-300 mb-2"></div>
               
-              <div className="flex items-center mb-1">
+              <div className="flex items-center justify-between mb-1">
                 <span className="text-gray-600 font-medium text-sm">المبلغ المدفوع :</span>
-                <span className="ml-6"></span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
                 </div>
               </div>
               
-              <div className="flex items-center">
+              <div className="flex items-center justify-between">
                 <span className="text-gray-600 font-medium text-sm">الرصيد المتبقي :</span>
-                <span className="ml-6"></span>
                 <div className="flex items-center gap-1">
                   <span className="text-gray-600 font-semibold text-sm">{remainingBalance.toFixed(2)}</span>
                   <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
