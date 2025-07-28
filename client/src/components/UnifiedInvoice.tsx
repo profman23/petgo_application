@@ -168,43 +168,43 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           {/* Item Description */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">Item Description</div>
-            <div className="text-gray-600 font-medium text-xs mt-1">وصف الصنف</div>
+            <div className="text-gray-600 font-medium text-xs">وصف الصنف</div>
           </div>
           
           {/* Quantity */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">Quantity</div>
-            <div className="text-gray-600 font-medium text-xs mt-1">الكمية</div>
+            <div className="text-gray-600 font-medium text-xs">الكمية</div>
           </div>
           
           {/* Unit Price */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">Unit Price</div>
-            <div className="text-gray-600 font-medium text-xs mt-1">سعر الوحدة</div>
+            <div className="text-gray-600 font-medium text-xs">سعر الوحدة</div>
           </div>
           
           {/* Discount */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">Discount</div>
-            <div className="text-gray-600 font-medium text-xs mt-1">الخصم</div>
+            <div className="text-gray-600 font-medium text-xs">الخصم</div>
           </div>
           
           {/* VAT */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">VAT</div>
-            <div className="text-gray-600 font-medium text-xs mt-1">ض.ق.م</div>
+            <div className="text-gray-600 font-medium text-xs">ض.ق.م</div>
           </div>
           
           {/* Total B.Vat */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">Total B.Vat</div>
-            <div className="text-gray-600 font-medium text-xs mt-1">المجموع ق.ض</div>
+            <div className="text-gray-600 font-medium text-xs">المجموع ق.ض</div>
           </div>
           
           {/* Total A.Vat */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">Total A.Vat</div>
-            <div className="text-gray-600 font-medium text-xs mt-1">المجموع ب.ض</div>
+            <div className="text-gray-600 font-medium text-xs">المجموع ب.ض</div>
           </div>
         </div>
         
