@@ -352,7 +352,12 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             </div>
 
             {/* المجاميع بالعربية - الجهة اليمنى */}
-            <div className="totals-ar text-right w-80" dir="rtl">
+            <div className="totals-ar text-right w-80 border border-gray-300 rounded-lg p-4" dir="rtl">
+              {/* عنوان القسم العربي */}
+              <div className="mb-3">
+                <h3 className="text-gray-700 font-bold text-sm border-b border-gray-200 pb-2">مجموع الفاتورة</h3>
+              </div>
+              
               <div className="flex items-center justify-between mb-1">
                 <span className="text-gray-600 font-medium text-sm">المجموع قبل الضريبة :</span>
                 <div className="flex items-center gap-1">
