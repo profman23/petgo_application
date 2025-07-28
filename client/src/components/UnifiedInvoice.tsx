@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
 import { invoiceConfig, generateInvoiceNumber } from '@shared/invoice-config';
 import logoImage from '@assets/Screenshot 2025-07-10 181936_1753696339125.png';
+import sarIcon from '@assets/Screenshot 2025-07-27 144314_1753699402447.png';
 
 interface UnifiedInvoiceProps {
   bookingId: number;
@@ -191,7 +192,10 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
                 
                 {/* Unit Price */}
                 <div className="text-center">
-                  <span className="text-gray-600 text-sm">{unitPrice.toFixed(2)} SAR</span>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-gray-600 text-sm">{unitPrice.toFixed(2)}</span>
+                    <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                  </div>
                 </div>
                 
                 {/* Discount */}
@@ -203,17 +207,26 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
                 
                 {/* VAT */}
                 <div className="text-center">
-                  <span className="text-gray-600 text-sm">{vatAmount.toFixed(2)} SAR</span>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-gray-600 text-sm">{vatAmount.toFixed(2)}</span>
+                    <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                  </div>
                 </div>
                 
                 {/* Total B.Vat */}
                 <div className="text-center">
-                  <span className="text-gray-600 text-sm">{totalBeforeVat.toFixed(2)} SAR</span>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-gray-600 text-sm">{totalBeforeVat.toFixed(2)}</span>
+                    <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                  </div>
                 </div>
                 
                 {/* Total A.Vat */}
                 <div className="text-center">
-                  <span className="text-gray-600 text-sm font-semibold">{totalAfterVat.toFixed(2)} SAR</span>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-gray-600 text-sm font-semibold">{totalAfterVat.toFixed(2)}</span>
+                    <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                  </div>
                 </div>
               </div>
             );
