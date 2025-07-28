@@ -93,7 +93,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           </div>
 
           {/* معلومات العميل بالعربية - الجهة اليمنى */}
-          <div className="customer-info-ar text-right">
+          <div className="customer-info-ar text-right" dir="rtl">
             <div className="mb-2">
               <span className="text-gray-700 font-medium">العميل : </span>
               <span className="text-gray-900 font-semibold text-sm">{(booking as any)?.customerName || 'غير محدد'}</span>
