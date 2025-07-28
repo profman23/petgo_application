@@ -51,11 +51,11 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           <div className="invoice-details">
             <div className="mb-2">
               <span className="text-gray-700 font-medium">Invoice : </span>
-              <span className="text-gray-900 font-semibold">{realInvoiceNumber}</span>
+              <span className="text-gray-900 font-semibold text-sm">{realInvoiceNumber}</span>
             </div>
             <div>
               <span className="text-gray-700 font-medium">Date : </span>
-              <span className="text-gray-900 font-semibold">{realDate}</span>
+              <span className="text-gray-900 font-semibold text-sm">{realDate}</span>
             </div>
           </div>
           
