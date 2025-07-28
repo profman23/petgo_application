@@ -1,4 +1,5 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
 import { invoiceConfig, generateInvoiceNumber } from '@shared/invoice-config';
 import logoImage from '@assets/Screenshot 2025-07-10 181936_1753696339125.png';
@@ -14,10 +15,25 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
 }) => {
   const { language } = useLanguage();
   const texts = invoiceConfig.texts[language as 'ar' | 'en'];
-  const invoiceNumber = generateInvoiceNumber(bookingId);
+  
+  // Fetch real booking data
+  const { data: booking } = useQuery({
+    queryKey: [`/api/doctor/booking/${bookingId}`],
+    enabled: !!bookingId
+  });
+
+  // Fetch real generated invoice data  
+  const { data: generatedInvoice } = useQuery({
+    queryKey: [`/api/generated-invoice/Vets9000020`],
+    enabled: !!bookingId
+  });
   
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
+
+  // Use real data when available
+  const realInvoiceNumber = (generatedInvoice as any)?.invoiceNumber || generateInvoiceNumber(bookingId);
+  const realDate = (booking as any)?.appointmentDate ? new Date((booking as any).appointmentDate).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
 
   return (
     <div 
@@ -35,11 +51,11 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           <div className="invoice-details">
             <div className="mb-2">
               <span className="text-gray-700 font-medium">Invoice : </span>
-              <span className="text-gray-900 font-semibold">{invoiceNumber}</span>
+              <span className="text-gray-900 font-semibold">{realInvoiceNumber}</span>
             </div>
             <div>
               <span className="text-gray-700 font-medium">Date : </span>
-              <span className="text-gray-900 font-semibold">{new Date().toLocaleDateString('en-GB')}</span>
+              <span className="text-gray-900 font-semibold">{realDate}</span>
             </div>
           </div>
           
