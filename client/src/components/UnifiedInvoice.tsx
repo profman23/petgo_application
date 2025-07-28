@@ -5,8 +5,13 @@ import { invoiceConfig, generateInvoiceNumber } from '@shared/invoice-config';
 import logoImage from '@assets/Screenshot 2025-07-10 181936_1753696339125.png';
 import sarIcon from '@assets/Screenshot 2025-07-27 144314_1753699402447.png';
 
-// CSS للطباعة لضمان التناسق
+// CSS للطباعة لضمان التناسق - بدون @import لتجنب أخطاء PDF
 const printStyles = `
+  /* Fonts will use system fallback to prevent @import issues in PDF */
+  * {
+    font-family: 'Roboto', 'Arial', sans-serif !important;
+  }
+  
   @media print {
     .table-header-cell {
       display: flex !important;
