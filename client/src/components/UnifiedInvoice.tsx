@@ -432,6 +432,61 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           </div>
         </div>
         
+        {/* Payment Type Section - ثنائي اللغة */}
+        <div className="payment-types mt-6">
+          <div className="flex justify-between items-start gap-6">
+            {/* Payment Types بالإنجليزية - الجهة اليسرى */}
+            <div className="payment-en text-left w-80 border border-gray-300 rounded-lg p-4">
+              <div className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-200">
+                Payment Types
+              </div>
+              
+              {payments && payments.length > 0 ? (
+                payments.map((payment, index) => (
+                  <div key={index} className="flex items-center justify-between mb-2">
+                    <span className="text-gray-600 font-medium text-sm">
+                      {payment.paymentType === 'cash' ? 'Cash' : 'Card'}:
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-600 font-semibold text-sm">{parseFloat(payment.amount).toFixed(2)}</span>
+                      <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-400 text-sm">
+                  No payments recorded
+                </div>
+              )}
+            </div>
+
+            {/* Payment Types بالعربية - الجهة اليمنى */}
+            <div className="payment-ar text-right w-80 border border-gray-300 rounded-lg p-4">
+              <div className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-200">
+                أنواع الدفع
+              </div>
+              
+              {payments && payments.length > 0 ? (
+                payments.map((payment, index) => (
+                  <div key={index} className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-1">
+                      <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                      <span className="text-gray-600 font-semibold text-sm">{parseFloat(payment.amount).toFixed(2)}</span>
+                    </div>
+                    <span className="text-gray-600 font-medium text-sm">
+                      :{payment.paymentType === 'cash' ? 'نقدي' : 'بطاقة'}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-400 text-sm">
+                  لا توجد مدفوعات مسجلة
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
         {/* خط فاصل رابع أسفل المجاميع */}
         <div 
           className="w-full h-0.5 mt-4"
