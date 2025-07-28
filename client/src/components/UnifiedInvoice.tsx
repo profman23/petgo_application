@@ -28,21 +28,9 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         fontFamily: language === 'ar' ? 'Delius, Arial, sans-serif' : 'Comic Relief, Arial, sans-serif'
       }}
     >
-      {/* Invoice Header - رقم الفاتورة في اليسار واللوجو في أقصى اليمين */}
+      {/* Invoice Header - اللوجو في أقصى اليمين فقط */}
       <div className="invoice-header mb-8">
-        <div className="flex justify-between items-start">
-          {/* رقم الفاتورة والتاريخ في اليسار */}
-          <div className="invoice-details">
-            <div className="mb-2">
-              <span className="text-gray-500 font-medium">Invoice : </span>
-              <span className="text-gray-800 font-semibold">{invoiceNumber}</span>
-            </div>
-            <div>
-              <span className="text-gray-500 font-medium">Date : </span>
-              <span className="text-gray-800 font-semibold">{new Date().toLocaleDateString('en-GB')}</span>
-            </div>
-          </div>
-          
+        <div className="flex justify-end items-start">
           {/* اللوجو في أقصى اليمين */}
           <div className="company-logo">
             <img 
