@@ -148,8 +148,8 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
                 issueDateTime: new Date().toISOString()
               };
               
-              // تشفير البيانات بـ Base64
-              const encodedData = btoa(JSON.stringify(qrData));
+              // تشفير البيانات بـ Base64 مع دعم Unicode
+              const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(qrData))));
               
               // إنشاء QR Code باستخدام Google Charts API
               const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(encodedData)}`;
