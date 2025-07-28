@@ -600,13 +600,6 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             </div>
           </div>
         </div>
-        
-        {/* خط فاصل رابع أسفل المجاميع */}
-        <div 
-          className="w-full h-0.5 mt-4"
-          style={{ backgroundColor: '#8B2F8B' }}
-        ></div>
-        </div>
       </div>
     </div>
   );
