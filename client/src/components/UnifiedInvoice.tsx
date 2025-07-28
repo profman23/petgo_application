@@ -52,8 +52,8 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
       }}
     >
       {/* Invoice Header - تخطيط فاتورة رسمية كلاسيكية */}
-      <div className="invoice-header mb-8">
-        <div className="flex justify-between items-start mb-4">
+      <div className="invoice-header mb-4">
+        <div className="flex justify-between items-start mb-2">
           {/* معلومات الفاتورة في أقصى اليسار */}
           <div className="invoice-details">
             <div className="mb-2">
@@ -79,13 +79,13 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         
         {/* خط فاصل بعرض الفاتورة - نفس لون الموف في اللوجو */}
         <div 
-          className="w-full h-0.5"
+          className="w-full h-0.5 my-2"
           style={{ backgroundColor: '#8B2F8B' }}
         ></div>
       </div>
 
       {/* Customer Information Section - ثنائي اللغة */}
-      <div className="customer-info mb-8">
+      <div className="customer-info mb-4">
         <div className="flex justify-between items-start">
           {/* معلومات العميل بالإنجليزية - الجهة اليسرى */}
           <div className="customer-info-en text-left">
@@ -114,14 +114,14 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         
         {/* خط فاصل ثاني أسفل معلومات العميل */}
         <div 
-          className="w-full h-0.5 mt-4"
+          className="w-full h-0.5 mt-2"
           style={{ backgroundColor: '#8B2F8B' }}
         ></div>
       </div>
 
       {/* Invoice Items Table Header */}
-      <div className="invoice-items-section mb-8">
-        <div className="grid grid-cols-7 gap-4 border-b border-gray-300 pb-3 mb-4">
+      <div className="invoice-items-section mb-4">
+        <div className="grid grid-cols-7 gap-4 border-b border-gray-300 pb-2 mb-2">
           {/* Item Description */}
           <div className="text-center">
             <div className="text-gray-600 font-semibold text-sm">Item Description</div>
