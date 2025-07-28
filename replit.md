@@ -759,6 +759,11 @@ Changelog:
 - July 28, 2025. IMPLEMENTED: Pet Information section between customer info and invoice items with Pet Name, Pet Type, and Pet Gender
 - July 28, 2025. REFINED: Arabic text direction (RTL) fixes for proper display order in pet information section
 - July 28, 2025. COMPLETED: Professional invoice structure with purple separating lines and optimized bilingual formatting
+- July 28, 2025. ENHANCED: VAT Number section added below logo with bilingual layout (English left, Arabic right) displaying 300848569100003
+- July 28, 2025. IMPLEMENTED: QR Code with encrypted Base64 data containing company name, VAT number, tax amount, total amount, invoice number, and issue datetime
+- July 28, 2025. RESOLVED: Fixed btoa() Unicode encoding issue for Arabic text using unescape(encodeURIComponent()) method
+- July 28, 2025. ADDED: Purple separator line above Total Invoice section with consistent styling and full invoice width
+- July 28, 2025. REFINED: Text color standardization for Total Paid and Remaining Balance labels to gray while maintaining value colors (green/red)
 - July 18, 2025. CRITICAL FIX: Permanently disabled all automatic backup systems causing data loss
 - July 18, 2025. DISABLED: ultimateDataProtection.initializeAllProtections() and importProtection.initialize() in storage.ts
 - July 18, 2025. DISABLED: createPermanentBackup() in dataProtectionFinal.ts and createImportBackup() in importDataProtection.ts
