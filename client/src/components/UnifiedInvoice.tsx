@@ -186,6 +186,51 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           className="w-full h-0.5 mt-2"
           style={{ backgroundColor: '#8B2F8B' }}
         ></div>
+        
+        {/* Pet Information Section - ثنائي اللغة */}
+        <div className="pet-info-section mt-1 mb-2">
+          <div className="flex justify-between items-start gap-6">
+            {/* Pet Info بالإنجليزية - الجهة اليسرى */}
+            <div className="pet-en text-left flex-1">
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-xs">Pet Name: </span>
+                <span className="text-gray-600 font-semibold text-xs">
+                  {(booking as any)?.selectedPets?.[0]?.name || 'N/A'}
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-600 font-medium text-xs">Pet Gender: </span>
+                <span className="text-gray-600 font-semibold text-xs">
+                  {(booking as any)?.selectedPets?.[0]?.gender || 'N/A'}
+                </span>
+              </div>
+            </div>
+
+            {/* Pet Info بالعربية - الجهة اليمنى */}
+            <div className="pet-ar text-right flex-1">
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-xs">اسم الأليف : </span>
+                <span className="text-gray-600 font-semibold text-xs">
+                  {(booking as any)?.selectedPets?.[0]?.name || 'غير محدد'}
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-600 font-medium text-xs">نوع الأليف : </span>
+                <span className="text-gray-600 font-semibold text-xs">
+                  {(booking as any)?.selectedPets?.[0]?.type === 'cat' ? 'قطة' : 
+                   (booking as any)?.selectedPets?.[0]?.type === 'dog' ? 'كلب' : 
+                   (booking as any)?.selectedPets?.[0]?.type === 'bird' ? 'طائر' : 'غير محدد'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* خط فاصل ثالث أسفل معلومات الأليف */}
+        <div 
+          className="w-full h-0.5 mt-2"
+          style={{ backgroundColor: '#8B2F8B' }}
+        ></div>
       </div>
 
       {/* Invoice Items Table Header */}
