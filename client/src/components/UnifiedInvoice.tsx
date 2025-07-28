@@ -215,7 +215,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             </div>
 
             {/* Pet Info بالعربية - الجهة اليمنى */}
-            <div className="pet-ar text-right flex-1">
+            <div className="pet-ar text-right flex-1" dir="rtl">
               <div className="mb-1">
                 <span className="text-gray-600 font-medium text-xs">اسم الأليف : </span>
                 <span className="text-gray-600 font-semibold text-xs">
