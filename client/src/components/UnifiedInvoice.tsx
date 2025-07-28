@@ -34,6 +34,12 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
     queryKey: [`/api/invoice-items/${bookingId}`],
     enabled: !!bookingId
   });
+
+  // Fetch invoice payments for totals calculation
+  const { data: invoicePayments } = useQuery({
+    queryKey: [`/api/invoice-payments/${bookingId}`],
+    enabled: !!bookingId
+  });
   
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
@@ -41,6 +47,43 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
   // Use real data when available
   const realInvoiceNumber = (generatedInvoice as any)?.invoiceNumber || generateInvoiceNumber(bookingId);
   const realDate = (booking as any)?.appointmentDate ? new Date((booking as any).appointmentDate).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
+
+  // Calculate totals from invoice items
+  const calculateTotals = () => {
+    if (!invoiceItems || !(invoiceItems as any[]).length) {
+      return { totalBeforeVat: 0, totalDiscount: 0, totalVat: 0, finalTotal: 0 };
+    }
+
+    let totalBeforeVat = 0;
+    let totalDiscount = 0;
+    let totalVat = 0;
+
+    (invoiceItems as any[]).forEach((item: any) => {
+      const quantity = parseFloat(item.quantity || '1');
+      const unitPrice = parseFloat(item.unitPrice || '0');
+      const subtotal = quantity * unitPrice;
+      const discountPercent = item.discountType === '10%' ? 10 : item.discountType === '100%' ? 100 : 0;
+      const discountAmount = (subtotal * discountPercent) / 100;
+      const beforeVat = subtotal - discountAmount;
+      const vatAmount = beforeVat * 0.15;
+
+      totalBeforeVat += beforeVat;
+      totalDiscount += discountAmount;
+      totalVat += vatAmount;
+    });
+
+    const finalTotal = totalBeforeVat + totalVat;
+    return { totalBeforeVat, totalDiscount, totalVat, finalTotal };
+  };
+
+  const totals = calculateTotals();
+  
+  // Calculate payments
+  const totalPaid = invoicePayments 
+    ? (invoicePayments as any[]).reduce((sum, payment) => sum + parseFloat(payment.amount || '0'), 0)
+    : 0;
+  
+  const remainingBalance = totals.finalTotal - totalPaid;
 
   return (
     <div 
@@ -236,6 +279,131 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             <p className="text-sm">{language === 'ar' ? 'بيانات الأصناف ستظهر هنا' : 'Invoice items will appear here'}</p>
           </div>
         )}
+        
+        {/* خط فاصل ثالث أسفل الأصناف */}
+        <div 
+          className="w-full h-0.5 mt-2 mb-4"
+          style={{ backgroundColor: '#8B2F8B' }}
+        ></div>
+        
+        {/* Invoice Totals Section - ثنائي اللغة */}
+        <div className="invoice-totals">
+          <div className="flex justify-between items-start">
+            {/* المجاميع بالإنجليزية - الجهة اليسرى */}
+            <div className="totals-en text-left">
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-sm">Total Before VAT: </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{totals.totalBeforeVat.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-sm">Discount: </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{totals.totalDiscount.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              <div className="mb-2">
+                <span className="text-gray-600 font-medium text-sm">VAT 15%: </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{totals.totalVat.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              {/* خط رمادي بسيط */}
+              <div className="w-full h-px bg-gray-300 mb-2"></div>
+              
+              <div className="mb-2">
+                <span className="text-gray-600 font-bold text-sm">Final Total: </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-bold text-sm">{totals.finalTotal.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              {/* خط رمادي بسيط */}
+              <div className="w-full h-px bg-gray-300 mb-2"></div>
+              
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-sm">Total Paid: </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              <div>
+                <span className="text-gray-600 font-medium text-sm">Remaining Balance: </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{remainingBalance.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+            </div>
+
+            {/* المجاميع بالعربية - الجهة اليمنى */}
+            <div className="totals-ar text-right" dir="rtl">
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-sm">المجموع قبل الضريبة : </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{totals.totalBeforeVat.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-sm">الخصم : </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{totals.totalDiscount.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              <div className="mb-2">
+                <span className="text-gray-600 font-medium text-sm">ضريبة القيمة المضافة 15% : </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{totals.totalVat.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              {/* خط رمادي بسيط */}
+              <div className="w-full h-px bg-gray-300 mb-2"></div>
+              
+              <div className="mb-2">
+                <span className="text-gray-600 font-bold text-sm">المجموع النهائي : </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-bold text-sm">{totals.finalTotal.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              {/* خط رمادي بسيط */}
+              <div className="w-full h-px bg-gray-300 mb-2"></div>
+              
+              <div className="mb-1">
+                <span className="text-gray-600 font-medium text-sm">المبلغ المدفوع : </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{totalPaid.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+              
+              <div>
+                <span className="text-gray-600 font-medium text-sm">الرصيد المتبقي : </span>
+                <div className="flex items-center gap-1 inline-flex">
+                  <span className="text-gray-600 font-semibold text-sm">{remainingBalance.toFixed(2)}</span>
+                  <img src={sarIcon} alt="SAR" className="h-3 w-3 object-contain" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
