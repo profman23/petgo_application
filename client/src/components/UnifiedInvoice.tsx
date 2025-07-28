@@ -151,7 +151,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
       </div>
 
       {/* Customer Information Section - ثنائي اللغة */}
-      <div className="customer-info mb-4">
+      <div className="customer-info mb-4 mt-1">
         <div className="flex justify-between items-start">
           {/* معلومات العميل بالإنجليزية - الجهة اليسرى */}
           <div className="customer-info-en text-left">
