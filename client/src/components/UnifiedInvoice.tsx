@@ -178,7 +178,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             const totalAfterVat = totalBeforeVat + vatAmount;
 
             return (
-              <div key={index} className="grid grid-cols-7 gap-4 py-3 border-b border-gray-100">
+              <div key={index} className="grid grid-cols-7 gap-4 py-1 border-b border-gray-100">
                 {/* Item Description */}
                 <div className="text-center">
                   <span className="text-gray-600 text-sm">{item.description || 'Service'}</span>
