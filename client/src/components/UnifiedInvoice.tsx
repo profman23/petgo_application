@@ -310,10 +310,10 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         ></div>
         
         {/* Invoice Totals Section - ثنائي اللغة */}
-        <div className="invoice-totals print:flex-col print:gap-4">
-          <div className="flex justify-between items-start gap-6 print:flex-col print:gap-4">
+        <div className="invoice-totals">
+          <div className="flex justify-between items-start gap-6">
             {/* المجاميع بالإنجليزية - الجهة اليسرى */}
-            <div className="totals-en text-left w-80 border border-gray-300 rounded-lg p-4 print:w-full print:mb-4">
+            <div className="totals-en text-left w-80 border border-gray-300 rounded-lg p-4">
               {/* عنوان القسم الإنجليزي */}
               <div className="mb-3">
                 <h3 className="text-gray-700 font-bold text-sm border-b border-gray-200 pb-2 text-center">Total Invoice</h3>
@@ -375,7 +375,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             </div>
 
             {/* المجاميع بالعربية - الجهة اليمنى */}
-            <div className="totals-ar text-right w-80 border border-gray-300 rounded-lg p-4 print:w-full print:mb-4" dir="rtl">
+            <div className="totals-ar text-right w-80 border border-gray-300 rounded-lg p-4" dir="rtl">
               {/* عنوان القسم العربي */}
               <div className="mb-3">
                 <h3 className="text-gray-700 font-bold text-sm border-b border-gray-200 pb-2 text-center font-bold">مجموع الفاتورة</h3>
