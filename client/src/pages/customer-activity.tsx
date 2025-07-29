@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, FileText } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -479,6 +479,21 @@ export default function CustomerActivity() {
                                     ? (language === 'ar' ? 'تم التقييم' : 'Rated')
                                     : (language === 'ar' ? 'تقييم الخدمة' : 'Rate Service')
                                   }
+                                </Button>
+                              )}
+
+                              {/* View Invoice Button for Completed Services Only */}
+                              {booking.status === 'completed' && (
+                                <Button
+                                  onClick={() => {
+                                    // No functionality yet - placeholder button
+                                    console.log('View Invoice clicked for booking:', booking.id);
+                                  }}
+                                  variant="outline"
+                                  className="w-full font-semibold py-2 px-4 text-blue-600 border-blue-200 hover:bg-blue-50"
+                                >
+                                  <FileText className="w-4 h-4 mr-2" />
+                                  {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
                                 </Button>
                               )}
                             </div>
