@@ -828,6 +828,9 @@ export default function RideRequest() {
                       src={surgicalToolsIcon} 
                       alt="Surgical Tools" 
                       className="w-4 h-4 object-contain"
+                      style={{
+                        filter: 'brightness(0) saturate(100%) invert(37%) sepia(73%) saturate(1234%) hue-rotate(21deg) brightness(93%) contrast(87%)'
+                      }}
                     />
                     <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
                   </div>
