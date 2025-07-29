@@ -355,7 +355,7 @@ export default function Login() {
                       <UserPlus className="w-5 h-5" />
                       <span style={{ 
                         fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                      }}>Create New Account</span>
+                      }}>{language === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'}</span>
                     </div>
                   </Button>
                   
