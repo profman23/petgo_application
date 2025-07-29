@@ -1025,16 +1025,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/patients', requireAuth, async (req, res) => {
     try {
       const userId = req.user.id;
-      const { name, type, ageYear, ageMonth, ageDay, photo } = req.body;
+      const { name, type, gender, ageYear, ageMonth, ageDay, photo } = req.body;
       
-      if (!name || !type) {
-        return res.status(400).json({ message: 'Patient name and type are required' });
+      if (!name || !type || !gender) {
+        return res.status(400).json({ message: 'Patient name, type, and gender are required' });
       }
       
       const patient = await storage.createPatient({
         userId,
         name,
         type,
+        gender,
         ageYear: ageYear || null,
         ageMonth: ageMonth || null,
         ageDay: ageDay || null,
@@ -1053,15 +1054,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.id;
       const patientId = parseInt(req.params.id);
-      const { name, type, ageYear, ageMonth, ageDay, photo } = req.body;
+      const { name, type, gender, ageYear, ageMonth, ageDay, photo } = req.body;
       
-      if (!name || !type) {
-        return res.status(400).json({ message: 'Patient name and type are required' });
+      if (!name || !type || !gender) {
+        return res.status(400).json({ message: 'Patient name, type, and gender are required' });
       }
       
       const updatedPatient = await storage.updatePatient(patientId, userId, {
         name,
         type,
+        gender,
         ageYear: ageYear || null,
         ageMonth: ageMonth || null,
         ageDay: ageDay || null,
