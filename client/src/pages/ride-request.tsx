@@ -1092,7 +1092,7 @@ export default function RideRequest() {
                             rel="noopener noreferrer"
                             className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
                           >
-                            {language === 'ar' ? 'احجز الآن فرع المطار' : 'Book Now Mathar Branch'}
+                            {language === 'ar' ? 'احجز الآن فرع المذر' : 'Book Now Mathar Branch'}
                           </a>
                         </div>
                       </div>
