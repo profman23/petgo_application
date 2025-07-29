@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
 import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, FileText, Eye, Download } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -17,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { InvoiceGeneratorProfessional } from '@/components/InvoiceGeneratorProfessional';
 
 interface Booking {
   id: number;
@@ -56,6 +58,12 @@ export default function CustomerActivity() {
   const [showTrackingDialog, setShowTrackingDialog] = useState(false);
   const [selectedTrackingBooking, setSelectedTrackingBooking] = useState<Booking | null>(null);
   const [trackingData, setTrackingData] = useState<any>(null);
+  
+  // Invoice modal states
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [selectedInvoiceBooking, setSelectedInvoiceBooking] = useState<Booking | null>(null);
+  const [invoiceData, setInvoiceData] = useState<any>(null);
+  const invoiceRef = useRef(null);
 
   // Handle logout
   const handleLogout = () => {
@@ -93,14 +101,87 @@ export default function CustomerActivity() {
     return booking?.status === 'completed';
   };
 
-  // Handle PDF download
-  const handleDownloadInvoice = (bookingId: number) => {
-    window.open(`/invoice-view?bookingId=${bookingId}&download=true`, '_blank');
+  // Handle invoice view - open modal like doctor screen
+  const handleViewInvoice = async (bookingId: number) => {
+    try {
+      const response = await apiRequest(`/api/invoice-view/${bookingId}`);
+      setInvoiceData(response);
+      setSelectedInvoiceBooking(bookings.find(b => b.id === bookingId) || null);
+      setShowInvoiceModal(true);
+    } catch (error) {
+      console.error('Failed to load invoice:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في تحميل الفاتورة' : 'Failed to load invoice',
+        variant: 'destructive',
+      });
+    }
   };
 
-  // Handle invoice view
-  const handleViewInvoice = (bookingId: number) => {
-    window.open(`/invoice-view?bookingId=${bookingId}`, '_blank');
+  // Handle PDF download - direct download like doctor screen
+  const handleDownloadInvoice = async (bookingId: number) => {
+    try {
+      const response = await apiRequest(`/api/invoice-view/${bookingId}`);
+      setInvoiceData(response);
+      setSelectedInvoiceBooking(bookings.find(b => b.id === bookingId) || null);
+      
+      // Wait a moment for the component to render
+      setTimeout(async () => {
+        if (!invoiceRef.current) {
+          console.error('Invoice ref not available');
+          toast({
+            title: language === 'ar' ? 'خطأ في التحميل' : 'Download Error',
+            description: language === 'ar' ? 'لا يمكن تحميل الفاتورة حالياً' : 'Cannot download invoice at this time',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        try {
+          const element = invoiceRef.current;
+          
+          const opt = {
+            margin: 0.5,
+            filename: `Invoice-${bookingId}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+              scale: 2,
+              useCORS: true,
+              allowTaint: true,
+              logging: true
+            },
+            jsPDF: { 
+              unit: 'in', 
+              format: 'a4', 
+              orientation: 'portrait' 
+            }
+          };
+
+          await html2pdf().set(opt).from(element).save();
+          
+          toast({
+            title: language === 'ar' ? 'تم تحميل الفاتورة' : 'Invoice downloaded successfully',
+            variant: 'default',
+          });
+          
+        } catch (error) {
+          console.error('PDF download error:', error);
+          toast({
+            title: language === 'ar' ? 'خطأ في التحميل' : 'Download Error',
+            description: language === 'ar' ? 'فشل في تحميل ملف PDF' : 'Failed to download PDF',
+            variant: 'destructive',
+          });
+        }
+      }, 100);
+      
+    } catch (error) {
+      console.error('Failed to load invoice for download:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في تحميل الفاتورة' : 'Failed to load invoice',
+        variant: 'destructive',
+      });
+    }
   };
 
 
@@ -620,6 +701,80 @@ export default function CustomerActivity() {
             setSelectedTrackingBooking(null);
           }}
         />
+      )}
+
+      {/* Invoice Modal - Hidden div for PDF generation */}
+      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
+        {invoiceData && selectedInvoiceBooking && (
+          <div ref={invoiceRef}>
+            <InvoiceGeneratorProfessional
+              invoiceData={{
+                bookingId: selectedInvoiceBooking.id,
+                customer: {
+                  firstName: invoiceData.booking?.customerName?.split(' ')[0] || '',
+                  lastName: invoiceData.booking?.customerName?.split(' ').slice(1).join(' ') || '',
+                  phone: invoiceData.booking?.customerPhone || '',
+                  email: invoiceData.booking?.customerEmail || ''
+                },
+                pets: invoiceData.booking?.pets || [],
+                appointmentDate: selectedInvoiceBooking.appointmentDate,
+                appointmentTime: selectedInvoiceBooking.appointmentTime,
+                serviceType: invoiceData.booking?.serviceType || '',
+                items: invoiceData.invoiceItems || [],
+                subtotal: invoiceData.invoiceItems?.reduce((sum: number, item: any) => sum + (item.totalBeforeVat || 0), 0) || 0,
+                discount: 0,
+                tax: invoiceData.invoiceItems?.reduce((sum: number, item: any) => sum + (item.vatAmount || 0), 0) || 0,
+                total: invoiceData.invoiceItems?.reduce((sum: number, item: any) => sum + (item.totalAfterVat || 0), 0) || 0,
+                notes: '',
+                doctorName: 'VetsVan Doctor',
+                vetsVanCode: selectedInvoiceBooking.vetsVanCode,
+                paymentMethods: []
+              }}
+              onClose={() => {}}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Invoice View Modal */}
+      {showInvoiceModal && invoiceData && selectedInvoiceBooking && (
+        <Dialog open={showInvoiceModal} onOpenChange={setShowInvoiceModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              <InvoiceGeneratorProfessional
+                invoiceData={{
+                  bookingId: selectedInvoiceBooking.id,
+                  customer: {
+                    firstName: invoiceData.booking?.customerName?.split(' ')[0] || '',
+                    lastName: invoiceData.booking?.customerName?.split(' ').slice(1).join(' ') || '',
+                    phone: invoiceData.booking?.customerPhone || '',
+                    email: invoiceData.booking?.customerEmail || ''
+                  },
+                  pets: invoiceData.booking?.pets || [],
+                  appointmentDate: selectedInvoiceBooking.appointmentDate,
+                  appointmentTime: selectedInvoiceBooking.appointmentTime,
+                  serviceType: invoiceData.booking?.serviceType || '',
+                  items: invoiceData.invoiceItems || [],
+                  subtotal: invoiceData.invoiceItems?.reduce((sum: number, item: any) => sum + (item.totalBeforeVat || 0), 0) || 0,
+                  discount: 0,
+                  tax: invoiceData.invoiceItems?.reduce((sum: number, item: any) => sum + (item.vatAmount || 0), 0) || 0,
+                  total: invoiceData.invoiceItems?.reduce((sum: number, item: any) => sum + (item.totalAfterVat || 0), 0) || 0,
+                  notes: '',
+                  doctorName: 'VetsVan Doctor',
+                  vetsVanCode: selectedInvoiceBooking.vetsVanCode,
+                  paymentMethods: []
+                }}
+                onClose={() => setShowInvoiceModal(false)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
