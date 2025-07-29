@@ -1127,7 +1127,7 @@ export default function RideRequest() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 font-medium text-sm rounded-lg border border-purple-300 hover:border-purple-400 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
-                    style={{ color: '#9333ea' }} // text-purple-600 equivalent
+                    style={{ color: '#9333ea !important' }} // text-purple-600 equivalent
                     title={language === 'ar' ? 'اضغط للحجز' : 'Click to book appointment'}
                   >
                     {language === 'ar' ? 'احجز الآن' : 'Book Now'}

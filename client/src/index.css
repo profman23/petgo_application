@@ -73,6 +73,15 @@
   color: #374151 !important;
 }
 
+/* Elite Vet Book Now button color override */
+a[href="https://vet.digitail.io/clinics/elite-vet-qourtobah-tel-920011626"] {
+  color: #9333ea !important;
+}
+
+a[href="https://vet.digitail.io/clinics/elite-vet-qourtobah-tel-920011626"]:hover {
+  color: #7c3aed !important;
+}
+
 /* Contact button animation */
 @keyframes pulse-border {
   0%, 100% {
