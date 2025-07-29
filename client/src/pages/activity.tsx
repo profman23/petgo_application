@@ -319,10 +319,10 @@ export default function Activity() {
                     )}
                   </div>
 
-                  {/* Rate Service Button and View Invoice Button for Completed Services */}
-                  {booking.status === 'completed' && (
-                    <div className="pt-3 border-t border-purple-600 space-y-2">
-                      {/* Rate Service Button */}
+                  {/* Action Buttons Section */}
+                  <div className="pt-3 border-t border-purple-600 space-y-2">
+                    {/* Rate Service Button - Only for Completed Services */}
+                    {booking.status === 'completed' && (
                       <Button
                         onClick={() => openReviewDialog(booking)}
                         variant="outline"
@@ -341,17 +341,17 @@ export default function Activity() {
                           : (language === 'ar' ? 'تقييم الخدمة' : 'Rate Service')
                         }
                       </Button>
-                      
-                      {/* View Invoice Button */}
-                      <Button
-                        onClick={() => handleViewInvoice(booking)}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
-                      </Button>
-                    </div>
-                  )}
+                    )}
+                    
+                    {/* View Invoice Button - For All Bookings */}
+                    <Button
+                      onClick={() => handleViewInvoice(booking)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
