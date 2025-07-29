@@ -17,6 +17,7 @@ import welcomeHandImage from "@assets/freepik__background__61417_1753095390676.p
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 import { YouTubeTutorialModal } from '@/components/YouTubeTutorialModal';
 import { shouldShowTutorialVideo } from '@/lib/deviceDetection';
+import { LanguageSelector } from '@/components/language-selector';
 
 interface LoginFormData {
   identifier: string;
@@ -192,6 +193,11 @@ export default function Login() {
         <Card className="border-0">
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
+            
+            {/* Language Selector in Top Right Corner */}
+            <div className="absolute top-4 right-4">
+              <LanguageSelector />
+            </div>
             
             {/* Logo Container - VETS VAN في الأعلى */}
             <div className="mb-16 flex justify-center">
