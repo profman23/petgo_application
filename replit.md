@@ -803,6 +803,14 @@ Changelog:
 - July 22, 2025. UPDATED: All customer screens (home.tsx, account.tsx, customer-activity.tsx, patients.tsx, fixed-footer.tsx, ride-request.tsx, vetsvan-booking.tsx)
 - July 22, 2025. PRESERVED: Delius font exception for "Weekly Tips" section as specified by user requirements
 - July 22, 2025. ENHANCED: Typography consistency with purple theme (#852085) maintained across all Comic Relief implementations
+- July 29, 2025. FIXED: Critical accessibility issue in customer login page - resolved "label for attribute doesn't match any element id" errors
+- July 29, 2025. ENHANCED: Customer login registration form with proper htmlFor attributes for all labels (firstName, lastName, email, phone, password, captcha)
+- July 29, 2025. IMPROVED: Form accessibility compliance - all input fields now have matching id attributes for screen readers and autofill functionality
+- July 29, 2025. RESOLVED: Browser console accessibility warnings eliminated - proper label-input association implemented
+- July 29, 2025. COMPLETED: Unified invoice viewing functionality across both customer Activity screen and doctor dashboard interfaces
+- July 29, 2025. IMPLEMENTED: Separate API endpoints for customer (/api/user/booking/:bookingId) and doctor (/api/doctor/booking/:bookingId) invoice access
+- July 29, 2025. FIXED: 403 Forbidden error when customers accessed invoice data - proper ownership verification and routing implemented
+- July 29, 2025. ENHANCED: UnifiedInvoice component with userType parameter for appropriate API endpoint selection
 - July 29, 2025. CRITICAL FIX: Resolved patient gender field persistence issue - gender data was not being saved or retrieved correctly
 - July 29, 2025. ROOT CAUSE IDENTIFIED: Gender field was missing from both API endpoints (/api/patients POST and PUT) causing data loss
 - July 29, 2025. IMPLEMENTED: Added gender field to server routes with mandatory validation for patient creation and updates
