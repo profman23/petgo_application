@@ -2339,6 +2339,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's invoice statuses
+  app.get('/api/user/invoice-statuses', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      
+      // Get user's bookings with invoice status
+      const userBookings = await storage.getUserBookings(userId);
+      const invoiceStatuses = [];
+      
+      for (const booking of userBookings) {
+        const invoiceStatus = await storage.getInvoiceStatus(booking.id);
+        if (invoiceStatus?.isGenerated) {
+          invoiceStatuses.push({
+            bookingId: booking.id,
+            isGenerated: true,
+            generatedAt: invoiceStatus.generatedAt
+          });
+        }
+      }
+      
+      res.json(invoiceStatuses);
+    } catch (error) {
+      console.error('Error fetching invoice statuses:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice statuses' });
+    }
+  });
+
   // Invoice view endpoint for customers
   app.get('/api/invoice-view/:bookingId', async (req, res) => {
     try {
