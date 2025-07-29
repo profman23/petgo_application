@@ -80,6 +80,7 @@ export const patients = pgTable("patients", {
   userId: integer("user_id").notNull().references(() => users.id),
   name: text("name").notNull(),
   type: text("type").notNull(), // Cat, Dog, Bird
+  gender: text("gender"), // Male, Female
   ageYear: integer("age_year"),
   ageMonth: integer("age_month"),
   ageDay: integer("age_day"),
@@ -187,6 +188,7 @@ export const rideRequestSchema = createInsertSchema(rides).pick({
 export const insertPatientSchema = createInsertSchema(patients).pick({
   name: true,
   type: true,
+  gender: true,
   ageYear: true,
   ageMonth: true,
   ageDay: true,

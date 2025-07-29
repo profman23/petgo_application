@@ -15,6 +15,7 @@ interface Patient {
   id: number;
   name: string;
   type: 'Cat' | 'Dog' | 'Bird';
+  gender?: 'Male' | 'Female';
   ageYear?: number;
   ageMonth?: number;
   ageDay?: number;

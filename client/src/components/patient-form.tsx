@@ -19,6 +19,9 @@ const patientFormSchema = z.object({
   type: z.enum(['Cat', 'Dog', 'Bird'], {
     errorMap: () => ({ message: 'Please select patient type' })
   }),
+  gender: z.enum(['Male', 'Female'], {
+    errorMap: () => ({ message: 'Please select patient gender' })
+  }).optional(),
   ageYear: z.string().optional(),
   ageMonth: z.string().optional(),
   ageDay: z.string().optional(),
@@ -50,6 +53,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
     defaultValues: {
       name: '',
       type: undefined,
+      gender: undefined,
       ageYear: '',
       ageMonth: '',
       ageDay: '',
@@ -100,9 +104,10 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
     const cleanData = {
       name: data.name,
       type: data.type,
-      ageYear: data.ageYear && data.ageYear !== '' ? Number(data.ageYear) : undefined,
-      ageMonth: data.ageMonth && data.ageMonth !== '' ? Number(data.ageMonth) : undefined,
-      ageDay: data.ageDay && data.ageDay !== '' ? Number(data.ageDay) : undefined,
+      gender: data.gender,
+      ageYear: data.ageYear && data.ageYear !== '' ? data.ageYear : undefined,
+      ageMonth: data.ageMonth && data.ageMonth !== '' ? data.ageMonth : undefined,
+      ageDay: data.ageDay && data.ageDay !== '' ? data.ageDay : undefined,
       photo: data.photo || undefined,
       birthdate: data.birthdate || undefined,
     };
@@ -181,6 +186,34 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 </Select>
                 {form.formState.errors.type && (
                   <p className="text-red-500 text-sm">{form.formState.errors.type.message}</p>
+                )}
+              </div>
+
+              {/* Patient Gender */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {t('patientGender')} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                </Label>
+                <Select
+                  onValueChange={(value) => form.setValue('gender', value as 'Male' | 'Female')}
+                  defaultValue={form.watch('gender')}
+                >
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
+                    <SelectValue placeholder={t('selectPatientGender')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">
+                      <span>{t('male')}</span>
+                    </SelectItem>
+                    <SelectItem value="Female">
+                      <span>{t('female')}</span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.gender && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.gender.message}</p>
                 )}
               </div>
 
