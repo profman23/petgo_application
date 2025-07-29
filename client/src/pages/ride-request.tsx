@@ -53,6 +53,7 @@ export default function RideRequest() {
   const [isSlideComplete, setIsSlideComplete] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [showPartnersDialog, setShowPartnersDialog] = useState(false);
+  const [showDrPawsBooking, setShowDrPawsBooking] = useState(false);
   
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -106,6 +107,23 @@ export default function RideRequest() {
       selectedPatients: [],
     },
   });
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showDrPawsBooking) {
+        setShowDrPawsBooking(false);
+      }
+    };
+
+    if (showDrPawsBooking) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showDrPawsBooking]);
 
   useEffect(() => {
     // Get user's current location with high accuracy - force new location request
@@ -1039,11 +1057,40 @@ export default function RideRequest() {
                       <MessageCircle className="w-4 h-4 text-green-600" />
                     </button>
                   </div>
-                  {/* Book Now Link */}
-                  <div className="text-center">
-                    <span className="text-sm text-green-600 font-medium cursor-default">
+                  {/* Book Now Button with Dropdown */}
+                  <div className="text-center relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDrPawsBooking(!showDrPawsBooking);
+                      }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 hover:text-green-800 font-medium text-sm rounded-lg border border-green-300 hover:border-green-400 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                      title={language === 'ar' ? 'اختر الفرع' : 'Choose Branch'}
+                    >
                       {language === 'ar' ? 'احجز الآن' : 'Book Now'}
-                    </span>
+                      <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showDrPawsBooking ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    {showDrPawsBooking && (
+                      <div 
+                        className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white border border-green-200 rounded-lg shadow-lg z-50 min-w-max"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="py-1">
+                          <button
+                            className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
+                          >
+                            {language === 'ar' ? 'احجز الآن فرع الصحافة' : 'Book Now Sahafa Branch'}
+                          </button>
+                          <button
+                            className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
+                          >
+                            {language === 'ar' ? 'احجز الآن فرع المطار' : 'Book Now Mathar Branch'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
