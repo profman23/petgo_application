@@ -240,15 +240,20 @@ export default function Login() {
                   name="identifier"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 font-semibold" style={{ 
-                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                      }}>
+                      <FormLabel 
+                        htmlFor={`login-identifier-${field.name}`}
+                        className="text-gray-700 font-semibold" 
+                        style={{ 
+                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                        }}
+                      >
                         {language === 'ar' ? 'رقم الهاتف أو الإيميل' : 'Phone Number or Email'}
                       </FormLabel>
                       <FormControl>
                         <div className="relative group">
                           <Input
                             {...field}
+                            id={`login-identifier-${field.name}`}
                             type="text"
                             placeholder={language === 'ar' ? 'أدخل رقم الهاتف أو الإيميل' : 'Enter phone number or email'}
                             className={`pr-4 pl-16 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
@@ -279,13 +284,18 @@ export default function Login() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-700 font-semibold" style={{ 
-                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                      }}>{t('password')}</FormLabel>
+                      <FormLabel 
+                        htmlFor={`login-password-${field.name}`}
+                        className="text-gray-700 font-semibold" 
+                        style={{ 
+                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                        }}
+                      >{t('password')}</FormLabel>
                       <FormControl>
                         <div className="relative group">
                           <Input
                             {...field}
+                            id={`login-password-${field.name}`}
                             type="password"
                             placeholder={t('enterPassword')}
                             className={`pr-4 pl-12 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 

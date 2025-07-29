@@ -123,13 +123,14 @@ export default function DoctorLogin() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel htmlFor={`doctor-username-${field.name}`}>
                         {language === 'ar' ? 'اسم المستخدم' : 'Username'}
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             {...field}
+                            id={`doctor-username-${field.name}`}
                             type="text"
                             placeholder="vetsvan1"
                             className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -148,13 +149,14 @@ export default function DoctorLogin() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel htmlFor={`doctor-password-${field.name}`}>
                         {language === 'ar' ? 'كلمة المرور' : 'Password'}
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             {...field}
+                            id={`doctor-password-${field.name}`}
                             type="password"
                             placeholder="••••••••"
                             className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}

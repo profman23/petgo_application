@@ -856,16 +856,21 @@ export default function RideRequest() {
                           alt="Location" 
                           className="w-5 h-5 object-contain"
                         />
-                        <FormLabel className="text-lg font-semibold text-gray-600" style={{ 
-                          textAlign,
-                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                        }}>{t('yourLocation')}</FormLabel>
+                        <FormLabel 
+                          htmlFor={`ride-pickup-location-${field.name}`}
+                          className="text-lg font-semibold text-gray-600" 
+                          style={{ 
+                            textAlign,
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}
+                        >{t('yourLocation')}</FormLabel>
                       </div>
                       <FormControl>
                         <div className="flex items-center gap-3">
                           <Circle className="w-3 h-3 text-green-500 flex-shrink-0" />
                           <Input
                             {...field}
+                            id={`ride-pickup-location-${field.name}`}
                             placeholder={language === 'ar' ? 'موقعك الحالي' : 'Your current location'}
                             className={`flex-1 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
                             style={{ textAlign }}
