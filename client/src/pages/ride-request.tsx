@@ -824,29 +824,55 @@ export default function RideRequest() {
                 <SelectItem value="surgery" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-orange-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* مشرط جراحي */}
                       <path 
-                        d="M20 4L16 8L14 6L18 2L20 4Z" 
+                        d="M20 2L18 4L16 2L18 0L20 2Z" 
                         fill="currentColor" 
                         stroke="currentColor" 
-                        strokeWidth="1"
+                        strokeWidth="0.5"
                       />
                       <path 
-                        d="M14 6L4 16L6 18L16 8L14 6Z" 
+                        d="M18 4L12 10L10 8L16 2L18 4Z" 
                         fill="none" 
                         stroke="currentColor" 
-                        strokeWidth="1.5" 
+                        strokeWidth="1.2" 
                         strokeLinecap="round"
                       />
                       <path 
-                        d="M4 16L2 18L4 20L6 18L4 16Z" 
+                        d="M10 8L8 10L10 12L12 10L10 8Z" 
                         fill="currentColor" 
                         stroke="currentColor" 
-                        strokeWidth="1"
+                        strokeWidth="0.5"
+                      />
+                      {/* مقص جراحي */}
+                      <path 
+                        d="M4 14L6 12L8 14L6 16L4 14Z" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        strokeWidth="0.5"
                       />
                       <path 
-                        d="M16 8L18 10" 
+                        d="M4 20L6 18L8 20L6 22L4 20Z" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        strokeWidth="0.5"
+                      />
+                      <path 
+                        d="M6 12L12 6" 
                         stroke="currentColor" 
                         strokeWidth="1" 
+                        strokeLinecap="round"
+                      />
+                      <path 
+                        d="M6 18L12 12" 
+                        stroke="currentColor" 
+                        strokeWidth="1" 
+                        strokeLinecap="round"
+                      />
+                      <path 
+                        d="M11 7L13 9" 
+                        stroke="currentColor" 
+                        strokeWidth="1.5" 
                         strokeLinecap="round"
                       />
                     </svg>
