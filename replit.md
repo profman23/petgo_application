@@ -790,6 +790,8 @@ Changelog:
 - July 29, 2025. COMPLETED: Dr. Paws dropdown menu now has working links for both Sahafa and Mathar branches
 - July 29, 2025. UPDATED: Dr. Paws Mathar Branch Arabic text changed from "فرع المطار" to "فرع المعذر" while English remains "Book Now Mathar Branch"
 - July 29, 2025. FIXED: React accessibility warning by adding DialogDescription to Partners Dialog in ride-request page
+- July 29, 2025. UPDATED: Patient gender field label changed from "جنس الحيوان الأليف" to "جنس الأليف" in Arabic translation
+- July 29, 2025. ENHANCED: Arabic text alignment in patient form fields - all input fields and select dropdowns now align text to the right for Arabic interface
 - July 18, 2025. CRITICAL FIX: Permanently disabled all automatic backup systems causing data loss
 - July 18, 2025. DISABLED: ultimateDataProtection.initializeAllProtections() and importProtection.initialize() in storage.ts
 - July 18, 2025. DISABLED: createPermanentBackup() in dataProtectionFinal.ts and createImportBackup() in importDataProtection.ts

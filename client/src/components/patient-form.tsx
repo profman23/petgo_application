@@ -132,6 +132,9 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   {...form.register('name')}
                   className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
                   placeholder={t('patientName')}
+                  style={{
+                    textAlign: language === 'ar' ? 'right' : 'left'
+                  }}
                   autoFocus
                 />
                 {form.formState.errors.name && (
@@ -150,7 +153,9 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   onValueChange={(value) => form.setValue('type', value as 'Cat' | 'Dog' | 'Bird')}
                   defaultValue={form.watch('type')}
                 >
-                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg" style={{
+                    textAlign: language === 'ar' ? 'right' : 'left'
+                  }}>
                     <SelectValue placeholder={t('selectPatientType')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -183,7 +188,9 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   onValueChange={(value) => form.setValue('gender', value as 'Male' | 'Female')}
                   value={form.watch('gender')}
                 >
-                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg" style={{
+                    textAlign: language === 'ar' ? 'right' : 'left'
+                  }}>
                     <SelectValue placeholder={t('selectPatientGender')} />
                   </SelectTrigger>
                   <SelectContent>

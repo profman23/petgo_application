@@ -107,7 +107,7 @@ export const translations = {
     cat: 'قطة',
     dog: 'كلب', 
     bird: 'طائر',
-    patientGender: 'جنس الحيوان الأليف',
+    patientGender: 'جنس الأليف',
     male: 'ذكر',
     female: 'أنثى',
     selectPatientGender: 'اختر جنس الحيوان الأليف',
