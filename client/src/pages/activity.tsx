@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Calendar, Clock, MapPin, CheckCircle, XCircle, AlertCircle, Star, MessageCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Clock, MapPin, CheckCircle, XCircle, AlertCircle, Star, MessageCircle, Eye, X } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import logoPath from '@assets/10773561_1751295833176.png';
 import { FixedFooter } from '@/components/fixed-footer';
 import { LanguageSelector } from '@/components/language-selector';
+import { UnifiedInvoice } from '@/components/UnifiedInvoice';
 
 interface Booking {
   id: number;
@@ -52,6 +53,8 @@ export default function Activity() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [selectedBookingForInvoice, setSelectedBookingForInvoice] = useState<Booking | null>(null);
 
   // Check authentication
   useEffect(() => {
@@ -92,7 +95,6 @@ export default function Activity() {
     mutationFn: async (reviewData: { bookingId: number; rating: number; comment: string }) => {
       return await apiRequest(`/api/bookings/${reviewData.bookingId}/review`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rating: reviewData.rating, comment: reviewData.comment })
       });
     },
@@ -178,6 +180,18 @@ export default function Activity() {
       rating,
       comment: comment.trim()
     });
+  };
+
+  // Open invoice modal
+  const handleViewInvoice = (booking: Booking) => {
+    setSelectedBookingForInvoice(booking);
+    setShowInvoiceModal(true);
+  };
+
+  // Close invoice modal
+  const handleCloseInvoice = () => {
+    setShowInvoiceModal(false);
+    setSelectedBookingForInvoice(null);
   };
 
   // Render star rating
@@ -305,9 +319,10 @@ export default function Activity() {
                     )}
                   </div>
 
-                  {/* Rate Service Button for Completed Services */}
+                  {/* Rate Service Button and View Invoice Button for Completed Services */}
                   {booking.status === 'completed' && (
-                    <div className="pt-3 border-t border-purple-600">
+                    <div className="pt-3 border-t border-purple-600 space-y-2">
+                      {/* Rate Service Button */}
                       <Button
                         onClick={() => openReviewDialog(booking)}
                         variant="outline"
@@ -325,6 +340,15 @@ export default function Activity() {
                           ? (language === 'ar' ? 'تم التقييم' : 'Rated')
                           : (language === 'ar' ? 'تقييم الخدمة' : 'Rate Service')
                         }
+                      </Button>
+                      
+                      {/* View Invoice Button */}
+                      <Button
+                        onClick={() => handleViewInvoice(booking)}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4"
+                      >
+                        <Eye className="w-4 h-4 mr-2" />
+                        {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
                       </Button>
                     </div>
                   )}
@@ -396,6 +420,34 @@ export default function Activity() {
                   }
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Invoice View Modal */}
+      {showInvoiceModal && selectedBookingForInvoice && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+          <div className="w-full max-w-4xl bg-white border-2 border-purple-600 shadow-2xl rounded-lg relative z-50 max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-4 border-b border-purple-600 bg-purple-50">
+              <h2 style={{ textAlign }} className="text-xl font-bold text-purple-600">
+                {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
+              </h2>
+              <button
+                onClick={handleCloseInvoice}
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-2 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            {/* Modal Content - Invoice */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <UnifiedInvoice 
+                bookingId={selectedBookingForInvoice.id} 
+                mode="view" 
+              />
             </div>
           </div>
         </div>
