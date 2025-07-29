@@ -1078,11 +1078,14 @@ export default function RideRequest() {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="py-1">
-                          <button
+                          <a
+                            href="https://vet.digitail.io/clinics/dr-paws-sahafa-tel-920003045"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
                           >
                             {language === 'ar' ? 'احجز الآن فرع الصحافة' : 'Book Now Sahafa Branch'}
-                          </button>
+                          </a>
                           <button
                             className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
                           >
