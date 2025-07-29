@@ -1079,9 +1079,13 @@ export default function RideRequest() {
                     href="https://vet.digitail.io/clinics/elite-vet-qourtobah-tel-920011626"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-purple-600 font-medium hover:text-purple-800 hover:underline transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 hover:text-purple-800 font-medium text-sm rounded-lg border border-purple-300 hover:border-purple-400 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
+                    title={language === 'ar' ? 'اضغط للحجز' : 'Click to book appointment'}
                   >
                     {language === 'ar' ? 'احجز الآن' : 'Book Now'}
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
                   </a>
                 </div>
               </div>
