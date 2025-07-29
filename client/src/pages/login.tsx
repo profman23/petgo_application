@@ -357,10 +357,11 @@ export default function Login() {
             <form onSubmit={handleRegisterSubmit} className="space-y-6">
               <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                  <label htmlFor="firstName" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                     {language === 'ar' ? 'الاسم الأول' : 'First Name'} *
                   </label>
                   <Input
+                    id="firstName"
                     type="text"
                     placeholder={language === 'ar' ? 'أدخل الاسم الأول' : 'Enter first name'}
                     className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -371,10 +372,11 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                  <label htmlFor="lastName" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                     {language === 'ar' ? 'الاسم الأخير' : 'Last Name'} *
                   </label>
                   <Input
+                    id="lastName"
                     type="text"
                     placeholder={language === 'ar' ? 'أدخل الاسم الأخير' : 'Enter last name'}
                     className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -386,11 +388,12 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                <label htmlFor="email" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                   {language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'} *
                 </label>
                 <div className="relative">
                   <Input
+                    id="email"
                     type="email"
                     placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter your email address'}
                     className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -403,11 +406,12 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                <label htmlFor="phone" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                   {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
                 </label>
                 <div className="relative">
                   <Input
+                    id="phone"
                     type="tel"
                     placeholder={language === 'ar' ? 'أدخل رقم الهاتف' : 'Enter your phone number'}
                     className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -420,11 +424,12 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                <label htmlFor="password" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                   {language === 'ar' ? 'كلمة المرور' : 'Password'} *
                 </label>
                 <div className="relative">
                   <Input
+                    id="password"
                     type="password"
                     placeholder={language === 'ar' ? 'أدخل كلمة المرور (6 أحرف على الأقل)' : 'Enter password (minimum 6 characters)'}
                     className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -447,6 +452,7 @@ export default function Login() {
                   </div>
                 </div>
                 <Input
+                  id="captcha"
                   type="number"
                   placeholder={language === 'ar' ? 'أدخل الإجابة' : 'Enter your answer'}
                   className="text-center text-xl mb-4 h-12 border-2 border-blue-300"
