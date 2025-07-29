@@ -788,7 +788,7 @@ Changelog:
 - July 29, 2025. ADDED: Functional link to Dr. Paws Sahafa Branch redirecting to https://vet.digitail.io/clinics/dr-paws-sahafa-tel-920003045
 - July 29, 2025. ADDED: Functional link to Dr. Paws Mathar Branch redirecting to https://vet.digitail.io/clinics/dr-paws-mathar-phone-920003045
 - July 29, 2025. COMPLETED: Dr. Paws dropdown menu now has working links for both Sahafa and Mathar branches
-- July 29, 2025. UPDATED: Dr. Paws Mathar Branch Arabic text changed from "فرع المطار" to "فرع المذر" while English remains "Book Now Mathar Branch"
+- July 29, 2025. UPDATED: Dr. Paws Mathar Branch Arabic text changed from "فرع المطار" to "فرع المعذر" while English remains "Book Now Mathar Branch"
 - July 18, 2025. CRITICAL FIX: Permanently disabled all automatic backup systems causing data loss
 - July 18, 2025. DISABLED: ultimateDataProtection.initializeAllProtections() and importProtection.initialize() in storage.ts
 - July 18, 2025. DISABLED: createPermanentBackup() in dataProtectionFinal.ts and createImportBackup() in importDataProtection.ts
