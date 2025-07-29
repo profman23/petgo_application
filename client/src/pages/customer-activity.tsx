@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, FileText, Eye, Download } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -35,6 +35,7 @@ interface Booking {
     address?: string;
   };
   createdAt: string;
+  hasInvoice?: boolean;
 }
 
 export default function CustomerActivity() {
@@ -84,6 +85,23 @@ export default function CustomerActivity() {
     queryKey: ['/api/user/reviews'],
     retry: false,
   });
+
+  // For demo purposes, assume completed bookings have invoices
+  // This would normally be fetched from API
+  const checkBookingHasInvoice = (bookingId: number): boolean => {
+    const booking = bookings.find(b => b.id === bookingId);
+    return booking?.status === 'completed';
+  };
+
+  // Handle PDF download
+  const handleDownloadInvoice = (bookingId: number) => {
+    window.open(`/invoice-view?bookingId=${bookingId}&download=true`, '_blank');
+  };
+
+  // Handle invoice view
+  const handleViewInvoice = (bookingId: number) => {
+    window.open(`/invoice-view?bookingId=${bookingId}`, '_blank');
+  };
 
 
 
@@ -404,9 +422,39 @@ export default function CustomerActivity() {
                               <Badge className={getStatusColor(booking.status)}>
                                 {getStatusText(booking.status)}
                               </Badge>
-                              <div className="flex items-center gap-1 text-sm text-gray-600">
-                                <Clock className="w-3 h-3" />
-                                {formatTime(booking.appointmentTime)}
+                              <div className="flex flex-col items-end gap-2">
+                                <div className="flex items-center gap-1 text-sm text-gray-600">
+                                  <Clock className="w-3 h-3" />
+                                  {formatTime(booking.appointmentTime)}
+                                </div>
+                                
+                                {/* Invoice Links for Completed Bookings */}
+                                {booking.status === 'completed' && checkBookingHasInvoice(booking.id) && (
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => handleDownloadInvoice(booking.id)}
+                                      className="flex items-center gap-1 text-xs text-purple-600 hover:text-purple-800 font-medium"
+                                      style={{ 
+                                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+                                        textAlign: language === 'ar' ? 'right' : 'left'
+                                      }}
+                                    >
+                                      <Download className="w-3 h-3" />
+                                      {language === 'ar' ? 'تحميل PDF' : 'PDF'}
+                                    </button>
+                                    <button
+                                      onClick={() => handleViewInvoice(booking.id)}
+                                      className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                      style={{ 
+                                        fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+                                        textAlign: language === 'ar' ? 'right' : 'left'
+                                      }}
+                                    >
+                                      <Eye className="w-3 h-3" />
+                                      {language === 'ar' ? 'عرض' : 'VIEW'}
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             </div>
 
