@@ -25,6 +25,7 @@ import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
 import drPawsLogo from "@assets/Dr.Paws Logo_1753364291004.png";
 import eliteVetLogo from "@assets/Final LogoLogo_1753364291004.png";
+import surgicalToolsImage from "@assets/freepik__background__96281_1753796812008.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -824,11 +825,19 @@ export default function RideRequest() {
                 <SelectItem value="surgery" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <img 
-                      src="/attached_assets/freepik__background__96281_1753796812008.png"
+                      src={surgicalToolsImage}
                       alt="Surgery Tools" 
                       className="w-4 h-4 object-contain"
                       style={{
-                        filter: 'hue-rotate(340deg) saturate(1.2) brightness(0.8)'
+                        filter: 'hue-rotate(340deg) saturate(1.2) brightness(0.8)',
+                        imageRendering: 'crisp-edges',
+                        display: 'block'
+                      }}
+                      onLoad={(e) => {
+                        console.log('Surgery image loaded successfully');
+                      }}
+                      onError={(e) => {
+                        console.error('Surgery image failed to load');
                       }}
                     />
                     <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
