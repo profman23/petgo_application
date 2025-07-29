@@ -40,6 +40,8 @@ export const translations = {
     loading: 'جاري التحميل...',
     error: 'خطأ',
     success: 'تم بنجاح',
+    accountTitle: 'حسابي',
+    accountSubtitle: 'إدارة معلوماتك الشخصية',
     
     // User Type Selection
     mobileVetClinic: 'العيادة البيطرية المتنقلة',
