@@ -1086,11 +1086,14 @@ export default function RideRequest() {
                           >
                             {language === 'ar' ? 'احجز الآن فرع الصحافة' : 'Book Now Sahafa Branch'}
                           </a>
-                          <button
+                          <a
+                            href="https://vet.digitail.io/clinics/dr-paws-mathar-phone-920003045"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
                           >
                             {language === 'ar' ? 'احجز الآن فرع المطار' : 'Book Now Mathar Branch'}
-                          </button>
+                          </a>
                         </div>
                       </div>
                     )}

@@ -786,7 +786,8 @@ Changelog:
 - July 29, 2025. ADDED: Bilingual branch selection menu with proper dropdown behavior and click-outside-to-close functionality
 - July 29, 2025. ADJUSTED: Elite Vet Book Now button text color to match phone/WhatsApp icons (text-purple-600) for visual consistency
 - July 29, 2025. ADDED: Functional link to Dr. Paws Sahafa Branch redirecting to https://vet.digitail.io/clinics/dr-paws-sahafa-tel-920003045
-- July 29, 2025. ENHANCED: Dr. Paws dropdown menu now has working Sahafa Branch link while Mathar Branch remains non-functional
+- July 29, 2025. ADDED: Functional link to Dr. Paws Mathar Branch redirecting to https://vet.digitail.io/clinics/dr-paws-mathar-phone-920003045
+- July 29, 2025. COMPLETED: Dr. Paws dropdown menu now has working links for both Sahafa and Mathar branches
 - July 18, 2025. CRITICAL FIX: Permanently disabled all automatic backup systems causing data loss
 - July 18, 2025. DISABLED: ultimateDataProtection.initializeAllProtections() and importProtection.initialize() in storage.ts
 - July 18, 2025. DISABLED: createPermanentBackup() in dataProtectionFinal.ts and createImportBackup() in importDataProtection.ts
