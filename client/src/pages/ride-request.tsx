@@ -1075,9 +1075,14 @@ export default function RideRequest() {
                 </div>
                 {/* Book Now Link */}
                 <div className="text-center">
-                  <span className="text-sm text-purple-600 font-medium cursor-default">
+                  <a 
+                    href="https://vet.digitail.io/clinics/elite-vet-qourtobah-tel-920011626"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-purple-600 font-medium hover:text-purple-800 hover:underline transition-colors cursor-pointer"
+                  >
                     {language === 'ar' ? 'احجز الآن' : 'Book Now'}
-                  </span>
+                  </a>
                 </div>
               </div>
             </div>
