@@ -769,6 +769,9 @@ Changelog:
 - July 29, 2025. FIXED: "Create New Account" button now displays "إنشاء حساب جديد" when Arabic language is selected
 - July 29, 2025. COMPLETED: Comprehensive Account page Arabization including "Account Details", "Patients", "Reset Password", "Save Profile" buttons
 - July 29, 2025. REMOVED: accountSubtitle text from Account page header section for cleaner interface presentation
+- July 29, 2025. ENHANCED: Surgery icon in ride-request page replaced with custom surgical scalpel SVG icon
+- July 29, 2025. IMPLEMENTED: Custom surgical scalpel icon maintaining same size (w-4 h-4) and orange color (text-orange-600)
+- July 29, 2025. DESIGNED: Realistic scalpel icon with handle and blade details for Surgery service type selection
 - July 18, 2025. CRITICAL FIX: Permanently disabled all automatic backup systems causing data loss
 - July 18, 2025. DISABLED: ultimateDataProtection.initializeAllProtections() and importProtection.initialize() in storage.ts
 - July 18, 2025. DISABLED: createPermanentBackup() in dataProtectionFinal.ts and createImportBackup() in importDataProtection.ts

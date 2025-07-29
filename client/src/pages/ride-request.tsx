@@ -823,7 +823,33 @@ export default function RideRequest() {
                 </SelectItem>
                 <SelectItem value="surgery" className="select-item-custom">
                   <div className="flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-orange-600" />
+                    <svg className="w-4 h-4 text-orange-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path 
+                        d="M20 4L16 8L14 6L18 2L20 4Z" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        strokeWidth="1"
+                      />
+                      <path 
+                        d="M14 6L4 16L6 18L16 8L14 6Z" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="1.5" 
+                        strokeLinecap="round"
+                      />
+                      <path 
+                        d="M4 16L2 18L4 20L6 18L4 16Z" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        strokeWidth="1"
+                      />
+                      <path 
+                        d="M16 8L18 10" 
+                        stroke="currentColor" 
+                        strokeWidth="1" 
+                        strokeLinecap="round"
+                      />
+                    </svg>
                     <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
                   </div>
                 </SelectItem>
