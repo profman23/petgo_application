@@ -25,7 +25,6 @@ import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
 import drPawsLogo from "@assets/Dr.Paws Logo_1753364291004.png";
 import eliteVetLogo from "@assets/Final LogoLogo_1753364291004.png";
-import surgicalToolsIcon from "@assets/freepik__background__96281_1753796046662.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -824,14 +823,59 @@ export default function RideRequest() {
                 </SelectItem>
                 <SelectItem value="surgery" className="select-item-custom">
                   <div className="flex items-center gap-2">
-                    <img 
-                      src={surgicalToolsIcon} 
-                      alt="Surgical Tools" 
-                      className="w-4 h-4 object-contain"
-                      style={{
-                        filter: 'brightness(0) saturate(100%) invert(37%) sepia(73%) saturate(1234%) hue-rotate(21deg) brightness(93%) contrast(87%)'
-                      }}
-                    />
+                    <svg className="w-4 h-4 text-orange-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* مشرط جراحي */}
+                      <path 
+                        d="M20 2L18 4L16 2L18 0L20 2Z" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        strokeWidth="0.5"
+                      />
+                      <path 
+                        d="M18 4L12 10L10 8L16 2L18 4Z" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="1.2" 
+                        strokeLinecap="round"
+                      />
+                      <path 
+                        d="M10 8L8 10L10 12L12 10L10 8Z" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        strokeWidth="0.5"
+                      />
+                      {/* مقص جراحي */}
+                      <path 
+                        d="M4 14L6 12L8 14L6 16L4 14Z" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        strokeWidth="0.5"
+                      />
+                      <path 
+                        d="M4 20L6 18L8 20L6 22L4 20Z" 
+                        fill="currentColor" 
+                        stroke="currentColor" 
+                        strokeWidth="0.5"
+                      />
+                      <path 
+                        d="M6 12L12 6" 
+                        stroke="currentColor" 
+                        strokeWidth="1" 
+                        strokeLinecap="round"
+                      />
+                      <path 
+                        d="M6 18L12 12" 
+                        stroke="currentColor" 
+                        strokeWidth="1" 
+                        strokeLinecap="round"
+                      />
+                      <path 
+                        d="M11 7L13 9" 
+                        stroke="currentColor" 
+                        strokeWidth="1.5" 
+                        strokeLinecap="round"
+                      />
+                    </svg>
                     <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
                   </div>
                 </SelectItem>
