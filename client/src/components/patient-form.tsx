@@ -21,7 +21,7 @@ const patientFormSchema = z.object({
   }),
   gender: z.enum(['Male', 'Female'], {
     errorMap: () => ({ message: 'Please select patient gender' })
-  }).optional(),
+  }),
   ageYear: z.string().optional(),
   ageMonth: z.string().optional(),
   ageDay: z.string().optional(),
@@ -177,11 +177,11 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 <Label className="text-sm font-medium text-gray-700" style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                 }}>
-                  {t('patientGender')} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                  {t('patientGender')} <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   onValueChange={(value) => form.setValue('gender', value as 'Male' | 'Female')}
-                  defaultValue={form.watch('gender')}
+                  value={form.watch('gender')}
                 >
                   <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
                     <SelectValue placeholder={t('selectPatientGender')} />

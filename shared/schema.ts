@@ -80,7 +80,7 @@ export const patients = pgTable("patients", {
   userId: integer("user_id").notNull().references(() => users.id),
   name: text("name").notNull(),
   type: text("type").notNull(), // Cat, Dog, Bird
-  gender: text("gender"), // Male, Female
+  gender: text("gender").notNull(), // Male, Female - required field
   ageYear: integer("age_year"),
   ageMonth: integer("age_month"),
   ageDay: integer("age_day"),
