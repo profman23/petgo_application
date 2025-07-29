@@ -1021,7 +1021,7 @@ export default function RideRequest() {
                     alt="Dr. Paws Logo" 
                     className="w-16 h-16 object-contain mb-2"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mb-2">
                     {/* Phone Icon */}
                     <button
                       onClick={() => window.open('tel:+966920003045', '_self')}
@@ -1039,6 +1039,12 @@ export default function RideRequest() {
                       <MessageCircle className="w-4 h-4 text-green-600" />
                     </button>
                   </div>
+                  {/* Book Now Link */}
+                  <div className="text-center">
+                    <span className="text-sm text-green-600 font-medium cursor-default">
+                      {language === 'ar' ? 'احجز الآن' : 'Book Now'}
+                    </span>
+                  </div>
                 </div>
               )}
 
@@ -1049,7 +1055,7 @@ export default function RideRequest() {
                   alt="Elite Vet Logo" 
                   className="w-16 h-16 object-contain mb-2"
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-2 mb-2">
                   {/* Phone Icon */}
                   <button
                     onClick={() => window.open('tel:+966920011626', '_self')}
@@ -1066,6 +1072,12 @@ export default function RideRequest() {
                   >
                     <MessageCircle className="w-4 h-4 text-purple-600" />
                   </button>
+                </div>
+                {/* Book Now Link */}
+                <div className="text-center">
+                  <span className="text-sm text-purple-600 font-medium cursor-default">
+                    {language === 'ar' ? 'احجز الآن' : 'Book Now'}
+                  </span>
                 </div>
               </div>
             </div>
