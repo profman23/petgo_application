@@ -908,18 +908,6 @@ export default function Home() {
                     </span>
                   </a>
                 </div>
-                
-                {/* Book Now Button - Static display only */}
-                <div className="mt-3 pt-3 border-t border-purple-200">
-                  <div className="flex justify-center">
-                    <div 
-                      className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium"
-                      style={{ fontFamily: '"Comic Relief", cursive' }}
-                    >
-                      Book Now
-                    </div>
-                  </div>
-                </div>
               </div>
             )}
           </div>
