@@ -260,7 +260,7 @@ export default function Account() {
             textAlign,
             fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
           }}>
-            Account Details
+            {language === 'ar' ? 'تفاصيل الحساب' : 'Account Details'}
           </span>
           {isAccountDetailsOpen ? (
             <ChevronUp className="text-purple-600" size={20} />
@@ -278,7 +278,7 @@ export default function Account() {
             textAlign,
             fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
           }}>
-            Patients
+            {language === 'ar' ? 'الحيوانات الأليفة' : 'Patients'}
           </span>
           <ArrowIcon className="text-purple-600" size={20} />
         </button>
@@ -394,7 +394,7 @@ export default function Account() {
             style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}
           >
             <Lock size={16} />
-            Reset Password
+            {language === 'ar' ? 'إعادة تعيين كلمة المرور' : 'Reset Password'}
           </button>
 
           {/* Save Button */}
@@ -404,7 +404,10 @@ export default function Account() {
             className="w-full bg-purple-600 hover:bg-purple-600 disabled:bg-purple-600 text-white font-medium py-3 rounded-md transition-colors"
             style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}
           >
-            {updateProfileMutation.isPending ? 'Loading...' : 'Save Profile'}
+            {updateProfileMutation.isPending ? 
+              (language === 'ar' ? 'جارٍ الحفظ...' : 'Loading...') : 
+              (language === 'ar' ? 'حفظ الملف الشخصي' : 'Save Profile')
+            }
           </button>
           </div>
         )}
