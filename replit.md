@@ -778,6 +778,8 @@ Changelog:
 - July 29, 2025. APPLIED: Red color filter to surgical tools image using CSS hue-rotate, saturate, and brightness properties
 - July 29, 2025. FIXED: Surgical tools image loading issue by using proper import statement and adding image rendering optimization
 - July 29, 2025. ENHANCED: Image display with crisp-edges rendering and proper loading event handlers for reliability
+- July 29, 2025. ADDED: "Book Now" button below contact information in Contact Us popup
+- July 29, 2025. IMPLEMENTED: Static display button with purple styling and Comic Relief font matching design consistency
 - July 18, 2025. CRITICAL FIX: Permanently disabled all automatic backup systems causing data loss
 - July 18, 2025. DISABLED: ultimateDataProtection.initializeAllProtections() and importProtection.initialize() in storage.ts
 - July 18, 2025. DISABLED: createPermanentBackup() in dataProtectionFinal.ts and createImportBackup() in importDataProtection.ts
