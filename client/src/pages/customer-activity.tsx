@@ -611,7 +611,7 @@ export default function CustomerActivity() {
               </Button>
             </div>
             <div className="p-4">
-              <UnifiedInvoice bookingId={selectedInvoiceBooking.id} mode="view" />
+              <UnifiedInvoice bookingId={selectedInvoiceBooking.id} mode="view" userType="customer" />
             </div>
           </div>
         </div>

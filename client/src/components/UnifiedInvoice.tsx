@@ -34,18 +34,20 @@ const printStyles = `
 interface UnifiedInvoiceProps {
   bookingId: number;
   mode?: 'view' | 'print' | 'pdf';
+  userType?: 'doctor' | 'customer';
 }
 
 export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({ 
   bookingId, 
-  mode = 'view' 
+  mode = 'view',
+  userType = 'doctor'
 }) => {
   const { language } = useLanguage();
   const texts = invoiceConfig.texts[language as 'ar' | 'en'];
   
-  // Fetch real booking data
+  // Fetch real booking data - use appropriate endpoint based on user type
   const { data: booking } = useQuery({
-    queryKey: [`/api/doctor/booking/${bookingId}`],
+    queryKey: userType === 'customer' ? [`/api/user/booking/${bookingId}`] : [`/api/doctor/booking/${bookingId}`],
     enabled: !!bookingId
   });
 
