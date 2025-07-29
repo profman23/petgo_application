@@ -244,9 +244,7 @@ export default function Account() {
               }}>
                 {userProfile?.name || t('accountTitle')}
               </h1>
-              <p className="text-sm text-gray-600" style={{
-                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-              }}>{t('accountSubtitle')}</p>
+
             </div>
           </div>
         </div>
