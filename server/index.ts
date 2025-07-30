@@ -7,17 +7,16 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false }));
 
-// Add cache control headers for automatic updates and fix domain issue
+// Add cache control headers for API requests only (not affecting user sessions)
 app.use((req, res, next) => {
-  // Force no-cache for all requests to ensure fresh content
-  res.set({
-    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-    'Pragma': 'no-cache',
-    'Expires': '0',
-    'ETag': false,
-    'Surrogate-Control': 'no-store',
-    'Clear-Site-Data': '"cache", "storage"'
-  });
+  // Only apply cache control to API requests to prevent caching API responses
+  if (req.path.startsWith('/api/')) {
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+  }
   next();
 });
 
