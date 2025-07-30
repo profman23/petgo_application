@@ -7,17 +7,17 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false }));
 
-// Add cache control headers for automatic updates
+// Add cache control headers for automatic updates and fix domain issue
 app.use((req, res, next) => {
   // Force no-cache for all requests to ensure fresh content
-  if (req.url.includes('.css') || req.url.includes('.js') || req.url.includes('/src/') || req.url === '/') {
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-      'ETag': false
-    });
-  }
+  res.set({
+    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'ETag': false,
+    'Surrogate-Control': 'no-store',
+    'Clear-Site-Data': '"cache", "storage"'
+  });
   next();
 });
 
