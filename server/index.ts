@@ -52,37 +52,61 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database
-  await initDatabase();
-  
-  const server = await registerRoutes(app);
+  try {
+    console.log('🚀 Starting server initialization...');
+    
+    // Initialize database
+    console.log('📊 Initializing database...');
+    await initDatabase();
+    console.log('✅ Database initialized successfully');
+    
+    console.log('🛣️ Registering routes...');
+    const server = await registerRoutes(app);
+    console.log('✅ Routes registered successfully');
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      const status = err.status || err.statusCode || 500;
+      const message = err.message || "Internal Server Error";
+      
+      console.error('🔥 Express Error Handler:', err);
+      res.status(status).json({ message });
+    });
 
-    res.status(status).json({ message });
-    throw err;
-  });
+    // importantly only setup vite in development and after
+    // setting up all the other routes so the catch-all route
+    // doesn't interfere with the other routes
+    if (app.get("env") === "development") {
+      console.log('🔧 Setting up Vite in development mode...');
+      await setupVite(app, server);
+    } else {
+      console.log('📦 Setting up static files for production...');
+      serveStatic(app);
+    }
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+    // ALWAYS serve the app on port 5000
+    // this serves both the API and the client.
+    // It is the only port that is not firewalled.
+    const port = 5000;
+    console.log(`🌐 Starting server on port ${port}...`);
+    
+    server.listen({
+      port,
+      host: "0.0.0.0",
+      reusePort: true,
+    }, () => {
+      console.log(`🎉 Server successfully started on port ${port}`);
+      log(`serving on port ${port}`);
+    });
+
+    // Add graceful error handling for server startup
+    server.on('error', (error: any) => {
+      console.error('🔥 Server startup error:', error);
+      process.exit(1);
+    });
+
+  } catch (error) {
+    console.error('💥 CRITICAL SERVER STARTUP ERROR:', error);
+    console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
+    process.exit(1);
   }
-
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
 })();
