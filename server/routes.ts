@@ -1195,9 +1195,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all VetsVan with their available shifts for booking (no auth required for public access)
   app.get('/api/vetsvan/availability', async (req: Request, res: Response) => {
     try {
+      console.log('🔍 Starting VetsVan availability request...');
+      
+      console.log('📋 Fetching drivers...');
       const drivers = await storage.getAllDrivers();
+      console.log(`✅ Found ${drivers.length} drivers`);
+      
+      console.log('📋 Fetching shifts...');
       const shifts = await storage.getAllShifts();
+      console.log(`✅ Found ${shifts.length} shifts`);
+      
+      console.log('📋 Fetching bookings...');
       const bookings = await storage.getAllBookings();
+      console.log(`✅ Found ${bookings.length} bookings`);
       
       // Get customer location from query parameters
       const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
@@ -1292,10 +1302,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return 0;
       });
 
+      console.log(`📤 Returning ${sortedVetsVans.length} VetsVans`);
       res.json(sortedVetsVans);
     } catch (error: unknown) {
-      console.error('Error fetching VetsVan availability:', error);
-      res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
+      console.error('❌ DETAILED ERROR in VetsVan availability:', error);
+      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error('❌ Error message:', error instanceof Error ? error.message : String(error));
+      res.status(500).json({ 
+        message: 'Failed to fetch VetsVan availability',
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
