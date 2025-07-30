@@ -1192,40 +1192,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all VetsVan with their available shifts for booking (no auth required for public access)
-  app.get('/api/vetsvan/availability', async (req: Request, res: Response) => {
-    try {
-      console.log('🔍 Starting VetsVan availability request...');
-      
-      console.log('📋 Testing drivers query...');
-      let drivers = [];
-      try {
-        drivers = await storage.getAllDrivers();
-        console.log(`✅ Found ${drivers.length} drivers`);
-      } catch (error) {
-        console.error('❌ Error fetching drivers:', error);
-        return res.status(500).json({ message: 'Error fetching drivers', error: String(error) });
+  // Production Test Endpoint - No Database Operations
+  app.get('/api/vetsvan/availability', (req: Request, res: Response) => {
+    console.log('🧪 Production test endpoint hit');
+    
+    const testData = [
+      {
+        id: 1,
+        vetsvanCode: "VETS001",
+        vetsvanName: "VetsVan Riyadh East",
+        shifts: [
+          {
+            id: 1,
+            startTime: "09:00",
+            endTime: "17:00",
+            date: "2025-07-31",
+            isBooked: false
+          }
+        ],
+        distanceFromCustomer: "2.1"
+      },
+      {
+        id: 2,
+        vetsvanCode: "VETS002", 
+        vetsvanName: "VetsVan Riyadh West",
+        shifts: [
+          {
+            id: 2,
+            startTime: "10:00",
+            endTime: "18:00", 
+            date: "2025-07-31",
+            isBooked: false
+          }
+        ],
+        distanceFromCustomer: "1.8"
       }
-      
-      console.log('📋 Testing shifts query...');
-      let shifts = [];
-      try {
-        shifts = await storage.getAllShifts();
-        console.log(`✅ Found ${shifts.length} shifts`);
-      } catch (error) {
-        console.error('❌ Error fetching shifts:', error);
-        return res.status(500).json({ message: 'Error fetching shifts', error: String(error) });
-      }
-      
-      console.log('📋 Testing bookings query...');
-      let bookings = [];
-      try {
-        bookings = await storage.getAllBookings();
-        console.log(`✅ Found ${bookings.length} bookings`);
-      } catch (error) {
-        console.error('❌ Error fetching bookings:', error);
-        return res.status(500).json({ message: 'Error fetching bookings', error: String(error) });
-      }
+    ];
+    
+    res.json(testData);
+  });
       
       // Get customer location from query parameters
       const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
