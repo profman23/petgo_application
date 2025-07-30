@@ -287,21 +287,15 @@ export default function DoctorInvoice() {
       if (invoiceStatus.isGenerated) {
         setIsRecordLocked(true);
         
-        // Check if this is a generated invoice with invoice number (new system)
-        if (invoiceStatus.invoiceNumber) {
-          console.log('✅ Invoice found:', invoiceStatus.invoiceNumber);
-          // Invoice is permanently generated - show as read-only
-          
-          // Load the complete generated invoice data
-          loadGeneratedInvoiceData(invoiceStatus.invoiceNumber);
-        } else {
-          // Old system compatibility
-          if (invoiceStatus.discountAmount) {
-            setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
-          }
-          if (invoiceStatus.notes) {
-            setNotes(invoiceStatus.notes);
-          }
+        // Load generated invoice data using booking ID
+        console.log('✅ Invoice is generated, loading data for booking:', booking?.id);
+        
+        // Load discount and notes from invoice status
+        if (invoiceStatus.discountAmount) {
+          // setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
+        }
+        if (invoiceStatus.notes) {
+          setNotes(invoiceStatus.notes);
         }
       }
     }
@@ -317,42 +311,8 @@ export default function DoctorInvoice() {
     }
   }, [invoicePayments]);
 
-  // Function to load generated invoice data
-  const loadGeneratedInvoiceData = async (invoiceNumber: string) => {
-    try {
-      const response = await fetch(`/api/generated-invoice/${invoiceNumber}`);
-      if (response.ok) {
-        const generatedInvoice = await response.json();
-        console.log('📄 Loading generated invoice data:', generatedInvoice);
-        
-        // Restore invoice items from generated invoice
-        if (generatedInvoice.items) {
-          setInvoiceItems(generatedInvoice.items.map((item: any) => ({
-            id: item.id || Date.now().toString(),
-            description: item.description,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            discount: item.discount || 0,
-            discountType: item.discountType || 'none',
-            vatRate: item.vatRate || 15,
-            vatAmount: item.vatAmount || 0,
-            totalBeforeVat: item.totalBeforeVat || item.total,
-            totalAfterVat: item.totalAfterVat || (item.total * 1.15),
-            total: item.total
-          })));
-        }
-        
-        // Restore notes
-        if (generatedInvoice.notes) {
-          setNotes(generatedInvoice.notes);
-        }
-        
-        console.log('✅ Generated invoice data loaded successfully');
-      }
-    } catch (error) {
-      console.error('Error loading generated invoice data:', error);
-    }
-  };
+  // Remove this function as it's no longer needed
+  // Invoice data is loaded from invoice_items table directly
 
 
 
