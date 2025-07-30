@@ -1130,141 +1130,375 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Get all VetsVan with their available shifts for booking (with authentication fix)
+  // Get all VetsVan with their available shifts for booking (Enhanced with comprehensive error handling)
   app.get('/api/vetsvan/availability', async (req: any, res) => {
+    const startTime = Date.now();
+    console.log('🔍 VetsVan availability endpoint called at:', new Date().toISOString());
+    
     try {
-      console.log('🔍 VetsVan availability endpoint called');
-      console.log('📍 Headers:', req.headers.authorization);
-      
       // Set proper headers for JSON response
       res.setHeader('Content-Type', 'application/json');
       
-      // Check if user is authenticated first
+      // STEP 1: Input validation with detailed logging
+      console.log('🔍 Step 1: Input validation starting');
+      console.log('📍 Query params:', req.query);
+      console.log('📍 Headers authorization:', req.headers.authorization ? 'Present' : 'Missing');
+      
+      // Validate query parameters with fallback
+      let customerLat: number | null = null;
+      let customerLon: number | null = null;
+      
+      try {
+        if (req.query.lat) {
+          customerLat = parseFloat(req.query.lat as string);
+          if (isNaN(customerLat)) {
+            console.log('⚠️ Invalid lat parameter:', req.query.lat);
+            customerLat = null;
+          }
+        }
+        if (req.query.lon) {
+          customerLon = parseFloat(req.query.lon as string);
+          if (isNaN(customerLon)) {
+            console.log('⚠️ Invalid lon parameter:', req.query.lon);
+            customerLon = null;
+          }
+        }
+        console.log('✅ Step 1 complete - Customer location:', { customerLat, customerLon });
+      } catch (paramError) {
+        console.error('❌ Step 1 failed - Parameter validation error:', paramError);
+        customerLat = null;
+        customerLon = null;
+      }
+      
+      // STEP 2: Authentication check with detailed logging
+      console.log('🔍 Step 2: Authentication check starting');
       const sessionId = req.headers.authorization?.replace('Bearer ', '');
       let user = null;
       
-      if (sessionId && sessions.has(sessionId)) {
-        user = sessions.get(sessionId).user;
-        console.log('✅ Authenticated user:', user.id);
-      } else {
-        console.log('⚠️ No valid session found, sessionId:', sessionId);
-        console.log('📊 Available sessions:', Array.from(sessions.keys()));
-        
-        // Return error with proper JSON
-        return res.status(401).json({ 
-          message: 'Authentication required',
-          error: 'Please login to access VetsVan availability',
-          loginUrl: '/login'
+      try {
+        if (sessionId && sessions.has(sessionId)) {
+          user = sessions.get(sessionId).user;
+          console.log('✅ Step 2 complete - Authenticated user:', user.id);
+        } else {
+          console.log('⚠️ Step 2 - No valid session found');
+          console.log('📊 SessionId:', sessionId);
+          console.log('📊 Available sessions count:', sessions.size);
+          console.log('📊 Session keys:', Array.from(sessions.keys()).slice(0, 3));
+          
+          // Return 401 but continue for debugging in production
+          return res.status(401).json({ 
+            message: 'Authentication required',
+            error: 'Please login to access VetsVan availability',
+            loginUrl: '/login',
+            debug: {
+              sessionId: sessionId ? 'present' : 'missing',
+              sessionsCount: sessions.size,
+              timestamp: new Date().toISOString()
+            }
+          });
+        }
+      } catch (authError) {
+        console.error('❌ Step 2 failed - Authentication error:', authError);
+        return res.status(500).json({ 
+          message: 'Authentication system error',
+          error: authError.message,
+          step: 'authentication'
         });
       }
       
-      const drivers = await storage.getAllDrivers();
-      const shifts = await storage.getAllShifts();
-      const bookings = await storage.getAllBookings();
+      // STEP 3: Database calls with individual error handling
+      console.log('🔍 Step 3: Database calls starting');
+      let drivers, shifts, bookings;
       
-      console.log('📊 Data fetched - Drivers:', drivers?.length, 'Shifts:', shifts?.length, 'Bookings:', bookings?.length);
-      
-      // Get customer location from query parameters
-      const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
-      const customerLon = req.query.lon ? parseFloat(req.query.lon) : null;
-      
-      // Function to calculate distance between two points using Haversine formula
-      const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-        const R = 6371; // Radius of the Earth in kilometers
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = 
-          Math.sin(dLat/2) * Math.sin(dLat/2) +
-          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-          Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c; // Distance in kilometers
-        return Math.round(distance * 10) / 10; // Round to 1 decimal place
-      };
-      
-      // Group shifts by VetsVan ID and check for bookings
-      const vetsvanWithShifts = drivers.map(driver => {
-        const driverShifts = shifts.filter(shift => shift.vetsVanId === driver.id);
-        
-        // Add detailed booking information to each shift
-        const shiftsWithBookingStatus = driverShifts.map(shift => {
-          // Get all bookings for this shift (not just 'booked' status)
-          const shiftBookings = bookings.filter(booking => 
-            booking.shiftId === shift.id
-          );
-          
-          return {
-            ...shift,
-            isBooked: shiftBookings.some(booking => 
-              ['pending_review', 'confirmed', 'in_progress', 'completed'].includes(booking.status)
-            ),
-            bookingsCount: shiftBookings.length,
-            bookings: shiftBookings // Include actual booking details with all statuses
-          };
+      try {
+        console.log('🔍 Step 3a: Fetching drivers');
+        drivers = await storage.getAllDrivers();
+        console.log('✅ Step 3a complete - Drivers fetched:', drivers?.length);
+      } catch (driversError) {
+        console.error('❌ Step 3a failed - Drivers fetch error:', driversError);
+        return res.status(500).json({ 
+          message: 'Failed to fetch VetsVan data',
+          error: driversError.message,
+          step: 'drivers_fetch'
         });
+      }
+      
+      try {
+        console.log('🔍 Step 3b: Fetching shifts');
+        shifts = await storage.getAllShifts();
+        console.log('✅ Step 3b complete - Shifts fetched:', shifts?.length);
+      } catch (shiftsError) {
+        console.error('❌ Step 3b failed - Shifts fetch error:', shiftsError);
+        return res.status(500).json({ 
+          message: 'Failed to fetch shift data',
+          error: shiftsError.message,
+          step: 'shifts_fetch'
+        });
+      }
+      
+      try {
+        console.log('🔍 Step 3c: Fetching bookings');
+        bookings = await storage.getAllBookings();
+        console.log('✅ Step 3c complete - Bookings fetched:', bookings?.length);
+      } catch (bookingsError) {
+        console.error('❌ Step 3c failed - Bookings fetch error:', bookingsError);
+        return res.status(500).json({ 
+          message: 'Failed to fetch booking data',
+          error: bookingsError.message,
+          step: 'bookings_fetch'
+        });
+      }
+      
+      // STEP 4: Data validation
+      console.log('🔍 Step 4: Data validation');
+      if (!drivers || !shifts || !bookings) {
+        console.error('❌ Step 4 failed - Missing data:', { 
+          drivers: !!drivers, 
+          shifts: !!shifts, 
+          bookings: !!bookings 
+        });
+        return res.status(500).json({ 
+          message: 'Incomplete data retrieved from database',
+          error: 'One or more data sources returned null/undefined',
+          step: 'data_validation',
+          data: { drivers: !!drivers, shifts: !!shifts, bookings: !!bookings }
+        });
+      }
+      console.log('✅ Step 4 complete - All data present');
+      
+      // STEP 5: Distance calculation function with error handling
+      console.log('🔍 Step 5: Setting up distance calculation');
+      const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+        try {
+          // Validate input parameters
+          if (!lat1 || !lon1 || !lat2 || !lon2 || 
+              isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
+            console.log('⚠️ Invalid coordinates for distance calculation:', { lat1, lon1, lat2, lon2 });
+            return 999; // Return high distance for invalid coordinates
+          }
+          
+          const R = 6371; // Radius of the Earth in kilometers
+          const dLat = (lat2 - lat1) * Math.PI / 180;
+          const dLon = (lon2 - lon1) * Math.PI / 180;
+          const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const distance = R * c; // Distance in kilometers
+          const roundedDistance = Math.round(distance * 10) / 10; // Round to 1 decimal place
+          
+          // Validate result
+          if (isNaN(roundedDistance) || roundedDistance < 0) {
+            console.log('⚠️ Invalid distance calculation result:', roundedDistance);
+            return 999;
+          }
+          
+          return roundedDistance;
+        } catch (error) {
+          console.error('❌ Distance calculation error:', error);
+          return 999; // Return high distance on error
+        }
+      };
+      console.log('✅ Step 5 complete - Distance function ready');
+      
+      // STEP 6: Data processing with comprehensive error handling
+      console.log('🔍 Step 6: Starting data processing');
+      let vetsvanWithShifts;
+      
+      try {
+        console.log('🔍 Step 6a: Processing VetsVan data');
+        vetsvanWithShifts = drivers.map((driver, index) => {
+          try {
+            console.log(`🔍 Processing driver ${index + 1}/${drivers.length}: ${driver.vetsvanCode}`);
+            
+            // Validate driver data
+            if (!driver || !driver.id) {
+              console.log('⚠️ Invalid driver data:', driver);
+              return null;
+            }
+            
+            const driverShifts = shifts.filter(shift => shift && shift.vetsVanId === driver.id);
+            console.log(`📊 Driver ${driver.vetsvanCode} has ${driverShifts.length} shifts`);
+            
+            // Add detailed booking information to each shift
+            const shiftsWithBookingStatus = driverShifts.map((shift, shiftIndex) => {
+              try {
+                if (!shift || !shift.id) {
+                  console.log('⚠️ Invalid shift data:', shift);
+                  return null;
+                }
+                
+                // Get all bookings for this shift (not just 'booked' status)
+                const shiftBookings = bookings.filter(booking => 
+                  booking && booking.shiftId === shift.id
+                );
+                
+                const processedShift = {
+                  ...shift,
+                  isBooked: shiftBookings.some(booking => 
+                    booking && booking.status && 
+                    ['pending_review', 'confirmed', 'in_progress', 'completed'].includes(booking.status)
+                  ),
+                  bookingsCount: shiftBookings.length,
+                  bookings: shiftBookings // Include actual booking details with all statuses
+                };
+                
+                return processedShift;
+              } catch (shiftError) {
+                console.error(`❌ Error processing shift ${shiftIndex}:`, shiftError);
+                return null;
+              }
+            }).filter(shift => shift !== null); // Remove failed shifts
+            
+            // Calculate distance from customer if location is provided
+            let distanceFromCustomer = null;
+            if (customerLat && customerLon && driver.latitude && driver.longitude) {
+              try {
+                distanceFromCustomer = calculateDistance(
+                  customerLat, 
+                  customerLon, 
+                  driver.latitude, 
+                  driver.longitude
+                );
+                console.log(`📍 Distance calculated for ${driver.vetsvanCode}: ${distanceFromCustomer}km`);
+              } catch (distanceError) {
+                console.error(`❌ Distance calculation failed for ${driver.vetsvanCode}:`, distanceError);
+                distanceFromCustomer = null;
+              }
+            }
+            
+            const processedDriver = {
+              id: driver.id,
+              vetsvanCode: driver.vetsvanCode || 'Unknown',
+              vetsvanName: driver.vetsvanName || 'Unknown VetsVan',
+              isAvailable: driver.isAvailable !== undefined ? driver.isAvailable : true,
+              latitude: driver.latitude,
+              longitude: driver.longitude,
+              shifts: shiftsWithBookingStatus,
+              distanceFromCustomer: distanceFromCustomer ? `${distanceFromCustomer}` : undefined
+            };
+            
+            return processedDriver;
+          } catch (driverError) {
+            console.error(`❌ Error processing driver ${index}:`, driverError);
+            return null;
+          }
+        }).filter(driver => driver !== null); // Remove failed drivers
         
-        // Calculate distance from customer if location is provided
-        let distanceFromCustomer = null;
-        if (customerLat && customerLon && driver.latitude && driver.longitude) {
-          distanceFromCustomer = calculateDistance(
-            customerLat, 
-            customerLon, 
-            driver.latitude, 
-            driver.longitude
-          );
+        console.log('✅ Step 6a complete - VetsVan data processed successfully');
+        console.log(`📊 Processed ${vetsvanWithShifts.length}/${drivers.length} drivers`);
+      } catch (processingError) {
+        console.error('❌ Step 6a failed - Data processing error:', processingError);
+        return res.status(500).json({ 
+          message: 'Failed to process VetsVan data',
+          error: processingError.message,
+          step: 'data_processing'
+        });
+      }
+      
+      // STEP 7: Distance sorting and final processing
+      console.log('🔍 Step 7: Distance sorting and final processing');
+      let sortedVetsVans;
+      
+      try {
+        console.log('🔍 Step 7a: Finding closest VetsVan');
+        // Find the closest VetsVan if customer location is available
+        let closestVetsVanId = null;
+        if (customerLat && customerLon) {
+          let minDistance = Infinity;
+          vetsvanWithShifts.forEach(vetsvan => {
+            if (vetsvan && vetsvan.distanceFromCustomer) {
+              try {
+                const distance = parseFloat(vetsvan.distanceFromCustomer);
+                if (!isNaN(distance) && distance < minDistance) {
+                  minDistance = distance;
+                  closestVetsVanId = vetsvan.id;
+                }
+              } catch (distanceParseError) {
+                console.log('⚠️ Failed to parse distance for VetsVan:', vetsvan.vetsvanCode);
+              }
+            }
+          });
+          console.log('📍 Closest VetsVan ID:', closestVetsVanId, 'Distance:', minDistance);
         }
         
-        return {
-          id: driver.id,
-          vetsvanCode: driver.vetsvanCode,
-          vetsvanName: driver.vetsvanName,
-          isAvailable: driver.isAvailable,
-          latitude: driver.latitude,
-          longitude: driver.longitude,
-          shifts: shiftsWithBookingStatus,
-          distanceFromCustomer: distanceFromCustomer ? `${distanceFromCustomer}` : undefined
-        };
-      });
-      
-      // Find the closest VetsVan if customer location is available
-      let closestVetsVanId = null;
-      if (customerLat && customerLon) {
-        let minDistance = Infinity;
-        vetsvanWithShifts.forEach(vetsvan => {
-          if (vetsvan.distanceFromCustomer) {
-            const distance = parseFloat(vetsvan.distanceFromCustomer);
-            if (distance < minDistance) {
-              minDistance = distance;
-              closestVetsVanId = vetsvan.id;
+        console.log('🔍 Step 7b: Adding closest flags');
+        // Add isClosest flag to each VetsVan
+        const vetsvanWithClosestFlag = vetsvanWithShifts.map(vetsvan => {
+          if (!vetsvan) return null;
+          return {
+            ...vetsvan,
+            isClosest: vetsvan.id === closestVetsVanId
+          };
+        }).filter(vetsvan => vetsvan !== null);
+
+        console.log('🔍 Step 7c: Sorting by distance');
+        // Sort VetsVans by distance (closest first)
+        sortedVetsVans = vetsvanWithClosestFlag.sort((a, b) => {
+          try {
+            if (a.distanceFromCustomer && b.distanceFromCustomer) {
+              const distA = parseFloat(a.distanceFromCustomer);
+              const distB = parseFloat(b.distanceFromCustomer);
+              if (!isNaN(distA) && !isNaN(distB)) {
+                return distA - distB;
+              }
             }
+            if (a.distanceFromCustomer && !b.distanceFromCustomer) return -1;
+            if (!a.distanceFromCustomer && b.distanceFromCustomer) return 1;
+            return 0;
+          } catch (sortError) {
+            console.log('⚠️ Sorting error between VetsVans:', a.vetsvanCode, b.vetsvanCode);
+            return 0;
           }
         });
+        
+        console.log('✅ Step 7 complete - Final processing done');
+        console.log(`📊 Final result: ${sortedVetsVans?.length} VetsVan records`);
+      } catch (finalProcessingError) {
+        console.error('❌ Step 7 failed - Final processing error:', finalProcessingError);
+        return res.status(500).json({ 
+          message: 'Failed to process final VetsVan sorting',
+          error: finalProcessingError.message,
+          step: 'final_processing'
+        });
       }
+
+      // STEP 8: Response generation
+      console.log('🔍 Step 8: Generating response');
+      const endTime = Date.now();
+      const processingTime = endTime - startTime;
       
-      // Add isClosest flag to each VetsVan
-      const vetsvanWithClosestFlag = vetsvanWithShifts.map(vetsvan => ({
-        ...vetsvan,
-        isClosest: vetsvan.id === closestVetsVanId
-      }));
-
-      // Sort VetsVans by distance (closest first)
-      const sortedVetsVans = vetsvanWithClosestFlag.sort((a, b) => {
-        if (a.distanceFromCustomer && b.distanceFromCustomer) {
-          return parseFloat(a.distanceFromCustomer) - parseFloat(b.distanceFromCustomer);
-        }
-        if (a.distanceFromCustomer && !b.distanceFromCustomer) return -1;
-        if (!a.distanceFromCustomer && b.distanceFromCustomer) return 1;
-        return 0;
-      });
-
-      console.log('✅ Returning', sortedVetsVans?.length, 'VetsVan records');
+      console.log(`✅ VetsVan availability request completed successfully in ${processingTime}ms`);
+      console.log(`📊 Returning ${sortedVetsVans?.length} VetsVan records`);
+      
       res.json(sortedVetsVans);
     } catch (error) {
-      console.error('❌ Error fetching VetsVan availability:', error);
+      const endTime = Date.now();
+      const processingTime = endTime - startTime;
+      
+      console.error('❌ CRITICAL ERROR in VetsVan availability endpoint:');
+      console.error('📍 Error message:', error.message);
       console.error('📍 Error stack:', error.stack);
+      console.error('📍 Processing time before error:', processingTime + 'ms');
+      console.error('📍 Request details:', {
+        query: req.query,
+        sessionId: req.headers.authorization?.replace('Bearer ', ''),
+        sessionsCount: sessions.size,
+        timestamp: new Date().toISOString()
+      });
+      
       res.status(500).json({ 
         message: 'Failed to fetch VetsVan availability',
-        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+        step: 'general_error',
+        processingTime: processingTime,
+        timestamp: new Date().toISOString(),
+        debug: process.env.NODE_ENV === 'development' ? {
+          stack: error.stack,
+          query: req.query,
+          sessionId: req.headers.authorization ? 'present' : 'missing'
+        } : undefined
       });
     }
   });
