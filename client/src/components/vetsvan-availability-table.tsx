@@ -63,6 +63,29 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // Debug authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    console.log('🔍 VetsVanAvailabilityTable mounted with authentication state:', {
+      hasToken: !!token,
+      tokenValue: token ? `${token.substring(0, 10)}...${token.substring(token.length - 5)}` : null,
+      hasUser: !!user,
+      userEmail: user ? JSON.parse(user).email || JSON.parse(user).phone : null
+    });
+    
+    if (!token) {
+      console.error('🚨 No authentication token found! User needs to login.');
+      toast({
+        title: language === 'ar' ? 'خطأ في المصادقة' : 'Authentication Error',
+        description: language === 'ar' ? 
+          'لم يتم العثور على رمز المصادقة. يرجى تسجيل الدخول مرة أخرى.' :
+          'No authentication token found. Please login again.',
+        variant: 'destructive',
+      });
+    }
+  }, [language, toast]);
+  
   // Get customer location
   const { latitude, longitude } = useCustomerLocation();
   
@@ -284,13 +307,16 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         console.log('🔐 Authentication status:', {
           hasToken: !!token,
           tokenLength: token?.length || 0,
+          tokenValue: token ? `${token.substring(0, 10)}...` : null,
           hasUser: !!user,
-          userInfo: user ? JSON.parse(user) : null
+          userInfo: user ? JSON.parse(user) : null,
+          localStorage: Object.keys(localStorage)
         });
         
         if (!token) {
-          console.error('❌ No authentication token found');
-          throw new Error('Please login to access VetsVan availability');
+          console.error('❌ No authentication token found in localStorage');
+          console.log('🔍 Available localStorage keys:', Object.keys(localStorage));
+          throw new Error('Authentication required - please login first');
         }
         
         const params = new URLSearchParams();
@@ -395,11 +421,21 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   if (isLoading) {
     return (
       <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center mb-4">
           <Loader2 className="w-6 h-6 animate-spin mr-2" />
           <span style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
             {language === 'ar' ? 'جاري تحميل المواعيد...' : 'Loading appointments...'}
           </span>
+        </div>
+        
+        {/* Debug information */}
+        <div className="text-xs text-gray-500 border-t pt-4">
+          <div className="mb-2">
+            <strong>Debug Info:</strong>
+          </div>
+          <div>Authentication: {localStorage.getItem('token') ? '✅ Token Present' : '❌ No Token'}</div>
+          <div>User: {localStorage.getItem('user') ? '✅ User Data Present' : '❌ No User Data'}</div>
+          <div>Location: {userLocation ? `✅ ${userLocation.lat}, ${userLocation.lon}` : '❌ No Location'}</div>
         </div>
       </div>
     );
