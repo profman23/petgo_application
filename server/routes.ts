@@ -23,18 +23,26 @@ function requireAuth(req: any, res: any, next: any) {
   const sessionId = req.headers.authorization?.replace('Bearer ', '');
   
   if (!sessionId) {
-    console.log('No token provided');
-    return res.status(401).json({ message: 'Unauthorized' });
+    console.log('⚠️ No token provided in request');
+    return res.status(401).json({ 
+      message: 'Unauthorized',
+      error: 'No authentication token provided'
+    });
   }
   
   const session = sessions.get(sessionId);
   
   if (!session) {
-    console.log('Invalid token:', sessionId);
-    console.log('Available sessions:', Array.from(sessions.keys()));
-    return res.status(401).json({ message: 'Unauthorized' });
+    console.log('❌ Invalid token:', sessionId);
+    console.log('📊 Available sessions:', Array.from(sessions.keys()));
+    console.log('🔍 Session count:', sessions.size);
+    return res.status(401).json({ 
+      message: 'Unauthorized',
+      error: 'Invalid or expired authentication token'
+    });
   }
   
+  console.log('✅ Valid session found for user:', session.user?.id);
   req.user = session.user;
   next();
 }
@@ -1114,9 +1122,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all VetsVan with their available shifts for booking
   app.get('/api/vetsvan/availability', requireAuth, async (req: any, res) => {
     try {
+      console.log('🔍 VetsVan availability endpoint called by user:', req.user?.id);
+      
       const drivers = await storage.getAllDrivers();
       const shifts = await storage.getAllShifts();
       const bookings = await storage.getAllBookings();
+      
+      console.log('📊 Data fetched - Drivers:', drivers?.length, 'Shifts:', shifts?.length, 'Bookings:', bookings?.length);
       
       // Get customer location from query parameters
       const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
@@ -1211,10 +1223,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return 0;
       });
 
+      console.log('✅ Returning', sortedVetsVans?.length, 'VetsVan records');
       res.json(sortedVetsVans);
     } catch (error) {
-      console.error('Error fetching VetsVan availability:', error);
-      res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
+      console.error('❌ Error fetching VetsVan availability:', error);
+      console.error('📍 Error stack:', error.stack);
+      res.status(500).json({ 
+        message: 'Failed to fetch VetsVan availability',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      });
     }
   });
 

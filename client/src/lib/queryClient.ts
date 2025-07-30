@@ -13,7 +13,7 @@ async function throwIfResNotOk(res: Response, url: string) {
         // Regular endpoint - clear user tokens and redirect to regular login
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
+        window.location.href = '/';
       }
       return;
     }

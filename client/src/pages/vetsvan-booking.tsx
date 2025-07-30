@@ -128,9 +128,47 @@ export default function VetsVanBooking() {
   }, [selectedDate, t, language, toast]);
 
   // استعلام جلب VetsVan المتاحة
-  const { data: vetsVans = [], isLoading } = useQuery({
+  const { data: vetsVans = [], isLoading, error: vetsVanError } = useQuery({
     queryKey: ['/api/vetsvan/availability'],
     staleTime: 30 * 1000,
+    retry: (failureCount, error: any) => {
+      console.log('🔄 Query retry attempt:', failureCount, 'Error:', error);
+      // إذا كان الخطأ 401 (غير مخول)، لا تعيد المحاولة
+      if (error?.message?.includes('Unauthorized') || error?.status === 401) {
+        console.log('🚫 Authentication error - redirecting to login');
+        // إعادة توجيه للتسجيل
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setTimeout(() => setLocation('/'), 100);
+        return false;
+      }
+      // للأخطاء الأخرى، حاول 3 مرات
+      return failureCount < 3;
+    },
+    onError: (error: any) => {
+      console.error('❌ VetsVan availability error:', error);
+      console.error('📍 Error type:', typeof error);
+      console.error('📍 Error message:', error?.message);
+      console.error('📍 Error status:', error?.status);
+      
+      if (error?.message?.includes('Unauthorized') || error?.status === 401) {
+        toast({
+          title: language === 'ar' ? 'انتهت جلسة العمل' : 'Session Expired',
+          description: language === 'ar' ? 
+            'يرجى تسجيل الدخول مرة أخرى' : 
+            'Please login again',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: language === 'ar' ? 'خطأ في التحميل' : 'Loading Error',
+          description: language === 'ar' ? 
+            'فشل في تحميل المواعيد المتاحة. يرجى المحاولة لاحقاً' : 
+            'Failed to load available appointments. Please try again later',
+          variant: 'destructive',
+        });
+      }
+    }
   });
 
   // جلب حجوزات العميل الحالية
@@ -474,6 +512,36 @@ export default function VetsVanBooking() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+      </div>
+    );
+  }
+
+  // عرض خطأ في حالة فشل تحميل VetsVan
+  if (vetsVanError && !isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full text-center">
+          <div className="text-red-500 mb-4">
+            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2" dir={direction}>
+            {language === 'ar' ? 'خطأ في التحميل' : 'Loading Error'}
+          </h3>
+          <p className="text-gray-600 mb-4" dir={direction}>
+            {language === 'ar' ? 
+              'لا يمكن تحميل المواعيد المتاحة. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.' :
+              'Unable to load available appointments. Please check your internet connection and try again.'
+            }
+          </p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="w-full"
+          >
+            {language === 'ar' ? 'إعادة المحاولة' : 'Try Again'}
+          </Button>
+        </div>
       </div>
     );
   }
