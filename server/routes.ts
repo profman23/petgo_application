@@ -58,7 +58,7 @@ function getErrorMessage(key: string, language: string = 'ar') {
     }
   };
   
-  return messages[language]?.[key] || messages.ar[key];
+  return messages[language as keyof typeof messages]?.[key as keyof typeof messages.ar] || messages.ar[key as keyof typeof messages.ar];
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -194,13 +194,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Handle database unique constraint violations
-      if (error.code === '23505') { // PostgreSQL unique constraint violation
+      if ((error as any).code === '23505') { // PostgreSQL unique constraint violation
         const userLanguage = req.body.preferredLanguage || 'ar';
         
-        if (error.constraint === 'users_phone_unique') {
+        if ((error as any).constraint === 'users_phone_unique') {
           return res.status(400).json({ message: getErrorMessage('phoneExists', userLanguage) });
         }
-        if (error.constraint === 'users_email_unique') {
+        if ((error as any).constraint === 'users_email_unique') {
           return res.status(400).json({ message: getErrorMessage('emailExists', userLanguage) });
         }
       }
@@ -240,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store OTP in database
       await storage.createOtpVerification({
         email,
-        otpCode,
+        code: otpCode,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
       });
       
@@ -471,8 +471,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const distance = calculateDistance(
           parseFloat(latitude as string),
           parseFloat(longitude as string),
-          driver.latitude,
-          driver.longitude
+          driver.latitude || 0,
+          driver.longitude || 0
         );
         const eta = Math.ceil(distance * 2); // 2 minutes per km
         const { estimatedCost } = calculateRideEstimates(distance);
@@ -497,7 +497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const rideData = rideRequestSchema.parse(req.body);
       
       // Check if user has active ride (excluding cancelled/rejected)
-      const activeRide = await storage.getUserActiveRide(req.user.id);
+      const activeRide = await storage.getUserActiveRide((req as any).user.id);
       if (activeRide && !['cancelled', 'cancelled_by_doctor', 'rejected'].includes(activeRide.status)) {
         return res.status(400).json({ message: 'لديك رحلة نشطة بالفعل' });
       }
@@ -514,7 +514,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const ride = await storage.createRide({
         ...rideData,
-        customerId: req.user.id,
+        customerId: (req as any).user.id,
         estimatedDistance: Math.round(distance * 10) / 10,
         estimatedTime,
         estimatedCost: Math.round(estimatedCost),
@@ -886,14 +886,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const distance = calculateDistance(
                 ride.pickupLatitude,
                 ride.pickupLongitude,
-                driver.latitude,
-                driver.longitude
+                driver.latitude || 0,
+                driver.longitude || 0
               );
               const nearestDistance = calculateDistance(
                 ride.pickupLatitude,
                 ride.pickupLongitude,
-                nearest.latitude,
-                nearest.longitude
+                nearest.latitude || 0,
+                nearest.longitude || 0
               );
               return distance < nearestDistance ? driver : nearest;
             });
@@ -922,7 +922,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user profile
   app.get('/api/user/profile', requireAuth, async (req, res) => {
     try {
-      const user = await storage.getUser(req.user.id);
+      const user = await storage.getUser((req as any).user.id);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
@@ -1093,7 +1093,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({
         userId: user.id,
-        username: user.username,
+        username: user.name,
         phone: user.phone,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -1161,7 +1161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Calculate distance from customer if location is provided
         let distanceFromCustomer = null;
-        if (customerLat && customerLon && driver.latitude && driver.longitude) {
+        if (customerLat && customerLon && driver.latitude !== null && driver.longitude !== null) {
           distanceFromCustomer = calculateDistance(
             customerLat, 
             customerLon, 
@@ -1183,7 +1183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Find the closest VetsVan if customer location is available
-      let closestVetsVanId = null;
+      let closestVetsVanId: number | null = null;
       if (customerLat && customerLon) {
         let minDistance = Infinity;
         vetsvanWithShifts.forEach(vetsvan => {
