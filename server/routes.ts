@@ -1232,10 +1232,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(testData);
   });
       
-      // Get customer location from query parameters
-      const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
-      const customerLon = req.query.lon ? parseFloat(req.query.lon) : null;
-      
       // Function to calculate distance between two points using Haversine formula
       const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
         const R = 6371; // Radius of the Earth in kilometers
