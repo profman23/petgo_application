@@ -75,6 +75,16 @@ export const otpVerifications = pgTable("otp_verifications", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Session management table for production persistence
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: integer("user_id"),
+  userType: text("user_type").notNull(), // 'customer', 'doctor', 'admin'
+  userData: jsonb("user_data").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),

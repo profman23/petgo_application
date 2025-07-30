@@ -28,14 +28,19 @@ interface AnyRequest extends Request {
 }
 // Payment service removed per user request
 
-// Simple session middleware
+// Simple session middleware - In-memory fallback for development
 const sessions = new Map();
+
+// Database session storage for production persistence
+import { db } from "./db";
+import { sessions as sessionsTable } from "@shared/schema";
+import { eq, lt } from "drizzle-orm";
 
 function generateSessionId() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
-function requireAuth(req: AnyRequest, res: Response, next: NextFunction) {
+async function requireAuth(req: AnyRequest, res: Response, next: NextFunction) {
   const sessionId = req.headers.authorization?.replace('Bearer ', '');
   
   if (!sessionId) {
@@ -43,16 +48,36 @@ function requireAuth(req: AnyRequest, res: Response, next: NextFunction) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
-  const session = sessions.get(sessionId);
-  
-  if (!session) {
-    console.log('Invalid token:', sessionId);
-    console.log('Available sessions:', Array.from(sessions.keys()));
+  try {
+    // Try database first for production persistence
+    const [dbSession] = await db.select().from(sessionsTable).where(eq(sessionsTable.id, sessionId));
+    
+    if (dbSession) {
+      // Check if session expired
+      if (new Date() > dbSession.expiresAt) {
+        await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+        console.log('Session expired:', sessionId);
+        return res.status(401).json({ message: 'Session expired' });
+      }
+      
+      req.user = dbSession.userData as any;
+      return next();
+    }
+    
+    // Fallback to in-memory for development
+    const session = sessions.get(sessionId);
+    if (!session) {
+      console.log('Invalid token:', sessionId);
+      console.log('Available sessions:', Array.from(sessions.keys()));
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    
+    req.user = session.user;
+    next();
+  } catch (error) {
+    console.error('Session validation error:', error);
     return res.status(401).json({ message: 'Unauthorized' });
   }
-  
-  req.user = session.user;
-  next();
 }
 
 // Error message translations
@@ -135,11 +160,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const sessionId = generateSessionId();
-      sessions.set(sessionId, { user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType } });
+      const userData = { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType };
+      
+      // Store session in database for production persistence
+      try {
+        await db.insert(sessionsTable).values({
+          id: sessionId,
+          userId: user.id,
+          userType: 'customer',
+          userData: userData as any,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+        });
+      } catch (dbError) {
+        console.log('Database session storage failed, using memory fallback');
+        sessions.set(sessionId, { user: userData });
+      }
       
       res.json({ 
         token: sessionId, 
-        user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType }
+        user: userData
       });
     } catch (error) {
       console.error('Login error:', error);
@@ -228,9 +267,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/auth/logout', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/auth/logout', requireAuth, async (req: AnyRequest, res: Response) => {
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
     if (sessionId) {
+      // Remove from database
+      try {
+        await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+      } catch (dbError) {
+        console.log('Database session deletion failed, removing from memory');
+      }
+      // Remove from memory fallback
       sessions.delete(sessionId);
     }
     res.json({ message: 'تم تسجيل الخروج بنجاح' });
@@ -372,14 +418,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Create session for automatic login
           const sessionId = generateSessionId();
-          sessions.set(sessionId, { 
-            user: { 
-              id: newUser.id, 
-              phone: newUser.phone, 
-              name: newUser.name, 
-              membershipType: newUser.membershipType 
-            } 
-          });
+          const newUserData = { 
+            id: newUser.id, 
+            phone: newUser.phone, 
+            name: newUser.name, 
+            membershipType: newUser.membershipType 
+          };
+          
+          // Store session in database for production persistence
+          try {
+            await db.insert(sessionsTable).values({
+              id: sessionId,
+              userId: newUser.id,
+              userType: 'customer',
+              userData: newUserData as any,
+              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+            });
+          } catch (dbError) {
+            console.log('Database session storage failed, using memory fallback');
+            sessions.set(sessionId, { user: newUserData });
+          }
           
           res.json({ 
             message: userLanguage === 'en' 
@@ -387,12 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               : 'تم إنشاء الحساب بنجاح',
             verified: true,
             token: sessionId,
-            user: {
-              id: newUser.id,
-              phone: newUser.phone,
-              name: newUser.name,
-              membershipType: newUser.membershipType
-            }
+            user: newUserData
           });
         } catch (userCreationError) {
           console.error('User creation error:', userCreationError);
@@ -439,16 +492,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const sessionId = generateSessionId();
-      sessions.set(sessionId, { 
-        user: { 
-          id: driver.id, 
-          phone: driver.phone, 
-          name: driver.name, 
-          membershipType: 'doctor',
-          vetsVanId: driver.id, // Using driver.id as VetsVan ID
-          vetsVanName: driver.vetsvanName
-        } 
-      });
+      const userData = { 
+        id: driver.id, 
+        phone: driver.phone, 
+        name: driver.name, 
+        membershipType: 'doctor',
+        vetsVanId: driver.id, // Using driver.id as VetsVan ID
+        vetsVanName: driver.vetsvanName
+      };
+      
+      // Store session in database for production persistence
+      try {
+        await db.insert(sessionsTable).values({
+          id: sessionId,
+          userId: driver.id,
+          userType: 'doctor',
+          userData: userData as any,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+        });
+      } catch (dbError) {
+        console.log('Database session storage failed, using memory fallback');
+        sessions.set(sessionId, { user: userData });
+      }
       
       res.json({ 
         token: sessionId, 
