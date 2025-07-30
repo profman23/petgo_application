@@ -75,8 +75,8 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
 
-  // Use real data when available
-  const realInvoiceNumber = (generatedInvoice as any)?.invoiceNumber || generateInvoiceNumber(bookingId);
+  // Use only real data from database - no fallback
+  const realInvoiceNumber = (generatedInvoice as any)?.invoiceNumber || 'LOADING...';
   const realDate = (booking as any)?.appointmentDate ? new Date((booking as any).appointmentDate).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
 
   // Calculate totals from invoice items
