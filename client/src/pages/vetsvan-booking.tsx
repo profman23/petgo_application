@@ -194,19 +194,19 @@ export default function VetsVanBooking() {
   };
 
   // فلترة VetsVan حسب التاريخ المحدد
-  const availableVetsVans = vetsVans.filter((vetsvan: VetsVanWithShifts) => 
-    vetsvan.shifts.some(shift => shift.date === selectedDate)
+  const availableVetsVans = (vetsVans as VetsVanWithShifts[]).filter((vetsvan: VetsVanWithShifts) => 
+    vetsvan.shifts.some((shift: Shift) => shift.date === selectedDate)
   );
 
   // جلب الأوقات المتاحة للـ VetsVan المحدد
   const getAvailableTimesForVetsVan = (vetsVanId: number) => {
-    const vetsvan = vetsVans.find((v: VetsVanWithShifts) => v.id === vetsVanId);
+    const vetsvan = (vetsVans as VetsVanWithShifts[]).find((v: VetsVanWithShifts) => v.id === vetsVanId);
     if (!vetsvan) return [];
 
-    const dayShifts = vetsvan.shifts.filter(shift => shift.date === selectedDate);
+    const dayShifts = vetsvan.shifts.filter((shift: Shift) => shift.date === selectedDate);
     const availableTimes: Array<{time: string, shiftId: number}> = [];
 
-    dayShifts.forEach(shift => {
+    dayShifts.forEach((shift: Shift) => {
       const startHour = parseInt(shift.startTime.split(':')[0]);
       const endHour = parseInt(shift.endTime.split(':')[0]);
       
@@ -214,7 +214,7 @@ export default function VetsVanBooking() {
         const timeSlot = `${hour.toString().padStart(2, '0')}:00`;
         
         // تحقق من عدم وجود حجز في هذا الوقت
-        const isTimeBooked = shift.bookings?.some(booking => 
+        const isTimeBooked = shift.bookings?.some((booking: Booking) => 
           booking.appointmentTime === timeSlot && 
           booking.appointmentDate === selectedDate &&
           booking.status === 'booked'
@@ -350,7 +350,7 @@ export default function VetsVanBooking() {
       
       // تحويل معرفات الحيوانات إلى تفاصيل كاملة
       const selectedPatientIds = requestData?.selectedPatients || [];
-      const selectedPetsData = allPatients.filter(pet => 
+      const selectedPetsData = (allPatients as any[]).filter((pet: any) => 
         selectedPatientIds.includes(pet.id)
       );
 
@@ -376,7 +376,10 @@ export default function VetsVanBooking() {
         fromSource: latitude && longitude ? 'GPS Hook' : 'Fallback'
       });
       
-      const result = await apiRequest('POST', '/api/bookings', bookingData);
+      const result = await apiRequest('/api/bookings', {
+        method: 'POST',
+        body: JSON.stringify(bookingData)
+      });
 
       console.log('Booking successful:', result);
       
@@ -435,7 +438,7 @@ export default function VetsVanBooking() {
     setSelectedTime(time);
     
     // البحث عن shiftId المناسب
-    const vetsvan = vetsVans.find((v: VetsVanWithShifts) => v.id === vetsvanId);
+    const vetsvan = (vetsVans as VetsVanWithShifts[]).find((v: VetsVanWithShifts) => v.id === vetsvanId);
     if (vetsvan) {
       const shift = vetsvan.shifts.find((s: any) => s.date === date);
       if (shift) {
