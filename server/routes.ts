@@ -1197,6 +1197,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('🔍 Starting VetsVan availability request...');
       
+      // Test basic response first
+      console.log('🧪 Testing basic response...');
+      res.json([
+        {
+          id: 1,
+          vetsvanCode: "TEST001",
+          vetsvanName: "Test VetsVan",
+          shifts: [],
+          distanceFromCustomer: "1.0"
+        }
+      ]);
+      return;
+      
       console.log('📋 Fetching drivers...');
       const drivers = await storage.getAllDrivers();
       console.log(`✅ Found ${drivers.length} drivers`);
