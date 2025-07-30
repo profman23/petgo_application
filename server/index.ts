@@ -7,35 +7,15 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false }));
 
-// API Request Logging Middleware
+// Add cache control headers for automatic updates
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api/')) {
-    console.log(`🌐 ${req.method} ${req.path}`);
-    console.log(`📍 Headers:`, JSON.stringify({
-      authorization: req.headers.authorization ? `Bearer ${req.headers.authorization.slice(-10)}...` : 'None',
-      'content-type': req.headers['content-type'],
-      'user-agent': req.headers['user-agent']?.slice(0, 50) + '...'
-    }, null, 2));
-    
-    if (req.method !== 'GET' && Object.keys(req.body || {}).length > 0) {
-      console.log(`📦 Body:`, JSON.stringify(req.body, null, 2));
-    }
-    
-    if (Object.keys(req.query || {}).length > 0) {
-      console.log(`🔗 Query:`, JSON.stringify(req.query, null, 2));
-    }
-  }
-  next();
-});
-
-// Add cache control headers for API requests only (not affecting user sessions)
-app.use((req, res, next) => {
-  // Only apply cache control to API requests to prevent caching API responses
-  if (req.path.startsWith('/api/')) {
+  // Force no-cache for all requests to ensure fresh content
+  if (req.url.includes('.css') || req.url.includes('.js') || req.url.includes('/src/') || req.url === '/') {
     res.set({
       'Cache-Control': 'no-cache, no-store, must-revalidate',
       'Pragma': 'no-cache',
-      'Expires': '0'
+      'Expires': '0',
+      'ETag': false
     });
   }
   next();
@@ -77,28 +57,12 @@ app.use((req, res, next) => {
   
   const server = await registerRoutes(app);
 
-  // Enhanced error handling middleware with comprehensive logging
-  app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    // Log detailed error information
-    console.error(`🚨 API Error: ${req.method} ${req.path}`);
-    console.error(`📍 Status: ${status}`);
-    console.error(`💬 Message: ${message}`);
-    console.error(`🔍 Stack:`, err.stack);
-    console.error(`📦 Request Body:`, JSON.stringify(req.body, null, 2));
-    console.error(`🔗 Request Headers:`, JSON.stringify(req.headers, null, 2));
-    console.error(`⏰ Timestamp:`, new Date().toISOString());
-    console.error('━'.repeat(60));
-
-    res.status(status).json({ 
-      message,
-      ...(process.env.NODE_ENV === 'development' && { 
-        stack: err.stack,
-        details: err.details || null
-      })
-    });
+    res.status(status).json({ message });
+    throw err;
   });
 
   // importantly only setup vite in development and after

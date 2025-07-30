@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
@@ -1026,9 +1026,6 @@ export default function RideRequest() {
             }}>
               {language === 'ar' ? 'شركاؤونا' : 'Our Partners'}
             </DialogTitle>
-            <DialogDescription className="text-center text-gray-600">
-              {language === 'ar' ? 'اختر من بين شركائنا الموثوقين لحجز موعد' : 'Choose from our trusted partners to book an appointment'}
-            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 p-4">
@@ -1095,7 +1092,7 @@ export default function RideRequest() {
                             rel="noopener noreferrer"
                             className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
                           >
-                            {language === 'ar' ? 'احجز الآن فرع المعذر' : 'Book Now Mathar Branch'}
+                            {language === 'ar' ? 'احجز الآن فرع المطار' : 'Book Now Mathar Branch'}
                           </a>
                         </div>
                       </div>

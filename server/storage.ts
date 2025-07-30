@@ -52,7 +52,6 @@ export interface IStorage {
   getShiftBookings(shiftId: number): Promise<Booking[]>;
   getAllBookings(): Promise<Booking[]>;
   updateBookingStatus(bookingId: number, status: string): Promise<Booking | undefined>;
-  updateBookingInvoiceGenerated(bookingId: number, invoiceGenerated: boolean): Promise<Booking | undefined>;
   getBookingWithUserDetails(bookingId: number): Promise<Booking & { user: User } | undefined>;
   getBookingWithDetails(bookingId: number): Promise<any>;
 
@@ -451,15 +450,6 @@ export class DatabaseStorage implements IStorage {
     const [updatedBooking] = await db
       .update(bookings)
       .set({ status })
-      .where(eq(bookings.id, bookingId))
-      .returning();
-    return updatedBooking;
-  }
-
-  async updateBookingInvoiceGenerated(bookingId: number, invoiceGenerated: boolean): Promise<Booking | undefined> {
-    const [updatedBooking] = await db
-      .update(bookings)
-      .set({ invoiceGenerated })
       .where(eq(bookings.id, bookingId))
       .returning();
     return updatedBooking;

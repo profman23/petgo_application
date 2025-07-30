@@ -51,9 +51,9 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
     enabled: !!bookingId
   });
 
-  // Fetch real generated invoice data by booking ID
+  // Fetch real generated invoice data  
   const { data: generatedInvoice } = useQuery({
-    queryKey: [`/api/generated-invoice/booking/${bookingId}`],
+    queryKey: [`/api/generated-invoice/Vets9000020`],
     enabled: !!bookingId
   });
 
@@ -75,8 +75,8 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
 
-  // Use only real data from database - no fallback
-  const realInvoiceNumber = (generatedInvoice as any)?.invoiceNumber || 'LOADING...';
+  // Use real data when available
+  const realInvoiceNumber = (generatedInvoice as any)?.invoiceNumber || generateInvoiceNumber(bookingId);
   const realDate = (booking as any)?.appointmentDate ? new Date((booking as any).appointmentDate).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
 
   // Calculate totals from invoice items

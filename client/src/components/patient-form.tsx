@@ -132,9 +132,6 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   {...form.register('name')}
                   className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
                   placeholder={t('patientName')}
-                  style={{
-                    textAlign: language === 'ar' ? 'right' : 'left'
-                  }}
                   autoFocus
                 />
                 {form.formState.errors.name && (
@@ -153,16 +150,14 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   onValueChange={(value) => form.setValue('type', value as 'Cat' | 'Dog' | 'Bird')}
                   defaultValue={form.watch('type')}
                 >
-                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg" style={{
-                    textAlign: language === 'ar' ? 'right' : 'left'
-                  }}>
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
                     <SelectValue placeholder={t('selectPatientType')} />
                   </SelectTrigger>
-                  <SelectContent style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                  <SelectContent>
                     {(['Cat', 'Dog', 'Bird'] as const).map((type) => {
                       const IconComponent = animalIcons[type];
                       return (
-                        <SelectItem key={type} value={type} style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                        <SelectItem key={type} value={type}>
                           <div className="flex items-center gap-2">
                             <IconComponent className="h-5 w-5 text-purple-600" />
                             <span>{t(type.toLowerCase() as 'cat' | 'dog' | 'bird')}</span>
@@ -188,16 +183,14 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   onValueChange={(value) => form.setValue('gender', value as 'Male' | 'Female')}
                   value={form.watch('gender')}
                 >
-                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg" style={{
-                    textAlign: language === 'ar' ? 'right' : 'left'
-                  }}>
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
                     <SelectValue placeholder={t('selectPatientGender')} />
                   </SelectTrigger>
-                  <SelectContent style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
-                    <SelectItem value="Male" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                  <SelectContent>
+                    <SelectItem value="Male">
                       <span>{t('male')}</span>
                     </SelectItem>
-                    <SelectItem value="Female" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                    <SelectItem value="Female">
                       <span>{t('female')}</span>
                     </SelectItem>
                   </SelectContent>

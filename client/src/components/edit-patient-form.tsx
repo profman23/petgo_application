@@ -142,9 +142,6 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                   {...form.register('name')}
                   className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
                   placeholder={t('patientName')}
-                  style={{
-                    textAlign: language === 'ar' ? 'right' : 'left'
-                  }}
                   autoFocus
                 />
                 {form.formState.errors.name && (
@@ -163,25 +160,23 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                   onValueChange={(value) => form.setValue('type', value as 'Cat' | 'Dog' | 'Bird')}
                   defaultValue={form.watch('type')}
                 >
-                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg" style={{
-                    textAlign: language === 'ar' ? 'right' : 'left'
-                  }}>
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
                     <SelectValue placeholder={t('selectPatientType')} />
                   </SelectTrigger>
-                  <SelectContent style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
-                    <SelectItem value="Cat" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                  <SelectContent>
+                    <SelectItem value="Cat">
                       <div className="flex items-center gap-2">
                         <Cat className="h-4 w-4" />
                         <span>{language === 'ar' ? 'قطة' : 'Cat'}</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="Dog" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                    <SelectItem value="Dog">
                       <div className="flex items-center gap-2">
                         <Dog className="h-4 w-4" />
                         <span>{language === 'ar' ? 'كلب' : 'Dog'}</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="Bird" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                    <SelectItem value="Bird">
                       <div className="flex items-center gap-2">
                         <Bird className="h-4 w-4" />
                         <span>{language === 'ar' ? 'طائر' : 'Bird'}</span>
@@ -205,16 +200,14 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                   onValueChange={(value) => form.setValue('gender', value as 'Male' | 'Female')}
                   value={form.watch('gender')}
                 >
-                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg" style={{
-                    textAlign: language === 'ar' ? 'right' : 'left'
-                  }}>
+                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
                     <SelectValue placeholder={t('selectPatientGender')} />
                   </SelectTrigger>
-                  <SelectContent style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
-                    <SelectItem value="Male" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                  <SelectContent>
+                    <SelectItem value="Male">
                       <span>{t('male')}</span>
                     </SelectItem>
-                    <SelectItem value="Female" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                    <SelectItem value="Female">
                       <span>{t('female')}</span>
                     </SelectItem>
                   </SelectContent>
