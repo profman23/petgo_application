@@ -1192,8 +1192,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all VetsVan with their available shifts for booking
-  app.get('/api/vetsvan/availability', requireAuth, async (req: AnyRequest, res: Response) => {
+  // Get all VetsVan with their available shifts for booking (no auth required for public access)
+  app.get('/api/vetsvan/availability', async (req: Request, res: Response) => {
     try {
       const drivers = await storage.getAllDrivers();
       const shifts = await storage.getAllShifts();
