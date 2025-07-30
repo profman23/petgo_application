@@ -1,8 +1,9 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import path from "path";
 import { fileURLToPath } from 'url';
+import type { User, Driver, Admin } from "@shared/schema";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,6 +11,15 @@ import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVe
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
+
+// Extended Request interfaces for type safety
+interface AuthenticatedRequest extends Request {
+  user: User & { membershipType: string };
+}
+
+interface AdminRequest extends Request {
+  admin: Admin;
+}
 // Payment service removed per user request
 
 // Simple session middleware
@@ -19,7 +29,7 @@ function generateSessionId() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
-function requireAuth(req: any, res: any, next: any) {
+function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const sessionId = req.headers.authorization?.replace('Bearer ', '');
   
   if (!sessionId) {
@@ -40,8 +50,8 @@ function requireAuth(req: any, res: any, next: any) {
 }
 
 // Error message translations
-function getErrorMessage(key: string, language: string = 'ar') {
-  const messages = {
+function getErrorMessage(key: string, language: string = 'ar'): string {
+  const messages: Record<string, Record<string, string>> = {
     ar: {
       phoneExists: 'رقم الهاتف مستخدم بالفعل',
       emailExists: 'الإيميل مستخدم بالفعل',
@@ -58,7 +68,7 @@ function getErrorMessage(key: string, language: string = 'ar') {
     }
   };
   
-  return messages[language]?.[key] || messages.ar[key];
+  return messages[language]?.[key] || messages.ar?.[key] || key;
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -188,19 +198,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: userLanguage === 'ar' ? 'تم إرسال رمز التحقق بنجاح' : 'Verification code sent successfully',
         email: userData.email
       });
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
       
       // Handle database unique constraint violations
-      if (error.code === '23505') { // PostgreSQL unique constraint violation
+      const dbError = error as any;
+      if (dbError?.code === '23505') { // PostgreSQL unique constraint violation
         const userLanguage = req.body.preferredLanguage || 'ar';
         
-        if (error.constraint === 'users_phone_unique') {
+        if (dbError.constraint === 'users_phone_unique') {
           return res.status(400).json({ message: getErrorMessage('phoneExists', userLanguage) });
         }
-        if (error.constraint === 'users_email_unique') {
+        if (dbError.constraint === 'users_email_unique') {
           return res.status(400).json({ message: getErrorMessage('emailExists', userLanguage) });
         }
       }
@@ -211,9 +222,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/auth/logout', requireAuth, (req, res) => {
+  app.post('/api/auth/logout', requireAuth, (req: AuthenticatedRequest, res: Response) => {
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
-    sessions.delete(sessionId);
+    if (sessionId) {
+      sessions.delete(sessionId);
+    }
     res.json({ message: 'تم تسجيل الخروج بنجاح' });
   });
 
@@ -240,7 +253,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store OTP in database
       await storage.createOtpVerification({
         email,
-        otpCode,
+        code: otpCode,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
       });
       
@@ -263,7 +276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             : 'فشل في إرسال رمز التحقق'
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Send OTP error:', error);
       const userLanguage = req.body.preferredLanguage || 'ar';
       
@@ -442,7 +455,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           vetsVanName: driver.vetsvanName
         }
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Doctor login error:', error);
       res.status(500).json({ message: 'خطأ في الخادم' });
     }
@@ -453,7 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const drivers = await storage.getAvailableDrivers();
       res.json(drivers);
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ message: 'خطأ في جلب السائقين' });
     }
   });
@@ -471,8 +484,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const distance = calculateDistance(
           parseFloat(latitude as string),
           parseFloat(longitude as string),
-          driver.latitude,
-          driver.longitude
+          driver.latitude || 24.7136,
+          driver.longitude || 46.6753
         );
         const eta = Math.ceil(distance * 2); // 2 minutes per km
         const { estimatedCost } = calculateRideEstimates(distance);
@@ -486,13 +499,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }).sort((a, b) => a.distance - b.distance);
       
       res.json(nearbyDrivers);
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ message: 'خطأ في جلب السائقين القريبين' });
     }
   });
 
   // Ride routes
-  app.post('/api/rides/request', requireAuth, async (req, res) => {
+  app.post('/api/rides/request', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const rideData = rideRequestSchema.parse(req.body);
       
@@ -522,7 +535,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.json(ride);
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
@@ -531,7 +544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all rides for current user (for Activity page)
-  app.get('/api/rides', requireAuth, async (req, res) => {
+  app.get('/api/rides', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const allRides = await storage.getAllRides();
       const userRides = allRides
@@ -543,13 +556,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       
       res.json(userRides);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching user rides:', error);
       res.status(500).json({ message: 'خطأ في جلب الطلبات' });
     }
   });
 
-  app.get('/api/rides/active', requireAuth, async (req, res) => {
+  app.get('/api/rides/active', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const ride = await storage.getUserActiveRide(req.user.id);
       if (!ride) {
@@ -839,7 +852,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update ride status (for doctors)
-  app.put('/api/rides/:id/status', requireAuth, async (req: any, res) => {
+  app.put('/api/rides/:id/status', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const rideId = parseInt(req.params.id);
       const { status } = req.body;
@@ -858,14 +871,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       await storage.updateRideStatus(rideId, status);
       res.json({ success: true });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating ride status:', error);
       res.status(500).json({ message: 'Failed to update ride status' });
     }
   });
 
   // Simulate ride status updates
-  app.post('/api/rides/:id/simulate', requireAuth, async (req, res) => {
+  app.post('/api/rides/:id/simulate', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const rideId = parseInt(req.params.id);
       const ride = await storage.getRide(rideId);
@@ -886,14 +899,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const distance = calculateDistance(
                 ride.pickupLatitude,
                 ride.pickupLongitude,
-                driver.latitude,
-                driver.longitude
+                driver.latitude || 24.7136,
+                driver.longitude || 46.6753
               );
               const nearestDistance = calculateDistance(
                 ride.pickupLatitude,
                 ride.pickupLongitude,
-                nearest.latitude,
-                nearest.longitude
+                nearest.latitude || 24.7136,
+                nearest.longitude || 46.6753
               );
               return distance < nearestDistance ? driver : nearest;
             });
@@ -914,13 +927,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }, 2000);
       
       res.json({ message: 'تم بدء محاكاة الرحلة' });
-    } catch (error) {
+    } catch (error: unknown) {
       res.status(500).json({ message: 'خطأ في محاكاة الرحلة' });
     }
   });
 
   // Get user profile
-  app.get('/api/user/profile', requireAuth, async (req, res) => {
+  app.get('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const user = await storage.getUser(req.user.id);
       if (!user) {
@@ -930,14 +943,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove password from response
       const { password, ...userProfile } = user;
       res.json(userProfile);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching user profile:', error);
       res.status(500).json({ message: 'Error fetching profile' });
     }
   });
 
   // Update user profile
-  app.put('/api/user/profile', requireAuth, async (req, res) => {
+  app.put('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { firstName, lastName, email, name, petName, petType } = req.body;
       
@@ -963,14 +976,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove password from response
       const { password, ...userProfile } = updatedUser;
       res.json(userProfile);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating user profile:', error);
       res.status(500).json({ message: 'Error updating profile' });
     }
   });
 
   // Reset password
-  app.put('/api/user/reset-password', requireAuth, async (req, res) => {
+  app.put('/api/user/reset-password', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { currentPassword, newPassword } = req.body;
       
