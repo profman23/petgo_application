@@ -1197,17 +1197,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('🔍 Starting VetsVan availability request...');
       
-      console.log('📋 Fetching drivers...');
-      const drivers = await storage.getAllDrivers();
-      console.log(`✅ Found ${drivers.length} drivers`);
+      console.log('📋 Testing drivers query...');
+      let drivers = [];
+      try {
+        drivers = await storage.getAllDrivers();
+        console.log(`✅ Found ${drivers.length} drivers`);
+      } catch (error) {
+        console.error('❌ Error fetching drivers:', error);
+        return res.status(500).json({ message: 'Error fetching drivers', error: String(error) });
+      }
       
-      console.log('📋 Fetching shifts...');
-      const shifts = await storage.getAllShifts();
-      console.log(`✅ Found ${shifts.length} shifts`);
+      console.log('📋 Testing shifts query...');
+      let shifts = [];
+      try {
+        shifts = await storage.getAllShifts();
+        console.log(`✅ Found ${shifts.length} shifts`);
+      } catch (error) {
+        console.error('❌ Error fetching shifts:', error);
+        return res.status(500).json({ message: 'Error fetching shifts', error: String(error) });
+      }
       
-      console.log('📋 Fetching bookings...');
-      const bookings = await storage.getAllBookings();
-      console.log(`✅ Found ${bookings.length} bookings`);
+      console.log('📋 Testing bookings query...');
+      let bookings = [];
+      try {
+        bookings = await storage.getAllBookings();
+        console.log(`✅ Found ${bookings.length} bookings`);
+      } catch (error) {
+        console.error('❌ Error fetching bookings:', error);
+        return res.status(500).json({ message: 'Error fetching bookings', error: String(error) });
+      }
       
       // Get customer location from query parameters
       const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
