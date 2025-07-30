@@ -36,16 +36,6 @@ export const db = drizzle({ client: pool, schema });
 export async function initDatabase() {
   console.log("🔧 Initializing database schema...");
   
-  // Test database connection first
-  try {
-    console.log("🔍 Testing database connection...");
-    await pool.query('SELECT 1 as test');
-    console.log("✅ Database connection successful");
-  } catch (error) {
-    console.error("❌ Database connection failed:", error);
-    throw new Error(`Database connection failed: ${error instanceof Error ? error.message : String(error)}`);
-  }
-  
   // Log protection status
   dbProtection.logProtectionStatus();
   

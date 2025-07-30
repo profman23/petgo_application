@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Cat, Dog, Bird, ArrowLeft } from 'lucide-react';
+import { Camera, Cat, Dog, Bird, ArrowLeft, Calendar } from 'lucide-react';
 
 // Patient form schema - only name and type are required
 const patientFormSchema = z.object({
@@ -19,12 +19,11 @@ const patientFormSchema = z.object({
   type: z.enum(['Cat', 'Dog', 'Bird'], {
     errorMap: () => ({ message: 'Please select patient type' })
   }),
-  gender: z.enum(['Male', 'Female'], {
-    errorMap: () => ({ message: 'Please select patient gender' })
-  }),
   ageYear: z.string().optional(),
   ageMonth: z.string().optional(),
   ageDay: z.string().optional(),
+  photo: z.string().optional(),
+  birthdate: z.string().optional(),
 });
 
 type PatientFormData = z.infer<typeof patientFormSchema>;
@@ -44,17 +43,18 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
   const { t, language } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   
   const form = useForm<PatientFormData>({
     resolver: zodResolver(patientFormSchema),
     defaultValues: {
       name: '',
       type: undefined,
-      gender: undefined,
       ageYear: '',
       ageMonth: '',
       ageDay: '',
+      photo: '',
+      birthdate: '',
     },
   });
 
@@ -82,17 +82,29 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
     },
   });
 
-
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setSelectedPhoto(result);
+        form.setValue('photo', result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const onSubmit = (data: PatientFormData) => {
     // Clean up data - convert empty strings to numbers or undefined for optional fields
     const cleanData = {
       name: data.name,
       type: data.type,
-      gender: data.gender,
-      ageYear: data.ageYear && data.ageYear !== '' ? data.ageYear : undefined,
-      ageMonth: data.ageMonth && data.ageMonth !== '' ? data.ageMonth : undefined,
-      ageDay: data.ageDay && data.ageDay !== '' ? data.ageDay : undefined,
+      ageYear: data.ageYear && data.ageYear !== '' ? Number(data.ageYear) : undefined,
+      ageMonth: data.ageMonth && data.ageMonth !== '' ? Number(data.ageMonth) : undefined,
+      ageDay: data.ageDay && data.ageDay !== '' ? Number(data.ageDay) : undefined,
+      photo: data.photo || undefined,
+      birthdate: data.birthdate || undefined,
     };
     addPatientMutation.mutate(cleanData);
   };
@@ -172,34 +184,6 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 )}
               </div>
 
-              {/* Patient Gender */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700" style={{
-                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                }}>
-                  {t('patientGender')} <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  onValueChange={(value) => form.setValue('gender', value as 'Male' | 'Female')}
-                  value={form.watch('gender')}
-                >
-                  <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg">
-                    <SelectValue placeholder={t('selectPatientGender')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Male">
-                      <span>{t('male')}</span>
-                    </SelectItem>
-                    <SelectItem value="Female">
-                      <span>{t('female')}</span>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                {form.formState.errors.gender && (
-                  <p className="text-red-500 text-sm">{form.formState.errors.gender.message}</p>
-                )}
-              </div>
-
               {/* Patient Age */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700" style={{
@@ -253,7 +237,68 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 </div>
               </div>
 
+              {/* Birthdate */}
+              <div className="space-y-2">
+                <Label htmlFor="birthdate" className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'تاريخ الميلاد' : 'Birthdate'} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                </Label>
+                <div className="relative">
+                  <Calendar className="absolute top-3 w-4 h-4 text-gray-400" style={{ [isRTL ? 'right' : 'left']: '12px' }} />
+                  <Input
+                    id="birthdate"
+                    type="date"
+                    {...form.register('birthdate')}
+                    className={`border-2 border-purple-600 focus:border-purple-600 rounded-lg ${isRTL ? 'pr-10 text-right' : 'pl-10'}`}
+                  />
+                </div>
+              </div>
 
+              {/* Patient Photo */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'صورة الأليف' : 'Patient Photo'} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                </Label>
+                <div className="flex flex-col items-center gap-4">
+                  {selectedPhoto ? (
+                    <div className="relative">
+                      <img
+                        src={selectedPhoto}
+                        alt="Patient"
+                        className="w-32 h-32 object-cover rounded-full border-2 border-gray-200"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="absolute -bottom-2 -right-2 bg-purple-600 hover:bg-purple-600 rounded-full p-2"
+                        onClick={() => document.getElementById('photo-upload')?.click()}
+                      >
+                        <Camera className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div
+                      className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:border-gray-500 transition-colors"
+                      onClick={() => document.getElementById('photo-upload')?.click()}
+                    >
+                      <div className="text-center">
+                        <Camera className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                        <p className="text-sm text-purple-600">{t('uploadPhoto')}</p>
+                      </div>
+                    </div>
+                  )}
+                  <input
+                    id="photo-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                </div>
+              </div>
 
               {/* Submit Button */}
               <div className="pt-4">

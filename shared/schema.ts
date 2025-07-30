@@ -75,19 +75,11 @@ export const otpVerifications = pgTable("otp_verifications", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Session management table for production persistence (using existing session table structure)
-export const sessions = pgTable("sessions", {
-  sid: text("sid").primaryKey(), // Using existing column name
-  sess: jsonb("sess").notNull(), // Using existing column name for session data
-  expire: timestamp("expire").notNull() // Using existing column name for expiration
-});
-
 export const patients = pgTable("patients", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id),
   name: text("name").notNull(),
   type: text("type").notNull(), // Cat, Dog, Bird
-  gender: text("gender").notNull(), // Male, Female - required field
   ageYear: integer("age_year"),
   ageMonth: integer("age_month"),
   ageDay: integer("age_day"),
@@ -195,7 +187,6 @@ export const rideRequestSchema = createInsertSchema(rides).pick({
 export const insertPatientSchema = createInsertSchema(patients).pick({
   name: true,
   type: true,
-  gender: true,
   ageYear: true,
   ageMonth: true,
   ageDay: true,

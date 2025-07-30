@@ -1,9 +1,8 @@
-import type { Express, Request, Response, NextFunction } from "express";
+import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import path from "path";
 import { fileURLToPath } from 'url';
-import type { User, Driver, Admin } from "@shared/schema";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,36 +10,16 @@ import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVe
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
-
-// Extended Request interfaces for type safety
-interface AuthenticatedRequest extends Request {
-  user: User & { membershipType: string };
-}
-
-interface AdminRequest extends Request {
-  admin: Admin;
-}
-
-// Use generic interface for middleware compatibility
-interface AnyRequest extends Request {
-  user?: User & { membershipType: string };
-  admin?: Admin;
-}
 // Payment service removed per user request
 
-// Simple session middleware - In-memory fallback for development
+// Simple session middleware
 const sessions = new Map();
-
-// Database session storage for production persistence
-import { db } from "./db";
-import { sessions as sessionsTable } from "@shared/schema";
-import { eq, lt } from "drizzle-orm";
 
 function generateSessionId() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
-async function requireAuth(req: AnyRequest, res: Response, next: NextFunction) {
+function requireAuth(req: any, res: any, next: any) {
   const sessionId = req.headers.authorization?.replace('Bearer ', '');
   
   if (!sessionId) {
@@ -48,42 +27,21 @@ async function requireAuth(req: AnyRequest, res: Response, next: NextFunction) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
-  try {
-    // Try database first for production persistence
-    const [dbSession] = await db.select().from(sessionsTable).where(eq(sessionsTable.sid, sessionId));
-    
-    if (dbSession) {
-      // Check if session expired
-      if (new Date() > dbSession.expire) {
-        await db.delete(sessionsTable).where(eq(sessionsTable.sid, sessionId));
-        console.log('Session expired:', sessionId);
-        return res.status(401).json({ message: 'Session expired' });
-      }
-      
-      const sessionData = dbSession.sess as any;
-      req.user = sessionData.user || sessionData;
-      return next();
-    }
-    
-    // Fallback to in-memory for development
-    const session = sessions.get(sessionId);
-    if (!session) {
-      console.log('Invalid token:', sessionId);
-      console.log('Available sessions:', Array.from(sessions.keys()));
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    
-    req.user = session.user;
-    next();
-  } catch (error) {
-    console.error('Session validation error:', error);
+  const session = sessions.get(sessionId);
+  
+  if (!session) {
+    console.log('Invalid token:', sessionId);
+    console.log('Available sessions:', Array.from(sessions.keys()));
     return res.status(401).json({ message: 'Unauthorized' });
   }
+  
+  req.user = session.user;
+  next();
 }
 
 // Error message translations
-function getErrorMessage(key: string, language: string = 'ar'): string {
-  const messages: Record<string, Record<string, string>> = {
+function getErrorMessage(key: string, language: string = 'ar') {
+  const messages = {
     ar: {
       phoneExists: 'رقم الهاتف مستخدم بالفعل',
       emailExists: 'الإيميل مستخدم بالفعل',
@@ -100,7 +58,7 @@ function getErrorMessage(key: string, language: string = 'ar'): string {
     }
   };
   
-  return messages[language]?.[key] || messages.ar?.[key] || key;
+  return messages[language]?.[key] || messages.ar[key];
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -161,23 +119,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const sessionId = generateSessionId();
-      const userData = { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType };
-      
-      // Store session in database for production persistence
-      try {
-        await db.insert(sessionsTable).values({
-          sid: sessionId,
-          sess: { user: userData } as any,
-          expire: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-        });
-      } catch (dbError) {
-        console.log('Database session storage failed, using memory fallback');
-        sessions.set(sessionId, { user: userData });
-      }
+      sessions.set(sessionId, { user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType } });
       
       res.json({ 
         token: sessionId, 
-        user: userData
+        user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType }
       });
     } catch (error) {
       console.error('Login error:', error);
@@ -242,20 +188,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: userLanguage === 'ar' ? 'تم إرسال رمز التحقق بنجاح' : 'Verification code sent successfully',
         email: userData.email
       });
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
       
       // Handle database unique constraint violations
-      const dbError = error as any;
-      if (dbError?.code === '23505') { // PostgreSQL unique constraint violation
+      if (error.code === '23505') { // PostgreSQL unique constraint violation
         const userLanguage = req.body.preferredLanguage || 'ar';
         
-        if (dbError.constraint === 'users_phone_unique') {
+        if (error.constraint === 'users_phone_unique') {
           return res.status(400).json({ message: getErrorMessage('phoneExists', userLanguage) });
         }
-        if (dbError.constraint === 'users_email_unique') {
+        if (error.constraint === 'users_email_unique') {
           return res.status(400).json({ message: getErrorMessage('emailExists', userLanguage) });
         }
       }
@@ -266,18 +211,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/auth/logout', requireAuth, async (req: AnyRequest, res: Response) => {
+  app.post('/api/auth/logout', requireAuth, (req, res) => {
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
-    if (sessionId) {
-      // Remove from database
-      try {
-        await db.delete(sessionsTable).where(eq(sessionsTable.sid, sessionId));
-      } catch (dbError) {
-        console.log('Database session deletion failed, removing from memory');
-      }
-      // Remove from memory fallback
-      sessions.delete(sessionId);
-    }
+    sessions.delete(sessionId);
     res.json({ message: 'تم تسجيل الخروج بنجاح' });
   });
 
@@ -304,7 +240,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store OTP in database
       await storage.createOtpVerification({
         email,
-        code: otpCode,
+        otpCode,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
       });
       
@@ -327,7 +263,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             : 'فشل في إرسال رمز التحقق'
         });
       }
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Send OTP error:', error);
       const userLanguage = req.body.preferredLanguage || 'ar';
       
@@ -417,24 +353,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Create session for automatic login
           const sessionId = generateSessionId();
-          const newUserData = { 
-            id: newUser.id, 
-            phone: newUser.phone, 
-            name: newUser.name, 
-            membershipType: newUser.membershipType 
-          };
-          
-          // Store session in database for production persistence
-          try {
-            await db.insert(sessionsTable).values({
-              sid: sessionId,
-              sess: { user: newUserData } as any,
-              expire: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-            });
-          } catch (dbError) {
-            console.log('Database session storage failed, using memory fallback');
-            sessions.set(sessionId, { user: newUserData });
-          }
+          sessions.set(sessionId, { 
+            user: { 
+              id: newUser.id, 
+              phone: newUser.phone, 
+              name: newUser.name, 
+              membershipType: newUser.membershipType 
+            } 
+          });
           
           res.json({ 
             message: userLanguage === 'en' 
@@ -442,7 +368,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               : 'تم إنشاء الحساب بنجاح',
             verified: true,
             token: sessionId,
-            user: newUserData
+            user: {
+              id: newUser.id,
+              phone: newUser.phone,
+              name: newUser.name,
+              membershipType: newUser.membershipType
+            }
           });
         } catch (userCreationError) {
           console.error('User creation error:', userCreationError);
@@ -489,26 +420,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const sessionId = generateSessionId();
-      const userData = { 
-        id: driver.id, 
-        phone: driver.phone, 
-        name: driver.name, 
-        membershipType: 'doctor',
-        vetsVanId: driver.id, // Using driver.id as VetsVan ID
-        vetsVanName: driver.vetsvanName
-      };
-      
-      // Store session in database for production persistence
-      try {
-        await db.insert(sessionsTable).values({
-          sid: sessionId,
-          sess: { user: userData } as any,
-          expire: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
-        });
-      } catch (dbError) {
-        console.log('Database session storage failed, using memory fallback');
-        sessions.set(sessionId, { user: userData });
-      }
+      sessions.set(sessionId, { 
+        user: { 
+          id: driver.id, 
+          phone: driver.phone, 
+          name: driver.name, 
+          membershipType: 'doctor',
+          vetsVanId: driver.id, // Using driver.id as VetsVan ID
+          vetsVanName: driver.vetsvanName
+        } 
+      });
       
       res.json({ 
         token: sessionId, 
@@ -521,7 +442,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           vetsVanName: driver.vetsvanName
         }
       });
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Doctor login error:', error);
       res.status(500).json({ message: 'خطأ في الخادم' });
     }
@@ -532,7 +453,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const drivers = await storage.getAvailableDrivers();
       res.json(drivers);
-    } catch (error: unknown) {
+    } catch (error) {
       res.status(500).json({ message: 'خطأ في جلب السائقين' });
     }
   });
@@ -550,8 +471,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const distance = calculateDistance(
           parseFloat(latitude as string),
           parseFloat(longitude as string),
-          driver.latitude || 24.7136,
-          driver.longitude || 46.6753
+          driver.latitude,
+          driver.longitude
         );
         const eta = Math.ceil(distance * 2); // 2 minutes per km
         const { estimatedCost } = calculateRideEstimates(distance);
@@ -565,13 +486,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }).sort((a, b) => a.distance - b.distance);
       
       res.json(nearbyDrivers);
-    } catch (error: unknown) {
+    } catch (error) {
       res.status(500).json({ message: 'خطأ في جلب السائقين القريبين' });
     }
   });
 
   // Ride routes
-  app.post('/api/rides/request', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/rides/request', requireAuth, async (req, res) => {
     try {
       const rideData = rideRequestSchema.parse(req.body);
       
@@ -601,7 +522,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.json(ride);
-    } catch (error: unknown) {
+    } catch (error) {
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
@@ -610,7 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all rides for current user (for Activity page)
-  app.get('/api/rides', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.get('/api/rides', requireAuth, async (req, res) => {
     try {
       const allRides = await storage.getAllRides();
       const userRides = allRides
@@ -622,13 +543,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       
       res.json(userRides);
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error fetching user rides:', error);
       res.status(500).json({ message: 'خطأ في جلب الطلبات' });
     }
   });
 
-  app.get('/api/rides/active', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.get('/api/rides/active', requireAuth, async (req, res) => {
     try {
       const ride = await storage.getUserActiveRide(req.user.id);
       if (!ride) {
@@ -918,7 +839,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update ride status (for doctors)
-  app.put('/api/rides/:id/status', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.put('/api/rides/:id/status', requireAuth, async (req: any, res) => {
     try {
       const rideId = parseInt(req.params.id);
       const { status } = req.body;
@@ -937,14 +858,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       await storage.updateRideStatus(rideId, status);
       res.json({ success: true });
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error updating ride status:', error);
       res.status(500).json({ message: 'Failed to update ride status' });
     }
   });
 
   // Simulate ride status updates
-  app.post('/api/rides/:id/simulate', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.post('/api/rides/:id/simulate', requireAuth, async (req, res) => {
     try {
       const rideId = parseInt(req.params.id);
       const ride = await storage.getRide(rideId);
@@ -965,14 +886,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const distance = calculateDistance(
                 ride.pickupLatitude,
                 ride.pickupLongitude,
-                driver.latitude || 24.7136,
-                driver.longitude || 46.6753
+                driver.latitude,
+                driver.longitude
               );
               const nearestDistance = calculateDistance(
                 ride.pickupLatitude,
                 ride.pickupLongitude,
-                nearest.latitude || 24.7136,
-                nearest.longitude || 46.6753
+                nearest.latitude,
+                nearest.longitude
               );
               return distance < nearestDistance ? driver : nearest;
             });
@@ -993,13 +914,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }, 2000);
       
       res.json({ message: 'تم بدء محاكاة الرحلة' });
-    } catch (error: unknown) {
+    } catch (error) {
       res.status(500).json({ message: 'خطأ في محاكاة الرحلة' });
     }
   });
 
   // Get user profile
-  app.get('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.get('/api/user/profile', requireAuth, async (req, res) => {
     try {
       const user = await storage.getUser(req.user.id);
       if (!user) {
@@ -1009,14 +930,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove password from response
       const { password, ...userProfile } = user;
       res.json(userProfile);
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error fetching user profile:', error);
       res.status(500).json({ message: 'Error fetching profile' });
     }
   });
 
   // Update user profile
-  app.put('/api/user/profile', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.put('/api/user/profile', requireAuth, async (req, res) => {
     try {
       const { firstName, lastName, email, name, petName, petType } = req.body;
       
@@ -1042,14 +963,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove password from response
       const { password, ...userProfile } = updatedUser;
       res.json(userProfile);
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error updating user profile:', error);
       res.status(500).json({ message: 'Error updating profile' });
     }
   });
 
   // Reset password
-  app.put('/api/user/reset-password', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  app.put('/api/user/reset-password', requireAuth, async (req, res) => {
     try {
       const { currentPassword, newPassword } = req.body;
       
@@ -1104,17 +1025,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/patients', requireAuth, async (req, res) => {
     try {
       const userId = req.user.id;
-      const { name, type, gender, ageYear, ageMonth, ageDay, photo } = req.body;
+      const { name, type, ageYear, ageMonth, ageDay, photo } = req.body;
       
-      if (!name || !type || !gender) {
-        return res.status(400).json({ message: 'Patient name, type, and gender are required' });
+      if (!name || !type) {
+        return res.status(400).json({ message: 'Patient name and type are required' });
       }
       
       const patient = await storage.createPatient({
         userId,
         name,
         type,
-        gender,
         ageYear: ageYear || null,
         ageMonth: ageMonth || null,
         ageDay: ageDay || null,
@@ -1133,16 +1053,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.id;
       const patientId = parseInt(req.params.id);
-      const { name, type, gender, ageYear, ageMonth, ageDay, photo } = req.body;
+      const { name, type, ageYear, ageMonth, ageDay, photo } = req.body;
       
-      if (!name || !type || !gender) {
-        return res.status(400).json({ message: 'Patient name, type, and gender are required' });
+      if (!name || !type) {
+        return res.status(400).json({ message: 'Patient name and type are required' });
       }
       
       const updatedPatient = await storage.updatePatient(patientId, userId, {
         name,
         type,
-        gender,
         ageYear: ageYear || null,
         ageMonth: ageMonth || null,
         ageDay: ageDay || null,
@@ -1192,45 +1111,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Production Test Endpoint - No Database Operations
-  app.get('/api/vetsvan/availability', (req: Request, res: Response) => {
-    console.log('🧪 Production test endpoint hit');
-    
-    const testData = [
-      {
-        id: 1,
-        vetsvanCode: "VETS001",
-        vetsvanName: "VetsVan Riyadh East",
-        shifts: [
-          {
-            id: 1,
-            startTime: "09:00",
-            endTime: "17:00",
-            date: "2025-07-31",
-            isBooked: false
-          }
-        ],
-        distanceFromCustomer: "2.1"
-      },
-      {
-        id: 2,
-        vetsvanCode: "VETS002", 
-        vetsvanName: "VetsVan Riyadh West",
-        shifts: [
-          {
-            id: 2,
-            startTime: "10:00",
-            endTime: "18:00", 
-            date: "2025-07-31",
-            isBooked: false
-          }
-        ],
-        distanceFromCustomer: "1.8"
-      }
-    ];
-    
-    res.json(testData);
-  });
+  // Get all VetsVan with their available shifts for booking
+  app.get('/api/vetsvan/availability', requireAuth, async (req: any, res) => {
+    try {
+      const drivers = await storage.getAllDrivers();
+      const shifts = await storage.getAllShifts();
+      const bookings = await storage.getAllBookings();
+      
+      // Get customer location from query parameters
+      const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
+      const customerLon = req.query.lon ? parseFloat(req.query.lon) : null;
       
       // Function to calculate distance between two points using Haversine formula
       const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -1321,24 +1211,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return 0;
       });
 
-      console.log(`📤 Returning ${sortedVetsVans.length} VetsVans`);
       res.json(sortedVetsVans);
-    } catch (error: unknown) {
-      console.error('❌ DETAILED ERROR in VetsVan availability:', error);
-      console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-      console.error('❌ Error message:', error instanceof Error ? error.message : String(error));
-      res.status(500).json({ 
-        message: 'Failed to fetch VetsVan availability',
-        error: error instanceof Error ? error.message : String(error)
-      });
+    } catch (error) {
+      console.error('Error fetching VetsVan availability:', error);
+      res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
     }
   });
 
   // Book an appointment
-  app.post('/api/bookings', requireAuth, async (req: AnyRequest, res: Response) => {
+  app.post('/api/bookings', requireAuth, async (req: any, res) => {
     try {
       const { shiftId, vetsVanId, appointmentDate, appointmentTime, customerLocation, selectedPets, serviceType } = req.body;
-      const userId = req.user!.id;
+      const userId = req.user.id;
       
       console.log('📍 Creating booking with request body:', req.body);
       console.log('📍 Customer location received:', customerLocation);
@@ -1459,9 +1343,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user's bookings for Activity page
-  app.get('/api/user/bookings', requireAuth, async (req: AnyRequest, res: Response) => {
+  app.get('/api/user/bookings', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const userBookings = await storage.getUserBookings(userId);
       
       // Get VetsVan details for each booking
@@ -1492,7 +1376,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.json(sortedBookings);
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error fetching user bookings:', error);
       res.status(500).json({ message: 'Failed to fetch user bookings' });
     }
@@ -1688,13 +1572,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user's bookings (Simple endpoint)
-  app.get('/api/user/bookings-simple', requireAuth, async (req: AnyRequest, res: Response) => {
+  // Get user's bookings
+  app.get('/api/user/bookings', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user!.id;
+      const userId = req.user.id;
       const bookings = await storage.getUserBookings(userId);
       res.json(bookings);
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('Error fetching user bookings:', error);
       res.status(500).json({ message: 'Failed to fetch bookings' });
     }
