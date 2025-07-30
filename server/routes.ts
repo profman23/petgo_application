@@ -1119,10 +1119,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all VetsVan with their available shifts for booking
-  app.get('/api/vetsvan/availability', requireAuth, async (req: any, res) => {
+  // Test endpoint to verify API is working
+  app.get('/api/test', (req: any, res) => {
+    console.log('🧪 Test endpoint called');
+    res.json({ 
+      message: 'API is working',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      sessions: sessions.size
+    });
+  });
+
+  // Get all VetsVan with their available shifts for booking (with authentication fix)
+  app.get('/api/vetsvan/availability', async (req: any, res) => {
     try {
-      console.log('🔍 VetsVan availability endpoint called by user:', req.user?.id);
+      console.log('🔍 VetsVan availability endpoint called');
+      console.log('📍 Headers:', req.headers.authorization);
+      
+      // Set proper headers for JSON response
+      res.setHeader('Content-Type', 'application/json');
+      
+      // Check if user is authenticated first
+      const sessionId = req.headers.authorization?.replace('Bearer ', '');
+      let user = null;
+      
+      if (sessionId && sessions.has(sessionId)) {
+        user = sessions.get(sessionId).user;
+        console.log('✅ Authenticated user:', user.id);
+      } else {
+        console.log('⚠️ No valid session found, sessionId:', sessionId);
+        console.log('📊 Available sessions:', Array.from(sessions.keys()));
+        
+        // Return error with proper JSON
+        return res.status(401).json({ 
+          message: 'Authentication required',
+          error: 'Please login to access VetsVan availability',
+          loginUrl: '/login'
+        });
+      }
       
       const drivers = await storage.getAllDrivers();
       const shifts = await storage.getAllShifts();
