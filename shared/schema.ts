@@ -459,6 +459,28 @@ export const insertInvoicePaymentSchema = createInsertSchema(invoicePayments).om
 export type InvoicePayment = typeof invoicePayments.$inferSelect;
 export type InsertInvoicePayment = z.infer<typeof insertInvoicePaymentSchema>;
 
+// Sessions table for production persistence
+export const userSessions = pgTable("user_sessions", {
+  id: text("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  userType: text("user_type").notNull().default("customer"), // customer, doctor, admin
+  userData: jsonb("user_data").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(),
+  lastAccessedAt: timestamp("last_accessed_at").defaultNow(),
+});
+
+export const insertSessionSchema = createInsertSchema(userSessions).pick({
+  id: true,
+  userId: true,
+  userType: true,
+  userData: true,
+  expiresAt: true,
+});
+
+export type UserSession = typeof userSessions.$inferSelect;
+export type InsertUserSession = z.infer<typeof insertSessionSchema>;
+
 // Products and Services tables for import system
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),

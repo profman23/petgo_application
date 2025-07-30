@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -159,6 +159,15 @@ export interface IStorage {
   createInvoicePayment(payment: InsertInvoicePayment): Promise<InvoicePayment>;
   getInvoicePaymentsByBooking(bookingId: number): Promise<InvoicePayment[]>;
   deleteInvoicePayment(paymentId: number): Promise<void>;
+
+  // Session operations for production persistence
+  createSession(session: InsertUserSession): Promise<UserSession>;
+  getSession(sessionId: string): Promise<UserSession | undefined>;
+  updateSessionLastAccessed(sessionId: string): Promise<void>;
+  deleteSession(sessionId: string): Promise<void>;
+  deleteExpiredSessions(): Promise<void>;
+  getUserSessions(userId: number): Promise<UserSession[]>;
+  getAllActiveSessions(): Promise<UserSession[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1065,6 +1074,49 @@ export class DatabaseStorage implements IStorage {
 
   async deleteInvoicePayment(paymentId: number): Promise<void> {
     await db.delete(invoicePayments).where(eq(invoicePayments.id, paymentId));
+  }
+
+  // Session operations for production persistence
+  async createSession(session: InsertUserSession): Promise<UserSession> {
+    const [newSession] = await db.insert(userSessions).values(session).returning();
+    return newSession;
+  }
+
+  async getSession(sessionId: string): Promise<UserSession | undefined> {
+    const [session] = await db.select().from(userSessions).where(eq(userSessions.id, sessionId));
+    if (!session) return undefined;
+    
+    // Check if session is expired
+    if (session.expiresAt && new Date() > session.expiresAt) {
+      await this.deleteSession(sessionId);
+      return undefined;
+    }
+    
+    // Update last accessed time
+    await this.updateSessionLastAccessed(sessionId);
+    return session;
+  }
+
+  async updateSessionLastAccessed(sessionId: string): Promise<void> {
+    await db.update(userSessions)
+      .set({ lastAccessedAt: new Date() })
+      .where(eq(userSessions.id, sessionId));
+  }
+
+  async deleteSession(sessionId: string): Promise<void> {
+    await db.delete(userSessions).where(eq(userSessions.id, sessionId));
+  }
+
+  async deleteExpiredSessions(): Promise<void> {
+    await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date()));
+  }
+
+  async getUserSessions(userId: number): Promise<UserSession[]> {
+    return await db.select().from(userSessions).where(eq(userSessions.userId, userId));
+  }
+
+  async getAllActiveSessions(): Promise<UserSession[]> {
+    return await db.select().from(userSessions).where(lt(new Date(), userSessions.expiresAt));
   }
 }
 

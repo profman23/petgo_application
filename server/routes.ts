@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { sessionService } from "./sessionService";
 import path from "path";
 import { fileURLToPath } from 'url';
 
@@ -12,39 +13,39 @@ import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
 // Payment service removed per user request
 
-// Simple session middleware
-const sessions = new Map();
-
-function generateSessionId() {
-  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-}
-
-function requireAuth(req: any, res: any, next: any) {
-  const sessionId = req.headers.authorization?.replace('Bearer ', '');
-  
-  if (!sessionId) {
-    console.log('⚠️ No token provided in request');
-    return res.status(401).json({ 
-      message: 'Unauthorized',
-      error: 'No authentication token provided'
+async function requireAuth(req: any, res: any, next: any) {
+  try {
+    const sessionId = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!sessionId) {
+      console.log('⚠️ No token provided in request');
+      return res.status(401).json({ 
+        message: 'Unauthorized',
+        error: 'No authentication token provided'
+      });
+    }
+    
+    const session = await sessionService.getSession(sessionId);
+    
+    if (!session) {
+      console.log('❌ Invalid or expired token:', sessionId);
+      return res.status(401).json({ 
+        message: 'Unauthorized',
+        error: 'Invalid or expired authentication token'
+      });
+    }
+    
+    console.log(`✅ Valid session found for user ${session.userId} (${session.userType})`);
+    req.user = session.userData;
+    req.session = session;
+    next();
+  } catch (error) {
+    console.error('❌ Authentication error:', error);
+    return res.status(500).json({ 
+      message: 'Authentication error',
+      error: 'Failed to validate session'
     });
   }
-  
-  const session = sessions.get(sessionId);
-  
-  if (!session) {
-    console.log('❌ Invalid token:', sessionId);
-    console.log('📊 Available sessions:', Array.from(sessions.keys()));
-    console.log('🔍 Session count:', sessions.size);
-    return res.status(401).json({ 
-      message: 'Unauthorized',
-      error: 'Invalid or expired authentication token'
-    });
-  }
-  
-  console.log('✅ Valid session found for user:', session.user?.id);
-  req.user = session.user;
-  next();
 }
 
 // Error message translations
@@ -126,12 +127,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
       }
       
-      const sessionId = generateSessionId();
-      sessions.set(sessionId, { user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType } });
+      const userData = { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType };
+      const sessionId = await sessionService.createSession(user.id, 'customer', userData, 24);
       
       res.json({ 
         token: sessionId, 
-        user: { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType }
+        user: userData
       });
     } catch (error) {
       console.error('Login error:', error);
@@ -219,9 +220,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/auth/logout', requireAuth, (req, res) => {
+  app.post('/api/auth/logout', requireAuth, async (req, res) => {
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
-    sessions.delete(sessionId);
+    await sessionService.deleteSession(sessionId);
     res.json({ message: 'تم تسجيل الخروج بنجاح' });
   });
 
@@ -360,15 +361,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.deleteOtpVerification(email);
           
           // Create session for automatic login
-          const sessionId = generateSessionId();
-          sessions.set(sessionId, { 
-            user: { 
-              id: newUser.id, 
-              phone: newUser.phone, 
-              name: newUser.name, 
-              membershipType: newUser.membershipType 
-            } 
-          });
+          const sessionUserData = { 
+            id: newUser.id, 
+            phone: newUser.phone, 
+            name: newUser.name, 
+            membershipType: newUser.membershipType 
+          };
+          const sessionId = await sessionService.createSession(newUser.id, 'customer', sessionUserData, 24);
           
           res.json({ 
             message: userLanguage === 'en' 
@@ -427,17 +426,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      const sessionId = generateSessionId();
-      sessions.set(sessionId, { 
-        user: { 
-          id: driver.id, 
-          phone: driver.phone, 
-          name: driver.name, 
-          membershipType: 'doctor',
-          vetsVanId: driver.id, // Using driver.id as VetsVan ID
-          vetsVanName: driver.vetsvanName
-        } 
-      });
+      const userData = { 
+        id: driver.id, 
+        phone: driver.phone, 
+        name: driver.name, 
+        membershipType: 'doctor',
+        vetsVanId: driver.id, // Using driver.id as VetsVan ID
+        vetsVanName: driver.vetsvanName
+      };
+      const sessionId = await sessionService.createSession(driver.id, 'doctor', userData, 24);
       
       res.json({ 
         token: sessionId, 
@@ -1120,14 +1117,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Test endpoint to verify API is working
-  app.get('/api/test', (req: any, res) => {
+  app.get('/api/test', async (req: any, res) => {
     console.log('🧪 Test endpoint called');
-    res.json({ 
-      message: 'API is working',
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      sessions: sessions.size
-    });
+    try {
+      const sessionCount = await sessionService.getActiveSessionCount();
+      res.json({ 
+        message: 'API is working',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        sessions: sessionCount
+      });
+    } catch (error) {
+      console.error('Test endpoint error:', error);
+      res.json({ 
+        message: 'API is working (session count unavailable)',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        sessions: 'N/A'
+      });
+    }
   });
 
   // Get all VetsVan with their available shifts for booking (Enhanced with comprehensive error handling)
@@ -1176,23 +1184,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let user = null;
       
       try {
-        if (sessionId && sessions.has(sessionId)) {
-          user = sessions.get(sessionId).user;
-          console.log('✅ Step 2 complete - Authenticated user:', user.id);
+        if (sessionId) {
+          const session = await sessionService.getSession(sessionId);
+          if (session) {
+            user = session.userData;
+            console.log('✅ Step 2 complete - Authenticated user:', user.id);
+          } else {
+            console.log('⚠️ Step 2 - Invalid or expired session');
+            const sessionCount = await sessionService.getActiveSessionCount();
+            
+            // Return 401 but continue for debugging in production
+            return res.status(401).json({ 
+              message: 'Authentication required',
+              error: 'Please login to access VetsVan availability',
+              loginUrl: '/login',
+              debug: {
+                sessionId: sessionId ? 'present' : 'missing',
+                activeSessions: sessionCount,
+                timestamp: new Date().toISOString()
+              }
+            });
+          }
         } else {
-          console.log('⚠️ Step 2 - No valid session found');
-          console.log('📊 SessionId:', sessionId);
-          console.log('📊 Available sessions count:', sessions.size);
-          console.log('📊 Session keys:', Array.from(sessions.keys()).slice(0, 3));
+          console.log('⚠️ Step 2 - No session ID provided');
+          const sessionCount = await sessionService.getActiveSessionCount();
           
-          // Return 401 but continue for debugging in production
           return res.status(401).json({ 
             message: 'Authentication required',
             error: 'Please login to access VetsVan availability',
             loginUrl: '/login',
             debug: {
-              sessionId: sessionId ? 'present' : 'missing',
-              sessionsCount: sessions.size,
+              sessionId: 'missing',
+              activeSessions: sessionCount,
               timestamp: new Date().toISOString()
             }
           });
@@ -1484,7 +1507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('📍 Request details:', {
         query: req.query,
         sessionId: req.headers.authorization?.replace('Bearer ', ''),
-        sessionsCount: sessions.size,
+        sessionInfo: req.session ? `Valid session for user ${req.session.userId}` : 'No session found',
         timestamp: new Date().toISOString()
       });
       
@@ -2046,24 +2069,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin Authentication
-  const adminSessions = new Map();
-
-  function requireAdminAuth(req: any, res: any, next: any) {
-    const sessionId = req.headers.authorization?.replace('Bearer ', '');
-    
-    if (!sessionId) {
-      return res.status(401).json({ message: 'Unauthorized' });
+  // Admin Authentication using database-backed sessions
+  async function requireAdminAuth(req: any, res: any, next: any) {
+    try {
+      const sessionId = req.headers.authorization?.replace('Bearer ', '');
+      
+      if (!sessionId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
+      const session = await sessionService.getSession(sessionId);
+      
+      if (!session || session.userType !== 'admin') {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      
+      req.admin = session.userData;
+      req.session = session;
+      next();
+    } catch (error) {
+      console.error('❌ Admin authentication error:', error);
+      return res.status(500).json({ message: 'Authentication error' });
     }
-    
-    const session = adminSessions.get(sessionId);
-    
-    if (!session || session.role !== 'admin') {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    
-    req.admin = session;
-    next();
   }
 
   // Admin login
@@ -2081,13 +2108,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      const sessionId = generateSessionId();
-      adminSessions.set(sessionId, {
+      const adminData = {
         id: admin.id,
         username: admin.username,
         name: admin.name,
         role: admin.role
-      });
+      };
+      const sessionId = await sessionService.createSession(admin.id, 'admin', adminData, 24);
 
       res.json({
         token: sessionId,
