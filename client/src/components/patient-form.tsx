@@ -158,11 +158,11 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   }}>
                     <SelectValue placeholder={t('selectPatientType')} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                     {(['Cat', 'Dog', 'Bird'] as const).map((type) => {
                       const IconComponent = animalIcons[type];
                       return (
-                        <SelectItem key={type} value={type}>
+                        <SelectItem key={type} value={type} style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                           <div className="flex items-center gap-2">
                             <IconComponent className="h-5 w-5 text-purple-600" />
                             <span>{t(type.toLowerCase() as 'cat' | 'dog' | 'bird')}</span>
@@ -193,11 +193,11 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   }}>
                     <SelectValue placeholder={t('selectPatientGender')} />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Male">
+                  <SelectContent style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                    <SelectItem value="Male" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                       <span>{t('male')}</span>
                     </SelectItem>
-                    <SelectItem value="Female">
+                    <SelectItem value="Female" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                       <span>{t('female')}</span>
                     </SelectItem>
                   </SelectContent>

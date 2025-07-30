@@ -1418,6 +1418,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update booking invoice generated status (Doctor only)
+  app.put('/api/bookings/:id/invoice-generated', requireAuth, async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.id);
+      const { invoiceGenerated } = req.body;
+      
+      // Validate invoiceGenerated is boolean
+      if (typeof invoiceGenerated !== 'boolean') {
+        return res.status(400).json({ 
+          message: 'invoiceGenerated must be a boolean value' 
+        });
+      }
+      
+      console.log(`🧾 Doctor ${req.user.username} updating booking ${bookingId} invoice_generated to: ${invoiceGenerated}`);
+      
+      const updatedBooking = await storage.updateBookingInvoiceGenerated(bookingId, invoiceGenerated);
+      
+      if (!updatedBooking) {
+        return res.status(404).json({ message: 'Booking not found' });
+      }
+      
+      console.log(`✅ Booking ${bookingId} invoice_generated updated successfully to: ${invoiceGenerated}`);
+      res.json({ 
+        success: true, 
+        booking: updatedBooking,
+        message: `Booking invoice_generated updated to ${invoiceGenerated}` 
+      });
+    } catch (error) {
+      console.error('Error updating booking invoice_generated:', error);
+      res.status(500).json({ message: 'Failed to update booking invoice_generated' });
+    }
+  });
+
   // Send tracking notification to customer (Doctor only)
   app.post('/api/bookings/:id/send-tracking', requireAuth, async (req: any, res) => {
     try {

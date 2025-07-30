@@ -283,6 +283,7 @@ export const bookings = pgTable("bookings", {
     ageDay?: number;
   }>>(),
   serviceType: text("service_type").default("General Check Up"),
+  invoiceGenerated: boolean("invoice_generated").notNull().default(false),
   // Payment fields removed per user request
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -298,6 +299,7 @@ export const insertBookingSchema = createInsertSchema(bookings).pick({
   customerLocation: true,
   selectedPets: true,
   serviceType: true,
+  invoiceGenerated: true,
   // Payment fields removed
 });
 

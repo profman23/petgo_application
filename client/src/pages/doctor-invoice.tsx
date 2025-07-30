@@ -869,6 +869,12 @@ export default function DoctorInvoice() {
         }
       });
 
+      // Mark invoice as generated in booking record
+      await apiRequest(`/api/bookings/${booking.id}/invoice-generated`, {
+        method: 'PUT',
+        body: { invoiceGenerated: true }
+      });
+
       // Lock the record (make invoice items read-only)
       setIsRecordLocked(true);
       setShowConfirmDialog(false);

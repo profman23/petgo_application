@@ -168,20 +168,20 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                   }}>
                     <SelectValue placeholder={t('selectPatientType')} />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Cat">
+                  <SelectContent style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                    <SelectItem value="Cat" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                       <div className="flex items-center gap-2">
                         <Cat className="h-4 w-4" />
                         <span>{language === 'ar' ? 'قطة' : 'Cat'}</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="Dog">
+                    <SelectItem value="Dog" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                       <div className="flex items-center gap-2">
                         <Dog className="h-4 w-4" />
                         <span>{language === 'ar' ? 'كلب' : 'Dog'}</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="Bird">
+                    <SelectItem value="Bird" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                       <div className="flex items-center gap-2">
                         <Bird className="h-4 w-4" />
                         <span>{language === 'ar' ? 'طائر' : 'Bird'}</span>
@@ -210,11 +210,11 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                   }}>
                     <SelectValue placeholder={t('selectPatientGender')} />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Male">
+                  <SelectContent style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
+                    <SelectItem value="Male" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                       <span>{t('male')}</span>
                     </SelectItem>
-                    <SelectItem value="Female">
+                    <SelectItem value="Female" style={{ textAlign: language === 'ar' ? 'right' : 'left' }}>
                       <span>{t('female')}</span>
                     </SelectItem>
                   </SelectContent>

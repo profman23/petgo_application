@@ -487,8 +487,8 @@ export default function CustomerActivity() {
                                 </Button>
                               )}
 
-                              {/* View Invoice Button for Completed Services Only */}
-                              {booking.status === 'completed' && (
+                              {/* View Invoice Button - Only show if invoice has been generated */}
+                              {booking.invoiceGenerated && (
                                 <Button
                                   onClick={() => {
                                     setSelectedInvoiceBooking(booking);
