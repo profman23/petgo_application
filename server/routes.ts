@@ -20,6 +20,12 @@ interface AuthenticatedRequest extends Request {
 interface AdminRequest extends Request {
   admin: Admin;
 }
+
+// Use generic interface for middleware compatibility
+interface AnyRequest extends Request {
+  user?: User & { membershipType: string };
+  admin?: Admin;
+}
 // Payment service removed per user request
 
 // Simple session middleware
@@ -29,7 +35,7 @@ function generateSessionId() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
-function requireAuth(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+function requireAuth(req: AnyRequest, res: Response, next: NextFunction) {
   const sessionId = req.headers.authorization?.replace('Bearer ', '');
   
   if (!sessionId) {
@@ -1127,7 +1133,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all VetsVan with their available shifts for booking
-  app.get('/api/vetsvan/availability', requireAuth, async (req: any, res) => {
+  app.get('/api/vetsvan/availability', requireAuth, async (req: AnyRequest, res: Response) => {
     try {
       const drivers = await storage.getAllDrivers();
       const shifts = await storage.getAllShifts();
@@ -1227,17 +1233,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       res.json(sortedVetsVans);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching VetsVan availability:', error);
       res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
     }
   });
 
   // Book an appointment
-  app.post('/api/bookings', requireAuth, async (req: any, res) => {
+  app.post('/api/bookings', requireAuth, async (req: AnyRequest, res: Response) => {
     try {
       const { shiftId, vetsVanId, appointmentDate, appointmentTime, customerLocation, selectedPets, serviceType } = req.body;
-      const userId = req.user.id;
+      const userId = req.user!.id;
       
       console.log('📍 Creating booking with request body:', req.body);
       console.log('📍 Customer location received:', customerLocation);
@@ -1358,9 +1364,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get user's bookings for Activity page
-  app.get('/api/user/bookings', requireAuth, async (req: any, res) => {
+  app.get('/api/user/bookings', requireAuth, async (req: AnyRequest, res: Response) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       const userBookings = await storage.getUserBookings(userId);
       
       // Get VetsVan details for each booking
@@ -1391,7 +1397,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       res.json(sortedBookings);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching user bookings:', error);
       res.status(500).json({ message: 'Failed to fetch user bookings' });
     }
@@ -1587,13 +1593,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get user's bookings
-  app.get('/api/user/bookings', requireAuth, async (req: any, res) => {
+  // Get user's bookings (Simple endpoint)
+  app.get('/api/user/bookings-simple', requireAuth, async (req: AnyRequest, res: Response) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user!.id;
       const bookings = await storage.getUserBookings(userId);
       res.json(bookings);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching user bookings:', error);
       res.status(500).json({ message: 'Failed to fetch bookings' });
     }
