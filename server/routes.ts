@@ -50,17 +50,18 @@ async function requireAuth(req: AnyRequest, res: Response, next: NextFunction) {
   
   try {
     // Try database first for production persistence
-    const [dbSession] = await db.select().from(sessionsTable).where(eq(sessionsTable.id, sessionId));
+    const [dbSession] = await db.select().from(sessionsTable).where(eq(sessionsTable.sid, sessionId));
     
     if (dbSession) {
       // Check if session expired
-      if (new Date() > dbSession.expiresAt) {
-        await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+      if (new Date() > dbSession.expire) {
+        await db.delete(sessionsTable).where(eq(sessionsTable.sid, sessionId));
         console.log('Session expired:', sessionId);
         return res.status(401).json({ message: 'Session expired' });
       }
       
-      req.user = dbSession.userData as any;
+      const sessionData = dbSession.sess as any;
+      req.user = sessionData.user || sessionData;
       return next();
     }
     
@@ -165,11 +166,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store session in database for production persistence
       try {
         await db.insert(sessionsTable).values({
-          id: sessionId,
-          userId: user.id,
-          userType: 'customer',
-          userData: userData as any,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+          sid: sessionId,
+          sess: { user: userData } as any,
+          expire: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
         });
       } catch (dbError) {
         console.log('Database session storage failed, using memory fallback');
@@ -272,7 +271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (sessionId) {
       // Remove from database
       try {
-        await db.delete(sessionsTable).where(eq(sessionsTable.id, sessionId));
+        await db.delete(sessionsTable).where(eq(sessionsTable.sid, sessionId));
       } catch (dbError) {
         console.log('Database session deletion failed, removing from memory');
       }
@@ -428,11 +427,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Store session in database for production persistence
           try {
             await db.insert(sessionsTable).values({
-              id: sessionId,
-              userId: newUser.id,
-              userType: 'customer',
-              userData: newUserData as any,
-              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+              sid: sessionId,
+              sess: { user: newUserData } as any,
+              expire: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
             });
           } catch (dbError) {
             console.log('Database session storage failed, using memory fallback');
@@ -504,11 +501,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store session in database for production persistence
       try {
         await db.insert(sessionsTable).values({
-          id: sessionId,
-          userId: driver.id,
-          userType: 'doctor',
-          userData: userData as any,
-          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+          sid: sessionId,
+          sess: { user: userData } as any,
+          expire: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
         });
       } catch (dbError) {
         console.log('Database session storage failed, using memory fallback');
