@@ -748,7 +748,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get customer information
-      const customer = await storage.getUser(activeRide.userId);
+      const customer = await storage.getUser(activeRide.customerId);
       
       res.json({
         ride: activeRide,
@@ -2122,8 +2122,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         vetsvanName: vetsVan.vetsvanName,
         latitude: vetsVan.latitude,
         longitude: vetsVan.longitude,
-        vehicleModel: vetsVan.vehicleModel || 'Mercedes Sprinter',
-        vehicleColor: vetsVan.vehicleColor || 'White',
+        vehicleModel: vetsVan.carModel || 'Mercedes Sprinter',
+        vehicleColor: vetsVan.carColor || 'White',
         plateNumber: vetsVan.plateNumber || 'ABC-123'
       };
       
@@ -2938,8 +2938,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await importProtection.createPostImportSnapshot();
       
       // Get current data counts
-      const allProducts = await storage.getAllProducts();
-      const allServices = await storage.getAllServices();
+      const allProducts = await storage.getProducts();
+      const allServices = await storage.getServices();
       
       res.json({
         success: true,
