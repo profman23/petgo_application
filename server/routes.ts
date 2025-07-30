@@ -2741,7 +2741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // New endpoint for specific generated invoice
+  // New endpoint for specific generated invoice by invoice number
   app.get('/api/generated-invoice/:invoiceNumber', async (req: any, res) => {
     try {
       const invoiceNumber = req.params.invoiceNumber;
@@ -2754,6 +2754,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(invoice);
     } catch (error) {
       console.error('Error fetching generated invoice:', error);
+      res.status(500).json({ message: 'Failed to fetch generated invoice' });
+    }
+  });
+
+  // New endpoint for generated invoice by booking ID
+  app.get('/api/generated-invoice/booking/:bookingId', async (req: any, res) => {
+    try {
+      const bookingId = parseInt(req.params.bookingId);
+      const invoice = await storage.getGeneratedInvoiceByBooking(bookingId);
+      
+      if (!invoice) {
+        return res.status(404).json({ message: 'Invoice not found for this booking' });
+      }
+
+      res.json(invoice);
+    } catch (error) {
+      console.error('Error fetching generated invoice by booking:', error);
       res.status(500).json({ message: 'Failed to fetch generated invoice' });
     }
   });

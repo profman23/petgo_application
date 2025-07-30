@@ -51,9 +51,9 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
     enabled: !!bookingId
   });
 
-  // Fetch real generated invoice data  
+  // Fetch real generated invoice data by booking ID
   const { data: generatedInvoice } = useQuery({
-    queryKey: [`/api/generated-invoice/Vets9000020`],
+    queryKey: [`/api/generated-invoice/booking/${bookingId}`],
     enabled: !!bookingId
   });
 
