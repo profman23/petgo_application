@@ -278,6 +278,21 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         console.log('🔍 VetsVanAvailabilityTable: Starting API call to /api/vetsvan/availability');
         console.log('📍 Location params:', userLocation);
         
+        // Check authentication state
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        console.log('🔐 Authentication status:', {
+          hasToken: !!token,
+          tokenLength: token?.length || 0,
+          hasUser: !!user,
+          userInfo: user ? JSON.parse(user) : null
+        });
+        
+        if (!token) {
+          console.error('❌ No authentication token found');
+          throw new Error('Please login to access VetsVan availability');
+        }
+        
         const params = new URLSearchParams();
         if (userLocation) {
           params.append('lat', userLocation.lat.toString());
@@ -291,11 +306,22 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         const response = await apiRequest(url);
         
         console.log('✅ VetsVanAvailabilityTable: API call successful');
-        console.log('📊 Response data length:', response?.length || 0);
+        console.log('📊 Response data:', response);
+        console.log('📊 Response type:', typeof response);
+        console.log('📊 Response is array:', Array.isArray(response));
+        console.log('📊 Response length:', response?.length || 0);
         
         return response;
       } catch (error) {
         console.error('❌ VetsVanAvailabilityTable: API call failed:', error);
+        
+        // Check if it's an authentication error
+        if (error instanceof Error && error.message.includes('Authentication')) {
+          console.log('🔐 Authentication error detected, redirecting to login');
+          window.location.href = '/';
+          return null;
+        }
+        
         throw error;
       }
     },
