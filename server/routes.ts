@@ -23,18 +23,20 @@ function requireAuth(req: any, res: any, next: any) {
   const sessionId = req.headers.authorization?.replace('Bearer ', '');
   
   if (!sessionId) {
-    console.log('No token provided');
+    console.log('🔐 AUTH ERROR: No token provided for', req.path);
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
   const session = sessions.get(sessionId);
   
   if (!session) {
-    console.log('Invalid token:', sessionId);
-    console.log('Available sessions:', Array.from(sessions.keys()));
+    console.log('🔐 AUTH ERROR: Invalid token for', req.path);
+    console.log('📋 Token provided:', sessionId);
+    console.log('📋 Available sessions:', Array.from(sessions.keys()).length, 'active sessions');
     return res.status(401).json({ message: 'Unauthorized' });
   }
   
+  console.log('✅ AUTH SUCCESS: User', session.user.id, 'accessed', req.path);
   req.user = session.user;
   next();
 }
@@ -532,6 +534,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get all rides for current user (for Activity page)
   app.get('/api/rides', requireAuth, async (req, res) => {
+    console.log('🚀 API Request: GET /api/rides');
+    console.log('👤 User:', req.user?.id, req.user?.membershipType);
+    
     try {
       const allRides = await storage.getAllRides();
       const userRides = allRides
@@ -544,12 +549,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(userRides);
     } catch (error) {
-      console.error('Error fetching user rides:', error);
-      res.status(500).json({ message: 'خطأ في جلب الطلبات' });
+      console.error('🚨 ERROR in GET /api/rides:');
+      console.error('📍 Error Type:', error?.constructor?.name || 'Unknown');
+      console.error('💬 Error Message:', (error as Error)?.message || 'No message');
+      console.error('🔍 Error Stack:', (error as Error)?.stack || 'No stack trace');
+      console.error('👤 User ID:', req.user?.id);
+      console.error('⏰ Error Timestamp:', new Date().toISOString());
+      console.error('━'.repeat(60));
+      
+      res.status(500).json({ 
+        message: 'خطأ في جلب الطلبات',
+        error: process.env.NODE_ENV === 'development' ? (error as Error)?.message : undefined
+      });
     }
   });
 
   app.get('/api/rides/active', requireAuth, async (req, res) => {
+    console.log('🚀 API Request: GET /api/rides/active');
+    console.log('👤 User:', req.user?.id, req.user?.membershipType);
+    
     try {
       const ride = await storage.getUserActiveRide(req.user.id);
       if (!ride) {
@@ -568,7 +586,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ ride, driver });
     } catch (error) {
-      res.status(500).json({ message: 'خطأ في جلب الرحلة النشطة' });
+      console.error('🚨 ERROR in GET /api/rides/active:');
+      console.error('📍 Error Type:', error?.constructor?.name || 'Unknown');
+      console.error('💬 Error Message:', (error as Error)?.message || 'No message');
+      console.error('🔍 Error Stack:', (error as Error)?.stack || 'No stack trace');
+      console.error('👤 User ID:', req.user?.id);
+      console.error('⏰ Error Timestamp:', new Date().toISOString());
+      console.error('━'.repeat(60));
+      
+      res.status(500).json({ 
+        message: 'خطأ في جلب الرحلة النشطة',
+        error: process.env.NODE_ENV === 'development' ? (error as Error)?.message : undefined
+      });
     }
   });
 
@@ -1115,10 +1144,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get all VetsVan with their available shifts for booking
   app.get('/api/vetsvan/availability', requireAuth, async (req: any, res) => {
+    console.log('🚀 API Request: GET /api/vetsvan/availability');
+    console.log('📍 User:', req.user?.id, req.user?.membershipType);
+    console.log('🔗 Query Params:', req.query);
+    
     try {
+      console.log('📊 Fetching data from storage...');
       const drivers = await storage.getAllDrivers();
       const shifts = await storage.getAllShifts();
       const bookings = await storage.getAllBookings();
+      console.log(`✅ Data loaded: ${drivers.length} drivers, ${shifts.length} shifts, ${bookings.length} bookings`);
       
       // Get customer location from query parameters
       const customerLat = req.query.lat ? parseFloat(req.query.lat) : null;
@@ -1213,15 +1248,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return 0;
       });
 
+      console.log('✅ Sending response with VetsVans data:', sortedVetsVans.length, 'items');
       res.json(sortedVetsVans);
     } catch (error) {
-      console.error('Error fetching VetsVan availability:', error);
-      res.status(500).json({ message: 'Failed to fetch VetsVan availability' });
+      console.error('🚨 ERROR in /api/vetsvan/availability:');
+      console.error('📍 Error Type:', error?.constructor?.name || 'Unknown');
+      console.error('💬 Error Message:', (error as Error)?.message || 'No message');
+      console.error('🔍 Error Stack:', (error as Error)?.stack || 'No stack trace');
+      console.error('📦 Request Details:', {
+        method: req.method,
+        path: req.path,
+        query: req.query,
+        userId: req.user?.id,
+        userType: req.user?.membershipType
+      });
+      console.error('⏰ Error Timestamp:', new Date().toISOString());
+      console.error('━'.repeat(60));
+      
+      res.status(500).json({ 
+        message: 'Failed to fetch VetsVan availability',
+        error: process.env.NODE_ENV === 'development' ? (error as Error)?.message : undefined
+      });
     }
   });
 
   // Book an appointment
   app.post('/api/bookings', requireAuth, async (req: any, res) => {
+    console.log('🚀 API Request: POST /api/bookings');
+    console.log('📍 User:', req.user?.id, req.user?.membershipType);
+    console.log('📦 Request Body:', JSON.stringify(req.body, null, 2));
+    
     try {
       const { shiftId, vetsVanId, appointmentDate, appointmentTime, customerLocation, selectedPets, serviceType } = req.body;
       const userId = req.user.id;
@@ -1309,13 +1365,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     } catch (error) {
-      console.error('Error creating booking:', error);
-      res.status(500).json({ message: 'Failed to book appointment' });
+      console.error('🚨 ERROR in POST /api/bookings:');
+      console.error('📍 Error Type:', error?.constructor?.name || 'Unknown');
+      console.error('💬 Error Message:', (error as Error)?.message || 'No message');
+      console.error('🔍 Error Stack:', (error as Error)?.stack || 'No stack trace');
+      console.error('📦 Request Body:', JSON.stringify(req.body, null, 2));
+      console.error('👤 User ID:', req.user?.id);
+      console.error('⏰ Error Timestamp:', new Date().toISOString());
+      console.error('━'.repeat(60));
+      
+      res.status(500).json({ 
+        message: 'Failed to book appointment',
+        error: process.env.NODE_ENV === 'development' ? (error as Error)?.message : undefined
+      });
     }
   });
 
   // Get bookings for a specific VetsVan (Doctor)
   app.get('/api/doctor/bookings/:vetsVanId', requireAuth, async (req: any, res) => {
+    console.log('🚀 API Request: GET /api/doctor/bookings/:vetsVanId');
+    console.log('📍 VetsVan ID:', req.params.vetsVanId);
+    console.log('👤 Doctor User:', req.user?.id, req.user?.membershipType);
+    
     try {
       const vetsVanId = parseInt(req.params.vetsVanId);
       const allBookings = await storage.getAllBookings();
