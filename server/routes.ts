@@ -1586,28 +1586,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get individual booking details for customer invoice
-  app.get('/api/user/booking/:bookingId', requireAuth, async (req: any, res) => {
-    try {
-      const bookingId = parseInt(req.params.bookingId);
-      const booking = await storage.getBookingWithDetails(bookingId);
-      
-      if (!booking) {
-        return res.status(404).json({ message: 'Booking not found' });
-      }
-      
-      // Check if the logged-in user owns this booking
-      if (booking.userId !== req.user.id) {
-        return res.status(403).json({ message: 'Access denied - not your booking' });
-      }
-      
-      res.json(booking);
-    } catch (error) {
-      console.error('Error fetching user booking:', error);
-      res.status(500).json({ message: 'Internal server error' });
-    }
-  });
-
   // Complete booking service (Doctor marks service as completed)
   app.post('/api/bookings/:bookingId/complete', requireAuth, async (req: any, res) => {
     try {

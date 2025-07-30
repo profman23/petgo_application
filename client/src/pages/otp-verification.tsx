@@ -231,13 +231,12 @@ export default function OtpVerification() {
                   name="otpCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor={`otp-code-${field.name}`} className="text-gray-700 dark:text-gray-300">
+                      <FormLabel className="text-gray-700 dark:text-gray-300">
                         {t.otpLabel}
                       </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
-                          id={`otp-code-${field.name}`}
                           type="text"
                           placeholder={t.otpPlaceholder}
                           maxLength={6}

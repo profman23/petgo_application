@@ -244,7 +244,9 @@ export default function Account() {
               }}>
                 {userProfile?.name || t('accountTitle')}
               </h1>
-
+              <p className="text-sm text-gray-600" style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>{t('accountSubtitle')}</p>
             </div>
           </div>
         </div>
@@ -258,7 +260,7 @@ export default function Account() {
             textAlign,
             fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
           }}>
-            {language === 'ar' ? 'تفاصيل الحساب' : 'Account Details'}
+            Account Details
           </span>
           {isAccountDetailsOpen ? (
             <ChevronUp className="text-purple-600" size={20} />
@@ -276,7 +278,7 @@ export default function Account() {
             textAlign,
             fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
           }}>
-            {language === 'ar' ? 'الحيوانات الأليفة' : 'Patients'}
+            Patients
           </span>
           <ArrowIcon className="text-purple-600" size={20} />
         </button>
@@ -392,7 +394,7 @@ export default function Account() {
             style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}
           >
             <Lock size={16} />
-            {language === 'ar' ? 'إعادة تعيين كلمة المرور' : 'Reset Password'}
+            Reset Password
           </button>
 
           {/* Save Button */}
@@ -402,10 +404,7 @@ export default function Account() {
             className="w-full bg-purple-600 hover:bg-purple-600 disabled:bg-purple-600 text-white font-medium py-3 rounded-md transition-colors"
             style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}
           >
-            {updateProfileMutation.isPending ? 
-              (language === 'ar' ? 'جارٍ الحفظ...' : 'Loading...') : 
-              (language === 'ar' ? 'حفظ الملف الشخصي' : 'Save Profile')
-            }
+            {updateProfileMutation.isPending ? 'Loading...' : 'Save Profile'}
           </button>
           </div>
         )}

@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car, Activity } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -25,7 +25,6 @@ import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
 import drPawsLogo from "@assets/Dr.Paws Logo_1753364291004.png";
 import eliteVetLogo from "@assets/Final LogoLogo_1753364291004.png";
-import surgicalToolsImage from "@assets/freepik__background__96281_1753796812008.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -53,7 +52,6 @@ export default function RideRequest() {
   const [isSlideComplete, setIsSlideComplete] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [showPartnersDialog, setShowPartnersDialog] = useState(false);
-  const [showDrPawsBooking, setShowDrPawsBooking] = useState(false);
   
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -107,23 +105,6 @@ export default function RideRequest() {
       selectedPatients: [],
     },
   });
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showDrPawsBooking) {
-        setShowDrPawsBooking(false);
-      }
-    };
-
-    if (showDrPawsBooking) {
-      document.addEventListener('click', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [showDrPawsBooking]);
 
   useEffect(() => {
     // Get user's current location with high accuracy - force new location request
@@ -842,22 +823,7 @@ export default function RideRequest() {
                 </SelectItem>
                 <SelectItem value="surgery" className="select-item-custom">
                   <div className="flex items-center gap-2">
-                    <img 
-                      src={surgicalToolsImage}
-                      alt="Surgery Tools" 
-                      className="w-4 h-4 object-contain"
-                      style={{
-                        filter: 'hue-rotate(340deg) saturate(1.2) brightness(0.8)',
-                        imageRendering: 'crisp-edges',
-                        display: 'block'
-                      }}
-                      onLoad={(e) => {
-                        console.log('Surgery image loaded successfully');
-                      }}
-                      onError={(e) => {
-                        console.error('Surgery image failed to load');
-                      }}
-                    />
+                    <Zap className="w-4 h-4 text-orange-600" />
                     <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
                   </div>
                 </SelectItem>
@@ -890,21 +856,16 @@ export default function RideRequest() {
                           alt="Location" 
                           className="w-5 h-5 object-contain"
                         />
-                        <FormLabel 
-                          htmlFor={`ride-pickup-location-${field.name}`}
-                          className="text-lg font-semibold text-gray-600" 
-                          style={{ 
-                            textAlign,
-                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                          }}
-                        >{t('yourLocation')}</FormLabel>
+                        <FormLabel className="text-lg font-semibold text-gray-600" style={{ 
+                          textAlign,
+                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                        }}>{t('yourLocation')}</FormLabel>
                       </div>
                       <FormControl>
                         <div className="flex items-center gap-3">
                           <Circle className="w-3 h-3 text-green-500 flex-shrink-0" />
                           <Input
                             {...field}
-                            id={`ride-pickup-location-${field.name}`}
                             placeholder={language === 'ar' ? 'موقعك الحالي' : 'Your current location'}
                             className={`flex-1 ${textAlign === 'right' ? 'text-right' : 'text-left'}`}
                             style={{ textAlign }}
@@ -1039,7 +1000,7 @@ export default function RideRequest() {
                     alt="Dr. Paws Logo" 
                     className="w-16 h-16 object-contain mb-2"
                   />
-                  <div className="flex gap-2 mb-2">
+                  <div className="flex gap-2">
                     {/* Phone Icon */}
                     <button
                       onClick={() => window.open('tel:+966920003045', '_self')}
@@ -1057,47 +1018,6 @@ export default function RideRequest() {
                       <MessageCircle className="w-4 h-4 text-green-600" />
                     </button>
                   </div>
-                  {/* Book Now Button with Dropdown */}
-                  <div className="text-center relative">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowDrPawsBooking(!showDrPawsBooking);
-                      }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 hover:text-green-800 font-medium text-sm rounded-lg border border-green-300 hover:border-green-400 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
-                      title={language === 'ar' ? 'اختر الفرع' : 'Choose Branch'}
-                    >
-                      {language === 'ar' ? 'احجز الآن' : 'Book Now'}
-                      <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${showDrPawsBooking ? 'rotate-180' : ''}`} />
-                    </button>
-                    
-                    {/* Dropdown Menu */}
-                    {showDrPawsBooking && (
-                      <div 
-                        className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-white border border-green-200 rounded-lg shadow-lg z-50 min-w-max"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="py-1">
-                          <a
-                            href="https://vet.digitail.io/clinics/dr-paws-sahafa-tel-920003045"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
-                          >
-                            {language === 'ar' ? 'احجز الآن فرع الصحافة' : 'Book Now Sahafa Branch'}
-                          </a>
-                          <a
-                            href="https://vet.digitail.io/clinics/dr-paws-mathar-phone-920003045"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block w-full px-4 py-2 text-sm text-green-700 hover:bg-green-50 transition-colors text-left"
-                          >
-                            {language === 'ar' ? 'احجز الآن فرع المطار' : 'Book Now Mathar Branch'}
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
               )}
 
@@ -1108,7 +1028,7 @@ export default function RideRequest() {
                   alt="Elite Vet Logo" 
                   className="w-16 h-16 object-contain mb-2"
                 />
-                <div className="flex gap-2 mb-2">
+                <div className="flex gap-2">
                   {/* Phone Icon */}
                   <button
                     onClick={() => window.open('tel:+966920011626', '_self')}
@@ -1125,22 +1045,6 @@ export default function RideRequest() {
                   >
                     <MessageCircle className="w-4 h-4 text-purple-600" />
                   </button>
-                </div>
-                {/* Book Now Link */}
-                <div className="text-center">
-                  <a 
-                    href="https://vet.digitail.io/clinics/elite-vet-qourtobah-tel-920011626"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-100 hover:bg-purple-200 font-medium text-sm rounded-lg border border-purple-300 hover:border-purple-400 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md"
-                    style={{ color: '#9333ea !important' }} // text-purple-600 equivalent
-                    title={language === 'ar' ? 'اضغط للحجز' : 'Click to book appointment'}
-                  >
-                    {language === 'ar' ? 'احجز الآن' : 'Book Now'}
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
                 </div>
               </div>
             </div>

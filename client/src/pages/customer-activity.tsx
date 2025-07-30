@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X, FileText, Eye } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, Truck, MapPin, Clock, User, Star, Navigation, Timer, TruckIcon, X } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -17,7 +17,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import UnifiedInvoice from '@/components/UnifiedInvoice';
 
 interface Booking {
   id: number;
@@ -54,10 +53,6 @@ export default function CustomerActivity() {
 
   // Tracking dialog states
   const [showTrackingDialog, setShowTrackingDialog] = useState(false);
-  
-  // Invoice viewing states
-  const [showInvoiceView, setShowInvoiceView] = useState(false);
-  const [selectedInvoiceBooking, setSelectedInvoiceBooking] = useState<Booking | null>(null);
   const [selectedTrackingBooking, setSelectedTrackingBooking] = useState<Booking | null>(null);
   const [trackingData, setTrackingData] = useState<any>(null);
 
@@ -486,21 +481,6 @@ export default function CustomerActivity() {
                                   }
                                 </Button>
                               )}
-
-                              {/* View Invoice Button for Completed Services Only */}
-                              {booking.status === 'completed' && (
-                                <Button
-                                  onClick={() => {
-                                    setSelectedInvoiceBooking(booking);
-                                    setShowInvoiceView(true);
-                                  }}
-                                  variant="outline"
-                                  className="w-full font-semibold py-2 px-4 text-blue-600 border-blue-200 hover:bg-blue-50"
-                                >
-                                  <Eye className="w-4 h-4 mr-2" />
-                                  {language === 'ar' ? 'عرض الفاتورة' : 'View Invoice'}
-                                </Button>
-                              )}
                             </div>
                           </div>
                         </CardContent>
@@ -592,29 +572,6 @@ export default function CustomerActivity() {
             setSelectedTrackingBooking(null);
           }}
         />
-      )}
-
-      {/* Invoice View Modal */}
-      {showInvoiceView && selectedInvoiceBooking && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-xl font-semibold">
-                {language === 'ar' ? 'عرض الفاتورة' : 'Invoice View'}
-              </h2>
-              <Button
-                variant="ghost"
-                onClick={() => setShowInvoiceView(false)}
-                className="text-gray-600 hover:text-gray-800"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            <div className="p-4">
-              <UnifiedInvoice bookingId={selectedInvoiceBooking.id} mode="view" userType="customer" />
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
