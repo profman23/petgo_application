@@ -273,22 +273,37 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
 
   const { data: vetsvanData, isLoading, error } = useQuery({
     queryKey: ['/api/vetsvan/availability', userLocation],
-    queryFn: () => {
-      const params = new URLSearchParams();
-      if (userLocation) {
-        params.append('lat', userLocation.lat.toString());
-        params.append('lon', userLocation.lon.toString());
-      }
-      const url = `/api/vetsvan/availability${params.toString() ? '?' + params.toString() : ''}`;
-      return fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+    queryFn: async () => {
+      try {
+        console.log('🔍 VetsVanAvailabilityTable: Starting API call to /api/vetsvan/availability');
+        console.log('📍 Location params:', userLocation);
+        
+        const params = new URLSearchParams();
+        if (userLocation) {
+          params.append('lat', userLocation.lat.toString());
+          params.append('lon', userLocation.lon.toString());
         }
-      }).then(res => res.json());
+        const url = `/api/vetsvan/availability${params.toString() ? '?' + params.toString() : ''}`;
+        
+        console.log('🌐 Making request to:', url);
+        
+        // Use apiRequest helper for proper error handling and authentication
+        const response = await apiRequest(url);
+        
+        console.log('✅ VetsVanAvailabilityTable: API call successful');
+        console.log('📊 Response data length:', response?.length || 0);
+        
+        return response;
+      } catch (error) {
+        console.error('❌ VetsVanAvailabilityTable: API call failed:', error);
+        throw error;
+      }
     },
     enabled: !!userLocation,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
+    retry: 3, // Retry 3 times on failure
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 
   // جلب حجوزات العميل الحالية
@@ -365,11 +380,25 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
   }
 
   if (error) {
+    console.error('❌ VetsVanAvailabilityTable: Error details:', error);
     return (
       <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-red-700 text-center" style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
-          {t('error')}
+        <p className="text-red-700 text-center font-medium mb-2" style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
+          {language === 'ar' ? 'خطأ في تحميل البيانات' : 'Error Loading Data'}
         </p>
+        <p className="text-red-600 text-sm text-center" style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
+          {language === 'ar' ? 
+            'فشل في تحميل مواعيد VetsVan. يرجى المحاولة مرة أخرى.' : 
+            'Failed to load VetsVan schedules. Please try again.'}
+        </p>
+        {process.env.NODE_ENV === 'development' && (
+          <details className="mt-2">
+            <summary className="text-red-500 text-xs cursor-pointer">Error Details (Development)</summary>
+            <pre className="text-red-500 text-xs mt-1 whitespace-pre-wrap">
+              {error instanceof Error ? error.message : String(error)}
+            </pre>
+          </details>
+        )}
       </div>
     );
   }
