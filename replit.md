@@ -778,6 +778,11 @@ Changelog:
 - July 30, 2025. ELIMINATED: generateInvoiceNumber fallback mechanism in UnifiedInvoice.tsx that was causing wrong number display
 - July 30, 2025. SUCCESS: Booking 53 now correctly displays Vets9000022 (22nd invoice in chronological sequence)
 - July 30, 2025. CONFIRMED: Invoice numbering system fully consistent across all database tables and UI components
+- July 30, 2025. DATA CLEANUP: Successfully removed all data for customer profman23@gmail.com (Mohamed Ghazal)
+- July 30, 2025. DELETED: 23 bookings, 20 generated invoices, 64 invoice items, 30 invoice payments, 5 payments, 1 additional payment
+- July 30, 2025. MAINTAINED: Customer account preserved in users table (ID: 70) - only removed bookings and invoices
+- July 30, 2025. RENUMBERED: Remaining invoices renumbered sequentially - 2 invoices remain as Vets9000001 and Vets9000002
+- July 30, 2025. VERIFIED: Database integrity maintained after mass deletion with proper foreign key handling
 - July 29, 2025. IMPLEMENTED: Custom surgical scalpel icon maintaining same size (w-4 h-4) and orange color (text-orange-600)
 - July 29, 2025. DESIGNED: Realistic scalpel icon with handle and blade details for Surgery service type selection
 - July 29, 2025. ENHANCED: Surgery icon updated to combine surgical scalpel and surgical scissors in one comprehensive icon
