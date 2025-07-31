@@ -31,7 +31,7 @@ export default function VetsVanBooking() {
             <tbody>
               {timeSlots.map((timeSlot, index) => (
                 <tr key={timeSlot} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                  <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                  <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium">
                     {timeSlot}
                   </td>
                   {/* Future column data will be added here */}
