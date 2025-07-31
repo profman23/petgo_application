@@ -1892,6 +1892,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get all Vets Vans for customer booking (accessible by customers)
+  app.get('/api/vetsvan/list', requireAuth, async (req: any, res) => {
+    try {
+      console.log('🔍 Customer VetsVan list endpoint called');
+      const drivers = await storage.getAllDrivers();
+      
+      // Return essential information for booking
+      const vetsVanList = drivers.map(driver => ({
+        id: driver.id,
+        name: driver.name,
+        vetsvanCode: driver.vetsvanCode,
+        vetsvanName: driver.vetsvanName,
+        isAvailable: driver.isAvailable,
+        username: driver.username
+      }));
+      
+      console.log(`✅ Retrieved ${vetsVanList.length} Vets Vans for customer booking`);
+      res.json(vetsVanList);
+    } catch (error) {
+      console.error('Error fetching Vets Van list:', error);
+      res.status(500).json({ message: 'Failed to fetch Vets Van list' });
+    }
+  });
+
   // Complete booking service (Doctor marks service as completed)
   app.post('/api/bookings/:bookingId/complete', requireAuth, async (req: any, res) => {
     try {
