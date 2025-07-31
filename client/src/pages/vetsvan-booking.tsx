@@ -48,6 +48,9 @@ export default function VetsVanBooking() {
     vetsVanCode: string;
   } | null>(null);
 
+  // Track locally booked slots for immediate visual feedback
+  const [locallyBookedSlots, setLocallyBookedSlots] = useState<Set<string>>(new Set());
+
   // Note: Past time slots are automatically styled with faded colors and disabled from booking
   // while still showing their original status (Available/Booked) for auditing purposes
 
@@ -198,6 +201,14 @@ export default function VetsVanBooking() {
       setIsBooking(true);
       setShowConfirmDialog(false);
       
+      // Add to locally booked slots immediately for visual feedback
+      const slotKey = `${pendingBooking.vetsVanId}-${pendingBooking.timeSlot}`;
+      setLocallyBookedSlots(prev => {
+        const newSet = new Set(prev);
+        newSet.add(slotKey);
+        return newSet;
+      });
+      
       // Create booking for the selected time slot
       createBookingMutation.mutate(pendingBooking);
       
@@ -281,25 +292,35 @@ export default function VetsVanBooking() {
   const getAvailabilityStatus = (vetsVanId: number, timeSlot: string) => {
     const isAvailable = isTimeSlotAvailable(vetsVanId, timeSlot);
     const isPast = isTimeSlotInPast(timeSlot, selectedDate);
+    const slotKey = `${vetsVanId}-${timeSlot}`;
+    const isLocallyBooked = locallyBookedSlots.has(slotKey);
     
-    // Determine the display text based on availability
-    let display = isAvailable ? 'Available' : '❌';
+    // Determine the display text based on availability and local booking status
+    let display = 'Available';
+    if (isLocallyBooked) {
+      display = 'Booked';
+    } else if (!isAvailable) {
+      display = '❌';
+    }
     
-    // If there's a specific booking for this slot, we could show "Booked" instead of ❌
-    // For now, keeping it simple with Available/❌
-    
-    // Determine styling based on past status and availability
+    // Determine styling based on past status, availability, and local booking
     let className = '';
     let isClickable = false;
     
     if (isPast) {
       // Past slots: faded styling, not clickable
-      className = isAvailable 
-        ? 'text-gray-400 font-medium opacity-50 cursor-not-allowed bg-gray-50' 
-        : 'text-gray-400 font-medium opacity-50 cursor-not-allowed bg-gray-100';
+      if (isLocallyBooked) {
+        className = 'text-gray-400 font-medium opacity-50 cursor-not-allowed bg-yellow-100';
+      } else {
+        className = isAvailable 
+          ? 'text-gray-400 font-medium opacity-50 cursor-not-allowed bg-gray-50' 
+          : 'text-gray-400 font-medium opacity-50 cursor-not-allowed bg-gray-100';
+      }
     } else {
       // Current/future slots: normal styling
-      if (isAvailable) {
+      if (isLocallyBooked) {
+        className = 'text-yellow-700 font-medium cursor-not-allowed bg-yellow-200';
+      } else if (isAvailable) {
         className = 'text-green-600 font-medium hover:text-green-700 hover:bg-green-50 cursor-pointer';
         isClickable = true;
       } else {
@@ -308,9 +329,9 @@ export default function VetsVanBooking() {
     }
     
     return {
-      isAvailable,
+      isAvailable: isAvailable && !isLocallyBooked,
       isPast,
-      isClickable,
+      isClickable: isClickable && !isLocallyBooked,
       display,
       className
     };
