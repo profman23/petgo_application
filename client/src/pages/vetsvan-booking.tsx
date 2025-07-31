@@ -260,9 +260,14 @@ export default function VetsVanBooking() {
           vetsVanId: vetsVanId,
           appointmentDate: selectedDate,
           appointmentTime: appointmentTime24,
-          customerLocation: null, // You can add location detection here if needed
-          selectedPets: [], // You can add pet selection if needed
-          serviceType: 'general_checkup'
+          customerLocation: rideRequestData ? {
+            latitude: rideRequestData.pickupLatitude,
+            longitude: rideRequestData.pickupLongitude,
+            address: rideRequestData.location || null
+          } : null,
+          selectedPets: rideRequestData?.selectedPatients ? 
+            patients.filter(p => rideRequestData.selectedPatients.includes(p.id)) : [],
+          serviceType: rideRequestData?.serviceType || 'general_checkup'
         }),
       });
 
