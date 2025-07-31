@@ -1,5 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 interface VetsVan {
   id: number;
@@ -23,6 +25,10 @@ interface Shift {
 export default function VetsVanBooking() {
   // Selected date for booking (defaults to today)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isBooking, setIsBooking] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   // Fetch all active Vets Vans using customer-accessible endpoint
   const { data: vetsVans = [], isLoading: loadingVetsVans } = useQuery<VetsVan[]>({
@@ -82,6 +88,88 @@ export default function VetsVanBooking() {
 
   // Filter only available Vets Vans
   const availableVetsVans = vetsVans.filter(van => van.isAvailable);
+
+  // Create booking mutation
+  const createBookingMutation = useMutation({
+    mutationFn: async ({ vetsVanId, timeSlot, vetsVanCode }: { vetsVanId: number; timeSlot: string; vetsVanCode: string }) => {
+      const customerToken = localStorage.getItem('token');
+      
+      if (!customerToken) {
+        throw new Error('Authentication required');
+      }
+
+      // Find the shift for this VetsVan and date
+      const shift = shifts.find(s => s.vetsVanId === vetsVanId && s.date === selectedDate);
+      if (!shift) {
+        throw new Error('No shift found for selected date and VetsVan');
+      }
+
+      // Convert time slot to 24-hour format
+      const convertTo24Hour = (time12: string): string => {
+        const [time, period] = time12.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        
+        if (period === 'PM' && hours !== 12) {
+          hours += 12;
+        } else if (period === 'AM' && hours === 12) {
+          hours = 0;
+        }
+        
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      };
+
+      const appointmentTime24 = convertTo24Hour(timeSlot);
+
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${customerToken}`,
+        },
+        body: JSON.stringify({
+          shiftId: shift.id,
+          vetsVanId: vetsVanId,
+          appointmentDate: selectedDate,
+          appointmentTime: appointmentTime24,
+          customerLocation: null, // You can add location detection here if needed
+          selectedPets: [], // You can add pet selection if needed
+          serviceType: 'general_checkup'
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to create booking');
+      }
+
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/shifts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/vetsvan-requests'] });
+      
+      toast({
+        title: "Booking Successful",
+        description: `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
+      });
+
+      console.log('🔔 Booking created successfully:', data);
+      
+      // Redirect to customer activity page
+      setLocation('/customer-activity');
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Booking Failed",
+        description: error.message || "Failed to create booking. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      setIsBooking(false);
+    }
+  });
 
   // Function to check if a time slot is available for a specific Vets Van
   const isTimeSlotAvailable = (vetsVanId: number, timeSlot: string): boolean => {
@@ -216,14 +304,28 @@ export default function VetsVanBooking() {
                         } ${availability.isAvailable ? 'hover:bg-purple-50 cursor-pointer' : 'cursor-not-allowed'}`}
                         style={{ textAlign: 'center' }}
                         onClick={() => {
-                          if (availability.isAvailable) {
-                            // Handle booking slot selection
-                            console.log(`Selected: ${timeSlot} for ${van.vetsvanCode}`);
+                          if (availability.isAvailable && !isBooking && !createBookingMutation.isPending) {
+                            // Prevent multiple simultaneous bookings
+                            setIsBooking(true);
+                            
+                            // Create booking for this time slot
+                            createBookingMutation.mutate({
+                              vetsVanId: van.id,
+                              timeSlot: timeSlot,
+                              vetsVanCode: van.vetsvanCode
+                            });
                           }
                         }}
                       >
                         <div className={`w-full h-full min-h-[40px] flex items-center justify-center ${availability.className} px-2 py-1 rounded`}>
-                          {availability.display}
+                          {(isBooking || createBookingMutation.isPending) && availability.isAvailable ? (
+                            <div className="flex items-center gap-1">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                              <span className="text-xs">Booking...</span>
+                            </div>
+                          ) : (
+                            availability.display
+                          )}
                         </div>
                       </td>
                     );
