@@ -22,19 +22,23 @@ export default function VetsVanBooking() {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-300">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400">
                   Time
                 </th>
-                {/* Future columns will be added here */}
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">
+                  {/* Placeholder for future columns */}
+                </th>
               </tr>
             </thead>
             <tbody>
               {timeSlots.map((timeSlot, index) => (
                 <tr key={timeSlot} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                  <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium border-r border-gray-300">
+                  <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium border-r-2 border-gray-400">
                     {timeSlot}
                   </td>
-                  {/* Future column data will be added here */}
+                  <td className="px-6 py-4">
+                    {/* Future column data will be added here */}
+                  </td>
                 </tr>
               ))}
             </tbody>
