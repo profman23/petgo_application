@@ -25,8 +25,8 @@ export default function VetsVanBooking() {
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400">
                   Time
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-400">
-                  {/* Placeholder for future columns */}
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                  Column 2
                 </th>
               </tr>
             </thead>
@@ -36,8 +36,8 @@ export default function VetsVanBooking() {
                   <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium border-r-2 border-gray-400">
                     {timeSlot}
                   </td>
-                  <td className="px-6 py-4">
-                    {/* Future column data will be added here */}
+                  <td className="px-6 py-4 text-left text-sm text-gray-600">
+                    Available
                   </td>
                 </tr>
               ))}
