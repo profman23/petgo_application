@@ -22,7 +22,7 @@ export default function VetsVanBooking() {
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r border-gray-300">
                   Time
                 </th>
                 {/* Future columns will be added here */}
@@ -31,7 +31,7 @@ export default function VetsVanBooking() {
             <tbody>
               {timeSlots.map((timeSlot, index) => (
                 <tr key={timeSlot} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                  <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium">
+                  <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium border-r border-gray-300">
                     {timeSlot}
                   </td>
                   {/* Future column data will be added here */}
