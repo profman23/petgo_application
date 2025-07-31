@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface VetsVan {
   id: number;
@@ -9,7 +10,20 @@ interface VetsVan {
   username: string;
 }
 
+interface Shift {
+  id: number;
+  vetsVanId: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+  duration: 'day' | 'week' | 'month';
+  status: 'scheduled' | 'active' | 'completed' | 'cancelled';
+}
+
 export default function VetsVanBooking() {
+  // Selected date for booking (defaults to today)
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
   // Fetch all active Vets Vans using customer-accessible endpoint
   const { data: vetsVans = [], isLoading: loadingVetsVans } = useQuery<VetsVan[]>({
     queryKey: ['/api/vetsvan/list'],
@@ -26,6 +40,27 @@ export default function VetsVanBooking() {
         },
       });
       if (!response.ok) throw new Error('Failed to fetch Vets Vans');
+      return await response.json();
+    },
+    retry: false,
+  });
+
+  // Fetch shifts for the selected date using customer-accessible endpoint
+  const { data: shifts = [], isLoading: loadingShifts } = useQuery<Shift[]>({
+    queryKey: ['/api/vetsvan/shifts', selectedDate],
+    queryFn: async () => {
+      const customerToken = localStorage.getItem('token');
+      
+      if (!customerToken) {
+        throw new Error('Authentication required');
+      }
+      
+      const response = await fetch(`/api/vetsvan/shifts?date=${selectedDate}`, {
+        headers: {
+          'Authorization': `Bearer ${customerToken}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch shifts');
       return await response.json();
     },
     retry: false,
@@ -48,7 +83,50 @@ export default function VetsVanBooking() {
   // Filter only available Vets Vans
   const availableVetsVans = vetsVans.filter(van => van.isAvailable);
 
-  if (loadingVetsVans) {
+  // Function to check if a time slot is available for a specific Vets Van
+  const isTimeSlotAvailable = (vetsVanId: number, timeSlot: string): boolean => {
+    // Find shift for this Vets Van on the selected date
+    const shift = shifts.find(s => s.vetsVanId === vetsVanId && s.date === selectedDate);
+    
+    if (!shift || shift.status === 'cancelled') {
+      return false; // No shift or cancelled shift means unavailable
+    }
+    
+    // Convert time slot to 24-hour format for comparison
+    const convertTo24Hour = (time12: string): string => {
+      const [time, period] = time12.split(' ');
+      let [hours, minutes] = time.split(':').map(Number);
+      
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
+    
+    const slotTime24 = convertTo24Hour(timeSlot);
+    const shiftStart = shift.startTime;
+    const shiftEnd = shift.endTime;
+    
+    // Check if the time slot falls within the shift time range
+    return slotTime24 >= shiftStart && slotTime24 < shiftEnd;
+  };
+
+  // Function to get availability status display
+  const getAvailabilityStatus = (vetsVanId: number, timeSlot: string) => {
+    const isAvailable = isTimeSlotAvailable(vetsVanId, timeSlot);
+    return {
+      isAvailable,
+      display: isAvailable ? 'Available' : '❌',
+      className: isAvailable 
+        ? 'text-green-600 font-medium hover:text-green-700 hover:bg-green-50' 
+        : 'text-red-500 font-bold cursor-not-allowed bg-red-50'
+    };
+  };
+
+  if (loadingVetsVans || loadingShifts) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center" dir="ltr">
         <div className="text-center">
@@ -66,9 +144,30 @@ export default function VetsVanBooking() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Vets Van Booking Schedule</h1>
-          <p className="text-gray-600">
-            Available Vets Vans: {availableVetsVans.length} | Total: {vetsVans.length}
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-600">
+                Available Vets Vans: {availableVetsVans.length} | Total: {vetsVans.length}
+              </p>
+              <p className="text-sm text-gray-500 mt-1">
+                Shifts loaded: {shifts.length} for {selectedDate}
+                {loadingShifts && <span className="ml-2 text-blue-600">(Loading shifts...)</span>}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="booking-date" className="text-sm font-medium text-gray-700">
+                Select Date:
+              </label>
+              <input
+                id="booking-date"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              />
+            </div>
+          </div>
         </div>
         
         {/* Table Container */}
@@ -107,23 +206,28 @@ export default function VetsVanBooking() {
                   <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium border-r-2 border-gray-400 sticky left-0 bg-inherit" style={{ textAlign: 'left' }}>
                     {timeSlot}
                   </td>
-                  {availableVetsVans.map((van, vanIndex) => (
-                    <td 
-                      key={van.id} 
-                      className={`px-6 py-4 text-center text-sm text-gray-600 hover:bg-purple-50 cursor-pointer transition-colors ${
-                        vanIndex < availableVetsVans.length - 1 ? 'border-r border-gray-300' : ''
-                      }`}
-                      style={{ textAlign: 'center' }}
-                      onClick={() => {
-                        // Handle booking slot selection
-                        console.log(`Selected: ${timeSlot} for ${van.vetsvanCode}`);
-                      }}
-                    >
-                      <button className="w-full h-full min-h-[40px] flex items-center justify-center text-green-600 font-medium hover:text-green-700">
-                        Available
-                      </button>
-                    </td>
-                  ))}
+                  {availableVetsVans.map((van, vanIndex) => {
+                    const availability = getAvailabilityStatus(van.id, timeSlot);
+                    return (
+                      <td 
+                        key={van.id} 
+                        className={`px-6 py-4 text-center text-sm transition-colors ${
+                          vanIndex < availableVetsVans.length - 1 ? 'border-r border-gray-300' : ''
+                        } ${availability.isAvailable ? 'hover:bg-purple-50 cursor-pointer' : 'cursor-not-allowed'}`}
+                        style={{ textAlign: 'center' }}
+                        onClick={() => {
+                          if (availability.isAvailable) {
+                            // Handle booking slot selection
+                            console.log(`Selected: ${timeSlot} for ${van.vetsvanCode}`);
+                          }
+                        }}
+                      >
+                        <div className={`w-full h-full min-h-[40px] flex items-center justify-center ${availability.className} px-2 py-1 rounded`}>
+                          {availability.display}
+                        </div>
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>

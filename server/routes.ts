@@ -1916,6 +1916,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get shifts for customer booking (accessible by customers)
+  app.get('/api/vetsvan/shifts', requireAuth, async (req: any, res) => {
+    try {
+      console.log('🔍 Customer shifts endpoint called');
+      const date = req.query.date as string;
+      
+      const shifts = await storage.getAllShifts();
+      
+      // Filter shifts by date if provided
+      const filteredShifts = date 
+        ? shifts.filter(shift => shift.date === date)
+        : shifts;
+      
+      // Return essential shift information for booking
+      const shiftList = filteredShifts.map(shift => ({
+        id: shift.id,
+        vetsVanId: shift.vetsVanId,
+        date: shift.date,
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        status: shift.status
+      }));
+      
+      console.log(`✅ Retrieved ${shiftList.length} shifts for customer booking`);
+      res.json(shiftList);
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
+      res.status(500).json({ message: 'Failed to fetch shifts' });
+    }
+  });
+
   // Complete booking service (Doctor marks service as completed)
   app.post('/api/bookings/:bookingId/complete', requireAuth, async (req: any, res) => {
     try {
