@@ -19,7 +19,11 @@ export default function VetsVanBooking() {
         
         {/* Table Container */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <table className="w-full">
+          <table className="w-full table-fixed">
+            <colgroup>
+              <col className="w-32" />
+              <col className="w-auto" />
+            </colgroup>
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400">
