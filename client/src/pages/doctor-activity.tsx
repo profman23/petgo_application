@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DoctorFooter } from '@/components/doctor-footer';
-import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, MapPin, User, Phone, Volume2, VolumeX, Copy, CheckCircle, Truck, Bell, Heart } from 'lucide-react';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
 import { useToast } from '@/hooks/use-toast';
@@ -31,6 +31,33 @@ interface Booking {
     longitude: number;
     address: string;
   };
+  selectedPets?: Array<{
+    id: number;
+    name: string;
+    type: string;
+  }>;
+  serviceType?: string;
+}
+
+interface DoctorNotification {
+  id: number;
+  type: string;
+  message: string;
+  vetsVanId: number;
+  appointmentDate: string;
+  appointmentTime: string;
+  customerName: string;
+  customerPhone: string;
+  serviceType: string;
+  selectedPets: string;
+  customerLocation?: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+  };
+  googleMapsUrl?: string;
+  createdAt: string;
+  isRead: boolean;
 }
 
 export default function DoctorActivity() {
@@ -52,6 +79,9 @@ export default function DoctorActivity() {
   // State for tracking notifications
   const [audioEnabled, setAudioEnabled] = useState(audioNotification.isAudioEnabled());
   const previousBookingCount = useRef<number>(0);
+  const previousNotificationCount = useRef<number>(0);
+  const [selectedNotification, setSelectedNotification] = useState<DoctorNotification | null>(null);
+  const [showNotificationDialog, setShowNotificationDialog] = useState(false);
 
   // Fetch VetsVan location information
   const { data: vetsVanInfo } = useQuery({
@@ -64,6 +94,13 @@ export default function DoctorActivity() {
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['/api/doctor/bookings'],
     refetchInterval: 5000, // Refresh every 5 seconds
+  });
+
+  // Fetch notifications for the current doctor's VetsVan
+  const { data: notifications = [], isLoading: loadingNotifications } = useQuery<DoctorNotification[]>({
+    queryKey: ['/api/doctor/notifications'],
+    refetchInterval: 3000, // Check for new notifications every 3 seconds
+    staleTime: 1000, // Consider data stale after 1 second for real-time updates
   });
 
   // Mutation to update booking status
@@ -120,6 +157,23 @@ export default function DoctorActivity() {
           'An error occurred while sending tracking notification',
         variant: 'destructive',
       });
+    },
+  });
+
+  // Mutation to mark notification as read
+  const markNotificationReadMutation = useMutation({
+    mutationFn: async (notificationId: number) => {
+      return await apiRequest(`/api/doctor/notifications/${notificationId}/read`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    },
+    onSuccess: () => {
+      // Refresh notifications after marking as read
+      queryClient.invalidateQueries({ queryKey: ['/api/doctor/notifications'] });
+    },
+    onError: (error: any) => {
+      console.error('Failed to mark notification as read:', error);
     },
   });
 
@@ -253,9 +307,10 @@ export default function DoctorActivity() {
   };
 
   // Open Google Maps with customer location
-  const openGoogleMaps = () => {
-    if (selectedBooking?.customerLocation) {
-      const { latitude, longitude } = selectedBooking.customerLocation;
+  const openGoogleMaps = (location?: { latitude: number; longitude: number }) => {
+    const targetLocation = location || selectedBooking?.customerLocation;
+    if (targetLocation) {
+      const { latitude, longitude } = targetLocation;
       const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
       
       // Try to open in new window/tab
@@ -272,6 +327,62 @@ export default function DoctorActivity() {
       });
     }
   };
+
+  // Handle notification click - open notification details and mark as read
+  const handleNotificationClick = (notification: DoctorNotification) => {
+    setSelectedNotification(notification);
+    setShowNotificationDialog(true);
+    
+    // Mark notification as read if not already read
+    if (!notification.isRead) {
+      markNotificationReadMutation.mutate(notification.id);
+    }
+  };
+
+  // Open Google Maps from notification
+  const openNotificationLocation = (notification: DoctorNotification) => {
+    if (notification.customerLocation) {
+      openGoogleMaps(notification.customerLocation);
+    } else if (notification.googleMapsUrl) {
+      window.open(notification.googleMapsUrl, '_blank');
+    }
+  };
+
+  // Monitor notifications for new alerts with enhanced details
+  useEffect(() => {
+    if (notifications && Array.isArray(notifications)) {
+      const currentCount = notifications.length;
+      
+      // Check if there are new notifications (avoid initial load notification)
+      if (previousNotificationCount.current > 0 && currentCount > previousNotificationCount.current) {
+        const latestNotification = notifications[0]; // Assuming sorted by newest first
+        
+        // Play audio notification if enabled
+        if (audioEnabled) {
+          playBookingNotification();
+        }
+        
+        // Show enhanced toast with pet information
+        toast({
+          title: language === 'ar' ? '🚨 إشعار جديد من VetsVan!' : '🚨 New VetsVan Notification!',
+          description: language === 'ar' ? 
+            `عميل جديد: ${latestNotification?.customerName}\nالحيوانات: ${latestNotification?.selectedPets}\nالخدمة: ${latestNotification?.serviceType}` :
+            `New customer: ${latestNotification?.customerName}\nPets: ${latestNotification?.selectedPets}\nService: ${latestNotification?.serviceType}`,
+          variant: 'default',
+        });
+
+        // Show browser notification if permission granted
+        if ('Notification' in window && Notification.permission === 'granted' && latestNotification) {
+          new Notification(language === 'ar' ? 'VetsVan - موعد جديد!' : 'VetsVan - New Appointment!', {
+            body: `${latestNotification.selectedPets} - ${latestNotification.customerName}`,
+            icon: '/favicon.ico'
+          });
+        }
+      }
+      
+      previousNotificationCount.current = currentCount;
+    }
+  }, [notifications, audioEnabled, language, toast]);
 
   // Group bookings by date with Today's Requests first
   const groupedBookings = React.useMemo(() => {
@@ -457,6 +568,79 @@ export default function DoctorActivity() {
                   </Button>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Notifications Section */}
+        {notifications && notifications.length > 0 && (
+          <Card className="mb-6 bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200">
+            <CardHeader className="pb-3">
+              <h3 className="text-lg font-semibold text-orange-900 flex items-center gap-2" style={{ textAlign }}>
+                <Bell className="w-5 h-5" />
+                {language === 'ar' ? 'الإشعارات' : 'Notifications'}
+                {notifications.filter(n => !n.isRead).length > 0 && (
+                  <Badge className="ml-2 bg-red-500 text-white">
+                    {notifications.filter(n => !n.isRead).length}
+                  </Badge>
+                )}
+              </h3>
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {notifications.slice(0, 5).map((notification) => (
+                  <div 
+                    key={notification.id}
+                    className={`p-3 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                      notification.isRead 
+                        ? 'bg-gray-50 border-gray-200' 
+                        : 'bg-white border-orange-300 shadow-sm'
+                    }`}
+                    onClick={() => handleNotificationClick(notification)}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className={`w-2 h-2 rounded-full ${notification.isRead ? 'bg-gray-300' : 'bg-orange-500'}`} />
+                          <span className="text-sm font-medium text-gray-900" style={{ textAlign }}>
+                            {notification.customerName}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {formatTime(notification.appointmentTime)}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-700 mb-1" style={{ textAlign }}>
+                          {notification.selectedPets} - {notification.serviceType}
+                        </div>
+                        <div className="text-xs text-gray-500" style={{ textAlign }}>
+                          {formatDate(notification.appointmentDate)}
+                        </div>
+                      </div>
+                      {notification.customerLocation && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-2 text-xs bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openNotificationLocation(notification);
+                          }}
+                        >
+                          <MapPin className="w-3 h-3 mr-1" />
+                          {language === 'ar' ? 'خرائط' : 'Maps'}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {notifications.length > 5 && (
+                <div className="text-center mt-3 pt-3 border-t border-orange-200">
+                  <p className="text-sm text-orange-700" style={{ textAlign }}>
+                    {language === 'ar' ? `عذرًا، ${notifications.length - 5} إشعارات أخرى...` : `${notifications.length - 5} more notifications...`}
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
@@ -809,6 +993,135 @@ export default function DoctorActivity() {
               />
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Notification Detail Dialog */}
+      <Dialog open={showNotificationDialog} onOpenChange={setShowNotificationDialog}>
+        <DialogContent className="sm:max-w-lg" dir={direction}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2" style={{ textAlign }}>
+              <Bell className="w-5 h-5 text-orange-600" />
+              {language === 'ar' ? 'تفاصيل الإشعار' : 'Notification Details'}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedNotification && (
+            <div className="space-y-4">
+              {/* Customer Info */}
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+                <h4 className="font-semibold text-blue-900 mb-3 flex items-center gap-2" style={{ textAlign }}>
+                  <User className="w-4 h-4" />
+                  {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-blue-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'الاسم:' : 'Name:'}
+                    </span>
+                    <span className="text-sm font-medium text-blue-900" style={{ textAlign }}>
+                      {selectedNotification.customerName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-blue-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'الهاتف:' : 'Phone:'}
+                    </span>
+                    <span className="text-sm font-medium text-blue-900" style={{ textAlign }}>
+                      {selectedNotification.customerPhone}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Appointment Info */}
+              <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                <h4 className="font-semibold text-green-900 mb-3 flex items-center gap-2" style={{ textAlign }}>
+                  <Calendar className="w-4 h-4" />
+                  {language === 'ar' ? 'معلومات الموعد' : 'Appointment Information'}
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-green-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'التاريخ:' : 'Date:'}
+                    </span>
+                    <span className="text-sm font-medium text-green-900" style={{ textAlign }}>
+                      {formatDate(selectedNotification.appointmentDate)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-green-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'الوقت:' : 'Time:'}
+                    </span>
+                    <span className="text-sm font-medium text-green-900" style={{ textAlign }}>
+                      {formatTime(selectedNotification.appointmentTime)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-green-700" style={{ textAlign }}>
+                      {language === 'ar' ? 'الخدمة:' : 'Service:'}
+                    </span>
+                    <span className="text-sm font-medium text-green-900" style={{ textAlign }}>
+                      {selectedNotification.serviceType}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pets Info */}
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                <h4 className="font-semibold text-purple-900 mb-3 flex items-center gap-2" style={{ textAlign }}>
+                  <Heart className="w-4 h-4" />
+                  {language === 'ar' ? 'الحيوانات الأليفة' : 'Pets'}
+                </h4>
+                <div className="text-sm font-medium text-purple-900" style={{ textAlign }}>
+                  {selectedNotification.selectedPets}
+                </div>
+              </div>
+
+              {/* Location & Actions */}
+              {selectedNotification.customerLocation && (
+                <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+                  <h4 className="font-semibold text-orange-900 mb-3 flex items-center gap-2" style={{ textAlign }}>
+                    <MapPin className="w-4 h-4" />
+                    {language === 'ar' ? 'الموقع والإجراءات' : 'Location & Actions'}
+                  </h4>
+                  <div className="space-y-3">
+                    {selectedNotification.customerLocation.address && (
+                      <div className="text-sm text-orange-700" style={{ textAlign }}>
+                        {selectedNotification.customerLocation.address}
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                        onClick={() => openNotificationLocation(selectedNotification)}
+                      >
+                        <MapPin className="w-4 h-4 mr-2" />
+                        {language === 'ar' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                        onClick={() => {
+                          window.open(`tel:${selectedNotification.customerPhone}`, '_self');
+                        }}
+                      >
+                        <Phone className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Notification Time */}
+              <div className="text-center text-xs text-gray-500 pt-2 border-t">
+                {language === 'ar' ? 'تم الإرسال:' : 'Sent:'} {new Date(selectedNotification.createdAt).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
