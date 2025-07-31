@@ -1600,58 +1600,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Store notification for real-time updates with enhanced details
+      // Store notification for real-time updates
+      // This could be enhanced with WebSocket or Server-Sent Events for real-time notifications
       console.log(`🔔 New booking notification for VetsVan ${vetsVanId}: ${customerName} booked ${appointmentTime} on ${appointmentDate}`);
-      
-      // Get selected pets information for notification
-      let petNamesWithEmojis = '';
-      if (selectedPets && Array.isArray(selectedPets)) {
-        const petEmojis = { 'Dog': '🐶', 'Cat': '🐱', 'Bird': '🐦' };
-        petNamesWithEmojis = selectedPets.map(pet => 
-          `${pet.name} ${petEmojis[pet.type] || '🐾'}`
-        ).join(', ');
-      }
-
-      // Create comprehensive notification data
-      const enhancedNotification = {
-        id: Date.now(), // Simple ID for tracking
-        type: 'new_booking',
-        message: `New appointment from ${customerName}`,
-        vetsVanId,
-        appointmentDate,
-        appointmentTime,
-        customerName,
-        customerPhone: user?.phone || 'Not provided',
-        serviceType: serviceType || 'General Service',
-        selectedPets: petNamesWithEmojis,
-        customerLocation,
-        googleMapsUrl: customerLocation ? 
-          `https://www.google.com/maps?q=${customerLocation.latitude},${customerLocation.longitude}` : null,
-        createdAt: new Date().toISOString(),
-        isRead: false
-      };
-
-      // Store notification in a simple in-memory store (could be enhanced with database)
-      if (!global.doctorNotifications) {
-        global.doctorNotifications = [];
-      }
-      global.doctorNotifications.push(enhancedNotification);
-      
-      // Keep only last 50 notifications
-      if (global.doctorNotifications.length > 50) {
-        global.doctorNotifications = global.doctorNotifications.slice(-50);
-      }
-
-      console.log(`📩 Enhanced notification created for VetsVan ${vetsVanId}:`, {
-        pets: petNamesWithEmojis,
-        service: serviceType,
-        location: customerLocation?.address || 'Location available'
-      });
 
       res.json({ 
         success: true, 
         booking,
-        notification: enhancedNotification
+        notification: {
+          message: `New booking from ${customerName}`,
+          vetsVanId,
+          appointmentDate,
+          appointmentTime
+        }
       });
     } catch (error) {
       console.error('Error creating booking:', error);
@@ -1888,72 +1849,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching doctor bookings:', error);
       res.status(500).json({ message: 'Failed to fetch doctor bookings' });
-    }
-  });
-
-  // Get notifications for doctor
-  app.get('/api/doctor/notifications', requireAuth, async (req: any, res) => {
-    try {
-      const user = req.user as any;
-      if (user.membershipType !== 'doctor') {
-        return res.status(403).json({ message: 'Access denied' });
-      }
-      
-      const vetsVanId = user.vetsVanId || user.id;
-      
-      if (!vetsVanId) {
-        return res.status(404).json({ message: 'VetsVan ID not found' });
-      }
-      
-      // Get notifications for this specific VetsVan
-      const notifications = global.doctorNotifications || [];
-      const vetsVanNotifications = notifications.filter(notification => 
-        notification.vetsVanId === vetsVanId
-      );
-      
-      // Sort by creation date (newest first)
-      const sortedNotifications = vetsVanNotifications.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      
-      console.log(`📱 Retrieved ${sortedNotifications.length} notifications for VetsVan ${vetsVanId}`);
-      res.json(sortedNotifications);
-    } catch (error) {
-      console.error('Error fetching doctor notifications:', error);
-      res.status(500).json({ message: 'Failed to fetch notifications' });
-    }
-  });
-
-  // Mark notification as read
-  app.put('/api/doctor/notifications/:id/read', requireAuth, async (req: any, res) => {
-    try {
-      const notificationId = parseInt(req.params.id);
-      const user = req.user as any;
-      if (user.membershipType !== 'doctor') {
-        return res.status(403).json({ message: 'Access denied' });
-      }
-      
-      const vetsVanId = user.vetsVanId || user.id;
-      
-      if (!global.doctorNotifications) {
-        return res.status(404).json({ message: 'Notification not found' });
-      }
-      
-      const notification = global.doctorNotifications.find(n => 
-        n.id === notificationId && n.vetsVanId === vetsVanId
-      );
-      
-      if (!notification) {
-        return res.status(404).json({ message: 'Notification not found' });
-      }
-      
-      notification.isRead = true;
-      console.log(`✅ Notification ${notificationId} marked as read for VetsVan ${vetsVanId}`);
-      
-      res.json({ success: true, notification });
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      res.status(500).json({ message: 'Failed to mark notification as read' });
     }
   });
 
