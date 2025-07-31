@@ -96,6 +96,27 @@ export default function VetsVanBooking() {
     retry: false,
   });
 
+  // Fetch existing bookings for the selected date
+  const { data: existingBookings = [], isLoading: loadingBookings } = useQuery({
+    queryKey: ['/api/bookings/date', selectedDate],
+    queryFn: async () => {
+      const customerToken = localStorage.getItem('token');
+      
+      if (!customerToken) {
+        throw new Error('Authentication required');
+      }
+      
+      const response = await fetch(`/api/bookings/by-date?date=${selectedDate}`, {
+        headers: {
+          'Authorization': `Bearer ${customerToken}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch bookings');
+      return await response.json();
+    },
+    retry: false,
+  });
+
   // Generate time slots from 9:00 AM to 9:00 PM
   const generateTimeSlots = () => {
     const slots = [];
@@ -288,28 +309,56 @@ export default function VetsVanBooking() {
     return false;
   };
 
+  // Function to check if a slot is already booked from server data
+  const isSlotBooked = (vetsVanId: number, timeSlot: string): boolean => {
+    // Convert time slot to 24-hour format for comparison
+    const convertTo24Hour = (time12: string): string => {
+      const [time, period] = time12.split(' ');
+      let [hours, minutes] = time.split(':').map(Number);
+      
+      if (period === 'PM' && hours !== 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
+
+    const slotTime24 = convertTo24Hour(timeSlot);
+    
+    // Check if there's a booking for this VetsVan at this time
+    return existingBookings.some((booking: any) => 
+      booking.vetsVanId === vetsVanId && 
+      booking.appointmentTime === slotTime24 &&
+      booking.appointmentDate === selectedDate
+    );
+  };
+
   // Function to get availability status display
   const getAvailabilityStatus = (vetsVanId: number, timeSlot: string) => {
     const isAvailable = isTimeSlotAvailable(vetsVanId, timeSlot);
     const isPast = isTimeSlotInPast(timeSlot, selectedDate);
     const slotKey = `${vetsVanId}-${timeSlot}`;
     const isLocallyBooked = locallyBookedSlots.has(slotKey);
+    const isServerBooked = isSlotBooked(vetsVanId, timeSlot);
+    const isActuallyBooked = isLocallyBooked || isServerBooked;
     
-    // Determine the display text based on availability and local booking status
+    // Determine the display text based on availability and booking status
     let display = 'Available';
-    if (isLocallyBooked) {
+    if (isActuallyBooked) {
       display = 'Booked';
     } else if (!isAvailable) {
       display = '❌';
     }
     
-    // Determine styling based on past status, availability, and local booking
+    // Determine styling based on past status, availability, and booking status
     let className = '';
     let isClickable = false;
     
     if (isPast) {
       // Past slots: faded styling, not clickable
-      if (isLocallyBooked) {
+      if (isActuallyBooked) {
         className = 'text-gray-400 font-medium opacity-50 cursor-not-allowed bg-yellow-100';
       } else {
         className = isAvailable 
@@ -318,7 +367,7 @@ export default function VetsVanBooking() {
       }
     } else {
       // Current/future slots: normal styling
-      if (isLocallyBooked) {
+      if (isActuallyBooked) {
         className = 'text-yellow-700 font-medium cursor-not-allowed bg-yellow-200';
       } else if (isAvailable) {
         className = 'text-green-600 font-medium hover:text-green-700 hover:bg-green-50 cursor-pointer';
@@ -329,20 +378,20 @@ export default function VetsVanBooking() {
     }
     
     return {
-      isAvailable: isAvailable && !isLocallyBooked,
+      isAvailable: isAvailable && !isActuallyBooked,
       isPast,
-      isClickable: isClickable && !isLocallyBooked,
+      isClickable: isClickable && !isActuallyBooked,
       display,
       className
     };
   };
 
-  if (loadingVetsVans || loadingShifts) {
+  if (loadingVetsVans || loadingShifts || loadingBookings) {
     return (
       <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center" dir="ltr">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading Vets Vans...</p>
+          <p className="text-gray-600">Loading booking data...</p>
         </div>
       </div>
     );

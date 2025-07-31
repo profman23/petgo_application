@@ -1892,6 +1892,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get bookings by date (for availability checking)
+  app.get('/api/bookings/by-date', requireAuth, async (req: any, res) => {
+    try {
+      const { date } = req.query;
+      
+      if (!date) {
+        return res.status(400).json({ message: 'Date parameter is required' });
+      }
+      
+      const allBookings = await storage.getAllBookings();
+      
+      // Filter bookings for the specific date
+      const dateBookings = allBookings.filter(booking => 
+        booking.appointmentDate === date
+      );
+      
+      // Return only essential fields for availability checking
+      const bookingsForDate = dateBookings.map(booking => ({
+        id: booking.id,
+        vetsVanId: booking.vetsVanId,
+        appointmentDate: booking.appointmentDate,
+        appointmentTime: booking.appointmentTime,
+        status: booking.status
+      }));
+      
+      res.json(bookingsForDate);
+    } catch (error) {
+      console.error('Error fetching bookings by date:', error);
+      res.status(500).json({ message: 'Failed to fetch bookings by date' });
+    }
+  });
+
   // Get all Vets Vans for customer booking (accessible by customers)
   app.get('/api/vetsvan/list', requireAuth, async (req: any, res) => {
     try {
