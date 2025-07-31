@@ -1,7 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { Card, CardContent } from "@/components/ui/card";
+import { MapPin, Stethoscope } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +34,20 @@ interface Shift {
   status: 'scheduled' | 'active' | 'completed' | 'cancelled';
 }
 
+interface Patient {
+  id: number;
+  name: string;
+  type: string;
+}
+
+interface RideRequestData {
+  selectedPatients: number[];
+  serviceType: string;
+  location: string;
+  pickupLatitude: number;
+  pickupLongitude: number;
+}
+
 export default function VetsVanBooking() {
   // Selected date for booking (defaults to today)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -51,8 +67,41 @@ export default function VetsVanBooking() {
   // Track locally booked slots for immediate visual feedback
   const [locallyBookedSlots, setLocallyBookedSlots] = useState<Set<string>>(new Set());
 
+  // Ride request data from localStorage
+  const [rideRequestData, setRideRequestData] = useState<RideRequestData | null>(null);
+
   // Note: Past time slots are automatically styled with faded colors and disabled from booking
   // while still showing their original status (Available/Booked) for auditing purposes
+
+  // Load ride request data from localStorage on component mount
+  useEffect(() => {
+    const savedRequestData = localStorage.getItem('pendingRequest');
+    if (savedRequestData) {
+      try {
+        const parsedData = JSON.parse(savedRequestData);
+        console.log('Loaded ride request data:', parsedData);
+        setRideRequestData(parsedData);
+      } catch (error) {
+        console.error('Error parsing ride request data:', error);
+      }
+    }
+  }, []);
+
+  // Fetch all patients for pet name lookup
+  const { data: patients = [] } = useQuery<Patient[]>({
+    queryKey: ['/api/patients'],
+    queryFn: async () => {
+      const customerToken = localStorage.getItem('token');
+      if (!customerToken) throw new Error('Authentication required');
+      
+      const response = await fetch('/api/patients', {
+        headers: { 'Authorization': `Bearer ${customerToken}` },
+      });
+      if (!response.ok) throw new Error('Failed to fetch patients');
+      return await response.json();
+    },
+    retry: false,
+  });
 
   // Fetch all active Vets Vans using customer-accessible endpoint
   const { data: vetsVans = [], isLoading: loadingVetsVans } = useQuery<VetsVan[]>({
@@ -133,6 +182,41 @@ export default function VetsVanBooking() {
 
   // Filter only available Vets Vans
   const availableVetsVans = vetsVans.filter(van => van.isAvailable);
+
+  // Helper function to get pet emoji based on type
+  const getPetEmoji = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'dog': return '🐶';
+      case 'cat': return '🐱';
+      case 'bird': return '🐦';
+      default: return '🐾';
+    }
+  };
+
+  // Helper function to get service type display name
+  const getServiceTypeDisplay = (serviceType: string) => {
+    const serviceMap: Record<string, string> = {
+      'general-checkup': 'General Check Up',
+      'grooming': 'Pet Grooming',
+      'vaccination': 'Vaccination',
+      'emergency': 'Emergency Care',
+      // Add more service types as needed
+    };
+    return serviceMap[serviceType] || serviceType;
+  };
+
+  // Get selected patients data for display
+  const getSelectedPetsDisplay = () => {
+    if (!rideRequestData || !rideRequestData.selectedPatients || patients.length === 0) {
+      return [];
+    }
+
+    return rideRequestData.selectedPatients
+      .map(petId => patients.find(pet => pet.id === petId))
+      .filter(Boolean) as Patient[];
+  };
+
+  const selectedPets = getSelectedPetsDisplay();
 
   // Create booking mutation
   const createBookingMutation = useMutation({
@@ -429,6 +513,70 @@ export default function VetsVanBooking() {
             </div>
           </div>
         </div>
+
+        {/* Ride Request Summary */}
+        {rideRequestData && selectedPets.length > 0 && (
+          <Card className="mb-6 border-2 border-purple-200 bg-purple-50">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                  <Stethoscope className="w-4 h-4 text-white" />
+                </div>
+                <h2 className="text-lg font-semibold text-purple-800">Request Summary</h2>
+              </div>
+              
+              <div className="space-y-3">
+                {/* Selected Pets */}
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 text-sm font-medium text-gray-700 min-w-[100px]">
+                    Selected Pets:
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedPets.map((pet, index) => (
+                      <span key={pet.id} className="inline-flex items-center gap-1 bg-white px-3 py-1 rounded-full text-sm font-medium text-purple-700 border border-purple-300">
+                        <span>{pet.name}</span>
+                        <span className="text-base">{getPetEmoji(pet.type)}</span>
+                        {index < selectedPets.length - 1 && <span className="text-purple-400">,</span>}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Service Type */}
+                {rideRequestData.serviceType && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0 text-sm font-medium text-gray-700 min-w-[100px]">
+                      Service Type:
+                    </div>
+                    <span className="inline-flex items-center gap-1 bg-white px-3 py-1 rounded-full text-sm font-medium text-purple-700 border border-purple-300">
+                      <Stethoscope className="w-3 h-3" />
+                      {getServiceTypeDisplay(rideRequestData.serviceType)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Location */}
+                {rideRequestData.location && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0 text-sm font-medium text-gray-700 min-w-[100px]">
+                      Service Location:
+                    </div>
+                    <span className="inline-flex items-center gap-1 bg-white px-3 py-1 rounded-full text-sm font-medium text-purple-700 border border-purple-300">
+                      <MapPin className="w-3 h-3" />
+                      {rideRequestData.location}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-purple-200">
+                <p className="text-sm text-purple-600 font-medium">
+                  Please select your preferred appointment time from the schedule below.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
         
         {/* Table Container */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
