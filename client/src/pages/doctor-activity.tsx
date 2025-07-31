@@ -414,7 +414,7 @@ export default function DoctorActivity() {
         </Card>
 
         {/* VetsVan Location Info Card */}
-        {vetsVanInfo && (
+        {vetsVanInfo && (vetsVanInfo as any).vetsvanName && (
           <Card className="mb-6 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -424,13 +424,13 @@ export default function DoctorActivity() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-blue-900" style={{ textAlign }}>
-                      {vetsVanInfo.vetsvanName} ({vetsVanInfo.vetsvanCode})
+                      {(vetsVanInfo as any).vetsvanName} ({(vetsVanInfo as any).vetsvanCode})
                     </h3>
                     <p className="text-sm text-blue-700" style={{ textAlign }}>
-                      {vetsVanInfo.carModel} - {vetsVanInfo.carColor}
+                      {(vetsVanInfo as any).carModel} - {(vetsVanInfo as any).carColor}
                     </p>
                     <p className="text-xs text-blue-600" style={{ textAlign }}>
-                      {language === 'ar' ? 'رقم اللوحة:' : 'Plate:'} {vetsVanInfo.plateNumber}
+                      {language === 'ar' ? 'رقم اللوحة:' : 'Plate:'} {(vetsVanInfo as any).plateNumber}
                     </p>
                   </div>
                 </div>
@@ -439,14 +439,14 @@ export default function DoctorActivity() {
                     {language === 'ar' ? 'الموقع المحدد:' : 'Set Location:'}
                   </div>
                   <div className="text-sm font-mono text-blue-800" style={{ textAlign }}>
-                    {vetsVanInfo.latitude?.toFixed(6)}, {vetsVanInfo.longitude?.toFixed(6)}
+                    {(vetsVanInfo as any).latitude?.toFixed(6)}, {(vetsVanInfo as any).longitude?.toFixed(6)}
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
                     className="mt-2 text-xs h-6 px-2 bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200"
                     onClick={() => {
-                      const url = `https://www.google.com/maps?q=${vetsVanInfo.latitude},${vetsVanInfo.longitude}`;
+                      const url = `https://www.google.com/maps?q=${(vetsVanInfo as any).latitude},${(vetsVanInfo as any).longitude}`;
                       window.open(url, '_blank');
                     }}
                   >
@@ -688,47 +688,31 @@ export default function DoctorActivity() {
                 </p>
               </div>
 
-              {/* Google Maps Embed */}
+              {/* Location Details Card */}
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
-                <div className="p-3 bg-gray-50 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2" style={{ textAlign }}>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4" style={{ textAlign }}>
                     <MapPin className="w-5 h-5 text-blue-600" />
-                    {language === 'ar' ? 'موقع العميل على الخريطة' : 'Customer Location on Map'}
+                    {language === 'ar' ? 'تفاصيل الموقع' : 'Location Details'}
                   </h3>
-                </div>
-                
-                {/* Google Maps iFrame */}
-                <div className="relative">
-                  <iframe
-                    width="100%"
-                    height="300"
-                    style={{ border: 0 }}
-                    src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOMD0C3d8kuLdg&q=${selectedBooking.customerLocation.latitude},${selectedBooking.customerLocation.longitude}&zoom=16&maptype=roadmap`}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={language === 'ar' ? 'موقع العميل' : 'Customer Location'}
-                  />
-                </div>
-                
-                {/* Map Controls */}
-                <div className="p-4 bg-gray-50 border-t border-gray-200">
-                  <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                    <div>
+                  
+                  {/* Coordinates Grid */}
+                  <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+                    <div className="bg-gray-50 p-3 rounded-lg">
                       <span className="font-semibold text-gray-700">
                         {language === 'ar' ? 'خط العرض:' : 'Latitude:'}
                       </span>
                       <br />
-                      <span className="font-mono text-blue-600">
+                      <span className="font-mono text-blue-600 text-lg">
                         {selectedBooking.customerLocation.latitude.toFixed(6)}
                       </span>
                     </div>
-                    <div>
+                    <div className="bg-gray-50 p-3 rounded-lg">
                       <span className="font-semibold text-gray-700">
                         {language === 'ar' ? 'خط الطول:' : 'Longitude:'}
                       </span>
                       <br />
-                      <span className="font-mono text-blue-600">
+                      <span className="font-mono text-blue-600 text-lg">
                         {selectedBooking.customerLocation.longitude.toFixed(6)}
                       </span>
                     </div>
@@ -765,7 +749,7 @@ export default function DoctorActivity() {
               </div>
 
               {/* Customer Contact Info */}
-              <div className="#85208550 p-4 rounded-lg">
+              <div className="bg-purple-50 p-4 rounded-lg">
                 <h4 className="font-semibold text-purple-600 mb-3" style={{ textAlign }}>
                   {language === 'ar' ? 'معلومات التواصل' : 'Contact Information'}
                 </h4>
