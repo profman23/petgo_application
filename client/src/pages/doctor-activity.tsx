@@ -71,7 +71,6 @@ export default function DoctorActivity() {
     mutationFn: async ({ bookingId, status }: { bookingId: number; status: string }) => {
       return await apiRequest(`/api/bookings/${bookingId}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
       });
     },
@@ -101,7 +100,6 @@ export default function DoctorActivity() {
     mutationFn: async (bookingId: number) => {
       return await apiRequest(`/api/bookings/${bookingId}/send-tracking`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
       });
     },
     onSuccess: () => {
@@ -605,11 +603,16 @@ export default function DoctorActivity() {
                         className="bg-green-100 border-green-300 text-green-700 hover:bg-green-200 hover:border-green-400"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent card click event
-                          // Customer Location functionality will be implemented later
-                          toast({
-                            title: language === 'ar' ? 'موقع العميل' : 'Customer Location',
-                            description: language === 'ar' ? 'سيتم تفعيل هذه الميزة قريباً' : 'This feature will be activated soon',
-                          });
+                          if (booking.customerLocation) {
+                            setSelectedBooking(booking);
+                            setShowMap(true);
+                          } else {
+                            toast({
+                              title: language === 'ar' ? 'موقع غير متوفر' : 'Location Not Available',
+                              description: language === 'ar' ? 'لا يتوفر موقع لهذا العميل' : 'No location available for this customer',
+                              variant: 'destructive',
+                            });
+                          }
                         }}
                       >
                         <MapPin className="w-4 h-4 mr-2" />
@@ -685,16 +688,32 @@ export default function DoctorActivity() {
                 </p>
               </div>
 
-              {/* Interactive Map Placeholder */}
-              <div className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-dashed border-blue-300 rounded-lg p-6 text-center">
-                <MapPin className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  {language === 'ar' ? 'موقع العميل على الخريطة' : 'Customer Location on Map'}
-                </h3>
+              {/* Google Maps Embed */}
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                <div className="p-3 bg-gray-50 border-b border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2" style={{ textAlign }}>
+                    <MapPin className="w-5 h-5 text-blue-600" />
+                    {language === 'ar' ? 'موقع العميل على الخريطة' : 'Customer Location on Map'}
+                  </h3>
+                </div>
                 
-                {/* Detailed Location Info */}
-                <div className="bg-white rounded-lg p-4 mb-4 border border-blue-200">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                {/* Google Maps iFrame */}
+                <div className="relative">
+                  <iframe
+                    width="100%"
+                    height="300"
+                    style={{ border: 0 }}
+                    src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOMD0C3d8kuLdg&q=${selectedBooking.customerLocation.latitude},${selectedBooking.customerLocation.longitude}&zoom=16&maptype=roadmap`}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title={language === 'ar' ? 'موقع العميل' : 'Customer Location'}
+                  />
+                </div>
+                
+                {/* Map Controls */}
+                <div className="p-4 bg-gray-50 border-t border-gray-200">
+                  <div className="grid grid-cols-2 gap-4 text-sm mb-4">
                     <div>
                       <span className="font-semibold text-gray-700">
                         {language === 'ar' ? 'خط العرض:' : 'Latitude:'}
@@ -715,49 +734,33 @@ export default function DoctorActivity() {
                     </div>
                   </div>
                   
-                  {/* Copy Coordinates Button */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-3 text-xs"
-                    onClick={() => {
-                      if (selectedBooking?.customerLocation) {
-                        const coords = `${selectedBooking.customerLocation.latitude},${selectedBooking.customerLocation.longitude}`;
-                        navigator.clipboard.writeText(coords);
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 justify-center">
+                    <Button 
+                      onClick={openGoogleMaps}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
+                      size="sm"
+                    >
+                      <MapPin className="w-4 h-4 mr-2" />
+                      {language === 'ar' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'}
+                    </Button>
+                    
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const { latitude, longitude } = selectedBooking.customerLocation!;
+                        navigator.clipboard.writeText(`${latitude}, ${longitude}`);
                         toast({
                           title: language === 'ar' ? 'تم النسخ' : 'Copied',
                           description: language === 'ar' ? 'تم نسخ الإحداثيات' : 'Coordinates copied to clipboard',
                         });
-                      }
-                    }}
-                  >
-                    📋 {language === 'ar' ? 'نسخ الإحداثيات' : 'Copy Coordinates'}
-                  </Button>
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="flex gap-3 justify-center">
-                  <Button 
-                    onClick={openGoogleMaps}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
-                  >
-                    <MapPin className="w-4 h-4 mr-2" />
-                    {language === 'ar' ? 'فتح في خرائط جوجل' : 'Open in Google Maps'}
-                  </Button>
-                  
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      const { latitude, longitude } = selectedBooking.customerLocation!;
-                      navigator.clipboard.writeText(`${latitude}, ${longitude}`);
-                      toast({
-                        title: language === 'ar' ? 'تم النسخ' : 'Copied',
-                        description: language === 'ar' ? 'تم نسخ الإحداثيات' : 'Coordinates copied to clipboard',
-                      });
-                    }}
-                  >
-                    {language === 'ar' ? 'نسخ الإحداثيات' : 'Copy Coordinates'}
-                  </Button>
+                      }}
+                    >
+                      <Copy className="w-4 h-4 mr-2" />
+                      {language === 'ar' ? 'نسخ الإحداثيات' : 'Copy Coordinates'}
+                    </Button>
+                  </div>
                 </div>
               </div>
 
