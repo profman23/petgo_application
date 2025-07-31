@@ -14,22 +14,22 @@ export default function VetsVanBooking() {
   const timeSlots = generateTimeSlots();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8" dir="ltr">
       <div className="max-w-4xl mx-auto px-4">
         
         {/* Table Container */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <table className="w-full table-fixed">
+          <table className="w-full table-fixed" style={{ direction: 'ltr' }}>
             <colgroup>
-              <col className="w-32" />
-              <col className="w-auto" />
+              <col style={{ width: '150px' }} />
+              <col style={{ width: 'auto' }} />
             </colgroup>
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400" style={{ textAlign: 'left' }}>
                   Time
                 </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900" style={{ textAlign: 'left' }}>
                   Column 2
                 </th>
               </tr>
@@ -37,10 +37,10 @@ export default function VetsVanBooking() {
             <tbody>
               {timeSlots.map((timeSlot, index) => (
                 <tr key={timeSlot} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                  <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium border-r-2 border-gray-400">
+                  <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium border-r-2 border-gray-400" style={{ textAlign: 'left' }}>
                     {timeSlot}
                   </td>
-                  <td className="px-6 py-4 text-left text-sm text-gray-600">
+                  <td className="px-6 py-4 text-left text-sm text-gray-600" style={{ textAlign: 'left' }}>
                     Available
                   </td>
                 </tr>
