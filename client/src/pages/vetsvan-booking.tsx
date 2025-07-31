@@ -30,6 +30,9 @@ export default function VetsVanBooking() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
 
+  // Note: Past time slots are automatically styled with faded colors and disabled from booking
+  // while still showing their original status (Available/Booked) for auditing purposes
+
   // Fetch all active Vets Vans using customer-accessible endpoint
   const { data: vetsVans = [], isLoading: loadingVetsVans } = useQuery<VetsVan[]>({
     queryKey: ['/api/vetsvan/list'],
@@ -202,15 +205,77 @@ export default function VetsVanBooking() {
     return slotTime24 >= shiftStart && slotTime24 < shiftEnd;
   };
 
+  // Function to check if a time slot is in the past
+  const isTimeSlotInPast = (timeSlot: string, date: string): boolean => {
+    const now = new Date();
+    const currentDate = now.toISOString().split('T')[0];
+    
+    // If the selected date is before today, all slots are in the past
+    if (date < currentDate) {
+      return true;
+    }
+    
+    // If the selected date is today, check if the time has passed
+    if (date === currentDate) {
+      const convertTo24Hour = (time12: string): string => {
+        const [time, period] = time12.split(' ');
+        let [hours, minutes] = time.split(':').map(Number);
+        
+        if (period === 'PM' && hours !== 12) {
+          hours += 12;
+        } else if (period === 'AM' && hours === 12) {
+          hours = 0;
+        }
+        
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      };
+      
+      const slotTime24 = convertTo24Hour(timeSlot);
+      const currentTime = now.toTimeString().split(' ')[0].substring(0, 5); // HH:MM format
+      
+      return slotTime24 <= currentTime;
+    }
+    
+    // Future dates are not in the past
+    return false;
+  };
+
   // Function to get availability status display
   const getAvailabilityStatus = (vetsVanId: number, timeSlot: string) => {
     const isAvailable = isTimeSlotAvailable(vetsVanId, timeSlot);
+    const isPast = isTimeSlotInPast(timeSlot, selectedDate);
+    
+    // Determine the display text based on availability
+    let display = isAvailable ? 'Available' : '❌';
+    
+    // If there's a specific booking for this slot, we could show "Booked" instead of ❌
+    // For now, keeping it simple with Available/❌
+    
+    // Determine styling based on past status and availability
+    let className = '';
+    let isClickable = false;
+    
+    if (isPast) {
+      // Past slots: faded styling, not clickable
+      className = isAvailable 
+        ? 'text-gray-400 font-medium opacity-50 cursor-not-allowed bg-gray-50' 
+        : 'text-gray-400 font-medium opacity-50 cursor-not-allowed bg-gray-100';
+    } else {
+      // Current/future slots: normal styling
+      if (isAvailable) {
+        className = 'text-green-600 font-medium hover:text-green-700 hover:bg-green-50 cursor-pointer';
+        isClickable = true;
+      } else {
+        className = 'text-red-500 font-bold cursor-not-allowed bg-red-50';
+      }
+    }
+    
     return {
       isAvailable,
-      display: isAvailable ? 'Available' : '❌',
-      className: isAvailable 
-        ? 'text-green-600 font-medium hover:text-green-700 hover:bg-green-50' 
-        : 'text-red-500 font-bold cursor-not-allowed bg-red-50'
+      isPast,
+      isClickable,
+      display,
+      className
     };
   };
 
@@ -301,10 +366,10 @@ export default function VetsVanBooking() {
                         key={van.id} 
                         className={`px-6 py-4 text-center text-sm transition-colors ${
                           vanIndex < availableVetsVans.length - 1 ? 'border-r border-gray-300' : ''
-                        } ${availability.isAvailable ? 'hover:bg-purple-50 cursor-pointer' : 'cursor-not-allowed'}`}
+                        } ${availability.isClickable ? 'hover:bg-purple-50' : ''}`}
                         style={{ textAlign: 'center' }}
                         onClick={() => {
-                          if (availability.isAvailable && !isBooking && !createBookingMutation.isPending) {
+                          if (availability.isClickable && !availability.isPast && !isBooking && !createBookingMutation.isPending) {
                             // Prevent multiple simultaneous bookings
                             setIsBooking(true);
                             
@@ -318,7 +383,7 @@ export default function VetsVanBooking() {
                         }}
                       >
                         <div className={`w-full h-full min-h-[40px] flex items-center justify-center ${availability.className} px-2 py-1 rounded`}>
-                          {(isBooking || createBookingMutation.isPending) && availability.isAvailable ? (
+                          {(isBooking || createBookingMutation.isPending) && availability.isClickable && !availability.isPast ? (
                             <div className="flex items-center gap-1">
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
                               <span className="text-xs">Booking...</span>
