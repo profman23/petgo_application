@@ -2,6 +2,16 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface VetsVan {
   id: number;
@@ -29,6 +39,14 @@ export default function VetsVanBooking() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+
+  // Confirmation dialog state
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingBooking, setPendingBooking] = useState<{
+    vetsVanId: number;
+    timeSlot: string;
+    vetsVanCode: string;
+  } | null>(null);
 
   // Note: Past time slots are automatically styled with faded colors and disabled from booking
   // while still showing their original status (Available/Booked) for auditing purposes
@@ -173,6 +191,25 @@ export default function VetsVanBooking() {
       setIsBooking(false);
     }
   });
+
+  // Handle confirmation dialog actions
+  const handleConfirmBooking = () => {
+    if (pendingBooking) {
+      setIsBooking(true);
+      setShowConfirmDialog(false);
+      
+      // Create booking for the selected time slot
+      createBookingMutation.mutate(pendingBooking);
+      
+      // Clear pending booking
+      setPendingBooking(null);
+    }
+  };
+
+  const handleCancelBooking = () => {
+    setShowConfirmDialog(false);
+    setPendingBooking(null);
+  };
 
   // Function to check if a time slot is available for a specific Vets Van
   const isTimeSlotAvailable = (vetsVanId: number, timeSlot: string): boolean => {
@@ -370,15 +407,13 @@ export default function VetsVanBooking() {
                         style={{ textAlign: 'center' }}
                         onClick={() => {
                           if (availability.isClickable && !availability.isPast && !isBooking && !createBookingMutation.isPending) {
-                            // Prevent multiple simultaneous bookings
-                            setIsBooking(true);
-                            
-                            // Create booking for this time slot
-                            createBookingMutation.mutate({
+                            // Show confirmation dialog before booking
+                            setPendingBooking({
                               vetsVanId: van.id,
                               timeSlot: timeSlot,
                               vetsVanCode: van.vetsvanCode
                             });
+                            setShowConfirmDialog(true);
                           }
                         }}
                       >
@@ -417,6 +452,47 @@ export default function VetsVanBooking() {
         )}
 
       </div>
+
+      {/* Booking Confirmation Dialog */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Booking</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to book this time slot?
+              {pendingBooking && (
+                <div className="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="flex items-center gap-2 text-sm text-purple-800">
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">VetsVan:</span>
+                      <span>{pendingBooking.vetsVanCode}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">Time:</span>
+                      <span>{pendingBooking.timeSlot}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="font-medium">Date:</span>
+                      <span>{selectedDate}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelBooking}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmBooking}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              Confirm Booking
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
