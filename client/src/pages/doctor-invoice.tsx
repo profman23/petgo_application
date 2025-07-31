@@ -879,6 +879,24 @@ export default function DoctorInvoice() {
       setIsRecordLocked(true);
       setShowConfirmDialog(false);
 
+      // Invalidate all related queries to force fresh data fetch
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/invoice-status/${booking.id}`] 
+      });
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/invoice-items/${booking.id}`] 
+      });
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/invoice-payments/${booking.id}`] 
+      });
+      // Also invalidate generated invoice query pattern (any invoice number for this booking)
+      await queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const queryKey = query.queryKey as string[];
+          return queryKey[0]?.includes('/api/generated-invoice/');
+        }
+      });
+
       // Send invoice link via email
       try {
         const emailResponse = await apiRequest(`/api/send-invoice-email/${booking.id}`, {
@@ -927,8 +945,32 @@ export default function DoctorInvoice() {
   };
 
   // Invoice functions
-  const handleViewInvoice = () => {
+  const handleViewInvoice = async () => {
     console.log('Opening invoice view modal');
+    
+    // Force refresh of all invoice-related data before viewing
+    if (booking?.id) {
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/invoice-status/${booking.id}`] 
+      });
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/invoice-items/${booking.id}`] 
+      });
+      await queryClient.invalidateQueries({ 
+        queryKey: [`/api/invoice-payments/${booking.id}`] 
+      });
+      // Also invalidate generated invoice queries
+      await queryClient.invalidateQueries({ 
+        predicate: (query) => {
+          const queryKey = query.queryKey as string[];
+          return queryKey[0]?.includes('/api/generated-invoice/');
+        }
+      });
+      
+      // Wait a brief moment for queries to refetch fresh data
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
     setShowInvoiceView(true);
   };
 
