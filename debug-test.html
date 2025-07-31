@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VetsVan API Debug Test</title>
+</head>
+<body>
+    <h1>VetsVan API Debug Test</h1>
+    <div id="status">Starting test...</div>
+    <div id="results"></div>
+    
+    <script>
+        async function testAPI() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                // Test login first
+                statusDiv.innerHTML = 'Testing login...';
+                const loginResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        identifier: 'profman23@gmail.com',
+                        password: '123456'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (!loginResponse.ok) {
+                    throw new Error(`Login failed: ${JSON.stringify(loginData)}`);
+                }
+                
+                const token = loginData.token;
+                statusDiv.innerHTML = `Login successful. Token: ${token.substring(0, 10)}...`;
+                
+                // Test VetsVan availability
+                statusDiv.innerHTML = 'Testing VetsVan availability...';
+                const apiResponse = await fetch('/api/vetsvan/availability?lat=24.7136&lon=46.6753', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                statusDiv.innerHTML = `API Response Status: ${apiResponse.status}`;
+                
+                if (!apiResponse.ok) {
+                    const errorText = await apiResponse.text();
+                    throw new Error(`API Error ${apiResponse.status}: ${errorText}`);
+                }
+                
+                const apiData = await apiResponse.json();
+                
+                statusDiv.innerHTML = 'SUCCESS: Both login and API working!';
+                resultsDiv.innerHTML = `
+                    <h3>Results:</h3>
+                    <p><strong>Login Status:</strong> ${loginResponse.status}</p>
+                    <p><strong>API Status:</strong> ${apiResponse.status}</p>
+                    <p><strong>VetsVan Count:</strong> ${apiData.length}</p>
+                    <p><strong>First VetsVan:</strong> ${apiData[0]?.vetsvanCode}</p>
+                `;
+                
+            } catch (error) {
+                statusDiv.innerHTML = 'ERROR: ' + error.message;
+                resultsDiv.innerHTML = `<pre style="color: red;">${error.stack}</pre>`;
+            }
+        }
+        
+        // Run test on page load
+        testAPI();
+    </script>
+</body>
+</html>

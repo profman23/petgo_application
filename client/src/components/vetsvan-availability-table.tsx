@@ -327,17 +327,27 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
         const url = `/api/vetsvan/availability${params.toString() ? '?' + params.toString() : ''}`;
         
         console.log('🌐 Making request to:', url);
+        console.log('🔑 Using token:', token ? `${token.substring(0, 10)}...${token.substring(token.length - 5)}` : 'No token');
         
         // Use apiRequest helper for proper error handling and authentication
-        const response = await apiRequest(url);
-        
-        console.log('✅ VetsVanAvailabilityTable: API call successful');
-        console.log('📊 Response data:', response);
-        console.log('📊 Response type:', typeof response);
-        console.log('📊 Response is array:', Array.isArray(response));
-        console.log('📊 Response length:', response?.length || 0);
-        
-        return response;
+        try {
+          const response = await apiRequest(url);
+          console.log('✅ VetsVanAvailabilityTable: API call successful');
+          console.log('📊 Response data:', response);
+          console.log('📊 Response type:', typeof response);
+          console.log('📊 Response is array:', Array.isArray(response));
+          console.log('📊 Response length:', response?.length || 0);
+          return response;
+        } catch (apiError: any) {
+          console.error('🚨 apiRequest failed:', {
+            error: apiError,
+            message: apiError?.message,
+            stack: apiError?.stack,
+            url: url,
+            tokenPresent: !!token
+          });
+          throw apiError;
+        }
       } catch (error) {
         console.error('❌ VetsVanAvailabilityTable: API call failed:', error);
         
