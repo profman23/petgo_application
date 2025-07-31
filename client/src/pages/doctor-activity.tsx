@@ -602,6 +602,22 @@ export default function DoctorActivity() {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="bg-green-100 border-green-300 text-green-700 hover:bg-green-200 hover:border-green-400"
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click event
+                          // Customer Location functionality will be implemented later
+                          toast({
+                            title: language === 'ar' ? 'موقع العميل' : 'Customer Location',
+                            description: language === 'ar' ? 'سيتم تفعيل هذه الميزة قريباً' : 'This feature will be activated soon',
+                          });
+                        }}
+                      >
+                        <MapPin className="w-4 h-4 mr-2" />
+                        {language === 'ar' ? 'موقع العميل' : 'Customer Location'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className="bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200 hover:border-blue-400"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent card click event
