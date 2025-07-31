@@ -348,6 +348,11 @@ export default function DoctorInvoice() {
         }
         
         console.log('✅ Generated invoice data loaded successfully');
+      } else if (response.status === 404) {
+        // Invoice doesn't exist yet - this is normal, just log it quietly
+        console.log('📋 Invoice not generated yet, starting with blank invoice');
+      } else {
+        console.warn('Failed to load generated invoice:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Error loading generated invoice data:', error);
