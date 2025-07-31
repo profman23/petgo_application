@@ -3059,13 +3059,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
           bookingId: generatedInvoice.bookingId,
           isGenerated: true,
           invoiceNumber: generatedInvoice.invoiceNumber,
-          generatedAt: generatedInvoice.generatedAt
+          generatedAt: generatedInvoice.generatedAt,
+          // Include financial details from generated invoice
+          subtotal: generatedInvoice.subtotal,
+          taxAmount: generatedInvoice.vatAmount,
+          discountAmount: generatedInvoice.totalDiscountAmount,
+          finalTotal: generatedInvoice.finalTotal,
+          notes: generatedInvoice.notes
         });
       }
 
-      // Fallback to old system
+      // Fallback to old system - ensure consistent response structure
       const status = await storage.getInvoiceStatus(bookingId);
-      res.json(status);
+      if (status) {
+        res.json({
+          ...status,
+          isGenerated: false, // Explicitly set as false
+          invoiceNumber: null // No invoice number available yet
+        });
+      } else {
+        // Return default structure for new invoices
+        res.json({
+          bookingId,
+          isGenerated: false,
+          invoiceNumber: null,
+          subtotal: '0',
+          taxAmount: '0',
+          discountAmount: '0',
+          finalTotal: '0',
+          notes: ''
+        });
+      }
     } catch (error) {
       console.error('Error fetching invoice status:', error);
       res.status(500).json({ message: 'Failed to fetch invoice status' });

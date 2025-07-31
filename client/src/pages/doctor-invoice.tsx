@@ -284,25 +284,26 @@ export default function DoctorInvoice() {
   // Load invoice status when data is available
   useEffect(() => {
     if (invoiceStatus) {
-      if (invoiceStatus.isGenerated) {
+      if (invoiceStatus.isGenerated && invoiceStatus.invoiceNumber) {
+        console.log('✅ Generated invoice found:', invoiceStatus.invoiceNumber);
         setIsRecordLocked(true);
         
-        // Check if this is a generated invoice with invoice number (new system)
-        if (invoiceStatus.invoiceNumber) {
-          console.log('✅ Invoice found:', invoiceStatus.invoiceNumber);
-          // Invoice is permanently generated - show as read-only
-          
-          // Load the complete generated invoice data
-          loadGeneratedInvoiceData(invoiceStatus.invoiceNumber);
-        } else {
-          // Old system compatibility
-          if (invoiceStatus.discountAmount) {
-            setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
-          }
-          if (invoiceStatus.notes) {
-            setNotes(invoiceStatus.notes);
-          }
+        // Load the complete generated invoice data
+        loadGeneratedInvoiceData(invoiceStatus.invoiceNumber);
+      } else if (invoiceStatus.isGenerated) {
+        console.log('⚠️ Invoice marked as generated but no invoice number found - using old system');
+        setIsRecordLocked(true);
+        
+        // Old system compatibility
+        if (invoiceStatus.discountAmount) {
+          setApplyDiscount(parseFloat(invoiceStatus.discountAmount) > 0);
         }
+        if (invoiceStatus.notes) {
+          setNotes(invoiceStatus.notes);
+        }
+      } else {
+        console.log('📋 Invoice not yet generated, starting with blank form');
+        setIsRecordLocked(false);
       }
     }
   }, [invoiceStatus]);
