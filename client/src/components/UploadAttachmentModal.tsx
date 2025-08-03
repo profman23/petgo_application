@@ -194,10 +194,11 @@ export default function UploadAttachmentModal({
             
             {/* File Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="file-input" className="block text-sm font-medium text-gray-700 mb-2">
                 {t('selectFile')}
               </label>
               <Input
+                id="file-input"
                 type="file"
                 onChange={handleFileSelect}
                 accept="image/*,application/pdf,.doc,.docx,.txt"
@@ -216,10 +217,11 @@ export default function UploadAttachmentModal({
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="description-input" className="block text-sm font-medium text-gray-700 mb-2">
                 {t('description')}
               </label>
               <Textarea
+                id="description-input"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t('enterDescription')}
