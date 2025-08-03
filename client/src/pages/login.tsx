@@ -308,6 +308,8 @@ export default function Login() {
                               fontSize: '16px',
                               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                             } as any}
+                            aria-describedby="login-identifier-help"
+                            aria-label={language === 'ar' ? 'رقم الهاتف أو البريد الإلكتروني للدخول' : 'Phone number or email for login'}
                           />
                           <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
                             <Phone className="text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
@@ -575,7 +577,12 @@ export default function Login() {
                   {language === 'ar' ? 'التحقق الأمني' : 'Security Verification'} *
                 </h3>
                 <div className="flex justify-center mb-4">
-                  <div className="inline-block bg-white border-3 border-blue-300 px-6 py-3 rounded-xl text-2xl font-bold text-blue-900 shadow-lg">
+                  <div 
+                    id="captcha-question" 
+                    className="inline-block bg-white border-3 border-blue-300 px-6 py-3 rounded-xl text-2xl font-bold text-blue-900 shadow-lg"
+                    role="img"
+                    aria-label={language === 'ar' ? `سؤال الحماية: ${captcha.question}` : `Security question: ${captcha.question}`}
+                  >
                     {captcha.question}
                   </div>
                 </div>
@@ -591,6 +598,7 @@ export default function Login() {
                   onChange={(e) => updateFormData('captcha', e.target.value)}
                   required
                   aria-label={language === 'ar' ? 'إجابة السؤال الأمني' : 'Security question answer'}
+                  aria-describedby="captcha-question"
                 />
                 <div className="flex justify-center">
                   <Button 
