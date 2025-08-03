@@ -579,6 +579,9 @@ export default function Login() {
                     {captcha.question}
                   </div>
                 </div>
+                <label htmlFor="captcha-input" className="block text-sm font-medium text-gray-700 mb-2 text-center" style={{ textAlign: getTextAlign(language) }}>
+                  {language === 'ar' ? 'الإجابة' : 'Answer'}
+                </label>
                 <Input
                   id="captcha-input"
                   type="number"
