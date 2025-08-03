@@ -861,9 +861,9 @@ export default function RideRequest() {
                           fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                         }}>{t('yourLocation')}</FormLabel>
                       </div>
-                      <FormControl>
-                        <div className="flex items-center gap-3">
-                          <Circle className="w-3 h-3 text-green-500 flex-shrink-0" />
+                      <div className="flex items-center gap-3">
+                        <Circle className="w-3 h-3 text-green-500 flex-shrink-0" />
+                        <FormControl>
                           <Input
                             {...field}
                             placeholder={language === 'ar' ? 'موقعك الحالي' : 'Your current location'}
@@ -871,25 +871,25 @@ export default function RideRequest() {
                             style={{ textAlign }}
                             readOnly
                           />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={refreshLocation}
-                            disabled={isLoadingGPS}
-                            title={isLoadingGPS ? 
-                              (language === 'ar' ? "يتم تحديد الموقع..." : "Detecting location...") : 
-                              (language === 'ar' ? "تحديث الموقع" : "Update location")
-                            }
-                          >
-                            {isLoadingGPS ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <RefreshCw className="w-4 h-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </FormControl>
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={refreshLocation}
+                          disabled={isLoadingGPS}
+                          title={isLoadingGPS ? 
+                            (language === 'ar' ? "يتم تحديد الموقع..." : "Detecting location...") : 
+                            (language === 'ar' ? "تحديث الموقع" : "Update location")
+                          }
+                        >
+                          {isLoadingGPS ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
                       <FormMessage />
                       <p className="text-xs text-gray-500 mt-1" style={{ textAlign }}>
                         {language === 'ar' ? 'العيادة البيطرية ستأتي إلى موقعك الحالي' : 'The veterinary clinic will come to your current location'}

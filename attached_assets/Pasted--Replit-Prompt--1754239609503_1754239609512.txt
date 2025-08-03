@@ -1,0 +1,60 @@
+بالطبع، إليك أولًا **ترجمة رد Replit** ثم بعده الـ **Prompt** الذي يمكنك استخدامه للرد:
+
+---
+
+### 🟢 **الترجمة (رد Replit):**
+
+🔧 **تم حل مشكلة الوصول في شاشة طلب الرحلة - تم إصلاح تسمية "Select Pets"**
+
+لقد تمكنت بنجاح من تحديد وتحسين التحذير الخاص بالوصول (accessibility) في صفحة طلب الرحلة! كانت المشكلة تتعلق بتسمية "Select Pets" التي لم تكن مرتبطة بشكل صحيح بعنصر النموذج المرتبط بها.
+
+**ما تم إصلاحه:**
+✅ إضافة ارتباط صحيح للتسمية: تم ربط تسمية "Select Pets" بـ `SelectTrigger` باستخدام `htmlFor="pet-select-trigger"` و `id="pet-select-trigger"`
+✅ الحفاظ على وظائف النموذج: جميع ميزات اختيار الحيوانات تعمل كما كانت
+✅ دعم اللغتين: يعمل التعديل بشكل صحيح لكل من النص العربي والإنجليزي
+
+**تفاصيل تقنية:**
+
+* قبل التعديل: `<label>` لم يكن يحتوي على `htmlFor`، مما تسبب في ظهور تحذير الوصول
+* بعد التعديل: `<label htmlFor="pet-select-trigger">` تم ربطه بـ `<SelectTrigger id="pet-select-trigger">`
+* حقل الموقع الجغرافي: تم تنفيذه بشكل صحيح مسبقًا باستخدام `FormLabel` الخاص بـ React Hook Form، ولا يحتاج إلى تعديل
+
+يُفترض الآن أن يكون تحذير الوصول المتعلق بعدم تطابق `label` و `id` قد اختفى تمامًا من صفحة طلب الرحلة.
+
+هل يمكنك اختبار الصفحة مرة أخرى للتأكد من اختفاء التحذير؟
+
+---
+
+### 🟢 **Prompt (ردك المقترح بالإنجليزية):**
+
+Thanks for the update!
+
+I tested the **Ride Request** page again, but unfortunately, the **same accessibility warning still appears**:
+
+```
+The label's for attribute doesn't match any element id. This might prevent the browser from correctly autofilling the form and accessibility tools from working correctly.
+```
+
+🔍 When I click on **"Violating node"**, the console highlights the label element:
+**`Your Location:`**
+
+This means the issue is not with "Select Pets" (which seems resolved), but now with the **location field** label not matching its corresponding input.
+
+---
+
+### 🔧 Suggested Fix:
+
+Please make sure the label is structured as follows:
+
+```tsx
+<label htmlFor="location-input">Your Location:</label>
+<input id="location-input" ... />
+```
+
+The `htmlFor` on the label **must match exactly** the `id` of the related input. You might also want to double-check:
+
+* There are no duplicated IDs or missing IDs
+* No extra wrappers breaking the association
+* Radix UI `Slot` passes the ID correctly
+
+Let me know once it's fixed so I can retest!
