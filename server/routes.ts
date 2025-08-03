@@ -170,9 +170,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userData: JSON.stringify({ type: 'password_reset' })
       });
 
-      // Send reset OTP email using the existing email service
+      // Send reset OTP email with custom content for password reset
       try {
-        await emailService.sendOtpVerificationEmail(email, 'User', otp);
+        await emailService.sendEmail(
+          email,
+          'Password Reset - إعادة تعيين كلمة المرور - VETS VAN',
+          `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #8B2F8B; margin: 0;">VETS VAN</h1>
+              <p style="color: #666; margin: 5px 0;">Mobile Veterinary Services</p>
+            </div>
+            
+            <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+              <h2 style="color: #8B2F8B; text-align: center; margin-bottom: 20px;">Password Reset Request</h2>
+              <p style="color: #333; font-size: 16px; line-height: 1.6;">
+                You have requested to reset your password for your VETS VAN account. 
+                Please use the following verification code to proceed with resetting your password:
+              </p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <div style="background-color: #f8f9fa; border: 2px solid #8B2F8B; border-radius: 8px; padding: 20px; display: inline-block;">
+                  <span style="font-size: 32px; font-weight: bold; color: #8B2F8B; letter-spacing: 8px;">${otp}</span>
+                </div>
+              </div>
+              
+              <p style="color: #666; font-size: 14px; text-align: center;">
+                This code will expire in 10 minutes. If you didn't request this reset, please ignore this email.
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              
+              <div style="direction: rtl; text-align: right;">
+                <h2 style="color: #8B2F8B; margin-bottom: 20px;">طلب إعادة تعيين كلمة المرور</h2>
+                <p style="color: #333; font-size: 16px; line-height: 1.6;">
+                  لقد طلبت إعادة تعيين كلمة المرور لحسابك في VETS VAN. 
+                  يرجى استخدام رمز التحقق التالي للمتابعة مع إعادة تعيين كلمة المرور:
+                </p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <div style="background-color: #f8f9fa; border: 2px solid #8B2F8B; border-radius: 8px; padding: 20px; display: inline-block;">
+                    <span style="font-size: 32px; font-weight: bold; color: #8B2F8B; letter-spacing: 8px;">${otp}</span>
+                  </div>
+                </div>
+                
+                <p style="color: #666; font-size: 14px; text-align: center;">
+                  سينتهي صلاحية هذا الرمز خلال 10 دقائق. إذا لم تطلب هذا التغيير، يرجى تجاهل هذا البريد الإلكتروني.
+                </p>
+              </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px; color: #999; font-size: 12px;">
+              <p>VETS VAN - Your Trusted Mobile Veterinary Service</p>
+            </div>
+          </div>
+          `
+        );
       } catch (emailError) {
         console.error('Failed to send reset email:', emailError);
         return res.status(500).json({ message: 'Failed to send reset email' });
@@ -201,7 +254,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check if OTP is for password reset
-      const userData = otpRecord.userData ? JSON.parse(otpRecord.userData as string) : {};
+      let userData: any = {};
+      if (otpRecord.userData) {
+        try {
+          if (typeof otpRecord.userData === 'string') {
+            userData = JSON.parse(otpRecord.userData);
+          } else {
+            userData = otpRecord.userData;
+          }
+        } catch (error) {
+          console.error('Error parsing userData:', error);
+          userData = {};
+        }
+      }
+      
       if (userData.type !== 'password_reset') {
         return res.status(401).json({ message: 'Invalid OTP type' });
       }

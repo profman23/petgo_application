@@ -284,6 +284,15 @@ export class DatabaseStorage implements IStorage {
     return updatedUser;
   }
 
+  async updateUserPassword(id: number, newPassword: string): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ password: newPassword })
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser;
+  }
+
   // Driver operations
   async getAllDrivers(): Promise<Driver[]> {
     return await db.select().from(drivers);

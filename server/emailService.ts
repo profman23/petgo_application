@@ -132,7 +132,27 @@ export class EmailService {
 
   // Payment confirmation email removed per user request
 
-  private async sendEmail(template: EmailTemplate): Promise<boolean> {
+  async sendEmail(template: EmailTemplate): Promise<boolean>;
+  async sendEmail(to: string, subject: string, html: string): Promise<boolean>;
+  async sendEmail(toOrTemplate: string | EmailTemplate, subject?: string, html?: string): Promise<boolean> {
+    let template: EmailTemplate;
+    
+    if (typeof toOrTemplate === 'string') {
+      // Called with individual parameters
+      template = {
+        to: toOrTemplate,
+        subject: subject!,
+        html: html!
+      };
+    } else {
+      // Called with template object
+      template = toOrTemplate;
+    }
+    
+    return this.sendEmailInternal(template);
+  }
+
+  private async sendEmailInternal(template: EmailTemplate): Promise<boolean> {
     try {
       // Try to send email via SMTP
       const mailOptions = {
