@@ -415,7 +415,7 @@ export default function Login() {
                     <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-200 transition-all duration-300">
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ 
+                          <label htmlFor="reset-email-input" className="block text-sm font-medium text-gray-700 mb-2" style={{ 
                             fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
                             textAlign: getTextAlign(language)
                           }}>
@@ -423,6 +423,7 @@ export default function Login() {
                           </label>
                           <div className="relative group">
                             <Input
+                              id="reset-email-input"
                               type="email"
                               placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email address'}
                               value={resetEmail}
@@ -484,10 +485,11 @@ export default function Login() {
             <form onSubmit={handleRegisterSubmit} className="space-y-6">
               <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                  <label htmlFor="first-name-input" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                     {language === 'ar' ? 'الاسم الأول' : 'First Name'} *
                   </label>
                   <Input
+                    id="first-name-input"
                     type="text"
                     placeholder={language === 'ar' ? 'أدخل الاسم الأول' : 'Enter first name'}
                     className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -498,10 +500,11 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                  <label htmlFor="last-name-input" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                     {language === 'ar' ? 'الاسم الأخير' : 'Last Name'} *
                   </label>
                   <Input
+                    id="last-name-input"
                     type="text"
                     placeholder={language === 'ar' ? 'أدخل الاسم الأخير' : 'Enter last name'}
                     className={`h-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -513,11 +516,12 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                <label htmlFor="reg-email-input" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                   {language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'} *
                 </label>
                 <div className="relative">
                   <Input
+                    id="reg-email-input"
                     type="email"
                     placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter your email address'}
                     className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -530,11 +534,12 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                <label htmlFor="reg-phone-input" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                   {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
                 </label>
                 <div className="relative">
                   <Input
+                    id="reg-phone-input"
                     type="tel"
                     placeholder={language === 'ar' ? 'أدخل رقم الهاتف' : 'Enter your phone number'}
                     className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -547,11 +552,12 @@ export default function Login() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
+                <label htmlFor="reg-password-input" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
                   {language === 'ar' ? 'كلمة المرور' : 'Password'} *
                 </label>
                 <div className="relative">
                   <Input
+                    id="reg-password-input"
                     type="password"
                     placeholder={language === 'ar' ? 'أدخل كلمة المرور (6 أحرف على الأقل)' : 'Enter password (minimum 6 characters)'}
                     className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
@@ -574,12 +580,14 @@ export default function Login() {
                   </div>
                 </div>
                 <Input
+                  id="captcha-input"
                   type="number"
                   placeholder={language === 'ar' ? 'أدخل الإجابة' : 'Enter your answer'}
                   className="text-center text-xl mb-4 h-12 border-2 border-blue-300"
                   value={formData.captcha}
                   onChange={(e) => updateFormData('captcha', e.target.value)}
                   required
+                  aria-label={language === 'ar' ? 'إجابة السؤال الأمني' : 'Security question answer'}
                 />
                 <div className="flex justify-center">
                   <Button 
