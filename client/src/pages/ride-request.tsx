@@ -667,7 +667,7 @@ export default function RideRequest() {
                       alt="Select Pets Logo" 
                       className="w-6 h-6 select-pets-logo object-cover"
                     />
-                    <label className="text-lg font-semibold text-gray-600" style={{ 
+                    <label htmlFor="pet-select-trigger" className="text-lg font-semibold text-gray-600" style={{ 
                       textAlign,
                       fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                     }}>
@@ -687,7 +687,7 @@ export default function RideRequest() {
                       }
                     }}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger id="pet-select-trigger" className="w-full">
                       <SelectValue placeholder={
                         language === 'ar' ? 'أضف حيوان أليف...' : 'Add pet...'
                       } />
