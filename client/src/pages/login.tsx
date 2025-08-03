@@ -37,6 +37,8 @@ export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [captcha, setCaptcha] = useState({ question: '', answer: 0 });
   const [showTutorialVideo, setShowTutorialVideo] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -184,6 +186,52 @@ export default function Login() {
   const handleTutorialVideoClose = () => {
     setShowTutorialVideo(false);
     setLocation('/home');
+  };
+
+  // Password reset mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const response = await apiRequest('/api/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      });
+      return response;
+    },
+    onSuccess: () => {
+      // Store email in localStorage for OTP verification
+      localStorage.setItem('otpEmail', resetEmail);
+      
+      toast({
+        title: language === 'ar' ? 'تم إرسال رمز إعادة التعيين' : 'Reset Code Sent',
+        description: language === 'ar' 
+          ? 'تم إرسال رمز إعادة تعيين كلمة المرور إلى بريدك الإلكتروني' 
+          : 'Password reset code has been sent to your email',
+        variant: "default",
+      });
+      setShowResetPassword(false);
+      setResetEmail('');
+      // Redirect to OTP verification page for password reset
+      setLocation('/otp-verification?type=reset');
+    },
+    onError: (error: Error) => {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleResetPassword = () => {
+    if (!resetEmail) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'يرجى إدخال البريد الإلكتروني' : 'Please enter your email address',
+        variant: "destructive",
+      });
+      return;
+    }
+    resetPasswordMutation.mutate(resetEmail);
   };
 
   return (
@@ -343,6 +391,85 @@ export default function Login() {
                     </div>
                   </Button>
                   
+                  {/* Reset Password Button */}
+                  <div className="mt-4">
+                    <Button 
+                      type="button" 
+                      variant="ghost" 
+                      onClick={() => setShowResetPassword(!showResetPassword)}
+                      className="w-full py-2 text-purple-600 hover:text-purple-700 hover:bg-purple-50 transition-all duration-300"
+                    >
+                      <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                        <RefreshCw className="w-4 h-4" />
+                        <span style={{ 
+                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                        }}>
+                          {language === 'ar' ? 'إعادة تعيين كلمة المرور' : 'Reset Account Password'}
+                        </span>
+                      </div>
+                    </Button>
+                  </div>
+
+                  {/* Reset Password Form */}
+                  {showResetPassword && (
+                    <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-200 transition-all duration-300">
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2" style={{ 
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
+                            textAlign: getTextAlign(language)
+                          }}>
+                            {language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}
+                          </label>
+                          <div className="relative group">
+                            <Input
+                              type="email"
+                              placeholder={language === 'ar' ? 'أدخل بريدك الإلكتروني' : 'Enter your email address'}
+                              value={resetEmail}
+                              onChange={(e) => setResetEmail(e.target.value)}
+                              className={`pr-4 pl-12 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
+                                focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
+                                ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                              style={{ 
+                                borderColor: 'var(--purple-primary)', 
+                                '--tw-ring-color': 'var(--purple-primary)',
+                                fontSize: '16px',
+                                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                              } as any}
+                            />
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
+                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          type="button" 
+                          onClick={handleResetPassword}
+                          disabled={resetPasswordMutation.isPending || !resetEmail}
+                          className="w-full text-white py-3 rounded-xl font-semibold text-sm shadow-lg transition-all duration-300 
+                            hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
+                            bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:to-purple-700" 
+                          style={{ 
+                            background: resetPasswordMutation.isPending ? '#6B21A8' : undefined,
+                            boxShadow: '0 6px 20px rgba(107, 33, 168, 0.3)'
+                          }}
+                        >
+                          <div className="flex items-center justify-center space-x-2">
+                            {resetPasswordMutation.isPending && <RefreshCw className="w-4 h-4 animate-spin" />}
+                            <span style={{ 
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
+                              {resetPasswordMutation.isPending 
+                                ? (language === 'ar' ? 'جاري الإرسال...' : 'Sending...') 
+                                : (language === 'ar' ? 'إرسال رمز إعادة التعيين' : 'Send Reset Code')
+                              }
+                            </span>
+                          </div>
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="mt-6 pt-4 border-t border-gray-200">
                     <p className="text-sm text-gray-500 font-medium tracking-wide" style={{ 
                       fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'

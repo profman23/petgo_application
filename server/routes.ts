@@ -143,6 +143,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Password reset endpoint
+  app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ message: 'Email is required' });
+      }
+
+      // Check if user exists
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // For security, don't reveal whether email exists
+        return res.status(200).json({ message: 'If the email exists, a reset code has been sent' });
+      }
+
+      // Generate OTP for password reset
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Store OTP with reset type - use code field, not otp
+      await storage.createOtpVerification({
+        email: email,
+        code: otp,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+        userData: JSON.stringify({ type: 'password_reset' })
+      });
+
+      // Send reset OTP email using the existing email service
+      try {
+        await emailService.sendOtpVerificationEmail(email, 'User', otp);
+      } catch (emailError) {
+        console.error('Failed to send reset email:', emailError);
+        return res.status(500).json({ message: 'Failed to send reset email' });
+      }
+
+      res.status(200).json({ message: 'Reset code sent to your email' });
+    } catch (error) {
+      console.error('Password reset error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Password reset OTP verification endpoint
+  app.post('/api/auth/verify-reset-otp', async (req, res) => {
+    try {
+      const { email, otpCode } = req.body;
+      
+      if (!email || !otpCode) {
+        return res.status(400).json({ message: 'Email and OTP code are required' });
+      }
+
+      // Verify OTP
+      const otpRecord = await storage.getOtpVerification(email, otpCode);
+      if (!otpRecord) {
+        return res.status(401).json({ message: 'Invalid or expired OTP code' });
+      }
+
+      // Check if OTP is for password reset
+      const userData = otpRecord.userData ? JSON.parse(otpRecord.userData as string) : {};
+      if (userData.type !== 'password_reset') {
+        return res.status(401).json({ message: 'Invalid OTP type' });
+      }
+
+      // OTP is valid, return success (don't delete yet, wait for password reset completion)
+      res.status(200).json({ message: 'OTP verified successfully' });
+    } catch (error) {
+      console.error('Reset OTP verification error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Complete password reset endpoint
+  app.post('/api/auth/complete-password-reset', async (req, res) => {
+    try {
+      const { email, newPassword } = req.body;
+      
+      if (!email || !newPassword) {
+        return res.status(400).json({ message: 'Email and new password are required' });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'Password must be at least 6 characters' });
+      }
+
+      // Get user by email
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Hash new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      
+      // Update user password
+      await storage.updateUserPassword(user.id, hashedPassword);
+      
+      // Clean up OTP records for this email
+      await storage.deleteOtpVerification(email);
+
+      res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+      console.error('Complete password reset error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
   app.post('/api/auth/register', async (req, res) => {
     try {
       const validatedData = registerSchema.parse(req.body);
