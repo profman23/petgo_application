@@ -294,30 +294,20 @@ export default function Login() {
                         {language === 'ar' ? 'رقم الهاتف أو الإيميل' : 'Phone Number or Email'}
                       </FormLabel>
                       <FormControl>
-                        <div className="relative group">
-                          <Input
-                            {...field}
-                            type="text"
-                            placeholder={language === 'ar' ? 'أدخل رقم الهاتف أو الإيميل' : 'Enter phone number or email'}
-                            className={`pr-4 pl-16 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
-                              focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
-                              ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                            style={{ 
-                              borderColor: 'var(--purple-primary)', 
-                              '--tw-ring-color': 'var(--purple-primary)',
-                              fontSize: '16px',
-                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                            } as any}
-                            aria-describedby="login-identifier-help"
-                            aria-label={language === 'ar' ? 'رقم الهاتف أو البريد الإلكتروني للدخول' : 'Phone number or email for login'}
-                          />
-                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
-                            <Phone className="text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
-                            <div className="w-px h-4 bg-gray-300"></div>
-                            <Mail className="text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
-                          </div>
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                        </div>
+                        <Input
+                          {...field}
+                          type="text"
+                          placeholder={language === 'ar' ? 'أدخل رقم الهاتف أو الإيميل' : 'Enter phone number or email'}
+                          className={`pr-4 pl-16 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
+                            focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
+                            ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                          style={{ 
+                            borderColor: 'var(--purple-primary)', 
+                            '--tw-ring-color': 'var(--purple-primary)',
+                            fontSize: '16px',
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          } as any}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -333,24 +323,20 @@ export default function Login() {
                         fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                       }}>{t('password')}</FormLabel>
                       <FormControl>
-                        <div className="relative group">
-                          <Input
-                            {...field}
-                            type="password"
-                            placeholder={t('enterPassword')}
-                            className={`pr-4 pl-12 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
-                              focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
-                              ${language === 'ar' ? 'text-right' : 'text-left'}`}
-                            style={{ 
-                              borderColor: 'var(--purple-primary)', 
-                              '--tw-ring-color': 'var(--purple-primary)',
-                              fontSize: '16px',
-                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                            } as any}
-                          />
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-600 w-4 h-4 transition-colors duration-300 group-focus-within:text-purple-600" />
-                          <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-600/5 to-pink-500/5 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                        </div>
+                        <Input
+                          {...field}
+                          type="password"
+                          placeholder={t('enterPassword')}
+                          className={`pr-4 pl-12 py-3 border-2 rounded-xl bg-white shadow-sm transition-all duration-300 
+                            focus:ring-4 focus:ring-opacity-20 focus:shadow-lg hover:shadow-md
+                            ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                          style={{ 
+                            borderColor: 'var(--purple-primary)', 
+                            '--tw-ring-color': 'var(--purple-primary)',
+                            fontSize: '16px',
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          } as any}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
