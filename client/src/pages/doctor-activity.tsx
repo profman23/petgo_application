@@ -247,7 +247,7 @@ export default function DoctorActivity() {
   // Handle booking click to show map
   const handleBookingClick = (booking: Booking) => {
     setSelectedBooking(booking);
-    setShowMap(true);
+    // setShowMap(true); // Disabled - modal no longer opens on card click
   };
 
   // Open Google Maps with customer location
