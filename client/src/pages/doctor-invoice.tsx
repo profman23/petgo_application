@@ -111,7 +111,12 @@ export default function DoctorInvoice() {
     weight: '',
     temperature: '',
     heartRate: '',
-    notes: ''
+    notes: '',
+    consultationDate: '',
+    reasonForVisit: '',
+    initialComplaintNotes: '',
+    bodyCondition: '',
+    bodyConditionScore: ''
   });
   const [totalPaid, setTotalPaid] = useState(0);
   const [payments, setPayments] = useState<any[]>([]);
@@ -398,6 +403,18 @@ export default function DoctorInvoice() {
       time: 'الوقت',
       service: 'نوع الخدمة',
       vitals: 'المؤشرات الحيوية',
+      petVitalsSummary: 'ملخص الفحص البيطري',
+      consultationSummary: 'ملخص الاستشارة',
+      summary: 'الملخص',
+      subjective: 'الفحص الذاتي',
+      objective: 'الفحص الموضوعي',
+      initialComplaint: 'الشكوى الأولية',
+      generalConsultation: 'الاستشارة العامة',
+      consultationDate: 'تاريخ الاستشارة',
+      reasonForVisit: 'سبب الزيارة',
+      initialComplaintNotes: 'ملاحظات الشكوى الأولية',
+      bodyCondition: 'حالة الجسم',
+      bodyConditionScore: 'درجة حالة الجسم',
       weight: 'الوزن (كيلو)',
       temperature: 'درجة الحرارة (°س)',
       heartRate: 'نبضات القلب',
@@ -464,6 +481,18 @@ export default function DoctorInvoice() {
       time: 'Time',
       service: 'Service Type',
       vitals: 'Pet Vitals',
+      petVitalsSummary: 'Pet Vitals Summary',
+      consultationSummary: 'Consultation Summary',
+      summary: 'Summary',
+      subjective: 'Subjective',
+      objective: 'Objective',
+      initialComplaint: 'Initial Complaint',
+      generalConsultation: 'General Consultation',
+      consultationDate: 'Consultation Date',
+      reasonForVisit: 'Reason for Visit',
+      initialComplaintNotes: 'Initial Complaint Notes',
+      bodyCondition: 'Body Condition',
+      bodyConditionScore: 'Body Condition Score',
       weight: 'Weight (KG)',
       temperature: 'Temperature (°C)',
       heartRate: 'Heart Rate',
@@ -742,17 +771,52 @@ export default function DoctorInvoice() {
             weight: petVitals.weight?.toString() || '',
             temperature: petVitals.temperature?.toString() || '',
             heartRate: petVitals.heartRate?.toString() || '',
-            notes: petVitals.notes || ''
+            notes: petVitals.notes || '',
+            consultationDate: booking?.appointmentDate || '',
+            reasonForVisit: petVitals.reasonForVisit || '',
+            initialComplaintNotes: petVitals.initialComplaintNotes || '',
+            bodyCondition: petVitals.bodyCondition || '',
+            bodyConditionScore: petVitals.bodyConditionScore || ''
           });
         } else {
-          setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+          setVitalsData({ 
+            weight: '', 
+            temperature: '', 
+            heartRate: '', 
+            notes: '',
+            consultationDate: booking?.appointmentDate || '',
+            reasonForVisit: '',
+            initialComplaintNotes: '',
+            bodyCondition: '',
+            bodyConditionScore: ''
+          });
         }
       } catch (error) {
         console.error('Error loading existing vitals:', error);
-        setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+        setVitalsData({ 
+          weight: '', 
+          temperature: '', 
+          heartRate: '', 
+          notes: '',
+          consultationDate: booking?.appointmentDate || '',
+          reasonForVisit: '',
+          initialComplaintNotes: '',
+          bodyCondition: '',
+          bodyConditionScore: ''
+        });
       }
     } else {
-      setVitalsData({ weight: '', temperature: '', heartRate: '', notes: '' });
+      setVitalsData({ 
+        weight: '', 
+        temperature: '', 
+        heartRate: '', 
+        notes: '',
+        consultationDate: booking?.appointmentDate || '',
+        reasonForVisit: '',
+        initialComplaintNotes: '',
+        bodyCondition: '',
+        bodyConditionScore: ''
+      });
     }
   };
 
@@ -767,6 +831,11 @@ export default function DoctorInvoice() {
         temperature: vitalsData.temperature ? parseFloat(vitalsData.temperature) : null,
         heartRate: vitalsData.heartRate ? parseInt(vitalsData.heartRate) : null,
         notes: vitalsData.notes || null,
+        consultationDate: vitalsData.consultationDate || null,
+        reasonForVisit: vitalsData.reasonForVisit || null,
+        initialComplaintNotes: vitalsData.initialComplaintNotes || null,
+        bodyCondition: vitalsData.bodyCondition || null,
+        bodyConditionScore: vitalsData.bodyConditionScore || null,
         recordedBy: 'doctor'
       };
 
@@ -1997,85 +2066,218 @@ export default function DoctorInvoice() {
         </div>
       </div>
 
-      {/* Pet Vitals Modal */}
+      {/* Enhanced Pet Vitals Modal with Structured Sections */}
       {showVitalsModal && selectedPet && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div 
-            className="bg-white rounded-lg shadow-xl w-full max-w-md"
+            className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
             dir={getDirection(language)}
             style={{ textAlign: getTextAlign(language) }}
           >
             <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                {t('vitalsFor')} {selectedPet.name}
-              </h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('weight')}
-                  </label>
-                  <Input
-                    type="number"
-                    value={vitalsData.weight}
-                    onChange={(e) => setVitalsData(prev => ({ ...prev, weight: e.target.value }))}
-                    placeholder="0.0"
-                    step="0.1"
-                    className="w-full"
-                  />
-                </div>
+              {/* Main Title */}
+              <div className="mb-6 border-b pb-4">
+                <h2 className="text-2xl font-bold text-purple-600 mb-2">
+                  {t('consultationSummary')}
+                </h2>
+                <p className="text-gray-600">
+                  {t('vitalsFor')} <span className="font-semibold text-purple-700">{selectedPet.name}</span>
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('temperature')}
-                  </label>
-                  <Input
-                    type="number"
-                    value={vitalsData.temperature}
-                    onChange={(e) => setVitalsData(prev => ({ ...prev, temperature: e.target.value }))}
-                    placeholder="0.0"
-                    step="0.1"
-                    className="w-full"
-                  />
+                {/* Summary Section */}
+                <div className="space-y-4">
+                  <div className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
+                    <h3 className="text-lg font-semibold text-blue-800 mb-3 flex items-center">
+                      <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-2">1</span>
+                      {t('summary')}
+                    </h3>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {t('consultationDate')}
+                      </label>
+                      <Input
+                        type="date"
+                        value={vitalsData.consultationDate}
+                        onChange={(e) => setVitalsData(prev => ({ ...prev, consultationDate: e.target.value }))}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Subjective Section */}
+                  <div className="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-400">
+                    <h3 className="text-lg font-semibold text-purple-800 mb-3 flex items-center">
+                      <span className="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-2">2</span>
+                      {t('subjective')}
+                    </h3>
+                    
+                    {/* Initial Complaint Subsection */}
+                    <div className="bg-white rounded-md p-3 mb-3 border border-purple-200">
+                      <h4 className="text-md font-medium text-purple-700 mb-3 flex items-center">
+                        <span className="w-4 h-4 bg-purple-400 text-white rounded-full flex items-center justify-center text-xs font-bold mr-2">•</span>
+                        {t('initialComplaint')}
+                      </h4>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('reasonForVisit')}
+                          </label>
+                          <Input
+                            type="text"
+                            value={vitalsData.reasonForVisit}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, reasonForVisit: e.target.value }))}
+                            placeholder={t('reasonForVisit')}
+                            className="w-full"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('initialComplaintNotes')}
+                          </label>
+                          <Textarea
+                            value={vitalsData.initialComplaintNotes}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, initialComplaintNotes: e.target.value }))}
+                            placeholder={t('initialComplaintNotes')}
+                            rows={3}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('heartRate')}
-                  </label>
-                  <Input
-                    type="number"
-                    value={vitalsData.heartRate}
-                    onChange={(e) => setVitalsData(prev => ({ ...prev, heartRate: e.target.value }))}
-                    placeholder="0"
-                    className="w-full"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('notes')}
-                  </label>
-                  <Textarea
-                    value={vitalsData.notes}
-                    onChange={(e) => setVitalsData(prev => ({ ...prev, notes: e.target.value }))}
-                    placeholder={t('notes')}
-                    rows={3}
-                    className="w-full"
-                  />
+
+                {/* Objective Section */}
+                <div className="space-y-4">
+                  <div className="bg-green-50 rounded-lg p-4 border-l-4 border-green-400">
+                    <h3 className="text-lg font-semibold text-green-800 mb-3 flex items-center">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-2">3</span>
+                      {t('objective')}
+                    </h3>
+                    
+                    {/* General Consultation Subsection */}
+                    <div className="bg-white rounded-md p-3 border border-green-200">
+                      <h4 className="text-md font-medium text-green-700 mb-3 flex items-center">
+                        <span className="w-4 h-4 bg-green-400 text-white rounded-full flex items-center justify-center text-xs font-bold mr-2">•</span>
+                        {t('generalConsultation')}
+                      </h4>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('weight')}
+                          </label>
+                          <Input
+                            type="number"
+                            value={vitalsData.weight}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, weight: e.target.value }))}
+                            placeholder="0.0"
+                            step="0.1"
+                            className="w-full"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('temperature')}
+                          </label>
+                          <Input
+                            type="number"
+                            value={vitalsData.temperature}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, temperature: e.target.value }))}
+                            placeholder="0.0"
+                            step="0.1"
+                            className="w-full"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('heartRate')}
+                          </label>
+                          <Input
+                            type="number"
+                            value={vitalsData.heartRate}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, heartRate: e.target.value }))}
+                            placeholder="0"
+                            className="w-full"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('bodyCondition')}
+                          </label>
+                          <Input
+                            type="text"
+                            value={vitalsData.bodyCondition}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, bodyCondition: e.target.value }))}
+                            placeholder={t('bodyCondition')}
+                            className="w-full"
+                          />
+                        </div>
+                        
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('bodyConditionScore')}
+                          </label>
+                          <Select
+                            value={vitalsData.bodyConditionScore}
+                            onValueChange={(value) => setVitalsData(prev => ({ ...prev, bodyConditionScore: value }))}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder={t('bodyConditionScore')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">1 - {language === 'ar' ? 'نحيف جداً' : 'Very Thin'}</SelectItem>
+                              <SelectItem value="2">2 - {language === 'ar' ? 'نحيف' : 'Thin'}</SelectItem>
+                              <SelectItem value="3">3 - {language === 'ar' ? 'أقل من المثالي' : 'Less than Ideal'}</SelectItem>
+                              <SelectItem value="4">4 - {language === 'ar' ? 'أقل من المثالي قليلاً' : 'Slightly Less than Ideal'}</SelectItem>
+                              <SelectItem value="5">5 - {language === 'ar' ? 'مثالي' : 'Ideal'}</SelectItem>
+                              <SelectItem value="6">6 - {language === 'ar' ? 'أكثر من المثالي قليلاً' : 'Slightly More than Ideal'}</SelectItem>
+                              <SelectItem value="7">7 - {language === 'ar' ? 'أكثر من المثالي' : 'More than Ideal'}</SelectItem>
+                              <SelectItem value="8">8 - {language === 'ar' ? 'سمين' : 'Fat'}</SelectItem>
+                              <SelectItem value="9">9 - {language === 'ar' ? 'سمين جداً' : 'Very Fat'}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('notes')}
+                          </label>
+                          <Textarea
+                            value={vitalsData.notes}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, notes: e.target.value }))}
+                            placeholder={t('notes')}
+                            rows={3}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <div className="flex justify-end gap-3 mt-6">
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 mt-6 pt-4 border-t">
                 <Button
                   variant="outline"
                   onClick={() => setShowVitalsModal(false)}
+                  className="px-6 py-2"
                 >
                   {t('cancel')}
                 </Button>
                 <Button
                   onClick={saveVitals}
-                  className="bg-purple-600 hover:bg-purple-600 text-white"
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
                 >
                   {t('save')}
                 </Button>
