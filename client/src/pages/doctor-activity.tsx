@@ -522,7 +522,7 @@ export default function DoctorActivity() {
               {dateBookings.map((booking) => (
                 <div 
                   key={booking.id} 
-                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer hover:bg-blue-50"
+                  className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer hover:bg-blue-50 w-full overflow-hidden"
                   onClick={() => handleBookingClick(booking)}
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -595,12 +595,12 @@ export default function DoctorActivity() {
                       )}
                     </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex justify-end gap-2">
+                    {/* Action Buttons - Mobile Responsive */}
+                    <div className="flex flex-wrap justify-end gap-2 w-full">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-green-100 border-green-300 text-green-700 hover:bg-green-200 hover:border-green-400"
+                        className="bg-green-100 border-green-300 text-green-700 hover:bg-green-200 hover:border-green-400 flex-shrink-0 min-w-0 text-xs sm:text-sm"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent card click event
                           if (booking.customerLocation) {
@@ -615,13 +615,14 @@ export default function DoctorActivity() {
                           }
                         }}
                       >
-                        <MapPin className="w-4 h-4 mr-2" />
-                        {language === 'ar' ? 'موقع العميل' : 'Customer Location'}
+                        <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">{language === 'ar' ? 'موقع العميل' : 'Customer Location'}</span>
+                        <span className="sm:hidden">{language === 'ar' ? 'موقع' : 'Location'}</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200 hover:border-blue-400"
+                        className="bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200 hover:border-blue-400 flex-shrink-0 min-w-0 text-xs sm:text-sm"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent card click event
                           sendTrackingMutation.mutate(booking.id);
@@ -629,23 +630,25 @@ export default function DoctorActivity() {
                         disabled={sendTrackingMutation.isPending}
                       >
                         {sendTrackingMutation.isPending ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                          <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-blue-600"></div>
                         ) : (
-                          <Truck className="w-4 h-4 mr-2" />
+                          <Truck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                         )}
-                        {language === 'ar' ? 'إرسال التتبع' : 'Send Tracking'}
+                        <span className="hidden sm:inline">{language === 'ar' ? 'إرسال التتبع' : 'Send Tracking'}</span>
+                        <span className="sm:hidden">{language === 'ar' ? 'تتبع' : 'Track'}</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700"
+                        className="bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700 flex-shrink-0 min-w-0 text-xs sm:text-sm"
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent card click event
                           setLocation(`/doctor-invoice/${booking.id}`);
                         }}
                       >
-                        <User className="w-4 h-4 mr-2" />
-                        {language === 'ar' ? 'فتح السجل' : 'Open Record'}
+                        <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        <span className="hidden sm:inline">{language === 'ar' ? 'فتح السجل' : 'Open Record'}</span>
+                        <span className="sm:hidden">{language === 'ar' ? 'سجل' : 'Record'}</span>
                       </Button>
                     </div>
                   </div>

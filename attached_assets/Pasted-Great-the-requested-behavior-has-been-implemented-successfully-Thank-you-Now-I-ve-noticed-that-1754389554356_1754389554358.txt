@@ -1,0 +1,59 @@
+Great — the requested behavior has been implemented successfully. Thank you!
+
+Now, I’ve noticed that when opening the Doctor Activity screen on a mobile device, the “Customer Location” button appears partially out of view, not fully aligned within the screen boundaries.
+
+📱 Issue:
+The button (Customer Location) is overflowing the visible screen width on mobile.
+
+It should be fully responsive and contained within the screen size.
+
+🎯 Expected Fix:
+Add proper horizontal spacing or responsive container behavior to ensure that the button aligns within the mobile screen.
+
+This might involve wrapping the button in a flex container with appropriate padding/margin, or adjusting max-width / responsive breakpoints.
+
+🔗 Relevant Links:
+Dev: https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/login/doctor
+
+Live: https://www.vetsvan.app/login/doctor
+
+📌 Button Element to Adjust:
+html
+Copy
+Edit
+<button class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border hover:text-accent-foreground h-9 rounded-md px-3 bg-green-100 border-green-300 text-green-700 hover:bg-green-200 hover:border-green-400">
+  <svg class="lucide lucide-map-pin w-4 h-4 mr-2" ...></svg>
+  Customer Location
+</button>
+Let me know once this is resolved, or if you need me to test across more screen sizes.
+
+📌 هل ترغب أن أزودك بنسخة عربية احتياطية أو نسخة منسقة لإرسالها بالبريد؟
+
+
+
+
+
+
+You said:
+نعم
+
+
+ChatGPT said:
+بالطبع، إليك النسخة العربية الاحترافية للـ Prompt السابق لاستخدامها كمرجعية أو لإرسالها في بريد:
+
+✅ برومبت بالعربية:
+
+تم تنفيذ المطلوب بنجاح، شكرًا لكم على التعديل السريع.
+
+الآن لاحظت عند فتح شاشة نشاط الطبيب (Doctor Activity) على جهاز جوال أن زر "Customer Location" يظهر جزئيًا خارج إطار الشاشة ولا يكون بمحاذاة كاملة مع أبعاد الجوال.
+
+📱 المشكلة الحالية:
+زر "Customer Location" يخرج عن عرض الشاشة على الأجهزة الصغيرة.
+
+يجب أن يكون الزر متناسقًا تمامًا مع حدود شاشة الجوال (Responsive).
+
+🎯 المطلوب:
+إضافة مساحات جانبية مناسبة أو تعديل حاوية الزر (Container) بحيث يظل داخل الشاشة بشكل سليم.
+
+يمكن استخدام خصائص CSS مثل padding, margin, أو max-width، أو تفعيل Flex مناسب لضمان توافقه مع الشاشات الصغيرة.
+
