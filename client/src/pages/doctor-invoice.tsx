@@ -116,7 +116,12 @@ export default function DoctorInvoice() {
     reasonForVisit: '',
     initialComplaintNotes: '',
     bodyCondition: '',
-    bodyConditionScore: ''
+    bodyConditionScore: '',
+    respiratoryFrequency: '',
+    muscleConditionScore: '',
+    painScore: '',
+    hydrationStatus: '',
+    attitude: ''
   });
   const [totalPaid, setTotalPaid] = useState(0);
   const [payments, setPayments] = useState<any[]>([]);
@@ -415,6 +420,11 @@ export default function DoctorInvoice() {
       initialComplaintNotes: 'ملاحظات الشكوى الأولية',
       bodyCondition: 'حالة الجسم',
       bodyConditionScore: 'درجة حالة الجسم',
+      respiratoryFrequency: 'معدل التنفس (نفس/دقيقة)',
+      muscleConditionScore: 'درجة حالة العضلات',
+      painScore: 'درجة الألم (CSU)',
+      hydrationStatus: 'حالة الترطيب',
+      attitude: 'السلوك',
       weight: 'الوزن (كيلو)',
       temperature: 'درجة الحرارة (°س)',
       heartRate: 'نبضات القلب',
@@ -493,6 +503,11 @@ export default function DoctorInvoice() {
       initialComplaintNotes: 'Initial Complaint Notes',
       bodyCondition: 'Body Condition',
       bodyConditionScore: 'Body Condition Score',
+      respiratoryFrequency: 'Respiratory Frequency (breaths/min)',
+      muscleConditionScore: 'Muscle Condition Score',
+      painScore: 'Pain Score (CSU)',
+      hydrationStatus: 'Hydration Status',
+      attitude: 'Attitude',
       weight: 'Weight (KG)',
       temperature: 'Temperature (°C)',
       heartRate: 'Heart Rate',
@@ -776,7 +791,12 @@ export default function DoctorInvoice() {
             reasonForVisit: petVitals.reasonForVisit || '',
             initialComplaintNotes: petVitals.initialComplaintNotes || '',
             bodyCondition: petVitals.bodyCondition || '',
-            bodyConditionScore: petVitals.bodyConditionScore || ''
+            bodyConditionScore: petVitals.bodyConditionScore || '',
+            respiratoryFrequency: petVitals.respiratoryFrequency || '',
+            muscleConditionScore: petVitals.muscleConditionScore || '',
+            painScore: petVitals.painScore || '',
+            hydrationStatus: petVitals.hydrationStatus || '',
+            attitude: petVitals.attitude || ''
           });
         } else {
           setVitalsData({ 
@@ -788,7 +808,12 @@ export default function DoctorInvoice() {
             reasonForVisit: '',
             initialComplaintNotes: '',
             bodyCondition: '',
-            bodyConditionScore: ''
+            bodyConditionScore: '',
+            respiratoryFrequency: '',
+            muscleConditionScore: '',
+            painScore: '',
+            hydrationStatus: '',
+            attitude: ''
           });
         }
       } catch (error) {
@@ -802,7 +827,12 @@ export default function DoctorInvoice() {
           reasonForVisit: '',
           initialComplaintNotes: '',
           bodyCondition: '',
-          bodyConditionScore: ''
+          bodyConditionScore: '',
+          respiratoryFrequency: '',
+          muscleConditionScore: '',
+          painScore: '',
+          hydrationStatus: '',
+          attitude: ''
         });
       }
     } else {
@@ -815,7 +845,12 @@ export default function DoctorInvoice() {
         reasonForVisit: '',
         initialComplaintNotes: '',
         bodyCondition: '',
-        bodyConditionScore: ''
+        bodyConditionScore: '',
+        respiratoryFrequency: '',
+        muscleConditionScore: '',
+        painScore: '',
+        hydrationStatus: '',
+        attitude: ''
       });
     }
   };
@@ -836,6 +871,11 @@ export default function DoctorInvoice() {
         initialComplaintNotes: vitalsData.initialComplaintNotes || null,
         bodyCondition: vitalsData.bodyCondition || null,
         bodyConditionScore: vitalsData.bodyConditionScore || null,
+        respiratoryFrequency: vitalsData.respiratoryFrequency ? parseInt(vitalsData.respiratoryFrequency) : null,
+        muscleConditionScore: vitalsData.muscleConditionScore || null,
+        painScore: vitalsData.painScore || null,
+        hydrationStatus: vitalsData.hydrationStatus || null,
+        attitude: vitalsData.attitude || null,
         recordedBy: 'doctor'
       };
 
@@ -2244,6 +2284,95 @@ export default function DoctorInvoice() {
                               <SelectItem value="7">7 - {language === 'ar' ? 'أكثر من المثالي' : 'More than Ideal'}</SelectItem>
                               <SelectItem value="8">8 - {language === 'ar' ? 'سمين' : 'Fat'}</SelectItem>
                               <SelectItem value="9">9 - {language === 'ar' ? 'سمين جداً' : 'Very Fat'}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {/* Additional Clinical Assessment Fields */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('respiratoryFrequency')}
+                          </label>
+                          <Input
+                            type="number"
+                            value={vitalsData.respiratoryFrequency}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, respiratoryFrequency: e.target.value }))}
+                            placeholder="0"
+                            className="w-full"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('muscleConditionScore')}
+                          </label>
+                          <Input
+                            type="text"
+                            value={vitalsData.muscleConditionScore}
+                            onChange={(e) => setVitalsData(prev => ({ ...prev, muscleConditionScore: e.target.value }))}
+                            placeholder={t('muscleConditionScore')}
+                            className="w-full"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('painScore')}
+                          </label>
+                          <Select
+                            value={vitalsData.painScore}
+                            onValueChange={(value) => setVitalsData(prev => ({ ...prev, painScore: value }))}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder={t('painScore')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="0">0 - {language === 'ar' ? 'لا ألم' : 'No Pain'}</SelectItem>
+                              <SelectItem value="1">1 - {language === 'ar' ? 'ألم خفيف' : 'Mild Pain'}</SelectItem>
+                              <SelectItem value="2">2 - {language === 'ar' ? 'ألم متوسط' : 'Moderate Pain'}</SelectItem>
+                              <SelectItem value="3">3 - {language === 'ar' ? 'ألم شديد' : 'Severe Pain'}</SelectItem>
+                              <SelectItem value="4">4 - {language === 'ar' ? 'ألم شديد جداً' : 'Very Severe Pain'}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('hydrationStatus')}
+                          </label>
+                          <Select
+                            value={vitalsData.hydrationStatus}
+                            onValueChange={(value) => setVitalsData(prev => ({ ...prev, hydrationStatus: value }))}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder={t('hydrationStatus')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="normal">{language === 'ar' ? 'طبيعي' : 'Normal'}</SelectItem>
+                              <SelectItem value="5_dehydrated">{language === 'ar' ? 'جفاف 5%' : '5% Dehydrated'}</SelectItem>
+                              <SelectItem value="10_dehydrated">{language === 'ar' ? 'جفاف 10%' : '10% Dehydrated'}</SelectItem>
+                              <SelectItem value="not_assessed">{language === 'ar' ? 'غير محدد' : 'Not Assessed'}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {t('attitude')}
+                          </label>
+                          <Select
+                            value={vitalsData.attitude}
+                            onValueChange={(value) => setVitalsData(prev => ({ ...prev, attitude: value }))}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder={t('attitude')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="bar">{language === 'ar' ? 'مشرق، متنبه، متجاوب (BAR)' : 'BAR (Bright, Alert, Responsive)'}</SelectItem>
+                              <SelectItem value="qar">{language === 'ar' ? 'هادئ، متنبه، متجاوب (QAR)' : 'QAR (Quiet, Alert, Responsive)'}</SelectItem>
+                              <SelectItem value="depressed">{language === 'ar' ? 'مكتئب' : 'Depressed'}</SelectItem>
+                              <SelectItem value="non_responsive">{language === 'ar' ? 'غير متجاوب' : 'Non-Responsive'}</SelectItem>
+                              <SelectItem value="not_assessed">{language === 'ar' ? 'غير محدد' : 'Not Assessed'}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
