@@ -331,6 +331,19 @@ export const petVitals = pgTable("pet_vitals", {
   temperature: decimal("temperature", { precision: 4, scale: 1 }), // in Celsius  
   heartRate: integer("heart_rate"), // beats per minute
   notes: text("notes"), // additional notes from doctor
+  // Summary section fields
+  consultationDate: text("consultation_date"),
+  // Subjective section fields
+  reasonForVisit: text("reason_for_visit"),
+  initialComplaintNotes: text("initial_complaint_notes"),
+  // Objective section additional fields
+  bodyCondition: text("body_condition"),
+  bodyConditionScore: text("body_condition_score"),
+  respiratoryFrequency: integer("respiratory_frequency"), // breaths per minute
+  muscleConditionScore: text("muscle_condition_score"),
+  painScore: text("pain_score"), // 0-4 scale
+  hydrationStatus: text("hydration_status"),
+  attitude: text("attitude"),
   recordedAt: timestamp("recorded_at").defaultNow(),
   recordedBy: varchar("recorded_by").notNull(), // doctor's username/id
 });
@@ -342,6 +355,16 @@ export const insertPetVitalSchema = createInsertSchema(petVitals).pick({
   temperature: true,
   heartRate: true,
   notes: true,
+  consultationDate: true,
+  reasonForVisit: true,
+  initialComplaintNotes: true,
+  bodyCondition: true,
+  bodyConditionScore: true,
+  respiratoryFrequency: true,
+  muscleConditionScore: true,
+  painScore: true,
+  hydrationStatus: true,
+  attitude: true,
   recordedBy: true,
 });
 

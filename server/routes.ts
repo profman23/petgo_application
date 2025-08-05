@@ -2952,6 +2952,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         temperature: req.body.temperature ? req.body.temperature.toString() : null,
         heartRate: req.body.heartRate,
         notes: req.body.notes,
+        // Summary section fields
+        consultationDate: req.body.consultationDate,
+        // Subjective section fields
+        reasonForVisit: req.body.reasonForVisit,
+        initialComplaintNotes: req.body.initialComplaintNotes,
+        // Objective section additional fields
+        bodyCondition: req.body.bodyCondition,
+        bodyConditionScore: req.body.bodyConditionScore,
+        respiratoryFrequency: req.body.respiratoryFrequency,
+        muscleConditionScore: req.body.muscleConditionScore,
+        painScore: req.body.painScore,
+        hydrationStatus: req.body.hydrationStatus,
+        attitude: req.body.attitude,
         recordedBy: req.body.recordedBy || 'doctor'
       };
       
@@ -3006,6 +3019,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         temperature: req.body.temperature,
         heartRate: req.body.heartRate,
         notes: req.body.notes,
+        // Summary section fields
+        consultationDate: req.body.consultationDate,
+        // Subjective section fields
+        reasonForVisit: req.body.reasonForVisit,
+        initialComplaintNotes: req.body.initialComplaintNotes,
+        // Objective section additional fields
+        bodyCondition: req.body.bodyCondition,
+        bodyConditionScore: req.body.bodyConditionScore,
+        respiratoryFrequency: req.body.respiratoryFrequency,
+        muscleConditionScore: req.body.muscleConditionScore,
+        painScore: req.body.painScore,
+        hydrationStatus: req.body.hydrationStatus,
+        attitude: req.body.attitude,
         recordedBy: req.body.recordedBy
       };
       
