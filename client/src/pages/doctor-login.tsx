@@ -89,6 +89,7 @@ export default function DoctorLogin() {
             <button
               onClick={() => setLocation('/user-type-selection')}
               className="absolute top-4 left-4 p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
               title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
             >
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
@@ -123,15 +124,17 @@ export default function DoctorLogin() {
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel htmlFor="doctor-username">
                         {language === 'ar' ? 'اسم المستخدم' : 'Username'}
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             {...field}
+                            id="doctor-username"
                             type="text"
                             placeholder="vetsvan1"
+                            autoComplete="username"
                             className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                             style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
                           />
@@ -148,15 +151,17 @@ export default function DoctorLogin() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>
+                      <FormLabel htmlFor="doctor-password">
                         {language === 'ar' ? 'كلمة المرور' : 'Password'}
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             {...field}
+                            id="doctor-password"
                             type="password"
                             placeholder="••••••••"
+                            autoComplete="current-password"
                             className={`pr-4 pl-12 border-2 focus:ring-2 focus:ring-opacity-50 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                             style={{ borderColor: 'var(--purple-primary)', '--tw-ring-color': 'var(--purple-primary)' } as any}
                           />
@@ -172,18 +177,30 @@ export default function DoctorLogin() {
                   type="submit"
                   className="w-full text-white py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 
                     hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
-                    bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:#852085950"
+                    bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:to-purple-700"
                   disabled={loginMutation.isPending}
+                  aria-describedby={loginMutation.isPending ? "login-status" : undefined}
                   style={{ 
-                    background: loginMutation.isPending ? '#6B21A8' : undefined,
-                    boxShadow: '0 8px 25px rgba(107, 33, 168, 0.4)'
+                    background: loginMutation.isPending ? '#6B21A8' : 'var(--purple-primary)',
+                    boxShadow: '0 8px 25px rgba(133, 32, 133, 0.4)'
                   }}
                 >
-                  {loginMutation.isPending 
-                    ? (language === 'ar' ? 'جاري تسجيل الدخول...' : 'Logging in...') 
-                    : (language === 'ar' ? 'دخول' : 'Login')
-                  }
+                  <div className="flex items-center justify-center gap-2">
+                    {loginMutation.isPending && (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    )}
+                    {loginMutation.isPending 
+                      ? (language === 'ar' ? 'جاري تسجيل الدخول...' : 'Logging in...') 
+                      : (language === 'ar' ? 'دخول' : 'Login')
+                    }
+                  </div>
                 </Button>
+                
+                {loginMutation.isPending && (
+                  <div id="login-status" className="sr-only">
+                    {language === 'ar' ? 'جاري تسجيل الدخول، يرجى الانتظار' : 'Login in progress, please wait'}
+                  </div>
+                )}
               </form>
             </Form>
 
