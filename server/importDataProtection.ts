@@ -1,5 +1,4 @@
 // Import Data Protection System - Prevents loss of imported data
-import { db } from "./db";
 import { products, services, importHistory } from "@shared/schema";
 import { eq } from "drizzle-orm";
 
@@ -16,6 +15,8 @@ export class ImportDataProtection {
   // Check if imported data exists
   async hasImportedData(): Promise<{ products: boolean; services: boolean; count: { products: number; services: number } }> {
     try {
+      // Import db here to avoid circular dependency
+      const { db } = await import('./db');
       const allProducts = await db.select().from(products);
       const allServices = await db.select().from(services);
       
@@ -43,6 +44,8 @@ export class ImportDataProtection {
       const importStatus = await this.hasImportedData();
       
       if (importStatus.products || importStatus.services) {
+        // Import db here to avoid circular dependency
+        const { db } = await import('./db');
         const allProducts = await db.select().from(products);
         const allServices = await db.select().from(services);
         
@@ -74,6 +77,8 @@ export class ImportDataProtection {
   // Create immediate snapshot after import
   async createPostImportSnapshot(): Promise<void> {
     try {
+      // Import db here to avoid circular dependency
+      const { db } = await import('./db');
       const allProducts = await db.select().from(products);
       const allServices = await db.select().from(services);
       

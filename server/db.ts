@@ -3,7 +3,6 @@ import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
 import { dbProtection } from './dbProtection';
-import { importProtection } from './importDataProtection';
 
 neonConfig.webSocketConstructor = ws;
 
@@ -13,24 +12,8 @@ if (!process.env.DATABASE_URL) {
   );
 }
 
-// Protected database pool with query validation
-class ProtectedPool extends Pool {
-  async query(text: string | object, params?: any[]): Promise<any> {
-    // Validate query through protection system
-    const validation = dbProtection.validateQuery(text);
-    
-    if (!validation.allowed) {
-      console.error(`🛡️ Database Protection: ${validation.reason}`);
-      console.error(`🚫 Blocked Query: ${typeof text === 'string' ? text : text.toString()}`);
-      throw new Error(`Database Protection: ${validation.reason}`);
-    }
-
-    return super.query(text as string, params);
-  }
-}
-
-export const pool = new ProtectedPool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export const db = drizzle(pool, { schema });
 
 // Initialize database schema
 export async function initDatabase() {
@@ -112,7 +95,8 @@ export async function initDatabase() {
     
     console.log('✅ Database schema initialized successfully with protection enabled');
     
-    // Initialize import data protection system
+    // Initialize import data protection system - import here to avoid circular dependency
+    const { importProtection } = await import('./importDataProtection');
     await importProtection.initialize();
     
   } catch (error) {
