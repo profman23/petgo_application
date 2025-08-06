@@ -209,7 +209,17 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
           <Button
             onClick={() => {
               const visibleServiceIds = paginatedServices.map(service => service.id);
-              setSelectedServices(new Set(visibleServiceIds));
+              const allVisible = visibleServiceIds.every(id => selectedServices.has(id));
+              
+              if (allVisible) {
+                // Deselect all visible services
+                const newSelected = new Set(selectedServices);
+                visibleServiceIds.forEach(id => newSelected.delete(id));
+                setSelectedServices(newSelected);
+              } else {
+                // Select all visible services
+                setSelectedServices(new Set(visibleServiceIds));
+              }
             }}
             variant="outline"
             className="border-purple-300 text-purple-700 hover:bg-purple-50"
