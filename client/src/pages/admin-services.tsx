@@ -657,7 +657,10 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
           />
           
           {/* Modal */}
-          <div className="relative bg-white rounded-lg shadow-xl p-6 max-w-md mx-4 z-10">
+          <div 
+            className="relative bg-white rounded-lg shadow-xl p-6 max-w-md mx-4 z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               {language === 'ar' ? 'تأكيد الحذف' : 'Confirm Deletion'}
             </h3>
@@ -672,14 +675,23 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
             <div className="flex gap-3 justify-end">
               <Button
                 variant="outline"
-                onClick={cancelDelete}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  cancelDelete();
+                }}
                 className="border-gray-300 hover:bg-gray-50"
               >
                 {language === 'ar' ? 'إلغاء' : 'Cancel'}
               </Button>
               
               <Button
-                onClick={confirmDelete}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Delete button clicked - about to call confirmDelete');
+                  confirmDelete();
+                }}
                 disabled={deleteServicesMutation.isPending}
                 className="bg-red-600 hover:bg-red-700 text-white"
               >
