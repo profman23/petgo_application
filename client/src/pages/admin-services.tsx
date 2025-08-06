@@ -193,14 +193,25 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
           {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
         </h2>
         
-        <Button
-          onClick={() => setShowAddForm(true)}
-          className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
-          style={{ direction: getDirection(language) }}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          {language === 'ar' ? 'إضافة خدمة' : 'Add Service'}
-        </Button>
+        <div className="flex flex-col gap-2 items-end">
+          <Button
+            onClick={() => setShowAddForm(true)}
+            className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+            style={{ direction: 'ltr' }}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Service
+          </Button>
+          
+          <Button
+            onClick={() => {/* TODO: Add select all functionality */}}
+            variant="outline"
+            className="border-purple-300 text-purple-700 hover:bg-purple-50"
+            style={{ direction: 'ltr' }}
+          >
+            Select All
+          </Button>
+        </div>
       </div>
 
       {/* Filter Field */}
