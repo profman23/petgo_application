@@ -21,6 +21,9 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   // Filter State
   const [filterText, setFilterText] = useState('');
   
+  // Selection State
+  const [selectedServices, setSelectedServices] = useState<Set<number>>(new Set());
+  
   // Add Service State
   const [showAddForm, setShowAddForm] = useState(false);
   const [newService, setNewService] = useState({
@@ -363,6 +366,9 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'الإجراءات' : 'Actions'}
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
+                  {language === 'ar' ? 'تحديد' : 'Select'}
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -452,6 +458,22 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
                         {language === 'ar' ? 'تعديل' : 'Edit'}
                       </Button>
                     )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <input
+                      type="checkbox"
+                      checked={selectedServices.has(service.id)}
+                      onChange={(e) => {
+                        const newSelected = new Set(selectedServices);
+                        if (e.target.checked) {
+                          newSelected.add(service.id);
+                        } else {
+                          newSelected.delete(service.id);
+                        }
+                        setSelectedServices(newSelected);
+                      }}
+                      className="h-4 w-4 text-purple-600 border-purple-300 rounded focus:ring-purple-500"
+                    />
                   </td>
                 </tr>
               ))}
