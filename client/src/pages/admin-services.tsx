@@ -4,14 +4,16 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Loader2, Plus, X, Search } from "lucide-react";
+import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 
 // Services Management Component
-const ServicesManagementTable = ({ language }: { language: string }) => {
+const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   const { toast } = useToast();
   const [editingService, setEditingService] = useState<{ id: number; price: string } | null>(null);
   const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
@@ -20,6 +22,10 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   
   // Filter State
   const [filterText, setFilterText] = useState('');
+  
+  // Selection State - only for currently visible services
+  const [selectedServices, setSelectedServices] = useState<number[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   // Add Service State
   const [showAddForm, setShowAddForm] = useState(false);
@@ -38,7 +44,7 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   const [displayServices, setDisplayServices] = useState<any[]>([]);
   
   useEffect(() => {
-    if (services) {
+    if (services && Array.isArray(services)) {
       // Only update display order if it's different from current services
       if (displayServices.length === 0 || services.length !== displayServices.length) {
         setDisplayServices([...services]);
@@ -113,6 +119,79 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
     }
   });
 
+  // Bulk Delete Services Mutation
+  const deleteServicesMutation = useMutation({
+    mutationFn: async (serviceIds: number[]) => {
+      // Delete services one by one to use existing single delete endpoint
+      const deletePromises = serviceIds.map(id => 
+        apiRequest(`/api/admin/services/${id}`, { method: 'DELETE' })
+      );
+      return Promise.all(deletePromises);
+    },
+    onSuccess: () => {
+      // Remove deleted services from display array
+      setDisplayServices(prev => 
+        prev.filter(service => !selectedServices.includes(service.id))
+      );
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/services'] });
+      toast({
+        title: language === 'ar' ? "تم الحذف بنجاح" : "Deleted Successfully",
+        description: language === 'ar' ? `تم حذف ${selectedServices.length} خدمة` : `${selectedServices.length} services deleted`,
+      });
+      
+      // Reset selection
+      setSelectedServices([]);
+      setShowDeleteConfirm(false);
+    },
+    onError: (error) => {
+      console.error('Error deleting services:', error);
+      toast({
+        title: language === 'ar' ? "خطأ في الحذف" : "Delete Error",
+        description: language === 'ar' ? "فشل في حذف الخدمات" : "Failed to delete services",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Selection handling functions
+  const handleSelectAll = () => {
+    const visibleServiceIds = paginatedServices.map((service: any) => service.id);
+    if (selectedServices.length === visibleServiceIds.length) {
+      // Deselect all if all are selected
+      setSelectedServices([]);
+    } else {
+      // Select all visible services
+      setSelectedServices(visibleServiceIds);
+    }
+  };
+
+  const handleServiceSelection = (serviceId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedServices(prev => [...prev, serviceId]);
+    } else {
+      setSelectedServices(prev => prev.filter(id => id !== serviceId));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedServices.length > 0) {
+      deleteServicesMutation.mutate(selectedServices);
+    }
+  };
+
+  // Clear selection when pagination or filter changes
+  const handleFilterChange = (value: string) => {
+    setFilterText(value);
+    setCurrentPage(1);
+    setSelectedServices([]); // Clear selection on filter change
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setSelectedServices([]); // Clear selection on page change
+  };
+
   const handlePriceEdit = (serviceId: number, currentPrice: string) => {
     setEditingService({ id: serviceId, price: currentPrice });
     setEditedServices({ [serviceId]: currentPrice });
@@ -176,11 +255,9 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   const paginatedServices = filteredServices.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
 
-  // Reset to page 1 when filter changes
-  const handleFilterChange = (value: string) => {
-    setFilterText(value);
-    setCurrentPage(1);
-  };
+  // Check if all visible services are selected
+  const areAllVisibleSelected = paginatedServices.length > 0 && 
+    paginatedServices.every((service: any) => selectedServices.includes(service.id));
 
   return (
     <div className="space-y-6">
@@ -204,13 +281,54 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
           </Button>
           
           <Button
-            onClick={() => {/* TODO: Add select all functionality */}}
+            onClick={handleSelectAll}
             variant="outline"
             className="border-purple-300 text-purple-700 hover:bg-purple-50"
             style={{ direction: 'ltr' }}
           >
-            Select All
+            {areAllVisibleSelected ? 'Deselect All' : 'Select All'}
           </Button>
+
+          {selectedServices.length > 0 && (
+            <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  style={{ direction: 'ltr' }}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete ({selectedServices.length})
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete {selectedServices.length} selected service(s)? 
+                    This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleBulkDelete}
+                    disabled={deleteServicesMutation.isPending}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    {deleteServicesMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Deleting...
+                      </>
+                    ) : (
+                      'Delete'
+                    )}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
 
@@ -345,6 +463,13 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gradient-to-r from-purple-50 to-purple-100">
               <tr>
+                <th className="px-6 py-3 text-left">
+                  <Checkbox
+                    checked={areAllVisibleSelected}
+                    onCheckedChange={() => handleSelectAll()}
+                    className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                  />
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'المعرف' : 'ID'}
                 </th>
@@ -367,7 +492,14 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {paginatedServices.map((service: any, index: number) => (
-                <tr key={service.id} className={index % 2 === 0 ? 'bg-white' : 'bg-purple-25'}>
+                <tr key={service.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-purple-25'} ${selectedServices.includes(service.id) ? 'bg-purple-50 border-purple-200' : ''}`}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <Checkbox
+                      checked={selectedServices.includes(service.id)}
+                      onCheckedChange={(checked) => handleServiceSelection(service.id, !!checked)}
+                      className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                    />
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {service.id}
                   </td>
@@ -468,8 +600,8 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
               textAlign: getTextAlign(language) 
             }}>
               {language === 'ar' 
-                ? `عرض ${paginatedServices.length} من أصل ${filteredServices.length} خدمة (المجموع: ${services?.length || 0})`
-                : `Showing ${paginatedServices.length} of ${filteredServices.length} services (Total: ${services?.length || 0})`
+                ? `عرض ${paginatedServices.length} من أصل ${filteredServices.length} خدمة (المجموع: ${Array.isArray(services) ? services.length : 0})`
+                : `Showing ${paginatedServices.length} of ${filteredServices.length} services (Total: ${Array.isArray(services) ? services.length : 0})`
               }
             </div>
             
@@ -481,7 +613,7 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
+                  handlePageChange(1);
                 }}
                 className="border border-purple-300 rounded px-3 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white"
                 style={{ direction: 'ltr' }}
@@ -502,7 +634,7 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
                 className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -521,7 +653,7 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
                 className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
