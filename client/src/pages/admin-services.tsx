@@ -11,7 +11,7 @@ import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 
 // Services Management Component
-const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
+const ServicesManagementTable = ({ language }: { language: string }) => {
   const { toast } = useToast();
   const [editingService, setEditingService] = useState<{ id: number; price: string } | null>(null);
   const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
@@ -20,12 +20,6 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   
   // Filter State
   const [filterText, setFilterText] = useState('');
-  
-  // Selection State
-  const [selectedServices, setSelectedServices] = useState<Set<number>>(new Set());
-  
-  // Delete confirmation state
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   // Add Service State
   const [showAddForm, setShowAddForm] = useState(false);
@@ -44,7 +38,7 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   const [displayServices, setDisplayServices] = useState<any[]>([]);
   
   useEffect(() => {
-    if (services && Array.isArray(services)) {
+    if (services) {
       // Only update display order if it's different from current services
       if (displayServices.length === 0 || services.length !== displayServices.length) {
         setDisplayServices([...services]);
@@ -119,42 +113,6 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     }
   });
 
-  // Delete Services Mutation
-  const deleteServicesMutation = useMutation({
-    mutationFn: async (serviceIds: number[]) => {
-      // Delete services one by one
-      const deletePromises = serviceIds.map(id => 
-        apiRequest(`/api/admin/services/${id}`, {
-          method: 'DELETE',
-        })
-      );
-      return Promise.all(deletePromises);
-    },
-    onSuccess: () => {
-      // Remove deleted services from display array
-      setDisplayServices(prev => 
-        prev.filter(service => !selectedServices.has(service.id))
-      );
-      
-      // Clear selection
-      setSelectedServices(new Set());
-      
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/services'] });
-      toast({
-        title: language === 'ar' ? "تم الحذف بنجاح" : "Deleted Successfully",
-        description: language === 'ar' ? "تم حذف الخدمات المحددة" : "Selected services deleted",
-      });
-    },
-    onError: (error) => {
-      console.error('Error deleting services:', error);
-      toast({
-        title: language === 'ar' ? "خطأ في الحذف" : "Delete Error",
-        description: language === 'ar' ? "فشل في حذف الخدمات" : "Failed to delete services",
-        variant: "destructive",
-      });
-    }
-  });
-
   const handlePriceEdit = (serviceId: number, currentPrice: string) => {
     setEditingService({ id: serviceId, price: currentPrice });
     setEditedServices({ [serviceId]: currentPrice });
@@ -190,23 +148,6 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   const cancelAddService = () => {
     setShowAddForm(false);
     setNewService({ name: '', nameAr: '', price: '' });
-  };
-
-  const handleDeleteSelected = () => {
-    setShowDeleteConfirm(true);
-  };
-
-  const confirmDelete = () => {
-    console.log('confirmDelete called');
-    const selectedIds = Array.from(selectedServices);
-    console.log('Selected IDs for deletion:', selectedIds);
-    deleteServicesMutation.mutate(selectedIds);
-    setShowDeleteConfirm(false);
-  };
-
-  const cancelDelete = () => {
-    console.log('cancelDelete called');
-    setShowDeleteConfirm(false);
   };
 
   if (isLoading) {
@@ -263,49 +204,13 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
           </Button>
           
           <Button
-            onClick={() => {
-              const visibleServiceIds = paginatedServices.map(service => service.id);
-              const allVisible = visibleServiceIds.every(id => selectedServices.has(id));
-              
-              if (allVisible) {
-                // Deselect all visible services
-                const newSelected = new Set(selectedServices);
-                visibleServiceIds.forEach(id => newSelected.delete(id));
-                setSelectedServices(newSelected);
-              } else {
-                // Select all visible services
-                setSelectedServices(new Set(visibleServiceIds));
-              }
-            }}
+            onClick={() => {/* TODO: Add select all functionality */}}
             variant="outline"
             className="border-purple-300 text-purple-700 hover:bg-purple-50"
             style={{ direction: 'ltr' }}
           >
             Select All
           </Button>
-          
-          {selectedServices.size > 0 && (
-            <>
-              <div className="text-sm text-purple-600 font-medium" style={{ direction: 'ltr' }}>
-                ✔️ {selectedServices.size} services selected
-              </div>
-              
-              <Button
-                onClick={handleDeleteSelected}
-                variant="outline"
-                className="border-red-300 text-red-600 hover:bg-red-50"
-                style={{ direction: 'ltr' }}
-                disabled={deleteServicesMutation.isPending}
-              >
-                {deleteServicesMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <X className="h-4 w-4 mr-2" />
-                )}
-                Delete Selected
-              </Button>
-            </>
-          )}
         </div>
       </div>
 
@@ -458,9 +363,6 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'الإجراءات' : 'Actions'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
-                  {language === 'ar' ? 'تحديد' : 'Select'}
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -551,22 +453,6 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
                       </Button>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <input
-                      type="checkbox"
-                      checked={selectedServices.has(service.id)}
-                      onChange={(e) => {
-                        const newSelected = new Set(selectedServices);
-                        if (e.target.checked) {
-                          newSelected.add(service.id);
-                        } else {
-                          newSelected.delete(service.id);
-                        }
-                        setSelectedServices(newSelected);
-                      }}
-                      className="h-4 w-4 text-purple-600 border-purple-300 rounded focus:ring-purple-500"
-                    />
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -582,8 +468,8 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
               textAlign: getTextAlign(language) 
             }}>
               {language === 'ar' 
-                ? `عرض ${paginatedServices.length} من أصل ${filteredServices.length} خدمة (المجموع: ${Array.isArray(services) ? services.length : 0})`
-                : `Showing ${paginatedServices.length} of ${filteredServices.length} services (Total: ${Array.isArray(services) ? services.length : 0})`
+                ? `عرض ${paginatedServices.length} من أصل ${filteredServices.length} خدمة (المجموع: ${services?.length || 0})`
+                : `Showing ${paginatedServices.length} of ${filteredServices.length} services (Total: ${services?.length || 0})`
               }
             </div>
             
@@ -646,64 +532,6 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
 
         </div>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50" 
-            onClick={cancelDelete}
-          />
-          
-          {/* Modal */}
-          <div 
-            className="relative bg-white rounded-lg shadow-xl p-6 max-w-md mx-4 z-10"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {language === 'ar' ? 'تأكيد الحذف' : 'Confirm Deletion'}
-            </h3>
-            
-            <p className="text-gray-600 mb-6">
-              {language === 'ar' 
-                ? 'هل أنت متأكد من رغبتك في حذف الخدمات المحددة؟'
-                : 'Are you sure you want to delete the selected services?'
-              }
-            </p>
-            
-            <div className="flex gap-3 justify-end">
-              <Button
-                variant="outline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  cancelDelete();
-                }}
-                className="border-gray-300 hover:bg-gray-50"
-              >
-                {language === 'ar' ? 'إلغاء' : 'Cancel'}
-              </Button>
-              
-              <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('Delete button clicked - about to call confirmDelete');
-                  confirmDelete();
-                }}
-                disabled={deleteServicesMutation.isPending}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                {deleteServicesMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : null}
-                {language === 'ar' ? 'حذف' : 'Delete'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
