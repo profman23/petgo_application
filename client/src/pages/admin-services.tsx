@@ -11,7 +11,7 @@ import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 
 // Services Management Component
-const ServicesManagementTable = ({ language }: { language: string }) => {
+const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   const { toast } = useToast();
   const [editingService, setEditingService] = useState<{ id: number; price: string } | null>(null);
   const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
@@ -41,7 +41,7 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
   const [displayServices, setDisplayServices] = useState<any[]>([]);
   
   useEffect(() => {
-    if (services) {
+    if (services && Array.isArray(services)) {
       // Only update display order if it's different from current services
       if (displayServices.length === 0 || services.length !== displayServices.length) {
         setDisplayServices([...services]);
@@ -207,13 +207,22 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
           </Button>
           
           <Button
-            onClick={() => {/* TODO: Add select all functionality */}}
+            onClick={() => {
+              const visibleServiceIds = paginatedServices.map(service => service.id);
+              setSelectedServices(new Set(visibleServiceIds));
+            }}
             variant="outline"
             className="border-purple-300 text-purple-700 hover:bg-purple-50"
             style={{ direction: 'ltr' }}
           >
             Select All
           </Button>
+          
+          {selectedServices.size > 0 && (
+            <div className="text-sm text-purple-600 font-medium" style={{ direction: 'ltr' }}>
+              ✔️ {selectedServices.size} services selected
+            </div>
+          )}
         </div>
       </div>
 
@@ -490,8 +499,8 @@ const ServicesManagementTable = ({ language }: { language: string }) => {
               textAlign: getTextAlign(language) 
             }}>
               {language === 'ar' 
-                ? `عرض ${paginatedServices.length} من أصل ${filteredServices.length} خدمة (المجموع: ${services?.length || 0})`
-                : `Showing ${paginatedServices.length} of ${filteredServices.length} services (Total: ${services?.length || 0})`
+                ? `عرض ${paginatedServices.length} من أصل ${filteredServices.length} خدمة (المجموع: ${Array.isArray(services) ? services.length : 0})`
+                : `Showing ${paginatedServices.length} of ${filteredServices.length} services (Total: ${Array.isArray(services) ? services.length : 0})`
               }
             </div>
             
