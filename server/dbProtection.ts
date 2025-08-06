@@ -7,6 +7,8 @@ export class DatabaseProtection {
   private allowedExceptions = [
     'DELETE FROM sessions WHERE expire <',  // Allow session cleanup
     'DELETE FROM otp_verifications WHERE expires_at <',  // Allow OTP cleanup
+    'DELETE FROM "services" WHERE "id" =',  // Allow admin service deletion by ID
+    'DELETE FROM services WHERE id =',  // Allow admin service deletion by ID (alternate syntax)
   ];
 
   static getInstance(): DatabaseProtection {
@@ -32,10 +34,23 @@ export class DatabaseProtection {
       };
     }
     
-    if (upperQuery.includes('DELETE FROM SERVICES') || upperQuery.includes('DROP TABLE SERVICES') || upperQuery.includes('TRUNCATE SERVICES')) {
+    // Allow individual service deletion by ID for admin operations
+    if (upperQuery.includes('DELETE FROM SERVICES') || upperQuery.includes('DELETE FROM "SERVICES"')) {
+      if (upperQuery.includes('WHERE "ID" =') || upperQuery.includes('WHERE ID =')) {
+        // Allow single service deletion by ID
+        return { allowed: true };
+      } else {
+        return {
+          allowed: false,
+          reason: `🔒 IMPORT DATA PROTECTION: Bulk deletion of services table is not allowed, only individual service deletion by ID`
+        };
+      }
+    }
+    
+    if (upperQuery.includes('DROP TABLE SERVICES') || upperQuery.includes('TRUNCATE SERVICES')) {
       return {
         allowed: false,
-        reason: `🔒 IMPORT DATA PROTECTION: Services table contains imported data and cannot be deleted`
+        reason: `🔒 IMPORT DATA PROTECTION: Services table contains imported data and cannot be dropped or truncated`
       };
     }
     

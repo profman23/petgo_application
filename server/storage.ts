@@ -833,9 +833,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteService(id: number): Promise<void> {
+    // Actually delete the service record from the database
     await db
-      .update(services)
-      .set({ isActive: false })
+      .delete(services)
       .where(eq(services.id, id));
   }
 
