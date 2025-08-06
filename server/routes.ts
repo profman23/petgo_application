@@ -3420,6 +3420,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin-specific service delete route
+  app.delete('/api/admin/services/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`🗑️ Admin deleting service with ID: ${id}`);
+      await storage.deleteService(parseInt(id));
+      res.json({ message: 'Service deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting service:', error);
+      res.status(500).json({ error: 'Failed to delete service' });
+    }
+  });
+
   // Import endpoints
   app.get('/api/import-history', requireAdminAuth, async (req, res) => {
     try {
