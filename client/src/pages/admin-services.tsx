@@ -24,6 +24,9 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   // Selection State
   const [selectedServices, setSelectedServices] = useState<Set<number>>(new Set());
   
+  // Delete confirmation state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
   // Add Service State
   const [showAddForm, setShowAddForm] = useState(false);
   const [newService, setNewService] = useState({
@@ -116,6 +119,42 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     }
   });
 
+  // Delete Services Mutation
+  const deleteServicesMutation = useMutation({
+    mutationFn: async (serviceIds: number[]) => {
+      // Delete services one by one
+      const deletePromises = serviceIds.map(id => 
+        apiRequest(`/api/admin/services/${id}`, {
+          method: 'DELETE',
+        })
+      );
+      return Promise.all(deletePromises);
+    },
+    onSuccess: () => {
+      // Remove deleted services from display array
+      setDisplayServices(prev => 
+        prev.filter(service => !selectedServices.has(service.id))
+      );
+      
+      // Clear selection
+      setSelectedServices(new Set());
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/services'] });
+      toast({
+        title: language === 'ar' ? "تم الحذف بنجاح" : "Deleted Successfully",
+        description: language === 'ar' ? "تم حذف الخدمات المحددة" : "Selected services deleted",
+      });
+    },
+    onError: (error) => {
+      console.error('Error deleting services:', error);
+      toast({
+        title: language === 'ar' ? "خطأ في الحذف" : "Delete Error",
+        description: language === 'ar' ? "فشل في حذف الخدمات" : "Failed to delete services",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handlePriceEdit = (serviceId: number, currentPrice: string) => {
     setEditingService({ id: serviceId, price: currentPrice });
     setEditedServices({ [serviceId]: currentPrice });
@@ -151,6 +190,20 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   const cancelAddService = () => {
     setShowAddForm(false);
     setNewService({ name: '', nameAr: '', price: '' });
+  };
+
+  const handleDeleteSelected = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    const selectedIds = Array.from(selectedServices);
+    deleteServicesMutation.mutate(selectedIds);
+    setShowDeleteConfirm(false);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
   };
 
   if (isLoading) {
@@ -229,9 +282,26 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
           </Button>
           
           {selectedServices.size > 0 && (
-            <div className="text-sm text-purple-600 font-medium" style={{ direction: 'ltr' }}>
-              ✔️ {selectedServices.size} services selected
-            </div>
+            <>
+              <div className="text-sm text-purple-600 font-medium" style={{ direction: 'ltr' }}>
+                ✔️ {selectedServices.size} services selected
+              </div>
+              
+              <Button
+                onClick={handleDeleteSelected}
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50"
+                style={{ direction: 'ltr' }}
+                disabled={deleteServicesMutation.isPending}
+              >
+                {deleteServicesMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <X className="h-4 w-4 mr-2" />
+                )}
+                Delete Selected
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -573,6 +643,52 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
 
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50" 
+            onClick={cancelDelete}
+          />
+          
+          {/* Modal */}
+          <div className="relative bg-white rounded-lg shadow-xl p-6 max-w-md mx-4 z-10">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {language === 'ar' ? 'تأكيد الحذف' : 'Confirm Deletion'}
+            </h3>
+            
+            <p className="text-gray-600 mb-6">
+              {language === 'ar' 
+                ? 'هل أنت متأكد من رغبتك في حذف الخدمات المحددة؟'
+                : 'Are you sure you want to delete the selected services?'
+              }
+            </p>
+            
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={cancelDelete}
+                className="border-gray-300 hover:bg-gray-50"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </Button>
+              
+              <Button
+                onClick={confirmDelete}
+                disabled={deleteServicesMutation.isPending}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {deleteServicesMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : null}
+                {language === 'ar' ? 'حذف' : 'Delete'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
