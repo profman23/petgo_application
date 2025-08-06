@@ -197,12 +197,15 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   };
 
   const confirmDelete = () => {
+    console.log('confirmDelete called');
     const selectedIds = Array.from(selectedServices);
+    console.log('Selected IDs for deletion:', selectedIds);
     deleteServicesMutation.mutate(selectedIds);
     setShowDeleteConfirm(false);
   };
 
   const cancelDelete = () => {
+    console.log('cancelDelete called');
     setShowDeleteConfirm(false);
   };
 
