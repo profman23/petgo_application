@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -72,6 +72,7 @@ export default function VetsVanShifts() {
     endTime: '17:00',
     duration: 'day' as 'day' | 'week' | 'month'
   });
+  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
 
   // تحديد نطاق التواريخ للعرض (7 أيام من بداية الأسبوع)
   const getDateRange = () => {
@@ -331,15 +332,15 @@ export default function VetsVanShifts() {
       dir={getDirection(language)}
       style={{ textAlign: getTextAlign(language) }}
     >
-      {/* Full-width Header with logo and controls */}
-      <div className="bg-white shadow-md border-b border-gray-200">
+      {/* Fixed Header - matches admin dashboard */}
+      <header className="bg-white shadow-md border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
         <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
-          {/* Logo */}
+          {/* Logo - using same source as admin dashboard */}
           <div className="flex-shrink-0">
             <img 
               src="/api/placeholder/32/32" 
               alt="VETS VAN" 
-              className="h-14 w-auto object-contain"
+              className="h-8 w-8 rounded-lg object-cover"
             />
           </div>
 
@@ -356,12 +357,12 @@ export default function VetsVanShifts() {
             </Button>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Main Content with Sidebar */}
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg min-h-screen">
+      {/* Main Content with Sidebar - add top margin for fixed header */}
+      <div className="flex pt-20">
+        {/* Sidebar - matches admin dashboard */}
+        <div className="w-64 bg-white shadow-lg min-h-screen fixed left-0 top-20 bottom-0 overflow-y-auto">
           <nav className="mt-4 px-2">
             <button
               onClick={() => setLocation('/admin-dashboard')}
@@ -411,12 +412,43 @@ export default function VetsVanShifts() {
               <Package className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
             </button>
+            
+            {/* New Reports & Analytics Dropdown - exact match from admin dashboard */}
+            <div className="mt-2">
+              <button
+                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <TrendingUp className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                </span>
+                {isNewReportsExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+              
+              {/* Dropdown Items */}
+              {isNewReportsExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </nav>
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
+        {/* Main Content Area - add left margin for fixed sidebar */}
+        <div className="flex-1 ml-64 overflow-auto">
+          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
             <div className="px-1 py-3 sm:px-0">
               {/* جدول النوبات */}
               <Card>
