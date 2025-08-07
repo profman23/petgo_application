@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -332,20 +332,42 @@ export default function VetsVanShifts() {
       dir={getDirection(language)}
       style={{ textAlign: getTextAlign(language) }}
     >
-      {/* Fixed Header - matches admin dashboard */}
+      {/* Fixed Header - matches admin dashboard exactly */}
       <header className="bg-white shadow-md border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
         <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
-          {/* Logo - using same source as admin dashboard */}
+          {/* Logo - matches admin dashboard */}
           <div className="flex-shrink-0">
             <img 
               src="/api/placeholder/32/32" 
               alt="VETS VAN" 
-              className="h-8 w-8 rounded-lg object-cover"
+              className="h-14 w-auto object-contain"
             />
           </div>
 
-          {/* Header Controls */}
+          {/* Header Controls - matches admin dashboard */}
           <div className="flex items-center gap-4">
+            {/* Language Selector */}
+            <div className="hidden sm:block">
+              <div className="text-sm text-gray-600">
+                {language === 'ar' ? 'العربية' : 'English'}
+              </div>
+            </div>
+            
+            {/* Notification Bell */}
+            <div className="relative">
+              <Bell className="h-6 w-6 text-purple-600" />
+            </div>
+            
+            {/* Audio Toggle */}
+            <button
+              onClick={() => {}}
+              className="p-2 rounded-md hover:bg-gray-100"
+              title={language === 'ar' ? 'تفعيل/إلغاء الصوت' : 'Toggle Audio'}
+            >
+              <Volume2 className="h-5 w-5 text-gray-600" />
+            </button>
+            
+            {/* Back Button */}
             <Button
               variant="ghost"
               size="sm"
@@ -355,14 +377,26 @@ export default function VetsVanShifts() {
               <ArrowLeft className="w-4 h-4" />
               {t('back')}
             </Button>
+            
+            {/* Logout Button */}
+            <button
+              onClick={() => {
+                localStorage.removeItem("adminToken");
+                setLocation("/admin-login");
+              }}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            >
+              <LogOut className="h-4 w-4 ml-2" />
+              {t('logout')}
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content with Sidebar - add top margin for fixed header */}
-      <div className="flex pt-20">
+      <div className="flex pt-24">
         {/* Sidebar - matches admin dashboard */}
-        <div className="w-64 bg-white shadow-lg min-h-screen fixed left-0 top-20 bottom-0 overflow-y-auto">
+        <div className="w-64 bg-white shadow-lg min-h-screen fixed left-0 top-24 bottom-0 overflow-y-auto">
           <nav className="mt-4 px-2">
             <button
               onClick={() => setLocation('/admin-dashboard')}
