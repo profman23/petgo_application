@@ -9,6 +9,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
@@ -725,6 +726,7 @@ export default function AdminDashboard() {
   const [requestSearchTerm, setRequestSearchTerm] = useState('');
   const [requestFilterDateFrom, setRequestFilterDateFrom] = useState<Date | undefined>(undefined);
   const [requestFilterDateTo, setRequestFilterDateTo] = useState<Date | undefined>(undefined);
+  const [selectedVetsVanIds, setSelectedVetsVanIds] = useState<number[]>([]);
   
   // Pagination State for VetsVan Requests
   const [requestCurrentPage, setRequestCurrentPage] = useState(1);
@@ -741,6 +743,7 @@ export default function AdminDashboard() {
     setRequestSearchTerm('');
     setRequestFilterDateFrom(undefined);
     setRequestFilterDateTo(undefined);
+    setSelectedVetsVanIds([]);
     setRequestCurrentPage(1); // Reset to first page when clearing filters
   };
 
@@ -1183,7 +1186,7 @@ export default function AdminDashboard() {
     refetchIntervalInBackground: true,
   });
 
-  // Filter VetsVan requests based on search term and date
+  // Filter VetsVan requests based on search term, date, and selected VetsVan vehicles
   const filteredVetsVanRequests = allVetsVanRequests?.filter(request => {
     // Search filter - check name, phone, email, pets, vetsvan
     const searchMatch = !requestSearchTerm || 
@@ -1210,7 +1213,11 @@ export default function AdminDashboard() {
                   (!toDateOnly || appointmentDateOnly <= toDateOnly);
     }
 
-    return searchMatch && dateMatch;
+    // VetsVan filter - check if request belongs to selected VetsVan vehicles
+    const vetsVanMatch = selectedVetsVanIds.length === 0 || 
+      selectedVetsVanIds.includes(request.driverId);
+
+    return searchMatch && dateMatch && vetsVanMatch;
   });
 
   // Pagination calculations for VetsVan requests
@@ -1233,7 +1240,7 @@ export default function AdminDashboard() {
   // Reset to first page when filters change
   useEffect(() => {
     setRequestCurrentPage(1);
-  }, [requestSearchTerm, requestFilterDateFrom, requestFilterDateTo]);
+  }, [requestSearchTerm, requestFilterDateFrom, requestFilterDateTo, selectedVetsVanIds]);
 
   // Monitor for new requests and trigger notifications
   useEffect(() => {
@@ -2395,12 +2402,63 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                       </div>
+
+                      {/* VetsVan Filter Section */}
+                      <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
+                          {language === 'ar' ? 'فلتر بسيارات VetsVan' : 'Filter by VetsVan Vehicles'}
+                        </label>
+                        <div className="border border-gray-300 rounded-md p-3 bg-gray-50 max-h-40 overflow-y-auto">
+                          {drivers && drivers.length > 0 ? (
+                            <div className="space-y-2">
+                              {drivers.map((driver) => (
+                                <div key={driver.id} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`vetsvan-${driver.id}`}
+                                    checked={selectedVetsVanIds.includes(driver.id)}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        setSelectedVetsVanIds(prev => [...prev, driver.id]);
+                                      } else {
+                                        setSelectedVetsVanIds(prev => prev.filter(id => id !== driver.id));
+                                      }
+                                    }}
+                                    className="border-purple-600 text-purple-600 focus:ring-purple-600"
+                                  />
+                                  <label
+                                    htmlFor={`vetsvan-${driver.id}`}
+                                    className="text-sm font-medium text-gray-700 cursor-pointer flex-1"
+                                    style={{ textAlign: getTextAlign(language) }}
+                                  >
+                                    {language === 'ar' 
+                                      ? `${(driver as any).vetsvanName || driver.name} - ${(driver as any).vetsvanCode || driver.username}`
+                                      : `${(driver as any).vetsvanName || driver.name} - ${(driver as any).vetsvanCode || driver.username}`
+                                    }
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-sm text-gray-500 text-center py-2">
+                              {language === 'ar' ? 'لا توجد سيارات VetsVan متاحة' : 'No VetsVan vehicles available'}
+                            </div>
+                          )}
+                        </div>
+                        {selectedVetsVanIds.length > 0 && (
+                          <div className="text-xs text-purple-600 mt-1">
+                            {language === 'ar' 
+                              ? `تم تحديد ${selectedVetsVanIds.length} سيارة`
+                              : `${selectedVetsVanIds.length} vehicle${selectedVetsVanIds.length !== 1 ? 's' : ''} selected`
+                            }
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Filter Actions and Results Counter */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div className="flex items-center gap-2">
-                        {(requestSearchTerm || requestFilterDateFrom || requestFilterDateTo) && (
+                        {(requestSearchTerm || requestFilterDateFrom || requestFilterDateTo || selectedVetsVanIds.length > 0) && (
                           <Button
                             variant="ghost"
                             size="sm"
