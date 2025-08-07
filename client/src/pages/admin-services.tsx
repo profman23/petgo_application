@@ -4,13 +4,14 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2, Bell, Volume2, LogOut, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
+import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 // Services Management Component
 const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
@@ -671,37 +672,89 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
 // Main Admin Services Page
 export default function AdminServices() {
   const [, setLocation] = useLocation();
-  const { language } = useTranslation();
+  const { language, t } = useTranslation();
+  
+  // State for tracking notifications and audio - matches VetsVan Shifts and admin dashboard
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const lastRequestCountRef = useRef(0);
+  const [currentRequestCount, setCurrentRequestCount] = useState(0);
+
+  // Fetch current requests count for notification badge - matches VetsVan Shifts
+  const { data: allVetsVanRequests } = useQuery({
+    queryKey: ['/api/admin/vetsvan-requests'],
+    refetchInterval: 2000, // Poll every 2 seconds for real-time updates like admin dashboard
+    refetchIntervalInBackground: true,
+    staleTime: 0,
+  });
+
+  // Monitor for new requests and update notification count - exact same logic as VetsVan Shifts
+  useEffect(() => {
+    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
+      const currentCount = allVetsVanRequests.length;
+      
+      lastRequestCountRef.current = currentCount;
+      setCurrentRequestCount(currentCount);
+    }
+  }, [allVetsVanRequests]);
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{ direction: getDirection(language) }}>
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4" style={{ 
-              direction: getDirection(language),
-              gap: language === 'ar' ? '0 1rem 0 0' : '0 0 0 1rem'
-            }}>
-              <Button
-                variant="ghost"
-                onClick={() => setLocation('/admin-dashboard')}
-                className="text-purple-600 hover:text-purple-800 hover:bg-purple-50"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'العودة إلى لوحة التحكم' : 'Back to Dashboard'}
-              </Button>
-              
-              <div className="h-6 w-px bg-gray-300"></div>
-              
-              <h1 className="text-xl font-semibold text-gray-900">
-                {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
-              </h1>
+    <div 
+      className="min-h-screen bg-gray-50"
+      dir={getDirection(language)}
+      style={{ textAlign: getTextAlign(language) }}
+    >
+      {/* Full-width Header with logo and controls - exact copy from VetsVan Shifts */}
+      <div className="bg-white shadow-md border-b border-gray-200">
+        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <img 
+              src={vetsVanLogo} 
+              alt="VETS VAN" 
+              className="h-14 w-auto object-contain"
+            />
+          </div>
+
+          {/* Header Controls */}
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            
+            {/* Audio notification toggle */}
+            <button
+              onClick={() => setAudioEnabled(!audioEnabled)}
+              className={`p-2 rounded-full transition-colors duration-200 ${
+                audioEnabled 
+                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={audioEnabled 
+                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
+                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
+              }
+            >
+              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            </button>
+
+            {/* Notifications counter - matches VetsVan Shifts and admin dashboard */}
+            <div className="relative">
+              <Bell className="h-6 w-6 text-purple-600" />
+              {currentRequestCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                </span>
+              )}
             </div>
             
-            <div className="flex items-center space-x-4">
-              <LanguageSelector />
-            </div>
+            <button
+              onClick={() => {
+                localStorage.removeItem("adminToken");
+                setLocation("/admin-login");
+              }}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            >
+              <LogOut className="h-4 w-4 ml-2" />
+              {t('logout')}
+            </button>
           </div>
         </div>
       </div>
