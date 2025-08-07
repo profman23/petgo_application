@@ -384,36 +384,8 @@ export default function VetsVanShifts() {
               <BarChart3 className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
             </button>
-            <button
-              onClick={() => setLocation('/admin-dashboard')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <FileText className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
-            </button>
-            <button
-              onClick={() => setLocation('/admin-dashboard')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Upload className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
-            </button>
-            <button
-              onClick={() => setLocation('/admin-dashboard/services')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Stethoscope className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
-            </button>
-            <button
-              onClick={() => setLocation('/admin-dashboard')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Package className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-            </button>
             
-            {/* New Reports & Analytics Dropdown - exact match from admin dashboard */}
+            {/* New Reports & Analytics Dropdown - positioned after Reports */}
             <div className="mt-2">
               <button
                 onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
@@ -443,6 +415,35 @@ export default function VetsVanShifts() {
                 </div>
               )}
             </div>
+            
+            <button
+              onClick={() => setLocation('/admin-dashboard')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+            </button>
+            <button
+              onClick={() => setLocation('/admin-dashboard')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Upload className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
+            </button>
+            <button
+              onClick={() => setLocation('/admin-dashboard/services')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Stethoscope className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+            </button>
+            <button
+              onClick={() => setLocation('/admin-dashboard')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Package className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
+            </button>
           </nav>
         </div>
 
