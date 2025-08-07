@@ -1634,47 +1634,47 @@ export default function AdminDashboard() {
           <nav className="mt-4 px-2">
             <button
               onClick={() => setActiveTab('management')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full ${
+              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
                 activeTab === 'management'
                   ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <Car className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
+              <Car className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
             </button>
             <button
               onClick={() => setLocation('/vets-van-shifts')}
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <Clock className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}
+              <Clock className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
             </button>
             <button
               onClick={() => setActiveTab('reports')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'reports'
                   ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <BarChart3 className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'التقارير' : 'Reports'}
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
             </button>
             {/* New Reports & Analytics Dropdown */}
             <div className="mt-2">
               <button
                 onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
-                className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
-                <TrendingUp className="ml-3 h-6 w-6" />
+                <TrendingUp className="h-6 w-6 flex-shrink-0" />
                 <span className="flex-1 text-left">
                   {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
                 </span>
                 {isNewReportsExpanded ? (
-                  <ChevronUp className="h-4 w-4" />
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
                 ) : (
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
                 )}
               </button>
               
@@ -1683,53 +1683,53 @@ export default function AdminDashboard() {
                 <div className="ml-6 mt-1 space-y-1">
                   <button
                     onClick={() => setLocation('/new-reports-analytics/sales-report')}
-                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <BarChart3 className="ml-3 h-5 w-5" />
-                    {language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
                   </button>
                 </div>
               )}
             </div>
             <button
               onClick={() => setActiveTab('requests')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'requests'
                   ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <FileText className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
             </button>
             <button
               onClick={() => setActiveTab('import')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'import'
                   ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <Upload className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'استيراد البيانات' : 'Import'}
+              <Upload className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
             </button>
             <button
               onClick={() => setLocation('/admin-dashboard/services')}
-              className="group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <Stethoscope className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'الخدمات' : 'Services'}
+              <Stethoscope className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
             </button>
             <button
               onClick={() => setActiveTab('products')}
-              className={`group flex items-center px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
+              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'products'
                   ? 'bg-purple-600 text-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <Package className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'المنتجات' : 'Products'}
+              <Package className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
             </button>
           </nav>
         </div>
