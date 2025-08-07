@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX } from "lucide-react";
@@ -75,18 +75,29 @@ export default function VetsVanShifts() {
     duration: 'day' as 'day' | 'week' | 'month'
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
+  
+  // State for tracking notifications and audio - matches admin dashboard
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const lastRequestCountRef = useRef(0);
+  const [currentRequestCount, setCurrentRequestCount] = useState(0);
 
-  // Fetch current requests count for notification badge
-  const { data: vetsvanRequests } = useQuery({
+  // Fetch current requests count for notification badge - matches admin dashboard
+  const { data: allVetsVanRequests } = useQuery({
     queryKey: ['/api/admin/vetsvan-requests'],
-    refetchInterval: 4000, // Refresh every 4 seconds like admin dashboard
+    refetchInterval: 2000, // Poll every 2 seconds for real-time updates like admin dashboard
+    refetchIntervalInBackground: true,
     staleTime: 0,
   });
 
-  const currentRequestCount = vetsvanRequests?.filter((request: any) => 
-    request.status === 'pending' || request.status === 'accepted'
-  ).length || 0;
+  // Monitor for new requests and update notification count - exact same logic as admin dashboard
+  useEffect(() => {
+    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
+      const currentCount = allVetsVanRequests.length;
+      
+      lastRequestCountRef.current = currentCount;
+      setCurrentRequestCount(currentCount);
+    }
+  }, [allVetsVanRequests]);
 
   // تحديد نطاق التواريخ للعرض (7 أيام من بداية الأسبوع)
   const getDateRange = () => {
