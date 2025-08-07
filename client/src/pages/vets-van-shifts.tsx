@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -331,9 +331,19 @@ export default function VetsVanShifts() {
       dir={getDirection(language)}
       style={{ textAlign: getTextAlign(language) }}
     >
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b p-4">
-        <div className="flex items-center justify-between">
+      {/* Full-width Header with logo and controls */}
+      <div className="bg-white shadow-md border-b border-gray-200">
+        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <img 
+              src="/api/placeholder/32/32" 
+              alt="VETS VAN" 
+              className="h-14 w-auto object-contain"
+            />
+          </div>
+
+          {/* Header Controls */}
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
@@ -344,23 +354,72 @@ export default function VetsVanShifts() {
               <ArrowLeft className="w-4 h-4" />
               {t('back')}
             </Button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-                <img 
-                  src="/api/placeholder/32/32" 
-                  alt="Logo" 
-                  className="w-6 h-6 rounded"
-                />
-              </div>
-              <h1 className="text-xl font-semibold text-gray-900">{t('vetsVanShifts')}</h1>
-            </div>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
-        {/* جدول النوبات */}
-        <Card>
+      {/* Main Content with Sidebar */}
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white shadow-lg min-h-screen">
+          <nav className="mt-4 px-2">
+            <button
+              onClick={() => setLocation('/admin-dashboard')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Car className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
+            </button>
+            <button
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 bg-purple-600 text-purple-600"
+            >
+              <Clock className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
+            </button>
+            <button
+              onClick={() => setLocation('/admin-dashboard')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+            </button>
+            <button
+              onClick={() => setLocation('/admin-dashboard')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+            </button>
+            <button
+              onClick={() => setLocation('/admin-dashboard')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Upload className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
+            </button>
+            <button
+              onClick={() => setLocation('/admin-dashboard/services')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Stethoscope className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+            </button>
+            <button
+              onClick={() => setLocation('/admin-dashboard')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Package className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-auto">
+          <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
+            <div className="px-1 py-3 sm:px-0">
+              {/* جدول النوبات */}
+              <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>{t('shiftsSchedule')}</span>
@@ -575,7 +634,10 @@ export default function VetsVanShifts() {
               </table>
             </div>
           </CardContent>
-        </Card>
+              </Card>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
