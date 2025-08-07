@@ -77,6 +77,17 @@ export default function VetsVanShifts() {
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
 
+  // Fetch current requests count for notification badge
+  const { data: vetsvanRequests } = useQuery({
+    queryKey: ['/api/admin/vetsvan-requests'],
+    refetchInterval: 4000, // Refresh every 4 seconds like admin dashboard
+    staleTime: 0,
+  });
+
+  const currentRequestCount = vetsvanRequests?.filter((request: any) => 
+    request.status === 'pending' || request.status === 'accepted'
+  ).length || 0;
+
   // تحديد نطاق التواريخ للعرض (7 أيام من بداية الأسبوع)
   const getDateRange = () => {
     const dates = [];
@@ -367,21 +378,15 @@ export default function VetsVanShifts() {
               {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
             </button>
 
-            {/* Notifications counter - placeholder for now */}
-            <div className="relative">
-              <Bell className="h-6 w-6 text-purple-600" />
-            </div>
-            
-            {/* Back Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation('/admin-dashboard')}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              {t('back')}
-            </Button>
+            {/* Notifications counter - matches admin dashboard */}
+            {currentRequestCount > 0 && (
+              <div className="relative">
+                <Bell className="h-6 w-6 text-purple-600" />
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                </span>
+              </div>
+            )}
             
             <button
               onClick={() => {
