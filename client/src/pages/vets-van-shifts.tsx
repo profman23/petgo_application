@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/language-selector";
 import { apiRequest } from "@/lib/queryClient";
+import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 import type { Driver, Shift as ShiftType } from "@shared/schema";
 
@@ -73,6 +75,7 @@ export default function VetsVanShifts() {
     duration: 'day' as 'day' | 'week' | 'month'
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
 
   // تحديد نطاق التواريخ للعرض (7 أيام من بداية الأسبوع)
   const getDateRange = () => {
@@ -332,40 +335,42 @@ export default function VetsVanShifts() {
       dir={getDirection(language)}
       style={{ textAlign: getTextAlign(language) }}
     >
-      {/* Fixed Header - matches admin dashboard exactly */}
-      <header className="bg-white shadow-md border-b border-gray-200 fixed top-0 left-0 right-0 z-50">
+      {/* Full-width Header with logo and controls - exact copy from admin dashboard */}
+      <div className="bg-white shadow-md border-b border-gray-200">
         <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
-          {/* Logo - matches admin dashboard */}
+          {/* Logo */}
           <div className="flex-shrink-0">
             <img 
-              src="/api/placeholder/32/32" 
+              src={vetsVanLogo} 
               alt="VETS VAN" 
               className="h-14 w-auto object-contain"
             />
           </div>
 
-          {/* Header Controls - matches admin dashboard */}
+          {/* Header Controls */}
           <div className="flex items-center gap-4">
-            {/* Language Selector */}
-            <div className="hidden sm:block">
-              <div className="text-sm text-gray-600">
-                {language === 'ar' ? 'العربية' : 'English'}
-              </div>
-            </div>
+            <LanguageSelector />
             
-            {/* Notification Bell */}
+            {/* Audio notification toggle */}
+            <button
+              onClick={() => setAudioEnabled(!audioEnabled)}
+              className={`p-2 rounded-full transition-colors duration-200 ${
+                audioEnabled 
+                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={audioEnabled 
+                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
+                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
+              }
+            >
+              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            </button>
+
+            {/* Notifications counter - placeholder for now */}
             <div className="relative">
               <Bell className="h-6 w-6 text-purple-600" />
             </div>
-            
-            {/* Audio Toggle */}
-            <button
-              onClick={() => {}}
-              className="p-2 rounded-md hover:bg-gray-100"
-              title={language === 'ar' ? 'تفعيل/إلغاء الصوت' : 'Toggle Audio'}
-            >
-              <Volume2 className="h-5 w-5 text-gray-600" />
-            </button>
             
             {/* Back Button */}
             <Button
@@ -378,7 +383,6 @@ export default function VetsVanShifts() {
               {t('back')}
             </Button>
             
-            {/* Logout Button */}
             <button
               onClick={() => {
                 localStorage.removeItem("adminToken");
@@ -391,12 +395,12 @@ export default function VetsVanShifts() {
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Main Content with Sidebar - add top margin for fixed header */}
-      <div className="flex pt-24">
-        {/* Sidebar - matches admin dashboard */}
-        <div className="w-64 bg-white shadow-lg min-h-screen fixed left-0 top-24 bottom-0 overflow-y-auto">
+      {/* Main Content with Sidebar */}
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
             <button
               onClick={() => setLocation('/admin-dashboard')}
@@ -481,9 +485,9 @@ export default function VetsVanShifts() {
           </nav>
         </div>
 
-        {/* Main Content Area - add left margin for fixed sidebar */}
-        <div className="flex-1 ml-64 overflow-auto">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-auto">
+          <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
             <div className="px-1 py-3 sm:px-0">
               {/* جدول النوبات */}
               <Card>
