@@ -611,6 +611,7 @@ export class DatabaseStorage implements IStorage {
     customerName: string;
     customerPhone: string;
     customerEmail: string;
+    driverId: number;
     vetsvanCode: string;
     vetsvanName: string;
     appointmentDate: string;
@@ -634,6 +635,7 @@ export class DatabaseStorage implements IStorage {
         customerName: users.name,
         customerPhone: users.phone,
         customerEmail: users.email,
+        driverId: drivers.id,
         vetsvanCode: drivers.vetsvanCode,
         vetsvanName: drivers.vetsvanName
       })
@@ -653,6 +655,7 @@ export class DatabaseStorage implements IStorage {
         customerName: booking.customerName || "Unknown",
         customerPhone: booking.customerPhone || "Unknown",
         customerEmail: booking.customerEmail || "Unknown",
+        driverId: booking.driverId,
         vetsvanCode: booking.vetsvanCode || "Unknown",
         vetsvanName: booking.vetsvanName || "Unknown",
         appointmentDate: booking.appointmentDate,
