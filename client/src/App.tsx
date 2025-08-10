@@ -13,9 +13,6 @@ import DoctorActivity from "@/pages/doctor-activity";
 import DoctorAccount from "@/pages/doctor-account";
 import DoctorInvoice from "@/pages/doctor-invoice";
 import InvoiceView from "@/pages/invoice-view";
-import PaymentSuccess from "@/pages/payment-success";
-import PaymentError from "@/pages/payment-error";
-import PaymentTest from "@/pages/payment-test";
 import UserTypeSelection from "@/pages/user-type-selection";
 import DoctorLogin from "@/pages/doctor-login";
 import DoctorRideTracking from "@/pages/doctor-ride-tracking";
@@ -130,8 +127,6 @@ function Router() {
           <Route path="/doctor-account" component={DoctorAccount} />
           <Route path="/doctor-invoice/:bookingId" component={DoctorInvoice} />
           <Route path="/invoice-view" component={InvoiceView} />
-          <Route path="/payment-success" component={PaymentSuccess} />
-          <Route path="/payment-error" component={PaymentError} />
           <Route path="/doctor-ride-tracking" component={DoctorRideTracking} />
           <Route path="/ride-request" component={() => <AuthCheck><RideRequest /></AuthCheck>} />
           <Route path="/vetsvan-booking" component={() => <AuthCheck><VetsVanBooking /></AuthCheck>} />
@@ -144,7 +139,6 @@ function Router() {
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
-          <Route path="/admin-dashboard/payment-test" component={PaymentTest} />
           <Route path="/sales-reports" component={SalesReports} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />

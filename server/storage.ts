@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, paymentMethods, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type PaymentTransaction, type InsertPaymentTransaction, type PaymentMethod, type InsertPaymentMethod } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -168,19 +168,6 @@ export interface IStorage {
   deleteExpiredSessions(): Promise<void>;
   getUserSessions(userId: number): Promise<UserSession[]>;
   getAllActiveSessions(): Promise<UserSession[]>;
-
-  // Payment methods operations
-  savePaymentMethods(methods: InsertPaymentMethod[]): Promise<void>;
-  getPaymentMethods(): Promise<PaymentMethod[]>;
-  getActivePaymentMethods(): Promise<PaymentMethod[]>;
-
-  // Payment transactions operations
-  createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction>;
-  updatePaymentTransaction(id: number, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined>;
-  getPaymentTransaction(id: number): Promise<PaymentTransaction | undefined>;
-  getPaymentTransactionByMyfatoorahId(myfatoorahPaymentId: string): Promise<PaymentTransaction | undefined>;
-  getInvoicePaymentTransactions(invoiceId: number): Promise<PaymentTransaction[]>;
-  getBookingPaymentTransactions(bookingId: number): Promise<PaymentTransaction[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1142,77 +1129,6 @@ export class DatabaseStorage implements IStorage {
 
   async getAllActiveSessions(): Promise<UserSession[]> {
     return await db.select().from(userSessions).where(lt(new Date(), userSessions.expiresAt));
-  }
-
-  // Payment methods operations
-  async savePaymentMethods(methods: InsertPaymentMethod[]): Promise<void> {
-    if (methods.length === 0) return;
-    
-    for (const method of methods) {
-      await db.insert(paymentMethods)
-        .values(method)
-        .onConflictDoUpdate({
-          target: paymentMethods.myfatoorahId,
-          set: {
-            nameEn: method.nameEn,
-            nameAr: method.nameAr,
-            code: method.code,
-            imageUrl: method.imageUrl,
-            isDirectPayment: method.isDirectPayment,
-            serviceCharge: method.serviceCharge,
-            currencyIso: method.currencyIso,
-            isActive: method.isActive,
-            updatedAt: new Date(),
-          }
-        });
-    }
-  }
-
-  async getPaymentMethods(): Promise<PaymentMethod[]> {
-    return db.select().from(paymentMethods).orderBy(paymentMethods.nameEn);
-  }
-
-  async getActivePaymentMethods(): Promise<PaymentMethod[]> {
-    return db.select().from(paymentMethods)
-      .where(eq(paymentMethods.isActive, true))
-      .orderBy(paymentMethods.nameEn);
-  }
-
-  // Payment transactions operations
-  async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<PaymentTransaction> {
-    const [result] = await db.insert(paymentTransactions).values(transaction).returning();
-    return result;
-  }
-
-  async updatePaymentTransaction(id: number, updates: Partial<PaymentTransaction>): Promise<PaymentTransaction | undefined> {
-    const [result] = await db.update(paymentTransactions)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(paymentTransactions.id, id))
-      .returning();
-    return result;
-  }
-
-  async getPaymentTransaction(id: number): Promise<PaymentTransaction | undefined> {
-    const [result] = await db.select().from(paymentTransactions).where(eq(paymentTransactions.id, id));
-    return result;
-  }
-
-  async getPaymentTransactionByMyfatoorahId(myfatoorahPaymentId: string): Promise<PaymentTransaction | undefined> {
-    const [result] = await db.select().from(paymentTransactions)
-      .where(eq(paymentTransactions.myfatoorahPaymentId, myfatoorahPaymentId));
-    return result;
-  }
-
-  async getInvoicePaymentTransactions(invoiceId: number): Promise<PaymentTransaction[]> {
-    return db.select().from(paymentTransactions)
-      .where(eq(paymentTransactions.invoiceId, invoiceId))
-      .orderBy(desc(paymentTransactions.createdAt));
-  }
-
-  async getBookingPaymentTransactions(bookingId: number): Promise<PaymentTransaction[]> {
-    return db.select().from(paymentTransactions)
-      .where(eq(paymentTransactions.bookingId, bookingId))
-      .orderBy(desc(paymentTransactions.createdAt));
   }
 }
 
