@@ -49,7 +49,7 @@
     "@types/memoizee": "^0.4.12",
     "@types/nodemailer": "^6.4.17",
     "@types/papaparse": "^5.3.16",
-    "axios": "^1.10.0",
+    "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

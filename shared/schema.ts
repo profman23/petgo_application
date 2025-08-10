@@ -684,3 +684,87 @@ export type GeneratedInvoice = typeof generatedInvoices.$inferSelect & {
   payments?: InvoicePayment[];
 };
 export type InsertGeneratedInvoice = z.infer<typeof insertGeneratedInvoiceSchema>;
+
+// Payment transactions table for MyFatoorah integration
+export const paymentTransactions = pgTable("payment_transactions", {
+  id: serial("id").primaryKey(),
+  invoiceId: integer("invoice_id"), // Reference to generatedInvoices.id
+  bookingId: integer("booking_id"), // Reference to bookings.id
+  myfatoorahPaymentId: text("myfatoorah_payment_id"), // PaymentId from MyFatoorah
+  myfatoorahInvoiceId: text("myfatoorah_invoice_id"), // InvoiceId from MyFatoorah
+  paymentMethodId: integer("payment_method_id"), // Payment method used
+  paymentMethodName: text("payment_method_name"), // e.g., "Mada", "Visa", "MasterCard"
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("SAR"),
+  status: text("status").notNull().default("pending"), // pending, paid, failed, cancelled, refunded
+  gatewayStatus: text("gateway_status"), // Status from MyFatoorah
+  transactionId: text("transaction_id"), // Bank transaction ID
+  referenceId: text("reference_id"), // Additional reference
+  customerName: text("customer_name"),
+  customerEmail: text("customer_email"),
+  customerPhone: text("customer_phone"),
+  paymentUrl: text("payment_url"), // Payment link from MyFatoorah
+  successUrl: text("success_url"),
+  errorUrl: text("error_url"),
+  paidAt: timestamp("paid_at"),
+  gatewayResponse: jsonb("gateway_response"), // Full response from MyFatoorah
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Payment methods table to cache MyFatoorah payment methods
+export const paymentMethods = pgTable("payment_methods", {
+  id: serial("id").primaryKey(),
+  myfatoorahId: integer("myfatoorah_id").notNull().unique(), // PaymentMethodId from MyFatoorah
+  nameEn: text("name_en").notNull(),
+  nameAr: text("name_ar").notNull(),
+  code: text("code").notNull(),
+  imageUrl: text("image_url"),
+  isDirectPayment: boolean("is_direct_payment").notNull().default(false),
+  serviceCharge: decimal("service_charge", { precision: 10, scale: 4 }).default("0"),
+  currencyIso: text("currency_iso").default("SAR"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPaymentTransactionSchema = createInsertSchema(paymentTransactions).pick({
+  invoiceId: true,
+  bookingId: true,
+  myfatoorahPaymentId: true,
+  myfatoorahInvoiceId: true,
+  paymentMethodId: true,
+  paymentMethodName: true,
+  amount: true,
+  currency: true,
+  status: true,
+  gatewayStatus: true,
+  transactionId: true,
+  referenceId: true,
+  customerName: true,
+  customerEmail: true,
+  customerPhone: true,
+  paymentUrl: true,
+  successUrl: true,
+  errorUrl: true,
+  gatewayResponse: true,
+});
+
+export const insertPaymentMethodSchema = createInsertSchema(paymentMethods).pick({
+  myfatoorahId: true,
+  nameEn: true,
+  nameAr: true,
+  code: true,
+  imageUrl: true,
+  isDirectPayment: true,
+  serviceCharge: true,
+  currencyIso: true,
+  isActive: true,
+});
+
+export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
+export type NewPaymentTransaction = typeof paymentTransactions.$inferInsert;
+export type InsertPaymentTransaction = z.infer<typeof insertPaymentTransactionSchema>;
+export type PaymentMethod = typeof paymentMethods.$inferSelect;
+export type NewPaymentMethod = typeof paymentMethods.$inferInsert;
+export type InsertPaymentMethod = z.infer<typeof insertPaymentMethodSchema>;
