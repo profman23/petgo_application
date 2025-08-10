@@ -1437,7 +1437,7 @@ export default function AdminDashboard() {
       await apiRequest("/api/admin/send-sms", {
         method: "POST",
         body: JSON.stringify({ 
-          message: "test sms from Taqnyat.sa , for testing internet sms service",
+          message: "test sms from Vets Van , for testing internet sms service",
           phoneNumber: "966548336693" // Test number
         }),
       });
