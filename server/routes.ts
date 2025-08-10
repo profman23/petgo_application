@@ -2725,7 +2725,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const smsData = {
         recipients: [phoneNumber],
         body: message,
-        sender: "Taqnyat.sa" // Registered sender name
+        sender: "Vets Van" // Registered sender name
       };
 
       // Log the request for debugging
