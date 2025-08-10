@@ -4075,6 +4075,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Payment Test endpoint - 1 SAR payment
+  app.post("/api/payments/test-payment", requireAuth, async (req, res) => {
+    try {
+      const { amount = 1.00, currency = 'SAR', description = 'Payment Test - 1 SAR' } = req.body;
+      
+      console.log("Creating test payment:", { amount, currency, description });
+      
+      // Create payment transaction record
+      const transaction = await storage.createPaymentTransaction({
+        userId: req.session.user!.id,
+        amount: amount,
+        currency: currency,
+        description: description,
+        status: 'pending',
+        type: 'test',
+        createdAt: new Date(),
+      });
+
+      // Get base URL for callbacks
+      const baseUrl = process.env.REPLIT_DOMAINS 
+        ? `https://${process.env.REPLIT_DOMAINS.split(',')[0]}`
+        : `http://localhost:${process.env.PORT || 5000}`;
+
+      // Create MyFatoorah payment
+      const paymentData = {
+        InvoiceValue: amount,
+        CustomerName: req.session.user!.phone || 'Test User',
+        DisplayCurrencyIso: currency,
+        MobileCountryCode: '+966',
+        CustomerMobile: req.session.user!.phone || '',
+        CustomerEmail: '',
+        CallBackUrl: `${baseUrl}/api/payments/callback/${transaction.id}`,
+        ErrorUrl: `${baseUrl}/payment-error?transaction=${transaction.id}`,
+        Language: 'ar',
+        CustomerReference: `TEST-${transaction.id}`,
+        CustomerCivilId: '',
+        UserDefinedField: `Payment Test Transaction ${transaction.id}`,
+        ExpiryDate: '',
+        SourceInfo: 'VetsVan Payment Test',
+        CustomerAddress: {
+          Block: '',
+          Street: '',
+          HouseBuildingNo: '',
+          Address: '',
+          AddressInstructions: ''
+        },
+        InvoiceItems: [
+          {
+            ItemName: description,
+            Quantity: 1,
+            UnitPrice: amount,
+            Weight: 0,
+            Width: 0,
+            Height: 0,
+            Depth: 0
+          }
+        ]
+      };
+
+      const paymentResponse = await myfatoorahService.executePayment(paymentData);
+      
+      // Update transaction with MyFatoorah response
+      await storage.updatePaymentTransaction(transaction.id, {
+        myfatoorahPaymentId: paymentResponse.Data.InvoiceId.toString(),
+        myfatoorahInvoiceId: paymentResponse.Data.InvoiceId.toString(),
+        paymentUrl: paymentResponse.Data.PaymentURL,
+        gatewayResponse: paymentResponse,
+      });
+      
+      res.json({
+        success: true,
+        paymentUrl: paymentResponse.Data.PaymentURL,
+        transactionId: transaction.id,
+        myfatoorahInvoiceId: paymentResponse.Data.InvoiceId,
+        amount: amount,
+        currency: currency
+      });
+      
+    } catch (error: any) {
+      console.error("Failed to create test payment:", error);
+      res.status(500).json({ 
+        message: "Failed to create test payment",
+        error: error.message 
+      });
+    }
+  });
+
   // Payment callback handler
   app.get("/api/payments/callback/:transactionId", async (req, res) => {
     try {

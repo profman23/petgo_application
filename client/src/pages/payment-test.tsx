@@ -1,7 +1,64 @@
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Play, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PaymentTest() {
+  const { toast } = useToast();
+  const [paymentStatus, setPaymentStatus] = useState<{
+    status: 'idle' | 'success' | 'error';
+    data?: any;
+    message?: string;
+  }>({ status: 'idle' });
+
+  const createPaymentMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('/api/payments/test-payment', {
+        method: 'POST',
+        body: JSON.stringify({
+          amount: 1.00,
+          currency: 'SAR',
+          description: 'Payment Test - 1 SAR'
+        })
+      });
+    },
+    onSuccess: (data) => {
+      if (data.success && data.paymentUrl) {
+        // Redirect to MyFatoorah payment page
+        window.location.href = data.paymentUrl;
+      } else {
+        setPaymentStatus({
+          status: 'error',
+          message: 'Failed to create payment session'
+        });
+        toast({
+          title: "خطأ في الدفع / Payment Error",
+          description: "فشل في إنشاء جلسة الدفع / Failed to create payment session",
+          variant: "destructive"
+        });
+      }
+    },
+    onError: (error: any) => {
+      setPaymentStatus({
+        status: 'error',
+        message: error.message || 'Payment creation failed'
+      });
+      toast({
+        title: "خطأ في الدفع / Payment Error",
+        description: "فشل في إنشاء طلب الدفع / Failed to create payment request",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleTestPayment = () => {
+    setPaymentStatus({ status: 'idle' });
+    createPaymentMutation.mutate();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
       {/* Admin Header */}
@@ -15,8 +72,12 @@ export default function PaymentTest() {
                 alt="VetsVan" 
                 className="h-8 w-auto"
                 onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.nextElementSibling!.style.display = 'block';
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.style.display = 'none';
+                  const nextElement = target.nextElementSibling as HTMLElement;
+                  if (nextElement) {
+                    nextElement.style.display = 'block';
+                  }
                 }}
               />
               <div className="text-xl font-bold text-purple-600 hidden">
@@ -49,6 +110,79 @@ export default function PaymentTest() {
               وحدة اختبار نظام المدفوعات - قيد التطوير
             </p>
           </div>
+
+          {/* Payment Test Section */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                <CreditCard className="w-6 h-6 text-purple-600" />
+                اختبار الدفع المباشر - MyFatoorah / Live Payment Test - MyFatoorah
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-900 mb-2">
+                    معلومات الاختبار / Test Information
+                  </h4>
+                  <div className="space-y-2 text-sm text-blue-800">
+                    <p>• المبلغ: 1.00 ريال سعودي / Amount: 1.00 SAR</p>
+                    <p>• البوابة: MyFatoorah Live API / Gateway: MyFatoorah Live API</p>
+                    <p>• طرق الدفع: جميع الطرق المتاحة (مدى، فيزا، ماستركارد، سداد) / Payment Methods: All available (Mada, Visa, MasterCard, Sadad)</p>
+                    <p>• البيئة: بيئة الإنتاج المباشرة / Environment: Live Production</p>
+                  </div>
+                </div>
+
+                {paymentStatus.status === 'error' && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-red-800">
+                      <XCircle className="w-5 h-5" />
+                      <span className="font-semibold">
+                        فشل في عملية الدفع / Payment Failed
+                      </span>
+                    </div>
+                    <p className="text-sm text-red-600 mt-1">{paymentStatus.message}</p>
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <Button
+                      onClick={handleTestPayment}
+                      disabled={createPaymentMutation.isPending}
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                      size="lg"
+                    >
+                      {createPaymentMutation.isPending ? (
+                        <>
+                          <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+                          جاري إنشاء الدفع... / Creating Payment...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-5 h-5 ml-2" />
+                          دفع 1 ريال سعودي / Pay 1 SAR
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h5 className="font-semibold text-gray-800 mb-2">
+                      خطوات الاختبار / Test Steps:
+                    </h5>
+                    <ol className="text-sm text-gray-600 space-y-1">
+                      <li>1. اضغط على زر "دفع 1 ريال سعودي" / Click "Pay 1 SAR" button</li>
+                      <li>2. سيتم توجيهك إلى صفحة MyFatoorah / You'll be redirected to MyFatoorah page</li>
+                      <li>3. اختر طريقة الدفع المفضلة / Choose your preferred payment method</li>
+                      <li>4. أكمل عملية الدفع / Complete the payment process</li>
+                      <li>5. سيتم إعادة توجيهك لصفحة النتيجة / You'll be redirected to result page</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Placeholder Content */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
