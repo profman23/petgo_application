@@ -698,6 +698,9 @@ export default function AdminDashboard() {
   const [newLocation, setNewLocation] = useState({ latitude: '', longitude: '' });
   const [showReviewsDialog, setShowReviewsDialog] = useState(false);
   const [showSmsDialog, setShowSmsDialog] = useState(false);
+  const [smsPhoneNumber, setSmsPhoneNumber] = useState('');
+  const [smsPhoneError, setSmsPhoneError] = useState('');
+  const [isSendingSms, setIsSendingSms] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [editDriverData, setEditDriverData] = useState<{vetsvanCode: string, vetsvanName: string}>({
@@ -1431,7 +1434,92 @@ export default function AdminDashboard() {
     },
   });
 
-  // Send SMS mutation
+  // Phone number validation function
+  const validatePhoneNumber = (phone: string): { isValid: boolean; normalized?: string; error?: string } => {
+    const trimmed = phone.trim().replace(/\s+/g, '');
+    
+    if (!trimmed) {
+      return { 
+        isValid: false, 
+        error: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Phone number is required' 
+      };
+    }
+    
+    // Check for 05... format (Saudi local)
+    if (/^05\d{8}$/.test(trimmed)) {
+      return { 
+        isValid: true, 
+        normalized: '+966' + trimmed.substring(1) 
+      };
+    }
+    
+    // Check for +9665... format (international)
+    if (/^\+9665\d{8}$/.test(trimmed)) {
+      return { 
+        isValid: true, 
+        normalized: trimmed 
+      };
+    }
+    
+    // Check for 9665... format (without +)
+    if (/^9665\d{8}$/.test(trimmed)) {
+      return { 
+        isValid: true, 
+        normalized: '+' + trimmed 
+      };
+    }
+    
+    return { 
+      isValid: false, 
+      error: language === 'ar' ? 'تنسيق رقم الهاتف غير صحيح. استخدم 05xxxxxxxx أو +9665xxxxxxxx' : 'Invalid phone format. Use 05xxxxxxxx or +9665xxxxxxxx' 
+    };
+  };
+
+  // Handle SMS sending with phone number validation
+  const handleSendSms = async () => {
+    const validation = validatePhoneNumber(smsPhoneNumber);
+    
+    if (!validation.isValid) {
+      setSmsPhoneError(validation.error || '');
+      return;
+    }
+    
+    setSmsPhoneError('');
+    setIsSendingSms(true);
+    
+    try {
+      await apiRequest("/api/admin/send-sms", {
+        method: "POST",
+        body: JSON.stringify({ 
+          message: language === 'ar' 
+            ? "رسالة تجريبية من خدمة Vets Van للطب البيطري المتنقل. تم إرسال هذه الرسالة للتأكد من عمل الخدمة بشكل صحيح."
+            : "Test message from Vets Van mobile veterinary service. This message was sent to verify the service is working correctly.",
+          phoneNumber: validation.normalized
+        }),
+      });
+      
+      toast({
+        title: language === 'ar' ? 'تم إرسال الرسالة' : 'SMS Sent',
+        description: language === 'ar' 
+          ? `تم إرسال الرسالة النصية بنجاح إلى ${validation.normalized}` 
+          : `SMS message sent successfully to ${validation.normalized}`,
+      });
+      
+      // Clear the phone number after successful send
+      setSmsPhoneNumber('');
+      
+    } catch (error) {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'فشل في إرسال الرسالة النصية' : 'Failed to send SMS message',
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingSms(false);
+    }
+  };
+
+  // Send SMS mutation (legacy - keeping for backward compatibility)
   const sendSmsMutation = useMutation({
     mutationFn: async () => {
       await apiRequest("/api/admin/send-sms", {
@@ -1526,10 +1614,7 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleSendSms = (e: React.FormEvent) => {
-    e.preventDefault();
-    sendSmsMutation.mutate();
-  };
+
 
   const handleAddDriver = (e: React.FormEvent) => {
     e.preventDefault();
@@ -2271,12 +2356,58 @@ export default function AdminDashboard() {
                         <p className="text-sm text-gray-600 mb-4">
                           {language === 'ar' ? 'إرسال رسائل نصية للعملاء باستخدام منصة تقنيات' : 'Send SMS messages to customers using Taqnyat platform'}
                         </p>
+                        
+                        {/* Phone Number Input Field */}
+                        <div className="mb-4">
+                          <label 
+                            htmlFor="sms-phone-number" 
+                            className="block text-sm font-medium text-gray-700 mb-2"
+                            style={{ textAlign: getTextAlign(language) }}
+                          >
+                            {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+                          </label>
+                          <input
+                            id="sms-phone-number"
+                            type="tel"
+                            value={smsPhoneNumber}
+                            onChange={(e) => {
+                              setSmsPhoneNumber(e.target.value);
+                              // Clear error when user starts typing
+                              if (smsPhoneError) setSmsPhoneError('');
+                            }}
+                            placeholder={language === 'ar' ? '05xxxxxxxx أو +9665xxxxxxxx' : '05xxxxxxxx or +9665xxxxxxxx'}
+                            className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600 ${
+                              smsPhoneError ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            style={{ textAlign: getTextAlign(language) }}
+                            dir={getDirection(language)}
+                            disabled={isSendingSms}
+                          />
+                          {smsPhoneError && (
+                            <p className="text-red-500 text-xs mt-1" style={{ textAlign: getTextAlign(language) }}>
+                              {smsPhoneError}
+                            </p>
+                          )}
+                        </div>
+                        
                         <button
-                          onClick={() => setShowSmsDialog(true)}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-600"
+                          onClick={handleSendSms}
+                          disabled={isSendingSms || !smsPhoneNumber.trim()}
+                          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white ${
+                            isSendingSms || !smsPhoneNumber.trim()
+                              ? 'bg-gray-400 cursor-not-allowed'
+                              : 'bg-purple-600 hover:bg-purple-700'
+                          }`}
                         >
-                          <MessageSquare className="h-4 w-4 ml-2" />
-                          {language === 'ar' ? 'إرسال رسالة نصية' : 'Send SMS Message'}
+                          {isSendingSms ? (
+                            <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                          ) : (
+                            <MessageSquare className="h-4 w-4 ml-2" />
+                          )}
+                          {isSendingSms 
+                            ? (language === 'ar' ? 'جاري الإرسال...' : 'Sending...')
+                            : (language === 'ar' ? 'إرسال رسالة نصية' : 'Send SMS Message')
+                          }
                         </button>
                       </div>
                     </div>
