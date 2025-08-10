@@ -16,14 +16,30 @@ export default function PaymentTest() {
 
   const createPaymentMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest('/api/payments/test-payment', {
+      const adminToken = localStorage.getItem("adminToken");
+      if (!adminToken) {
+        throw new Error('Admin authentication required');
+      }
+      
+      const response = await fetch('/api/payments/test-payment', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
+        },
         body: JSON.stringify({
           amount: 1.00,
           currency: 'SAR',
           description: 'Payment Test - 1 SAR'
         })
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+      
+      return response.json();
     },
     onSuccess: (data) => {
       if (data.success && data.paymentUrl) {

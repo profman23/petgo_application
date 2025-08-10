@@ -4076,7 +4076,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Payment Test endpoint - 1 SAR payment
-  app.post("/api/payments/test-payment", requireAuth, async (req, res) => {
+  app.post("/api/payments/test-payment", requireAdminAuth, async (req, res) => {
     try {
       const { amount = 1.00, currency = 'SAR', description = 'Payment Test - 1 SAR' } = req.body;
       
@@ -4084,7 +4084,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Create payment transaction record
       const transaction = await storage.createPaymentTransaction({
-        userId: req.session.user!.id,
+        userId: req.session.userId,
         amount: amount,
         currency: currency,
         description: description,
@@ -4101,10 +4101,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Create MyFatoorah payment
       const paymentData = {
         InvoiceValue: amount,
-        CustomerName: req.session.user!.phone || 'Test User',
+        CustomerName: req.admin?.phone || req.session.userData?.phone || 'Test Admin',
         DisplayCurrencyIso: currency,
         MobileCountryCode: '+966',
-        CustomerMobile: req.session.user!.phone || '',
+        CustomerMobile: req.admin?.phone || req.session.userData?.phone || '',
         CustomerEmail: '',
         CallBackUrl: `${baseUrl}/api/payments/callback/${transaction.id}`,
         ErrorUrl: `${baseUrl}/payment-error?transaction=${transaction.id}`,
