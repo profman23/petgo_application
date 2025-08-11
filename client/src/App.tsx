@@ -28,6 +28,7 @@ import NewReportsAnalytics from "@/pages/new-reports-analytics";
 import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
+import { PaymentTest } from "@/pages/payment-test";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -144,6 +145,7 @@ function Router() {
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
+          <Route path="/payment-test" component={() => <AuthCheck><PaymentTest /></AuthCheck>} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
           <Route path="/" component={Login} />
           <Route component={NotFound} />

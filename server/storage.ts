@@ -1137,7 +1137,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllActiveSessions(): Promise<UserSession[]> {
-    return await db.select().from(userSessions).where(lt(new Date(), userSessions.expiresAt));
+    return await db.select().from(userSessions);
   }
 
   // Payment Transaction operations for MyFatoorah

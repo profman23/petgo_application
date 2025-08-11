@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema } from "@shared/schema";
+import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
@@ -3946,6 +3947,286 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error exporting sales report:', error);
       res.status(500).json({ message: 'Failed to export sales report' });
+    }
+  });
+
+  // MyFatoorah Payment Gateway Routes
+  
+  // Create payment invoice with MyFatoorah
+  app.post('/api/payments/create-invoice', requireAuth, async (req: any, res) => {
+    try {
+      const { 
+        invoiceNumber, 
+        amount, 
+        customerName, 
+        customerEmail, 
+        customerPhone, 
+        description 
+      } = req.body;
+
+      if (!invoiceNumber || !amount || !customerName || !customerEmail || !customerPhone) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required fields: invoiceNumber, amount, customerName, customerEmail, customerPhone'
+        });
+      }
+
+      const myfatoorah = new MyFatoorahService();
+      
+      // Prepare payment request for MyFatoorah API
+      const paymentRequest = {
+        InvoiceAmount: parseFloat(amount),
+        CustomerName: customerName,
+        CustomerEmail: customerEmail,
+        CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
+        CustomerReference: `CUSTOMER-${req.user.id}`,
+        InvoiceReference: invoiceNumber,
+        InvoiceDisplayValue: `${amount} SAR`,
+        Language: 'AR' as const,
+        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success`,
+        ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error`,
+        MobileCountryCode: '+966',
+        SendInvoiceOption: 2 // Email only
+      };
+
+      console.log('🏦 Creating MyFatoorah payment invoice:', paymentRequest);
+
+      const paymentResponse = await myfatoorah.createInvoice(paymentRequest);
+
+      if (paymentResponse.IsSuccess && paymentResponse.Data) {
+        // Save payment transaction to database
+        const transactionData = {
+          invoiceNumber,
+          myFatoorahInvoiceId: paymentResponse.Data.InvoiceId.toString(),
+          amount: parseFloat(amount),
+          customerName,
+          customerEmail,
+          customerPhone,
+          paymentUrl: paymentResponse.Data.PaymentURL,
+          status: 'pending',
+          createdBy: req.user.id,
+          description: description || `Payment for invoice ${invoiceNumber}`
+        };
+
+        const transaction = await storage.createPaymentTransaction(transactionData);
+
+        console.log('✅ Payment transaction created:', transaction);
+
+        res.json({
+          success: true,
+          data: {
+            transactionId: transaction.id,
+            paymentUrl: paymentResponse.Data.PaymentURL,
+            invoiceId: paymentResponse.Data.InvoiceId,
+            message: 'Payment invoice created successfully'
+          }
+        });
+      } else {
+        console.error('❌ MyFatoorah payment creation failed:', paymentResponse);
+        res.status(400).json({
+          success: false,
+          message: paymentResponse.Message || 'Payment creation failed',
+          errors: paymentResponse.ValidationErrors || []
+        });
+      }
+
+    } catch (error: any) {
+      console.error('❌ Payment invoice creation error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create payment invoice',
+        error: error.message
+      });
+    }
+  });
+
+  // Check payment status
+  app.get('/api/payments/status/:transactionId', requireAuth, async (req: any, res) => {
+    try {
+      const transactionId = parseInt(req.params.transactionId);
+      const transaction = await storage.getPaymentTransaction(transactionId);
+
+      if (!transaction) {
+        return res.status(404).json({
+          success: false,
+          message: 'Payment transaction not found'
+        });
+      }
+
+      const myfatoorah = new MyFatoorahService();
+      const paymentStatus = await myfatoorah.getPaymentStatus(parseInt(transaction.myFatoorahInvoiceId));
+
+      // Update transaction status based on MyFatoorah response
+      let newStatus = 'pending';
+      if (paymentStatus.InvoiceStatus === 'Paid') {
+        newStatus = 'completed';
+      } else if (paymentStatus.InvoiceStatus === 'Failed' || paymentStatus.InvoiceStatus === 'Expired') {
+        newStatus = 'failed';
+      }
+
+      // Update transaction if status changed
+      if (newStatus !== transaction.status) {
+        await storage.updatePaymentTransaction(transactionId, {
+          status: newStatus,
+          paidAmount: paymentStatus.PaidValue || null,
+          paymentMethod: paymentStatus.PaymentMethod || null
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          transactionId,
+          status: newStatus,
+          amount: transaction.amount,
+          paidAmount: paymentStatus.PaidValue || 0,
+          paymentMethod: paymentStatus.PaymentMethod || null,
+          invoiceStatus: paymentStatus.InvoiceStatus,
+          lastUpdated: new Date().toISOString()
+        }
+      });
+
+    } catch (error: any) {
+      console.error('❌ Payment status check error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to check payment status',
+        error: error.message
+      });
+    }
+  });
+
+  // MyFatoorah webhook handler
+  app.post('/api/payments/webhook', async (req, res) => {
+    try {
+      console.log('🔔 MyFatoorah webhook received:', req.body);
+
+      const myfatoorah = new MyFatoorahService();
+      const webhookData = await myfatoorah.processWebhook(req.body);
+
+      // Find transaction by MyFatoorah invoice ID
+      const transaction = await storage.getPaymentTransactionByMyFatoorahId(webhookData.invoiceId.toString());
+
+      if (transaction) {
+        // Update transaction status
+        const newStatus = webhookData.isPaid ? 'completed' : 'failed';
+        
+        await storage.updatePaymentTransaction(transaction.id, {
+          status: newStatus,
+          paidAmount: webhookData.amount
+        });
+
+        console.log(`✅ Payment transaction ${transaction.id} updated to ${newStatus}`);
+      }
+
+      res.json({ success: true, message: 'Webhook processed successfully' });
+
+    } catch (error: any) {
+      console.error('❌ Webhook processing error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Webhook processing failed',
+        error: error.message
+      });
+    }
+  });
+
+  // Get payment transactions for user
+  app.get('/api/payments/transactions', requireAuth, async (req: any, res) => {
+    try {
+      const transactions = await storage.getPaymentTransactionsByUser(req.user.id);
+      
+      res.json({
+        success: true,
+        data: transactions
+      });
+
+    } catch (error: any) {
+      console.error('❌ Failed to fetch payment transactions:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch payment transactions',
+        error: error.message
+      });
+    }
+  });
+
+  // Test endpoint for 1 SAR payment
+  app.post('/api/payments/test-payment', requireAuth, async (req: any, res) => {
+    try {
+      const { customerEmail, customerPhone } = req.body;
+
+      if (!customerEmail || !customerPhone) {
+        return res.status(400).json({
+          success: false,
+          message: 'Customer email and phone are required for test payment'
+        });
+      }
+
+      const myfatoorah = new MyFatoorahService();
+      const testInvoiceNumber = `TEST-${Date.now()}`;
+      
+      const paymentRequest = {
+        InvoiceAmount: 1.00, // 1 SAR test payment
+        CustomerName: req.user.name || 'Test Customer',
+        CustomerEmail: customerEmail,
+        CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''),
+        CustomerReference: `TEST-CUSTOMER-${req.user.id}`,
+        InvoiceReference: testInvoiceNumber,
+        InvoiceDisplayValue: '1.00 SAR',
+        Language: 'AR' as const,
+        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success`,
+        ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error`,
+        MobileCountryCode: '+966',
+        SendInvoiceOption: 2 // Email only
+      };
+
+      console.log('🧪 Creating test payment for 1 SAR:', paymentRequest);
+
+      const paymentResponse = await myfatoorah.createInvoice(paymentRequest);
+
+      if (paymentResponse.IsSuccess && paymentResponse.Data) {
+        // Save test transaction
+        const transactionData = {
+          invoiceNumber: testInvoiceNumber,
+          myFatoorahInvoiceId: paymentResponse.Data.InvoiceId.toString(),
+          amount: 1.00,
+          customerName: req.user.name || 'Test Customer',
+          customerEmail,
+          customerPhone,
+          paymentUrl: paymentResponse.Data.PaymentURL,
+          status: 'pending',
+          createdBy: req.user.id,
+          description: 'MyFatoorah Integration Test Payment - 1 SAR'
+        };
+
+        const transaction = await storage.createPaymentTransaction(transactionData);
+
+        res.json({
+          success: true,
+          data: {
+            transactionId: transaction.id,
+            paymentUrl: paymentResponse.Data.PaymentURL,
+            invoiceId: paymentResponse.Data.InvoiceId,
+            amount: 1.00,
+            message: 'Test payment created successfully. Please complete payment to test integration.'
+          }
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: paymentResponse.Message || 'Test payment creation failed',
+          errors: paymentResponse.ValidationErrors || []
+        });
+      }
+
+    } catch (error: any) {
+      console.error('❌ Test payment creation error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create test payment',
+        error: error.message
+      });
     }
   });
 
