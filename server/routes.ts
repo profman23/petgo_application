@@ -4106,18 +4106,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Extract payment details from webhook - MyFatoorah sends data in nested structure
       const webhookData = req.body.Data || req.body;
-      const { 
-        PaymentId, 
-        TransactionId, 
-        InvoiceId, 
-        InvoiceReference,
-        TransactionStatus,
-        InvoiceValueInBaseCurrency,
-        PaymentMethod,
-        ReferenceId 
-      } = webhookData;
       
-      console.log('📋 Payment Details Extracted:');
+      // Access properties directly from webhookData
+      const PaymentId = webhookData.PaymentId;
+      const TransactionId = webhookData.TransactionId;
+      const InvoiceId = webhookData.InvoiceId;
+      const InvoiceReference = webhookData.InvoiceReference;
+      const TransactionStatus = webhookData.TransactionStatus;
+      const InvoiceValueInBaseCurrency = webhookData.InvoiceValueInBaseCurrency;
+      const PaymentMethod = webhookData.PaymentMethod;
+      const ReferenceId = webhookData.ReferenceId;
+      
+      console.log('📋 Payment Details Extracted (FIXED):');
       console.log('Payment ID:', PaymentId);
       console.log('Transaction ID:', TransactionId);
       console.log('Invoice ID:', InvoiceId);
@@ -4126,6 +4126,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Status:', TransactionStatus);
       console.log('Amount Paid:', InvoiceValueInBaseCurrency);
       console.log('Payment Method:', PaymentMethod);
+      
+      console.log('🔍 Raw webhook data structure:');
+      console.log('Direct PaymentId:', webhookData.PaymentId);
+      console.log('Direct TransactionStatus:', webhookData.TransactionStatus);
+      console.log('Direct InvoiceId:', webhookData.InvoiceId);
       
       // Store payment details for verification API
       if (PaymentId || ReferenceId || TransactionId) {

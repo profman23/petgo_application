@@ -43,6 +43,41 @@ export function PaymentTest() {
   const [statusData, setStatusData] = useState<PaymentStatus['data'] | null>(null);
   const { toast } = useToast();
 
+  const createQuickTestPayment = async () => {
+    setIsCreating(true);
+    
+    try {
+      const response = await apiRequest('/api/payments/create-invoice', 'POST', {
+        invoiceNumber: `TEST-${Date.now()}`,
+        amount: '1.00',
+        customerName: 'Test Customer',
+        customerEmail: 'test@example.com',
+        customerPhone: '+966548336693',
+        description: 'Quick 1 SAR test payment with VetsVan redirect'
+      });
+
+      if (response.success) {
+        toast({
+          title: "Payment Link Created",
+          description: "Opening payment page... Complete payment to see success modal in VetsVan",
+        });
+        
+        // Open payment URL in new tab
+        window.open(response.data.paymentUrl, '_blank');
+      } else {
+        throw new Error(response.message);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: `Failed to create payment: ${error.message}`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const handleCreateTestPayment = async () => {
     if (!email || !phone) {
       toast({
@@ -176,14 +211,24 @@ export function PaymentTest() {
               Test the complete payment flow with a real 1 SAR payment link:
             </p>
             <Button 
-              onClick={() => window.open('https://sa.myfatoorah.com/SAU/le/0505970789553553', '_blank')}
+              onClick={createQuickTestPayment}
+              disabled={isCreating}
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
-              <CreditCard className="w-4 h-4 mr-2" />
-              Open 1 SAR Test Payment
+              {isCreating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating Payment...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Create 1 SAR Test Payment (with VetsVan redirect)
+                </>
+              )}
             </Button>
             <p className="text-xs text-blue-600 mt-2 text-center">
-              This will redirect back to our success/error pages after payment completion
+              This will create a new payment that redirects back to VetsVan with success modal
             </p>
           </div>
 
