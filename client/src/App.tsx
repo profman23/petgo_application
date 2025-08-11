@@ -29,6 +29,8 @@ import VetsVanShifts from "@/pages/vets-van-shifts";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { PaymentTest } from "@/pages/payment-test";
+import PaymentSuccess from "@/pages/payment-success";
+import PaymentError from "@/pages/payment-error";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -146,6 +148,8 @@ function Router() {
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/payment-test" component={() => <AuthCheck><PaymentTest /></AuthCheck>} />
+          <Route path="/payment-success" component={PaymentSuccess} />
+          <Route path="/payment-error" component={PaymentError} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
           <Route path="/" component={Login} />
           <Route component={NotFound} />

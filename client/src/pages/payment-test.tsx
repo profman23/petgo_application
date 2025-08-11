@@ -165,6 +165,36 @@ export function PaymentTest() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Live Payment Test Section */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
+              <ExternalLink className="w-4 h-4" />
+              Live MyFatoorah Test Payment
+            </h3>
+            <p className="text-sm text-blue-700 mb-3">
+              Test the complete payment flow with a real 1 SAR payment link:
+            </p>
+            <Button 
+              onClick={() => window.open('https://sa.myfatoorah.com/SAU/le/0505970789553553', '_blank')}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
+              Open 1 SAR Test Payment
+            </Button>
+            <p className="text-xs text-blue-600 mt-2 text-center">
+              This will redirect back to our success/error pages after payment completion
+            </p>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">Or create new test payment</span>
+            </div>
+          </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="email">Customer Email</Label>
