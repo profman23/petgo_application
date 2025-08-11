@@ -42,7 +42,7 @@ export class MyFatoorahService {
   private apiKey: string;
 
   constructor() {
-    // Try test environment first - API key might be for testing
+    // Try test environment - API key might be for sandbox
     this.baseURL = 'https://apitest.myfatoorah.com';
     this.apiKey = process.env.MYFATOORAH_API_KEY || '';
     
