@@ -47,11 +47,10 @@ export function PaymentTest() {
     setIsCreating(true);
     
     try {
-      const response = await fetch('/api/payments/create-invoice', {
+      const response = await fetch('/api/public/payments/test-invoice', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionStorage.getItem('sessionToken') || localStorage.getItem('sessionToken')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           invoiceNumber: `TEST-${Date.now()}`,
