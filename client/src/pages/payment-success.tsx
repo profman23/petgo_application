@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Receipt, ArrowLeft } from "lucide-react";
+import { CheckCircle, Receipt, ArrowLeft, ExternalLink, Copy } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { PaymentSuccessModal } from "@/components/payment-success-modal";
 
 export function PaymentSuccess() {
   const [, navigate] = useLocation();
   const [paymentData, setPaymentData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Parse URL parameters to get payment information
@@ -16,17 +20,24 @@ export function PaymentSuccess() {
     const paymentId = urlParams.get('paymentId');
     const transactionId = urlParams.get('transactionId');
     const invoiceId = urlParams.get('invoiceId');
+    const ref = urlParams.get('ref');
     
     console.log('Payment success callback received:', {
       paymentId,
       transactionId,
       invoiceId,
+      ref,
       fullUrl: window.location.href
     });
 
-    if (paymentId || transactionId || invoiceId) {
+    // Auto-show modal for successful payments
+    const paymentRef = paymentId || transactionId || invoiceId || ref || 'test-payment';
+    
+    if (paymentRef) {
       // Verify payment status with backend
-      verifyPayment(paymentId || transactionId || invoiceId);
+      verifyPayment(paymentRef);
+      // Show success modal automatically
+      setTimeout(() => setShowModal(true), 500);
     } else {
       // No payment ID found, show generic success
       setPaymentData({
@@ -35,6 +46,7 @@ export function PaymentSuccess() {
         amount: '1.00 SAR'
       });
       setLoading(false);
+      setTimeout(() => setShowModal(true), 500);
     }
   }, []);
 
@@ -75,8 +87,27 @@ export function PaymentSuccess() {
     );
   }
 
+  const copyTransactionId = () => {
+    if (paymentData?.transactionId) {
+      navigator.clipboard.writeText(paymentData.transactionId);
+      toast({
+        title: "تم النسخ / Copied",
+        description: "Transaction ID copied to clipboard",
+        variant: "default"
+      });
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+    <>
+      <PaymentSuccessModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        paymentReference={paymentData?.transactionId || 'test-payment'}
+        amount={paymentData?.amount || '1.00 SAR'}
+      />
+      
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -152,6 +183,7 @@ export function PaymentSuccess() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }
 
