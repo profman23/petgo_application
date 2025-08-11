@@ -43,13 +43,19 @@ export class MyFatoorahService {
   private apiKey: string;
 
   constructor() {
-    // Use sandbox for testing, production URL would be different
-    this.baseURL = 'https://apitest.myfatoorah.com';
+    // Try production URL - test URL might not be working
+    this.baseURL = 'https://api.myfatoorah.com';
     this.apiKey = process.env.MYFATOORAH_API_KEY || '';
     
     if (!this.apiKey) {
       throw new Error('MYFATOORAH_API_KEY environment variable is required');
     }
+    
+    console.log('🔧 MyFatoorah Service initialized:', {
+      baseURL: this.baseURL,
+      hasApiKey: !!this.apiKey,
+      apiKeyLength: this.apiKey.length
+    });
   }
 
   private getHeaders() {
@@ -67,6 +73,13 @@ export class MyFatoorahService {
         reference: request.CustomerReference
       });
 
+      console.log('🔐 API Details:', {
+        baseURL: this.baseURL,
+        apiKeyLength: this.apiKey.length,
+        apiKeyPrefix: this.apiKey.substring(0, 20) + '...',
+        headers: this.getHeaders()
+      });
+
       const response = await axios.post(
         `${this.baseURL}/v2/SendPayment`,
         request,
@@ -76,7 +89,14 @@ export class MyFatoorahService {
       console.log('✅ MyFatoorah invoice created successfully:', response.data);
       return response.data;
     } catch (error: any) {
-      console.error('❌ MyFatoorah invoice creation failed:', error.response?.data || error.message);
+      console.error('❌ MyFatoorah detailed error:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        headers: error.response?.headers,
+        url: error.config?.url,
+        requestHeaders: error.config?.headers
+      });
       throw new Error(`Payment gateway error: ${error.response?.data?.Message || error.message}`);
     }
   }
