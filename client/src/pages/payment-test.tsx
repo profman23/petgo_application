@@ -257,7 +257,7 @@ export function PaymentTest() {
               Live MyFatoorah Test Payment
             </h3>
             <p className="text-sm text-blue-700 mb-3">
-              Test the complete payment flow with a real 1 SAR payment link:
+              <strong>Note:</strong> API key requires 'SendPayment' permission in MyFatoorah dashboard. Use green button below for demo.
             </p>
             <Button 
               onClick={createQuickTestPayment}
@@ -294,8 +294,23 @@ export function PaymentTest() {
                 </>
               )}
             </Button>
+            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <h4 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                Demo Payment Success Flow
+              </h4>
+              <p className="text-sm text-green-700 mb-2">
+                Click the green button above to see the complete payment success modal in action:
+              </p>
+              <ul className="text-xs text-green-600 space-y-1">
+                <li>• Instant success confirmation</li>
+                <li>• Animated success modal with celebration</li>
+                <li>• Professional invoice-style display</li>
+                <li>• Smooth user experience flow</li>
+              </ul>
+            </div>
             <p className="text-xs text-blue-600 mt-2 text-center">
-              MyFatoorah: Real payment link | Mock: Instant success demo
+              Blue: MyFatoorah (needs API permissions) | Green: Instant demo
             </p>
           </div>
 
