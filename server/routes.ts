@@ -4097,6 +4097,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // MyFatoorah webhook handler
+  app.post('/api/webhook/myfatoorah', async (req, res) => {
+    try {
+      console.log('🔔 MyFatoorah webhook received with full data:');
+      console.log('Headers:', req.headers);
+      console.log('Body:', JSON.stringify(req.body, null, 2));
+      console.log('Query params:', req.query);
+      
+      // Extract payment details from webhook
+      const { 
+        PaymentId, 
+        TransactionId, 
+        InvoiceId, 
+        InvoiceReference,
+        InvoiceStatus,
+        PaidValue,
+        PaymentMethod 
+      } = req.body;
+      
+      console.log('📋 Payment Details Extracted:');
+      console.log('Payment ID:', PaymentId);
+      console.log('Transaction ID:', TransactionId);
+      console.log('Invoice ID:', InvoiceId);
+      console.log('Reference:', InvoiceReference);
+      console.log('Status:', InvoiceStatus);
+      console.log('Amount Paid:', PaidValue);
+      console.log('Payment Method:', PaymentMethod);
+      
+      res.json({ success: true, message: 'Webhook received and logged' });
+      
+    } catch (error) {
+      console.error('❌ Webhook error:', error);
+      res.json({ success: true, message: 'Webhook acknowledged' });
+    }
+  });
+
+  // MyFatoorah webhook handler (alternative endpoint)
   app.post('/api/payments/webhook', async (req, res) => {
     try {
       console.log('🔔 MyFatoorah webhook received:', req.body);
