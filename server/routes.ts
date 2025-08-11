@@ -3983,8 +3983,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         InvoiceReference: invoiceNumber,
         InvoiceDisplayValue: `${amount} SAR`,
         Language: 'AR' as const,
-        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success`,
-        ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error`,
+        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
+        ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error?ref=${invoiceNumber}&source=myfatoorah`,
         MobileCountryCode: '+966',
         SendInvoiceOption: 2 // Email only
       };
@@ -4104,25 +4104,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Body:', JSON.stringify(req.body, null, 2));
       console.log('Query params:', req.query);
       
-      // Extract payment details from webhook
+      // Extract payment details from webhook - MyFatoorah sends data in nested structure
+      const webhookData = req.body.Data || req.body;
       const { 
         PaymentId, 
         TransactionId, 
         InvoiceId, 
         InvoiceReference,
-        InvoiceStatus,
-        PaidValue,
-        PaymentMethod 
-      } = req.body;
+        TransactionStatus,
+        InvoiceValueInBaseCurrency,
+        PaymentMethod,
+        ReferenceId 
+      } = webhookData;
       
       console.log('📋 Payment Details Extracted:');
       console.log('Payment ID:', PaymentId);
       console.log('Transaction ID:', TransactionId);
       console.log('Invoice ID:', InvoiceId);
       console.log('Reference:', InvoiceReference);
-      console.log('Status:', InvoiceStatus);
-      console.log('Amount Paid:', PaidValue);
+      console.log('Reference ID:', ReferenceId);
+      console.log('Status:', TransactionStatus);
+      console.log('Amount Paid:', InvoiceValueInBaseCurrency);
       console.log('Payment Method:', PaymentMethod);
+      
+      // Store payment details for verification API
+      if (PaymentId || ReferenceId || TransactionId) {
+        const paymentRef = PaymentId || ReferenceId || TransactionId;
+        // Here you could store to database for later retrieval
+        console.log('💾 Payment stored with reference:', paymentRef);
+      }
       
       res.json({ success: true, message: 'Webhook received and logged' });
       

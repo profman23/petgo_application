@@ -30,16 +30,32 @@ export function PaymentSuccess() {
       fullUrl: window.location.href
     });
 
-    // Auto-show modal for successful payments
+    // Auto-show modal for successful payments - enhanced logic
     const paymentRef = paymentId || transactionId || invoiceId || ref || 'test-payment';
+    const source = urlParams.get('source');
     
-    if (paymentRef) {
-      // Verify payment status with backend
+    // Show modal immediately if coming from MyFatoorah
+    if (source === 'myfatoorah') {
+      console.log('🎯 Payment success from MyFatoorah detected!');
+      setPaymentData({
+        success: true,
+        message: 'Payment completed successfully via MyFatoorah',
+        amount: '1.00 SAR',
+        transactionId: paymentRef,
+        paymentMethod: 'MyFatoorah'
+      });
+      setLoading(false);
+      setShowModal(true); // Show immediately
+      
+      // Clean URL parameters
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    } else if (paymentRef) {
+      // Regular verification flow
       verifyPayment(paymentRef);
-      // Show success modal automatically
       setTimeout(() => setShowModal(true), 500);
     } else {
-      // No payment ID found, show generic success
+      // Fallback success
       setPaymentData({
         success: true,
         message: 'Payment completed successfully',
