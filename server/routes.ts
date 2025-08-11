@@ -3952,7 +3952,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // MyFatoorah Payment Gateway Routes
   
-  // Public test payment creation (no auth required)
+  // Mock successful payment for demonstration (bypasses MyFatoorah)
+  app.post('/api/public/payments/mock-success', async (req: any, res) => {
+    try {
+      const { invoiceNumber } = req.body;
+      
+      console.log('🧪 Creating MOCK payment for demonstration');
+      
+      // Simulate successful payment creation
+      res.json({
+        success: true,
+        data: {
+          paymentUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah&mock=true`,
+          invoiceId: 12345,
+          message: 'Mock payment created - will show success modal immediately'
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: 'Mock payment creation failed',
+        error: error.message
+      });
+    }
+  });
+
+  // Public test payment creation (no auth required)  
   app.post('/api/public/payments/test-invoice', async (req: any, res) => {
     try {
       const { 
@@ -3973,20 +3998,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const myfatoorah = new MyFatoorahService();
       
-      // Prepare payment request for MyFatoorah API
+      // Prepare payment request using exact MyFatoorah documentation format
       const paymentRequest = {
-        InvoiceAmount: parseFloat(amount),
         CustomerName: customerName,
+        NotificationOption: "EML", // Email notification
+        InvoiceValue: parseFloat(amount),
+        DisplayCurrencyIso: "SAR",
+        MobileCountryCode: "966",
+        CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''),
         CustomerEmail: customerEmail,
-        CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
-        CustomerReference: `TEST-CUSTOMER`,
-        InvoiceReference: invoiceNumber,
-        InvoiceDisplayValue: `${amount} SAR`,
-        Language: 'AR' as const,
         CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
         ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error?ref=${invoiceNumber}&source=myfatoorah`,
-        MobileCountryCode: '+966',
-        SendInvoiceOption: 2 // Email only
+        Language: "En", // Using English as per docs
+        CustomerReference: invoiceNumber
       };
 
       console.log('🏦 Creating MyFatoorah TEST payment invoice:', paymentRequest);

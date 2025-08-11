@@ -38,10 +38,50 @@ export function PaymentTest() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [isMocking, setIsMocking] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [paymentData, setPaymentData] = useState<PaymentResponse['data'] | null>(null);
   const [statusData, setStatusData] = useState<PaymentStatus['data'] | null>(null);
   const { toast } = useToast();
+
+  const createMockPayment = async () => {
+    setIsMocking(true);
+    
+    try {
+      const response = await fetch('/api/public/payments/mock-success', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          invoiceNumber: `MOCK-${Date.now()}`
+        })
+      });
+
+      const responseData = await response.json();
+
+      if (responseData.success) {
+        toast({
+          title: "Mock Payment Created",
+          description: "Redirecting to success page to show payment modal...",
+        });
+        
+        // Redirect to success page to demonstrate the modal
+        window.location.href = responseData.data.paymentUrl;
+      } else {
+        throw new Error(responseData.message || 'Mock payment creation failed');
+      }
+    } catch (error: any) {
+      console.error('Mock payment creation error:', error);
+      toast({
+        title: "Error",
+        description: `Failed to create mock payment: ${error.message}`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsMocking(false);
+    }
+  };
 
   const createQuickTestPayment = async () => {
     setIsCreating(true);
@@ -221,8 +261,8 @@ export function PaymentTest() {
             </p>
             <Button 
               onClick={createQuickTestPayment}
-              disabled={isCreating}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              disabled={isCreating || isMocking}
+              className="w-full bg-blue-600 hover:bg-blue-700 mb-3"
             >
               {isCreating ? (
                 <>
@@ -232,12 +272,30 @@ export function PaymentTest() {
               ) : (
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Create 1 SAR Test Payment (with VetsVan redirect)
+                  Create 1 SAR Test Payment (MyFatoorah)
+                </>
+              )}
+            </Button>
+            
+            <Button 
+              onClick={createMockPayment}
+              disabled={isCreating || isMocking}
+              className="w-full bg-green-600 hover:bg-green-700 mt-3"
+            >
+              {isMocking ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating Mock...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Demo Success Modal (Mock Payment)
                 </>
               )}
             </Button>
             <p className="text-xs text-blue-600 mt-2 text-center">
-              This will create a new payment that redirects back to VetsVan with success modal
+              MyFatoorah: Real payment link | Mock: Instant success demo
             </p>
           </div>
 

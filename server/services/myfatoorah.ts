@@ -1,19 +1,18 @@
 import axios from 'axios';
 
 export interface CreateInvoiceRequest {
-  InvoiceAmount: number;
   CustomerName: string;
-  CustomerEmail: string;
+  NotificationOption: string; // "EML" for email
+  InvoiceValue: number;
+  DisplayCurrencyIso: string; // "SAR"
+  MobileCountryCode: string; // "966"
   CustomerMobile: string;
-  CustomerReference: string;
-  InvoiceReference: string;
-  InvoiceDisplayValue: string;
-  Language: 'EN' | 'AR';
+  CustomerEmail: string;
   CallBackUrl: string;
   ErrorUrl: string;
-  MobileCountryCode: string;
+  Language: string; // "En" or "Ar"
+  CustomerReference: string;
   ExpiryDate?: string;
-  SendInvoiceOption: number; // 1=SMS, 2=Email, 3=Both
 }
 
 export interface CreateInvoiceResponse {
@@ -43,15 +42,15 @@ export class MyFatoorahService {
   private apiKey: string;
 
   constructor() {
-    // Try production URL - test URL might not be working
-    this.baseURL = 'https://api.myfatoorah.com';
+    // Try test environment first - API key might be for testing
+    this.baseURL = 'https://apitest.myfatoorah.com';
     this.apiKey = process.env.MYFATOORAH_API_KEY || '';
     
     if (!this.apiKey) {
       throw new Error('MYFATOORAH_API_KEY environment variable is required');
     }
     
-    console.log('🔧 MyFatoorah Service initialized:', {
+    console.log('🔧 MyFatoorah Service initialized for Saudi Arabia:', {
       baseURL: this.baseURL,
       hasApiKey: !!this.apiKey,
       apiKeyLength: this.apiKey.length
@@ -61,7 +60,8 @@ export class MyFatoorahService {
   private getHeaders() {
     return {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.apiKey}`
+      'Authorization': `Bearer ${this.apiKey}`,
+      'Accept': 'application/json'
     };
   }
 
