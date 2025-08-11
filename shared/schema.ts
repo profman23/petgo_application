@@ -482,6 +482,34 @@ export const insertInvoicePaymentSchema = createInsertSchema(invoicePayments).om
 export type InvoicePayment = typeof invoicePayments.$inferSelect;
 export type InsertInvoicePayment = z.infer<typeof insertInvoicePaymentSchema>;
 
+// Payment Transactions table for MyFatoorah integration
+export const paymentTransactions = pgTable("payment_transactions", {
+  id: serial("id").primaryKey(),
+  bookingId: integer("booking_id").references(() => bookings.id).notNull(),
+  paymentId: text("payment_id"), // MyFatoorah Payment ID
+  invoiceReference: text("invoice_reference"), // MyFatoorah Invoice Reference
+  paymentReference: text("payment_reference"), // MyFatoorah Payment Reference
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("SAR"), // Saudi Riyal for KSA
+  status: text("status").notNull().default("pending"), // pending, paid, failed, cancelled, refunded
+  paymentMethod: text("payment_method"), // MADA, VISA, ApplePay, STCPay, etc.
+  gatewayResponse: jsonb("gateway_response"), // Full response from MyFatoorah
+  paymentUrl: text("payment_url"), // Payment link from MyFatoorah
+  customerReference: text("customer_reference"), // Customer reference for tracking
+  errorMessage: text("error_message"), // Error details if payment fails
+  paidAt: timestamp("paid_at"), // When payment was completed
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertPaymentTransactionSchema = createInsertSchema(paymentTransactions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertPaymentTransaction = z.infer<typeof insertPaymentTransactionSchema>;
+export type SelectPaymentTransaction = typeof paymentTransactions.$inferSelect;
+
 // Sessions table for production persistence
 export const userSessions = pgTable("user_sessions", {
   id: text("id").primaryKey(),

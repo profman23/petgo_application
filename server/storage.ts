@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession } from "@shared/schema";
+import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -168,6 +168,15 @@ export interface IStorage {
   deleteExpiredSessions(): Promise<void>;
   getUserSessions(userId: number): Promise<UserSession[]>;
   getAllActiveSessions(): Promise<UserSession[]>;
+
+  // Payment Transaction operations for MyFatoorah
+  createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<SelectPaymentTransaction>;
+  getPaymentTransaction(id: number): Promise<SelectPaymentTransaction | undefined>;
+  getPaymentTransactionByBooking(bookingId: number): Promise<SelectPaymentTransaction | undefined>;
+  getPaymentTransactionByPaymentId(paymentId: string): Promise<SelectPaymentTransaction | undefined>;
+  updatePaymentTransaction(id: number, data: Partial<SelectPaymentTransaction>): Promise<SelectPaymentTransaction | undefined>;
+  updatePaymentTransactionStatus(id: number, status: string, paidAt?: Date): Promise<void>;
+  getAllPaymentTransactions(): Promise<SelectPaymentTransaction[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1129,6 +1138,58 @@ export class DatabaseStorage implements IStorage {
 
   async getAllActiveSessions(): Promise<UserSession[]> {
     return await db.select().from(userSessions).where(lt(new Date(), userSessions.expiresAt));
+  }
+
+  // Payment Transaction operations for MyFatoorah
+  async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<SelectPaymentTransaction> {
+    const [newTransaction] = await db.insert(paymentTransactions).values(transaction).returning();
+    return newTransaction;
+  }
+
+  async getPaymentTransaction(id: number): Promise<SelectPaymentTransaction | undefined> {
+    const [transaction] = await db.select().from(paymentTransactions).where(eq(paymentTransactions.id, id));
+    return transaction;
+  }
+
+  async getPaymentTransactionByBooking(bookingId: number): Promise<SelectPaymentTransaction | undefined> {
+    const [transaction] = await db.select().from(paymentTransactions)
+      .where(eq(paymentTransactions.bookingId, bookingId))
+      .orderBy(desc(paymentTransactions.createdAt));
+    return transaction;
+  }
+
+  async getPaymentTransactionByPaymentId(paymentId: string): Promise<SelectPaymentTransaction | undefined> {
+    const [transaction] = await db.select().from(paymentTransactions)
+      .where(eq(paymentTransactions.paymentId, paymentId));
+    return transaction;
+  }
+
+  async updatePaymentTransaction(id: number, data: Partial<SelectPaymentTransaction>): Promise<SelectPaymentTransaction | undefined> {
+    const [updatedTransaction] = await db.update(paymentTransactions)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(paymentTransactions.id, id))
+      .returning();
+    return updatedTransaction;
+  }
+
+  async updatePaymentTransactionStatus(id: number, status: string, paidAt?: Date): Promise<void> {
+    const updateData: any = { 
+      status, 
+      updatedAt: new Date() 
+    };
+    
+    if (paidAt) {
+      updateData.paidAt = paidAt;
+    }
+
+    await db.update(paymentTransactions)
+      .set(updateData)
+      .where(eq(paymentTransactions.id, id));
+  }
+
+  async getAllPaymentTransactions(): Promise<SelectPaymentTransaction[]> {
+    return await db.select().from(paymentTransactions)
+      .orderBy(desc(paymentTransactions.createdAt));
   }
 }
 
