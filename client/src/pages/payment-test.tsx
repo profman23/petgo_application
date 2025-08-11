@@ -47,27 +47,37 @@ export function PaymentTest() {
     setIsCreating(true);
     
     try {
-      const response = await apiRequest('/api/payments/create-invoice', 'POST', {
-        invoiceNumber: `TEST-${Date.now()}`,
-        amount: '1.00',
-        customerName: 'Test Customer',
-        customerEmail: 'test@example.com',
-        customerPhone: '+966548336693',
-        description: 'Quick 1 SAR test payment with VetsVan redirect'
+      const response = await fetch('/api/payments/create-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('sessionToken') || localStorage.getItem('sessionToken')}`
+        },
+        body: JSON.stringify({
+          invoiceNumber: `TEST-${Date.now()}`,
+          amount: '1.00',
+          customerName: 'Test Customer',
+          customerEmail: 'test@example.com',
+          customerPhone: '+966548336693',
+          description: 'Quick 1 SAR test payment with VetsVan redirect'
+        })
       });
 
-      if (response.success) {
+      const responseData = await response.json();
+
+      if (responseData.success) {
         toast({
           title: "Payment Link Created",
           description: "Opening payment page... Complete payment to see success modal in VetsVan",
         });
         
         // Open payment URL in new tab
-        window.open(response.data.paymentUrl, '_blank');
+        window.open(responseData.data.paymentUrl, '_blank');
       } else {
-        throw new Error(response.message);
+        throw new Error(responseData.message || 'Payment creation failed');
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Payment creation error:', error);
       toast({
         title: "Error",
         description: `Failed to create payment: ${error.message}`,
