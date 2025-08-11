@@ -4151,6 +4151,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Simple API test endpoint (no auth required)
+  app.post('/api/payments/quick-test', async (req: any, res) => {
+    try {
+      const { customerEmail, customerPhone } = req.body;
+
+      if (!customerEmail || !customerPhone) {
+        return res.status(400).json({
+          success: false,
+          message: 'Customer email and phone are required for test payment'
+        });
+      }
+
+      const myfatoorah = new MyFatoorahService();
+      const testInvoiceNumber = `QUICK-TEST-${Date.now()}`;
+      
+      const paymentRequest = {
+        InvoiceAmount: 1.00, // 1 SAR test payment
+        CustomerName: 'Test Customer',
+        CustomerEmail: customerEmail,
+        CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''),
+        CustomerReference: `QUICK-TEST-CUSTOMER`,
+        InvoiceReference: testInvoiceNumber,
+        InvoiceDisplayValue: '1.00 SAR',
+        Language: 'AR' as const,
+        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success`,
+        ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error`,
+        MobileCountryCode: '+966',
+        SendInvoiceOption: 2 // Email only
+      };
+
+      console.log('🧪 Creating quick test payment for 1 SAR:', paymentRequest);
+
+      const paymentResponse = await myfatoorah.createInvoice(paymentRequest);
+
+      if (paymentResponse.IsSuccess && paymentResponse.Data) {
+        res.json({
+          success: true,
+          data: {
+            paymentUrl: paymentResponse.Data.PaymentURL,
+            invoiceId: paymentResponse.Data.InvoiceId,
+            amount: 1.00,
+            message: 'Quick test payment created successfully. Click the payment URL to complete payment.'
+          }
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: paymentResponse.Message || 'Test payment creation failed',
+          errors: paymentResponse.ValidationErrors || []
+        });
+      }
+
+    } catch (error: any) {
+      console.error('❌ Quick test payment creation error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create test payment',
+        error: error.message
+      });
+    }
+  });
+
   // Test endpoint for 1 SAR payment
   app.post('/api/payments/test-payment', requireAuth, async (req: any, res) => {
     try {
