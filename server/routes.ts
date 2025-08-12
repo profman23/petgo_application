@@ -12,6 +12,7 @@ import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
+import { addPublicPaymentRoutes } from "./routes-public";
 // Payment service removed per user request
 
 async function requireAuth(req: any, res: any, next: any) {
@@ -3977,75 +3978,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Public test payment creation (no auth required)  
-  app.post('/api/public/payments/test-invoice', async (req: any, res) => {
-    try {
-      const { 
-        invoiceNumber, 
-        amount, 
-        customerName, 
-        customerEmail, 
-        customerPhone, 
-        description 
-      } = req.body;
 
-      if (!invoiceNumber || !amount || !customerName || !customerEmail || !customerPhone) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing required fields: invoiceNumber, amount, customerName, customerEmail, customerPhone'
-        });
-      }
-
-      const myfatoorah = new MyFatoorahService();
-      
-      // Prepare payment request using exact MyFatoorah documentation format
-      const paymentRequest = {
-        CustomerName: customerName,
-        NotificationOption: "EML", // Email notification
-        InvoiceValue: parseFloat(amount),
-        DisplayCurrencyIso: "SAR",
-        MobileCountryCode: "966",
-        CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''),
-        CustomerEmail: customerEmail,
-        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
-        ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error?ref=${invoiceNumber}&source=myfatoorah`,
-        Language: "En", // Using English as per docs
-        CustomerReference: invoiceNumber
-      };
-
-      console.log('🏦 Creating MyFatoorah TEST payment invoice:', paymentRequest);
-
-      const paymentResponse = await myfatoorah.createInvoice(paymentRequest);
-
-      if (paymentResponse.IsSuccess && paymentResponse.Data) {
-        console.log('✅ Test payment created successfully:', paymentResponse.Data);
-
-        res.json({
-          success: true,
-          data: {
-            paymentUrl: paymentResponse.Data.PaymentURL,
-            invoiceId: paymentResponse.Data.InvoiceId,
-            message: 'Test payment invoice created successfully'
-          }
-        });
-      } else {
-        console.error('❌ MyFatoorah test payment creation failed:', paymentResponse);
-        res.status(400).json({
-          success: false,
-          message: 'Failed to create payment invoice',
-          error: paymentResponse.ValidationErrors || paymentResponse.Message
-        });
-      }
-
-    } catch (error: any) {
-      console.error('❌ Test payment creation error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Internal server error during payment creation',
-        error: error.message
-      });
-    }
-  });
   
   // Create payment invoice with MyFatoorah
   app.post('/api/payments/create-invoice', requireAuth, async (req: any, res) => {
@@ -4468,6 +4401,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Register public payment routes
+  addPublicPaymentRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;

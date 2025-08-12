@@ -68,7 +68,7 @@ export class MyFatoorahService {
   async createInvoice(request: CreateInvoiceRequest): Promise<CreateInvoiceResponse> {
     try {
       console.log('🏦 Creating MyFatoorah invoice:', {
-        amount: request.InvoiceAmount,
+        amount: request.InvoiceValue,
         customer: request.CustomerName,
         reference: request.CustomerReference
       });

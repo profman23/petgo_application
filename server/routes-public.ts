@@ -3,7 +3,7 @@ import { MyFatoorahService } from './services/myfatoorah';
 
 export function addPublicPaymentRoutes(app: any) {
   // Public test payment creation (no auth required)
-  app.post('/api/public/payments/test-invoice', async (req: any, res) => {
+  app.post('/api/public/payments/test-invoice', async (req: any, res: any) => {
     try {
       const { 
         invoiceNumber, 
@@ -25,18 +25,17 @@ export function addPublicPaymentRoutes(app: any) {
       
       // Prepare payment request for MyFatoorah API
       const paymentRequest = {
-        InvoiceAmount: parseFloat(amount),
         CustomerName: customerName,
-        CustomerEmail: customerEmail,
+        NotificationOption: 'EML',
+        InvoiceValue: parseFloat(amount),
+        DisplayCurrencyIso: 'SAR',
+        MobileCountryCode: '966',
         CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
-        CustomerReference: `TEST-CUSTOMER`,
-        InvoiceReference: invoiceNumber,
-        InvoiceDisplayValue: `${amount} SAR`,
-        Language: 'AR' as const,
+        CustomerEmail: customerEmail,
         CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
         ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error?ref=${invoiceNumber}&source=myfatoorah`,
-        MobileCountryCode: '+966',
-        SendInvoiceOption: 2 // Email only
+        Language: 'En' as const,
+        CustomerReference: invoiceNumber
       };
 
       console.log('🏦 Creating MyFatoorah TEST payment invoice:', paymentRequest);
@@ -45,15 +44,20 @@ export function addPublicPaymentRoutes(app: any) {
 
       if (paymentResponse.IsSuccess && paymentResponse.Data) {
         console.log('✅ Test payment created successfully:', paymentResponse.Data);
+        console.log('🔗 Payment URL being sent:', paymentResponse.Data.InvoiceURL);
 
-        res.json({
+        const responseData = {
           success: true,
           data: {
-            paymentUrl: paymentResponse.Data.PaymentURL,
+            paymentUrl: paymentResponse.Data.InvoiceURL,
             invoiceId: paymentResponse.Data.InvoiceId,
+            invoiceReference: paymentResponse.Data.CustomerReference,
             message: 'Test payment invoice created successfully'
           }
-        });
+        };
+
+        console.log('📤 Final API Response:', JSON.stringify(responseData, null, 2));
+        res.json(responseData);
       } else {
         console.error('❌ MyFatoorah test payment creation failed:', paymentResponse);
         res.status(400).json({
