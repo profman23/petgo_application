@@ -87,109 +87,6 @@ export default function VetsVanBooking() {
     }
   }, []);
 
-  // Check for payment success/error on component mount
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const paymentStatus = urlParams.get('payment');
-    
-    if (paymentStatus === 'success') {
-      // Payment successful - complete the booking
-      handlePaymentSuccess();
-    } else if (paymentStatus === 'error') {
-      // Payment failed
-      toast({
-        title: "Payment Failed",
-        description: "Your payment could not be processed. Please try again.",
-        variant: "destructive",
-      });
-      
-      // Clear pending booking data
-      localStorage.removeItem('pendingVetsVanBooking');
-      
-      // Clean URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, []);
-
-  // Handle successful payment and create booking
-  const handlePaymentSuccess = async () => {
-    try {
-      const pendingBookingStr = localStorage.getItem('pendingVetsVanBooking');
-      if (!pendingBookingStr) {
-        throw new Error('No pending booking found');
-      }
-
-      const bookingDraft = JSON.parse(pendingBookingStr);
-      const customerToken = localStorage.getItem('token');
-      
-      if (!customerToken) {
-        throw new Error('Authentication required');
-      }
-
-      // Create the actual booking now that payment is complete
-      const response = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${customerToken}`,
-        },
-        body: JSON.stringify({
-          shiftId: bookingDraft.shiftId,
-          vetsVanId: bookingDraft.vetsVanId,
-          appointmentDate: bookingDraft.appointmentDate,
-          appointmentTime: bookingDraft.appointmentTime,
-          customerLocation: bookingDraft.rideRequestData ? {
-            latitude: bookingDraft.rideRequestData.pickupLatitude,
-            longitude: bookingDraft.rideRequestData.pickupLongitude,
-            address: bookingDraft.rideRequestData.location || null
-          } : null,
-          selectedPets: bookingDraft.rideRequestData?.selectedPatients ? 
-            patients.filter(p => bookingDraft.rideRequestData.selectedPatients.includes(p.id)) : [],
-          serviceType: bookingDraft.rideRequestData?.serviceType || 'general_checkup',
-          paymentStatus: 'paid',
-          paymentAmount: bookingDraft.estimatedCost,
-          invoiceId: bookingDraft.invoiceId
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to create booking after payment');
-      }
-
-      const bookingResult = await response.json();
-
-      // Success - show message and refresh data
-      toast({
-        title: "Payment Successful!",
-        description: `Your appointment has been booked for ${bookingDraft.timeSlot} on ${bookingDraft.appointmentDate}. VetsVan ${bookingDraft.vetsVanCode} will visit you.`,
-      });
-
-      // Clear pending booking data
-      localStorage.removeItem('pendingVetsVanBooking');
-      
-      // Refresh data
-      queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/shifts'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/bookings/date'] });
-      
-      // Clean URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-      
-      console.log('✅ Booking completed after payment:', bookingResult);
-      
-    } catch (error: any) {
-      console.error('❌ Failed to complete booking after payment:', error);
-      toast({
-        title: "Booking Error",
-        description: error.message || "Payment was successful but booking creation failed. Please contact support.",
-        variant: "destructive",
-      });
-      
-      // Clean URL but keep pending booking for retry
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  };
-
   // Fetch all patients for pet name lookup
   const { data: patients = [] } = useQuery<Patient[]>({
     queryKey: ['/api/patients'],
@@ -321,36 +218,7 @@ export default function VetsVanBooking() {
 
   const selectedPets = getSelectedPetsDisplay();
 
-  // Helper function to calculate estimated cost based on pet count and service type
-  const getEstimatedCost = (petCount: number, serviceType?: string): number => {
-    if (serviceType === 'test') {
-      if (petCount === 1) return 1;
-      if (petCount <= 3) return 3;
-      if (petCount === 4) return 4;
-      return 5; // 5+ pets
-    }
-    
-    // Default pricing for first-visit, general-checkup, home-consultation
-    if (petCount <= 2) return 172.5;
-    if (petCount <= 4) return 345;
-    return 517.5; // 5+ pets
-  };
-
-  // Get estimated cost from ride request data
-  const getBookingEstimatedCost = (): number | null => {
-    if (!rideRequestData || !rideRequestData.selectedPatients) {
-      return null;
-    }
-    
-    const supportedServices = ['first-visit', 'general-checkup', 'home-consultation', 'test'];
-    if (!supportedServices.includes(rideRequestData.serviceType)) {
-      return null;
-    }
-    
-    return getEstimatedCost(rideRequestData.selectedPatients.length, rideRequestData.serviceType);
-  };
-
-  // Create payment and booking mutation
+  // Create booking mutation
   const createBookingMutation = useMutation({
     mutationFn: async ({ vetsVanId, timeSlot, vetsVanCode }: { vetsVanId: number; timeSlot: string; vetsVanCode: string }) => {
       const customerToken = localStorage.getItem('token');
@@ -358,23 +226,6 @@ export default function VetsVanBooking() {
       if (!customerToken) {
         throw new Error('Authentication required');
       }
-
-      // Validate estimated cost exists
-      const estimatedCost = getBookingEstimatedCost();
-      if (!estimatedCost) {
-        throw new Error('Unable to determine cost. Please go back to the ride request page and select a supported service type.');
-      }
-
-      // Get user info for payment
-      const userResponse = await fetch('/api/auth/me', {
-        headers: { 'Authorization': `Bearer ${customerToken}` }
-      });
-      
-      if (!userResponse.ok) {
-        throw new Error('Failed to get user information');
-      }
-      
-      const user = await userResponse.json();
 
       // Find the shift for this VetsVan and date
       const shift = shifts.find(s => s.vetsVanId === vetsVanId && s.date === selectedDate);
@@ -398,175 +249,54 @@ export default function VetsVanBooking() {
 
       const appointmentTime24 = convertTo24Hour(timeSlot);
 
-      // Create payment with MyFatoorah
-      const paymentData = {
-        amount: estimatedCost,
-        customerName: user.name || user.username || 'VetsVan Customer',
-        customerMobile: user.phone || '',
-        customerEmail: user.email || '',
-        callBackUrl: `${window.location.origin}/vetsvan-booking?payment=success`,
-        errorUrl: `${window.location.origin}/vetsvan-booking?payment=error`,
-        metadata: {
-          vetsVanId: vetsVanId,
-          vetsVanCode: vetsVanCode,
-          timeSlot: timeSlot,
-          appointmentTime: appointmentTime24,
-          appointmentDate: selectedDate,
-          serviceType: rideRequestData?.serviceType,
-          petsCount: rideRequestData?.selectedPatients?.length || 0,
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${customerToken}`,
+        },
+        body: JSON.stringify({
           shiftId: shift.id,
+          vetsVanId: vetsVanId,
+          appointmentDate: selectedDate,
+          appointmentTime: appointmentTime24,
           customerLocation: rideRequestData ? {
             latitude: rideRequestData.pickupLatitude,
             longitude: rideRequestData.pickupLongitude,
             address: rideRequestData.location || null
           } : null,
           selectedPets: rideRequestData?.selectedPatients ? 
-            patients.filter(p => rideRequestData.selectedPatients.includes(p.id)) : []
-        }
-      };
-
-      const paymentRequestData = {
-        invoiceNumber: `VB-${Date.now()}-${vetsVanCode}`,
-        amount: estimatedCost.toString(),
-        customerName: paymentData.customerName,
-        customerEmail: paymentData.customerEmail || `customer-${user.id}@vetsvan.app`,
-        customerPhone: paymentData.customerMobile || '966500000000',
-        description: `VetsVan Booking - ${vetsVanCode} on ${selectedDate} at ${timeSlot}`,
-        callBackUrl: `${window.location.origin}/vetsvan-booking?payment=success`,
-        errorUrl: `${window.location.origin}/vetsvan-booking?payment=error`
-      };
-
-      console.log('🚀 Creating payment request:', paymentRequestData);
-      
-      const requestUrl = '/api/public/payments/test-invoice';
-      console.log('🔗 Request URL:', requestUrl);
-      console.log('🌐 Full URL:', window.location.origin + requestUrl);
-
-      const paymentResponse = await fetch(requestUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(paymentRequestData),
+            patients.filter(p => rideRequestData.selectedPatients.includes(p.id)) : [],
+          serviceType: rideRequestData?.serviceType || 'general_checkup'
+        }),
       });
 
-      // Comprehensive response logging
-      console.log('📡 Response status:', paymentResponse.status);
-      console.log('📡 Response URL (resolved):', paymentResponse.url);
-      console.log('📡 Response headers:', Object.fromEntries(paymentResponse.headers.entries()));
-      
-      const responseContentType = paymentResponse.headers.get('content-type');
-      console.log('📋 Content-Type header:', responseContentType);
-
-      // Validate response before any parsing
-      if (!paymentResponse.ok) {
-        console.error('❌ HTTP error response:', {
-          status: paymentResponse.status,
-          statusText: paymentResponse.statusText,
-          url: paymentResponse.url,
-          contentType: responseContentType
-        });
-        
-        let errorData;
-        if (responseContentType && responseContentType.includes('application/json')) {
-          try {
-            errorData = await paymentResponse.json();
-            console.log('📄 Error JSON data:', errorData);
-          } catch (e) {
-            console.error('❌ Failed to parse error JSON:', e);
-            const textResponse = await paymentResponse.text();
-            console.error('❌ Raw error response (first 300 chars):', textResponse.substring(0, 300));
-            errorData = { message: `HTTP ${paymentResponse.status} error - JSON parse failed` };
-          }
-        } else {
-          const textResponse = await paymentResponse.text();
-          console.error('❌ Non-JSON error response (first 300 chars):', textResponse.substring(0, 300));
-          errorData = { message: `Server returned non-JSON response (status: ${paymentResponse.status}, content-type: ${responseContentType})` };
-        }
-        
-        throw new Error(errorData.message || 'Payment request failed');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to create booking');
       }
 
-      // Validate successful response has JSON content type
-      if (!responseContentType || !responseContentType.includes('application/json')) {
-        console.error('❌ Expected JSON content-type but got:', responseContentType);
-        
-        // Read the full response body for diagnostic purposes
-        const responseText = await paymentResponse.text();
-        console.error('❌ Non-JSON success response details:', {
-          status: paymentResponse.status,
-          url: paymentResponse.url,
-          contentType: responseContentType,
-          bodyPreview: responseText.substring(0, 300)
-        });
-        
-        throw new Error(`Server returned non-JSON response. Expected 'application/json' but got '${responseContentType}'. This might be an HTML error page or redirect.`);
-      }
-
-      // Parse JSON with comprehensive error handling
-      let paymentResult;
-      try {
-        paymentResult = await paymentResponse.json();
-        console.log('✅ Payment JSON parsed successfully:', {
-          success: paymentResult.success,
-          hasPaymentUrl: !!paymentResult.data?.paymentUrl,
-          hasInvoiceId: !!paymentResult.data?.invoiceId,
-          fullResponse: paymentResult
-        });
-      } catch (parseError: any) {
-        console.error('❌ JSON parsing failed:', parseError);
-        
-        // Get the raw response text for debugging
-        try {
-          const responseText = await paymentResponse.text();
-          console.error('❌ Raw response that failed to parse (first 300 chars):', responseText.substring(0, 300));
-          
-          // Check if this is clearly HTML
-          if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
-            throw new Error('Server returned HTML page instead of JSON. This indicates a server error or incorrect routing.');
-          }
-        } catch (textError) {
-          console.error('❌ Could not read response text:', textError);
-        }
-        
-        throw new Error(`Failed to parse payment response as JSON: ${parseError.message}`);
-      }
-      
-      if (!paymentResult.success || !paymentResult.data?.paymentUrl) {
-        throw new Error('Failed to create payment URL');
-      }
-
-      // Store booking details in localStorage for later completion after payment
-      const bookingDraft = {
-        vetsVanId,
-        vetsVanCode,
-        timeSlot,
-        appointmentTime: appointmentTime24,
-        appointmentDate: selectedDate,
-        shiftId: shift.id,
-        estimatedCost,
-        paymentUrl: paymentResult.data.paymentUrl,
-        invoiceId: paymentResult.data.invoiceId,
-        rideRequestData
-      };
-      
-      localStorage.setItem('pendingVetsVanBooking', JSON.stringify(bookingDraft));
-      
-      return { 
-        paymentUrl: paymentResult.data.paymentUrl,
-        invoiceId: paymentResult.data.invoiceId 
-      };
+      return await response.json();
     },
     onSuccess: (data) => {
-      console.log('✅ Payment URL created:', data.paymentUrl);
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/shifts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/vetsvan-requests'] });
       
-      // Redirect to MyFatoorah payment page
-      window.location.href = data.paymentUrl;
+      toast({
+        title: "Booking Successful",
+        description: `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
+      });
+
+      console.log('🔔 Booking created successfully:', data);
+      
+      // Redirect to customer activity page
+      setLocation('/customer-activity');
     },
     onError: (error: any) => {
       toast({
-        title: "Payment Failed",
-        description: error.message || "Failed to create payment. Please try again.",
+        title: "Booking Failed",
+        description: error.message || "Failed to create booking. Please try again.",
         variant: "destructive",
       });
     },
@@ -581,8 +311,13 @@ export default function VetsVanBooking() {
       setIsBooking(true);
       setShowConfirmDialog(false);
       
-      // DO NOT mark as booked yet - only create payment and redirect
-      console.log('🔄 Creating payment for booking:', pendingBooking);
+      // Add to locally booked slots immediately for visual feedback
+      const slotKey = `${pendingBooking.vetsVanId}-${pendingBooking.timeSlot}`;
+      setLocallyBookedSlots(prev => {
+        const newSet = new Set(prev);
+        newSet.add(slotKey);
+        return newSet;
+      });
       
       // Create booking for the selected time slot
       createBookingMutation.mutate(pendingBooking);
@@ -840,16 +575,9 @@ export default function VetsVanBooking() {
               </div>
 
               <div className="mt-4 pt-4 border-t border-purple-200">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-purple-600 font-medium">
-                    Please select your preferred appointment time from the schedule below.
-                  </p>
-                  {getBookingEstimatedCost() && (
-                    <span className="inline-flex items-center gap-1 bg-purple-100 px-3 py-1 rounded-full text-sm font-bold text-purple-800">
-                      💰 {getBookingEstimatedCost()} SAR
-                    </span>
-                  )}
-                </div>
+                <p className="text-sm text-purple-600 font-medium">
+                  Please select your preferred appointment time from the schedule below.
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -954,24 +682,7 @@ export default function VetsVanBooking() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Booking</AlertDialogTitle>
             <AlertDialogDescription>
-              {pendingBooking && getBookingEstimatedCost() ? (
-                <div className="space-y-3">
-                  <p>You are about to book:</p>
-                  <div className="bg-purple-50 p-3 rounded-lg space-y-2 text-sm">
-                    <div><strong>VetsVan:</strong> {pendingBooking.vetsVanCode}</div>
-                    <div><strong>Date & Time:</strong> {selectedDate} at {pendingBooking.timeSlot}</div>
-                    <div><strong>Service:</strong> {getServiceTypeDisplay(rideRequestData?.serviceType || '')}</div>
-                    <div><strong>Pets:</strong> {rideRequestData?.selectedPatients?.length || 0} pet(s)</div>
-                    <div className="flex items-center justify-between pt-2 border-t">
-                      <strong>Total Amount:</strong>
-                      <span className="text-lg font-bold text-purple-800">{getBookingEstimatedCost()} SAR</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600">You will be redirected to MyFatoorah to complete the payment.</p>
-                </div>
-              ) : (
-                "Are you sure you want to book this time slot?"
-              )}
+              Are you sure you want to book this time slot?
               {pendingBooking && (
                 <div className="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
                   <div className="flex items-center gap-2 text-sm text-purple-800">
