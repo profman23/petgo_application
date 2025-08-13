@@ -16,7 +16,16 @@ export function addPublicPaymentRoutes(app: any) {
         errorUrl
       } = req.body;
 
+      console.log('📥 Payment creation request received:', {
+        invoiceNumber,
+        amount,
+        customerName,
+        customerEmail: customerEmail?.substring(0, 20) + '...',
+        customerPhone: customerPhone?.substring(0, 10) + '...'
+      });
+
       if (!invoiceNumber || !amount || !customerName || !customerEmail || !customerPhone) {
+        console.error('❌ Missing required fields for payment creation');
         return res.status(400).json({
           success: false,
           message: 'Missing required fields: invoiceNumber, amount, customerName, customerEmail, customerPhone'
@@ -59,9 +68,13 @@ export function addPublicPaymentRoutes(app: any) {
         };
 
         console.log('📤 Final API Response:', JSON.stringify(responseData, null, 2));
+        
+        // Ensure proper JSON content type
+        res.setHeader('Content-Type', 'application/json');
         res.json(responseData);
       } else {
         console.error('❌ MyFatoorah test payment creation failed:', paymentResponse);
+        res.setHeader('Content-Type', 'application/json');
         res.status(400).json({
           success: false,
           message: 'Failed to create payment invoice',
@@ -71,10 +84,11 @@ export function addPublicPaymentRoutes(app: any) {
 
     } catch (error: any) {
       console.error('❌ Test payment creation error:', error);
+      res.setHeader('Content-Type', 'application/json');
       res.status(500).json({
         success: false,
         message: 'Internal server error during payment creation',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   });

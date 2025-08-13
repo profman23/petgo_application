@@ -425,6 +425,14 @@ export default function VetsVanBooking() {
         }
       };
 
+      console.log('🚀 Creating payment with data:', {
+        invoiceNumber: `VB-${Date.now()}-${vetsVanCode}`,
+        amount: estimatedCost.toString(),
+        customerName: paymentData.customerName,
+        customerEmail: paymentData.customerEmail || `customer-${user.id}@vetsvan.app`,
+        customerPhone: paymentData.customerMobile || '966500000000'
+      });
+
       const paymentResponse = await fetch('/api/public/payments/test-invoice', {
         method: 'POST',
         headers: {
@@ -442,12 +450,47 @@ export default function VetsVanBooking() {
         }),
       });
 
+      console.log('📡 Payment response status:', paymentResponse.status);
+      console.log('📡 Payment response headers:', Object.fromEntries(paymentResponse.headers.entries()));
+
       if (!paymentResponse.ok) {
-        const errorData = await paymentResponse.json().catch(() => ({}));
+        console.error('❌ Payment response not OK:', paymentResponse.status);
+        let errorData;
+        const contentType = paymentResponse.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          try {
+            errorData = await paymentResponse.json();
+          } catch (e) {
+            console.error('❌ Failed to parse error JSON:', e);
+            errorData = { message: `HTTP ${paymentResponse.status} error` };
+          }
+        } else {
+          const textResponse = await paymentResponse.text();
+          console.error('❌ Non-JSON error response (first 200 chars):', textResponse.substring(0, 200));
+          errorData = { message: `Server returned HTML error (status: ${paymentResponse.status})` };
+        }
+        
         throw new Error(errorData.message || 'Failed to create payment');
       }
 
-      const paymentResult = await paymentResponse.json();
+      // Check content type before parsing JSON
+      const contentType = paymentResponse.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await paymentResponse.text();
+        console.error('❌ Expected JSON but got:', contentType);
+        console.error('❌ Response body (first 200 chars):', responseText.substring(0, 200));
+        throw new Error('Server returned non-JSON response. Expected payment data.');
+      }
+
+      let paymentResult;
+      try {
+        paymentResult = await paymentResponse.json();
+        console.log('✅ Payment response parsed successfully:', paymentResult);
+      } catch (error) {
+        console.error('❌ Failed to parse payment JSON:', error);
+        throw new Error('Invalid JSON response from payment server');
+      }
       
       if (!paymentResult.success || !paymentResult.data?.paymentUrl) {
         throw new Error('Failed to create payment URL');
@@ -498,13 +541,8 @@ export default function VetsVanBooking() {
       setIsBooking(true);
       setShowConfirmDialog(false);
       
-      // Add to locally booked slots immediately for visual feedback
-      const slotKey = `${pendingBooking.vetsVanId}-${pendingBooking.timeSlot}`;
-      setLocallyBookedSlots(prev => {
-        const newSet = new Set(prev);
-        newSet.add(slotKey);
-        return newSet;
-      });
+      // DO NOT mark as booked yet - only create payment and redirect
+      console.log('🔄 Creating payment for booking:', pendingBooking);
       
       // Create booking for the selected time slot
       createBookingMutation.mutate(pendingBooking);
