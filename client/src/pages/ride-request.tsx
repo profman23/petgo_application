@@ -40,8 +40,16 @@ const formSchema = rideRequestSchema.extend({
 
 type FormData = z.infer<typeof formSchema>;
 
-// Helper function to calculate estimated cost based on pet count
-const getEstimatedCost = (petCount: number): number => {
+// Helper function to calculate estimated cost based on pet count and service type
+const getEstimatedCost = (petCount: number, serviceType?: string): number => {
+  if (serviceType === 'test') {
+    if (petCount === 1) return 1;
+    if (petCount <= 3) return 3;
+    if (petCount === 4) return 4;
+    return 5; // 5+ pets
+  }
+  
+  // Default pricing for first-visit, general-checkup, home-consultation
   if (petCount <= 2) return 172.5;
   if (petCount <= 4) return 345;
   return 517.5; // 5+ pets
@@ -822,6 +830,12 @@ export default function RideRequest() {
                     <span>{language === 'ar' ? 'استشارة منزلية' : 'Home Consultation'}</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="test" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Circle className="w-4 h-4 text-purple-600" />
+                    <span>{language === 'ar' ? 'اختبار' : 'Test'}</span>
+                  </div>
+                </SelectItem>
                 <SelectItem value="pickup-drop" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Car className="w-4 h-4 text-indigo-600" />
@@ -857,7 +871,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'home-consultation', 'test'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-purple-800" style={{ 
@@ -868,7 +882,7 @@ export default function RideRequest() {
                   <span className="text-lg font-bold text-purple-900" style={{ 
                     fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                   }}>
-                    {getEstimatedCost(selectedPatients.length)} {language === 'ar' ? 'ريال' : 'SAR'}
+                    {getEstimatedCost(selectedPatients.length, serviceType)} {language === 'ar' ? 'ريال' : 'SAR'}
                   </span>
                 </div>
               </div>
