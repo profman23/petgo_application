@@ -40,6 +40,13 @@ const formSchema = rideRequestSchema.extend({
 
 type FormData = z.infer<typeof formSchema>;
 
+// Helper function to calculate estimated cost based on pet count
+const getEstimatedCost = (petCount: number): number => {
+  if (petCount <= 2) return 172.5;
+  if (petCount <= 4) return 345;
+  return 517.5; // 5+ pets
+};
+
 export default function RideRequest() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -847,6 +854,25 @@ export default function RideRequest() {
                 </SelectItem>
               </SelectContent>
             </Select>
+            
+            {/* Estimated Cost Display */}
+            {selectedPatients.length > 0 && 
+             ['first-visit', 'general-checkup', 'home-consultation'].includes(serviceType) && (
+              <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-purple-800" style={{ 
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                  }}>
+                    {language === 'ar' ? 'التكلفة التقديرية:' : 'Estimated Cost:'}
+                  </span>
+                  <span className="text-lg font-bold text-purple-900" style={{ 
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                  }}>
+                    {getEstimatedCost(selectedPatients.length)} {language === 'ar' ? 'ريال' : 'SAR'}
+                  </span>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
