@@ -11,7 +11,9 @@ export function addPublicPaymentRoutes(app: any) {
         customerName, 
         customerEmail, 
         customerPhone, 
-        description 
+        description,
+        callBackUrl,
+        errorUrl
       } = req.body;
 
       if (!invoiceNumber || !amount || !customerName || !customerEmail || !customerPhone) {
@@ -32,8 +34,8 @@ export function addPublicPaymentRoutes(app: any) {
         MobileCountryCode: '966',
         CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
         CustomerEmail: customerEmail,
-        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
-        ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error?ref=${invoiceNumber}&source=myfatoorah`,
+        CallBackUrl: callBackUrl || `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
+        ErrorUrl: errorUrl || `${req.protocol}://${req.get('host')}/payment-error?ref=${invoiceNumber}&source=myfatoorah`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
       };
