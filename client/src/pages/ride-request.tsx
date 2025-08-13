@@ -65,11 +65,33 @@ export default function RideRequest() {
   const [isSlideComplete, setIsSlideComplete] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [showPartnersDialog, setShowPartnersDialog] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
   const { t } = useTranslation();
   const { language } = useLanguage();
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
+
+  // Check for payment status in URL parameters
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    
+    if (paymentStatus === 'failed') {
+      toast({
+        title: language === 'ar' ? 'فشل الدفع' : 'Payment Failed',
+        description: language === 'ar' ? 
+          'تم إلغاء الدفع أو فشل. يرجى المحاولة مرة أخرى.' : 
+          'Payment was cancelled or failed. Please try again.',
+        variant: 'destructive',
+        duration: 8000,
+      });
+      
+      // Clear the URL parameter without page reload
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, [toast, language]);
 
   // خدمات تتطلب شركاء (الكل) و خدمات خاصة بالنخبة فقط
   const specializedServices = ['neutering', 'surgery', 'grooming'];
@@ -87,6 +109,14 @@ export default function RideRequest() {
     queryKey: ['/api/patients'],
     staleTime: 5 * 60 * 1000, // 5 دقائق
     gcTime: 10 * 60 * 1000, // 10 دقائق
+    refetchOnWindowFocus: false,
+  });
+
+  // جلب بيانات المستخدم للدفع
+  const { data: userSession } = useQuery<{user?: {name?: string, phone?: string, email?: string}}>({
+    queryKey: ['/api/auth/session'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
   
@@ -364,9 +394,9 @@ export default function RideRequest() {
     }
   };
 
-  // دالة منفصلة لتنفيذ الطلب - توجه لصفحة اختيار المواعيد
+  // دالة لتنفيذ الدفع قبل التوجه لصفحة الحجز
   const executeRideRequest = async () => {
-    console.log('executeRideRequest called');
+    console.log('executeRideRequest called - Starting payment flow');
     console.log('Current location:', currentLocation);
     console.log('Selected patients:', selectedPatients);
     console.log('Service type:', serviceType);
@@ -400,32 +430,93 @@ export default function RideRequest() {
       setSlidePosition(0);
       return;
     }
+
+    // التحقق من وجود التكلفة التقديرية
+    const estimatedCost = getEstimatedCost(selectedPatients.length, serviceType);
+    if (!estimatedCost || estimatedCost <= 0) {
+      toast({
+        title: language === 'ar' ? 'خطأ في التكلفة' : 'Cost Error',
+        description: language === 'ar' ? 'لا يمكن تحديد تكلفة الخدمة' : 'Cannot determine service cost',
+        variant: 'destructive',
+      });
+      setIsSlideComplete(false);
+      setSlidePosition(0);
+      return;
+    }
+
+    setIsProcessingPayment(true);
     
-    // حفظ بيانات الطلب في localStorage للاستخدام في صفحة الحجز
-    const requestData = {
-      pickupLatitude: currentLocation.latitude,
-      pickupLongitude: currentLocation.longitude,
-      selectedPatients,
-      serviceType,
-      location: form.getValues('pickupLocation'),
-    };
-    
-    console.log('Saving request data to localStorage:', requestData);
-    localStorage.setItem('pendingRequest', JSON.stringify(requestData));
-    
-    // تأكد من حفظ البيانات
-    const savedData = localStorage.getItem('pendingRequest');
-    console.log('Verification - data saved in localStorage:', savedData);
-    
-    console.log('Request data saved, redirecting to booking page');
-    
-    toast({
-      title: language === 'ar' ? 'تم تأكيد البيانات' : 'Data Confirmed',
-      description: language === 'ar' ? 'يرجى اختيار موعد الحجز' : 'Please select appointment time',
-    });
-    
-    // توجه لصفحة اختيار المواعيد
-    setLocation('/vetsvan-booking');
+    try {
+      // حفظ بيانات الطلب في localStorage للاستخدام بعد الدفع
+      const requestData = {
+        pickupLatitude: currentLocation.latitude,
+        pickupLongitude: currentLocation.longitude,
+        selectedPatients,
+        serviceType,
+        location: form.getValues('pickupLocation'),
+        estimatedCost,
+      };
+      
+      console.log('Saving request data to localStorage:', requestData);
+      localStorage.setItem('pendingRequest', JSON.stringify(requestData));
+      
+      // إعداد بيانات المستخدم للدفع
+      const customerName = userSession?.user?.name || userSession?.user?.phone || 'Customer';
+      const customerEmail = userSession?.user?.email || 'test@example.com';
+      const customerPhone = userSession?.user?.phone || '+966000000000';
+      
+      // إنشاء رابط الدفع
+      console.log('Creating payment link with cost:', estimatedCost);
+      const response = await fetch('/api/public/payments/test-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          invoiceNumber: `RIDE-${Date.now()}`,
+          amount: estimatedCost.toString(),
+          customerName,
+          customerEmail,
+          customerPhone,
+          description: `VetsVan Service: ${serviceType} for ${selectedPatients.length} pet(s)`,
+          successUrl: `${window.location.origin}/vetsvan-booking?payment=success`,
+          errorUrl: `${window.location.origin}/ride-request?payment=failed`
+        })
+      });
+
+      const responseData = await response.json();
+
+      if (responseData.success && responseData.data?.paymentUrl) {
+        console.log('Payment link created successfully:', responseData.data.paymentUrl);
+        
+        toast({
+          title: language === 'ar' ? 'جاري التوجه للدفع' : 'Redirecting to Payment',
+          description: language === 'ar' ? 
+            `تكلفة الخدمة: ${estimatedCost} ريال` : 
+            `Service cost: ${estimatedCost} SAR`,
+        });
+        
+        // التوجه مباشرة لصفحة الدفع
+        window.location.href = responseData.data.paymentUrl;
+      } else {
+        throw new Error(responseData.message || 'Payment link creation failed');
+      }
+    } catch (error: any) {
+      console.error('Payment creation error:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ في الدفع' : 'Payment Error',
+        description: language === 'ar' ? 
+          `فشل في إنشاء رابط الدفع: ${error.message}` : 
+          `Failed to create payment link: ${error.message}`,
+        variant: 'destructive'
+      });
+      
+      // إعادة تعيين السحب عند الفشل
+      setIsSlideComplete(false);
+      setSlidePosition(0);
+    } finally {
+      setIsProcessingPayment(false);
+    }
   };
 
   const handleSlideComplete = async () => {
@@ -965,7 +1056,9 @@ export default function RideRequest() {
                     {/* Background Track */}
                     <div className="absolute inset-0 flex items-center justify-center">
                       <span className="text-white font-medium text-lg">
-                        {isRequestingRide ? 
+                        {isProcessingPayment ? 
+                          (language === 'ar' ? 'جاري إنشاء الدفعة...' : 'Creating payment...') :
+                          isRequestingRide ? 
                           (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') :
                           !currentLocation ? 
                           (language === 'ar' ? 'في انتظار تحديد الموقع...' : 'Waiting for location...') :
@@ -990,15 +1083,15 @@ export default function RideRequest() {
                       className="absolute top-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full shadow-xl flex items-center justify-center cursor-grab active:cursor-grabbing active:scale-105"
                       style={{ 
                         left: `${slidePosition}px`,
-                        opacity: (!currentLocation || selectedPatients.length === 0 || !serviceType) ? 0.5 : 1,
-                        pointerEvents: (!currentLocation || selectedPatients.length === 0 || !serviceType) ? 'none' : 'auto',
+                        opacity: (!currentLocation || selectedPatients.length === 0 || !serviceType || isProcessingPayment) ? 0.5 : 1,
+                        pointerEvents: (!currentLocation || selectedPatients.length === 0 || !serviceType || isProcessingPayment) ? 'none' : 'auto',
                         transform: `translateY(-50%) ${isSliding ? 'scale(1.05)' : 'scale(1)'}`,
                         transition: isSliding ? 'transform 0.1s ease-out' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                       }}
                       onMouseDown={handleSlideStart}
                       onTouchStart={handleSlideStart}
                     >
-                      {isRequestingRide ? (
+                      {isProcessingPayment || isRequestingRide ? (
                         <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
                       ) : isSlideComplete ? (
                         <Check className="w-8 h-8 text-green-600" />
