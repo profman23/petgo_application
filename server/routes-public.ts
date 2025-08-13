@@ -24,6 +24,18 @@ export function addPublicPaymentRoutes(app: any) {
         customerPhone: customerPhone?.substring(0, 10) + '...'
       });
 
+      // Log detailed request info to debug browser vs curl differences
+      console.log('🔍 Request details:', {
+        method: req.method,
+        url: req.url,
+        userAgent: req.headers['user-agent']?.substring(0, 50) + '...',
+        contentType: req.headers['content-type'],
+        accept: req.headers.accept,
+        host: req.headers.host,
+        origin: req.headers.origin,
+        referer: req.headers.referer
+      });
+
       if (!invoiceNumber || !amount || !customerName || !customerEmail || !customerPhone) {
         console.error('❌ Missing required fields for payment creation');
         return res.status(400).json({
@@ -69,8 +81,16 @@ export function addPublicPaymentRoutes(app: any) {
 
         console.log('📤 Final API Response:', JSON.stringify(responseData, null, 2));
         
-        // Ensure proper JSON content type
-        res.setHeader('Content-Type', 'application/json');
+        // Ensure proper JSON content type and prevent any HTML responses
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-cache');
+        
+        console.log('📤 Response headers being sent:', {
+          'Content-Type': res.get('Content-Type'),
+          'Cache-Control': res.get('Cache-Control'),
+          'X-Powered-By': res.get('X-Powered-By')
+        });
+        
         res.json(responseData);
       } else {
         console.error('❌ MyFatoorah test payment creation failed:', paymentResponse);

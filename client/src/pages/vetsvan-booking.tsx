@@ -425,71 +425,111 @@ export default function VetsVanBooking() {
         }
       };
 
-      console.log('🚀 Creating payment with data:', {
+      const paymentRequestData = {
         invoiceNumber: `VB-${Date.now()}-${vetsVanCode}`,
         amount: estimatedCost.toString(),
         customerName: paymentData.customerName,
         customerEmail: paymentData.customerEmail || `customer-${user.id}@vetsvan.app`,
-        customerPhone: paymentData.customerMobile || '966500000000'
-      });
+        customerPhone: paymentData.customerMobile || '966500000000',
+        description: `VetsVan Booking - ${vetsVanCode} on ${selectedDate} at ${timeSlot}`,
+        callBackUrl: `${window.location.origin}/vetsvan-booking?payment=success`,
+        errorUrl: `${window.location.origin}/vetsvan-booking?payment=error`
+      };
 
-      const paymentResponse = await fetch('/api/public/payments/test-invoice', {
+      console.log('🚀 Creating payment request:', paymentRequestData);
+      
+      const requestUrl = '/api/public/payments/test-invoice';
+      console.log('🔗 Request URL:', requestUrl);
+      console.log('🌐 Full URL:', window.location.origin + requestUrl);
+
+      const paymentResponse = await fetch(requestUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          invoiceNumber: `VB-${Date.now()}-${vetsVanCode}`,
-          amount: estimatedCost.toString(),
-          customerName: paymentData.customerName,
-          customerEmail: paymentData.customerEmail || `customer-${user.id}@vetsvan.app`,
-          customerPhone: paymentData.customerMobile || '966500000000',
-          description: `VetsVan Booking - ${vetsVanCode} on ${selectedDate} at ${timeSlot}`,
-          callBackUrl: `${window.location.origin}/vetsvan-booking?payment=success`,
-          errorUrl: `${window.location.origin}/vetsvan-booking?payment=error`
-        }),
+        body: JSON.stringify(paymentRequestData),
       });
 
-      console.log('📡 Payment response status:', paymentResponse.status);
-      console.log('📡 Payment response headers:', Object.fromEntries(paymentResponse.headers.entries()));
+      // Comprehensive response logging
+      console.log('📡 Response status:', paymentResponse.status);
+      console.log('📡 Response URL (resolved):', paymentResponse.url);
+      console.log('📡 Response headers:', Object.fromEntries(paymentResponse.headers.entries()));
+      
+      const responseContentType = paymentResponse.headers.get('content-type');
+      console.log('📋 Content-Type header:', responseContentType);
 
+      // Validate response before any parsing
       if (!paymentResponse.ok) {
-        console.error('❌ Payment response not OK:', paymentResponse.status);
-        let errorData;
-        const contentType = paymentResponse.headers.get('content-type');
+        console.error('❌ HTTP error response:', {
+          status: paymentResponse.status,
+          statusText: paymentResponse.statusText,
+          url: paymentResponse.url,
+          contentType: responseContentType
+        });
         
-        if (contentType && contentType.includes('application/json')) {
+        let errorData;
+        if (responseContentType && responseContentType.includes('application/json')) {
           try {
             errorData = await paymentResponse.json();
+            console.log('📄 Error JSON data:', errorData);
           } catch (e) {
             console.error('❌ Failed to parse error JSON:', e);
-            errorData = { message: `HTTP ${paymentResponse.status} error` };
+            const textResponse = await paymentResponse.text();
+            console.error('❌ Raw error response (first 300 chars):', textResponse.substring(0, 300));
+            errorData = { message: `HTTP ${paymentResponse.status} error - JSON parse failed` };
           }
         } else {
           const textResponse = await paymentResponse.text();
-          console.error('❌ Non-JSON error response (first 200 chars):', textResponse.substring(0, 200));
-          errorData = { message: `Server returned HTML error (status: ${paymentResponse.status})` };
+          console.error('❌ Non-JSON error response (first 300 chars):', textResponse.substring(0, 300));
+          errorData = { message: `Server returned non-JSON response (status: ${paymentResponse.status}, content-type: ${responseContentType})` };
         }
         
-        throw new Error(errorData.message || 'Failed to create payment');
+        throw new Error(errorData.message || 'Payment request failed');
       }
 
-      // Check content type before parsing JSON
-      const contentType = paymentResponse.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
+      // Validate successful response has JSON content type
+      if (!responseContentType || !responseContentType.includes('application/json')) {
+        console.error('❌ Expected JSON content-type but got:', responseContentType);
+        
+        // Read the full response body for diagnostic purposes
         const responseText = await paymentResponse.text();
-        console.error('❌ Expected JSON but got:', contentType);
-        console.error('❌ Response body (first 200 chars):', responseText.substring(0, 200));
-        throw new Error('Server returned non-JSON response. Expected payment data.');
+        console.error('❌ Non-JSON success response details:', {
+          status: paymentResponse.status,
+          url: paymentResponse.url,
+          contentType: responseContentType,
+          bodyPreview: responseText.substring(0, 300)
+        });
+        
+        throw new Error(`Server returned non-JSON response. Expected 'application/json' but got '${responseContentType}'. This might be an HTML error page or redirect.`);
       }
 
+      // Parse JSON with comprehensive error handling
       let paymentResult;
       try {
         paymentResult = await paymentResponse.json();
-        console.log('✅ Payment response parsed successfully:', paymentResult);
-      } catch (error) {
-        console.error('❌ Failed to parse payment JSON:', error);
-        throw new Error('Invalid JSON response from payment server');
+        console.log('✅ Payment JSON parsed successfully:', {
+          success: paymentResult.success,
+          hasPaymentUrl: !!paymentResult.data?.paymentUrl,
+          hasInvoiceId: !!paymentResult.data?.invoiceId,
+          fullResponse: paymentResult
+        });
+      } catch (parseError: any) {
+        console.error('❌ JSON parsing failed:', parseError);
+        
+        // Get the raw response text for debugging
+        try {
+          const responseText = await paymentResponse.text();
+          console.error('❌ Raw response that failed to parse (first 300 chars):', responseText.substring(0, 300));
+          
+          // Check if this is clearly HTML
+          if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+            throw new Error('Server returned HTML page instead of JSON. This indicates a server error or incorrect routing.');
+          }
+        } catch (textError) {
+          console.error('❌ Could not read response text:', textError);
+        }
+        
+        throw new Error(`Failed to parse payment response as JSON: ${parseError.message}`);
       }
       
       if (!paymentResult.success || !paymentResult.data?.paymentUrl) {

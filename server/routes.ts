@@ -94,6 +94,10 @@ function calculateRideEstimates(distance: number) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // *** PRIORITY: Register public payment routes FIRST to prevent conflicts ***
+  addPublicPaymentRoutes(app);
+  console.log('✅ Public payment routes registered FIRST (highest priority)');
+
   // PWA Routes - Serve Service Worker and Manifest
   app.get('/sw.js', (req, res) => {
     res.setHeader('Content-Type', 'application/javascript');
@@ -4401,9 +4405,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
-  // Register public payment routes
-  addPublicPaymentRoutes(app);
 
   const httpServer = createServer(app);
   return httpServer;
