@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car, Home } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -797,10 +797,22 @@ export default function RideRequest() {
                 } />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="first-visit" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-4 h-4 text-yellow-600" />
+                    <span>{language === 'ar' ? 'الزيارة الأولى' : 'First Visit'}</span>
+                  </div>
+                </SelectItem>
                 <SelectItem value="general-checkup" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Stethoscope className="w-4 h-4 text-blue-600" />
                     <span>{t('generalCheckUp')}</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="home-consultation" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Home className="w-4 h-4 text-green-700" />
+                    <span>{language === 'ar' ? 'استشارة منزلية' : 'Home Consultation'}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="pickup-drop" className="select-item-custom">
