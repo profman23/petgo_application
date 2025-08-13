@@ -127,6 +127,50 @@ export function PaymentTest() {
     }
   };
 
+  const createTwoSarTestPayment = async () => {
+    setIsCreating(true);
+    
+    try {
+      const response = await fetch('/api/public/payments/test-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          invoiceNumber: `TEST-2SAR-${Date.now()}`,
+          amount: '2.00',
+          customerName: 'Test Customer - 2 SAR',
+          customerEmail: 'test2sar@example.com',
+          customerPhone: '+966548336693',
+          description: 'Quick 2 SAR test payment with VetsVan redirect'
+        })
+      });
+
+      const responseData = await response.json();
+
+      if (responseData.success) {
+        toast({
+          title: "2 SAR Payment Link Created",
+          description: "Opening payment page... Complete payment to see success modal in VetsVan",
+        });
+        
+        // Open payment URL in new tab
+        window.open(responseData.data.paymentUrl, '_blank');
+      } else {
+        throw new Error(responseData.message || 'Payment creation failed');
+      }
+    } catch (error: any) {
+      console.error('2 SAR Payment creation error:', error);
+      toast({
+        title: "Error",
+        description: `Failed to create 2 SAR payment: ${error.message}`,
+        variant: "destructive"
+      });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const handleCreateTestPayment = async () => {
     if (!email || !phone) {
       toast({
@@ -273,6 +317,24 @@ export function PaymentTest() {
                 <>
                   <CreditCard className="w-4 h-4 mr-2" />
                   Create 1 SAR Test Payment (MyFatoorah)
+                </>
+              )}
+            </Button>
+            
+            <Button 
+              onClick={createTwoSarTestPayment}
+              disabled={isCreating || isMocking}
+              className="w-full bg-purple-600 hover:bg-purple-700 mb-3"
+            >
+              {isCreating ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Creating Payment...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Create 2 SAR Test Payment (MyFatoorah)
                 </>
               )}
             </Button>
