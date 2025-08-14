@@ -36,10 +36,12 @@ import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 
-// Check for expired tokens on app start (skip for admin routes)
+// Check for expired tokens on app start (skip for admin routes and payment pages)
 const checkAndClearExpiredTokens = async () => {
-  // Don't check tokens for admin routes
-  if (window.location.pathname.includes('admin')) {
+  // Don't check tokens for admin routes and payment-related pages
+  if (window.location.pathname.includes('admin') || 
+      window.location.pathname.includes('vetsvan-booking') ||
+      window.location.pathname.includes('payment')) {
     return;
   }
   
@@ -61,8 +63,10 @@ const checkAndClearExpiredTokens = async () => {
   }
 };
 
-// Run check immediately (but skip for admin routes)
-if (!window.location.pathname.includes('admin')) {
+// Run check immediately (but skip for admin routes and payment pages)
+if (!window.location.pathname.includes('admin') && 
+    !window.location.pathname.includes('vetsvan-booking') &&
+    !window.location.pathname.includes('payment')) {
   checkAndClearExpiredTokens();
 }
 
