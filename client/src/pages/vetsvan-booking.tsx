@@ -331,55 +331,9 @@ export default function VetsVanBooking() {
         }
         
         // Get real customer details from user session
-        let customerName = userSession?.user?.name || userSession?.user?.phone || 'Customer';
-        let customerEmail = userSession?.user?.email || 'test@example.com';
-        let customerPhone = userSession?.user?.phone || '+966000000000';
-        
-        // Additional debugging: Log what we actually received from the session
-        console.log('🔍 Session Debug Info:', {
-          userSession: userSession,
-          hasUser: !!userSession?.user,
-          userName: userSession?.user?.name,
-          userEmail: userSession?.user?.email,
-          userPhone: userSession?.user?.phone,
-          finalCustomerName: customerName,
-          finalCustomerEmail: customerEmail,
-          finalCustomerPhone: customerPhone
-        });
-        
-        // If session data is missing but we have a token, try to get real user data another way
-        if (customerName === 'Customer' || customerEmail === 'test@example.com') {
-          console.log('⚠️ Session data incomplete, checking if we can get real customer data...');
-          
-          // Try to fetch fresh user data directly
-          try {
-            const customerToken = localStorage.getItem('token');
-            if (customerToken) {
-              const userResponse = await fetch('/api/auth/session', {
-                headers: { 'Authorization': `Bearer ${customerToken}` }
-              });
-              
-              if (userResponse.ok) {
-                const freshUserData = await userResponse.json();
-                console.log('🔄 Fresh user data fetched:', freshUserData);
-                
-                if (freshUserData?.user) {
-                  customerName = freshUserData.user.name || freshUserData.user.phone || customerName;
-                  customerEmail = freshUserData.user.email || customerEmail;
-                  customerPhone = freshUserData.user.phone || customerPhone;
-                  
-                  console.log('✅ Updated customer details from fresh data:', {
-                    customerName,
-                    customerEmail,
-                    customerPhone: customerPhone?.substring(0, 8) + '...'
-                  });
-                }
-              }
-            }
-          } catch (error) {
-            console.error('❌ Failed to fetch fresh user data:', error);
-          }
-        }
+        const customerName = userSession?.user?.name || userSession?.user?.phone || 'Customer';
+        const customerEmail = userSession?.user?.email || 'test@example.com';
+        const customerPhone = userSession?.user?.phone || '+966000000000';
         
         console.log('Creating payment with real customer details:', {
           customerName,

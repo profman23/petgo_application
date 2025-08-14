@@ -91,11 +91,6 @@ export default function Login() {
       return response as AuthResponse;
     },
     onSuccess: (data) => {
-      console.log('✅ Login successful, storing token and user data:', {
-        token: data.token.substring(0, 10) + '...',
-        user: data.user
-      });
-      
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
@@ -111,7 +106,6 @@ export default function Login() {
         dismiss();
       }, 1000);
       
-      console.log('🏠 Redirecting to home page...');
       // Check if tutorial video should be shown
       if (shouldShowTutorialVideo()) {
         setShowTutorialVideo(true);
