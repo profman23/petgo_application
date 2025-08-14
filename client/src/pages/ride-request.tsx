@@ -112,13 +112,21 @@ export default function RideRequest() {
     refetchOnWindowFocus: false,
   });
 
-  // جلب بيانات المستخدم للدفع
-  const { data: userSession } = useQuery<{user?: {name?: string, phone?: string, email?: string}}>({
-    queryKey: ['/api/auth/session'],
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+  // جلب بيانات المستخدم من localStorage مباشرة
+  const [userSession, setUserSession] = useState<{user?: {id?: number, name?: string, phone?: string, email?: string}} | null>(null);
+  
+  useEffect(() => {
+    // Get user data from localStorage like VetsVan booking does
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setUserSession({ user: userData });
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+      }
+    }
+  }, []);
   
   // استخدام نظام GPS الحقيقي
   const {
@@ -460,26 +468,31 @@ export default function RideRequest() {
       console.log('Saving request data to localStorage:', requestData);
       localStorage.setItem('pendingRequest', JSON.stringify(requestData));
       
-      // إعداد بيانات المستخدم للدفع
-      const customerName = userSession?.user?.name || userSession?.user?.phone || 'Customer';
-      const customerEmail = userSession?.user?.email || 'test@example.com';
-      const customerPhone = userSession?.user?.phone || '+966000000000';
+      // إنشاء رابط الدفع مع البيانات الحقيقية للمستخدم
+      console.log('Creating authenticated payment link with cost:', estimatedCost);
+      const token = localStorage.getItem('token');
       
-      // إنشاء رابط الدفع
-      console.log('Creating payment link with cost:', estimatedCost);
+      if (!token) {
+        toast({
+          title: language === 'ar' ? 'خطأ في المصادقة' : 'Authentication Error',
+          description: language === 'ar' ? 'يرجى تسجيل الدخول مرة أخرى' : 'Please log in again',
+          variant: 'destructive',
+        });
+        setLocation('/login');
+        return;
+      }
+
       const response = await fetch('/api/public/payments/test-invoice', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           invoiceNumber: `RIDE-${Date.now()}`,
           amount: estimatedCost.toString(),
-          customerName,
-          customerEmail,
-          customerPhone,
           description: `VetsVan Service: ${serviceType} for ${selectedPatients.length} pet(s)`,
-          successUrl: `${window.location.origin}/vetsvan-booking?payment=success`,
+          successUrl: `${window.location.origin}/payment-success`,
           errorUrl: `${window.location.origin}/ride-request?payment=failed`
         })
       });

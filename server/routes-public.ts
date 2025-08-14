@@ -14,31 +14,67 @@ export function addPublicPaymentRoutes(app: any) {
         description 
       } = req.body;
 
-      if (!invoiceNumber || !amount || !customerName || !customerEmail || !customerPhone) {
+      if (!invoiceNumber || !amount) {
         return res.status(400).json({
           success: false,
-          message: 'Missing required fields: invoiceNumber, amount, customerName, customerEmail, customerPhone'
+          message: 'Missing required fields: invoiceNumber, amount'
         });
+      }
+
+      // Initialize customer data with provided values
+      let finalCustomerName = customerName || 'Customer';
+      let finalCustomerEmail = customerEmail || 'test@example.com';
+      let finalCustomerPhone = customerPhone || '+966000000000';
+
+      // Check if user is authenticated and override with real data
+      const authHeader = req.headers.authorization;
+      if (authHeader?.startsWith('Bearer ')) {
+        try {
+          const sessionId = authHeader.replace('Bearer ', '');
+          const sessionService = require('./sessionService').default;
+          const session = await sessionService.getSession(sessionId);
+          
+          if (session && session.userData) {
+            // Fetch complete user data from database
+            const storage = require('./storage').default;
+            const fullUser = await storage.getUser(session.userData.id);
+            
+            if (fullUser) {
+              finalCustomerName = fullUser.name || fullUser.phone || `User-${fullUser.id}`;
+              finalCustomerEmail = fullUser.email || `user${fullUser.id}@vetsvan.app`;
+              finalCustomerPhone = fullUser.phone || '+966000000000';
+              
+              console.log('🔑 Using authenticated user data for payment:', {
+                userId: fullUser.id,
+                customerName: finalCustomerName,
+                customerEmail: finalCustomerEmail?.substring(0, 8) + '...',
+                customerPhone: finalCustomerPhone?.substring(0, 8) + '...'
+              });
+            }
+          }
+        } catch (authError) {
+          console.log('⚠️ Authentication check failed, using provided customer data:', authError.message);
+        }
       }
 
       const myfatoorah = new MyFatoorahService();
       
       // Prepare payment request for MyFatoorah API
       const paymentRequest = {
-        CustomerName: customerName,
+        CustomerName: finalCustomerName,
         NotificationOption: 'EML',
         InvoiceValue: parseFloat(amount),
         DisplayCurrencyIso: 'SAR',
         MobileCountryCode: '966',
-        CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
-        CustomerEmail: customerEmail,
+        CustomerMobile: finalCustomerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
+        CustomerEmail: finalCustomerEmail,
         CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
         ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error?ref=${invoiceNumber}&source=myfatoorah`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
       };
 
-      console.log('🏦 Creating MyFatoorah TEST payment invoice:', paymentRequest);
+      console.log('🏦 Creating MyFatoorah payment invoice with customer data:', paymentRequest);
 
       const paymentResponse = await myfatoorah.createInvoice(paymentRequest);
 

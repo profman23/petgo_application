@@ -402,6 +402,164 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user session data
+  app.get('/api/auth/session', requireAuth, async (req, res) => {
+    try {
+      // Get user data from authenticated session
+      const sessionUserData = req.user;
+      const sessionData = req.session;
+      
+      // Fetch complete user data from database to get email
+      const fullUser = await storage.getUser(sessionUserData.id);
+      
+      if (!fullUser) {
+        return res.status(404).json({ message: 'المستخدم غير موجود' });
+      }
+      
+      res.json({
+        user: {
+          id: fullUser.id,
+          name: fullUser.name,
+          phone: fullUser.phone,
+          email: fullUser.email,
+          membershipType: fullUser.membershipType
+        },
+        sessionInfo: {
+          userType: sessionData.userType,
+          expiresAt: sessionData.expiresAt
+        }
+      });
+    } catch (error) {
+      console.error('Session fetch error:', error);
+      res.status(500).json({ message: 'خطأ في جلب بيانات الجلسة' });
+    }
+  });
+
+  // Get current user account data (alternative endpoint for account info)
+  app.get('/api/auth/account', requireAuth, async (req, res) => {
+    try {
+      // Get user data from authenticated session
+      const sessionUserData = req.user;
+      
+      // Fetch complete user data from database to get email
+      const fullUser = await storage.getUser(sessionUserData.id);
+      
+      if (!fullUser) {
+        return res.status(404).json({ message: 'المستخدم غير موجود' });
+      }
+      
+      res.json({
+        id: fullUser.id,
+        name: fullUser.name,
+        phone: fullUser.phone,
+        email: fullUser.email,
+        membershipType: fullUser.membershipType,
+        firstName: fullUser.firstName,
+        lastName: fullUser.lastName
+      });
+    } catch (error) {
+      console.error('Account fetch error:', error);
+      res.status(500).json({ message: 'خطأ في جلب بيانات الحساب' });
+    }
+  });
+
+  // Create authenticated payment invoice for ride requests with real customer data
+  app.post('/api/payments/ride-invoice', requireAuth, async (req: any, res) => {
+    try {
+      const { 
+        invoiceNumber, 
+        amount, 
+        description 
+      } = req.body;
+
+      if (!invoiceNumber || !amount) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required fields: invoiceNumber, amount'
+        });
+      }
+
+      // Get authenticated user data
+      const sessionUserData = req.user;
+      const fullUser = await storage.getUser(sessionUserData.id);
+      
+      if (!fullUser) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      // Use real customer data from database
+      const customerName = fullUser.name || fullUser.phone || `User-${fullUser.id}`;
+      const customerEmail = fullUser.email || `user${fullUser.id}@vetsvan.app`; // Fallback if no email
+      const customerPhone = fullUser.phone || '+966000000000';
+
+      console.log('🏦 Creating authenticated ride payment with real customer data:', {
+        customerId: fullUser.id,
+        customerName,
+        customerEmail: customerEmail?.substring(0, 8) + '...',
+        customerPhone: customerPhone?.substring(0, 8) + '...',
+        amount: parseFloat(amount),
+        invoiceNumber
+      });
+
+      const myfatoorah = new MyFatoorahService();
+      
+      // Prepare payment request for MyFatoorah API
+      const paymentRequest = {
+        CustomerName: customerName,
+        NotificationOption: 'EML',
+        InvoiceValue: parseFloat(amount),
+        DisplayCurrencyIso: 'SAR',
+        MobileCountryCode: '966',
+        CustomerMobile: customerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
+        CustomerEmail: customerEmail,
+        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
+        ErrorUrl: `${req.protocol}://${req.get('host')}/ride-request?payment=failed`,
+        Language: 'En' as const,
+        CustomerReference: invoiceNumber
+      };
+
+      console.log('🏦 Creating MyFatoorah ride payment invoice with real data:', paymentRequest);
+
+      const paymentResponse = await myfatoorah.createInvoice(paymentRequest);
+
+      if (paymentResponse.IsSuccess && paymentResponse.Data) {
+        console.log('✅ Authenticated ride payment created successfully:', paymentResponse.Data);
+        console.log('🔗 Payment URL being sent:', paymentResponse.Data.InvoiceURL);
+
+        const responseData = {
+          success: true,
+          data: {
+            paymentUrl: paymentResponse.Data.InvoiceURL,
+            invoiceId: paymentResponse.Data.InvoiceId,
+            invoiceReference: paymentResponse.Data.CustomerReference,
+            message: 'Ride payment invoice created successfully with real customer data'
+          }
+        };
+
+        console.log('📤 Final API Response:', JSON.stringify(responseData, null, 2));
+        res.json(responseData);
+      } else {
+        console.error('❌ MyFatoorah ride payment creation failed:', paymentResponse);
+        res.status(400).json({
+          success: false,
+          message: 'Failed to create payment invoice',
+          error: paymentResponse.ValidationErrors || paymentResponse.Message
+        });
+      }
+
+    } catch (error: any) {
+      console.error('❌ Authenticated ride payment creation error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error during payment creation',
+        error: error.message
+      });
+    }
+  });
+
   app.post('/api/auth/logout', requireAuth, async (req, res) => {
     const sessionId = req.headers.authorization?.replace('Bearer ', '');
     await sessionService.deleteSession(sessionId);
