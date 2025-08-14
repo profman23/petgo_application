@@ -70,6 +70,29 @@ export default function VetsVanBooking() {
   // Ride request data from localStorage
   const [rideRequestData, setRideRequestData] = useState<RideRequestData | null>(null);
 
+  // Check if coming from successful payment
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentReference, setPaymentReference] = useState<string | null>(null);
+  const [paymentId, setPaymentId] = useState<string | null>(null);
+
+  // Parse URL parameters on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const payment = urlParams.get('payment');
+    const ref = urlParams.get('ref');
+    const paymentIdParam = urlParams.get('paymentId') || urlParams.get('Id');
+    
+    if (payment === 'success' && ref && paymentIdParam) {
+      console.log('🎉 Payment successful! Ready to finalize booking:', {
+        reference: ref,
+        paymentId: paymentIdParam
+      });
+      setPaymentSuccess(true);
+      setPaymentReference(ref);
+      setPaymentId(paymentIdParam);
+    }
+  }, []);
+
   // Fetch user session data for real customer details
   const { data: userSession } = useQuery<{user?: {name?: string, phone?: string, email?: string}}>({
     queryKey: ['/api/auth/session'],
@@ -313,14 +336,38 @@ export default function VetsVanBooking() {
     }
   });
 
-  // Handle confirmation dialog actions - PAYMENT FIRST APPROACH
+  // Handle confirmation dialog actions - PAYMENT FIRST APPROACH CORRECTED
   const handleConfirmBooking = async () => {
     if (pendingBooking) {
       setIsBooking(true);
       setShowConfirmDialog(false);
       
       try {
-        // Get estimated cost from ride request data
+        // CHECK 1: If payment is already successful (coming from MyFatoorah redirect), finalize booking
+        if (paymentSuccess && paymentReference && paymentId) {
+          console.log('✅ Payment already completed, finalizing booking with payment:', {
+            reference: paymentReference,
+            paymentId: paymentId,
+            vetsVanCode: pendingBooking.vetsVanCode,
+            timeSlot: pendingBooking.timeSlot
+          });
+          
+          // Directly finalize the booking using existing mutation
+          bookingMutation.mutate({
+            vetsVanId: pendingBooking.vetsVanId,
+            timeSlot: pendingBooking.timeSlot
+          });
+          
+          // Clear URL parameters to prevent confusion
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setPaymentSuccess(false);
+          setPaymentReference(null);
+          setPaymentId(null);
+          
+          return; // Exit here - booking finalization handled by mutation
+        }
+        
+        // CHECK 2: If no payment yet, create payment first (original flow)
         const petCount = rideRequestData?.selectedPatients?.length || 1;
         const serviceType = rideRequestData?.serviceType || 'General Check Up';
         
@@ -335,7 +382,7 @@ export default function VetsVanBooking() {
         const customerEmail = userSession?.user?.email || 'test@example.com';
         const customerPhone = userSession?.user?.phone || '+966000000000';
         
-        console.log('Creating payment with real customer details:', {
+        console.log('💳 No payment detected, creating payment with real customer details:', {
           customerName,
           customerEmail,
           customerPhone: customerPhone?.substring(0, 8) + '...',
@@ -392,10 +439,10 @@ export default function VetsVanBooking() {
         }
         
       } catch (error: any) {
-        console.error('Payment creation failed:', error);
+        console.error('Booking confirmation failed:', error);
         toast({
-          title: "Payment Failed",
-          description: error.message || "Failed to create payment. Please try again.",
+          title: "Booking Failed",
+          description: error.message || "Failed to process booking. Please try again.",
           variant: "destructive",
         });
       } finally {
@@ -567,6 +614,28 @@ export default function VetsVanBooking() {
   return (
     <div className="min-h-screen bg-gray-50 py-8" dir="ltr">
       <div className="max-w-7xl mx-auto px-4">
+        
+        {/* Payment Success Banner */}
+        {paymentSuccess && paymentReference && paymentId && (
+          <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-green-800">Payment Successful!</h3>
+                <p className="text-sm text-green-700">
+                  Payment Reference: <span className="font-mono">{paymentReference}</span> | Payment ID: <span className="font-mono">{paymentId}</span>
+                </p>
+                <p className="text-sm text-green-600 mt-1">
+                  Select your preferred time slot below and click "Confirm Booking" to complete your appointment.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Header */}
         <div className="mb-6">
