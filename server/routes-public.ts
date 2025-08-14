@@ -1,5 +1,7 @@
 // Public payment test endpoint without authentication
 import { MyFatoorahService } from './services/myfatoorah';
+import { sessionService } from './sessionService';
+import { storage } from './storage';
 
 export function addPublicPaymentRoutes(app: any) {
   // Public test payment creation (no auth required)
@@ -28,33 +30,59 @@ export function addPublicPaymentRoutes(app: any) {
 
       // Check if user is authenticated and override with real data
       const authHeader = req.headers.authorization;
+      console.log('🔍 Payment Auth Check:', {
+        hasAuthHeader: !!authHeader,
+        authPrefix: authHeader?.substring(0, 20) + '...',
+        providedCustomerName: customerName,
+        providedCustomerEmail: customerEmail
+      });
+      
       if (authHeader?.startsWith('Bearer ')) {
         try {
           const sessionId = authHeader.replace('Bearer ', '');
-          const sessionService = require('./sessionService').default;
+          console.log('🔍 Checking session:', sessionId?.substring(0, 20) + '...');
+          
           const session = await sessionService.getSession(sessionId);
+          
+          console.log('🔍 Session result:', {
+            hasSession: !!session,
+            hasUserData: !!session?.userData,
+            userId: session?.userData?.id
+          });
           
           if (session && session.userData) {
             // Fetch complete user data from database
-            const storage = require('./storage').default;
             const fullUser = await storage.getUser(session.userData.id);
+            
+            console.log('🔍 Full user data:', {
+              hasFullUser: !!fullUser,
+              userName: fullUser?.name,
+              userEmail: fullUser?.email,
+              userPhone: fullUser?.phone
+            });
             
             if (fullUser) {
               finalCustomerName = fullUser.name || fullUser.phone || `User-${fullUser.id}`;
               finalCustomerEmail = fullUser.email || `user${fullUser.id}@vetsvan.app`;
               finalCustomerPhone = fullUser.phone || '+966000000000';
               
-              console.log('🔑 Using authenticated user data for payment:', {
+              console.log('🔑 SUCCESS: Using authenticated user data for payment:', {
                 userId: fullUser.id,
                 customerName: finalCustomerName,
                 customerEmail: finalCustomerEmail?.substring(0, 8) + '...',
                 customerPhone: finalCustomerPhone?.substring(0, 8) + '...'
               });
+            } else {
+              console.log('❌ No user found in database for ID:', session.userData.id);
             }
+          } else {
+            console.log('❌ No valid session or userData found');
           }
         } catch (authError) {
           console.log('⚠️ Authentication check failed, using provided customer data:', authError.message);
         }
+      } else {
+        console.log('ℹ️ No Bearer token found, using provided customer data');
       }
 
       const myfatoorah = new MyFatoorahService();
