@@ -352,11 +352,19 @@ export default function VetsVanBooking() {
             timeSlot: pendingBooking.timeSlot
           });
           
-          // Directly finalize the booking using existing mutation
-          bookingMutation.mutate({
+          // Add payment information to local booking data for reference
+          const bookingWithPayment = {
             vetsVanId: pendingBooking.vetsVanId,
-            timeSlot: pendingBooking.timeSlot
-          });
+            timeSlot: pendingBooking.timeSlot,
+            vetsVanCode: pendingBooking.vetsVanCode,
+            paymentReference: paymentReference,
+            paymentId: paymentId
+          };
+          
+          console.log('🎯 Creating booking with payment data:', bookingWithPayment);
+          
+          // Directly finalize the booking using existing mutation
+          createBookingMutation.mutate(bookingWithPayment);
           
           // Clear URL parameters to prevent confusion
           window.history.replaceState({}, document.title, window.location.pathname);
