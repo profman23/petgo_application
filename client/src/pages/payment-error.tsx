@@ -129,11 +129,11 @@ export function PaymentError() {
               'You can try again with the same amount'}
           </div>
           
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-3">
             <Button 
               onClick={handleTryAgain}
               disabled={isRetrying}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 min-w-[200px] flex items-center justify-center gap-2"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 flex items-center justify-center gap-2"
             >
               {isRetrying ? (
                 <>
@@ -149,6 +149,18 @@ export function PaymentError() {
                   {language === 'ar' ? 'حاول مرة أخرى' : 'Try Again'}
                 </span>
               )}
+            </Button>
+            
+            <Button 
+              onClick={() => navigate('/ride-request')}
+              variant="outline"
+              className="border-purple-600 text-purple-600 hover:bg-purple-50 px-6 py-3"
+            >
+              <span style={{
+                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+              }}>
+                {language === 'ar' ? 'الرجوع إلى طلب العيادة المتنقلة' : 'Back to Ride Request'}
+              </span>
             </Button>
           </div>
         </CardContent>
