@@ -47,17 +47,19 @@ const checkAndClearExpiredTokens = async () => {
   if (!token) return;
   
   try {
-    const response = await fetch('/api/rides/active', {
+    const response = await fetch('/api/auth/session', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
     if (response.status === 401) {
+      console.log('🔑 Token expired or invalid, clearing and redirecting to login');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
   } catch (error) {
     // Network error, ignore
+    console.log('⚠️ Network error during token validation:', error);
   }
 };
 
