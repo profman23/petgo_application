@@ -122,8 +122,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
       }
       
-      // Check password with bcrypt
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      // Check password - handle both plain text (legacy) and bcrypt hashed passwords
+      let isPasswordValid = false;
+      
+      if (user.password.startsWith('$2b$') || user.password.startsWith('$2a$')) {
+        // Bcrypt hashed password
+        isPasswordValid = await bcrypt.compare(password, user.password);
+      } else {
+        // Plain text password (legacy) - direct comparison
+        isPasswordValid = (password === user.password);
+      }
       
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
