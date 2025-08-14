@@ -96,8 +96,8 @@ export function addPublicPaymentRoutes(app: any) {
         MobileCountryCode: '966',
         CustomerMobile: finalCustomerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
         CustomerEmail: finalCustomerEmail,
-        CallBackUrl: `${req.protocol}://${req.get('host')}/payment-success?ref=${invoiceNumber}&source=myfatoorah`,
-        ErrorUrl: `${req.protocol}://${req.get('host')}/payment-error?ref=${invoiceNumber}&source=myfatoorah`,
+        CallBackUrl: `${req.protocol}://${req.get('host')}/vetsvan-booking?payment=success&ref=${invoiceNumber}&source=myfatoorah`,
+        ErrorUrl: `${req.protocol}://${req.get('host')}/ride-request?payment=failed&ref=${invoiceNumber}&source=myfatoorah`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
       };
