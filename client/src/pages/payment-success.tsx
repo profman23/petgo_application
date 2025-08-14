@@ -21,12 +21,14 @@ export function PaymentSuccess() {
     const transactionId = urlParams.get('transactionId');
     const invoiceId = urlParams.get('invoiceId');
     const ref = urlParams.get('ref');
+    const isBooking = urlParams.get('booking') === 'true'; // Check if this is a VetsVan booking payment
     
     console.log('Payment success callback received:', {
       paymentId,
       transactionId,
       invoiceId,
       ref,
+      isBooking,
       fullUrl: window.location.href
     });
 
@@ -34,8 +36,13 @@ export function PaymentSuccess() {
     const paymentRef = paymentId || transactionId || invoiceId || ref || 'test-payment';
     const source = urlParams.get('source');
     
+    // Handle VetsVan booking after successful payment
+    if (isBooking && source === 'myfatoorah') {
+      console.log('🎯 VetsVan booking payment success detected! Creating booking...');
+      createVetsVanBooking(paymentRef);
+    }
     // Show modal immediately if coming from MyFatoorah
-    if (source === 'myfatoorah') {
+    else if (source === 'myfatoorah') {
       console.log('🎯 Payment success from MyFatoorah detected!');
       setPaymentData({
         success: true,
@@ -65,6 +72,141 @@ export function PaymentSuccess() {
       setTimeout(() => setShowModal(true), 500);
     }
   }, []);
+
+  // Create VetsVan booking after successful payment
+  const createVetsVanBooking = async (paymentRef: string) => {
+    try {
+      // Get stored booking details
+      const storedBookingDetails = localStorage.getItem('pendingBookingDetails');
+      if (!storedBookingDetails) {
+        throw new Error('No booking details found');
+      }
+
+      const bookingDetails = JSON.parse(storedBookingDetails);
+      console.log('Creating VetsVan booking with details:', bookingDetails);
+
+      // Get authentication token
+      const customerToken = localStorage.getItem('customer-token') || localStorage.getItem('authToken');
+      if (!customerToken) {
+        throw new Error('Authentication required');
+      }
+
+      // First, get the shifts to find the correct shiftId
+      const shiftsResponse = await fetch('/api/vetsvan/shifts', {
+        headers: {
+          'Authorization': `Bearer ${customerToken}`,
+        }
+      });
+      
+      if (!shiftsResponse.ok) {
+        throw new Error('Failed to fetch shifts');
+      }
+      
+      const shifts = await shiftsResponse.json();
+      
+      // Find the shift for this VetsVan and date
+      const shift = shifts.find((s: any) => 
+        s.vetsVanId === bookingDetails.vetsVanId && 
+        s.date === bookingDetails.selectedDate
+      );
+      
+      if (!shift) {
+        throw new Error('No shift found for selected date and VetsVan');
+      }
+
+      // Create the booking
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${customerToken}`,
+        },
+        body: JSON.stringify({
+          shiftId: shift.id,
+          vetsVanId: bookingDetails.vetsVanId,
+          appointmentDate: bookingDetails.selectedDate,
+          appointmentTime: convertTo24Hour(bookingDetails.timeSlot),
+          customerLocation: bookingDetails.rideRequestData ? {
+            latitude: bookingDetails.rideRequestData.pickupLatitude,
+            longitude: bookingDetails.rideRequestData.pickupLongitude,
+            address: bookingDetails.rideRequestData.location || null
+          } : null,
+          selectedPets: bookingDetails.rideRequestData?.selectedPatients || [],
+          serviceType: bookingDetails.serviceType || 'general_checkup',
+          paymentReference: paymentRef,
+          amount: bookingDetails.estimatedCost
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to create booking');
+      }
+
+      const bookingResult = await response.json();
+      console.log('✅ VetsVan booking created successfully:', bookingResult);
+
+      // Clear stored booking details
+      localStorage.removeItem('pendingBookingDetails');
+
+      // Set success data with booking information
+      setPaymentData({
+        success: true,
+        message: 'Payment completed and booking confirmed!',
+        amount: `${bookingDetails.estimatedCost}.00 SAR`,
+        transactionId: paymentRef,
+        paymentMethod: 'MyFatoorah',
+        booking: bookingResult.booking
+      });
+      setLoading(false);
+      setShowModal(true);
+
+      // Clean URL parameters
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+
+      // Show success toast
+      toast({
+        title: "Booking Confirmed!",
+        description: `Your appointment has been booked for ${bookingDetails.timeSlot} on ${bookingDetails.selectedDate}`,
+      });
+
+    } catch (error: any) {
+      console.error('Failed to create VetsVan booking:', error);
+      
+      // Still show payment success but with booking error
+      setPaymentData({
+        success: true,
+        message: 'Payment completed but booking failed. Please contact support.',
+        amount: '1.00 SAR',
+        transactionId: paymentRef,
+        paymentMethod: 'MyFatoorah',
+        error: error.message
+      });
+      setLoading(false);
+      setShowModal(true);
+
+      toast({
+        title: "Booking Error",
+        description: error.message || "Payment successful but booking failed. Please contact support.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Helper function to convert 12-hour to 24-hour time
+  const convertTo24Hour = (time12: string): string => {
+    const [time, period] = time12.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+    
+    if (period === 'PM' && hours !== 12) {
+      hours += 12;
+    } else if (period === 'AM' && hours === 12) {
+      hours = 0;
+    }
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  };
 
   const verifyPayment = async (paymentId: string) => {
     try {

@@ -70,6 +70,14 @@ export default function VetsVanBooking() {
   // Ride request data from localStorage
   const [rideRequestData, setRideRequestData] = useState<RideRequestData | null>(null);
 
+  // Fetch user session data for real customer details
+  const { data: userSession } = useQuery<{user?: {name?: string, phone?: string, email?: string}}>({
+    queryKey: ['/api/auth/session'],
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   // Note: Past time slots are automatically styled with faded colors and disabled from booking
   // while still showing their original status (Available/Booked) for auditing purposes
 
@@ -305,25 +313,95 @@ export default function VetsVanBooking() {
     }
   });
 
-  // Handle confirmation dialog actions
-  const handleConfirmBooking = () => {
+  // Handle confirmation dialog actions - PAYMENT FIRST APPROACH
+  const handleConfirmBooking = async () => {
     if (pendingBooking) {
       setIsBooking(true);
       setShowConfirmDialog(false);
       
-      // Add to locally booked slots immediately for visual feedback
-      const slotKey = `${pendingBooking.vetsVanId}-${pendingBooking.timeSlot}`;
-      setLocallyBookedSlots(prev => {
-        const newSet = new Set(prev);
-        newSet.add(slotKey);
-        return newSet;
-      });
-      
-      // Create booking for the selected time slot
-      createBookingMutation.mutate(pendingBooking);
-      
-      // Clear pending booking
-      setPendingBooking(null);
+      try {
+        // Get estimated cost from ride request data
+        const petCount = rideRequestData?.selectedPatients?.length || 1;
+        const serviceType = rideRequestData?.serviceType || 'General Check Up';
+        
+        // Calculate estimated cost (1 SAR per pet for Test Service)
+        let estimatedCost = 1; // Default for Test Service
+        if (serviceType === 'Test Service') {
+          estimatedCost = petCount * 1; // 1 SAR per pet
+        }
+        
+        // Get real customer details from user session
+        const customerName = userSession?.user?.name || userSession?.user?.phone || 'Customer';
+        const customerEmail = userSession?.user?.email || 'test@example.com';
+        const customerPhone = userSession?.user?.phone || '+966000000000';
+        
+        console.log('Creating payment with real customer details:', {
+          customerName,
+          customerEmail,
+          customerPhone: customerPhone?.substring(0, 8) + '...',
+          amount: estimatedCost,
+          serviceType,
+          petCount
+        });
+        
+        // Store booking details for after payment success
+        const bookingDetails = {
+          ...pendingBooking,
+          estimatedCost,
+          customerName,
+          customerEmail,
+          customerPhone,
+          serviceType,
+          selectedDate,
+          rideRequestData
+        };
+        localStorage.setItem('pendingBookingDetails', JSON.stringify(bookingDetails));
+        
+        // Create payment with real customer details
+        const response = await fetch('/api/public/payments/test-invoice', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            invoiceNumber: `VETSVAN-${Date.now()}`,
+            amount: estimatedCost.toString(),
+            customerName,
+            customerEmail,
+            customerPhone,
+            description: `VetsVan Booking: ${serviceType} for ${petCount} pet(s) - ${pendingBooking.vetsVanCode}`,
+            successUrl: `${window.location.origin}/payment-success?booking=true`,
+            errorUrl: `${window.location.origin}/payment-error`
+          })
+        });
+
+        const responseData = await response.json();
+
+        if (responseData.success && responseData.data?.paymentUrl) {
+          console.log('Payment link created successfully, redirecting to MyFatoorah...');
+          
+          toast({
+            title: "Redirecting to Payment",
+            description: "Please complete payment to confirm your booking.",
+          });
+          
+          // Redirect to MyFatoorah payment page
+          window.location.href = responseData.data.paymentUrl;
+        } else {
+          throw new Error(responseData.message || 'Failed to create payment link');
+        }
+        
+      } catch (error: any) {
+        console.error('Payment creation failed:', error);
+        toast({
+          title: "Payment Failed",
+          description: error.message || "Failed to create payment. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsBooking(false);
+        setPendingBooking(null);
+      }
     }
   };
 
