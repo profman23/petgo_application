@@ -129,7 +129,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
       }
       
-      const userData = { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType };
+      const userData = { id: user.id, phone: user.phone, name: user.name, email: user.email, membershipType: user.membershipType };
+      console.log('📝 Creating session with userData including email:', {
+        userId: userData.id,
+        userName: userData.name,
+        userEmail: userData.email,
+        userPhone: userData.phone
+      });
       const sessionId = await sessionService.createSession(user.id, 'customer', userData, 24);
       
       res.json({ 
@@ -391,6 +397,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Registration error:', error);
       const userLanguage = req.body.preferredLanguage || 'ar';
       res.status(500).json({ message: getErrorMessage('serverError', userLanguage) });
+    }
+  });
+
+  // Session endpoint to get current user data
+  app.get('/api/auth/session', requireAuth, async (req, res) => {
+    try {
+      // Get user data from the session that was set by requireAuth middleware
+      const userData = req.user;
+      const sessionData = req.session;
+      
+      console.log('Session endpoint called:', {
+        userId: userData?.id,
+        userName: userData?.name,
+        userEmail: userData?.email,
+        userPhone: userData?.phone,
+        membershipType: userData?.membershipType
+      });
+      
+      // If email is missing from session, fetch it from database
+      let userEmail = userData?.email;
+      if (!userEmail && userData?.id) {
+        try {
+          const fullUser = await storage.getUser(userData.id);
+          userEmail = fullUser?.email;
+          console.log('✅ Fetched email from database:', userEmail);
+        } catch (error) {
+          console.error('❌ Failed to fetch user email from database:', error);
+        }
+      }
+      
+      res.json({
+        user: {
+          id: userData.id,
+          name: userData.name,
+          email: userEmail,
+          phone: userData.phone,
+          membershipType: userData.membershipType
+        },
+        sessionValid: true
+      });
+    } catch (error) {
+      console.error('Session endpoint error:', error);
+      res.status(500).json({ message: 'Failed to get session data' });
     }
   });
 
