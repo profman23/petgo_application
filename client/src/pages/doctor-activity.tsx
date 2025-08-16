@@ -54,6 +54,7 @@ export default function DoctorActivity() {
 
   // State for tracking notifications
   const [audioEnabled, setAudioEnabled] = useState(audioNotification.isAudioEnabled());
+  const [audioUnlocked, setAudioUnlocked] = useState(audioNotification.getUnlockStatus());
   const previousBookingCount = useRef<number>(0);
 
   // Fetch VetsVan location information
@@ -224,6 +225,27 @@ export default function DoctorActivity() {
           });
         } catch (error) {
           console.warn('Audio notification failed:', error);
+          
+          // Show user-friendly notification about audio permission
+          if (error.message?.includes('Audio blocked') || error.message?.includes('Audio permission required')) {
+            toast({
+              title: language === 'ar' ? '🔔 طلب جديد!' : '🔔 New Booking!',
+              description: language === 'ar' 
+                ? 'تم إضافة موعد جديد. انقر في أي مكان لتفعيل الصوت للإشعارات القادمة'
+                : 'A new appointment was added. Click anywhere to enable sound for future notifications',
+              variant: 'default',
+              duration: 6000,
+            });
+          } else {
+            // Still show the booking notification even if sound fails
+            toast({
+              title: language === 'ar' ? '🔔 طلب جديد!' : '🔔 New Booking!',
+              description: language === 'ar' 
+                ? 'تم إضافة موعد جديد إلى جدولك'
+                : 'A new appointment has been added to your schedule',
+              variant: 'default',
+            });
+          }
         }
       };
       
@@ -256,6 +278,32 @@ export default function DoctorActivity() {
       testAudioNotification();
     }
   };
+
+  // Audio unlock function
+  const unlockAudio = async () => {
+    const unlocked = await audioNotification.requestAudioUnlock();
+    setAudioUnlocked(unlocked);
+    if (unlocked) {
+      toast({
+        title: language === 'ar' ? '🔓 تم تفعيل الصوت' : '🔓 Sound Enabled',
+        description: language === 'ar' ? 'ستحصل على إشعارات صوتية للمواعيد الجديدة' : 'You will receive sound notifications for new appointments',
+        variant: 'default',
+      });
+    }
+  };
+
+  // Check audio unlock status on page load
+  useEffect(() => {
+    const checkAudioStatus = () => {
+      setAudioUnlocked(audioNotification.getUnlockStatus());
+    };
+    
+    checkAudioStatus();
+    
+    // Check periodically in case audio gets unlocked elsewhere
+    const interval = setInterval(checkAudioStatus, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Handle booking click to show map
   const handleBookingClick = (booking: Booking) => {
@@ -405,6 +453,38 @@ export default function DoctorActivity() {
           </Button>
         </div>
       </header>
+
+      {/* Audio Unlock Banner */}
+      {audioEnabled && !audioUnlocked && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mx-4 mt-4 rounded-r-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Volume2 className="w-5 h-5 text-yellow-600 mr-3" />
+              <div>
+                <p className="text-sm font-medium text-yellow-800" style={{ textAlign }}>
+                  {language === 'ar' 
+                    ? 'انقر لتفعيل الصوت'
+                    : 'Click to enable sound'
+                  }
+                </p>
+                <p className="text-xs text-yellow-700" style={{ textAlign }}>
+                  {language === 'ar'
+                    ? 'ستتلقى إشعارات صوتية للمواعيد الجديدة'
+                    : 'You will receive sound notifications for new appointments'
+                  }
+                </p>
+              </div>
+            </div>
+            <Button
+              onClick={unlockAudio}
+              size="sm"
+              className="bg-yellow-600 hover:bg-yellow-700 text-white"
+            >
+              {language === 'ar' ? 'تفعيل' : 'Enable'}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="p-4">
         {/* Doctor Info Card */}
