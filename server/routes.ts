@@ -2212,14 +2212,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const allBookings = await storage.getAllBookings();
       
+      console.log('🔍 DEBUG Doctor Bookings API Called:', {
+        timestamp: new Date().toISOString(),
+        doctorId: user.id,
+        vetsVanId: vetsVanId,
+        allBookingsCount: allBookings.length,
+        recentBookingIds: allBookings.map(b => ({ id: b.id, vetsVanId: b.vetsVanId })).slice(-5)
+      });
+      
       // Filter bookings for this specific VetsVan - show ALL bookings regardless of status
       const vetsVanBookings = allBookings.filter(booking => 
         booking.vetsVanId === vetsVanId
       );
       
+      console.log('🔍 DEBUG Filtered Bookings Result:', {
+        vetsVanBookingsCount: vetsVanBookings.length,
+        bookingIds: vetsVanBookings.map(b => ({ id: b.id, userId: b.userId, status: b.status, createdAt: b.createdAt }))
+      });
+      
+      // Sort bookings by creation date (newest first)
+      const sortedBookings = vetsVanBookings.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
       // Get user details and payment information for each booking
       const bookingsWithUserDetails = await Promise.all(
-        vetsVanBookings.map(async (booking) => {
+        sortedBookings.map(async (booking) => {
           const customer = await storage.getUser(booking.userId);
           
           // Get payment information from MyFatoorah transactions
@@ -2240,6 +2258,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         })
       );
+      
+      console.log('🔍 Final Response - First 3 bookings:', bookingsWithUserDetails.slice(0, 3).map(b => ({ id: b.id, paymentAmount: b.paymentAmount, paymentCurrency: b.paymentCurrency })));
+      
+      // Add cache-busting headers
+      res.set({
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       
       res.json(bookingsWithUserDetails);
     } catch (error) {

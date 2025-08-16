@@ -63,10 +63,20 @@ export default function DoctorActivity() {
     retry: false,
   });
 
+  // Invalidate cache on mount
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['/api/doctor/bookings'] });
+  }, [queryClient]);
+
   // Fetch bookings for the current doctor's VetsVan
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['/api/doctor/bookings'],
-    refetchInterval: 5000, // Refresh every 5 seconds
+    queryFn: () => apiRequest('/api/doctor/bookings'),
+    refetchInterval: 3000,
+    staleTime: 0,
+    gcTime: 0, // Updated from cacheTime to gcTime for React Query v5
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: 'always',
   });
 
   // Mutation to update booking status
