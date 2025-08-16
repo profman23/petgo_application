@@ -1,9 +1,16 @@
 // Public payment test endpoint without authentication
+import { sql } from 'drizzle-orm';
 import { MyFatoorahService } from './services/myfatoorah';
 import { sessionService } from './sessionService';
 import { storage } from './storage';
+import { db } from './db';
 
 export function addPublicPaymentRoutes(app: any) {
+  // Simple test endpoint
+  app.get('/api/public/test', (req: any, res: any) => {
+    res.json({ status: 'Public routes working', timestamp: new Date() });
+  });
+
   // Public test payment creation (no auth required)
   app.post('/api/public/payments/test-invoice', async (req: any, res: any) => {
     try {
@@ -96,7 +103,7 @@ export function addPublicPaymentRoutes(app: any) {
         MobileCountryCode: '966',
         CustomerMobile: finalCustomerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
         CustomerEmail: finalCustomerEmail,
-        CallBackUrl: `${req.protocol}://${req.get('host')}/vetsvan-booking?payment=success&ref=${invoiceNumber}&source=myfatoorah`,
+        CallBackUrl: `${req.protocol}://${req.get('host')}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
         ErrorUrl: `${req.protocol}://${req.get('host')}/ride-request?payment=failed&ref=${invoiceNumber}&source=myfatoorah`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
@@ -136,6 +143,124 @@ export function addPublicPaymentRoutes(app: any) {
       res.status(500).json({
         success: false,
         message: 'Internal server error during payment creation',
+        error: error.message
+      });
+    }
+  });
+
+  // MyFatoorah payment callback handler
+  app.get('/api/public/myfatoorah/callback', async (req: any, res: any) => {
+    try {
+      const { paymentId, Id, ref } = req.query;
+      const actualPaymentId = paymentId || Id;
+      
+      console.log('🎉 MyFatoorah payment callback received:', {
+        paymentId: actualPaymentId,
+        reference: ref,
+        allParams: req.query
+      });
+
+      if (actualPaymentId && ref) {
+        // Store payment success info and redirect to booking page
+        const redirectUrl = `/vetsvan-booking?payment=success&ref=${ref}&paymentId=${actualPaymentId}&source=myfatoorah`;
+        console.log('🔄 Redirecting to booking page with payment info:', redirectUrl);
+        return res.redirect(redirectUrl);
+      } else {
+        console.log('❌ Missing payment parameters, redirecting to booking page without payment info');
+        return res.redirect('/vetsvan-booking?payment=failed');
+      }
+    } catch (error: any) {
+      console.error('❌ MyFatoorah callback error:', error);
+      res.redirect('/vetsvan-booking?payment=error');
+    }
+  });
+
+  // MyFatoorah webhook handler for payment notifications
+  app.post('/api/public/myfatoorah/webhook', async (req: any, res: any) => {
+    try {
+      console.log('🔔 MyFatoorah webhook received:', req.body);
+      
+      const { InvoiceId, PaymentId, InvoiceValue, InvoiceStatus, CustomerReference } = req.body;
+      
+      if (InvoiceStatus === 'Paid' && PaymentId && InvoiceValue && CustomerReference) {
+        console.log('💰 Payment confirmed via webhook:', {
+          invoiceId: InvoiceId,
+          paymentId: PaymentId,
+          amount: InvoiceValue,
+          reference: CustomerReference
+        });
+        
+        // TODO: Create payment transaction record here
+        // This will be useful for future integrations
+      }
+      
+      res.status(200).json({ success: true });
+    } catch (error: any) {
+      console.error('❌ MyFatoorah webhook error:', error);
+      res.status(500).json({ error: 'Webhook processing failed' });
+    }
+  });
+
+  // Manual payment linking endpoint for testing (admin only)
+  app.post('/api/public/link-payment-to-booking', async (req: any, res: any) => {
+    try {
+      const { bookingId, amount, paymentId, reference } = req.body;
+      
+      if (!bookingId || !amount) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required fields: bookingId, amount'
+        });
+      }
+
+      console.log('🔗 Manually linking payment to booking:', {
+        bookingId,
+        amount,
+        paymentId,
+        reference
+      });
+
+      // Get booking details
+      const allBookings = await storage.getAllBookings();
+      const booking = allBookings.find(b => b.id === parseInt(bookingId));
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: 'Booking not found'
+        });
+      }
+
+      // Get user details
+      const user = await storage.getUser(booking.userId);
+
+      // Create payment transaction record using raw SQL (to match existing database structure)
+      await db.execute(sql`
+        INSERT INTO payment_transactions (
+          booking_id, myfatoorah_payment_id, amount, currency, status, 
+          reference_id, customer_name, customer_email, customer_phone,
+          paid_at, created_at, updated_at
+        ) VALUES (
+          ${booking.id}, ${paymentId || `MANUAL-${Date.now()}`}, ${parseFloat(amount)}, 'SAR', 'paid',
+          ${reference || `REF-${bookingId}`}, ${user?.name || 'Customer'}, 
+          ${user?.email || 'customer@vetsvan.app'}, ${user?.phone || '+966000000000'},
+          ${new Date()}, ${new Date()}, ${new Date()}
+        )
+      `);
+
+      console.log('✅ Payment successfully linked to booking:', bookingId);
+
+      res.json({
+        success: true,
+        message: 'Payment linked successfully',
+        bookingId,
+        amount
+      });
+
+    } catch (error: any) {
+      console.error('❌ Payment linking error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to link payment',
         error: error.message
       });
     }
