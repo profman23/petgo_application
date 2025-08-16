@@ -1869,7 +1869,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Book an appointment
   app.post('/api/bookings', requireAuth, async (req: any, res) => {
     try {
-      const { shiftId, vetsVanId, appointmentDate, appointmentTime, customerLocation, selectedPets, serviceType } = req.body;
+      const { 
+        shiftId, 
+        vetsVanId, 
+        appointmentDate, 
+        appointmentTime, 
+        customerLocation, 
+        selectedPets, 
+        serviceType,
+        paymentReference,
+        paymentId
+      } = req.body;
       const userId = req.user.id;
       
       console.log('📍 Creating booking with request body:', req.body);
@@ -1879,6 +1889,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🐾 Selected pets type:', typeof selectedPets);
       console.log('🐾 Selected pets length:', selectedPets?.length);
       console.log('🏥 Service type received:', serviceType);
+      console.log('💳 Payment info received:', { paymentReference, paymentId });
 
       // Check if this specific time slot is already booked
       const existingBookings = await storage.getShiftBookings(shiftId);
@@ -1904,6 +1915,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedPets: selectedPets || [],
         serviceType: serviceType || 'General Check Up'
       });
+
+      // If payment information is provided, create payment transaction record
+      if (paymentReference && paymentId && booking) {
+        try {
+          console.log('💳 Creating payment transaction record for booking:', booking.id);
+          
+          // Get user details for payment record
+          const user = await storage.getUser(userId);
+          
+          // Calculate amount based on service type and pets
+          const petCount = selectedPets?.length || 1;
+          let amount = 1; // Default for Test Service
+          if (serviceType === 'Test Service') {
+            amount = petCount * 1; // 1 SAR per pet
+          }
+          
+          // Create payment transaction record
+          await storage.createPaymentTransaction({
+            bookingId: booking.id,
+            amount: amount,
+            currency: 'SAR',
+            status: 'paid',
+            myfatoorahPaymentId: paymentId,
+            myfatoorahInvoiceId: paymentReference,
+            customerName: user?.name || 'Customer',
+            customerEmail: user?.email || 'customer@vetsvan.app',
+            customerPhone: user?.phone || '+966000000000',
+            paidAt: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+          
+          console.log('✅ Payment transaction record created successfully for booking:', booking.id);
+        } catch (paymentError) {
+          console.error('❌ Failed to create payment transaction record:', paymentError);
+          // Don't fail the booking creation if payment record fails
+        }
+      }
 
       // Get user details for the notification
       const user = await storage.getUser(userId);

@@ -251,7 +251,19 @@ export default function VetsVanBooking() {
 
   // Create booking mutation
   const createBookingMutation = useMutation({
-    mutationFn: async ({ vetsVanId, timeSlot, vetsVanCode }: { vetsVanId: number; timeSlot: string; vetsVanCode: string }) => {
+    mutationFn: async ({ 
+      vetsVanId, 
+      timeSlot, 
+      vetsVanCode, 
+      paymentReference = null, 
+      paymentId = null 
+    }: { 
+      vetsVanId: number; 
+      timeSlot: string; 
+      vetsVanCode: string;
+      paymentReference?: string | null; 
+      paymentId?: string | null; 
+    }) => {
       const customerToken = localStorage.getItem('token');
       
       if (!customerToken) {
@@ -298,7 +310,9 @@ export default function VetsVanBooking() {
           } : null,
           selectedPets: rideRequestData?.selectedPatients ? 
             patients.filter(p => rideRequestData.selectedPatients.includes(p.id)) : [],
-          serviceType: rideRequestData?.serviceType || 'general_checkup'
+          serviceType: rideRequestData?.serviceType || 'general_checkup',
+          paymentReference: paymentReference,
+          paymentId: paymentId
         }),
       });
 
