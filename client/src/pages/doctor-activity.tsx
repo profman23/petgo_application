@@ -26,6 +26,9 @@ interface Booking {
   customerName: string;
   customerPhone: string;
   createdAt: string;
+  paymentAmount?: string | null;
+  paymentCurrency?: string;
+  paymentStatus?: string | null;
   customerLocation?: {
     latitude: number;
     longitude: number;
@@ -532,7 +535,14 @@ export default function DoctorActivity() {
                         {formatTime(booking.appointmentTime)}
                       </span>
                     </div>
-                    {getStatusBadge(booking.status)}
+                    <div className="flex flex-col items-end gap-1">
+                      {getStatusBadge(booking.status)}
+                      {booking.paymentAmount && (
+                        <div className="text-sm font-medium text-green-600" style={{ textAlign }}>
+                          {language === 'ar' ? 'المبلغ:' : 'Payment:'} {booking.paymentAmount} {booking.paymentCurrency || 'SAR'}
+                        </div>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="space-y-2">

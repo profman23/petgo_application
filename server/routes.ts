@@ -2168,10 +2168,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         booking.vetsVanId === vetsVanId
       );
       
-      // Get user details for each booking
+      // Get user details and payment information for each booking
       const bookingsWithUserDetails = await Promise.all(
         vetsVanBookings.map(async (booking) => {
           const customer = await storage.getUser(booking.userId);
+          
+          // Get payment information from MyFatoorah transactions
+          const paymentTransaction = await storage.getPaymentTransactionByBooking(booking.id);
+          
           return {
             ...booking,
             customerName: customer?.name || 'غير معروف',
@@ -2180,7 +2184,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               latitude: booking.customerLocation.latitude,
               longitude: booking.customerLocation.longitude,
               address: booking.customerLocation.address || null
-            } : null
+            } : null,
+            paymentAmount: paymentTransaction?.amount || null,
+            paymentCurrency: paymentTransaction?.currency || 'SAR',
+            paymentStatus: paymentTransaction?.status || null
           };
         })
       );
