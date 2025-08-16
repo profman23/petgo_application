@@ -436,21 +436,31 @@ export default function DoctorActivity() {
               {language === 'ar' ? 'النشاط' : 'Activity'}
             </h1>
           </div>
-          <Button
-            variant="ghost"
-            onClick={toggleAudio}
-            className={`p-2 rounded-full ${audioEnabled ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}
-            title={language === 'ar' 
-              ? (audioEnabled ? 'إيقاف الإشعارات الصوتية' : 'تفعيل الإشعارات الصوتية')
-              : (audioEnabled ? 'Disable audio notifications' : 'Enable audio notifications')
-            }
-          >
-            {audioEnabled ? (
-              <Volume2 className="w-5 h-5" />
-            ) : (
-              <VolumeX className="w-5 h-5" />
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => testAudioNotification()}
+              className="text-purple-600 hover:bg-purple-50"
+            >
+              {language === 'ar' ? 'اختبار الصوت' : 'Test Sound'}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={toggleAudio}
+              className={`p-2 rounded-full ${audioEnabled ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-50'}`}
+              title={language === 'ar' 
+                ? (audioEnabled ? 'إيقاف الإشعارات الصوتية' : 'تفعيل الإشعارات الصوتية')
+                : (audioEnabled ? 'Disable audio notifications' : 'Enable audio notifications')
+              }
+            >
+              {audioEnabled ? (
+                <Volume2 className="w-5 h-5" />
+              ) : (
+                <VolumeX className="w-5 h-5" />
+              )}
+            </Button>
+          </div>
         </div>
       </header>
 
