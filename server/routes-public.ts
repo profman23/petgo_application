@@ -11,6 +11,76 @@ export function addPublicPaymentRoutes(app: any) {
     res.json({ status: 'Public routes working', timestamp: new Date() });
   });
 
+  // Backfill payment amounts from MyFatoorah for existing transactions
+  app.post('/api/public/payments/backfill-amounts', async (req: any, res: any) => {
+    try {
+      console.log('🔧 Starting payment amount backfill process...');
+      
+      // Get all payment transactions with payment IDs but potentially incorrect amounts
+      const result = await db.execute(sql`
+        SELECT id, myfatoorah_payment_id, amount, status, created_at 
+        FROM payment_transactions 
+        WHERE myfatoorah_payment_id IS NOT NULL 
+        AND status = 'paid'
+        ORDER BY created_at DESC 
+        LIMIT 20
+      `);
+      
+      const transactions = result.rows;
+      console.log(`📊 Found ${transactions.length} transactions to process`);
+      
+      const myFatoorahService = new MyFatoorahService();
+      let successCount = 0;
+      let errorCount = 0;
+      
+      for (const transaction of transactions) {
+        try {
+          console.log(`🔍 Processing payment ID: ${transaction.myfatoorah_payment_id}`);
+          
+          const paymentDetails = await myFatoorahService.getPaymentDetailsFromCallback(
+            transaction.myfatoorah_payment_id
+          );
+          
+          if (paymentDetails.amount > 0 && paymentDetails.amount !== transaction.amount) {
+            await db.execute(sql`
+              UPDATE payment_transactions 
+              SET amount = ${paymentDetails.amount}, 
+                  currency = ${paymentDetails.currency || 'SAR'},
+                  updated_at = ${new Date()}
+              WHERE id = ${transaction.id}
+            `);
+            
+            console.log(`✅ Updated transaction ${transaction.id}: ${transaction.amount} → ${paymentDetails.amount} SAR`);
+            successCount++;
+          } else {
+            console.log(`⏭️ Skipping transaction ${transaction.id}: amount already correct or unavailable`);
+          }
+          
+          // Small delay to avoid overwhelming the API
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+          console.error(`❌ Failed to update transaction ${transaction.id}:`, error);
+          errorCount++;
+        }
+      }
+      
+      res.json({
+        success: true,
+        message: `Backfill completed: ${successCount} updated, ${errorCount} errors`,
+        processed: transactions.length,
+        updated: successCount,
+        errors: errorCount
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Payment backfill error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
   // Public test payment creation (no auth required)
   app.post('/api/public/payments/test-invoice', async (req: any, res: any) => {
     try {
@@ -161,6 +231,32 @@ export function addPublicPaymentRoutes(app: any) {
       });
 
       if (actualPaymentId && ref) {
+        // Fetch actual payment details from MyFatoorah
+        try {
+          const myFatoorahService = new MyFatoorahService();
+          const paymentDetails = await myFatoorahService.getPaymentDetailsFromCallback(actualPaymentId);
+          
+          console.log('💰 Fetched actual payment details:', paymentDetails);
+
+          // Update existing payment transaction with correct amount
+          if (paymentDetails.amount > 0) {
+            await db.execute(sql`
+              UPDATE payment_transactions 
+              SET amount = ${paymentDetails.amount}, 
+                  currency = ${paymentDetails.currency},
+                  status = ${paymentDetails.status},
+                  paid_at = ${paymentDetails.paidAt},
+                  updated_at = ${new Date()}
+              WHERE myfatoorah_payment_id = ${actualPaymentId}
+              OR reference_id = ${ref}
+            `);
+            
+            console.log('✅ Payment transaction updated with actual amount:', paymentDetails.amount);
+          }
+        } catch (fetchError) {
+          console.error('❌ Failed to fetch payment details:', fetchError);
+        }
+
         // Store payment success info and redirect to booking page
         const redirectUrl = `/vetsvan-booking?payment=success&ref=${ref}&paymentId=${actualPaymentId}&source=myfatoorah`;
         console.log('🔄 Redirecting to booking page with payment info:', redirectUrl);
@@ -190,8 +286,22 @@ export function addPublicPaymentRoutes(app: any) {
           reference: CustomerReference
         });
         
-        // TODO: Create payment transaction record here
-        // This will be useful for future integrations
+        // Update existing payment transaction with correct amount
+        try {
+          await db.execute(sql`
+            UPDATE payment_transactions 
+            SET amount = ${parseFloat(InvoiceValue)}, 
+                status = 'paid',
+                paid_at = ${new Date()},
+                updated_at = ${new Date()}
+            WHERE myfatoorah_payment_id = ${PaymentId}
+            OR reference_id = ${CustomerReference}
+          `);
+          
+          console.log('✅ Payment transaction updated with actual amount:', InvoiceValue);
+        } catch (updateError) {
+          console.error('❌ Failed to update payment transaction:', updateError);
+        }
       }
       
       res.status(200).json({ success: true });

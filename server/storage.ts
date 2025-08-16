@@ -1165,12 +1165,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPaymentTransactionByBooking(bookingId: number): Promise<any> {
-    // Use raw SQL to query the actual payment_transactions table structure
+    // Link payment transactions to bookings via payment_id in bookings table
     const result = await db.execute(sql`
-      SELECT amount, currency, status, myfatoorah_payment_id, paid_at
-      FROM payment_transactions 
-      WHERE booking_id = ${bookingId} 
-      ORDER BY created_at DESC 
+      SELECT 
+        pt.amount, 
+        pt.currency, 
+        pt.status, 
+        pt.myfatoorah_payment_id, 
+        pt.paid_at
+      FROM payment_transactions pt
+      INNER JOIN bookings b ON b.payment_id = pt.myfatoorah_payment_id
+      WHERE b.id = ${bookingId} 
+      ORDER BY pt.created_at DESC 
       LIMIT 1
     `);
     

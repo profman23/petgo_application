@@ -124,17 +124,53 @@ export class MyFatoorahService {
       console.log('🔔 Processing MyFatoorah webhook:', webhookData);
       
       // Extract payment information from webhook
-      const { InvoiceId, InvoiceStatus, InvoiceValue } = webhookData;
+      const { InvoiceId, InvoiceStatus, InvoiceValue, PaymentId } = webhookData;
       
       return {
         invoiceId: InvoiceId,
+        paymentId: PaymentId,
         status: InvoiceStatus,
-        amount: InvoiceValue,
+        amount: parseFloat(InvoiceValue) || 0,
         isPaid: InvoiceStatus === 'Paid'
       };
     } catch (error: any) {
       console.error('❌ Webhook processing failed:', error);
       throw new Error(`Webhook processing failed: ${error.message}`);
+    }
+  }
+
+  async getPaymentDetailsFromCallback(paymentId: string): Promise<any> {
+    try {
+      console.log('🔍 Fetching payment details from MyFatoorah for payment ID:', paymentId);
+
+      const response = await axios.post(
+        `${this.baseURL}/v2/getPaymentStatus`,
+        { Key: paymentId, KeyType: 'PaymentId' },
+        { headers: this.getHeaders() }
+      );
+
+      console.log('✅ Payment details retrieved:', response.data);
+      
+      const paymentData = response.data.Data;
+      return {
+        paymentId: paymentData.InvoiceTransactions[0]?.PaymentId || paymentId,
+        invoiceId: paymentData.InvoiceId,
+        amount: parseFloat(paymentData.InvoiceValue) || 0,
+        currency: paymentData.InvoiceDisplayValue?.split(' ')[1] || 'SAR',
+        status: paymentData.InvoiceStatus === 'Paid' ? 'paid' : 'pending',
+        customerReference: paymentData.CustomerReference,
+        paidAt: paymentData.InvoiceTransactions[0]?.TransactionDate ? new Date(paymentData.InvoiceTransactions[0].TransactionDate) : new Date()
+      };
+    } catch (error: any) {
+      console.error('❌ Failed to fetch payment details:', error.response?.data || error.message);
+      // Return default structure if API call fails
+      return {
+        paymentId: paymentId,
+        amount: 0,
+        currency: 'SAR',
+        status: 'unknown',
+        paidAt: new Date()
+      };
     }
   }
 }
