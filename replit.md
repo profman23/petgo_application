@@ -3,6 +3,9 @@
 ## Overview
 This is a full-stack ride hailing application, transformed into a comprehensive veterinary clinic service app. It enables users to request mobile veterinary services, track their status, and manage appointments. The system offers real-time updates for both customers and veterinary professionals, facilitating seamless service delivery and management. Key capabilities include phone-based authentication, real-time GPS tracking of Vets Vans, multi-language support (Arabic/English), and an integrated invoicing and payment system. The project's vision is to provide convenient, accessible, and high-quality mobile veterinary care.
 
+## Recent Changes (August 16, 2025)
+**🎉 DOCTOR DASHBOARD PAYMENT DISPLAY FEATURE COMPLETE**: Successfully implemented payment amount display in Doctor Dashboard booking cards. Each booking now shows real MyFatoorah payment amounts below the status badge in green text (e.g., "Payment: 150 SAR" or "المبلغ: 150 ريال سعودي"). Enhanced API to fetch payment transaction data and updated frontend booking interface to include payment fields. System automatically displays authentic payment amounts from completed transactions and handles cases where no payment exists. Feature supports both Arabic and English localization with proper text alignment.
+
 ## Recent Changes (August 14, 2025)
 **🎉 VETSVAN BOOKING PAYMENT-FIRST FLOW FIXED**: Resolved critical issue where "Confirm Booking" button incorrectly triggered new payment instead of finalizing booking with existing payment data. Modified VetsVan booking page to detect successful payment from URL parameters (payment=success&ref=xxx&paymentId=xxx) and automatically finalize booking without additional payment process. Updated payment callback URL to redirect directly to VetsVan booking page after successful payment. Added visual payment success banner and corrected booking confirmation logic to complete payment-first workflow as intended.
 
