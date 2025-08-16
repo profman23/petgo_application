@@ -1141,9 +1141,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Payment Transaction operations for MyFatoorah
-  async createPaymentTransaction(transaction: InsertPaymentTransaction): Promise<SelectPaymentTransaction> {
-    const [newTransaction] = await db.insert(paymentTransactions).values(transaction).returning();
-    return newTransaction;
+  async createPaymentTransaction(transaction: any): Promise<any> {
+    // Use raw SQL to handle database column mismatch
+    const [newTransaction] = await db.execute(sql`
+      INSERT INTO payment_transactions (
+        booking_id, myfatoorah_payment_id, myfatoorah_invoice_id, amount, currency, status, 
+        customer_name, customer_email, customer_phone, paid_at, created_at, updated_at
+      ) VALUES (
+        ${transaction.bookingId}, ${transaction.myfatoorahPaymentId || transaction.paymentId}, 
+        ${transaction.myfatoorahInvoiceId || transaction.invoiceReference}, 
+        ${transaction.amount}, ${transaction.currency || 'SAR'}, ${transaction.status || 'paid'},
+        ${transaction.customerName}, ${transaction.customerEmail}, ${transaction.customerPhone},
+        ${transaction.paidAt || new Date()}, ${transaction.createdAt || new Date()}, 
+        ${transaction.updatedAt || new Date()}
+      ) RETURNING *
+    `);
+    return newTransaction.rows[0];
   }
 
   async getPaymentTransaction(id: number): Promise<SelectPaymentTransaction | undefined> {
