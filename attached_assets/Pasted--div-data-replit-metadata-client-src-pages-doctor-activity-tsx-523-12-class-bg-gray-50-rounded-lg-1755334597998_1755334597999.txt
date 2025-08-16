@@ -1,0 +1,46 @@
+<div data-replit-metadata="client/src/pages/doctor-activity.tsx:523:12" class="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer hover:bg-blue-50 w-full overflow-hidden">
+  <div class="flex items-start justify-between mb-3">
+    <div class="flex items-center gap-2">
+      <!-- Icon -->
+      <span class="font-semibold text-purple-600">8:00 PM</span>
+    </div>
+    <div class="inline-flex ... bg-blue-100 text-blue-800">Under Review</div>
+  </div>
+
+  <div class="space-y-2">
+    <div class="flex items-center gap-2">
+      <!-- User icon -->
+      <span class="text-sm text-gray-700" style="text-align: left;">oqab salem</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <!-- Phone icon -->
+      <span class="text-sm text-gray-700" style="text-align: left;">0543373021</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <!-- Map pin icon -->
+      <span class="text-xs text-gray-500" style="text-align: left;">Booked at: 7/15/2025, 7:12:06 PM</span>
+    </div>
+  </div>
+
+  <div class="mt-3 pt-3 border-t border-gray-200">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-sm font-medium text-gray-700" style="text-align: left;">Booking Status:</span>
+      <button class="... w-48">
+        <span>Under Review</span>
+        <!-- chevron -->
+      </button>
+    </div>
+
+    <div class="flex flex-wrap justify-end gap-2 w-full">
+      <button class="... bg-green-100 ...">
+        <!-- map pin --> <span class="hidden sm:inline">Customer Location</span><span class="sm:hidden">Location</span>
+      </button>
+      <button class="... bg-blue-100 ...">
+        <!-- truck --> <span class="hidden sm:inline">Send Tracking</span><span class="sm:hidden">Track</span>
+      </button>
+      <button class="... bg-purple-600 text-white ...">
+        <!-- user --> <span class="hidden sm:inline">Open Record</span><span class="sm:hidden">Record</span>
+      </button>
+    </div>
+  </div>
+</div>
