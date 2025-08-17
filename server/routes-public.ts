@@ -472,6 +472,44 @@ export function addPublicPaymentRoutes(app: any) {
               )
             `);
             console.log('✅ Payment transaction stored with customer data:', { customerName, customerEmail, customerPhone });
+          } else {
+            // Payment transaction already exists, check if it has placeholder data and update with real customer data
+            const existingRecord = existingPayment.rows[0] as any;
+            const shouldUpdate = existingRecord && (
+              (existingRecord.customer_name === 'Payment Verified' || 
+               existingRecord.customer_email === 'verified@payment.com' ||
+               existingRecord.customer_phone === '+966000000000')
+            );
+            
+            if (shouldUpdate) {
+              // Use MyFatoorah customer data as the authoritative source for this payment
+              const mfCustomerName = paymentDetails.customerName || 'Customer';
+              const mfCustomerEmail = paymentDetails.customerEmail || 'customer@payment.com';
+              const mfCustomerPhone = paymentDetails.customerMobile ? 
+                '+966' + paymentDetails.customerMobile.replace(/^966/, '') : '+966000000000';
+              
+              console.log('🔧 Updating existing payment transaction with MyFatoorah customer data:', {
+                paymentId,
+                mfCustomerName,
+                mfCustomerEmail: mfCustomerEmail.substring(0, 10) + '...',
+                mfCustomerPhone: mfCustomerPhone.substring(0, 8) + '...'
+              });
+              
+              await db.execute(sql`
+                UPDATE payment_transactions 
+                SET customer_name = ${mfCustomerName},
+                    customer_email = ${mfCustomerEmail},
+                    customer_phone = ${mfCustomerPhone},
+                    updated_at = ${new Date()}
+                WHERE myfatoorah_payment_id = ${paymentId}
+                AND (customer_name = 'Payment Verified' OR 
+                     customer_email = 'verified@payment.com' OR 
+                     customer_phone = '+966000000000')
+              `);
+              console.log('✅ Updated existing payment transaction with authentic MyFatoorah customer data');
+            } else {
+              console.log('ℹ️ Existing payment transaction already has real customer data, skipping update');
+            }
           }
         } catch (storeError) {
           console.log('⚠️ Payment storage failed, but proceeding with display:', storeError);
