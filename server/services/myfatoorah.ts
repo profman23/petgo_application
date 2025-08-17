@@ -159,7 +159,11 @@ export class MyFatoorahService {
         currency: paymentData.InvoiceDisplayValue?.split(' ')[1] || 'SAR',
         status: paymentData.InvoiceStatus === 'Paid' ? 'paid' : 'pending',
         customerReference: paymentData.CustomerReference,
-        paidAt: paymentData.InvoiceTransactions[0]?.TransactionDate ? new Date(paymentData.InvoiceTransactions[0].TransactionDate) : new Date()
+        paidAt: paymentData.InvoiceTransactions[0]?.TransactionDate ? new Date(paymentData.InvoiceTransactions[0].TransactionDate) : new Date(),
+        // Include customer data directly from the response
+        customerName: paymentData.CustomerName,
+        customerEmail: paymentData.CustomerEmail,
+        customerMobile: paymentData.CustomerMobile
       };
     } catch (error: any) {
       console.error('❌ Failed to fetch payment details:', error.response?.data || error.message);
@@ -171,6 +175,24 @@ export class MyFatoorahService {
         status: 'unknown',
         paidAt: new Date()
       };
+    }
+  }
+
+  async getInvoiceDetails(invoiceId: number): Promise<any> {
+    try {
+      console.log('🔍 Fetching invoice details from MyFatoorah for invoice ID:', invoiceId);
+
+      const response = await axios.post(
+        `${this.baseURL}/v2/getPaymentStatus`,
+        { Key: invoiceId, KeyType: 'InvoiceId' },
+        { headers: this.getHeaders() }
+      );
+
+      console.log('✅ Invoice details retrieved:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Failed to fetch invoice details:', error.response?.data || error.message);
+      return null;
     }
   }
 }

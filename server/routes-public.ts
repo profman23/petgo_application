@@ -275,20 +275,46 @@ export function addPublicPaymentRoutes(app: any) {
           
           console.log('💰 Fetched actual payment details:', paymentDetails);
 
-          // Update existing payment transaction with correct amount
+          // Update existing payment transaction with correct amount AND customer data
           if (paymentDetails.amount > 0) {
+            // Fetch full invoice details to get customer data
+            const fullInvoiceDetails = await myFatoorahService.getInvoiceDetails(paymentDetails.invoiceId);
+            
+            // Extract customer data from invoice
+            let customerName = 'Payment Customer';
+            let customerEmail = 'payment@callback.com';
+            let customerPhone = '+966000000000';
+            
+            if (fullInvoiceDetails?.Data) {
+              customerName = fullInvoiceDetails.Data.CustomerName || 'Payment Customer';
+              customerEmail = fullInvoiceDetails.Data.CustomerEmail || 'payment@callback.com';
+              customerPhone = fullInvoiceDetails.Data.CustomerMobile ? 
+                '+966' + fullInvoiceDetails.Data.CustomerMobile.replace(/^966/, '') : '+966000000000';
+            }
+            
+            console.log('🔄 CALLBACK - Updating payment transaction with authentic customer data:', {
+              paymentId: actualPaymentId,
+              amount: paymentDetails.amount,
+              customerName,
+              customerEmail: customerEmail?.substring(0, 15) + '...',
+              customerPhone: customerPhone?.substring(0, 8) + '...'
+            });
+
             await db.execute(sql`
               UPDATE payment_transactions 
               SET amount = ${paymentDetails.amount}, 
                   currency = ${paymentDetails.currency},
                   status = ${paymentDetails.status},
                   paid_at = ${paymentDetails.paidAt},
+                  customer_name = ${customerName},
+                  customer_email = ${customerEmail},
+                  customer_phone = ${customerPhone},
                   updated_at = ${new Date()}
               WHERE myfatoorah_payment_id = ${actualPaymentId}
               OR reference_id = ${ref}
             `);
             
-            console.log('✅ Payment transaction updated with actual amount:', paymentDetails.amount);
+            console.log('✅ Payment transaction updated with amount AND customer data from callback');
           }
         } catch (fetchError) {
           console.error('❌ Failed to fetch payment details:', fetchError);
@@ -323,19 +349,48 @@ export function addPublicPaymentRoutes(app: any) {
           reference: CustomerReference
         });
         
-        // Update existing payment transaction with correct amount
+        // Update existing payment transaction with correct amount AND customer data
         try {
+          const myFatoorahService = new MyFatoorahService();
+          
+          // Fetch full invoice details to get customer data
+          const fullInvoiceDetails = await myFatoorahService.getInvoiceDetails(InvoiceId);
+          
+          // Extract customer data from invoice
+          let customerName = 'Webhook Customer';
+          let customerEmail = 'payment@webhook.com';
+          let customerPhone = '+966000000000';
+          
+          if (fullInvoiceDetails?.Data) {
+            customerName = fullInvoiceDetails.Data.CustomerName || 'Webhook Customer';
+            customerEmail = fullInvoiceDetails.Data.CustomerEmail || 'payment@webhook.com';
+            customerPhone = fullInvoiceDetails.Data.CustomerMobile ? 
+              '+966' + fullInvoiceDetails.Data.CustomerMobile.replace(/^966/, '') : '+966000000000';
+          }
+          
+          console.log('🔔 WEBHOOK - Updating payment transaction with authentic customer data:', {
+            paymentId: PaymentId,
+            invoiceId: InvoiceId,
+            amount: InvoiceValue,
+            customerName,
+            customerEmail: customerEmail?.substring(0, 15) + '...',
+            customerPhone: customerPhone?.substring(0, 8) + '...'
+          });
+
           await db.execute(sql`
             UPDATE payment_transactions 
             SET amount = ${parseFloat(InvoiceValue)}, 
                 status = 'paid',
                 paid_at = ${new Date()},
+                customer_name = ${customerName},
+                customer_email = ${customerEmail},
+                customer_phone = ${customerPhone},
                 updated_at = ${new Date()}
             WHERE myfatoorah_payment_id = ${PaymentId}
             OR reference_id = ${CustomerReference}
           `);
           
-          console.log('✅ Payment transaction updated with actual amount:', InvoiceValue);
+          console.log('✅ Payment transaction updated with amount AND customer data from webhook');
         } catch (updateError) {
           console.error('❌ Failed to update payment transaction:', updateError);
         }
@@ -384,6 +439,8 @@ export function addPublicPaymentRoutes(app: any) {
           const paymentDetails = await myFatoorahService.getPaymentDetailsFromCallback(
             transaction.myfatoorah_payment_id
           );
+          
+          console.log(`🔍 Payment details for transaction ${transaction.id}:`, paymentDetails);
           
           if (paymentDetails && paymentDetails.customerName) {
             const mfCustomerName = paymentDetails.customerName || 'MyFatoorah Customer';
