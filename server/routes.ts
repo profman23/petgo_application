@@ -1927,16 +1927,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const existingPayment = await storage.getPaymentTransactionByPaymentId(paymentId);
           
           if (existingPayment) {
-            // Update existing payment transaction to link it to the booking
+            // Get user details for payment record
+            const user = await storage.getUser(userId);
+            
+            // Update existing payment transaction to link it to the booking AND update customer data
             await db.execute(sql`
               UPDATE payment_transactions 
               SET booking_id = ${booking.id},
+                  customer_name = CASE 
+                    WHEN customer_name IS NULL OR customer_name IN ('Customer', 'Payment Verified', 'Test Customer') 
+                    THEN ${user?.name || 'Customer'}
+                    ELSE customer_name 
+                  END,
+                  customer_phone = CASE 
+                    WHEN customer_phone IS NULL OR customer_phone IN ('+966000000000', '0000000000') 
+                    THEN ${user?.phone || '+966000000000'}
+                    ELSE customer_phone 
+                  END,
+                  customer_email = CASE 
+                    WHEN customer_email IS NULL OR customer_email IN ('customer@vetsvan.app', 'verified@payment.com', 'test@example.com') 
+                    THEN ${user?.email || 'customer@vetsvan.app'}
+                    ELSE customer_email 
+                  END,
                   updated_at = ${new Date()}
               WHERE myfatoorah_payment_id = ${paymentId}
-              AND booking_id IS NULL
             `);
             
-            console.log('✅ Existing payment transaction linked to booking:', booking.id);
+            console.log('✅ Payment transaction linked to booking with real customer data:', {
+              bookingId: booking.id,
+              customerName: user?.name,
+              customerPhone: user?.phone,
+              customerEmail: user?.email
+            });
+            
+            // Verification log: Check what was actually saved in database
+            const verifyPayment = await db.execute(sql`
+              SELECT customer_name, customer_phone, customer_email 
+              FROM payment_transactions 
+              WHERE myfatoorah_payment_id = ${paymentId}
+            `);
+            console.log('🔍 Database verification - Real customer data persisted:', verifyPayment.rows[0]);
           } else {
             console.log('⚠️ No existing payment transaction found for payment ID:', paymentId);
             // Don't create a new payment - this should have been created already

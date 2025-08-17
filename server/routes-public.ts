@@ -403,7 +403,33 @@ export function addPublicPaymentRoutes(app: any) {
           `);
 
           if (existingPayment.rows.length === 0) {
-            // Create new payment transaction record
+            // Try to get authenticated user data first
+            let customerName = 'Payment Verified';
+            let customerEmail = 'verified@payment.com';
+            let customerPhone = '+966000000000';
+            
+            const authHeader = req.headers.authorization;
+            if (authHeader?.startsWith('Bearer ')) {
+              try {
+                const sessionId = authHeader.replace('Bearer ', '');
+                const session = await sessionService.getSession(sessionId);
+                if (session && session.userData) {
+                  const fullUser = await storage.getUser(session.userData.id);
+                  if (fullUser) {
+                    customerName = fullUser.name || 'Customer';
+                    customerEmail = fullUser.email || 'customer@vetsvan.app';
+                    customerPhone = fullUser.phone || '+966000000000';
+                    console.log('🔍 Using authenticated user data for payment transaction:', {
+                      customerName, customerEmail, customerPhone
+                    });
+                  }
+                }
+              } catch (authError) {
+                console.log('⚠️ Could not fetch user data, using fallback values');
+              }
+            }
+            
+            // Create new payment transaction record with real customer data
             await db.execute(sql`
               INSERT INTO payment_transactions (
                 myfatoorah_payment_id, myfatoorah_invoice_id, amount, currency, status,
@@ -411,12 +437,12 @@ export function addPublicPaymentRoutes(app: any) {
                 reference_id
               ) VALUES (
                 ${paymentId}, ${paymentDetails.invoiceId}, ${paymentDetails.amount}, 
-                ${paymentDetails.currency}, ${paymentDetails.status}, 'Payment Verified', 
-                'verified@payment.com', '+966000000000', ${paymentDetails.paidAt || new Date()}, 
+                ${paymentDetails.currency}, ${paymentDetails.status}, ${customerName}, 
+                ${customerEmail}, ${customerPhone}, ${paymentDetails.paidAt || new Date()}, 
                 ${new Date()}, ${new Date()}, ${paymentDetails.customerReference || ''}
               )
             `);
-            console.log('✅ Payment transaction stored for immediate display');
+            console.log('✅ Payment transaction stored with customer data:', { customerName, customerEmail, customerPhone });
           }
         } catch (storeError) {
           console.log('⚠️ Payment storage failed, but proceeding with display:', storeError);
