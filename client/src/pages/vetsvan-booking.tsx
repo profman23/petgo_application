@@ -103,7 +103,24 @@ export default function VetsVanBooking() {
     try {
       console.log('🔍 Fetching payment details for:', paymentId);
       
-      const response = await fetch(`/api/public/payment-details/${paymentId}`);
+      // Get authentication token from localStorage
+      const token = localStorage.getItem('authToken');
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authentication header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        console.log('🔑 Including authentication token for payment details fetch');
+      } else {
+        console.log('⚠️ No authentication token found for payment details fetch');
+      }
+      
+      const response = await fetch(`/api/public/payment-details/${paymentId}`, {
+        method: 'GET',
+        headers
+      });
       const data = await response.json();
       
       if (data.success && data.payment) {

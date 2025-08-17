@@ -1967,6 +1967,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
               WHERE myfatoorah_payment_id = ${paymentId}
             `);
             console.log('🔍 Database verification - Real customer data persisted:', verifyPayment.rows[0]);
+            
+            // Also update any other payment transactions with the same payment ID that might have placeholder data
+            await db.execute(sql`
+              UPDATE payment_transactions 
+              SET customer_name = CASE 
+                    WHEN customer_name IS NULL OR customer_name IN ('Customer', 'Payment Verified', 'Test Customer') 
+                    THEN ${user?.name || 'Customer'}
+                    ELSE customer_name 
+                  END,
+                  customer_phone = CASE 
+                    WHEN customer_phone IS NULL OR customer_phone IN ('+966000000000', '0000000000') 
+                    THEN ${user?.phone || '+966000000000'}
+                    ELSE customer_phone 
+                  END,
+                  customer_email = CASE 
+                    WHEN customer_email IS NULL OR customer_email IN ('customer@vetsvan.app', 'verified@payment.com', 'test@example.com') 
+                    THEN ${user?.email || 'customer@vetsvan.app'}
+                    ELSE customer_email 
+                  END,
+                  updated_at = ${new Date()}
+              WHERE myfatoorah_payment_id = ${paymentId}
+              AND booking_id IS NULL
+            `);
+            console.log('🔧 Backfilled any remaining placeholder data for payment ID:', paymentId);
           } else {
             console.log('⚠️ No existing payment transaction found for payment ID:', paymentId);
             // Don't create a new payment - this should have been created already

@@ -409,24 +409,53 @@ export function addPublicPaymentRoutes(app: any) {
             let customerPhone = '+966000000000';
             
             const authHeader = req.headers.authorization;
+            console.log('🔍 Payment details - Auth header check:', {
+              hasAuthHeader: !!authHeader,
+              authHeaderPrefix: authHeader?.substring(0, 20) + '...'
+            });
+            
             if (authHeader?.startsWith('Bearer ')) {
               try {
                 const sessionId = authHeader.replace('Bearer ', '');
+                console.log('🔍 Payment details - Checking session:', sessionId?.substring(0, 20) + '...');
+                
                 const session = await sessionService.getSession(sessionId);
+                console.log('🔍 Payment details - Session result:', {
+                  hasSession: !!session,
+                  hasUserData: !!session?.userData,
+                  userId: session?.userData?.id
+                });
+                
                 if (session && session.userData) {
                   const fullUser = await storage.getUser(session.userData.id);
+                  console.log('🔍 Payment details - User lookup result:', {
+                    hasFullUser: !!fullUser,
+                    userName: fullUser?.name,
+                    userEmail: fullUser?.email?.substring(0, 10) + '...',
+                    userPhone: fullUser?.phone?.substring(0, 8) + '...'
+                  });
+                  
                   if (fullUser) {
                     customerName = fullUser.name || 'Customer';
                     customerEmail = fullUser.email || 'customer@vetsvan.app';
                     customerPhone = fullUser.phone || '+966000000000';
-                    console.log('🔍 Using authenticated user data for payment transaction:', {
-                      customerName, customerEmail, customerPhone
+                    console.log('✅ SUCCESS: Using authenticated user data for payment transaction:', {
+                      userId: fullUser.id,
+                      customerName,
+                      customerEmail: customerEmail.substring(0, 10) + '...',
+                      customerPhone: customerPhone.substring(0, 8) + '...'
                     });
+                  } else {
+                    console.log('❌ No user found in database for session userId:', session.userData.id);
                   }
+                } else {
+                  console.log('❌ No valid session found for token');
                 }
               } catch (authError) {
-                console.log('⚠️ Could not fetch user data, using fallback values');
+                console.log('⚠️ Authentication error in payment details:', authError);
               }
+            } else {
+              console.log('⚠️ No Bearer token found in payment details request');
             }
             
             // Create new payment transaction record with real customer data
