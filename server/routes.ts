@@ -13,6 +13,8 @@ import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
 import { addPublicPaymentRoutes } from "./routes-public";
+import { db } from "./db";
+import { sql } from "drizzle-orm";
 // Payment service removed per user request
 
 async function requireAuth(req: any, res: any, next: any) {
@@ -1916,41 +1918,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         serviceType: serviceType || 'General Check Up'
       });
 
-      // If payment information is provided, create payment transaction record
+      // If payment information is provided, link existing payment transaction to booking
       if (paymentReference && paymentId && booking) {
         try {
-          console.log('💳 Creating payment transaction record for booking:', booking.id);
+          console.log('💳 Linking existing payment transaction to booking:', booking.id);
           
-          // Get user details for payment record
-          const user = await storage.getUser(userId);
+          // Check if payment transaction already exists for this payment ID
+          const existingPayment = await storage.getPaymentTransactionByPaymentId(paymentId);
           
-          // Calculate amount based on service type and pets
-          const petCount = selectedPets?.length || 1;
-          let amount = 1; // Default for Test Service
-          if (serviceType === 'Test Service') {
-            amount = petCount * 1; // 1 SAR per pet
+          if (existingPayment) {
+            // Update existing payment transaction to link it to the booking
+            await db.execute(sql`
+              UPDATE payment_transactions 
+              SET booking_id = ${booking.id},
+                  updated_at = ${new Date()}
+              WHERE myfatoorah_payment_id = ${paymentId}
+              AND booking_id IS NULL
+            `);
+            
+            console.log('✅ Existing payment transaction linked to booking:', booking.id);
+          } else {
+            console.log('⚠️ No existing payment transaction found for payment ID:', paymentId);
+            // Don't create a new payment - this should have been created already
           }
-          
-          // Create payment transaction record
-          await storage.createPaymentTransaction({
-            bookingId: booking.id,
-            amount: amount,
-            currency: 'SAR',
-            status: 'paid',
-            myfatoorahPaymentId: paymentId,
-            myfatoorahInvoiceId: paymentReference,
-            customerName: user?.name || 'Customer',
-            customerEmail: user?.email || 'customer@vetsvan.app',
-            customerPhone: user?.phone || '+966000000000',
-            paidAt: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date()
-          });
-          
-          console.log('✅ Payment transaction record created successfully for booking:', booking.id);
         } catch (paymentError) {
-          console.error('❌ Failed to create payment transaction record:', paymentError);
-          // Don't fail the booking creation if payment record fails
+          console.error('❌ Failed to link payment transaction to booking:', paymentError);
+          // Don't fail the booking creation if payment linking fails
         }
       }
 
