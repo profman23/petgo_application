@@ -124,12 +124,12 @@ export function addPublicPaymentRoutes(app: any) {
           console.log('🔍 PAYMENT CREATION - Session result:', {
             hasSession: !!session,
             hasUserData: !!session?.userData,
-            userId: session?.userData?.id
+            userId: (session?.userData as any)?.id
           });
           
           if (session && session.userData) {
             // Fetch complete user data from database
-            const fullUser = await storage.getUser(session.userData.id);
+            const fullUser = await storage.getUser((session.userData as any).id);
             
             console.log('🔍 PAYMENT CREATION - Full user data:', {
               hasFullUser: !!fullUser,
@@ -150,13 +150,13 @@ export function addPublicPaymentRoutes(app: any) {
                 customerPhone: finalCustomerPhone?.substring(0, 8) + '...'
               });
             } else {
-              console.log('❌ PAYMENT CREATION - No user found in database for ID:', session.userData.id);
+              console.log('❌ PAYMENT CREATION - No user found in database for ID:', (session.userData as any).id);
             }
           } else {
             console.log('❌ PAYMENT CREATION - No valid session or userData found');
           }
-        } catch (authError) {
-          console.log('⚠️ PAYMENT CREATION - Authentication check failed, using provided customer data:', authError.message);
+        } catch (authError: any) {
+          console.log('⚠️ PAYMENT CREATION - Authentication check failed, using provided customer data:', authError?.message || authError);
         }
       } else {
         console.log('⚠️ PAYMENT CREATION - No Bearer token found, using provided customer data');
@@ -527,13 +527,14 @@ export function addPublicPaymentRoutes(app: any) {
           `);
 
           if (existingPayment.rows.length === 0) {
-            // Try to get authenticated user data first
-            let customerName = 'Payment Verified';
-            let customerEmail = 'verified@payment.com';
-            let customerPhone = '+966000000000';
+            // PRIORITY 1: Always try to get authenticated user data FIRST
+            let customerName = '';
+            let customerEmail = '';
+            let customerPhone = '';
+            let hasAuthenticatedData = false;
             
             const authHeader = req.headers.authorization;
-            console.log('🔍 Payment details - Auth header check:', {
+            console.log('🔍 PAYMENT DETAILS - Critical auth check for customer data:', {
               hasAuthHeader: !!authHeader,
               authHeaderPrefix: authHeader?.substring(0, 20) + '...'
             });
@@ -541,45 +542,60 @@ export function addPublicPaymentRoutes(app: any) {
             if (authHeader?.startsWith('Bearer ')) {
               try {
                 const sessionId = authHeader.replace('Bearer ', '');
-                console.log('🔍 Payment details - Checking session:', sessionId?.substring(0, 20) + '...');
+                console.log('🔍 PAYMENT DETAILS - Checking session for customer data:', sessionId?.substring(0, 20) + '...');
                 
                 const session = await sessionService.getSession(sessionId);
-                console.log('🔍 Payment details - Session result:', {
+                console.log('🔍 PAYMENT DETAILS - Session validation result:', {
                   hasSession: !!session,
                   hasUserData: !!session?.userData,
-                  userId: session?.userData?.id
+                  userId: (session?.userData as any)?.id
                 });
                 
                 if (session && session.userData) {
-                  const fullUser = await storage.getUser(session.userData.id);
-                  console.log('🔍 Payment details - User lookup result:', {
+                  const fullUser = await storage.getUser((session.userData as any).id);
+                  console.log('🔍 PAYMENT DETAILS - User database lookup:', {
                     hasFullUser: !!fullUser,
                     userName: fullUser?.name,
                     userEmail: fullUser?.email?.substring(0, 10) + '...',
                     userPhone: fullUser?.phone?.substring(0, 8) + '...'
                   });
                   
-                  if (fullUser) {
-                    customerName = fullUser.name || 'Customer';
-                    customerEmail = fullUser.email || 'customer@vetsvan.app';
+                  if (fullUser && fullUser.email) {
+                    // SUCCESS: Use real authenticated user data
+                    customerName = fullUser.name || `User-${fullUser.id}`;
+                    customerEmail = fullUser.email;
                     customerPhone = fullUser.phone || '+966000000000';
-                    console.log('✅ SUCCESS: Using authenticated user data for payment transaction:', {
+                    hasAuthenticatedData = true;
+                    
+                    console.log('✅ SUCCESS: PAYMENT DETAILS using authenticated customer data:', {
                       userId: fullUser.id,
                       customerName,
-                      customerEmail: customerEmail.substring(0, 10) + '...',
+                      customerEmail: customerEmail.substring(0, 15) + '...',
                       customerPhone: customerPhone.substring(0, 8) + '...'
                     });
                   } else {
-                    console.log('❌ No user found in database for session userId:', session.userData.id);
+                    console.log('❌ PAYMENT DETAILS - User found but missing email data:', {
+                      hasUser: !!fullUser,
+                      hasEmail: !!fullUser?.email,
+                      userId: (session.userData as any).id
+                    });
                   }
                 } else {
-                  console.log('❌ No valid session found for token');
+                  console.log('❌ PAYMENT DETAILS - No valid session found for token');
                 }
-              } catch (authError) {
-                console.log('⚠️ Authentication error in payment details:', authError);
+              } catch (authError: any) {
+                console.log('⚠️ PAYMENT DETAILS - Authentication error:', authError?.message || authError);
               }
             } else {
-              console.log('⚠️ No Bearer token found in payment details request');
+              console.log('⚠️ PAYMENT DETAILS - No Bearer token found');
+            }
+
+            // ONLY use fallback if NO authenticated data was found
+            if (!hasAuthenticatedData) {
+              console.log('⚠️ WARNING: Using fallback customer data - authentication failed');
+              customerName = 'Customer Authentication Failed';
+              customerEmail = 'auth_failed@payment.verification';
+              customerPhone = '+966000000000';
             }
             
             // Create new payment transaction record with real customer data
