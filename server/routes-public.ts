@@ -105,9 +105,9 @@ export function addPublicPaymentRoutes(app: any) {
       let finalCustomerEmail = customerEmail || 'test@example.com';
       let finalCustomerPhone = customerPhone || '+966000000000';
 
-      // Check if user is authenticated and override with real data
+      // PRIORITY 1: Check if user is authenticated and ALWAYS use real session data
       const authHeader = req.headers.authorization;
-      console.log('🔍 Payment Auth Check:', {
+      console.log('🔍 PAYMENT CREATION - Auth Check:', {
         hasAuthHeader: !!authHeader,
         authPrefix: authHeader?.substring(0, 20) + '...',
         providedCustomerName: customerName,
@@ -117,11 +117,11 @@ export function addPublicPaymentRoutes(app: any) {
       if (authHeader?.startsWith('Bearer ')) {
         try {
           const sessionId = authHeader.replace('Bearer ', '');
-          console.log('🔍 Checking session:', sessionId?.substring(0, 20) + '...');
+          console.log('🔍 PAYMENT CREATION - Checking session:', sessionId?.substring(0, 20) + '...');
           
           const session = await sessionService.getSession(sessionId);
           
-          console.log('🔍 Session result:', {
+          console.log('🔍 PAYMENT CREATION - Session result:', {
             hasSession: !!session,
             hasUserData: !!session?.userData,
             userId: session?.userData?.id
@@ -131,7 +131,7 @@ export function addPublicPaymentRoutes(app: any) {
             // Fetch complete user data from database
             const fullUser = await storage.getUser(session.userData.id);
             
-            console.log('🔍 Full user data:', {
+            console.log('🔍 PAYMENT CREATION - Full user data:', {
               hasFullUser: !!fullUser,
               userName: fullUser?.name,
               userEmail: fullUser?.email,
@@ -143,24 +143,65 @@ export function addPublicPaymentRoutes(app: any) {
               finalCustomerEmail = fullUser.email || `user${fullUser.id}@vetsvan.app`;
               finalCustomerPhone = fullUser.phone || '+966000000000';
               
-              console.log('🔑 SUCCESS: Using authenticated user data for payment:', {
+              console.log('✅ SUCCESS: PAYMENT CREATION using authenticated user data:', {
                 userId: fullUser.id,
                 customerName: finalCustomerName,
                 customerEmail: finalCustomerEmail?.substring(0, 8) + '...',
                 customerPhone: finalCustomerPhone?.substring(0, 8) + '...'
               });
             } else {
-              console.log('❌ No user found in database for ID:', session.userData.id);
+              console.log('❌ PAYMENT CREATION - No user found in database for ID:', session.userData.id);
             }
           } else {
-            console.log('❌ No valid session or userData found');
+            console.log('❌ PAYMENT CREATION - No valid session or userData found');
           }
         } catch (authError) {
-          console.log('⚠️ Authentication check failed, using provided customer data:', authError.message);
+          console.log('⚠️ PAYMENT CREATION - Authentication check failed, using provided customer data:', authError.message);
         }
       } else {
-        console.log('ℹ️ No Bearer token found, using provided customer data');
+        console.log('⚠️ PAYMENT CREATION - No Bearer token found, using provided customer data');
       }
+
+      // VALIDATION: Never allow placeholder values in payment creation
+      const isPlaceholderData = (
+        finalCustomerName === 'Customer' ||
+        finalCustomerName === 'Payment Verified' ||
+        finalCustomerName === 'Test Customer' ||
+        finalCustomerEmail === 'verified@payment.com' ||
+        finalCustomerEmail === 'test@example.com' ||
+        finalCustomerPhone === '+966000000000' ||
+        finalCustomerPhone === '0000000000'
+      );
+
+      if (isPlaceholderData) {
+        console.log('❌ PAYMENT CREATION BLOCKED - Detected placeholder data:', {
+          customerName: finalCustomerName,
+          customerEmail: finalCustomerEmail,
+          customerPhone: finalCustomerPhone
+        });
+        
+        return res.status(400).json({
+          success: false,
+          message: 'Payment creation requires authentic customer data. Please ensure you are logged in.',
+          error: 'PLACEHOLDER_DATA_DETECTED'
+        });
+      }
+      
+      console.log('✅ PAYMENT CREATION APPROVED - Using authentic customer data:', {
+        customerName: finalCustomerName,
+        customerEmail: finalCustomerEmail?.substring(0, 10) + '...',
+        customerPhone: finalCustomerPhone?.substring(0, 8) + '...'
+      });
+
+      // Final validation before MyFatoorah API call
+      console.log('🔒 PRE-SAVE VALIDATION - Final customer data check:', {
+        name: finalCustomerName,
+        email: finalCustomerEmail,
+        phone: finalCustomerPhone,
+        isValidName: finalCustomerName !== 'Customer' && finalCustomerName !== 'Payment Verified',
+        isValidEmail: finalCustomerEmail !== 'verified@payment.com' && finalCustomerEmail !== 'test@example.com',
+        isValidPhone: finalCustomerPhone !== '+966000000000'
+      });
 
       const myfatoorah = new MyFatoorahService();
       
@@ -308,6 +349,93 @@ export function addPublicPaymentRoutes(app: any) {
     } catch (error: any) {
       console.error('❌ MyFatoorah webhook error:', error);
       res.status(500).json({ error: 'Webhook processing failed' });
+    }
+  });
+
+  // Comprehensive backfill endpoint for placeholder payment transactions
+  app.post('/api/public/backfill-payment-customer-data', async (req: any, res: any) => {
+    try {
+      console.log('🔧 Starting comprehensive payment customer data backfill...');
+      
+      // Get all payment transactions with placeholder data
+      const placeholderTransactions = await db.execute(sql`
+        SELECT 
+          pt.id,
+          pt.myfatoorah_payment_id,
+          pt.customer_name,
+          pt.customer_phone,
+          pt.customer_email,
+          pt.booking_id
+        FROM payment_transactions pt
+        WHERE 
+          pt.customer_name IN ('Payment Verified', 'Customer', 'Test Customer') OR
+          pt.customer_email IN ('verified@payment.com', 'test@example.com', 'customer@vetsvan.app') OR
+          pt.customer_phone IN ('+966000000000', '0000000000')
+        ORDER BY pt.created_at DESC
+      `);
+      
+      console.log(`📊 Found ${placeholderTransactions.rows.length} payment transactions with placeholder data`);
+      
+      let successCount = 0;
+      let errorCount = 0;
+      const myFatoorahService = new MyFatoorahService();
+      
+      for (const transaction of placeholderTransactions.rows as any[]) {
+        try {
+          console.log(`🔍 Processing payment transaction ${transaction.id} - Payment ID: ${transaction.myfatoorah_payment_id}`);
+          
+          // Get real customer data from MyFatoorah
+          const paymentDetails = await myFatoorahService.getPaymentDetailsFromCallback(
+            transaction.myfatoorah_payment_id
+          );
+          
+          if (paymentDetails && paymentDetails.customerName) {
+            const mfCustomerName = paymentDetails.customerName || 'MyFatoorah Customer';
+            const mfCustomerEmail = paymentDetails.customerEmail || 'customer@myfatoorah.com';
+            const mfCustomerPhone = paymentDetails.customerMobile ? 
+              '+966' + paymentDetails.customerMobile.replace(/^966/, '') : '+966000000000';
+            
+            await db.execute(sql`
+              UPDATE payment_transactions 
+              SET customer_name = ${mfCustomerName},
+                  customer_email = ${mfCustomerEmail},
+                  customer_phone = ${mfCustomerPhone},
+                  updated_at = ${new Date()}
+              WHERE id = ${transaction.id}
+            `);
+            
+            console.log(`✅ Updated transaction ${transaction.id} with MyFatoorah customer data:`, {
+              name: mfCustomerName,
+              email: mfCustomerEmail?.substring(0, 15) + '...',
+              phone: mfCustomerPhone?.substring(0, 8) + '...'
+            });
+            successCount++;
+          } else {
+            console.log(`⚠️ No MyFatoorah customer data found for transaction ${transaction.id}, skipping`);
+          }
+          
+          // Small delay to avoid overwhelming the API
+          await new Promise(resolve => setTimeout(resolve, 300));
+        } catch (error) {
+          console.error(`❌ Failed to backfill transaction ${transaction.id}:`, error);
+          errorCount++;
+        }
+      }
+      
+      res.json({
+        success: true,
+        message: `Payment customer data backfill completed: ${successCount} updated, ${errorCount} errors`,
+        processed: placeholderTransactions.rows.length,
+        updated: successCount,
+        errors: errorCount
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Payment backfill error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
     }
   });
 

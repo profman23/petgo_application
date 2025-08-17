@@ -470,7 +470,7 @@ export default function RideRequest() {
       
       // إنشاء رابط الدفع مع البيانات الحقيقية للمستخدم
       console.log('Creating authenticated payment link with cost:', estimatedCost);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       
       if (!token) {
         toast({
