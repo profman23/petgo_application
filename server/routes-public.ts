@@ -521,7 +521,8 @@ export function addPublicPaymentRoutes(app: any) {
         // Store payment transaction immediately for future reference
         try {
           const existingPayment = await db.execute(sql`
-            SELECT id FROM payment_transactions 
+            SELECT id, customer_name, customer_email, customer_phone, myfatoorah_payment_id, amount
+            FROM payment_transactions 
             WHERE myfatoorah_payment_id = ${paymentId}
             LIMIT 1
           `);
@@ -615,18 +616,93 @@ export function addPublicPaymentRoutes(app: any) {
           } else {
             // Payment transaction already exists, check if it has placeholder data and update with real customer data
             const existingRecord = existingPayment.rows[0] as any;
-            const shouldUpdate = existingRecord && (
-              (existingRecord.customer_name === 'Payment Verified' || 
-               existingRecord.customer_email === 'verified@payment.com' ||
-               existingRecord.customer_phone === '+966000000000')
-            );
+            
+            console.log('🔍 MYFATOORAH UPDATE CHECK - Full existingPayment result:', JSON.stringify(existingPayment, null, 2));
+            console.log('🔍 MYFATOORAH UPDATE CHECK - Existing record raw structure:', JSON.stringify(existingRecord, null, 2));
+            console.log('🔍 MYFATOORAH UPDATE CHECK - Existing record details:', {
+              id: existingRecord?.id,
+              customerName: existingRecord?.customer_name,
+              customerEmail: existingRecord?.customer_email,
+              customerPhone: existingRecord?.customer_phone,
+              paymentId: existingRecord?.myfatoorah_payment_id
+            });
+            
+            const hasPlaceholderName = existingRecord?.customer_name === 'Payment Verified' || 
+                                      existingRecord?.customer_name === 'Customer Authentication Failed';
+            const hasPlaceholderEmail = existingRecord?.customer_email === 'verified@payment.com' || 
+                                       existingRecord?.customer_email === 'auth_failed@payment.verification';
+            const hasPlaceholderPhone = existingRecord?.customer_phone === '+966000000000';
+            
+            // No longer need force update - proper detection is working
+            const forceUpdate = false;
+            
+            const shouldUpdate = existingRecord && (forceUpdate || hasPlaceholderName || hasPlaceholderEmail || hasPlaceholderPhone);
+            
+            console.log('🔍 MYFATOORAH UPDATE CHECK - Should update decision:', {
+              hasPlaceholderName,
+              hasPlaceholderEmail, 
+              hasPlaceholderPhone,
+              shouldUpdate
+            });
             
             if (shouldUpdate) {
-              // Use MyFatoorah customer data as the authoritative source for this payment
-              const mfCustomerName = paymentDetails.customerName || 'Customer';
-              const mfCustomerEmail = paymentDetails.customerEmail || 'customer@payment.com';
-              const mfCustomerPhone = paymentDetails.customerMobile ? 
-                '+966' + paymentDetails.customerMobile.replace(/^966/, '') : '+966000000000';
+              // CRITICAL FIX: Use MyFatoorah customer data as the authoritative source
+              // MyFatoorah stores customer data in paymentDetails.Data structure from earlier logs
+              console.log('🔍 MYFATOORAH FIX - Raw payment details structure:', JSON.stringify(paymentDetails, null, 2));
+              
+              // Extract real customer data from MyFatoorah response using the correct structure
+              let mfCustomerName = 'Customer';
+              let mfCustomerEmail = 'customer@payment.com';
+              let mfCustomerPhone = '+966000000000';
+              
+              try {
+                // Fetch fresh detailed invoice data which contains customer info  
+                const myFatoorahService = new MyFatoorahService();
+                
+                // Use the same successful pattern from earlier working logs
+                const response = await fetch(`${(myFatoorahService as any).baseURL}/v2/getPaymentStatus`, {
+                  method: 'POST',
+                  headers: (myFatoorahService as any).getHeaders(),
+                  body: JSON.stringify({ Key: paymentId, KeyType: 'PaymentId' })
+                });
+                
+                const detailedData = await response.json();
+                console.log('🔍 MYFATOORAH FIX - Full invoice response:', JSON.stringify(detailedData, null, 2));
+                
+                if (detailedData?.IsSuccess && detailedData?.Data) {
+                  const invoiceData = detailedData.Data;
+                  
+                  // Use the exact same structure that worked in earlier logs:
+                  // CustomerName: 'Mohamed Ghazal', CustomerEmail: 'profman23@gmail.com', CustomerMobile: '9660543730256'
+                  if (invoiceData.CustomerName && invoiceData.CustomerEmail) {
+                    mfCustomerName = invoiceData.CustomerName;
+                    mfCustomerEmail = invoiceData.CustomerEmail;
+                    mfCustomerPhone = invoiceData.CustomerMobile ? 
+                      (invoiceData.CustomerMobile.startsWith('966') ? '+' + invoiceData.CustomerMobile : '+966' + invoiceData.CustomerMobile.replace(/^0/, ''))
+                      : '+966000000000';
+                      
+                    console.log('✅ MYFATOORAH FIX - Successfully extracted customer data from invoice:', {
+                      name: mfCustomerName,
+                      email: mfCustomerEmail?.substring(0, 15) + '...',
+                      phone: mfCustomerPhone?.substring(0, 8) + '...',
+                      source: 'MyFatoorah Invoice Data'
+                    });
+                  } else {
+                    console.log('⚠️ MYFATOORAH FIX - Invoice data missing customer details:', {
+                      hasCustomerName: !!invoiceData.CustomerName,
+                      hasCustomerEmail: !!invoiceData.CustomerEmail,
+                      hasCustomerMobile: !!invoiceData.CustomerMobile
+                    });
+                  }
+                } else {
+                  console.log('❌ MYFATOORAH FIX - Invalid response structure:', {
+                    isSuccess: detailedData?.IsSuccess,
+                    hasData: !!detailedData?.Data
+                  });
+                }
+              } catch (mfError: any) {
+                console.log('⚠️ MYFATOORAH FIX - Failed to fetch detailed customer data:', mfError?.message || mfError);
+              }
               
               console.log('🔧 Updating existing payment transaction with MyFatoorah customer data:', {
                 paymentId,
@@ -648,7 +724,11 @@ export function addPublicPaymentRoutes(app: any) {
               `);
               console.log('✅ Updated existing payment transaction with authentic MyFatoorah customer data');
             } else {
-              console.log('ℹ️ Existing payment transaction already has real customer data, skipping update');
+              console.log('ℹ️ SKIPPING UPDATE - Payment transaction already has real customer data:', {
+                customerName: existingRecord?.customer_name,
+                customerEmail: existingRecord?.customer_email?.substring(0, 15) + '...',
+                customerPhone: existingRecord?.customer_phone?.substring(0, 8) + '...'
+              });
             }
           }
         } catch (storeError) {
