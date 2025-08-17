@@ -375,4 +375,80 @@ export function addPublicPaymentRoutes(app: any) {
       });
     }
   });
+
+  // Fetch payment details endpoint for immediate payment verification
+  app.get('/api/public/payment-details/:paymentId', async (req: any, res: any) => {
+    try {
+      const { paymentId } = req.params;
+      
+      if (!paymentId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Payment ID is required'
+        });
+      }
+
+      console.log('🔍 Fetching payment details for immediate display:', paymentId);
+
+      const myFatoorahService = new MyFatoorahService();
+      const paymentDetails = await myFatoorahService.getPaymentDetailsFromCallback(paymentId);
+
+      if (paymentDetails && paymentDetails.amount > 0) {
+        // Store payment transaction immediately for future reference
+        try {
+          const existingPayment = await db.execute(sql`
+            SELECT id FROM payment_transactions 
+            WHERE myfatoorah_payment_id = ${paymentId}
+            LIMIT 1
+          `);
+
+          if (existingPayment.rows.length === 0) {
+            // Create new payment transaction record
+            await db.execute(sql`
+              INSERT INTO payment_transactions (
+                myfatoorah_payment_id, myfatoorah_invoice_id, amount, currency, status,
+                customer_name, customer_email, customer_phone, paid_at, created_at, updated_at,
+                reference_id
+              ) VALUES (
+                ${paymentId}, ${paymentDetails.invoiceId}, ${paymentDetails.amount}, 
+                ${paymentDetails.currency}, ${paymentDetails.status}, 'Payment Verified', 
+                'verified@payment.com', '+966000000000', ${paymentDetails.paidAt || new Date()}, 
+                ${new Date()}, ${new Date()}, ${paymentDetails.customerReference || ''}
+              )
+            `);
+            console.log('✅ Payment transaction stored for immediate display');
+          }
+        } catch (storeError) {
+          console.log('⚠️ Payment storage failed, but proceeding with display:', storeError);
+        }
+
+        res.json({
+          success: true,
+          payment: {
+            paymentId: paymentDetails.paymentId,
+            invoiceId: paymentDetails.invoiceId,
+            amount: paymentDetails.amount,
+            currency: paymentDetails.currency,
+            status: paymentDetails.status,
+            customerReference: paymentDetails.customerReference,
+            paidAt: paymentDetails.paidAt
+          }
+        });
+      } else {
+        res.json({
+          success: false,
+          message: 'Payment not found or not completed',
+          payment: null
+        });
+      }
+
+    } catch (error: any) {
+      console.error('❌ Payment details fetch error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch payment details',
+        error: error.message
+      });
+    }
+  });
 }

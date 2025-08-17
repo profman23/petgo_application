@@ -74,6 +74,8 @@ export default function VetsVanBooking() {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentReference, setPaymentReference] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState<number | null>(null);
+  const [paymentCurrency, setPaymentCurrency] = useState<string>('SAR');
 
   // Parse URL parameters on component mount
   useEffect(() => {
@@ -90,8 +92,46 @@ export default function VetsVanBooking() {
       setPaymentSuccess(true);
       setPaymentReference(ref);
       setPaymentId(paymentIdParam);
+      
+      // Fetch actual payment amount immediately
+      fetchPaymentDetails(paymentIdParam);
     }
   }, []);
+
+  // Function to fetch payment details from MyFatoorah
+  const fetchPaymentDetails = async (paymentId: string) => {
+    try {
+      console.log('🔍 Fetching payment details for:', paymentId);
+      
+      const response = await fetch(`/api/public/payment-details/${paymentId}`);
+      const data = await response.json();
+      
+      if (data.success && data.payment) {
+        console.log('💰 Payment details received:', data.payment);
+        setPaymentAmount(data.payment.amount);
+        setPaymentCurrency(data.payment.currency);
+        
+        toast({
+          title: "Payment Details Loaded",
+          description: `Amount: ${data.payment.amount} ${data.payment.currency}`,
+        });
+      } else {
+        console.log('⚠️ Payment details not available yet');
+        toast({
+          title: "Payment Processing",
+          description: "Payment details are being processed...",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      console.error('❌ Failed to fetch payment details:', error);
+      toast({
+        title: "Payment Details Error",
+        description: "Unable to load payment amount details",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Fetch user session data for real customer details
   const { data: userSession } = useQuery<{user?: {name?: string, phone?: string, email?: string}}>({
@@ -651,6 +691,11 @@ export default function VetsVanBooking() {
                 <p className="text-sm text-green-700">
                   Payment Reference: <span className="font-mono">{paymentReference}</span> | Payment ID: <span className="font-mono">{paymentId}</span>
                 </p>
+                {paymentAmount && paymentAmount > 0 && (
+                  <p className="text-sm text-green-700 mt-1 font-semibold">
+                    💰 Amount Paid: <span className="text-lg">{paymentAmount} {paymentCurrency}</span>
+                  </p>
+                )}
                 <p className="text-sm text-green-600 mt-1">
                   Select your preferred time slot below and click "Confirm Booking" to complete your appointment.
                 </p>
