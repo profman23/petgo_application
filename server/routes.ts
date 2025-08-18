@@ -2277,15 +2277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Get payment information from MyFatoorah transactions
           const paymentTransaction = await storage.getPaymentTransactionByBooking(booking.id);
           
-          // Debug log for payment data
-          if (booking.id <= 111 && booking.id >= 107) {
-            console.log(`Payment debug for booking ${booking.id}:`, {
-              hasPayment: !!paymentTransaction,
-              amount: paymentTransaction?.amount,
-              currency: paymentTransaction?.currency,
-              status: paymentTransaction?.status
-            });
-          }
+
           
           return {
             ...booking,
