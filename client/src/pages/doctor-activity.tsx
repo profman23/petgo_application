@@ -637,10 +637,9 @@ export default function DoctorActivity() {
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       {getStatusBadge(booking.status)}
-                      {booking.paymentStatus?.trim().toLowerCase() === 'paid' && Number(booking.paymentAmount) > 0 && (
-                        <div className="text-green-700 font-semibold text-xs mt-1" style={{ textAlign }}>
-                          {console.log(`Rendering Paid ${Number(booking.paymentAmount).toFixed(2)} SAR for booking ${booking.id}`)}
-                          {language === 'ar' ? 'مدفوع' : 'Paid'} {Number(booking.paymentAmount).toFixed(2)} {booking.paymentCurrency === 'SR' ? 'SAR' : (booking.paymentCurrency || 'SAR')}
+                      {(booking.paymentAmount || booking.paymentAmount === 0) && (
+                        <div className="text-sm font-medium text-green-600" style={{ textAlign }}>
+                          {language === 'ar' ? 'المبلغ:' : 'Payment:'} {booking.paymentAmount} {booking.paymentCurrency || 'SAR'}
                         </div>
                       )}
 

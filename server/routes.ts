@@ -2277,8 +2277,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Get payment information from MyFatoorah transactions
           const paymentTransaction = await storage.getPaymentTransactionByBooking(booking.id);
           
-
-          
           return {
             ...booking,
             customerName: customer?.name || 'غير معروف',
