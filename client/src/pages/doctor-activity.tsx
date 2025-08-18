@@ -637,9 +637,21 @@ export default function DoctorActivity() {
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       {getStatusBadge(booking.status)}
-                      {booking.paymentStatus === "paid" && booking.paymentAmount > 0 && (
+                      {/* Debug payment data */}
+                      {booking.id <= 111 && booking.id >= 107 && console.log(`Frontend booking ${booking.id}:`, {
+                        paymentAmount: booking.paymentAmount,
+                        paymentCurrency: booking.paymentCurrency,
+                        paymentStatus: booking.paymentStatus,
+                        amountType: typeof booking.paymentAmount,
+                        numberValue: Number(booking.paymentAmount),
+                        condition1: booking.paymentStatus === "paid",
+                        condition2: !!booking.paymentAmount,
+                        condition3: Number(booking.paymentAmount) > 0,
+                        allConditions: booking.paymentStatus === "paid" && booking.paymentAmount && Number(booking.paymentAmount) > 0
+                      })}
+                      {booking.paymentStatus === "paid" && booking.paymentAmount && Number(booking.paymentAmount) > 0 && (
                         <div className="text-sm font-medium text-green-600" style={{ textAlign }}>
-                          {language === 'ar' ? 'مدفوع:' : 'Paid:'} {booking.paymentAmount.toFixed(2)} {booking.paymentCurrency === 'SR' ? 'SAR' : (booking.paymentCurrency || 'SAR')}
+                          {language === 'ar' ? 'مدفوع:' : 'Paid'} {Number(booking.paymentAmount).toFixed(2)} {booking.paymentCurrency === 'SR' ? 'SAR' : (booking.paymentCurrency || 'SAR')}
                         </div>
                       )}
 
