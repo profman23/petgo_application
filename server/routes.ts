@@ -1918,7 +1918,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         serviceType: serviceType || 'General Check Up'
       });
 
-      // If payment information is provided, link existing payment transaction to booking
+      // Link existing payment transaction to booking
+      // First check if payment information is explicitly provided
       if (paymentReference && paymentId && booking) {
         try {
           console.log('💳 Linking existing payment transaction to booking:', booking.id);
@@ -1998,6 +1999,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } catch (paymentError) {
           console.error('❌ Failed to link payment transaction to booking:', paymentError);
           // Don't fail the booking creation if payment linking fails
+        }
+      } else if (booking) {
+        // Fallback: Try to find and link recent unlinked payments by the same customer
+        try {
+          console.log('🔍 No payment info provided, searching for recent unlinked payments for user:', userId);
+          const user = await storage.getUser(userId);
+          
+          if (user) {
+            // Look for recent paid payment transactions without booking_id for this customer
+            const recentUnlinkedPayments = await db.execute(sql`
+              SELECT id, myfatoorah_payment_id, amount, currency, created_at
+              FROM payment_transactions 
+              WHERE customer_name = ${user.name} 
+                AND booking_id IS NULL 
+                AND status = 'paid'
+                AND created_at >= ${new Date(Date.now() - 10 * 60 * 1000)}
+              ORDER BY created_at DESC 
+              LIMIT 1
+            `);
+            
+            if (recentUnlinkedPayments.rows.length > 0) {
+              const payment = recentUnlinkedPayments.rows[0];
+              console.log('🎯 Found recent unlinked payment to link:', payment);
+              
+              // Link this payment to the new booking
+              await db.execute(sql`
+                UPDATE payment_transactions 
+                SET booking_id = ${booking.id}, updated_at = ${new Date()}
+                WHERE id = ${payment.id}
+              `);
+              
+              console.log('✅ Automatically linked payment to booking:', {
+                paymentId: payment.id,
+                bookingId: booking.id,
+                amount: payment.amount,
+                currency: payment.currency
+              });
+            } else {
+              console.log('ℹ️ No recent unlinked payments found for automatic linking');
+            }
+          }
+        } catch (fallbackError) {
+          console.error('❌ Failed during fallback payment linking:', fallbackError);
+          // Don't fail the booking creation if fallback linking fails
         }
       }
 
