@@ -255,7 +255,10 @@ export function addPublicPaymentRoutes(app: any) {
               currency,
               status,
               myfatoorah_invoice_id,
-              customer_reference
+              reference_id,
+              original_customer_name,
+              original_customer_email,
+              original_customer_phone
             ) VALUES (
               ${finalCustomerName},
               ${finalCustomerEmail}, 
@@ -264,7 +267,10 @@ export function addPublicPaymentRoutes(app: any) {
               'SAR',
               'pending',
               ${paymentResponse.Data.InvoiceId},
-              ${invoiceNumber}
+              ${invoiceNumber},
+              ${finalCustomerName},
+              ${finalCustomerEmail},
+              ${finalCustomerPhone}
             ) RETURNING id
           `);
           
@@ -332,44 +338,53 @@ export function addPublicPaymentRoutes(app: any) {
           
           console.log('💰 Fetched actual payment details:', paymentDetails);
 
-          // Update existing payment transaction with correct amount AND customer data
+          // Update existing payment transaction with correct amount while preserving original customer data
           if (paymentDetails.amount > 0) {
-            // Fetch full invoice details to get customer data
-            const fullInvoiceDetails = await myFatoorahService.getInvoiceDetails(paymentDetails.invoiceId);
-            
-            // Extract customer data from invoice
-            let customerName = 'Payment Customer';
-            let customerEmail = 'payment@callback.com';
-            let customerPhone = '+966000000000';
-            
-            if (fullInvoiceDetails?.Data) {
-              customerName = fullInvoiceDetails.Data.CustomerName || 'Payment Customer';
-              customerEmail = fullInvoiceDetails.Data.CustomerEmail || 'payment@callback.com';
-              customerPhone = fullInvoiceDetails.Data.CustomerMobile ? 
-                '+966' + fullInvoiceDetails.Data.CustomerMobile.replace(/^966/, '') : '+966000000000';
-            }
-            
-            console.log('🔄 CALLBACK - Updating payment transaction with authentic customer data:', {
+            console.log('🔄 CALLBACK - Updating payment with amount while preserving original customer data:', {
               paymentId: actualPaymentId,
               amount: paymentDetails.amount,
-              customerName,
-              customerEmail: customerEmail?.substring(0, 15) + '...',
-              customerPhone: customerPhone?.substring(0, 8) + '...'
+              preservingOriginalCustomerData: true
             });
 
-            await db.execute(sql`
-              UPDATE payment_transactions 
-              SET amount = ${paymentDetails.amount}, 
-                  currency = ${paymentDetails.currency},
-                  status = ${paymentDetails.status},
-                  paid_at = ${paymentDetails.paidAt},
-                  customer_name = ${customerName},
-                  customer_email = ${customerEmail},
-                  customer_phone = ${customerPhone},
-                  updated_at = ${new Date()}
-              WHERE myfatoorah_payment_id = ${actualPaymentId}
+            // First check if we have original customer data stored
+            const existingPayment = await db.execute(sql`
+              SELECT id, customer_name, customer_email, customer_phone, 
+                     original_customer_name, original_customer_email, original_customer_phone
+              FROM payment_transactions 
+              WHERE myfatoorah_invoice_id = ${paymentDetails.invoiceId}
+              OR myfatoorah_payment_id = ${actualPaymentId}
               OR reference_id = ${ref}
+              LIMIT 1
             `);
+
+            if (existingPayment.rows.length > 0) {
+              const payment = existingPayment.rows[0];
+              
+              // Use original customer data if available, otherwise keep current data
+              const useCustomerName = payment.original_customer_name || payment.customer_name;
+              const useCustomerEmail = payment.original_customer_email || payment.customer_email;
+              const useCustomerPhone = payment.original_customer_phone || payment.customer_phone;
+              
+              console.log('🔄 CALLBACK - Using preserved customer data:', {
+                customerName: useCustomerName,
+                customerEmail: useCustomerEmail?.substring(0, 15) + '...',
+                customerPhone: useCustomerPhone?.substring(0, 8) + '...'
+              });
+
+              await db.execute(sql`
+                UPDATE payment_transactions 
+                SET amount = ${paymentDetails.amount}, 
+                    currency = ${paymentDetails.currency},
+                    status = ${paymentDetails.status},
+                    paid_at = ${paymentDetails.paidAt},
+                    customer_name = ${useCustomerName},
+                    customer_email = ${useCustomerEmail},
+                    customer_phone = ${useCustomerPhone},
+                    myfatoorah_payment_id = ${actualPaymentId},
+                    updated_at = ${new Date()}
+                WHERE id = ${payment.id}
+              `);
+            }
             
             console.log('✅ Payment transaction updated with amount AND customer data from callback');
           }
@@ -406,48 +421,59 @@ export function addPublicPaymentRoutes(app: any) {
           reference: CustomerReference
         });
         
-        // Update existing payment transaction with correct amount AND customer data
+        // Update existing payment transaction with amount while preserving original customer data
         try {
-          const myFatoorahService = new MyFatoorahService();
-          
-          // Fetch full invoice details to get customer data
-          const fullInvoiceDetails = await myFatoorahService.getInvoiceDetails(InvoiceId);
-          
-          // Extract customer data from invoice
-          let customerName = 'Webhook Customer';
-          let customerEmail = 'payment@webhook.com';
-          let customerPhone = '+966000000000';
-          
-          if (fullInvoiceDetails?.Data) {
-            customerName = fullInvoiceDetails.Data.CustomerName || 'Webhook Customer';
-            customerEmail = fullInvoiceDetails.Data.CustomerEmail || 'payment@webhook.com';
-            customerPhone = fullInvoiceDetails.Data.CustomerMobile ? 
-              '+966' + fullInvoiceDetails.Data.CustomerMobile.replace(/^966/, '') : '+966000000000';
-          }
-          
-          console.log('🔔 WEBHOOK - Updating payment transaction with authentic customer data:', {
+          console.log('🔔 WEBHOOK - Updating payment with amount while preserving original customer data:', {
             paymentId: PaymentId,
             invoiceId: InvoiceId,
             amount: InvoiceValue,
-            customerName,
-            customerEmail: customerEmail?.substring(0, 15) + '...',
-            customerPhone: customerPhone?.substring(0, 8) + '...'
+            preservingOriginalCustomerData: true
           });
 
-          await db.execute(sql`
-            UPDATE payment_transactions 
-            SET amount = ${parseFloat(InvoiceValue)}, 
-                status = 'paid',
-                paid_at = ${new Date()},
-                customer_name = ${customerName},
-                customer_email = ${customerEmail},
-                customer_phone = ${customerPhone},
-                updated_at = ${new Date()}
-            WHERE myfatoorah_payment_id = ${PaymentId}
+          // First check if we have original customer data stored
+          const existingPayment = await db.execute(sql`
+            SELECT id, customer_name, customer_email, customer_phone, 
+                   original_customer_name, original_customer_email, original_customer_phone
+            FROM payment_transactions 
+            WHERE myfatoorah_invoice_id = ${InvoiceId}
+            OR myfatoorah_payment_id = ${PaymentId}
             OR reference_id = ${CustomerReference}
+            LIMIT 1
           `);
-          
-          console.log('✅ Payment transaction updated with amount AND customer data from webhook');
+
+          if (existingPayment.rows.length > 0) {
+            const payment = existingPayment.rows[0];
+            
+            // Use original customer data if available, otherwise keep current data
+            const useCustomerName = payment.original_customer_name || payment.customer_name;
+            const useCustomerEmail = payment.original_customer_email || payment.customer_email;
+            const useCustomerPhone = payment.original_customer_phone || payment.customer_phone;
+            
+            console.log('🔔 WEBHOOK - Using preserved customer data:', {
+              customerName: useCustomerName,
+              customerEmail: useCustomerEmail?.substring(0, 15) + '...',
+              customerPhone: useCustomerPhone?.substring(0, 8) + '...'
+            });
+
+            await db.execute(sql`
+              UPDATE payment_transactions 
+              SET amount = ${InvoiceValue}, 
+                  currency = 'SAR',
+                  status = 'paid',
+                  customer_name = ${useCustomerName},
+                  customer_email = ${useCustomerEmail},
+                  customer_phone = ${useCustomerPhone},
+                  myfatoorah_payment_id = ${PaymentId},
+                  updated_at = ${new Date()}
+              WHERE id = ${payment.id}
+            `);
+            
+            console.log('✅ WEBHOOK - Payment transaction updated with preserved customer data');
+          } else {
+            console.log('⚠️ WEBHOOK - No existing payment transaction found for webhook update');
+          }
+
+
         } catch (updateError) {
           console.error('❌ Failed to update payment transaction:', updateError);
         }
