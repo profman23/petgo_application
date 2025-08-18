@@ -1892,6 +1892,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🐾 Selected pets length:', selectedPets?.length);
       console.log('🏥 Service type received:', serviceType);
       console.log('💳 Payment info received:', { paymentReference, paymentId });
+      console.log('💳 Payment info types:', { 
+        paymentReferenceType: typeof paymentReference, 
+        paymentIdType: typeof paymentId,
+        paymentReferenceValue: paymentReference,
+        paymentIdValue: paymentId
+      });
 
       // Check if this specific time slot is already booked
       const existingBookings = await storage.getShiftBookings(shiftId);
@@ -1920,12 +1926,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Link existing payment transaction to booking
       // First check if payment information is explicitly provided
+      console.log('🔄 Payment linking decision point:', {
+        hasPaymentReference: !!paymentReference,
+        hasPaymentId: !!paymentId,
+        hasBooking: !!booking,
+        willTakePrimaryPath: !!(paymentReference && paymentId && booking)
+      });
+      
       if (paymentReference && paymentId && booking) {
         try {
           console.log('💳 Linking existing payment transaction to booking:', booking.id);
           
           // Check if payment transaction already exists for this payment ID
+          console.log('🔍 Searching for existing payment with ID:', paymentId);
           const existingPayment = await storage.getPaymentTransactionByPaymentId(paymentId);
+          console.log('🔍 Existing payment found:', existingPayment ? 'YES' : 'NO', existingPayment);
           
           if (existingPayment) {
             // Get user details for payment record
@@ -2003,11 +2018,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else if (booking) {
         // Fallback: Try to find and link recent unlinked payments by the same customer
         try {
-          console.log('🔍 No payment info provided, searching for recent unlinked payments for user:', userId);
+          console.log('🔍 FALLBACK TRIGGERED - No payment info provided, searching for recent unlinked payments for user:', userId);
+          console.log('🔍 Fallback reason: paymentReference =', paymentReference, ', paymentId =', paymentId);
           const user = await storage.getUser(userId);
           
           if (user) {
             // Look for recent paid payment transactions without booking_id for this customer
+            console.log('🔍 Searching for payments with customer_name:', user.name);
+            console.log('🔍 Search time window: last 10 minutes from', new Date(Date.now() - 10 * 60 * 1000));
+            
             const recentUnlinkedPayments = await db.execute(sql`
               SELECT id, myfatoorah_payment_id, amount, currency, created_at
               FROM payment_transactions 
@@ -2018,6 +2037,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ORDER BY created_at DESC 
               LIMIT 1
             `);
+            
+            console.log('🔍 Found unlinked payments:', recentUnlinkedPayments.rows.length, recentUnlinkedPayments.rows);
             
             if (recentUnlinkedPayments.rows.length > 0) {
               const payment = recentUnlinkedPayments.rows[0];
