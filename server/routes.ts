@@ -1870,6 +1870,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Book an appointment
   app.post('/api/bookings', requireAuth, async (req: any, res) => {
+    console.log('🚀 BOOKING ENDPOINT HIT - /api/bookings POST request received');
     try {
       const { 
         shiftId, 
@@ -1930,17 +1931,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         hasPaymentReference: !!paymentReference,
         hasPaymentId: !!paymentId,
         hasBooking: !!booking,
-        willTakePrimaryPath: !!(paymentReference && paymentId && booking)
+        willTakePrimaryPath: !!(paymentReference && paymentId && booking),
+        willTakePaymentRefPath: !!(paymentReference && booking && !paymentId)
       });
       
-      if (paymentReference && paymentId && booking) {
+      // Enhanced logic: Try to link by paymentReference first, then by paymentId
+      if ((paymentReference || paymentId) && booking) {
         try {
           console.log('💳 Linking existing payment transaction to booking:', booking.id);
           
-          // Check if payment transaction already exists for this payment ID
-          console.log('🔍 Searching for existing payment with ID:', paymentId);
-          const existingPayment = await storage.getPaymentTransactionByPaymentId(paymentId);
-          console.log('🔍 Existing payment found:', existingPayment ? 'YES' : 'NO', existingPayment);
+          let existingPayment = null;
+          
+          // Try to find payment by paymentId first
+          if (paymentId) {
+            console.log('🔍 Searching for existing payment with ID:', paymentId);
+            existingPayment = await storage.getPaymentTransactionByPaymentId(paymentId);
+            console.log('🔍 Payment found by ID:', existingPayment ? 'YES' : 'NO', existingPayment);
+          }
+          
+          // If not found by paymentId, try to find by paymentReference
+          if (!existingPayment && paymentReference) {
+            console.log('🔍 Searching for existing payment with reference:', paymentReference);
+            const paymentByReference = await db.execute(sql`
+              SELECT id, myfatoorah_payment_id, reference_id, amount, currency, status, customer_name, created_at
+              FROM payment_transactions 
+              WHERE reference_id = ${paymentReference}
+              AND status = 'paid'
+              ORDER BY created_at DESC 
+              LIMIT 1
+            `);
+            
+            if (paymentByReference.rows.length > 0) {
+              existingPayment = paymentByReference.rows[0];
+              console.log('🔍 Payment found by reference:', existingPayment);
+            } else {
+              console.log('🔍 No payment found by reference:', paymentReference);
+            }
+          }
           
           if (existingPayment) {
             // Get user details for payment record
@@ -1966,49 +1993,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     ELSE customer_email 
                   END,
                   updated_at = ${new Date()}
-              WHERE myfatoorah_payment_id = ${paymentId}
+              WHERE id = ${existingPayment.id}
+              AND booking_id IS NULL
             `);
             
             console.log('✅ Payment transaction linked to booking with real customer data:', {
+              paymentTransactionId: existingPayment.id,
               bookingId: booking.id,
               customerName: user?.name,
               customerPhone: user?.phone,
-              customerEmail: user?.email
+              customerEmail: user?.email,
+              amount: existingPayment.amount
             });
             
             // Verification log: Check what was actually saved in database
             const verifyPayment = await db.execute(sql`
-              SELECT customer_name, customer_phone, customer_email 
+              SELECT booking_id, customer_name, customer_phone, customer_email, amount
               FROM payment_transactions 
-              WHERE myfatoorah_payment_id = ${paymentId}
+              WHERE id = ${existingPayment.id}
             `);
-            console.log('🔍 Database verification - Real customer data persisted:', verifyPayment.rows[0]);
+            console.log('🔍 Database verification - Payment linked successfully:', verifyPayment.rows[0]);
             
-            // Also update any other payment transactions with the same payment ID that might have placeholder data
-            await db.execute(sql`
-              UPDATE payment_transactions 
-              SET customer_name = CASE 
-                    WHEN customer_name IS NULL OR customer_name IN ('Customer', 'Payment Verified', 'Test Customer') 
-                    THEN ${user?.name || 'Customer'}
-                    ELSE customer_name 
-                  END,
-                  customer_phone = CASE 
-                    WHEN customer_phone IS NULL OR customer_phone IN ('+966000000000', '0000000000') 
-                    THEN ${user?.phone || '+966000000000'}
-                    ELSE customer_phone 
-                  END,
-                  customer_email = CASE 
-                    WHEN customer_email IS NULL OR customer_email IN ('customer@vetsvan.app', 'verified@payment.com', 'test@example.com') 
-                    THEN ${user?.email || 'customer@vetsvan.app'}
-                    ELSE customer_email 
-                  END,
-                  updated_at = ${new Date()}
-              WHERE myfatoorah_payment_id = ${paymentId}
-              AND booking_id IS NULL
-            `);
-            console.log('🔧 Backfilled any remaining placeholder data for payment ID:', paymentId);
           } else {
-            console.log('⚠️ No existing payment transaction found for payment ID:', paymentId);
+            console.log('⚠️ No existing payment transaction found for:', { paymentId, paymentReference });
             // Don't create a new payment - this should have been created already
           }
         } catch (paymentError) {
