@@ -2193,58 +2193,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Booking not found' });
       }
       
-      // If booking is being confirmed (status = "confirmed"), automatically link any unlinked payments
-      if (status === 'confirmed') {
-        try {
-          console.log(`🔗 Booking ${bookingId} confirmed - searching for unlinked payments to auto-link`);
-          
-          // Get booking details to find customer
-          const booking = await storage.getBookingById(bookingId);
-          if (booking) {
-            const customer = await storage.getUser(booking.userId);
-            
-            if (customer) {
-              // Search for recent unlinked payments for this customer
-              const unlinkedPayments = await db.execute(sql`
-                SELECT id, myfatoorah_payment_id, amount, currency, created_at, reference_id
-                FROM payment_transactions 
-                WHERE customer_name = ${customer.name} 
-                  AND booking_id IS NULL 
-                  AND status = 'paid'
-                  AND created_at >= ${new Date(Date.now() - 24 * 60 * 60 * 1000)}
-                ORDER BY created_at DESC 
-                LIMIT 1
-              `);
-              
-              if (unlinkedPayments.rows.length > 0) {
-                const payment = unlinkedPayments.rows[0];
-                
-                // Link this payment to the confirmed booking
-                await db.execute(sql`
-                  UPDATE payment_transactions 
-                  SET booking_id = ${bookingId}, updated_at = ${new Date()}
-                  WHERE id = ${payment.id}
-                `);
-                
-                console.log(`✅ Auto-linked payment to confirmed booking:`, {
-                  paymentId: payment.id,
-                  bookingId: bookingId,
-                  amount: payment.amount,
-                  currency: payment.currency,
-                  customerName: customer.name,
-                  reference: payment.reference_id
-                });
-              } else {
-                console.log(`ℹ️ No unlinked payments found for customer ${customer.name} within 24h window`);
-              }
-            }
-          }
-        } catch (linkingError) {
-          console.error('❌ Failed to auto-link payment during booking confirmation:', linkingError);
-          // Don't fail the status update if payment linking fails
-        }
-      }
-      
       console.log(`✅ Booking ${bookingId} status updated successfully to: ${status}`);
       res.json({ 
         success: true, 
