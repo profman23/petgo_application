@@ -2296,7 +2296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               longitude: booking.customerLocation.longitude,
               address: booking.customerLocation.address || null
             } : null,
-            paymentAmount: paymentTransaction?.amount || null,
+            paymentAmount: paymentTransaction?.amount ? parseFloat(paymentTransaction.amount) : null,
             paymentCurrency: paymentTransaction?.currency || 'SAR',
             paymentStatus: paymentTransaction?.status || null
           };

@@ -637,6 +637,15 @@ export default function DoctorActivity() {
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       {getStatusBadge(booking.status)}
+                      {/* Debug payment data */}
+                      {booking.id <= 111 && booking.id >= 107 && console.log(`Frontend booking ${booking.id}:`, {
+                        paymentAmount: booking.paymentAmount,
+                        paymentCurrency: booking.paymentCurrency,
+                        paymentStatus: booking.paymentStatus,
+                        amountType: typeof booking.paymentAmount,
+                        truthyCheck: !!booking.paymentAmount
+                      })}
+                      
                       {(booking.paymentAmount || booking.paymentAmount === 0) && (
                         <div className="text-sm font-medium text-green-600" style={{ textAlign }}>
                           {language === 'ar' ? 'المبلغ:' : 'Payment:'} {booking.paymentAmount} {booking.paymentCurrency || 'SAR'}
