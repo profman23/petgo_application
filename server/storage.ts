@@ -1165,7 +1165,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPaymentTransactionByBooking(bookingId: number): Promise<any> {
-    // Link payment transactions to bookings via payment_id in bookings table
+    // Link payment transactions to bookings via booking_id in payment_transactions table
     const result = await db.execute(sql`
       SELECT 
         pt.amount, 
@@ -1174,8 +1174,7 @@ export class DatabaseStorage implements IStorage {
         pt.myfatoorah_payment_id, 
         pt.paid_at
       FROM payment_transactions pt
-      INNER JOIN bookings b ON b.payment_id = pt.myfatoorah_payment_id
-      WHERE b.id = ${bookingId} 
+      WHERE pt.booking_id = ${bookingId}
       ORDER BY pt.created_at DESC 
       LIMIT 1
     `);
