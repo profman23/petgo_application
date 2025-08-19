@@ -74,6 +74,88 @@ function getErrorMessage(key: string, language: string = 'ar') {
   return messages[language]?.[key] || messages.ar[key];
 }
 
+// Enhanced payment linking with multi-criteria matching
+async function enhancedPaymentLinking() {
+  try {
+    console.log('🔄 Running enhanced payment linking job...');
+    
+    // Find all unlinked payments from the last 7 days
+    const unlinkedPayments = await db.execute(sql`
+      SELECT p.id, p.myfatoorah_payment_id, p.amount, p.currency, p.customer_name, 
+             p.customer_phone, p.customer_email, p.created_at
+      FROM payment_transactions p
+      WHERE p.booking_id IS NULL 
+        AND p.status = 'paid'
+        AND p.created_at >= ${new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)}
+      ORDER BY p.created_at DESC
+    `);
+
+    let linkedCount = 0;
+    let attemptedCount = 0;
+
+    for (const payment of unlinkedPayments.rows as any[]) {
+      attemptedCount++;
+      
+      // Try to find matching bookings created after this payment
+      const matchingBookings = await db.execute(sql`
+        SELECT b.id, b.userId, u.name, u.phone, u.email
+        FROM bookings b
+        JOIN users u ON b.userId = u.id
+        WHERE b.created_at >= ${payment.created_at}
+          AND b.created_at <= ${new Date((payment.created_at || new Date()).getTime() + 48 * 60 * 60 * 1000)}
+          AND (
+            u.phone = ${payment.customer_phone} OR
+            u.email = ${payment.customer_email} OR
+            u.name = ${payment.customer_name} OR
+            LOWER(TRIM(u.name)) = LOWER(TRIM(${payment.customer_name})) OR
+            u.name LIKE '%' || ${payment.customer_name?.split(' ')[0] || ''} || '%'
+          )
+        ORDER BY 
+          CASE 
+            WHEN u.phone = ${payment.customer_phone} THEN 1
+            WHEN u.email = ${payment.customer_email} THEN 2
+            WHEN u.name = ${payment.customer_name} THEN 3
+            ELSE 4
+          END,
+          b.created_at ASC
+        LIMIT 1
+      `);
+
+      if (matchingBookings.rows.length > 0) {
+        const booking = matchingBookings.rows[0] as any;
+        
+        // Link the payment to the booking
+        await db.execute(sql`
+          UPDATE payment_transactions 
+          SET booking_id = ${booking.id}, updated_at = ${new Date()}
+          WHERE id = ${payment.id}
+        `);
+
+        linkedCount++;
+        
+        const matchType = booking.phone === payment.customer_phone ? 'phone' :
+                          booking.email === payment.customer_email ? 'email' :
+                          booking.name === payment.customer_name ? 'exact_name' : 'fuzzy_name';
+        
+        console.log(`✅ Background linking successful:`, {
+          paymentId: payment.id,
+          bookingId: booking.id,
+          customerName: booking.name,
+          matchedBy: matchType,
+          timeDiff: Math.round(((booking.created_at || new Date()).getTime() - (payment.created_at || new Date()).getTime()) / (1000 * 60)) + 'min'
+        });
+      }
+    }
+
+    console.log(`🎯 Background linking completed: ${linkedCount}/${attemptedCount} payments linked`);
+    return { linked: linkedCount, attempted: attemptedCount };
+    
+  } catch (error) {
+    console.error('❌ Background linking job failed:', error);
+    return { linked: 0, attempted: 0 };
+  }
+}
+
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Earth's radius in kilometers
   const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -2007,15 +2089,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const user = await storage.getUser(userId);
           
           if (user) {
-            // Look for recent paid payment transactions without booking_id for this customer
+            // Enhanced linking: Use phone number as primary identifier, with name as fallback
+            // Extend time window to 2 hours for better reliability
             const recentUnlinkedPayments = await db.execute(sql`
-              SELECT id, myfatoorah_payment_id, amount, currency, created_at
+              SELECT id, myfatoorah_payment_id, amount, currency, created_at, customer_name, customer_phone
               FROM payment_transactions 
-              WHERE customer_name = ${user.name} 
+              WHERE (
+                  customer_phone = ${user.phone} OR
+                  customer_email = ${user.email || ''} OR
+                  customer_name = ${user.name} OR
+                  LOWER(TRIM(customer_name)) = LOWER(TRIM(${user.name})) OR
+                  customer_name LIKE '%' || ${user.name.split(' ')[0] || user.name} || '%'
+                )
                 AND booking_id IS NULL 
                 AND status = 'paid'
-                AND created_at >= ${new Date(Date.now() - 10 * 60 * 1000)}
-              ORDER BY created_at DESC 
+                AND created_at >= ${new Date(Date.now() - 2 * 60 * 60 * 1000)}
+              ORDER BY 
+                CASE 
+                  WHEN customer_phone = ${user.phone} THEN 1
+                  WHEN customer_email = ${user.email || ''} THEN 2
+                  WHEN customer_name = ${user.name} THEN 3
+                  ELSE 4
+                END,
+                created_at DESC 
               LIMIT 1
             `);
             
@@ -2034,7 +2130,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 paymentId: payment.id,
                 bookingId: booking.id,
                 amount: payment.amount,
-                currency: payment.currency
+                currency: payment.currency,
+                matchedBy: payment.customer_phone === user.phone ? 'phone' : 
+                          payment.customer_email === user.email ? 'email' : 
+                          payment.customer_name === user.name ? 'exact_name' : 'fuzzy_name'
               });
             } else {
               console.log('ℹ️ No recent unlinked payments found for automatic linking');
@@ -2204,15 +2303,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const customer = await storage.getUser(booking.userId);
             
             if (customer) {
-              // Search for recent unlinked payments for this customer
+              // Enhanced linking: Use phone number as primary identifier with extended window
               const unlinkedPayments = await db.execute(sql`
-                SELECT id, myfatoorah_payment_id, amount, currency, created_at, reference_id
+                SELECT id, myfatoorah_payment_id, amount, currency, created_at, reference_id, customer_name, customer_phone
                 FROM payment_transactions 
-                WHERE customer_name = ${customer.name} 
+                WHERE (
+                    customer_phone = ${customer.phone} OR
+                    customer_email = ${customer.email || ''} OR
+                    customer_name = ${customer.name} OR
+                    LOWER(TRIM(customer_name)) = LOWER(TRIM(${customer.name})) OR
+                    customer_name LIKE '%' || ${customer.name.split(' ')[0] || customer.name} || '%'
+                  )
                   AND booking_id IS NULL 
                   AND status = 'paid'
-                  AND created_at >= ${new Date(Date.now() - 24 * 60 * 60 * 1000)}
-                ORDER BY created_at DESC 
+                  AND created_at >= ${new Date(Date.now() - 48 * 60 * 60 * 1000)}
+                ORDER BY 
+                  CASE 
+                    WHEN customer_phone = ${customer.phone} THEN 1
+                    WHEN customer_email = ${customer.email || ''} THEN 2
+                    WHEN customer_name = ${customer.name} THEN 3
+                    ELSE 4
+                  END,
+                  created_at DESC 
                 LIMIT 1
               `);
               
@@ -2232,10 +2344,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   amount: payment.amount,
                   currency: payment.currency,
                   customerName: customer.name,
-                  reference: payment.reference_id
+                  reference: payment.reference_id,
+                  matchedBy: payment.customer_phone === customer.phone ? 'phone' : 
+                            payment.customer_email === customer.email ? 'email' : 
+                            payment.customer_name === customer.name ? 'exact_name' : 'fuzzy_name'
                 });
               } else {
-                console.log(`ℹ️ No unlinked payments found for customer ${customer.name} within 24h window`);
+                console.log(`ℹ️ No unlinked payments found for customer ${customer.name} within 48h window`);
               }
             }
           }
@@ -4780,8 +4895,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Enhanced payment linking endpoint (Admin only)
+  app.post('/api/admin/payments/link-job', requireAdminAuth, async (req, res) => {
+    try {
+      const result = await enhancedPaymentLinking();
+      res.json({
+        success: true,
+        message: `Background linking completed: ${result.linked}/${result.attempted} payments linked`,
+        data: result
+      });
+    } catch (error: any) {
+      console.error('❌ Enhanced payment linking endpoint error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to run payment linking job',
+        error: error.message
+      });
+    }
+  });
+
+  // Payment linking statistics endpoint (Admin only)
+  app.get('/api/admin/payments/stats', requireAdminAuth, async (req, res) => {
+    try {
+      const unlinkedCount = await db.execute(sql`
+        SELECT COUNT(*) as count 
+        FROM payment_transactions 
+        WHERE booking_id IS NULL AND status = 'paid'
+      `);
+      
+      const totalPayments = await db.execute(sql`
+        SELECT COUNT(*) as count 
+        FROM payment_transactions 
+        WHERE status = 'paid'
+      `);
+      
+      const linkedCount = await db.execute(sql`
+        SELECT COUNT(*) as count 
+        FROM payment_transactions 
+        WHERE booking_id IS NOT NULL AND status = 'paid'
+      `);
+      
+      const unlinked = (unlinkedCount.rows[0] as any)?.count || 0;
+      const total = (totalPayments.rows[0] as any)?.count || 0;
+      const linked = (linkedCount.rows[0] as any)?.count || 0;
+      const linkingRate = total > 0 ? Math.round((linked / total) * 100) : 0;
+      
+      res.json({
+        success: true,
+        data: {
+          totalPayments: total,
+          linkedPayments: linked,
+          unlinkedPayments: unlinked,
+          linkingSuccessRate: linkingRate
+        }
+      });
+    } catch (error: any) {
+      console.error('❌ Payment stats endpoint error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get payment statistics',
+        error: error.message
+      });
+    }
+  });
+
   // Register public payment routes
   addPublicPaymentRoutes(app);
+
+  // Start background linking job - runs every 15 minutes
+  setInterval(async () => {
+    try {
+      await enhancedPaymentLinking();
+    } catch (error) {
+      console.error('❌ Scheduled payment linking job failed:', error);
+    }
+  }, 15 * 60 * 1000); // 15 minutes
+
+  console.log('🔄 Background payment linking job scheduled every 15 minutes');
 
   const httpServer = createServer(app);
   return httpServer;
