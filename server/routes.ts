@@ -102,7 +102,7 @@ async function enhancedPaymentLinking() {
         FROM bookings b
         JOIN users u ON b.userId = u.id
         WHERE b.created_at >= ${payment.created_at}
-          AND b.created_at <= ${new Date((payment.created_at || new Date()).getTime() + 48 * 60 * 60 * 1000)}
+          AND b.created_at <= ${new Date(new Date(payment.created_at).getTime() + 48 * 60 * 60 * 1000)}
           AND (
             u.phone = ${payment.customer_phone} OR
             u.email = ${payment.customer_email} OR
@@ -142,7 +142,7 @@ async function enhancedPaymentLinking() {
           bookingId: booking.id,
           customerName: booking.name,
           matchedBy: matchType,
-          timeDiff: Math.round(((booking.created_at || new Date()).getTime() - (payment.created_at || new Date()).getTime()) / (1000 * 60)) + 'min'
+          timeDiff: Math.round((new Date(booking.created_at).getTime() - new Date(payment.created_at).getTime()) / (1000 * 60)) + 'min'
         });
       }
     }
