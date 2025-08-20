@@ -47,6 +47,11 @@ const getEstimatedCost = (petCount: number, serviceType: string): number => {
     return petCount;
   }
   
+  // Vaccination pricing: 172.5 SAR per pet
+  if (serviceType === 'vaccination') {
+    return petCount * 172.5;
+  }
+  
   // Original pricing for other services
   if (petCount <= 2) return 172.5;
   if (petCount <= 4) return 345;
@@ -962,6 +967,12 @@ export default function RideRequest() {
                     <span>{language === 'ar' ? 'أشعة مقطعية' : 'CT-Scan'}</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="vaccination" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-blue-500" />
+                    <span>{language === 'ar' ? 'التطعيم' : 'Vaccination'}</span>
+                  </div>
+                </SelectItem>
                 <SelectItem value="test-service" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Bell className="w-4 h-4 text-purple-600" />
@@ -973,7 +984,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'test-service'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'test-service'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-purple-800" style={{ 
