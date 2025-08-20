@@ -1163,7 +1163,7 @@ export default function RideRequest() {
         onOpenChange={() => {}} // Disable default close behavior
       >
         <DialogContent 
-          className="sm:max-w-md"
+          className="sm:max-w-md [&>button]:hidden" // Hide the close button
           onInteractOutside={(e) => e.preventDefault()} // Block outside clicks
           onEscapeKeyDown={(e) => e.preventDefault()}   // Block Escape key
         >
