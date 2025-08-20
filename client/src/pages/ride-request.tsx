@@ -966,6 +966,12 @@ export default function RideRequest() {
                     <span>{language === 'ar' ? 'الديدان' : 'Deworming'}</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="fleas-ticks-prevention" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-emerald-600" />
+                    <span>{language === 'ar' ? 'الوقاية من القراد والبراغيث' : 'Fleas & Ticks Prevention'}</span>
+                  </div>
+                </SelectItem>
                 <SelectItem value="pickup-drop" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Car className="w-4 h-4 text-indigo-600" />
