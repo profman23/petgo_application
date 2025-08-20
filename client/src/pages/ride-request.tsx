@@ -937,6 +937,12 @@ export default function RideRequest() {
                     <span>{language === 'ar' ? 'استشارة منزلية' : 'Home Consultation'}</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="vaccination" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-blue-500" />
+                    <span>{language === 'ar' ? 'التطعيم' : 'Vaccination'}</span>
+                  </div>
+                </SelectItem>
                 <SelectItem value="pickup-drop" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Car className="w-4 h-4 text-indigo-600" />
@@ -965,12 +971,6 @@ export default function RideRequest() {
                   <div className="flex items-center gap-2">
                     <Scan className="w-4 h-4 text-green-600" />
                     <span>{language === 'ar' ? 'أشعة مقطعية' : 'CT-Scan'}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="vaccination" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-blue-500" />
-                    <span>{language === 'ar' ? 'التطعيم' : 'Vaccination'}</span>
                   </div>
                 </SelectItem>
                 <SelectItem value="test-service" className="select-item-custom">
