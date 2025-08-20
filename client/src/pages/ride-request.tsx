@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car, Home } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car, Home, Cross } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -25,7 +25,7 @@ import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
 import drPawsLogo from "@assets/Dr.Paws Logo_1753364291004.png";
 import eliteVetLogo from "@assets/Final LogoLogo_1753364291004.png";
-import surgicalIcon from "@assets/generated_images/Red_surgical_icon_white_background_e2301cca.png";
+
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -964,11 +964,7 @@ export default function RideRequest() {
                 </SelectItem>
                 <SelectItem value="surgery" className="select-item-custom">
                   <div className="flex items-center gap-2">
-                    <img 
-                      src={surgicalIcon} 
-                      alt="Surgery" 
-                      className="w-4 h-4 object-contain"
-                    />
+                    <Cross className="w-4 h-4 text-red-600" />
                     <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
                   </div>
                 </SelectItem>
