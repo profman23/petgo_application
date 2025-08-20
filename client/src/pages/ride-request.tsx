@@ -41,19 +41,44 @@ const formSchema = rideRequestSchema.extend({
 
 type FormData = z.infer<typeof formSchema>;
 
-// Helper function to calculate estimated cost based on pet count and service type
-const getEstimatedCost = (petCount: number, serviceType: string): number => {
+// Helper function to calculate estimated cost based on pet types and service type
+const getEstimatedCost = (selectedPatients: number[], patients: Patient[], serviceType: string): number | null => {
+  // Get selected pet details
+  const selectedPets = selectedPatients.map(id => patients.find(p => p.id === id)).filter(Boolean);
+  
+  // Count cats and dogs
+  const catCount = selectedPets.filter(pet => pet?.type === 'cat').length;
+  const dogCount = selectedPets.filter(pet => pet?.type === 'dog').length;
+  
   // Test Service pricing: 1 SAR per pet
   if (serviceType === 'test-service') {
-    return petCount;
+    return selectedPatients.length;
   }
   
   // Vaccination pricing: 172.5 SAR per pet
   if (serviceType === 'vaccination') {
-    return petCount * 172.5;
+    return selectedPatients.length * 172.5;
+  }
+  
+  // For other services, apply pet-type-based pricing
+  if (['first-visit', 'general-checkup', 'home-consultation'].includes(serviceType)) {
+    let totalCost = 0;
+    
+    // Cats: 80.50 SAR per cat
+    if (catCount > 0) {
+      totalCost += catCount * 80.5;
+    }
+    
+    // Dogs: No cost shown for now (empty)
+    if (dogCount > 0 && catCount === 0) {
+      return null; // Return null to hide cost display for dogs only
+    }
+    
+    return totalCost;
   }
   
   // Original pricing for other services
+  const petCount = selectedPatients.length;
   if (petCount <= 2) return 172.5;
   if (petCount <= 4) return 345;
   return 517.5; // 5+ pets
@@ -1001,23 +1026,29 @@ export default function RideRequest() {
             </Select>
             
             {/* Estimated Cost Display */}
-            {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'test-service'].includes(serviceType) && (
-              <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-purple-800" style={{ 
-                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                  }}>
-                    {language === 'ar' ? 'التكلفة التقديرية:' : 'Estimated Cost:'}
-                  </span>
-                  <span className="text-lg font-bold text-purple-900" style={{ 
-                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                  }}>
-                    {getEstimatedCost(selectedPatients.length, serviceType)} {language === 'ar' ? 'ريال' : 'SAR'}
-                  </span>
+            {(() => {
+              const estimatedCost = selectedPatients.length > 0 && 
+                ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'test-service'].includes(serviceType) 
+                ? getEstimatedCost(selectedPatients, patients, serviceType) 
+                : null;
+              
+              return estimatedCost !== null && (
+                <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-purple-800" style={{ 
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
+                      {language === 'ar' ? 'التكلفة التقديرية:' : 'Estimated Cost:'}
+                    </span>
+                    <span className="text-lg font-bold text-purple-900" style={{ 
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
+                      {estimatedCost} {language === 'ar' ? 'ريال' : 'SAR'}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </CardContent>
         </Card>
 
