@@ -53,6 +53,11 @@ const getEstimatedCost = (petCount: number, serviceType: string): number => {
     return petCount * 172.5;
   }
   
+  // Deworming pricing: 80.50 SAR per pet
+  if (serviceType === 'deworming') {
+    return petCount * 80.5;
+  }
+  
   // Original pricing for other services
   if (petCount <= 2) return 172.5;
   if (petCount <= 4) return 345;
@@ -1002,7 +1007,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'test-service'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'test-service'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-purple-800" style={{ 
