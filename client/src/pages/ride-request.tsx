@@ -25,6 +25,7 @@ import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
 import drPawsLogo from "@assets/Dr.Paws Logo_1753364291004.png";
 import eliteVetLogo from "@assets/Final LogoLogo_1753364291004.png";
+import surgicalIcon from "@assets/generated_images/Medical_surgical_icon_set_60bdb061.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
@@ -963,7 +964,11 @@ export default function RideRequest() {
                 </SelectItem>
                 <SelectItem value="surgery" className="select-item-custom">
                   <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-orange-600" />
+                    <img 
+                      src={surgicalIcon} 
+                      alt="Surgery" 
+                      className="w-4 h-4 object-contain"
+                    />
                     <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
                   </div>
                 </SelectItem>
