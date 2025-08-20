@@ -25,7 +25,7 @@ import locationIcon from "@assets/freepik_assistant_1751438122960_1751438131963.
 import vetVanImage from "@assets/freepik__background__70346_1751441138494.png";
 import drPawsLogo from "@assets/Dr.Paws Logo_1753364291004.png";
 import eliteVetLogo from "@assets/Final LogoLogo_1753364291004.png";
-import surgicalIcon from "@assets/generated_images/Medical_surgical_icon_set_60bdb061.png";
+import surgicalIcon from "@assets/generated_images/Red_surgical_icon_transparent_e0bf3fd8.png";
 import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
