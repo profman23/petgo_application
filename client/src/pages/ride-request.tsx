@@ -15,7 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car, Home, Cross } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car, Home, ShieldPlus } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -964,7 +964,7 @@ export default function RideRequest() {
                 </SelectItem>
                 <SelectItem value="surgery" className="select-item-custom">
                   <div className="flex items-center gap-2">
-                    <Cross className="w-4 h-4 text-red-600" />
+                    <ShieldPlus className="w-4 h-4 text-red-600" />
                     <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
                   </div>
                 </SelectItem>
