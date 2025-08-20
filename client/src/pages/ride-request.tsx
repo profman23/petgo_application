@@ -918,7 +918,7 @@ export default function RideRequest() {
                   language === 'ar' ? 'اختر نوع الخدمة...' : 'Select service type...'
                 } />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[240px] overflow-y-auto">
                 <SelectItem value="first-visit" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-yellow-600" />
