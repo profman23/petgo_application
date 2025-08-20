@@ -71,6 +71,7 @@ export default function RideRequest() {
   const [isSlideComplete, setIsSlideComplete] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [showPartnersDialog, setShowPartnersDialog] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
   const { t } = useTranslation();
@@ -104,10 +105,20 @@ export default function RideRequest() {
   const eliteOnlyServices = ['ct-scan'];
 
   const handleServiceTypeChange = (value: string) => {
-    setServiceType(value);
     if (specializedServices.includes(value) || eliteOnlyServices.includes(value)) {
+      setIsDialogOpen(true);
       setShowPartnersDialog(true);
+      // Don't set service type yet - only after OK button confirmation
+    } else {
+      setServiceType(value);
     }
+  };
+
+  const handleDialogOkClick = () => {
+    setIsDialogOpen(false);
+    setShowPartnersDialog(false);
+    // Reset service selection - don't keep the specialized service
+    setServiceType('');
   };
   
   // جلب الحيوانات الأليفة المسجلة بتحسين الأداء
@@ -1147,8 +1158,15 @@ export default function RideRequest() {
       </div>
 
       {/* Partners Dialog */}
-      <Dialog open={showPartnersDialog} onOpenChange={setShowPartnersDialog}>
-        <DialogContent className="sm:max-w-md">
+      <Dialog 
+        open={isDialogOpen} 
+        onOpenChange={() => {}} // Disable default close behavior
+      >
+        <DialogContent 
+          className="sm:max-w-md"
+          onInteractOutside={(e) => e.preventDefault()} // Block outside clicks
+          onEscapeKeyDown={(e) => e.preventDefault()}   // Block Escape key
+        >
           <DialogHeader>
             <DialogTitle className="text-center text-xl font-bold text-gray-800" style={{
               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
@@ -1231,13 +1249,10 @@ export default function RideRequest() {
               </p>
             </div>
 
-            {/* Close Button */}
+            {/* OK Button - Only way to close dialog */}
             <div className="flex justify-center mt-6">
               <Button 
-                onClick={() => {
-                  setShowPartnersDialog(false);
-                  setServiceType(''); // إعادة تعيين الخدمة
-                }}
+                onClick={handleDialogOkClick}
                 className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2"
                 style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
