@@ -25,6 +25,7 @@ The application is a full-stack solution. The frontend is built with React 18 an
     - **Notification System**: Real-time browser and audio notifications for new requests (doctors/admins), and email notifications for booking confirmations and pre-appointment alerts.
     - **Data Persistence**: Robust PostgreSQL-based storage with comprehensive CRUD operations and multi-layered data protection.
     - **Invoice & Payment System**: Generation of professional, bilingual invoices with tax and discount calculations, pet vitals tracking, and email delivery of invoice links.
+    - **Patient Weight Management**: Comprehensive patient weight tracking with decimal precision support (patient_weight column, REAL type) integrated in both Create and Edit patient forms with bilingual UI.
     - **Admin Dashboard**: Centralized management for Vets Vans, products, services, user accounts, sales reports with Excel export, and payment linking statistics.
     - **Location Services**: Precise customer location detection with reverse geocoding (OpenStreetMap) and Vets Van location management.
 
