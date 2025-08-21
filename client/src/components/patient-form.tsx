@@ -204,11 +204,12 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                   <Input
                     id="patientWeight"
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     min="0"
+                    inputMode="decimal"
                     {...form.register('patientWeight')}
                     className="border-2 border-purple-600 focus:border-purple-600 rounded-lg pr-12"
-                    placeholder={language === 'ar' ? 'أدخل الوزن' : 'Enter weight'}
+                    placeholder={language === 'ar' ? 'أدخل الوزن (مثل: 5.3)' : 'Enter weight (e.g., 5.3)'}
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <span className="text-sm text-gray-500 font-medium">kg</span>

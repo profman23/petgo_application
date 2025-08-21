@@ -227,11 +227,12 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                   <Input
                     id="patientWeight"
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     min="0"
+                    inputMode="decimal"
                     {...form.register('patientWeight')}
                     className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
-                    placeholder={language === 'ar' ? 'أدخل الوزن' : 'Enter weight'}
+                    placeholder={language === 'ar' ? 'أدخل الوزن (مثل: 5.3)' : 'Enter weight (e.g., 5.3)'}
                     style={{ paddingRight: isRTL ? '12px' : '50px', paddingLeft: isRTL ? '50px' : '12px' }}
                   />
                   <span 
