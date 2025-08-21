@@ -1486,7 +1486,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const patientId = parseInt(req.params.id);
       const { patientWeight } = req.body;
       
-      if (!patientWeight || patientWeight <= 0) {
+      console.log(`PATCH /api/patients/${patientId}/weight - received weight:`, patientWeight);
+      
+      if (patientWeight === undefined || patientWeight === null || parseFloat(patientWeight) <= 0) {
+        console.log('Invalid weight provided:', patientWeight);
         return res.status(400).json({ message: 'Valid patient weight is required' });
       }
 

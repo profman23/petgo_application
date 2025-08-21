@@ -124,16 +124,27 @@ export default function RideRequest() {
       setShowPartnersDialog(true);
       // Don't set service type yet - only after OK button confirmation
     } else if (value === 'fleas-ticks-prevention') {
-      // Check if any selected pets are missing weight data
-      const petsWithoutWeight = selectedPatients
+      // Get selected pets with their weight status for debugging
+      const selectedPetsWithStatus = selectedPatients
         .map(patientId => patients.find(p => p.id === patientId))
-        .filter(patient => patient && (!patient.patientWeight || patient.patientWeight === 0));
+        .filter(patient => patient);
+      
+      console.log('Selected pets for fleas-ticks-prevention:', selectedPetsWithStatus.map(p => ({
+        id: p.id,
+        name: p.name, 
+        weight: p.patientWeight,
+        hasWeight: !(!p.patientWeight || p.patientWeight === 0)
+      })));
+
+      // Check if any selected pets are missing weight data  
+      const petsWithoutWeight = selectedPetsWithStatus
+        .filter(patient => !patient.patientWeight || patient.patientWeight === 0);
       
       if (petsWithoutWeight.length > 0) {
-        // Show weight modal for all pets without weight
+        // Show weight modal for pets without weight
         setPatientsForWeight(petsWithoutWeight as Patient[]);
         
-        // Initialize weights object
+        // Initialize weights object - empty for pets without weight
         const initialWeights: Record<number, string> = {};
         petsWithoutWeight.forEach(pet => {
           if (pet) initialWeights[pet.id] = '';
@@ -143,9 +154,11 @@ export default function RideRequest() {
         setWeightErrors({});
         
         setShowWeightModal(true);
+        console.log('Opening weight modal for pets without weight:', petsWithoutWeight.map(p => p.name));
         // Don't set service type yet - only after weights are entered
       } else {
         // All pets have weights, proceed normally
+        console.log('All selected pets have weights, proceeding with service');
         setServiceType(value);
       }
     } else {
@@ -193,6 +206,9 @@ export default function RideRequest() {
 
   // Handle saving all weights
   const handleWeightSaveAll = async () => {
+    console.log('Starting weight save for pets:', patientsForWeight.map(p => p.name));
+    console.log('Current weight inputs:', patientWeights);
+    
     // Validate all weights
     const errors: Record<number, string> = {};
     const validWeights: { patientId: number; weight: number }[] = [];
@@ -210,6 +226,7 @@ export default function RideRequest() {
     
     if (Object.keys(errors).length > 0) {
       setWeightErrors(errors);
+      console.log('Validation errors:', errors);
       return;
     }
     
@@ -219,18 +236,23 @@ export default function RideRequest() {
     // Update all weights
     let successCount = 0;
     let failedPets: string[] = [];
+    let updatedPets: string[] = [];
     
     for (const { patientId, weight } of validWeights) {
       try {
         setUpdatingWeights(prev => ({ ...prev, [patientId]: true }));
         
+        console.log(`Updating pet ${patientId} weight to ${weight}`);
         await updatePatientWeightMutation.mutateAsync({
           patientId,
           weight
         });
         
+        const pet = patientsForWeight.find(p => p.id === patientId);
+        updatedPets.push(pet?.name || `Pet ${patientId}`);
         successCount++;
       } catch (error) {
+        console.error(`Failed to update weight for pet ${patientId}:`, error);
         const pet = patientsForWeight.find(p => p.id === patientId);
         failedPets.push(pet?.name || `Pet ${patientId}`);
       } finally {
@@ -243,8 +265,8 @@ export default function RideRequest() {
       toast({
         title: language === 'ar' ? 'تم حفظ جميع الأوزان' : 'All Weights Saved',
         description: language === 'ar' ? 
-          `تم حفظ أوزان ${successCount} حيوان أليف بنجاح` : 
-          `Successfully saved weights for ${successCount} pets`,
+          `تم حفظ أوزان: ${updatedPets.join(', ')}` : 
+          `Successfully updated: ${updatedPets.join(', ')}`,
         duration: 3000,
       });
       
