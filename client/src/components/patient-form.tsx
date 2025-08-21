@@ -57,7 +57,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
     defaultValues: {
       name: '',
       type: undefined,
-      patientWeight: '',
+      patientWeight: 0 as any,
       ageYear: '',
       ageMonth: '',
       ageDay: '',
@@ -103,15 +103,15 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
     }
   };
 
-  const onSubmit = (data: PatientFormData) => {
-    // Clean up data - convert empty strings to numbers or undefined for optional fields
+  const onSubmit = async (data: PatientFormData) => {
+    // Clean up data - send as expected by the API
     const cleanData = {
       name: data.name,
       type: data.type,
       patientWeight: data.patientWeight,
-      ageYear: data.ageYear && data.ageYear !== '' ? Number(data.ageYear) : undefined,
-      ageMonth: data.ageMonth && data.ageMonth !== '' ? Number(data.ageMonth) : undefined,
-      ageDay: data.ageDay && data.ageDay !== '' ? Number(data.ageDay) : undefined,
+      ageYear: data.ageYear && data.ageYear !== '' ? data.ageYear : undefined,
+      ageMonth: data.ageMonth && data.ageMonth !== '' ? data.ageMonth : undefined,
+      ageDay: data.ageDay && data.ageDay !== '' ? data.ageDay : undefined,
       photo: data.photo || undefined,
       birthdate: data.birthdate || undefined,
     };
@@ -224,7 +224,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 <Label className="text-sm font-medium text-gray-700" style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                 }}>
-                  {language === 'ar' ? 'عمر الأليف' : 'Patient Age'} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                  {language === 'ar' ? 'عمر الأليف' : 'Patient Age'} <span className="text-gray-400 text-xs">(Optional)</span>
                 </Label>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
@@ -277,7 +277,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 <Label htmlFor="birthdate" className="text-sm font-medium text-gray-700" style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                 }}>
-                  {language === 'ar' ? 'تاريخ الميلاد' : 'Birthdate'} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                  {language === 'ar' ? 'تاريخ الميلاد' : 'Birthdate'} <span className="text-gray-400 text-xs">(Optional)</span>
                 </Label>
                 <div className="relative">
                   <Calendar className="absolute top-3 w-4 h-4 text-gray-400" style={{ [isRTL ? 'right' : 'left']: '12px' }} />
@@ -295,7 +295,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 <Label className="text-sm font-medium text-gray-700" style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                 }}>
-                  {language === 'ar' ? 'صورة الأليف' : 'Patient Photo'} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                  {language === 'ar' ? 'صورة الأليف' : 'Patient Photo'} <span className="text-gray-400 text-xs">(Optional)</span>
                 </Label>
                 <div className="flex flex-col items-center gap-4">
                   {selectedPhoto ? (
@@ -321,7 +321,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                     >
                       <div className="text-center">
                         <Camera className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                        <p className="text-sm text-purple-600">{t('uploadPhoto')}</p>
+                        <p className="text-sm text-purple-600">{language === 'ar' ? 'تحميل صورة' : 'Upload Photo'}</p>
                       </div>
                     </div>
                   )}
