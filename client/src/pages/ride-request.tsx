@@ -42,27 +42,106 @@ const formSchema = rideRequestSchema.extend({
 
 type FormData = z.infer<typeof formSchema>;
 
-// Helper function to calculate estimated cost based on pet count and service type
-const getEstimatedCost = (petCount: number, serviceType: string): number => {
-  // Test Service pricing: 1 SAR per pet
-  if (serviceType === 'test-service') {
-    return petCount;
+// Helper function to calculate fleas & ticks prevention cost per pet
+const getFleaTicksCostPerPet = (petType: string, weight: number): { cost: number; tier: string } => {
+  const normalizedType = petType.toLowerCase();
+  
+  if (normalizedType === 'cat') {
+    if (weight >= 0 && weight <= 2.9) {
+      return { cost: 230, tier: '0.0-2.9kg' };
+    } else if (weight >= 3.0 && weight <= 5.9) {
+      return { cost: 250, tier: '3.0-5.9kg' };
+    } else if (weight >= 6.0) {
+      return { cost: 270, tier: '≥6.0kg' };
+    }
+  } else if (normalizedType === 'dog') {
+    if (weight >= 0 && weight <= 10.0) {
+      return { cost: 230, tier: '0.0-10.0kg' };
+    } else if (weight > 10.0) {
+      return { cost: 287, tier: '>10.0kg' };
+    }
   }
   
-  // Vaccination pricing: 172.5 SAR per pet
-  if (serviceType === 'vaccination') {
-    return petCount * 172.5;
+  // Unknown type or invalid weight
+  return { cost: 0, tier: 'Unknown' };
+};
+
+// Helper function to calculate estimated cost based on pets and service type
+const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], serviceType: string): { 
+  total: number; 
+  breakdown: Array<{ name: string; type: string; weight: number; tier: string; cost: number; }>; 
+  warnings: string[];
+} => {
+  const selectedPets = selectedPetIds
+    .map(id => patients.find(p => p.id === id))
+    .filter(pet => pet) as Patient[];
+
+  if (serviceType === 'fleas-ticks-prevention') {
+    const breakdown: Array<{ name: string; type: string; weight: number; tier: string; cost: number; }> = [];
+    const warnings: string[] = [];
+    let total = 0;
+
+    selectedPets.forEach(pet => {
+      if (!pet.patientWeight || pet.patientWeight <= 0) {
+        warnings.push(`${pet.name}: Missing weight data`);
+        breakdown.push({
+          name: pet.name,
+          type: pet.type,
+          weight: pet.patientWeight || 0,
+          tier: 'No weight',
+          cost: 0
+        });
+        return;
+      }
+
+      const { cost, tier } = getFleaTicksCostPerPet(pet.type, pet.patientWeight);
+      
+      if (cost === 0) {
+        warnings.push(`${pet.name}: Unknown pet type (${pet.type})`);
+      }
+
+      breakdown.push({
+        name: pet.name,
+        type: pet.type,
+        weight: pet.patientWeight,
+        tier: tier,
+        cost: cost
+      });
+
+      total += cost;
+    });
+
+    return { total, breakdown, warnings };
   }
-  
-  // Deworming pricing: 80.50 SAR per pet
-  if (serviceType === 'deworming') {
-    return petCount * 80.5;
-  }
-  
+
   // Original pricing for other services
-  if (petCount <= 2) return 172.5;
-  if (petCount <= 4) return 345;
-  return 517.5; // 5+ pets
+  const petCount = selectedPets.length;
+  let total = 0;
+
+  if (serviceType === 'test-service') {
+    total = petCount;
+  } else if (serviceType === 'vaccination') {
+    total = petCount * 172.5;
+  } else if (serviceType === 'deworming') {
+    total = petCount * 80.5;
+  } else {
+    // Original pricing for other services
+    if (petCount <= 2) total = 172.5;
+    else if (petCount <= 4) total = 345;
+    else total = 517.5; // 5+ pets
+  }
+
+  return { 
+    total, 
+    breakdown: selectedPets.map(pet => ({
+      name: pet.name,
+      type: pet.type,
+      weight: pet.patientWeight || 0,
+      tier: 'Standard',
+      cost: total / selectedPets.length
+    })), 
+    warnings: [] 
+  };
 };
 
 export default function RideRequest() {
@@ -275,6 +354,9 @@ export default function RideRequest() {
       setPatientsForWeight([]);
       setPatientWeights({});
       setServiceType('fleas-ticks-prevention');
+      
+      // Trigger a refetch to update the cost calculation
+      queryClient.invalidateQueries({ queryKey: ['/api/patients'] });
     } else if (failedPets.length > 0) {
       toast({
         title: language === 'ar' ? 'فشل في حفظ بعض الأوزان' : 'Some Weights Failed to Save',
@@ -646,7 +728,7 @@ export default function RideRequest() {
     }
 
     // التحقق من وجود التكلفة التقديرية
-    const estimatedCost = getEstimatedCost(selectedPatients.length, serviceType);
+    const { total: estimatedCost } = getEstimatedCost(selectedPatients, patients, serviceType);
     if (!estimatedCost || estimatedCost <= 0) {
       toast({
         title: language === 'ar' ? 'خطأ في التكلفة' : 'Cost Error',
@@ -1197,20 +1279,73 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'test-service'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'test-service', 'fleas-ticks-prevention'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-purple-800" style={{ 
-                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                  }}>
-                    {language === 'ar' ? 'التكلفة التقديرية:' : 'Estimated Cost:'}
-                  </span>
-                  <span className="text-lg font-bold text-purple-900" style={{ 
-                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                  }}>
-                    {getEstimatedCost(selectedPatients.length, serviceType)} {language === 'ar' ? 'ريال' : 'SAR'}
-                  </span>
-                </div>
+                {(() => {
+                  const costData = getEstimatedCost(selectedPatients, patients, serviceType);
+                  return (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-purple-800" style={{ 
+                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                        }}>
+                          {language === 'ar' ? 'التكلفة التقديرية:' : 'Estimated Cost:'}
+                        </span>
+                        <span className="text-lg font-bold text-purple-900" style={{ 
+                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                        }}>
+                          {costData.total.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                        </span>
+                      </div>
+                      
+                      {/* Show breakdown for fleas-ticks-prevention */}
+                      {serviceType === 'fleas-ticks-prevention' && costData.breakdown.length > 0 && (
+                        <div className="mt-3 space-y-2">
+                          <div className="text-xs font-medium text-purple-700" style={{ 
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}>
+                            {language === 'ar' ? 'تفصيل التكاليف:' : 'Cost Breakdown:'}
+                          </div>
+                          {costData.breakdown.map((item, index) => (
+                            <div key={index} className="flex items-center justify-between text-xs text-purple-600 bg-white rounded px-2 py-1">
+                              <div className="flex items-center gap-1">
+                                <span>{item.name}</span>
+                                <span className="text-gray-500">
+                                  ({item.type.toLowerCase() === 'cat' ? (language === 'ar' ? 'قطة' : 'Cat') :
+                                    item.type.toLowerCase() === 'dog' ? (language === 'ar' ? 'كلب' : 'Dog') :
+                                    item.type})
+                                </span>
+                                {item.weight > 0 && (
+                                  <span className="text-gray-500">- {item.weight}kg</span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs text-gray-500">{item.tier}</span>
+                                <span className="font-medium">{item.cost.toFixed(2)} SAR</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {/* Show warnings if any */}
+                      {costData.warnings.length > 0 && (
+                        <div className="mt-3 p-2 bg-orange-50 border border-orange-200 rounded">
+                          <div className="text-xs font-medium text-orange-700 mb-1" style={{ 
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}>
+                            {language === 'ar' ? 'تحذيرات:' : 'Warnings:'}
+                          </div>
+                          {costData.warnings.map((warning, index) => (
+                            <div key={index} className="text-xs text-orange-600">
+                              {warning}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             )}
           </CardContent>
