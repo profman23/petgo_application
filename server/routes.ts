@@ -1484,19 +1484,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.id;
       const patientId = parseInt(req.params.id);
-      const { name, type, ageYear, ageMonth, ageDay, photo } = req.body;
+      const { name, type, patientWeight, ageYear, ageMonth, ageDay, photo, birthdate } = req.body;
       
-      if (!name || !type) {
-        return res.status(400).json({ message: 'Patient name and type are required' });
+      if (!name || !type || !patientWeight) {
+        return res.status(400).json({ message: 'Patient name, type, and weight are required' });
       }
       
       const updatedPatient = await storage.updatePatient(patientId, userId, {
         name,
         type,
+        patientWeight,
         ageYear: ageYear || null,
         ageMonth: ageMonth || null,
         ageDay: ageDay || null,
         photo: photo || null,
+        birthdate: birthdate || null,
       });
       
       if (!updatedPatient) {

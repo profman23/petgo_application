@@ -20,6 +20,10 @@ const editPatientFormSchema = z.object({
   type: z.enum(['Cat', 'Dog', 'Bird'], {
     errorMap: () => ({ message: 'Please select patient type' })
   }),
+  patientWeight: z.string()
+    .min(1, 'Patient weight is required')
+    .transform((val) => parseFloat(val))
+    .refine((val) => val > 0, 'Patient weight must be greater than 0'),
   ageYear: z.string().optional(),
   ageMonth: z.string().optional(),
   ageDay: z.string().optional(),
@@ -48,6 +52,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
     defaultValues: {
       name: patient.name,
       type: patient.type as 'Cat' | 'Dog' | 'Bird',
+      patientWeight: patient.patientWeight?.toString() || '0',
       ageYear: patient.ageYear?.toString() || '',
       ageMonth: patient.ageMonth?.toString() || '',
       ageDay: patient.ageDay?.toString() || '',
@@ -61,6 +66,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
       const cleanData = {
         name: data.name,
         type: data.type,
+        patientWeight: data.patientWeight,
         ageYear: data.ageYear && data.ageYear !== '' ? Number(data.ageYear) : undefined,
         ageMonth: data.ageMonth && data.ageMonth !== '' ? Number(data.ageMonth) : undefined,
         ageDay: data.ageDay && data.ageDay !== '' ? Number(data.ageDay) : undefined,
@@ -111,7 +117,7 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
     }
   };
 
-  const onSubmit = (data: EditPatientFormData) => {
+  const onSubmit = async (data: EditPatientFormData) => {
     updatePatientMutation.mutate(data);
   };
 
@@ -210,12 +216,42 @@ export function EditPatientForm({ patient, onBack, onSuccess }: EditPatientFormP
                 )}
               </div>
 
+              {/* Patient Weight */}
+              <div className="space-y-2">
+                <Label htmlFor="patientWeight" className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'وزن الأليف (كجم)' : 'Patient Weight (kg)'} <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="patientWeight"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    {...form.register('patientWeight')}
+                    className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
+                    placeholder={language === 'ar' ? 'أدخل الوزن' : 'Enter weight'}
+                    style={{ paddingRight: isRTL ? '12px' : '50px', paddingLeft: isRTL ? '50px' : '12px' }}
+                  />
+                  <span 
+                    className="absolute top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none"
+                    style={{ [isRTL ? 'left' : 'right']: '12px' }}
+                  >
+                    kg
+                  </span>
+                </div>
+                {form.formState.errors.patientWeight && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.patientWeight.message}</p>
+                )}
+              </div>
+
               {/* Patient Age */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-gray-700" style={{
                   fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                 }}>
-                  {language === 'ar' ? 'عمر الأليف' : 'Patient Age'} <span className="text-gray-400 text-xs">({t('optional')})</span>
+                  {language === 'ar' ? 'عمر الأليف' : 'Patient Age'} <span className="text-gray-400 text-xs">(Optional)</span>
                 </Label>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
