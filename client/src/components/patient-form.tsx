@@ -13,11 +13,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Camera, Cat, Dog, Bird, ArrowLeft, Calendar } from 'lucide-react';
 
-// Patient form schema - only name and type are required
+// Patient form schema - name, type, and weight are required
 const patientFormSchema = z.object({
   name: z.string().min(2, 'Patient name is required'),
   type: z.enum(['Cat', 'Dog', 'Bird'], {
     errorMap: () => ({ message: 'Please select patient type' })
+  }),
+  patientWeight: z.string().min(1, 'Patient weight is required').transform((val) => {
+    const num = parseFloat(val);
+    if (isNaN(num) || num <= 0) {
+      throw new Error('Please enter a valid weight');
+    }
+    return num;
   }),
   ageYear: z.string().optional(),
   ageMonth: z.string().optional(),
@@ -50,6 +57,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
     defaultValues: {
       name: '',
       type: undefined,
+      patientWeight: '',
       ageYear: '',
       ageMonth: '',
       ageDay: '',
@@ -100,6 +108,7 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
     const cleanData = {
       name: data.name,
       type: data.type,
+      patientWeight: data.patientWeight,
       ageYear: data.ageYear && data.ageYear !== '' ? Number(data.ageYear) : undefined,
       ageMonth: data.ageMonth && data.ageMonth !== '' ? Number(data.ageMonth) : undefined,
       ageDay: data.ageDay && data.ageDay !== '' ? Number(data.ageDay) : undefined,
@@ -181,6 +190,32 @@ export function PatientForm({ onBack, onSuccess }: PatientFormProps) {
                 </Select>
                 {form.formState.errors.type && (
                   <p className="text-red-500 text-sm">{form.formState.errors.type.message}</p>
+                )}
+              </div>
+
+              {/* Patient Weight */}
+              <div className="space-y-2">
+                <Label htmlFor="patientWeight" className="text-sm font-medium text-gray-700" style={{
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  {language === 'ar' ? 'وزن الأليف' : 'Patient Weight'} <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="patientWeight"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    {...form.register('patientWeight')}
+                    className="border-2 border-purple-600 focus:border-purple-600 rounded-lg pr-12"
+                    placeholder={language === 'ar' ? 'أدخل الوزن' : 'Enter weight'}
+                  />
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <span className="text-sm text-gray-500 font-medium">kg</span>
+                  </div>
+                </div>
+                {form.formState.errors.patientWeight && (
+                  <p className="text-red-500 text-sm">{form.formState.errors.patientWeight.message}</p>
                 )}
               </div>
 
