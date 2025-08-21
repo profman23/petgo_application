@@ -1479,6 +1479,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update patient weight only (PATCH /api/patients/:id/weight)
+  app.patch('/api/patients/:id/weight', requireAuth, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const patientId = parseInt(req.params.id);
+      const { patientWeight } = req.body;
+      
+      if (!patientWeight || patientWeight <= 0) {
+        return res.status(400).json({ message: 'Valid patient weight is required' });
+      }
+
+      // Get current patient data
+      const currentPatient = await storage.getPatientById(patientId, userId);
+      if (!currentPatient) {
+        return res.status(404).json({ message: 'Patient not found' });
+      }
+
+      // Update only the weight
+      const updatedPatient = await storage.updatePatient(patientId, userId, {
+        name: currentPatient.name,
+        type: currentPatient.type,
+        patientWeight: parseFloat(patientWeight),
+        ageYear: currentPatient.ageYear,
+        ageMonth: currentPatient.ageMonth,
+        ageDay: currentPatient.ageDay,
+        photo: currentPatient.photo,
+        birthdate: currentPatient.birthdate,
+      });
+      
+      res.json(updatedPatient);
+    } catch (error) {
+      console.error('Error updating patient weight:', error);
+      res.status(500).json({ message: 'Failed to update patient weight' });
+    }
+  });
+
   // Update patient
   app.put('/api/patients/:id', requireAuth, async (req, res) => {
     try {

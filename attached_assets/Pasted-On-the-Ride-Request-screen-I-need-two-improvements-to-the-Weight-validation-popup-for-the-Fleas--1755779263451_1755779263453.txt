@@ -1,0 +1,53 @@
+On the Ride Request screen, I need two improvements to the Weight validation popup for the “Fleas & Ticks Prevention” service:
+
+Support multiple pets without weight
+
+If the user selects multiple pets that have no weight in DB, show them all in one popup so the user can enter weights once for all.
+
+Popup layout: a table/list with rows = each pet (Pet Name / Type / Weight (kg) input with step=0.01, min=0, required).
+
+Buttons: Save All (writes all weights), Cancel (close without saving), and optionally Skip pet per row.
+
+If “all in one popup” is complex now, implement a sequential flow: show the popup for pet #1 → Save → then auto-open for pet #2 → … until all pets missing weight are handled.
+
+After successful save(s), continue the normal service selection flow.
+
+Fix 400 error on saving weight
+Current console error (repro):
+
+PUT /api/patients/:id → 400 Bad Request
+{"message":"Patient name, type, and weight are required"}
+
+
+Root cause: the PUT endpoint requires name and type along with weight.
+
+Acceptable fix (choose one):
+A. Add a PATCH /api/patients/:id endpoint that allows partial updates (only patientWeight).
+OR
+B. Keep PUT, but merge existing fields on the server: read current patient (name, type, …) and replace only patient_weight.
+OR
+C. Keep PUT, and on the client, fetch the patient first and send name, type, and the new patientWeight together.
+
+Frontend requirements:
+
+For multi-pet popup: allow decimals (step 0.01), min=0, required. Inline errors per row.
+
+On Save All:
+
+If using PATCH: PATCH /api/patients/:id with { patientWeight }.
+
+If using batch: POST /api/patients/batch-weight with [{ id, patientWeight }, …].
+
+Show loading state per row, and aggregate success/error toasts.
+
+Optimistic UI is nice-to-have; if any row fails, display which pet failed and keep the row editable.
+
+Acceptance criteria:
+
+Selecting multiple pets without weight triggers one popup listing all of them (or sequential popups).
+
+Entering weights and saving writes to DB for all selected pets (REAL/float).
+
+No 400 errors; partial update or merged PUT works reliably.
+
+After save, service selection resumes automatically.

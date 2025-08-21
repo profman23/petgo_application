@@ -81,11 +81,12 @@ export default function RideRequest() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
-  // Weight modal state
+  // Weight modal state - Multi-pet support
   const [showWeightModal, setShowWeightModal] = useState(false);
-  const [currentPatientForWeight, setCurrentPatientForWeight] = useState<Patient | null>(null);
-  const [patientWeight, setPatientWeight] = useState<string>('');
-  const [isUpdatingWeight, setIsUpdatingWeight] = useState(false);
+  const [patientsForWeight, setPatientsForWeight] = useState<Patient[]>([]);
+  const [patientWeights, setPatientWeights] = useState<Record<number, string>>({});
+  const [updatingWeights, setUpdatingWeights] = useState<Record<number, boolean>>({});
+  const [weightErrors, setWeightErrors] = useState<Record<number, string>>({});
   
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -129,11 +130,20 @@ export default function RideRequest() {
         .filter(patient => patient && (!patient.patientWeight || patient.patientWeight === 0));
       
       if (petsWithoutWeight.length > 0) {
-        // Show weight modal for the first pet without weight
-        setCurrentPatientForWeight(petsWithoutWeight[0]!);
-        setPatientWeight('');
+        // Show weight modal for all pets without weight
+        setPatientsForWeight(petsWithoutWeight as Patient[]);
+        
+        // Initialize weights object
+        const initialWeights: Record<number, string> = {};
+        petsWithoutWeight.forEach(pet => {
+          if (pet) initialWeights[pet.id] = '';
+        });
+        setPatientWeights(initialWeights);
+        setUpdatingWeights({});
+        setWeightErrors({});
+        
         setShowWeightModal(true);
-        // Don't set service type yet - only after weight is entered
+        // Don't set service type yet - only after weights are entered
       } else {
         // All pets have weights, proceed normally
         setServiceType(value);
@@ -153,12 +163,9 @@ export default function RideRequest() {
   // Weight update mutation
   const updatePatientWeightMutation = useMutation({
     mutationFn: async ({ patientId, weight }: { patientId: number; weight: number }) => {
-      return apiRequest(`/api/patients/${patientId}`, {
-        method: 'PUT',
+      return apiRequest(`/api/patients/${patientId}/weight`, {
+        method: 'PATCH',
         body: JSON.stringify({ patientWeight: weight }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
     },
     onSuccess: () => {
@@ -184,45 +191,101 @@ export default function RideRequest() {
     },
   });
 
-  // Handle weight modal save
-  const handleWeightSave = async () => {
-    if (!currentPatientForWeight || !patientWeight || parseFloat(patientWeight) <= 0) {
-      toast({
-        title: language === 'ar' ? 'وزن غير صالح' : 'Invalid Weight',
-        description: language === 'ar' ? 
-          'يرجى إدخال وزن صالح أكبر من صفر' : 
-          'Please enter a valid weight greater than zero',
-        variant: 'destructive',
-        duration: 5000,
-      });
+  // Handle saving all weights
+  const handleWeightSaveAll = async () => {
+    // Validate all weights
+    const errors: Record<number, string> = {};
+    const validWeights: { patientId: number; weight: number }[] = [];
+    
+    for (const pet of patientsForWeight) {
+      const weightStr = patientWeights[pet.id] || '';
+      const weight = parseFloat(weightStr);
+      
+      if (!weightStr || weight <= 0 || isNaN(weight)) {
+        errors[pet.id] = language === 'ar' ? 'يرجى إدخال وزن صالح' : 'Please enter valid weight';
+      } else {
+        validWeights.push({ patientId: pet.id, weight });
+      }
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setWeightErrors(errors);
       return;
     }
-
-    setIsUpdatingWeight(true);
-    try {
-      await updatePatientWeightMutation.mutateAsync({
-        patientId: currentPatientForWeight.id,
-        weight: parseFloat(patientWeight)
+    
+    // Clear any previous errors
+    setWeightErrors({});
+    
+    // Update all weights
+    let successCount = 0;
+    let failedPets: string[] = [];
+    
+    for (const { patientId, weight } of validWeights) {
+      try {
+        setUpdatingWeights(prev => ({ ...prev, [patientId]: true }));
+        
+        await updatePatientWeightMutation.mutateAsync({
+          patientId,
+          weight
+        });
+        
+        successCount++;
+      } catch (error) {
+        const pet = patientsForWeight.find(p => p.id === patientId);
+        failedPets.push(pet?.name || `Pet ${patientId}`);
+      } finally {
+        setUpdatingWeights(prev => ({ ...prev, [patientId]: false }));
+      }
+    }
+    
+    // Show results
+    if (successCount === validWeights.length) {
+      toast({
+        title: language === 'ar' ? 'تم حفظ جميع الأوزان' : 'All Weights Saved',
+        description: language === 'ar' ? 
+          `تم حفظ أوزان ${successCount} حيوان أليف بنجاح` : 
+          `Successfully saved weights for ${successCount} pets`,
+        duration: 3000,
       });
       
       // Close modal and continue with service selection
       setShowWeightModal(false);
-      setCurrentPatientForWeight(null);
-      setPatientWeight('');
+      setPatientsForWeight([]);
+      setPatientWeights({});
       setServiceType('fleas-ticks-prevention');
-    } catch (error) {
-      // Error handling is done in the mutation onError
-    } finally {
-      setIsUpdatingWeight(false);
+    } else if (failedPets.length > 0) {
+      toast({
+        title: language === 'ar' ? 'فشل في حفظ بعض الأوزان' : 'Some Weights Failed to Save',
+        description: language === 'ar' ? 
+          `فشل حفظ: ${failedPets.join(', ')}` : 
+          `Failed to save: ${failedPets.join(', ')}`,
+        variant: 'destructive',
+        duration: 8000,
+      });
     }
   };
 
   // Handle weight modal cancel
   const handleWeightCancel = () => {
     setShowWeightModal(false);
-    setCurrentPatientForWeight(null);
-    setPatientWeight('');
+    setPatientsForWeight([]);
+    setPatientWeights({});
+    setUpdatingWeights({});
+    setWeightErrors({});
     // Don't set the service type, user needs to try again
+  };
+
+  // Update individual pet weight
+  const handlePetWeightChange = (petId: number, weight: string) => {
+    setPatientWeights(prev => ({ ...prev, [petId]: weight }));
+    // Clear error for this pet if they start typing
+    if (weightErrors[petId]) {
+      setWeightErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[petId];
+        return newErrors;
+      });
+    }
   };
   
   // جلب الحيوانات الأليفة المسجلة بتحسين الأداء
@@ -1389,16 +1452,16 @@ export default function RideRequest() {
         </DialogContent>
       </Dialog>
 
-      {/* Weight Modal for Fleas & Ticks Prevention */}
+      {/* Multi-Pet Weight Modal for Fleas & Ticks Prevention */}
       <Dialog open={showWeightModal} onOpenChange={() => {}}>
-        <DialogContent className="sm:max-w-md mx-auto">
+        <DialogContent className="sm:max-w-2xl mx-auto max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-center" style={{
               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
               textAlign: 'center',
               direction: language === 'ar' ? 'rtl' : 'ltr'
             }}>
-              {language === 'ar' ? 'إدخال وزن الحيوان الأليف' : 'Enter Pet Weight'}
+              {language === 'ar' ? 'إدخال أوزان الحيوانات الأليفة' : 'Enter Pet Weights'}
             </DialogTitle>
             <DialogDescription className="text-center" style={{
               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
@@ -1406,57 +1469,89 @@ export default function RideRequest() {
               direction: language === 'ar' ? 'rtl' : 'ltr'
             }}>
               {language === 'ar' 
-                ? `يرجى إدخال وزن ${currentPatientForWeight?.name || 'الحيوان الأليف'} لمتابعة خدمة الوقاية من القراد والبراغيث`
-                : `Please enter the weight for ${currentPatientForWeight?.name || 'your pet'} to continue with Fleas & Ticks Prevention service`
+                ? `يرجى إدخال أوزان الحيوانات الأليفة التالية لمتابعة خدمة الوقاية من القراد والبراغيث`
+                : `Please enter weights for the following pets to continue with Fleas & Ticks Prevention service`
               }
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <label 
-                htmlFor="modalPatientWeight" 
-                className="text-sm font-medium text-gray-700"
-                style={{
-                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                }}
-              >
-                {language === 'ar' ? 'وزن الحيوان الأليف (كجم)' : 'Patient Weight (kg)'} <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <Input
-                  id="modalPatientWeight"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  inputMode="decimal"
-                  value={patientWeight}
-                  onChange={(e) => setPatientWeight(e.target.value)}
-                  className="border-2 border-purple-600 focus:border-purple-600 rounded-lg"
-                  placeholder={language === 'ar' ? 'أدخل الوزن (مثل: 5.3)' : 'Enter weight (e.g., 5.3)'}
-                  style={{ 
-                    paddingRight: language === 'ar' ? '12px' : '50px', 
-                    paddingLeft: language === 'ar' ? '50px' : '12px',
-                    direction: 'ltr',
-                    textAlign: 'left'
-                  }}
-                  disabled={isUpdatingWeight}
-                />
-                <span 
-                  className="absolute top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none"
-                  style={{ [language === 'ar' ? 'left' : 'right']: '12px' }}
-                >
-                  kg
-                </span>
+            {patientsForWeight.map((pet) => (
+              <div key={pet.id} className="border rounded-lg p-4 space-y-3">
+                {/* Pet Info Header */}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    {pet.type === 'Cat' && <Cat className="w-5 h-5 text-purple-600" />}
+                    {pet.type === 'Dog' && <Dog className="w-5 h-5 text-purple-600" />}
+                    {pet.type === 'Bird' && <Bird className="w-5 h-5 text-purple-600" />}
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-900" style={{
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
+                      {pet.name}
+                    </h4>
+                    <p className="text-sm text-gray-500">
+                      {language === 'ar' ? 
+                        (pet.type === 'Cat' ? 'قطة' : pet.type === 'Dog' ? 'كلب' : 'طائر') :
+                        pet.type
+                      }
+                    </p>
+                  </div>
+                </div>
+
+                {/* Weight Input */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700" style={{
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                  }}>
+                    {language === 'ar' ? 'الوزن (كجم)' : 'Weight (kg)'} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      inputMode="decimal"
+                      value={patientWeights[pet.id] || ''}
+                      onChange={(e) => handlePetWeightChange(pet.id, e.target.value)}
+                      className={`border-2 focus:border-purple-600 rounded-lg ${
+                        weightErrors[pet.id] ? 'border-red-500' : 'border-purple-600'
+                      }`}
+                      placeholder={language === 'ar' ? 'أدخل الوزن (مثل: 5.3)' : 'Enter weight (e.g., 5.3)'}
+                      style={{ 
+                        paddingRight: language === 'ar' ? '12px' : '50px', 
+                        paddingLeft: language === 'ar' ? '50px' : '12px',
+                        direction: 'ltr',
+                        textAlign: 'left'
+                      }}
+                      disabled={updatingWeights[pet.id]}
+                    />
+                    <span 
+                      className="absolute top-1/2 transform -translate-y-1/2 text-gray-500 text-sm pointer-events-none"
+                      style={{ [language === 'ar' ? 'left' : 'right']: '12px' }}
+                    >
+                      kg
+                    </span>
+                    {updatingWeights[pet.id] && (
+                      <div className="absolute top-1/2 transform -translate-y-1/2 left-3">
+                        <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
+                      </div>
+                    )}
+                  </div>
+                  {weightErrors[pet.id] && (
+                    <p className="text-red-500 text-sm">{weightErrors[pet.id]}</p>
+                  )}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
 
           <div className="flex justify-center gap-4 mt-6">
             <Button 
               variant="outline"
               onClick={handleWeightCancel}
-              disabled={isUpdatingWeight}
+              disabled={Object.values(updatingWeights).some(Boolean)}
               className="px-6"
               style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
@@ -1465,20 +1560,23 @@ export default function RideRequest() {
               {language === 'ar' ? 'إلغاء' : 'Cancel'}
             </Button>
             <Button 
-              onClick={handleWeightSave}
-              disabled={isUpdatingWeight || !patientWeight || parseFloat(patientWeight || '0') <= 0}
+              onClick={handleWeightSaveAll}
+              disabled={
+                Object.values(updatingWeights).some(Boolean) ||
+                patientsForWeight.some(pet => !patientWeights[pet.id] || parseFloat(patientWeights[pet.id] || '0') <= 0)
+              }
               className="bg-purple-600 hover:bg-purple-700 text-white px-6"
               style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}
             >
-              {isUpdatingWeight ? (
+              {Object.values(updatingWeights).some(Boolean) ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   {language === 'ar' ? 'جاري الحفظ...' : 'Saving...'}
                 </>
               ) : (
-                language === 'ar' ? 'حفظ' : 'Save'
+                language === 'ar' ? 'حفظ جميع الأوزان' : 'Save All Weights'
               )}
             </Button>
           </div>
