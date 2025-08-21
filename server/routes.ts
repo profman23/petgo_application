@@ -1454,20 +1454,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/patients', requireAuth, async (req, res) => {
     try {
       const userId = req.user.id;
-      const { name, type, ageYear, ageMonth, ageDay, photo } = req.body;
+      const { name, type, patientWeight, ageYear, ageMonth, ageDay, photo, birthdate } = req.body;
       
-      if (!name || !type) {
-        return res.status(400).json({ message: 'Patient name and type are required' });
+      if (!name || !type || !patientWeight) {
+        return res.status(400).json({ message: 'Patient name, type, and weight are required' });
       }
       
       const patient = await storage.createPatient({
         userId,
         name,
         type,
+        patientWeight,
         ageYear: ageYear || null,
         ageMonth: ageMonth || null,
         ageDay: ageDay || null,
         photo: photo || null,
+        birthdate: birthdate || null,
       });
       
       res.status(201).json(patient);
