@@ -16,7 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useRide } from '@/hooks/useRide';
 import { useGeolocation } from '@/hooks/useGeolocation';
-import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car, Home, ShieldPlus, Pill } from 'lucide-react';
+import { ArrowLeft, MapPin, Navigation, Circle, RefreshCw, Loader2, Truck, Heart, Shield, Clock, Star, User, PawPrint, Check, ChevronDown, Bell, Scissors, Stethoscope, Zap, Scan, Phone, MessageCircle, Car, Home, ShieldPlus, Pill, Cat, Dog, Bird } from 'lucide-react';
 import { rideRequestSchema, type Patient } from '@shared/schema';
 import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import petsImage from "@assets/freepik_assistant_1751437357520_1751437467714.png";
@@ -1484,6 +1484,7 @@ export default function RideRequest() {
                     {pet.type === 'Cat' && <Cat className="w-5 h-5 text-purple-600" />}
                     {pet.type === 'Dog' && <Dog className="w-5 h-5 text-purple-600" />}
                     {pet.type === 'Bird' && <Bird className="w-5 h-5 text-purple-600" />}
+                    {!['Cat', 'Dog', 'Bird'].includes(pet.type) && <PawPrint className="w-5 h-5 text-purple-600" />}
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900" style={{
@@ -1493,7 +1494,10 @@ export default function RideRequest() {
                     </h4>
                     <p className="text-sm text-gray-500">
                       {language === 'ar' ? 
-                        (pet.type === 'Cat' ? 'قطة' : pet.type === 'Dog' ? 'كلب' : 'طائر') :
+                        (pet.type === 'Cat' ? 'قطة' : 
+                         pet.type === 'Dog' ? 'كلب' : 
+                         pet.type === 'Bird' ? 'طائر' : 
+                         'حيوان أليف') :
                         pet.type
                       }
                     </p>
