@@ -294,8 +294,8 @@ export default function AdministrationAuthorization() {
 
       {/* Add New Authorization Popup */}
       {showAddAuthorizationPopup && (
-        <div className="fixed inset-0 bg-white z-50">
-          <div className="h-full w-full">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style={{ left: '256px', top: '82px' }}>
+          <div className="bg-white rounded-lg shadow-xl w-[500px] max-w-2xl mx-4">
             {/* Popup Header */}
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900">
