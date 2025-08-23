@@ -22,10 +22,15 @@ export default function AdministrationAuthorization() {
   // State for popup
   const [showAddAuthorizationPopup, setShowAddAuthorizationPopup] = useState(false);
   
-  // State for checkboxes
+  // State for checkboxes - Users section
   const [hiddenUsersChecked, setHiddenUsersChecked] = useState(false);
   const [readUsersChecked, setReadUsersChecked] = useState(false);
   const [fullControlChecked, setFullControlChecked] = useState(false);
+  
+  // State for checkboxes - Authorization section
+  const [authHiddenUsersChecked, setAuthHiddenUsersChecked] = useState(false);
+  const [authReadUsersChecked, setAuthReadUsersChecked] = useState(false);
+  const [authFullControlChecked, setAuthFullControlChecked] = useState(false);
 
   // Check admin authentication
   useEffect(() => {
@@ -363,6 +368,58 @@ export default function AdministrationAuthorization() {
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="fullControl" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Authorization Section */}
+                <div className="ml-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                    {language === 'ar' ? 'التصريح' : 'Authorization'}
+                  </h4>
+                  
+                  {/* Permission Items */}
+                  <div className="ml-4 space-y-2">
+                    {/* Hidden Users */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="authHiddenUsers"
+                        checked={authHiddenUsersChecked}
+                        onChange={(e) => setAuthHiddenUsersChecked(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="authHiddenUsers" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'المستخدمين المخفيين' : 'Hidden Users'}
+                      </label>
+                    </div>
+                    
+                    {/* Read Users */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="authReadUsers"
+                        checked={authReadUsersChecked}
+                        onChange={(e) => setAuthReadUsersChecked(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="authReadUsers" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'قراءة المستخدمين' : 'Read Users'}
+                      </label>
+                    </div>
+                    
+                    {/* Full Control */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="authFullControl"
+                        checked={authFullControlChecked}
+                        onChange={(e) => setAuthFullControlChecked(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="authFullControl" className="ml-2 text-sm text-gray-600">
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
