@@ -255,9 +255,16 @@ export default function AdministrationAuthorization() {
             <div className="px-4 py-6 sm:px-0">
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                    {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
-                  </h1>
+                  <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
+                    </h1>
+                    <button
+                      className="px-4 py-2 border-2 border-purple-600 bg-white text-purple-600 font-medium rounded-md hover:bg-purple-50 transition-colors duration-200"
+                    >
+                      {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+                    </button>
+                  </div>
                   <div className="text-center py-12">
                     <Shield className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900">
