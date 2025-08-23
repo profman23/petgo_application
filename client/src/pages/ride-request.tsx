@@ -136,7 +136,7 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   } else if (serviceType === 'deworming') {
     total = petCount * 80.5;
   } else if (serviceType === 'pickup-drop') {
-    total = petCount * 115;
+    total = 115;
   } else {
     // Original pricing for other services
     if (petCount <= 2) total = 172.5;
