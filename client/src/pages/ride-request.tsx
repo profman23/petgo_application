@@ -66,6 +66,17 @@ const getFleaTicksCostPerPet = (petType: string, weight: number): { cost: number
   return { cost: 0, tier: 'Unknown' };
 };
 
+// Helper function to check if only Bird pets are selected
+const isOnlyBirdsSelected = (selectedPetIds: number[], patients: Patient[]): boolean => {
+  if (selectedPetIds.length === 0) return false;
+  
+  const selectedPets = selectedPetIds
+    .map(id => patients.find(p => p.id === id))
+    .filter(pet => pet) as Patient[];
+  
+  return selectedPets.length > 0 && selectedPets.every(pet => pet.type === 'Bird');
+};
+
 // Helper function to calculate estimated cost based on pets and service type
 const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], serviceType: string): { 
   total: number; 
@@ -166,6 +177,15 @@ export default function RideRequest() {
   const [patientWeights, setPatientWeights] = useState<Record<number, string>>({});
   const [updatingWeights, setUpdatingWeights] = useState<Record<number, boolean>>({});
   const [weightErrors, setWeightErrors] = useState<Record<number, string>>({});
+  
+  // Check if only birds are selected and clear fleas-ticks-prevention if needed
+  useEffect(() => {
+    if (serviceType === 'fleas-ticks-prevention' && isOnlyBirdsSelected(selectedPatients, patients)) {
+      console.log('Clearing fleas-ticks-prevention service as only birds are selected');
+      setServiceType('');
+      form.setValue('serviceType', '');
+    }
+  }, [selectedPatients, patients, serviceType, form]);
   
   const { t } = useTranslation();
   const { language } = useLanguage();
@@ -1232,12 +1252,14 @@ export default function RideRequest() {
                     <span>{language === 'ar' ? 'الديدان' : 'Deworming'}</span>
                   </div>
                 </SelectItem>
-                <SelectItem value="fleas-ticks-prevention" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-emerald-600" />
-                    <span>{language === 'ar' ? 'الوقاية من القراد والبراغيث' : 'Fleas & Ticks Prevention'}</span>
-                  </div>
-                </SelectItem>
+                {!isOnlyBirdsSelected(selectedPatients, patients) && (
+                  <SelectItem value="fleas-ticks-prevention" className="select-item-custom">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-emerald-600" />
+                      <span>{language === 'ar' ? 'الوقاية من القراد والبراغيث' : 'Fleas & Ticks Prevention'}</span>
+                    </div>
+                  </SelectItem>
+                )}
                 <SelectItem value="pickup-drop" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Car className="w-4 h-4 text-indigo-600" />
