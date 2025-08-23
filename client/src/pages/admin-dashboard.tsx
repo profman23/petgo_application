@@ -691,6 +691,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false); // Administration module dropdown state
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
@@ -1722,6 +1723,42 @@ export default function AdminDashboard() {
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
+            {/* Administration Module */}
+            <div className="mb-2">
+              <button
+                onClick={() => setIsAdministrationExpanded(!isAdministrationExpanded)}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <Users className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'الإدارة' : 'Administration'}
+                </span>
+                {isAdministrationExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+              
+              {/* Administration Submenu */}
+              {isAdministrationExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <User className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                  </button>
+                  <button
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Shield className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+            
             <button
               onClick={() => setActiveTab('management')}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
