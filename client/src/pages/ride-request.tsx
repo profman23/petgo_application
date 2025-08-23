@@ -178,15 +178,6 @@ export default function RideRequest() {
   const [updatingWeights, setUpdatingWeights] = useState<Record<number, boolean>>({});
   const [weightErrors, setWeightErrors] = useState<Record<number, string>>({});
   
-  // Check if only birds are selected and clear fleas-ticks-prevention if needed
-  useEffect(() => {
-    if (serviceType === 'fleas-ticks-prevention' && isOnlyBirdsSelected(selectedPatients, patients)) {
-      console.log('Clearing fleas-ticks-prevention service as only birds are selected');
-      setServiceType('');
-      form.setValue('serviceType', '');
-    }
-  }, [selectedPatients, patients, serviceType, form]);
-  
   const { t } = useTranslation();
   const { language } = useLanguage();
   const direction = getDirection(language);
@@ -464,6 +455,15 @@ export default function RideRequest() {
       selectedPatients: [],
     },
   });
+
+  // Check if only birds are selected and clear fleas-ticks-prevention if needed
+  useEffect(() => {
+    if (serviceType === 'fleas-ticks-prevention' && isOnlyBirdsSelected(selectedPatients, patients)) {
+      console.log('Clearing fleas-ticks-prevention service as only birds are selected');
+      setServiceType('');
+      form.setValue('serviceType', '');
+    }
+  }, [selectedPatients, patients, serviceType, form]);
 
   useEffect(() => {
     // Get user's current location with high accuracy - force new location request

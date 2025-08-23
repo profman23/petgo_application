@@ -1,0 +1,32 @@
+The following appears in the console during testing: 
+ride-request.tsx:188 Uncaught ReferenceError: Cannot access 'patients' before initialization
+    at RideRequest (ride-request.tsx:188:25)
+
+chunk-276SZO74.js?v=c17afaab:14032 The above error occurred in the <RideRequest> component:
+
+    at RideRequest (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/ride-request.tsx?t=1755941478404:137:27)
+    at AuthCheck (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?t=1755941478404&v=mekaF_P0_wGmBWvuNt17p:93:22)
+    at component
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/.../node_modules/.vite/deps/wouter.js?v=c17afaab:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/.../node_modules/.vite/deps/wouter.js?v=c17afaab:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?t=1755941478404&v=mekaF_P0_wGmBWvuNt17p:122:22)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/.../node_modules/.vite/deps/@tanstack_react-query.js?v=c17afaab:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?t=1755941478404&v=mekaF_P0_wGmBWvuNt17p:395:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+chunk-276SZO74.js?v=c17afaab:19413 Uncaught ReferenceError: Cannot access 'patients' before initialization
+    at RideRequest (ride-request.tsx:188:25)
+
+And on the screen itself the following appears:  
+[plugin:runtime-error-plugin] Cannot access 'patients' before initialization
+/home/runner/workspace/client/src/pages/ride-request.tsx:188:25
+186|        form.setValue('serviceType', '');
+187|      }
+188|    }, [selectedPatients, patients, serviceType, form]);
+   |                          ^
+189|    
+190|    const { t } = useTranslation();
