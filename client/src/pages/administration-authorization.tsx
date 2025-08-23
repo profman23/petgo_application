@@ -31,6 +31,9 @@ export default function AdministrationAuthorization() {
   const [authHiddenUsersChecked, setAuthHiddenUsersChecked] = useState(false);
   const [authReadUsersChecked, setAuthReadUsersChecked] = useState(false);
   const [authFullControlChecked, setAuthFullControlChecked] = useState(false);
+  
+  // State for authorization name field
+  const [authorizationName, setAuthorizationName] = useState('');
 
   // Handlers for Users section
   const handleHiddenUsersChange = (checked: boolean) => {
@@ -360,6 +363,23 @@ export default function AdministrationAuthorization() {
             
             {/* Popup Content */}
             <div className="p-4">
+              {/* Authorization Name Field */}
+              <div className="mb-6">
+                <label htmlFor="authorizationName" className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'اسم التصريح:' : 'Authorization Name:'}
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="authorizationName"
+                  value={authorizationName}
+                  onChange={(e) => setAuthorizationName(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  placeholder={language === 'ar' ? 'أدخل اسم التصريح' : 'Enter authorization name'}
+                />
+              </div>
+              
               {/* Administration Tab */}
               <div className="mb-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-2">
