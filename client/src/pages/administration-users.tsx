@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -18,6 +18,18 @@ export default function AdministrationUsers() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
+  
+  // State for popup
+  const [showCreateUserPopup, setShowCreateUserPopup] = useState(false);
+  
+  // Form state
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [selectedAuthorization, setSelectedAuthorization] = useState('');
 
   // Check admin authentication
   useEffect(() => {
@@ -67,6 +79,23 @@ export default function AdministrationUsers() {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("admin");
     setLocation("/admin-login");
+  };
+
+  // Reset form function
+  const resetForm = () => {
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setUsername('');
+    setPassword('');
+    setConfirmPassword('');
+    setSelectedAuthorization('');
+  };
+
+  // Handle close popup
+  const handleClosePopup = () => {
+    setShowCreateUserPopup(false);
+    resetForm();
   };
 
   return (
@@ -255,9 +284,17 @@ export default function AdministrationUsers() {
             <div className="px-4 py-6 sm:px-0">
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                    {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
-                  </h1>
+                  <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                      {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
+                    </h1>
+                    <button
+                      onClick={() => setShowCreateUserPopup(true)}
+                      className="px-4 py-2 border-2 border-purple-600 bg-white text-purple-600 font-medium rounded-md hover:bg-purple-50 transition-colors duration-200"
+                    >
+                      {language === 'ar' ? 'إنشاء مستخدم جديد' : 'Create New User'}
+                    </button>
+                  </div>
                   <div className="text-center py-12">
                     <User className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-2 text-sm font-medium text-gray-900">
@@ -275,6 +312,163 @@ export default function AdministrationUsers() {
           </div>
         </div>
       </div>
+
+      {/* Create New User Popup */}
+      {showCreateUserPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style={{ left: '256px', top: '82px' }}>
+          <div className="bg-white rounded-lg shadow-xl w-[500px] max-w-2xl mx-4">
+            {/* Popup Header */}
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {language === 'ar' ? 'إنشاء مستخدم جديد' : 'Create New User'}
+              </h2>
+              <button
+                onClick={handleClosePopup}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            {/* Popup Content */}
+            <div className="p-4 max-h-96 overflow-y-auto">
+              <div className="space-y-4">
+                {/* First Name */}
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'الاسم الأول:' : 'First Name:'}
+                  </label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل الاسم الأول' : 'Enter first name'}
+                  />
+                </div>
+
+                {/* Last Name */}
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'اسم العائلة:' : 'Last Name:'}
+                  </label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل اسم العائلة' : 'Enter last name'}
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'البريد الإلكتروني:' : 'Email:'}
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email address'}
+                  />
+                </div>
+
+                {/* User Name */}
+                <div>
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'اسم المستخدم:' : 'User Name:'}
+                  </label>
+                  <input
+                    type="text"
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل اسم المستخدم' : 'Enter username'}
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'كلمة المرور:' : 'Password:'}
+                  </label>
+                  <input
+                    type="password"
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل كلمة المرور' : 'Enter password'}
+                  />
+                </div>
+
+                {/* Confirm Password */}
+                <div>
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'تأكيد كلمة المرور:' : 'Confirm Password:'}
+                  </label>
+                  <input
+                    type="password"
+                    id="confirmPassword"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder={language === 'ar' ? 'أعد إدخال كلمة المرور' : 'Re-enter password'}
+                  />
+                </div>
+
+                {/* Authorization */}
+                <div>
+                  <label htmlFor="authorization" className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'التصريح:' : 'Authorization:'}
+                  </label>
+                  <select
+                    id="authorization"
+                    value={selectedAuthorization}
+                    onChange={(e) => setSelectedAuthorization(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  >
+                    <option value="">
+                      {language === 'ar' ? 'اختر التصريح' : 'Select Authorization'}
+                    </option>
+                    <option value="admin">
+                      {language === 'ar' ? 'مدير' : 'Admin'}
+                    </option>
+                    <option value="user">
+                      {language === 'ar' ? 'مستخدم' : 'User'}
+                    </option>
+                    <option value="editor">
+                      {language === 'ar' ? 'محرر' : 'Editor'}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            {/* Popup Footer */}
+            <div className="flex justify-end gap-2 p-4 border-t">
+              <button
+                onClick={handleClosePopup}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+              <button
+                type="button"
+                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
+              >
+                {language === 'ar' ? 'إنشاء' : 'Create'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
