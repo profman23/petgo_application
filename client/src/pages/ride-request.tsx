@@ -661,8 +661,23 @@ export default function RideRequest() {
     console.log('Patients:', selectedPatients);
     console.log('Service:', serviceType);
     
-    if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
-      console.log('Cannot slide - missing data');
+    // Check if only birds are selected
+    const onlyBirdsSelected = isOnlyBirdsSelected(selectedPatients, patients);
+    
+    if (!currentLocation || selectedPatients.length === 0 || !serviceType || onlyBirdsSelected) {
+      if (onlyBirdsSelected) {
+        console.log('Cannot slide - only birds selected');
+        toast({
+          title: language === 'ar' ? 'خدمة غير متاحة للطيور' : 'Service not available for birds',
+          description: language === 'ar' ? 
+            'يرجى اختيار حيوانات أليفة أخرى غير الطيور لاستكمال الطلب' : 
+            'Please select pets other than birds to continue with the request',
+          variant: 'destructive',
+          duration: 4000,
+        });
+      } else {
+        console.log('Cannot slide - missing data');
+      }
       return;
     }
     
@@ -718,7 +733,21 @@ export default function RideRequest() {
     console.log('Service type:', serviceType);
     
     // التأكد من صحة البيانات قبل الإرسال
-    if (!currentLocation || selectedPatients.length === 0 || !serviceType) {
+    const onlyBirdsSelected = isOnlyBirdsSelected(selectedPatients, patients);
+    
+    if (!currentLocation || selectedPatients.length === 0 || !serviceType || onlyBirdsSelected) {
+      if (onlyBirdsSelected) {
+        console.log('Cannot proceed - only birds selected');
+        toast({
+          title: language === 'ar' ? 'خدمة غير متاحة للطيور' : 'Service not available for birds',
+          description: language === 'ar' ? 
+            'يرجى اختيار حيوانات أليفة أخرى غير الطيور لاستكمال الطلب' : 
+            'Please select pets other than birds to continue with the request',
+          variant: 'destructive',
+          duration: 4000,
+        });
+        return;
+      }
       console.log('Missing required data for ride request');
       
       if (!currentLocation) {
@@ -1456,6 +1485,8 @@ export default function RideRequest() {
                           (language === 'ar' ? 'جاري إرسال الطلب...' : 'Sending request...') :
                           !currentLocation ? 
                           (language === 'ar' ? 'في انتظار تحديد الموقع...' : 'Waiting for location...') :
+                          isOnlyBirdsSelected(selectedPatients, patients) ?
+                          (language === 'ar' ? 'خدمة غير متاحة للطيور' : 'Service not available for birds') :
                           isSlideComplete ?
                           (language === 'ar' ? 'تم التأكيد!' : 'Confirmed!') :
                           (language === 'ar' ? 'اسحب للتأكيد' : 'Slide to Confirm')
@@ -1477,8 +1508,8 @@ export default function RideRequest() {
                       className="absolute top-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full shadow-xl flex items-center justify-center cursor-grab active:cursor-grabbing active:scale-105"
                       style={{ 
                         left: `${slidePosition}px`,
-                        opacity: (!currentLocation || selectedPatients.length === 0 || !serviceType || isProcessingPayment) ? 0.5 : 1,
-                        pointerEvents: (!currentLocation || selectedPatients.length === 0 || !serviceType || isProcessingPayment) ? 'none' : 'auto',
+                        opacity: (!currentLocation || selectedPatients.length === 0 || !serviceType || isProcessingPayment || isOnlyBirdsSelected(selectedPatients, patients)) ? 0.5 : 1,
+                        pointerEvents: (!currentLocation || selectedPatients.length === 0 || !serviceType || isProcessingPayment || isOnlyBirdsSelected(selectedPatients, patients)) ? 'none' : 'auto',
                         transform: `translateY(-50%) ${isSliding ? 'scale(1.05)' : 'scale(1)'}`,
                         transition: isSliding ? 'transform 0.1s ease-out' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                       }}
