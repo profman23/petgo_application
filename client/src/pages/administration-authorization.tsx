@@ -47,6 +47,10 @@ export default function AdministrationAuthorization() {
 
   const handleReadUsersChange = (checked: boolean) => {
     setReadUsersChecked(checked);
+    if (!checked) {
+      // If Read is unchecked, also uncheck Full Control
+      setFullControlChecked(false);
+    }
   };
 
   const handleFullControlChange = (checked: boolean) => {
@@ -69,6 +73,10 @@ export default function AdministrationAuthorization() {
 
   const handleAuthReadUsersChange = (checked: boolean) => {
     setAuthReadUsersChecked(checked);
+    if (!checked) {
+      // If Read is unchecked, also uncheck Full Control
+      setAuthFullControlChecked(false);
+    }
   };
 
   const handleAuthFullControlChange = (checked: boolean) => {
