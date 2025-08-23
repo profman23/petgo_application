@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -18,6 +18,14 @@ export default function AdministrationAuthorization() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
+  
+  // State for popup
+  const [showAddAuthorizationPopup, setShowAddAuthorizationPopup] = useState(false);
+  
+  // State for checkboxes
+  const [hiddenUsersChecked, setHiddenUsersChecked] = useState(false);
+  const [readUsersChecked, setReadUsersChecked] = useState(false);
+  const [fullControlChecked, setFullControlChecked] = useState(false);
 
   // Check admin authentication
   useEffect(() => {
@@ -260,6 +268,7 @@ export default function AdministrationAuthorization() {
                       {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
                     </h1>
                     <button
+                      onClick={() => setShowAddAuthorizationPopup(true)}
                       className="px-4 py-2 border-2 border-purple-600 bg-white text-purple-600 font-medium rounded-md hover:bg-purple-50 transition-colors duration-200"
                     >
                       {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
@@ -282,6 +291,103 @@ export default function AdministrationAuthorization() {
           </div>
         </div>
       </div>
+
+      {/* Add New Authorization Popup */}
+      {showAddAuthorizationPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-96 max-w-md mx-4">
+            {/* Popup Header */}
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+              </h2>
+              <button
+                onClick={() => setShowAddAuthorizationPopup(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            {/* Popup Content */}
+            <div className="p-4">
+              {/* Administration Tab */}
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  {language === 'ar' ? 'الإدارة' : 'Administration'}
+                </h3>
+                
+                {/* Users Section */}
+                <div className="ml-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                    {language === 'ar' ? 'المستخدمين' : 'Users'}
+                  </h4>
+                  
+                  {/* Permission Items */}
+                  <div className="ml-4 space-y-2">
+                    {/* Hidden Users */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="hiddenUsers"
+                        checked={hiddenUsersChecked}
+                        onChange={(e) => setHiddenUsersChecked(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="hiddenUsers" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'المستخدمين المخفيين' : 'Hidden Users'}
+                      </label>
+                    </div>
+                    
+                    {/* Read Users */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="readUsers"
+                        checked={readUsersChecked}
+                        onChange={(e) => setReadUsersChecked(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="readUsers" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'قراءة المستخدمين' : 'Read Users'}
+                      </label>
+                    </div>
+                    
+                    {/* Full Control */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="fullControl"
+                        checked={fullControlChecked}
+                        onChange={(e) => setFullControlChecked(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="fullControl" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Popup Footer */}
+            <div className="flex justify-end gap-2 p-4 border-t">
+              <button
+                onClick={() => setShowAddAuthorizationPopup(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+              <button
+                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
+              >
+                {language === 'ar' ? 'حفظ' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
