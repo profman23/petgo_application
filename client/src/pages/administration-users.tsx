@@ -1,16 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 export default function AdministrationUsers() {
   const [, setLocation] = useLocation();
   const { t, language } = useTranslation();
+  const { toast } = useToast();
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(true); // Keep expanded since we're in administration
+  
+  // State for tracking notifications and audio
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const lastRequestCountRef = useRef(0);
+  const [currentRequestCount, setCurrentRequestCount] = useState(0);
 
   // Check admin authentication
   useEffect(() => {
@@ -24,6 +31,38 @@ export default function AdministrationUsers() {
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");
 
+  // Fetch all VetsVan requests for notification counter
+  const { data: allVetsVanRequests } = useQuery({
+    queryKey: ["/api/admin/vetsvan-requests"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/vetsvan-requests", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch requests");
+      return response.json();
+    },
+    refetchInterval: 3000,
+    enabled: !!adminToken,
+  });
+
+  // Monitor for new requests and update counter
+  useEffect(() => {
+    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
+      const currentCount = allVetsVanRequests.length;
+      lastRequestCountRef.current = currentCount;
+      setCurrentRequestCount(currentCount);
+    }
+  }, [allVetsVanRequests]);
+
+  // Request browser notification permission on component mount
+  useEffect(() => {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("admin");
@@ -32,46 +71,55 @@ export default function AdministrationUsers() {
 
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className={`flex items-center ${language === 'ar' ? 'ml-auto' : 'mr-auto'}`}>
-              <img
-                src={vetsVanLogo}
-                alt="VetsVan Logo"
-                className="h-14 w-auto object-contain"
-              />
-            </div>
+      {/* Full-width Header with logo and controls */}
+      <div className="bg-white shadow-md border-b border-gray-200">
+        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <img 
+              src={vetsVanLogo} 
+              alt="VETS VAN" 
+              className="h-14 w-auto object-contain"
+            />
+          </div>
 
-            {/* Header Controls */}
-            <div className="flex items-center gap-4">
-              <LanguageSelector />
-              
-              {/* Audio notification toggle */}
-              <button
-                onClick={() => setAudioEnabled(!audioEnabled)}
-                className={`p-2 rounded-full transition-colors duration-200 ${
-                  audioEnabled 
-                    ? 'bg-green-100 text-green-600 hover:bg-green-200' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                title={audioEnabled 
-                  ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
-                  : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
-                }
-              >
-                {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-              </button>
-              
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-              >
-                <LogOut className="h-4 w-4 ml-2" />
-                {t('logout')}
-              </button>
-            </div>
+          {/* Header Controls */}
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            
+            {/* Audio notification toggle */}
+            <button
+              onClick={() => setAudioEnabled(!audioEnabled)}
+              className={`p-2 rounded-full transition-colors duration-200 ${
+                audioEnabled 
+                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={audioEnabled 
+                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
+                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
+              }
+            >
+              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            </button>
+
+            {/* Notifications counter */}
+            {currentRequestCount > 0 && (
+              <div className="relative">
+                <Bell className="h-6 w-6 text-purple-600" />
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                </span>
+              </div>
+            )}
+            
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            >
+              <LogOut className="h-4 w-4 ml-2" />
+              {t('logout')}
+            </button>
           </div>
         </div>
       </div>
