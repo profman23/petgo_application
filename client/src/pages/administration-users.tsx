@@ -59,6 +59,18 @@ export default function AdministrationUsers() {
     enabled: !!adminToken,
   });
 
+  // Fetch authorizations for dropdown
+  const {
+    data: authorizations = [],
+    isLoading: authorizationsLoading,
+    error: authorizationsError
+  } = useQuery({
+    queryKey: ['/api/admin/authorizations'],
+    retry: false,
+    refetchInterval: 30000, // Refetch every 30 seconds
+    enabled: !!adminToken,
+  });
+
   // Monitor for new requests and update counter
   useEffect(() => {
     if (allVetsVanRequests && allVetsVanRequests.length > 0) {
@@ -433,20 +445,25 @@ export default function AdministrationUsers() {
                     value={selectedAuthorization}
                     onChange={(e) => setSelectedAuthorization(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    disabled={authorizationsLoading}
                   >
                     <option value="">
-                      {language === 'ar' ? 'اختر التصريح' : 'Select Authorization'}
+                      {authorizationsLoading 
+                        ? (language === 'ar' ? 'جاري التحميل...' : 'Loading...')
+                        : (language === 'ar' ? 'اختر التصريح' : 'Select Authorization')
+                      }
                     </option>
-                    <option value="admin">
-                      {language === 'ar' ? 'مدير' : 'Admin'}
-                    </option>
-                    <option value="user">
-                      {language === 'ar' ? 'مستخدم' : 'User'}
-                    </option>
-                    <option value="editor">
-                      {language === 'ar' ? 'محرر' : 'Editor'}
-                    </option>
+                    {authorizations && authorizations.map((authorization: any) => (
+                      <option key={authorization.id} value={authorization.id}>
+                        {authorization.name}
+                      </option>
+                    ))}
                   </select>
+                  {authorizationsError && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {language === 'ar' ? 'خطأ في تحميل التصريحات' : 'Error loading authorizations'}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
