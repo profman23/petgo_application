@@ -32,6 +32,50 @@ export default function AdministrationAuthorization() {
   const [authReadUsersChecked, setAuthReadUsersChecked] = useState(false);
   const [authFullControlChecked, setAuthFullControlChecked] = useState(false);
 
+  // Handlers for Users section
+  const handleHiddenUsersChange = (checked: boolean) => {
+    setHiddenUsersChecked(checked);
+    if (checked) {
+      // If Hidden is checked, uncheck and disable Read and Full Control
+      setReadUsersChecked(false);
+      setFullControlChecked(false);
+    }
+  };
+
+  const handleReadUsersChange = (checked: boolean) => {
+    setReadUsersChecked(checked);
+  };
+
+  const handleFullControlChange = (checked: boolean) => {
+    setFullControlChecked(checked);
+    if (checked) {
+      // If Full Control is checked, automatically check Read
+      setReadUsersChecked(true);
+    }
+  };
+
+  // Handlers for Authorization section
+  const handleAuthHiddenUsersChange = (checked: boolean) => {
+    setAuthHiddenUsersChecked(checked);
+    if (checked) {
+      // If Hidden is checked, uncheck and disable Read and Full Control
+      setAuthReadUsersChecked(false);
+      setAuthFullControlChecked(false);
+    }
+  };
+
+  const handleAuthReadUsersChange = (checked: boolean) => {
+    setAuthReadUsersChecked(checked);
+  };
+
+  const handleAuthFullControlChange = (checked: boolean) => {
+    setAuthFullControlChecked(checked);
+    if (checked) {
+      // If Full Control is checked, automatically check Read
+      setAuthReadUsersChecked(true);
+    }
+  };
+
   // Check admin authentication
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
@@ -336,7 +380,7 @@ export default function AdministrationAuthorization() {
                         type="checkbox"
                         id="hiddenUsers"
                         checked={hiddenUsersChecked}
-                        onChange={(e) => setHiddenUsersChecked(e.target.checked)}
+                        onChange={(e) => handleHiddenUsersChange(e.target.checked)}
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="hiddenUsers" className="ml-2 text-sm text-gray-600">
@@ -350,10 +394,11 @@ export default function AdministrationAuthorization() {
                         type="checkbox"
                         id="readUsers"
                         checked={readUsersChecked}
-                        onChange={(e) => setReadUsersChecked(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        disabled={hiddenUsersChecked}
+                        onChange={(e) => handleReadUsersChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${hiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="readUsers" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="readUsers" className={`ml-2 text-sm ${hiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'قراءة المستخدمين' : 'Read Users'}
                       </label>
                     </div>
@@ -364,10 +409,11 @@ export default function AdministrationAuthorization() {
                         type="checkbox"
                         id="fullControl"
                         checked={fullControlChecked}
-                        onChange={(e) => setFullControlChecked(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        disabled={hiddenUsersChecked}
+                        onChange={(e) => handleFullControlChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${hiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="fullControl" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="fullControl" className={`ml-2 text-sm ${hiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
@@ -388,7 +434,7 @@ export default function AdministrationAuthorization() {
                         type="checkbox"
                         id="authHiddenUsers"
                         checked={authHiddenUsersChecked}
-                        onChange={(e) => setAuthHiddenUsersChecked(e.target.checked)}
+                        onChange={(e) => handleAuthHiddenUsersChange(e.target.checked)}
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="authHiddenUsers" className="ml-2 text-sm text-gray-600">
@@ -402,10 +448,11 @@ export default function AdministrationAuthorization() {
                         type="checkbox"
                         id="authReadUsers"
                         checked={authReadUsersChecked}
-                        onChange={(e) => setAuthReadUsersChecked(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        disabled={authHiddenUsersChecked}
+                        onChange={(e) => handleAuthReadUsersChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authHiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="authReadUsers" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="authReadUsers" className={`ml-2 text-sm ${authHiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'قراءة المستخدمين' : 'Read Users'}
                       </label>
                     </div>
@@ -416,10 +463,11 @@ export default function AdministrationAuthorization() {
                         type="checkbox"
                         id="authFullControl"
                         checked={authFullControlChecked}
-                        onChange={(e) => setAuthFullControlChecked(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        disabled={authHiddenUsersChecked}
+                        onChange={(e) => handleAuthFullControlChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authHiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="authFullControl" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="authFullControl" className={`ml-2 text-sm ${authHiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
