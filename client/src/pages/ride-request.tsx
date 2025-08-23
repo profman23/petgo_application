@@ -135,6 +135,8 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
     total = petCount * 172.5;
   } else if (serviceType === 'deworming') {
     total = petCount * 80.5;
+  } else if (serviceType === 'pickup-drop') {
+    total = petCount * 115;
   } else {
     // Original pricing for other services
     if (petCount <= 2) total = 172.5;
@@ -1330,7 +1332,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'test-service', 'fleas-ticks-prevention'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 {(() => {
                   const costData = getEstimatedCost(selectedPatients, patients, serviceType);
