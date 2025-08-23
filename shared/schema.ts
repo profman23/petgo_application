@@ -734,6 +734,20 @@ export const authorizations = pgTable("authorizations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Admin users table for user management
+export const adminUsers = pgTable("admin_users", {
+  id: serial("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull().unique(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  authorizationId: integer("authorization_id").notNull().references(() => authorizations.id),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertAuthorizationSchema = createInsertSchema(authorizations).pick({
   name: true,
   usersHidden: true,
@@ -744,5 +758,17 @@ export const insertAuthorizationSchema = createInsertSchema(authorizations).pick
   authFullControl: true,
 });
 
+export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
+  firstName: true,
+  lastName: true,
+  email: true,
+  username: true,
+  password: true,
+  authorizationId: true,
+  isActive: true,
+});
+
 export type Authorization = typeof authorizations.$inferSelect;
 export type InsertAuthorization = z.infer<typeof insertAuthorizationSchema>;
+export type AdminUser = typeof adminUsers.$inferSelect;
+export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;

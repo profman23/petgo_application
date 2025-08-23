@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, insertAdminUserSchema, adminUsers } from "@shared/schema";
 import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
@@ -2984,6 +2984,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: error.errors[0].message });
       }
       res.status(500).json({ message: 'Error updating authorization' });
+    }
+  });
+
+  // Admin users management routes
+  app.get('/api/admin/admin-users', requireAdminAuth, async (req, res) => {
+    try {
+      const adminUsersList = await db.select({
+        id: adminUsers.id,
+        firstName: adminUsers.firstName,
+        lastName: adminUsers.lastName,
+        email: adminUsers.email,
+        username: adminUsers.username,
+        authorizationId: adminUsers.authorizationId,
+        isActive: adminUsers.isActive,
+        createdAt: adminUsers.createdAt,
+        authorizationName: authorizations.name
+      })
+      .from(adminUsers)
+      .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
+      .orderBy(adminUsers.createdAt);
+      
+      res.json(adminUsersList);
+    } catch (error) {
+      console.error('Error fetching admin users:', error);
+      res.status(500).json({ message: 'Error fetching admin users' });
+    }
+  });
+
+  app.post('/api/admin/admin-users', requireAdminAuth, async (req, res) => {
+    try {
+      const userData = insertAdminUserSchema.parse(req.body);
+      
+      // Hash password before storing
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      const userDataWithHashedPassword = {
+        ...userData,
+        password: hashedPassword
+      };
+      
+      const [newUser] = await db.insert(adminUsers).values(userDataWithHashedPassword).returning();
+      res.json(newUser);
+    } catch (error) {
+      console.error('Error creating admin user:', error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      // Handle database unique constraint violations
+      if (error.code === '23505') { // PostgreSQL unique constraint violation
+        if (error.constraint === 'admin_users_email_unique') {
+          return res.status(400).json({ message: 'Email address is already in use' });
+        }
+        if (error.constraint === 'admin_users_username_unique') {
+          return res.status(400).json({ message: 'Username is already taken' });
+        }
+      }
+      res.status(500).json({ message: 'Error creating admin user' });
+    }
+  });
+
+  app.put('/api/admin/admin-users/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const userData = insertAdminUserSchema.parse(req.body);
+      
+      // Hash password if provided
+      let userDataWithHashedPassword = { ...userData };
+      if (userData.password) {
+        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        userDataWithHashedPassword.password = hashedPassword;
+      }
+      
+      const [updatedUser] = await db.update(adminUsers)
+        .set({ ...userDataWithHashedPassword, updatedAt: new Date() })
+        .where(eq(adminUsers.id, id))
+        .returning();
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'Admin user not found' });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      console.error('Error updating admin user:', error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      res.status(500).json({ message: 'Error updating admin user' });
+    }
+  });
+
+  app.put('/api/admin/admin-users/:id/toggle-status', requireAdminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { isActive } = req.body;
+      
+      const [updatedUser] = await db.update(adminUsers)
+        .set({ isActive, updatedAt: new Date() })
+        .where(eq(adminUsers.id, id))
+        .returning();
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'Admin user not found' });
+      }
+      
+      res.json(updatedUser);
+    } catch (error) {
+      console.error('Error toggling admin user status:', error);
+      res.status(500).json({ message: 'Error updating admin user status' });
     }
   });
 

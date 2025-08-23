@@ -3,7 +3,8 @@ import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
@@ -104,10 +105,117 @@ export default function AdministrationUsers() {
     setSelectedAuthorization('');
   };
 
+  // Query client for cache invalidation
+  const queryClient = useQueryClient();
+
+  // Fetch admin users from API
+  const {
+    data: adminUsers = [],
+    isLoading: usersLoading,
+    error: usersError
+  } = useQuery<any[]>({
+    queryKey: ['/api/admin/admin-users'],
+    retry: false,
+    refetchInterval: 30000, // Refetch every 30 seconds
+    enabled: !!adminToken,
+  });
+
+  // Create user mutation
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: any) => {
+      return apiRequest('/api/admin/admin-users', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/admin-users'] });
+      toast({
+        title: language === 'ar' ? 'تم الحفظ بنجاح' : 'Saved Successfully',
+        description: language === 'ar' ? 'تم إنشاء المستخدم بنجاح' : 'User has been created successfully',
+      });
+      resetForm();
+      setShowCreateUserPopup(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: error.message || (language === 'ar' ? 'حدث خطأ أثناء إنشاء المستخدم' : 'An error occurred while creating user'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Toggle user status mutation
+  const toggleUserStatusMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: number; isActive: boolean }) => {
+      return apiRequest(`/api/admin/admin-users/${id}/toggle-status`, {
+        method: 'PUT',
+        body: JSON.stringify({ isActive }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/admin-users'] });
+      toast({
+        title: language === 'ar' ? 'تم التحديث بنجاح' : 'Updated Successfully',
+        description: language === 'ar' ? 'تم تحديث حالة المستخدم بنجاح' : 'User status has been updated successfully',
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: error.message || (language === 'ar' ? 'حدث خطأ أثناء التحديث' : 'An error occurred while updating'),
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Handle close popup
   const handleClosePopup = () => {
     setShowCreateUserPopup(false);
     resetForm();
+  };
+
+  // Handle save user
+  const handleSaveUser = () => {
+    // Validation
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !username.trim() || !password.trim() || !confirmPassword.trim() || !selectedAuthorization) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill in all fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const userData = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      username: username.trim(),
+      password: password,
+      authorizationId: parseInt(selectedAuthorization),
+      isActive: true
+    };
+
+    createUserMutation.mutate(userData);
+  };
+
+  // Handle toggle user status
+  const handleToggleUserStatus = (userId: number, currentStatus: boolean) => {
+    toggleUserStatusMutation.mutate({
+      id: userId,
+      isActive: !currentStatus
+    });
   };
 
   return (
@@ -307,17 +415,124 @@ export default function AdministrationUsers() {
                       {language === 'ar' ? 'إنشاء مستخدم جديد' : 'Create New User'}
                     </button>
                   </div>
-                  <div className="text-center py-12">
-                    <User className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">
-                      {language === 'ar' ? 'قادم قريباً' : 'Coming Soon'}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {language === 'ar' 
-                        ? 'صفحة إدارة المستخدمين قيد التطوير' 
-                        : 'Users management page is under development'}
-                    </p>
-                  </div>
+                  {/* Users List */}
+                  {usersLoading ? (
+                    <div className="text-center py-12">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                      <p className="mt-2 text-sm text-gray-500">
+                        {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+                      </p>
+                    </div>
+                  ) : usersError ? (
+                    <div className="text-center py-12">
+                      <User className="mx-auto h-12 w-12 text-red-400" />
+                      <h3 className="mt-2 text-sm font-medium text-gray-900">
+                        {language === 'ar' ? 'خطأ في التحميل' : 'Loading Error'}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {language === 'ar' ? 'فشل في تحميل المستخدمين' : 'Failed to load users'}
+                      </p>
+                    </div>
+                  ) : adminUsers.length === 0 ? (
+                    <div className="text-center py-12">
+                      <User className="mx-auto h-12 w-12 text-gray-400" />
+                      <h3 className="mt-2 text-sm font-medium text-gray-900">
+                        {language === 'ar' ? 'لا يوجد مستخدمين' : 'No Users'}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {language === 'ar' ? 'ابدأ بإنشاء مستخدم جديد' : 'Start by creating a new user'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {language === 'ar' ? 'المستخدم' : 'User'}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {language === 'ar' ? 'اسم المستخدم' : 'Username'}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {language === 'ar' ? 'التصريح' : 'Authorization'}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {language === 'ar' ? 'الحالة' : 'Status'}
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {adminUsers.map((user: any) => (
+                            <tr key={user.id}>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0 h-10 w-10">
+                                    <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                      <User className="h-5 w-5 text-purple-600" />
+                                    </div>
+                                  </div>
+                                  <div className="ml-4">
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {user.firstName} {user.lastName}
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {user.email}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {user.username}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {user.authorizationName || user.authorizationId}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                  user.isActive 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {user.isActive 
+                                    ? (language === 'ar' ? 'نشط' : 'Active')
+                                    : (language === 'ar' ? 'معطل' : 'Disabled')
+                                  }
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button
+                                  className="text-blue-600 hover:text-blue-900 mr-4"
+                                >
+                                  {language === 'ar' ? 'تعديل' : 'Edit'}
+                                </button>
+                                <button
+                                  onClick={() => handleToggleUserStatus(user.id, user.isActive)}
+                                  disabled={toggleUserStatusMutation.isPending}
+                                  className={`${
+                                    user.isActive 
+                                      ? 'text-red-600 hover:text-red-900' 
+                                      : 'text-green-600 hover:text-green-900'
+                                  } disabled:opacity-50`}
+                                >
+                                  {user.isActive 
+                                    ? (language === 'ar' ? 'تعطيل' : 'Disable')
+                                    : (language === 'ar' ? 'تفعيل' : 'Enable')
+                                  }
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -478,9 +693,14 @@ export default function AdministrationUsers() {
               </button>
               <button
                 type="button"
-                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
+                onClick={handleSaveUser}
+                disabled={createUserMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 disabled:opacity-50"
               >
-                {language === 'ar' ? 'إنشاء' : 'Create'}
+                {createUserMutation.isPending 
+                  ? (language === 'ar' ? 'جاري الإنشاء...' : 'Creating...')
+                  : (language === 'ar' ? 'إنشاء' : 'Create')
+                }
               </button>
             </div>
           </div>
