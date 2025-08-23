@@ -132,12 +132,12 @@ export default function AdministrationAuthorization() {
 
     const authData = {
       name: authorizationName.trim(),
-      users_hidden: hiddenUsersChecked,
-      users_read: readUsersChecked,
-      users_full_control: fullControlChecked,
-      auth_hidden: authHiddenUsersChecked,
-      auth_read: authReadUsersChecked,
-      auth_full_control: authFullControlChecked,
+      usersHidden: hiddenUsersChecked,
+      usersRead: readUsersChecked,
+      usersFullControl: fullControlChecked,
+      authHidden: authHiddenUsersChecked,
+      authRead: authReadUsersChecked,
+      authFullControl: authFullControlChecked,
     };
 
     if (editingAuthorization) {
@@ -151,12 +151,12 @@ export default function AdministrationAuthorization() {
   const handleEditAuthorization = (auth: any) => {
     setEditingAuthorization(auth);
     setAuthorizationName(auth.name);
-    setHiddenUsersChecked(auth.users_hidden);
-    setReadUsersChecked(auth.users_read);
-    setFullControlChecked(auth.users_full_control);
-    setAuthHiddenUsersChecked(auth.auth_hidden);
-    setAuthReadUsersChecked(auth.auth_read);
-    setAuthFullControlChecked(auth.auth_full_control);
+    setHiddenUsersChecked(auth.usersHidden);
+    setReadUsersChecked(auth.usersRead);
+    setFullControlChecked(auth.usersFullControl);
+    setAuthHiddenUsersChecked(auth.authHidden);
+    setAuthReadUsersChecked(auth.authRead);
+    setAuthFullControlChecked(auth.authFullControl);
     setShowAddAuthorizationPopup(true);
   };
 
@@ -504,22 +504,22 @@ export default function AdministrationAuthorization() {
                                     {language === 'ar' ? 'المستخدمين:' : 'Users:'}
                                   </h4>
                                   <div className="flex flex-wrap gap-2">
-                                    {auth.users_hidden && (
+                                    {auth.usersHidden && (
                                       <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
                                         {language === 'ar' ? 'مخفي' : 'Hidden'}
                                       </span>
                                     )}
-                                    {auth.users_read && (
+                                    {auth.usersRead && (
                                       <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
                                         {language === 'ar' ? 'قراءة' : 'Read'}
                                       </span>
                                     )}
-                                    {auth.users_full_control && (
+                                    {auth.usersFullControl && (
                                       <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
                                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                                       </span>
                                     )}
-                                    {!auth.users_hidden && !auth.users_read && !auth.users_full_control && (
+                                    {!auth.usersHidden && !auth.usersRead && !auth.usersFullControl && (
                                       <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
                                         {language === 'ar' ? 'لا توجد صلاحيات' : 'No permissions'}
                                       </span>
@@ -532,22 +532,22 @@ export default function AdministrationAuthorization() {
                                     {language === 'ar' ? 'التصريحات:' : 'Authorization:'}
                                   </h4>
                                   <div className="flex flex-wrap gap-2">
-                                    {auth.auth_hidden && (
+                                    {auth.authHidden && (
                                       <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
                                         {language === 'ar' ? 'مخفي' : 'Hidden'}
                                       </span>
                                     )}
-                                    {auth.auth_read && (
+                                    {auth.authRead && (
                                       <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
                                         {language === 'ar' ? 'قراءة' : 'Read'}
                                       </span>
                                     )}
-                                    {auth.auth_full_control && (
+                                    {auth.authFullControl && (
                                       <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
                                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                                       </span>
                                     )}
-                                    {!auth.auth_hidden && !auth.auth_read && !auth.auth_full_control && (
+                                    {!auth.authHidden && !auth.authRead && !auth.authFullControl && (
                                       <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
                                         {language === 'ar' ? 'لا توجد صلاحيات' : 'No permissions'}
                                       </span>
