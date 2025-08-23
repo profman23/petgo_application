@@ -714,3 +714,35 @@ export type GeneratedInvoice = typeof generatedInvoices.$inferSelect & {
   payments?: InvoicePayment[];
 };
 export type InsertGeneratedInvoice = z.infer<typeof insertGeneratedInvoiceSchema>;
+
+// Authorizations table for permission management
+export const authorizations = pgTable("authorizations", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  
+  // Users permissions
+  usersHidden: boolean("users_hidden").notNull().default(false),
+  usersRead: boolean("users_read").notNull().default(false),
+  usersFullControl: boolean("users_full_control").notNull().default(false),
+  
+  // Authorization permissions
+  authHidden: boolean("auth_hidden").notNull().default(false),
+  authRead: boolean("auth_read").notNull().default(false),
+  authFullControl: boolean("auth_full_control").notNull().default(false),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAuthorizationSchema = createInsertSchema(authorizations).pick({
+  name: true,
+  usersHidden: true,
+  usersRead: true,
+  usersFullControl: true,
+  authHidden: true,
+  authRead: true,
+  authFullControl: true,
+});
+
+export type Authorization = typeof authorizations.$inferSelect;
+export type InsertAuthorization = z.infer<typeof insertAuthorizationSchema>;

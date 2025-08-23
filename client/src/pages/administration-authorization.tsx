@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
@@ -34,6 +35,137 @@ export default function AdministrationAuthorization() {
   
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
+  
+  // State for editing
+  const [editingAuthorization, setEditingAuthorization] = useState<any>(null);
+  
+  // Query client for cache invalidation
+  const queryClient = useQueryClient();
+
+  // Fetch authorizations from API
+  const {
+    data: authorizations = [],
+    isLoading: authorizationsLoading,
+    error: authorizationsError
+  } = useQuery({
+    queryKey: ['/api/admin/authorizations'],
+    retry: false,
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  // Create authorization mutation
+  const createAuthorizationMutation = useMutation({
+    mutationFn: async (authData: any) => {
+      return apiRequest('/api/admin/authorizations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(authData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/authorizations'] });
+      toast({
+        title: language === 'ar' ? 'تم الحفظ بنجاح' : 'Saved Successfully',
+        description: language === 'ar' ? 'تم حفظ التصريح بنجاح' : 'Authorization has been saved successfully',
+      });
+      resetForm();
+      setShowAddAuthorizationPopup(false);
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: error.message || (language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'An error occurred while saving'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Update authorization mutation
+  const updateAuthorizationMutation = useMutation({
+    mutationFn: async ({ id, authData }: { id: number; authData: any }) => {
+      return apiRequest(`/api/admin/authorizations/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(authData),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/authorizations'] });
+      toast({
+        title: language === 'ar' ? 'تم التحديث بنجاح' : 'Updated Successfully',
+        description: language === 'ar' ? 'تم تحديث التصريح بنجاح' : 'Authorization has been updated successfully',
+      });
+      resetForm();
+      setShowAddAuthorizationPopup(false);
+      setEditingAuthorization(null);
+    },
+    onError: (error: any) => {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: error.message || (language === 'ar' ? 'حدث خطأ أثناء التحديث' : 'An error occurred while updating'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Reset form function
+  const resetForm = () => {
+    setAuthorizationName('');
+    setHiddenUsersChecked(false);
+    setReadUsersChecked(false);
+    setFullControlChecked(false);
+    setAuthHiddenUsersChecked(false);
+    setAuthReadUsersChecked(false);
+    setAuthFullControlChecked(false);
+  };
+
+  // Handle save authorization
+  const handleSaveAuthorization = () => {
+    if (!authorizationName.trim()) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'اسم التصريح مطلوب' : 'Authorization name is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const authData = {
+      name: authorizationName.trim(),
+      users_hidden: hiddenUsersChecked,
+      users_read: readUsersChecked,
+      users_full_control: fullControlChecked,
+      auth_hidden: authHiddenUsersChecked,
+      auth_read: authReadUsersChecked,
+      auth_full_control: authFullControlChecked,
+    };
+
+    if (editingAuthorization) {
+      updateAuthorizationMutation.mutate({ id: editingAuthorization.id, authData });
+    } else {
+      createAuthorizationMutation.mutate(authData);
+    }
+  };
+
+  // Handle edit authorization
+  const handleEditAuthorization = (auth: any) => {
+    setEditingAuthorization(auth);
+    setAuthorizationName(auth.name);
+    setHiddenUsersChecked(auth.users_hidden);
+    setReadUsersChecked(auth.users_read);
+    setFullControlChecked(auth.users_full_control);
+    setAuthHiddenUsersChecked(auth.auth_hidden);
+    setAuthReadUsersChecked(auth.auth_read);
+    setAuthFullControlChecked(auth.auth_full_control);
+    setShowAddAuthorizationPopup(true);
+  };
+
+  // Handle cancel/close popup
+  const handleClosePopup = () => {
+    setShowAddAuthorizationPopup(false);
+    setEditingAuthorization(null);
+    resetForm();
+  };
 
   // Handlers for Users section
   const handleHiddenUsersChange = (checked: boolean) => {
@@ -334,17 +466,121 @@ export default function AdministrationAuthorization() {
                       {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
                     </button>
                   </div>
-                  <div className="text-center py-12">
-                    <Shield className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">
-                      {language === 'ar' ? 'قادم قريباً' : 'Coming Soon'}
-                    </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                      {language === 'ar' 
-                        ? 'صفحة إدارة التصريحات قيد التطوير' 
-                        : 'Authorization management page is under development'}
-                    </p>
-                  </div>
+                  {authorizationsLoading ? (
+                    <div className="text-center py-12">
+                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+                      <p className="mt-2 text-sm text-gray-500">
+                        {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+                      </p>
+                    </div>
+                  ) : authorizations.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Shield className="mx-auto h-12 w-12 text-gray-400" />
+                      <h3 className="mt-2 text-sm font-medium text-gray-900">
+                        {language === 'ar' ? 'لا توجد تصريحات' : 'No Authorizations'}
+                      </h3>
+                      <p className="mt-1 text-sm text-gray-500">
+                        {language === 'ar' 
+                          ? 'اضغط على "إضافة تصريح جديد" لإنشاء تصريح جديد' 
+                          : 'Click "Add New Authorization" to create your first authorization'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {authorizations.map((auth: any) => (
+                        <div
+                          key={auth.id}
+                          className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                {auth.name}
+                              </h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Users Permissions */}
+                                <div>
+                                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                                    {language === 'ar' ? 'المستخدمين:' : 'Users:'}
+                                  </h4>
+                                  <div className="flex flex-wrap gap-2">
+                                    {auth.users_hidden && (
+                                      <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
+                                        {language === 'ar' ? 'مخفي' : 'Hidden'}
+                                      </span>
+                                    )}
+                                    {auth.users_read && (
+                                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                                        {language === 'ar' ? 'قراءة' : 'Read'}
+                                      </span>
+                                    )}
+                                    {auth.users_full_control && (
+                                      <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+                                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                                      </span>
+                                    )}
+                                    {!auth.users_hidden && !auth.users_read && !auth.users_full_control && (
+                                      <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
+                                        {language === 'ar' ? 'لا توجد صلاحيات' : 'No permissions'}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                {/* Authorization Permissions */}
+                                <div>
+                                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                                    {language === 'ar' ? 'التصريحات:' : 'Authorization:'}
+                                  </h4>
+                                  <div className="flex flex-wrap gap-2">
+                                    {auth.auth_hidden && (
+                                      <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
+                                        {language === 'ar' ? 'مخفي' : 'Hidden'}
+                                      </span>
+                                    )}
+                                    {auth.auth_read && (
+                                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                                        {language === 'ar' ? 'قراءة' : 'Read'}
+                                      </span>
+                                    )}
+                                    {auth.auth_full_control && (
+                                      <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+                                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                                      </span>
+                                    )}
+                                    {!auth.auth_hidden && !auth.auth_read && !auth.auth_full_control && (
+                                      <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
+                                        {language === 'ar' ? 'لا توجد صلاحيات' : 'No permissions'}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="ml-4">
+                              <button
+                                onClick={() => handleEditAuthorization(auth)}
+                                className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-full transition-colors"
+                                title={language === 'ar' ? 'تعديل' : 'Edit'}
+                              >
+                                <Edit className="h-5 w-5" />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="mt-3 text-xs text-gray-500">
+                            {language === 'ar' ? 'تم الإنشاء في:' : 'Created:'} {new Date(auth.created_at).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                            {auth.updated_at && new Date(auth.updated_at) > new Date(auth.created_at) && (
+                              <span className="mx-2">•</span>
+                            )}
+                            {auth.updated_at && new Date(auth.updated_at) > new Date(auth.created_at) && (
+                              <span>
+                                {language === 'ar' ? 'تم التحديث:' : 'Updated:'} {new Date(auth.updated_at).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -359,10 +595,13 @@ export default function AdministrationAuthorization() {
             {/* Popup Header */}
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900">
-                {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+                {editingAuthorization 
+                  ? (language === 'ar' ? 'تعديل التصريح' : 'Edit Authorization')
+                  : (language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization')
+                }
               </h2>
               <button
-                onClick={() => setShowAddAuthorizationPopup(false)}
+                onClick={handleClosePopup}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="h-5 w-5" />
@@ -507,15 +746,23 @@ export default function AdministrationAuthorization() {
             {/* Popup Footer */}
             <div className="flex justify-end gap-2 p-4 border-t">
               <button
-                onClick={() => setShowAddAuthorizationPopup(false)}
+                onClick={handleClosePopup}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
               >
                 {language === 'ar' ? 'إلغاء' : 'Cancel'}
               </button>
               <button
-                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
+                type="button"
+                onClick={handleSaveAuthorization}
+                disabled={createAuthorizationMutation.isPending || updateAuthorizationMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {language === 'ar' ? 'حفظ' : 'Save'}
+                {createAuthorizationMutation.isPending || updateAuthorizationMutation.isPending 
+                  ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') 
+                  : editingAuthorization 
+                    ? (language === 'ar' ? 'تحديث' : 'Update')
+                    : (language === 'ar' ? 'حفظ' : 'Save')
+                }
               </button>
             </div>
           </div>

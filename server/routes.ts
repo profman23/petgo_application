@@ -7,14 +7,14 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations } from "@shared/schema";
 import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
 import bcrypt from 'bcrypt';
 import { addPublicPaymentRoutes } from "./routes-public";
 import { db } from "./db";
-import { sql } from "drizzle-orm";
+import { sql, eq } from "drizzle-orm";
 // Payment service removed per user request
 
 async function requireAuth(req: any, res: any, next: any) {
@@ -2936,6 +2936,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching drivers:', error);
       res.status(500).json({ message: 'Failed to fetch drivers' });
+    }
+  });
+
+  // Authorization management routes
+  app.get('/api/admin/authorizations', requireAdminAuth, async (req, res) => {
+    try {
+      const authorizationsList = await db.select().from(authorizations).orderBy(authorizations.createdAt);
+      res.json(authorizationsList);
+    } catch (error) {
+      console.error('Error fetching authorizations:', error);
+      res.status(500).json({ message: 'Error fetching authorizations' });
+    }
+  });
+
+  app.post('/api/admin/authorizations', requireAdminAuth, async (req, res) => {
+    try {
+      const authData = insertAuthorizationSchema.parse(req.body);
+      const [newAuth] = await db.insert(authorizations).values(authData).returning();
+      res.json(newAuth);
+    } catch (error) {
+      console.error('Error creating authorization:', error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      res.status(500).json({ message: 'Error creating authorization' });
+    }
+  });
+
+  app.put('/api/admin/authorizations/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const authData = insertAuthorizationSchema.parse(req.body);
+      const [updatedAuth] = await db.update(authorizations)
+        .set({ ...authData, updatedAt: new Date() })
+        .where(eq(authorizations.id, id))
+        .returning();
+      
+      if (!updatedAuth) {
+        return res.status(404).json({ message: 'Authorization not found' });
+      }
+      
+      res.json(updatedAuth);
+    } catch (error) {
+      console.error('Error updating authorization:', error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: error.errors[0].message });
+      }
+      res.status(500).json({ message: 'Error updating authorization' });
     }
   });
 
