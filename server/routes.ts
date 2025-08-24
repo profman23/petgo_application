@@ -3189,6 +3189,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset driver password
+  app.put('/api/admin/drivers/:id/reset-password', requireAdminAuth, async (req, res) => {
+    try {
+      const driverId = parseInt(req.params.id);
+      const { password } = req.body;
+      
+      if (!password) {
+        return res.status(400).json({ message: 'Password is required' });
+      }
+      
+      if (password.length < 6) {
+        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+      }
+      
+      await storage.resetDriverPassword(driverId, password);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error resetting driver password:', error);
+      res.status(500).json({ message: 'Failed to reset password' });
+    }
+  });
+
   // Shifts management endpoints
   app.get('/api/admin/shifts', requireAdminAuth, async (req, res) => {
     try {

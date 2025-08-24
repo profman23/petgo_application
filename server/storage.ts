@@ -1,6 +1,7 @@
 import { users, drivers, rides, patients, admins, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt, sql } from "drizzle-orm";
+import bcrypt from "bcrypt";
 
 export interface IStorage {
   // User operations
@@ -21,6 +22,7 @@ export interface IStorage {
   updateDriverLocation(id: number, latitude: number, longitude: number): Promise<void>;
   updateDriverAvailability(id: number, isAvailable: boolean): Promise<void>;
   updateVetsVanData(id: number, vetsvanCode: string, vetsvanName: string, username: string, phone: string, plateNumber: string): Promise<void>;
+  resetDriverPassword(id: number, password: string): Promise<void>;
   
   // Ride operations
   createRide(ride: RideRequest): Promise<Ride>;
@@ -338,6 +340,14 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(drivers)
       .set({ vetsvanCode, vetsvanName, username, phone, plateNumber })
+      .where(eq(drivers.id, id));
+  }
+
+  async resetDriverPassword(id: number, password: string): Promise<void> {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await db
+      .update(drivers)
+      .set({ password: hashedPassword })
       .where(eq(drivers.id, id));
   }
 
