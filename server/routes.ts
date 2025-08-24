@@ -237,6 +237,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Doctor login endpoint
+  app.post('/api/doctor/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+      }
+      
+      const driver = await storage.getDriverByUsername(username);
+      if (!driver) {
+        return res.status(401).json({ message: 'Invalid username or password' });
+      }
+      
+      // Check password using bcrypt
+      let isPasswordValid = false;
+      
+      if (driver.password.startsWith('$2b$') || driver.password.startsWith('$2a$')) {
+        // Bcrypt hashed password
+        isPasswordValid = await bcrypt.compare(password, driver.password);
+      } else {
+        // Plain text password (legacy) - direct comparison
+        isPasswordValid = (password === driver.password);
+      }
+      
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'Invalid username or password' });
+      }
+      
+      // Create session for doctor
+      const sessionId = await sessionService.createSession(
+        driver.id, 
+        'doctor', 
+        {
+          id: driver.id,
+          name: driver.vetsvanName,
+          username: driver.username,
+          vetsvanCode: driver.vetsvanCode,
+          phone: driver.phone
+        }
+      );
+      
+      res.json({
+        token: sessionId,
+        user: {
+          id: driver.id,
+          name: driver.vetsvanName,
+          username: driver.username,
+          vetsvanCode: driver.vetsvanCode,
+          phone: driver.phone
+        }
+      });
+    } catch (error) {
+      console.error('Doctor login error:', error);
+      res.status(500).json({ message: 'Login failed' });
+    }
+  });
+
   // Password reset endpoint
   app.post('/api/auth/reset-password', async (req, res) => {
     try {
