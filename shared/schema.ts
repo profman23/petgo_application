@@ -772,3 +772,29 @@ export type Authorization = typeof authorizations.$inferSelect;
 export type InsertAuthorization = z.infer<typeof insertAuthorizationSchema>;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
+
+// Red zones table - circular areas where ride requests are restricted
+export const redZones = pgTable("red_zones", {
+  id: serial("id").primaryKey(),
+  vetsvanId: integer("vetsvan_id").notNull().references(() => drivers.id),
+  latitude: real("latitude").notNull(),
+  longitude: real("longitude").notNull(),
+  radius: integer("radius").notNull().default(1000), // radius in meters
+  name: text("name"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Red zones schemas
+export const insertRedZoneSchema = createInsertSchema(redZones).pick({
+  vetsvanId: true,
+  latitude: true,
+  longitude: true,
+  radius: true,
+  name: true,
+  description: true,
+});
+
+// Type exports for red zones
+export type RedZone = typeof redZones.$inferSelect;
+export type InsertRedZone = z.infer<typeof insertRedZoneSchema>;

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, insertAdminUserSchema, adminUsers } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, insertAdminUserSchema, adminUsers, redZones } from "@shared/schema";
 import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
@@ -3484,6 +3484,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error sending SMS:', error);
       res.status(500).json({ message: 'Failed to send SMS' });
+    }
+  });
+
+  // Red Zones Management Routes
+  app.post('/api/admin/red-zones', requireAuth, async (req, res) => {
+    try {
+      const { vetsvanId, zones } = req.body;
+      
+      if (!vetsvanId || !Array.isArray(zones)) {
+        return res.status(400).json({ error: 'VetsVan ID and zones array are required' });
+      }
+
+      // Delete existing zones for this VetsVan
+      await db.delete(redZones).where(eq(redZones.vetsvanId, vetsvanId));
+      
+      // Insert new zones
+      if (zones.length > 0) {
+        const newZones = zones.map(zone => ({
+          vetsvanId,
+          centerLat: zone.lat,
+          centerLng: zone.lng,
+          radius: zone.radius,
+          name: zone.name || `Zone ${zones.indexOf(zone) + 1}`
+        }));
+        
+        await db.insert(redZones).values(newZones);
+      }
+      
+      res.json({ success: true, message: 'Red zones saved successfully' });
+    } catch (error) {
+      console.error('Error saving red zones:', error);
+      res.status(500).json({ error: 'Failed to save red zones' });
+    }
+  });
+
+  app.get('/api/admin/red-zones/:vetsvanId', requireAuth, async (req, res) => {
+    try {
+      const { vetsvanId } = req.params;
+      
+      const zones = await db
+        .select()
+        .from(redZones)
+        .where(eq(redZones.vetsvanId, parseInt(vetsvanId)));
+      
+      res.json({ zones });
+    } catch (error) {
+      console.error('Error fetching red zones:', error);
+      res.status(500).json({ error: 'Failed to fetch red zones' });
+    }
+  });
+
+  app.delete('/api/admin/red-zones/:zoneId', requireAuth, async (req, res) => {
+    try {
+      const { zoneId } = req.params;
+      
+      await db.delete(redZones).where(eq(redZones.id, parseInt(zoneId)));
+      
+      res.json({ success: true, message: 'Red zone deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting red zone:', error);
+      res.status(500).json({ error: 'Failed to delete red zone' });
     }
   });
 

@@ -4,12 +4,14 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp, ChevronLeft, ChevronRight, Plus, AlertTriangle } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp, ChevronLeft, ChevronRight, Plus, AlertTriangle, Save } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MapContainer, TileLayer, Circle, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -714,6 +716,12 @@ export default function AdminDashboard() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importSubTab, setImportSubTab] = useState<'products' | 'services'>('products');
+  
+  // Red Zones state
+  const [showRedZonesDialog, setShowRedZonesDialog] = useState(false);
+  const [selectedVetsVanForZones, setSelectedVetsVanForZones] = useState<Driver | null>(null);
+  const [redZones, setRedZones] = useState<{id?: number, lat: number, lng: number, radius: number, name?: string}[]>([]);
+  const [isSavingZones, setIsSavingZones] = useState(false);
   const [newDriver, setNewDriver] = useState<NewDriverData>({
     vetsvanCode: "",
     vetsvanName: "",
@@ -1661,6 +1669,75 @@ export default function AdminDashboard() {
     });
   };
 
+  // Map click handler component for adding red zones
+  const MapClickHandler = ({ zones, setZones }: { zones: any[], setZones: (zones: any[]) => void }) => {
+    useMapEvents({
+      click: (e) => {
+        const newZone = {
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+          radius: 1000, // Default 1km radius
+          name: `Zone ${zones.length + 1}`
+        };
+        setZones([...zones, newZone]);
+      }
+    });
+    return null;
+  };
+
+  // Handle Red Zones button click
+  const handleRedZonesClick = async (driver: Driver) => {
+    setSelectedVetsVanForZones(driver);
+    setShowRedZonesDialog(true);
+    
+    // Load existing red zones for this VetsVan
+    try {
+      const response = await apiRequest(`/api/admin/red-zones/${driver.id}`);
+      const existingZones = response.zones.map((zone: any) => ({
+        id: zone.id,
+        lat: zone.centerLat,
+        lng: zone.centerLng,
+        radius: zone.radius,
+        name: zone.name
+      }));
+      setRedZones(existingZones);
+    } catch (error) {
+      console.error('Error loading red zones:', error);
+      setRedZones([]); // Start with empty zones if loading fails
+    }
+  };
+
+  // Save red zones to database
+  const handleSaveRedZones = async () => {
+    if (!selectedVetsVanForZones) return;
+    
+    setIsSavingZones(true);
+    try {
+      await apiRequest('/api/admin/red-zones', {
+        method: 'POST',
+        body: JSON.stringify({
+          vetsvanId: selectedVetsVanForZones.id,
+          zones: redZones
+        }),
+      });
+      
+      toast({
+        title: language === 'ar' ? 'تم الحفظ بنجاح' : 'Saved Successfully',
+        description: language === 'ar' ? 'تم حفظ المناطق الحمراء بنجاح' : 'Red zones saved successfully',
+      });
+      
+      setShowRedZonesDialog(false);
+    } catch (error) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في حفظ المناطق الحمراء' : 'Failed to save red zones',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSavingZones(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -2017,6 +2094,7 @@ export default function AdminDashboard() {
                                 {language === 'ar' ? 'تحديد الموقع' : 'Set Location'}
                               </button>
                               <button
+                                onClick={() => handleRedZonesClick(driver)}
                                 className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1"
                               >
                                 <AlertTriangle className="w-3 h-3" />
@@ -3512,6 +3590,102 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Red Zones Management Modal */}
+      {showRedZonesDialog && selectedVetsVanForZones && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <h2 className="text-xl font-bold" style={{ textAlign: getTextAlign(language) }}>
+                {language === 'ar' ? `إدارة المناطق الحمراء - ${selectedVetsVanForZones.vetsvanName}` : `Red Zones Management - ${selectedVetsVanForZones.vetsvanName}`}
+              </h2>
+            </div>
+            
+            <div className="p-4">
+              <div className="mb-4">
+                <p className="text-sm text-gray-600" style={{ textAlign: getTextAlign(language) }}>
+                  {language === 'ar' ? 'انقر على الخريطة لإضافة منطقة حمراء جديدة. المناطق الحمراء هي مناطق محظورة لطلبات الرحلات.' : 'Click on the map to add a new red zone. Red zones are restricted areas for ride requests.'}
+                </p>
+              </div>
+              
+              <div className="h-96 border border-gray-300 rounded-lg overflow-hidden">
+                <MapContainer
+                  center={[24.7136, 46.6753]} // Riyadh coordinates
+                  zoom={11}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  
+                  <MapClickHandler zones={redZones} setZones={setRedZones} />
+                  
+                  {redZones.map((zone, index) => (
+                    <Circle
+                      key={index}
+                      center={[zone.lat, zone.lng]}
+                      radius={zone.radius}
+                      pathOptions={{
+                        color: 'red',
+                        fillColor: 'red',
+                        fillOpacity: 0.2,
+                      }}
+                    />
+                  ))}
+                </MapContainer>
+              </div>
+              
+              {redZones.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium mb-2" style={{ textAlign: getTextAlign(language) }}>
+                    {language === 'ar' ? 'المناطق الحمراء:' : 'Red Zones:'}
+                  </h3>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {redZones.map((zone, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                        <span className="text-sm">
+                          {zone.name} - {language === 'ar' ? 'نصف القطر:' : 'Radius:'} {zone.radius}m
+                        </span>
+                        <button
+                          onClick={() => setRedZones(redZones.filter((_, i) => i !== index))}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="p-4 border-t border-gray-200 flex gap-3 justify-end">
+              <button
+                onClick={() => setShowRedZonesDialog(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+              <button
+                onClick={handleSaveRedZones}
+                disabled={isSavingZones}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {isSavingZones ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                {isSavingZones 
+                  ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') 
+                  : (language === 'ar' ? 'حفظ المناطق' : 'Save Zones')
+                }
+              </button>
+            </div>
           </div>
         </div>
       )}
