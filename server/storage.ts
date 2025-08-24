@@ -22,7 +22,7 @@ export interface IStorage {
   updateDriverLocation(id: number, latitude: number, longitude: number): Promise<void>;
   updateDriverAvailability(id: number, isAvailable: boolean): Promise<void>;
   updateVetsVanData(id: number, vetsvanCode: string, vetsvanName: string, username: string, phone: string, plateNumber: string): Promise<void>;
-  resetDriverPassword(id: number, password: string): Promise<void>;
+  updateDriverPassword(id: number, password: string): Promise<void>;
   
   // Ride operations
   createRide(ride: RideRequest): Promise<Ride>;
@@ -343,18 +343,18 @@ export class DatabaseStorage implements IStorage {
       .where(eq(drivers.id, id));
   }
 
-  async resetDriverPassword(id: number, password: string): Promise<void> {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await db
-      .update(drivers)
-      .set({ password: hashedPassword })
-      .where(eq(drivers.id, id));
-  }
-
   async updateDriverAvailability(id: number, isAvailable: boolean): Promise<void> {
     await db
       .update(drivers)
       .set({ isAvailable })
+      .where(eq(drivers.id, id));
+  }
+
+  async updateDriverPassword(id: number, password: string): Promise<void> {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await db
+      .update(drivers)
+      .set({ password: hashedPassword })
       .where(eq(drivers.id, id));
   }
 

@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp, ChevronLeft, ChevronRight, Plus, Key } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -704,15 +704,17 @@ export default function AdminDashboard() {
   const [isSendingSms, setIsSendingSms] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
-  const [showPasswordResetDialog, setShowPasswordResetDialog] = useState(false);
-  const [passwordResetDriver, setPasswordResetDriver] = useState<Driver | null>(null);
-  const [passwordResetData, setPasswordResetData] = useState({ password: '', confirmPassword: '' });
   const [editDriverData, setEditDriverData] = useState<{vetsvanCode: string, vetsvanName: string, username: string, phone: string, plateNumber: string}>({
     vetsvanCode: "",
     vetsvanName: "",
     username: "",
     phone: "",
     plateNumber: ""
+  });
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    password: "",
+    confirmPassword: ""
   });
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -1391,6 +1393,31 @@ export default function AdminDashboard() {
     },
   });
 
+  // Password reset mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ driverId, password }: { driverId: number; password: string }) => {
+      await apiRequest(`/api/admin/drivers/${driverId}/reset-password`, {
+        method: "PUT",
+        body: JSON.stringify({ password }),
+      });
+    },
+    onSuccess: async () => {
+      setShowPasswordReset(false);
+      setPasswordData({ password: "", confirmPassword: "" });
+      toast({
+        title: language === 'ar' ? 'تم إعادة تعيين كلمة المرور بنجاح' : 'Password Reset Successfully',
+        description: language === 'ar' ? 'تم تحديث كلمة المرور للطبيب بنجاح' : 'Doctor password updated successfully',
+      });
+    },
+    onError: () => {
+      toast({
+        title: t('error'),
+        description: language === 'ar' ? 'فشل في إعادة تعيين كلمة المرور' : 'Failed to reset password',
+        variant: 'destructive'
+      });
+    },
+  });
+
   // Delete driver mutation
   const deleteDriverMutation = useMutation({
     mutationFn: async (driverId: number) => {
@@ -1436,32 +1463,6 @@ export default function AdminDashboard() {
       toast({
         title: t('error'),
         description: language === 'ar' ? 'فشل في تحديث الموقع' : 'Failed to update location',
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Password reset mutation
-  const passwordResetMutation = useMutation({
-    mutationFn: async ({ driverId, password }: { driverId: number; password: string }) => {
-      await apiRequest(`/api/admin/drivers/${driverId}/reset-password`, {
-        method: "PUT",
-        body: JSON.stringify({ password }),
-      });
-    },
-    onSuccess: async () => {
-      setShowPasswordResetDialog(false);
-      setPasswordResetDriver(null);
-      setPasswordResetData({ password: '', confirmPassword: '' });
-      toast({
-        title: language === 'ar' ? 'تم إعادة تعيين كلمة المرور بنجاح' : 'Password Reset Successfully',
-        description: language === 'ar' ? 'تم إعادة تعيين كلمة المرور بنجاح' : 'Password has been reset successfully',
-      });
-    },
-    onError: () => {
-      toast({
-        title: t('error'),
-        description: language === 'ar' ? 'حدث خطأ أثناء إعادة تعيين كلمة المرور' : 'Error resetting password',
         variant: "destructive",
       });
     },
@@ -1671,13 +1672,9 @@ export default function AdminDashboard() {
       phone: driver.phone || '',
       plateNumber: (driver as any).plateNumber || ''
     });
+    setShowPasswordReset(false);
+    setPasswordData({ password: "", confirmPassword: "" });
     setShowEditDialog(true);
-  };
-
-  const handlePasswordResetClick = (driver: Driver) => {
-    setPasswordResetDriver(driver);
-    setPasswordResetData({ password: '', confirmPassword: '' });
-    setShowPasswordResetDialog(true);
   };
 
   const handleEditSubmit = (e: React.FormEvent) => {
@@ -1696,47 +1693,35 @@ export default function AdminDashboard() {
     });
   };
 
-  const handlePasswordResetSubmit = (e: React.FormEvent) => {
+  const handlePasswordReset = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!passwordResetDriver) {
+    if (!editingDriver || !passwordData.password || !passwordData.confirmPassword) {
       toast({
         title: t('error'),
-        description: language === 'ar' ? 'لم يتم تحديد المستخدم' : 'No user selected',
-        variant: "destructive",
+        description: language === 'ar' ? 'يرجى ملء جميع حقول كلمة المرور' : 'Please fill all password fields',
+        variant: 'destructive'
       });
       return;
     }
-    
-    if (!passwordResetData.password || !passwordResetData.confirmPassword) {
-      toast({
-        title: t('error'),
-        description: language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields',
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (passwordResetData.password !== passwordResetData.confirmPassword) {
+    if (passwordData.password !== passwordData.confirmPassword) {
       toast({
         title: t('error'),
         description: language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match',
-        variant: "destructive",
+        variant: 'destructive'
       });
       return;
     }
-    
-    if (passwordResetData.password.length < 6) {
+    if (passwordData.password.length < 6) {
       toast({
         title: t('error'),
-        description: language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters long',
-        variant: "destructive",
+        description: language === 'ar' ? 'كلمة المرور يجب أن تكون على الأقل 6 أحرف' : 'Password must be at least 6 characters',
+        variant: 'destructive'
       });
       return;
     }
-    
-    passwordResetMutation.mutate({
-      driverId: passwordResetDriver.id,
-      password: passwordResetData.password
+    resetPasswordMutation.mutate({
+      driverId: editingDriver.id,
+      password: passwordData.password
     });
   };
 
@@ -2101,13 +2086,6 @@ export default function AdminDashboard() {
                               >
                                 <Edit className="w-3 h-3" />
                                 {language === 'ar' ? 'تعديل' : 'Edit'}
-                              </button>
-                              <button
-                                onClick={() => handlePasswordResetClick(driver)}
-                                className="text-sm text-blue-600 hover:text-blue-900 inline-flex items-center gap-1 ml-2"
-                              >
-                                <Key className="w-3 h-3" />
-                                {language === 'ar' ? 'إعادة تعيين كلمة المرور' : 'Reset Password'}
                               </button>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
@@ -3383,6 +3361,78 @@ export default function AdminDashboard() {
                 />
               </div>
 
+              {/* Reset Password Section */}
+              <div className="pt-4 border-t border-gray-200">
+                {!showPasswordReset ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowPasswordReset(true)}
+                    className="w-full px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
+                  >
+                    {language === 'ar' ? 'إعادة تعيين كلمة المرور' : 'Reset Password'}
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-medium text-gray-900">
+                      {language === 'ar' ? 'إعادة تعيين كلمة المرور' : 'Reset Password'}
+                    </h4>
+                    
+                    <form onSubmit={handlePasswordReset} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
+                        </label>
+                        <input
+                          type="password"
+                          value={passwordData.password}
+                          onChange={(e) => setPasswordData({ ...passwordData, password: e.target.value })}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          required
+                          style={{ textAlign: getTextAlign(language) }}
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                        </label>
+                        <input
+                          type="password"
+                          value={passwordData.confirmPassword}
+                          onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          required
+                          style={{ textAlign: getTextAlign(language) }}
+                        />
+                      </div>
+                      
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowPasswordReset(false);
+                            setPasswordData({ password: "", confirmPassword: "" });
+                          }}
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                        >
+                          {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={resetPasswordMutation.isPending}
+                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {resetPasswordMutation.isPending 
+                            ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...')
+                            : (language === 'ar' ? 'حفظ' : 'Save')
+                          }
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
+
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -3399,77 +3449,6 @@ export default function AdminDashboard() {
                   {editDriverMutation.isPending 
                     ? (language === 'ar' ? 'جاري التحديث...' : 'Updating...')
                     : (language === 'ar' ? 'تحديث البيانات' : 'Update Data')
-                  }
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Password Reset Dialog */}
-      {showPasswordResetDialog && passwordResetDriver && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" dir={getDirection(language)}>
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                {language === 'ar' ? 'إعادة تعيين كلمة المرور' : 'Reset Password'}
-              </h3>
-              <button
-                onClick={() => setShowPasswordResetDialog(false)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <form onSubmit={handlePasswordResetSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
-                </label>
-                <input
-                  type="password"
-                  value={passwordResetData.password}
-                  onChange={(e) => setPasswordResetData({ ...passwordResetData, password: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  required
-                  minLength={6}
-                  style={{ textAlign: getTextAlign(language) }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}
-                </label>
-                <input
-                  type="password"
-                  value={passwordResetData.confirmPassword}
-                  onChange={(e) => setPasswordResetData({ ...passwordResetData, confirmPassword: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  required
-                  minLength={6}
-                  style={{ textAlign: getTextAlign(language) }}
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowPasswordResetDialog(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  type="submit"
-                  disabled={passwordResetMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {passwordResetMutation.isPending 
-                    ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...')
-                    : (language === 'ar' ? 'حفظ' : 'SAVE')
                   }
                 </button>
               </div>
