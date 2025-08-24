@@ -704,9 +704,10 @@ export default function AdminDashboard() {
   const [isSendingSms, setIsSendingSms] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
-  const [editDriverData, setEditDriverData] = useState<{vetsvanCode: string, vetsvanName: string}>({
+  const [editDriverData, setEditDriverData] = useState<{vetsvanCode: string, vetsvanName: string, username: string}>({
     vetsvanCode: "",
-    vetsvanName: ""
+    vetsvanName: "",
+    username: ""
   });
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -1358,7 +1359,7 @@ export default function AdminDashboard() {
 
   // Edit driver mutation
   const editDriverMutation = useMutation({
-    mutationFn: async ({ driverId, data }: { driverId: number; data: {vetsvanCode: string, vetsvanName: string} }) => {
+    mutationFn: async ({ driverId, data }: { driverId: number; data: {vetsvanCode: string, vetsvanName: string, username: string} }) => {
       await apiRequest(`/api/admin/drivers/${driverId}`, {
         method: "PUT",
         body: JSON.stringify(data),
@@ -1634,14 +1635,15 @@ export default function AdminDashboard() {
     setEditingDriver(driver);
     setEditDriverData({
       vetsvanCode: (driver as any).vetsvanCode || '',
-      vetsvanName: (driver as any).vetsvanName || ''
+      vetsvanName: (driver as any).vetsvanName || '',
+      username: driver.username || ''
     });
     setShowEditDialog(true);
   };
 
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingDriver || !editDriverData.vetsvanCode || !editDriverData.vetsvanName) {
+    if (!editingDriver || !editDriverData.vetsvanCode || !editDriverData.vetsvanName || !editDriverData.username) {
       toast({
         title: t('error'),
         description: language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields',
@@ -3240,6 +3242,21 @@ export default function AdminDashboard() {
                   type="text"
                   value={editDriverData.vetsvanName}
                   onChange={(e) => setEditDriverData({ ...editDriverData, vetsvanName: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  style={{ textAlign: getTextAlign(language) }}
+                />
+              </div>
+
+              {/* Username field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'اسم المستخدم' : 'User Name'}
+                </label>
+                <input
+                  type="text"
+                  value={editDriverData.username}
+                  onChange={(e) => setEditDriverData({ ...editDriverData, username: e.target.value })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
                   style={{ textAlign: getTextAlign(language) }}
