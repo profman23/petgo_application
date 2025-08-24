@@ -704,10 +704,12 @@ export default function AdminDashboard() {
   const [isSendingSms, setIsSendingSms] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
-  const [editDriverData, setEditDriverData] = useState<{vetsvanCode: string, vetsvanName: string, username: string}>({
+  const [editDriverData, setEditDriverData] = useState<{vetsvanCode: string, vetsvanName: string, username: string, phone: string, plateNumber: string}>({
     vetsvanCode: "",
     vetsvanName: "",
-    username: ""
+    username: "",
+    phone: "",
+    plateNumber: ""
   });
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -1359,7 +1361,7 @@ export default function AdminDashboard() {
 
   // Edit driver mutation
   const editDriverMutation = useMutation({
-    mutationFn: async ({ driverId, data }: { driverId: number; data: {vetsvanCode: string, vetsvanName: string, username: string} }) => {
+    mutationFn: async ({ driverId, data }: { driverId: number; data: {vetsvanCode: string, vetsvanName: string, username: string, phone: string, plateNumber: string} }) => {
       await apiRequest(`/api/admin/drivers/${driverId}`, {
         method: "PUT",
         body: JSON.stringify(data),
@@ -1636,14 +1638,16 @@ export default function AdminDashboard() {
     setEditDriverData({
       vetsvanCode: (driver as any).vetsvanCode || '',
       vetsvanName: (driver as any).vetsvanName || '',
-      username: driver.username || ''
+      username: driver.username || '',
+      phone: driver.phone || '',
+      plateNumber: (driver as any).plateNumber || ''
     });
     setShowEditDialog(true);
   };
 
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingDriver || !editDriverData.vetsvanCode || !editDriverData.vetsvanName || !editDriverData.username) {
+    if (!editingDriver || !editDriverData.vetsvanCode || !editDriverData.vetsvanName || !editDriverData.username || !editDriverData.phone || !editDriverData.plateNumber) {
       toast({
         title: t('error'),
         description: language === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields',
@@ -3257,6 +3261,36 @@ export default function AdminDashboard() {
                   type="text"
                   value={editDriverData.username}
                   onChange={(e) => setEditDriverData({ ...editDriverData, username: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  style={{ textAlign: getTextAlign(language) }}
+                />
+              </div>
+
+              {/* Phone field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+                </label>
+                <input
+                  type="text"
+                  value={editDriverData.phone}
+                  onChange={(e) => setEditDriverData({ ...editDriverData, phone: e.target.value })}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                  style={{ textAlign: getTextAlign(language) }}
+                />
+              </div>
+
+              {/* Plate Number field */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {language === 'ar' ? 'رقم اللوحة' : 'Plate Number'}
+                </label>
+                <input
+                  type="text"
+                  value={editDriverData.plateNumber}
+                  onChange={(e) => setEditDriverData({ ...editDriverData, plateNumber: e.target.value })}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   required
                   style={{ textAlign: getTextAlign(language) }}

@@ -3175,13 +3175,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put('/api/admin/drivers/:id', requireAdminAuth, async (req, res) => {
     try {
       const driverId = parseInt(req.params.id);
-      const { vetsvanCode, vetsvanName, username } = req.body;
+      const { vetsvanCode, vetsvanName, username, phone, plateNumber } = req.body;
       
-      if (!vetsvanCode || !vetsvanName || !username) {
-        return res.status(400).json({ message: 'VetsVan code, name, and username are required' });
+      if (!vetsvanCode || !vetsvanName || !username || !phone || !plateNumber) {
+        return res.status(400).json({ message: 'VetsVan code, name, username, phone, and plate number are required' });
       }
       
-      await storage.updateVetsVanData(driverId, vetsvanCode, vetsvanName, username);
+      await storage.updateVetsVanData(driverId, vetsvanCode, vetsvanName, username, phone, plateNumber);
       res.json({ success: true });
     } catch (error) {
       console.error('Error updating VetsVan data:', error);

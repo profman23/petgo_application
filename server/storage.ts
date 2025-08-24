@@ -20,7 +20,7 @@ export interface IStorage {
   getDriverByVetsVanCode(vetsVanCode: string): Promise<Driver | undefined>;
   updateDriverLocation(id: number, latitude: number, longitude: number): Promise<void>;
   updateDriverAvailability(id: number, isAvailable: boolean): Promise<void>;
-  updateVetsVanData(id: number, vetsvanCode: string, vetsvanName: string, username: string): Promise<void>;
+  updateVetsVanData(id: number, vetsvanCode: string, vetsvanName: string, username: string, phone: string, plateNumber: string): Promise<void>;
   
   // Ride operations
   createRide(ride: RideRequest): Promise<Ride>;
@@ -334,10 +334,10 @@ export class DatabaseStorage implements IStorage {
       .where(eq(drivers.id, id));
   }
 
-  async updateVetsVanData(id: number, vetsvanCode: string, vetsvanName: string, username: string): Promise<void> {
+  async updateVetsVanData(id: number, vetsvanCode: string, vetsvanName: string, username: string, phone: string, plateNumber: string): Promise<void> {
     await db
       .update(drivers)
-      .set({ vetsvanCode, vetsvanName, username })
+      .set({ vetsvanCode, vetsvanName, username, phone, plateNumber })
       .where(eq(drivers.id, id));
   }
 
