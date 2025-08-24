@@ -22,7 +22,7 @@ export const drivers = pgTable("drivers", {
   vetsvanCode: text("vetsvan_code").notNull(),
   vetsvanName: text("vetsvan_name").notNull(),
   name: text("name").notNull(),
-  phone: text("phone").notNull().unique(),
+  phone: text("phone").notNull(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   rating: real("rating").notNull().default(4.5),
