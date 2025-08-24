@@ -1695,8 +1695,8 @@ export default function AdminDashboard() {
       const response = await apiRequest(`/api/admin/red-zones/${driver.id}`);
       const existingZones = response.zones.map((zone: any) => ({
         id: zone.id,
-        lat: zone.centerLat,
-        lng: zone.centerLng,
+        lat: zone.latitude,
+        lng: zone.longitude,
         radius: zone.radius,
         name: zone.name
       }));

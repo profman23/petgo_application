@@ -3503,8 +3503,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (zones.length > 0) {
         const newZones = zones.map(zone => ({
           vetsvanId,
-          centerLat: zone.lat,
-          centerLng: zone.lng,
+          latitude: zone.lat,
+          longitude: zone.lng,
           radius: zone.radius,
           name: zone.name || `Zone ${zones.indexOf(zone) + 1}`
         }));
