@@ -797,13 +797,15 @@ export default function RideRequest() {
 
         // إنشاء الحجز مباشرة بدون دفع
         const bookingData = {
+          pickupLocation: form.getValues('pickupLocation') || 'موقعك الحالي',
+          destination: form.getValues('pickupLocation') || 'موقعك الحالي', // نفس موقع الانطلاق للخدمة المنزلية
           pickupLatitude: currentLocation.latitude,
           pickupLongitude: currentLocation.longitude,
           destinationLatitude: currentLocation.latitude,
           destinationLongitude: currentLocation.longitude,
+          vehicleType: 'vetsvan', // نوع المركبة مطلوب
           serviceType: serviceType,
-          selectedPatients: selectedPatients,
-          pickupLocation: form.getValues('pickupLocation') || 'موقعك الحالي'
+          selectedPatients: selectedPatients
         };
 
         console.log('Creating direct booking for deworming:', bookingData);
