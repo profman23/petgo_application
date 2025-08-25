@@ -135,6 +135,8 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
     total = petCount * 172.5;
   } else if (serviceType === 'deworming') {
     total = petCount * 80.5;
+  } else if (serviceType === 'free-deworming') {
+    total = 0; // Free service
   } else if (serviceType === 'pickup-drop') {
     total = 115;
   } else {
@@ -778,8 +780,42 @@ export default function RideRequest() {
       return;
     }
 
-    // التحقق من وجود التكلفة التقديرية
+    // التحقق من وجود التكلفة التقديرية - تجاوز للخدمات المجانية
     const { total: estimatedCost } = getEstimatedCost(selectedPatients, patients, serviceType);
+    
+    // Special handling for free services
+    if (serviceType === 'free-deworming') {
+      // Skip payment flow and go directly to booking
+      const requestData = {
+        pickupLatitude: currentLocation.latitude,
+        pickupLongitude: currentLocation.longitude,
+        selectedPatients,
+        serviceType,
+        location: form.getValues('pickupLocation'),
+        estimatedCost: 0,
+      };
+      
+      console.log('Free service selected - saving request data and redirecting to booking:', requestData);
+      localStorage.setItem('pendingRequest', JSON.stringify(requestData));
+      
+      toast({
+        title: language === 'ar' ? 'خدمة مجانية!' : 'Free Service!',
+        description: language === 'ar' ? 
+          'يتم توجيهك مباشرة لحجز الموعد' : 
+          'Redirecting directly to appointment booking',
+      });
+      
+      // Reset slide state before redirect
+      setIsSlideComplete(false);
+      setSlidePosition(0);
+      
+      // Redirect to booking page
+      setTimeout(() => {
+        setLocation('/vetsvan-booking');
+      }, 1000);
+      return;
+    }
+    
     if (!estimatedCost || estimatedCost <= 0) {
       toast({
         title: language === 'ar' ? 'خطأ في التكلفة' : 'Cost Error',
@@ -1283,6 +1319,12 @@ export default function RideRequest() {
                     <span>{language === 'ar' ? 'الديدان' : 'Deworming'}</span>
                   </div>
                 </SelectItem>
+                <SelectItem value="free-deworming" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Pill className="w-4 h-4 text-green-600" />
+                    <span>{language === 'ar' ? 'ديدان مجاني' : 'Free Deworming'}</span>
+                  </div>
+                </SelectItem>
                 {!isOnlyBirdsSelected(selectedPatients, patients) && (
                   <SelectItem value="fleas-ticks-prevention" className="select-item-custom">
                     <div className="flex items-center gap-2">
@@ -1332,7 +1374,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 {(() => {
                   const costData = getEstimatedCost(selectedPatients, patients, serviceType);
