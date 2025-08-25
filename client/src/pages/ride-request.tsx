@@ -803,14 +803,12 @@ export default function RideRequest() {
           destinationLongitude: currentLocation.longitude,
           serviceType: serviceType,
           selectedPatients: selectedPatients,
-          location: form.getValues('pickupLocation') || 'موقعك الحالي',
-          estimatedCost: 0, // مجاني للديدان
-          paymentStatus: 'free' // حجز مجاني
+          pickupLocation: form.getValues('pickupLocation') || 'موقعك الحالي'
         };
 
         console.log('Creating direct booking for deworming:', bookingData);
         
-        const response = await fetch('/api/rides', {
+        const response = await fetch('/api/rides/request', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
