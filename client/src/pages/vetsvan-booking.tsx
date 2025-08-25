@@ -414,6 +414,33 @@ export default function VetsVanBooking() {
       setShowConfirmDialog(false);
       
       try {
+        // CHECK 0: Handle free services (bypass payment flow entirely)
+        if (rideRequestData?.serviceType === 'free-deworming') {
+          console.log('🆓 Free deworming service detected - creating booking without payment');
+          
+          // Create booking directly without any payment processing
+          const freeBooking = {
+            vetsVanId: pendingBooking.vetsVanId,
+            timeSlot: pendingBooking.timeSlot,
+            vetsVanCode: pendingBooking.vetsVanCode,
+            paymentReference: null, // No payment for free service
+            paymentId: null
+          };
+          
+          console.log('🎯 Creating free booking:', freeBooking);
+          
+          // Directly create the booking using existing mutation
+          createBookingMutation.mutate(freeBooking);
+          
+          // Show success message
+          toast({
+            title: "Free Service Booking",
+            description: "Your free deworming appointment is being processed!",
+          });
+          
+          return; // Exit here - free booking handled
+        }
+        
         // CHECK 1: If payment is already successful (coming from MyFatoorah redirect), finalize booking
         if (paymentSuccess && paymentReference && paymentId) {
           console.log('✅ Payment already completed, finalizing booking with payment:', {
