@@ -429,7 +429,7 @@ export class DatabaseStorage implements IStorage {
 
   // Admin operations
   async getAdminByUsername(username: string): Promise<Admin | undefined> {
-    const [admin] = await db.select().from(admins).where(eq(admins.username, username));
+    const [admin] = await db.select().from(adminUsers).where(eq(adminUsers.username, username));
     return admin;
   }
 
