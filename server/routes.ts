@@ -2901,7 +2901,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const admin = await storage.getAdminByUsername(username);
       
-      if (!admin || admin.password !== password) {
+      if (!admin) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+
+      // Proper password verification with bcrypt support
+      let isPasswordValid = false;
+      if (admin.password.startsWith('$2b$') || admin.password.startsWith('$2a$')) {
+        // Bcrypt hashed password
+        isPasswordValid = await bcrypt.compare(password, admin.password);
+      } else {
+        // Plain text password (legacy) - direct comparison
+        isPasswordValid = (password === admin.password);
+      }
+      
+      if (!isPasswordValid) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
