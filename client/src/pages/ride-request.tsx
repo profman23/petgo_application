@@ -729,7 +729,7 @@ export default function RideRequest() {
 
   // دالة لتنفيذ الدفع قبل التوجه لصفحة الحجز
   const executeRideRequest = async () => {
-    console.log('executeRideRequest called - Starting payment flow');
+    console.log('executeRideRequest called - Starting flow for:', serviceType);
     console.log('Current location:', currentLocation);
     console.log('Selected patients:', selectedPatients);
     console.log('Service type:', serviceType);
@@ -778,7 +778,83 @@ export default function RideRequest() {
       return;
     }
 
-    // التحقق من وجود التكلفة التقديرية
+    // خاص بخدمة الديدان - تخطي الدفع والتوجه مباشرة للحجز
+    if (serviceType === 'deworming') {
+      console.log('Deworming service - skipping payment, creating booking directly');
+      setIsProcessingPayment(true);
+      
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          toast({
+            title: language === 'ar' ? 'خطأ في المصادقة' : 'Authentication Error',
+            description: language === 'ar' ? 'يرجى تسجيل الدخول مرة أخرى' : 'Please log in again',
+            variant: 'destructive',
+          });
+          setLocation('/login');
+          return;
+        }
+
+        // إنشاء الحجز مباشرة بدون دفع
+        const bookingData = {
+          pickupLatitude: currentLocation.latitude,
+          pickupLongitude: currentLocation.longitude,
+          destinationLatitude: currentLocation.latitude,
+          destinationLongitude: currentLocation.longitude,
+          serviceType: serviceType,
+          selectedPatients: selectedPatients,
+          location: form.getValues('pickupLocation') || 'موقعك الحالي',
+          estimatedCost: 0, // مجاني للديدان
+          paymentStatus: 'free' // حجز مجاني
+        };
+
+        console.log('Creating direct booking for deworming:', bookingData);
+        
+        const response = await fetch('/api/rides', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(bookingData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          console.log('Deworming booking created successfully:', result);
+          toast({
+            title: language === 'ar' ? 'تم إنشاء الحجز بنجاح' : 'Booking Created Successfully',
+            description: language === 'ar' ? 
+              'تم إنشاء حجز خدمة الديدان المجانية بنجاح' : 
+              'Free deworming service booking created successfully',
+          });
+          
+          // التوجه مباشرة لصفحة الحجوزات
+          setLocation('/bookings');
+        } else {
+          throw new Error(result.message || 'Failed to create booking');
+        }
+      } catch (error: any) {
+        console.error('Deworming booking error:', error);
+        toast({
+          title: language === 'ar' ? 'خطأ في إنشاء الحجز' : 'Booking Error',
+          description: language === 'ar' ? 
+            `فشل في إنشاء الحجز: ${error.message}` : 
+            `Failed to create booking: ${error.message}`,
+          variant: 'destructive'
+        });
+        
+        // إعادة تعيين السحب عند الفشل
+        setIsSlideComplete(false);
+        setSlidePosition(0);
+      } finally {
+        setIsProcessingPayment(false);
+      }
+      return;
+    }
+
+    // التحقق من وجود التكلفة التقديرية للخدمات المدفوعة
     const { total: estimatedCost } = getEstimatedCost(selectedPatients, patients, serviceType);
     if (!estimatedCost || estimatedCost <= 0) {
       toast({
@@ -1332,7 +1408,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 {(() => {
                   const costData = getEstimatedCost(selectedPatients, patients, serviceType);
