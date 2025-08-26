@@ -111,12 +111,13 @@ export default function DoctorLogin() {
         <Card className="shadow-xl border-2" style={{ borderColor: 'var(--purple-primary)', boxShadow: '0 15px 35px rgba(139, 47, 139, 0.15)' }}>
           {/* Header with back button - matching customer login style */}
           <div className="bg-white p-6 text-center relative rounded-t-lg border-b shadow-sm">
-            {/* Back button */}
+            {/* Back button - hidden for /login/doctor route */}
             <button
               onClick={() => setLocation('/user-type-selection')}
               className="absolute top-4 left-4 p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
               title={language === 'ar' ? 'العودة للخلف' : 'Go Back'}
+              style={{ display: window.location.pathname === '/login/doctor' ? 'none' : 'block' }}
             >
               <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'rotate-180' : ''}`} />
             </button>
