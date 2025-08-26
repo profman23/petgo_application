@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useRoute } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/i18n';
-import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Eye, Printer, Download, X } from 'lucide-react';
+import { ArrowLeft, FileText, User, Phone, Calendar, Mail, Plus, Minus, Receipt, Save, Stethoscope, Upload, AlertTriangle, Eye, Printer, Download, X, Brain } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -2415,6 +2415,14 @@ export default function DoctorInvoice() {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* AI Doctor Assistants Button */}
+                <div className="mt-6 flex justify-center">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg">
+                    <Brain className="h-5 w-5 mr-2" />
+                    {language === 'ar' ? 'مساعدو الطبيب الذكي' : 'AI Doctor Assistants'}
+                  </Button>
                 </div>
               </div>
               
