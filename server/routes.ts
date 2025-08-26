@@ -5271,11 +5271,24 @@ Please provide your analysis in EXACTLY this format:
 - [List any concerning findings that need immediate attention]
 - [If none, state "No immediate red flags identified"]
 
-**Suggested Next Steps:**
-- [List 2-3 recommended actions]
+**Recommended Lab Tests:**
+- [List specific lab tests with brief rationale]
+- [Include CBC, chemistry panel, urinalysis, etc. as appropriate]
+
+**Recommended Imaging/Procedures:**
+- [List imaging studies: X-ray, ultrasound, CT/MRI as applicable]
+- [Include any other diagnostic procedures]
+
+**Rationale:**
+- [Explain why each major test/imaging is suggested]
+
+**Priority/Urgency:**
+- STAT: [List any immediate tests needed]
+- Within 24-48h: [List urgent but not emergency tests]
+- Routine: [List non-urgent follow-up tests]
 
 **Missing Data to Collect:**
-- [List important missing information]
+- [List important missing information for complete assessment]
 
 ## ARABIC ANALYSIS / التحليل العربي
 
@@ -5286,13 +5299,26 @@ Please provide your analysis in EXACTLY this format:
 - [List concerning findings in Arabic]
 - [If none, state "لم يتم تحديد علامات حمراء فورية"]
 
-**الخطوات المقترحة التالية:**
-- [List 2-3 recommended actions in Arabic]
+**الفحوصات المخبرية المقترحة:**
+- [List specific lab tests with brief rationale in Arabic]
+
+**التصوير/الإجراءات المقترحة:**
+- [List imaging studies and procedures in Arabic]
+
+**المبرر:**
+- [Explain rationale in Arabic]
+
+**الأولوية/الإلحاح:**
+- فوري: [Immediate tests in Arabic]
+- خلال 24-48 ساعة: [Urgent tests in Arabic]
+- روتيني: [Routine tests in Arabic]
 
 **البيانات المفقودة للجمع:**
 - [List important missing information in Arabic]
 
-Keep each section concise and clinically relevant.`;
+**DISCLAIMER:** This is decision-support only, not a diagnosis. Clinical judgment and species-specific considerations should always guide final decisions.
+
+Keep each section concise and clinically relevant. Tailor recommendations to the specific species, age, weight, and presenting symptoms.`;
 
       const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',

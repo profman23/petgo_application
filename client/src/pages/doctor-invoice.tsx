@@ -137,6 +137,7 @@ export default function DoctorInvoice() {
   const [aiAnalysis, setAiAnalysis] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [aiActiveTab, setAiActiveTab] = useState<'english' | 'arabic'>('english');
   
   // Invoice viewing states
   const [showInvoiceView, setShowInvoiceView] = useState(false);
@@ -1147,6 +1148,27 @@ export default function DoctorInvoice() {
       title: language === 'ar' ? "تم النسخ" : "Copied",
       description: language === 'ar' ? "تم نسخ التحليل إلى الحافظة" : "Analysis copied to clipboard",
     });
+  };
+
+  const copyAnalysisSection = (section: 'english' | 'arabic') => {
+    const sectionContent = getDisplayedAnalysis();
+    navigator.clipboard.writeText(sectionContent);
+    toast({
+      title: language === 'ar' ? "تم النسخ" : "Copied",
+      description: language === 'ar' ? "تم نسخ القسم إلى الحافظة" : "Section copied to clipboard",
+    });
+  };
+
+  const getDisplayedAnalysis = () => {
+    if (!aiAnalysis) return '';
+    
+    const sections = aiAnalysis.split('## ARABIC ANALYSIS');
+    
+    if (aiActiveTab === 'english') {
+      return sections[0].replace('## ENGLISH ANALYSIS', '').trim();
+    } else {
+      return sections[1] ? ('## ARABIC ANALYSIS' + sections[1]).trim() : '';
+    }
   };
 
   const retryAnalysis = () => {
@@ -2665,17 +2687,39 @@ export default function DoctorInvoice() {
 
                 {aiAnalysis && (
                   <div className="space-y-4">
+                    {/* Tab Navigation */}
+                    <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+                      <Button
+                        onClick={() => setAiActiveTab('english')}
+                        variant={aiActiveTab === 'english' ? 'default' : 'ghost'}
+                        size="sm"
+                        className="flex-1"
+                      >
+                        Analysis (EN)
+                      </Button>
+                      <Button
+                        onClick={() => setAiActiveTab('arabic')}
+                        variant={aiActiveTab === 'arabic' ? 'default' : 'ghost'}
+                        size="sm"
+                        className="flex-1"
+                      >
+                        التحليل (AR)
+                      </Button>
+                    </div>
+
+                    {/* Copy Button */}
                     <div className="flex justify-end">
                       <Button
-                        onClick={copyAnalysis}
+                        onClick={() => copyAnalysisSection(aiActiveTab)}
                         variant="outline"
                         size="sm"
                         className="flex items-center space-x-2"
                       >
-                        <span>{language === 'ar' ? 'نسخ' : 'Copy'}</span>
+                        <span>{language === 'ar' ? 'نسخ القسم' : 'Copy Section'}</span>
                       </Button>
                     </div>
                     
+                    {/* Analysis Content */}
                     <div className="bg-gray-50 rounded-lg p-6">
                       <div 
                         className="prose max-w-none"
@@ -2685,8 +2729,18 @@ export default function DoctorInvoice() {
                           lineHeight: '1.6'
                         }}
                       >
-                        {aiAnalysis}
+                        {getDisplayedAnalysis()}
                       </div>
+                    </div>
+
+                    {/* Disclaimer */}
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <p className="text-sm text-yellow-800 font-medium">
+                        {language === 'ar' 
+                          ? '⚠️ هذا دعم للقرار فقط، وليس تشخيصاً. يجب أن يوجه الحكم السريري والاعتبارات الخاصة بالنوع القرارات النهائية دائماً.'
+                          : '⚠️ This is decision-support only, not a diagnosis. Clinical judgment and species-specific considerations should always guide final decisions.'
+                        }
+                      </p>
                     </div>
                   </div>
                 )}
