@@ -28,6 +28,7 @@ The application is a full-stack solution. The frontend is built with React 18 an
     - **Patient Weight Management**: Comprehensive patient weight tracking with decimal precision support (patient_weight column, REAL type) integrated in both Create and Edit patient forms with bilingual UI.
     - **Admin Dashboard**: Centralized management for Vets Vans, products, services, user accounts, sales reports with Excel export, and payment linking statistics.
     - **Location Services**: Precise customer location detection with reverse geocoding (OpenStreetMap) and Vets Van location management.
+    - **AI Doctor Assistants**: Perplexity API integration for analyzing pet vitals data with bilingual medical insights, featuring screen content extraction from Pet Vitals modal and structured medical analysis display.
 
 **System Design Choices:**
 - **Modularity**: Clear separation of frontend and backend.
