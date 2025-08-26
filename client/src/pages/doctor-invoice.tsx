@@ -1323,6 +1323,7 @@ export default function DoctorInvoice() {
             <button
               onClick={() => setLocation('/doctor-activity')}
               className="flex items-center text-gray-600 hover:text-purple-600"
+              style={{ display: 'none' }}
             >
               <ArrowLeft className="h-5 w-5 ml-2" />
               {t('back')}
