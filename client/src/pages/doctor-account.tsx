@@ -166,6 +166,7 @@ export default function DoctorAccount() {
             variant="ghost"
             onClick={() => setLocation('/user-type-selection')}
             className="flex items-center gap-2"
+            style={{ display: 'none' }}
           >
             <ArrowLeft className="w-4 h-4" />
             {language === 'ar' ? 'رجوع' : 'Back'}
@@ -351,6 +352,7 @@ export default function DoctorAccount() {
               onClick={handleLogout}
               variant="destructive" 
               className="w-full"
+              style={{ display: 'none' }}
             >
               {language === 'ar' ? 'تسجيل الخروج' : 'Logout'}
             </Button>
