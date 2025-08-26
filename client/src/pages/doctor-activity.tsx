@@ -422,7 +422,7 @@ export default function DoctorActivity() {
             variant="ghost"
             onClick={() => setLocation('/user-type-selection')}
             className="flex items-center gap-2"
-            style={{ display: window.location.pathname === '/doctor-dashboard' ? 'none' : 'flex' }}
+            style={{ display: 'none' }}
           >
             <ArrowLeft className="w-4 h-4" />
             {language === 'ar' ? 'رجوع' : 'Back'}
