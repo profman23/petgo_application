@@ -5233,6 +5233,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Doctor Assistants - Perplexity Analysis
+  app.post('/api/ai-doctor-analysis', requireAuth, async (req: any, res) => {
+    try {
+      const { screenContent } = req.body;
+
+      if (!screenContent) {
+        return res.status(400).json({
+          success: false,
+          message: 'Screen content is required for analysis'
+        });
+      }
+
+      // Truncate content to safe length (32k characters max)
+      const maxLength = 32000;
+      const truncatedContent = screenContent.length > maxLength 
+        ? screenContent.substring(0, maxLength) + "...[truncated]"
+        : screenContent;
+
+      console.log('🧠 AI Doctor Analysis requested, content length:', truncatedContent.length);
+
+      const perplexityApiKey = process.env.PERPLEXITY_API_KEY;
+      if (!perplexityApiKey) {
+        throw new Error('PERPLEXITY_API_KEY environment variable not found');
+      }
+
+      const systemMessage = `You are a veterinary medical assistant. Analyze the provided pet vitals and medical information. 
+
+Please provide your analysis in EXACTLY this format:
+
+## ENGLISH ANALYSIS
+
+**Key Findings:**
+- [List 2-3 main clinical findings]
+
+**Red Flags:**
+- [List any concerning findings that need immediate attention]
+- [If none, state "No immediate red flags identified"]
+
+**Suggested Next Steps:**
+- [List 2-3 recommended actions]
+
+**Missing Data to Collect:**
+- [List important missing information]
+
+## ARABIC ANALYSIS / التحليل العربي
+
+**النتائج الرئيسية:**
+- [List 2-3 main clinical findings in Arabic]
+
+**العلامات الحمراء:**
+- [List concerning findings in Arabic]
+- [If none, state "لم يتم تحديد علامات حمراء فورية"]
+
+**الخطوات المقترحة التالية:**
+- [List 2-3 recommended actions in Arabic]
+
+**البيانات المفقودة للجمع:**
+- [List important missing information in Arabic]
+
+Keep each section concise and clinically relevant.`;
+
+      const response = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${perplexityApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-sonar-small-128k-online',
+          messages: [
+            {
+              role: 'system',
+              content: systemMessage
+            },
+            {
+              role: 'user',
+              content: `Please analyze this pet vitals screen content:\n\n${truncatedContent}`
+            }
+          ],
+          max_tokens: 2000,
+          temperature: 0.2,
+          top_p: 0.9,
+          return_images: false,
+          return_related_questions: false,
+          stream: false
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Perplexity API error:', response.status, errorText);
+        throw new Error(`Perplexity API error: ${response.status} ${errorText}`);
+      }
+
+      const perplexityResult = await response.json();
+      
+      if (!perplexityResult.choices || !perplexityResult.choices[0]) {
+        throw new Error('Invalid response from Perplexity API');
+      }
+
+      const analysis = perplexityResult.choices[0].message.content;
+
+      console.log('✅ AI Doctor Analysis completed successfully');
+
+      res.json({
+        success: true,
+        analysis: analysis,
+        citations: perplexityResult.citations || [],
+        usage: perplexityResult.usage
+      });
+
+    } catch (error: any) {
+      console.error('❌ AI Doctor Analysis error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to analyze screen content',
+        error: error.message
+      });
+    }
+  });
+
   // Register public payment routes
   addPublicPaymentRoutes(app);
 

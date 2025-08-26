@@ -132,6 +132,12 @@ export default function DoctorInvoice() {
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState('');
   
+  // AI Doctor Assistants states
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [aiError, setAiError] = useState('');
+  
   // Invoice viewing states
   const [showInvoiceView, setShowInvoiceView] = useState(false);
   const invoiceRef = useRef<HTMLDivElement>(null);
@@ -1081,6 +1087,72 @@ export default function DoctorInvoice() {
   const openUploadModal = (pet: Pet) => {
     setSelectedPetForUpload(pet);
     setShowUploadModal(true);
+  };
+
+  // AI Doctor Assistants function
+  const handleAiAnalysis = async () => {
+    try {
+      setIsAnalyzing(true);
+      setAiError('');
+      setShowAiModal(true);
+      
+      // Get screen content from the Pet Vitals modal
+      const vitalsModal = document.querySelector('.vitals-modal-content');
+      let screenContent = '';
+      
+      if (vitalsModal) {
+        screenContent = vitalsModal.textContent || vitalsModal.innerText || '';
+      } else {
+        // Fallback to body text if modal not found
+        screenContent = document.body.innerText || '';
+      }
+      
+      // Truncate to safe length
+      const maxLength = 30000;
+      screenContent = screenContent.length > maxLength 
+        ? screenContent.substring(0, maxLength) + '...[truncated]'
+        : screenContent;
+      
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/ai-doctor-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          screenContent: screenContent
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Analysis failed');
+      }
+      
+      setAiAnalysis(result.analysis);
+      
+    } catch (error: any) {
+      console.error('AI Analysis error:', error);
+      setAiError(error.message || 'Failed to analyze screen content');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const copyAnalysis = () => {
+    navigator.clipboard.writeText(aiAnalysis);
+    toast({
+      title: language === 'ar' ? "تم النسخ" : "Copied",
+      description: language === 'ar' ? "تم نسخ التحليل إلى الحافظة" : "Analysis copied to clipboard",
+    });
+  };
+
+  const retryAnalysis = () => {
+    setAiError('');
+    setAiAnalysis('');
+    handleAiAnalysis();
   };
 
   const closeUploadModal = () => {
@@ -2133,7 +2205,7 @@ export default function DoctorInvoice() {
       {showVitalsModal && selectedPet && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div 
-            className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto vitals-modal-content"
             dir={getDirection(language)}
             style={{ textAlign: getTextAlign(language) }}
           >
@@ -2419,9 +2491,16 @@ export default function DoctorInvoice() {
 
                 {/* AI Doctor Assistants Button */}
                 <div className="mt-6 flex justify-center">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg">
+                  <Button 
+                    onClick={handleAiAnalysis}
+                    disabled={isAnalyzing}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg"
+                  >
                     <Brain className="h-5 w-5 mr-2" />
-                    {language === 'ar' ? 'مساعدو الطبيب الذكي' : 'AI Doctor Assistants'}
+                    {isAnalyzing 
+                      ? (language === 'ar' ? 'جارٍ التحليل...' : 'Analyzing...') 
+                      : (language === 'ar' ? 'مساعدو الطبيب الذكي' : 'AI Doctor Assistants')
+                    }
                   </Button>
                 </div>
               </div>
@@ -2535,6 +2614,96 @@ export default function DoctorInvoice() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* AI Doctor Assistants Modal */}
+      {showAiModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                  <Brain className="h-6 w-6 text-blue-600 mr-2" />
+                  {language === 'ar' ? 'مساعدو الطبيب الذكي' : 'AI Doctor Assistants'}
+                </h2>
+                <Button
+                  variant="ghost"
+                  onClick={() => setShowAiModal(false)}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Content */}
+              <div className="space-y-4">
+                {isAnalyzing && (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="flex items-center space-x-3">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                      <span className="text-gray-600">
+                        {language === 'ar' ? 'جارٍ تحليل الشاشة...' : 'Analyzing screen...'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {aiError && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-red-800">{aiError}</p>
+                      <Button
+                        onClick={retryAnalysis}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                        size="sm"
+                      >
+                        {language === 'ar' ? 'إعادة المحاولة' : 'Retry'}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {aiAnalysis && (
+                  <div className="space-y-4">
+                    <div className="flex justify-end">
+                      <Button
+                        onClick={copyAnalysis}
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center space-x-2"
+                      >
+                        <span>{language === 'ar' ? 'نسخ' : 'Copy'}</span>
+                      </Button>
+                    </div>
+                    
+                    <div className="bg-gray-50 rounded-lg p-6">
+                      <div 
+                        className="prose max-w-none"
+                        style={{ 
+                          whiteSpace: 'pre-wrap',
+                          fontFamily: 'system-ui, -apple-system, sans-serif',
+                          lineHeight: '1.6'
+                        }}
+                      >
+                        {aiAnalysis}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {!isAnalyzing && !aiAnalysis && !aiError && (
+                  <div className="text-center py-8 text-gray-500">
+                    {language === 'ar' 
+                      ? 'انقر على زر "مساعدو الطبيب الذكي" لبدء التحليل'
+                      : 'Click "AI Doctor Assistants" button to start analysis'
+                    }
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
