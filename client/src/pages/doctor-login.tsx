@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -34,6 +34,32 @@ export default function DoctorLogin() {
   const { toast } = useToast();
   const { language } = useLanguage();
   const { t } = useTranslation();
+
+  // Prevent Back button navigation ONLY for /login/doctor route
+  useEffect(() => {
+    // Check if current path is exactly /login/doctor
+    if (window.location.pathname === '/login/doctor') {
+      // Add current state to history to create a "trap"
+      const currentState = { page: 'doctor-login', preventBack: true };
+      window.history.pushState(currentState, '', window.location.href);
+      
+      // Handle popstate events (Back/Forward button presses)
+      const handlePopState = (event: PopStateEvent) => {
+        // If user tries to go back from doctor login, stay on the same page
+        if (window.location.pathname === '/login/doctor') {
+          // Push the state again to keep user on doctor login
+          window.history.pushState(currentState, '', window.location.href);
+        }
+      };
+      
+      window.addEventListener('popstate', handlePopState);
+      
+      // Cleanup event listener on component unmount
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, []);
 
   const doctorLoginSchema = z.object({
     username: z.string().min(1, language === 'ar' ? 'اسم المستخدم مطلوب' : 'Username is required'),
