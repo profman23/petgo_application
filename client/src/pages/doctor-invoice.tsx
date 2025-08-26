@@ -760,9 +760,18 @@ export default function DoctorInvoice() {
   // Remove item
   const removeItem = (id: string) => {
     if (invoiceItems.length > 1) {
-      const newItems = invoiceItems.filter(item => item.id !== id);
-      setInvoiceItems(newItems);
-      saveInvoiceItems(newItems);
+      // Filter out the item and recalculate all remaining items
+      const filteredItems = invoiceItems.filter(item => item.id !== id);
+      
+      // Recalculate all remaining items to ensure proper price calculations
+      const recalculatedItems = filteredItems.map(item => calculateItemValues(item));
+      
+      setInvoiceItems(recalculatedItems);
+      saveInvoiceItems(recalculatedItems);
+      
+      // Clear search state to prevent UI issues
+      setSearchQuery('');
+      setDropdownOpen('');
     }
   };
 
