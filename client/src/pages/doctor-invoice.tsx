@@ -757,6 +757,32 @@ export default function DoctorInvoice() {
     setSearchQuery('');
   };
 
+  // Clear all fields for an item (reset to defaults)
+  const clearItem = (id: string) => {
+    const clearedItem = {
+      id: id,
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+      discount: 0,
+      discountType: 'none' as const,
+      vatRate: 15,
+      vatAmount: 0,
+      totalBeforeVat: 0,
+      totalAfterVat: 0,
+      total: 0
+    };
+    
+    setInvoiceItems(items => 
+      items.map(item => 
+        item.id === id ? calculateItemValues(clearedItem) : item
+      )
+    );
+    
+    setSearchQuery('');
+    setDropdownOpen('');
+  };
+
   // Remove item
   const removeItem = (id: string) => {
     if (invoiceItems.length > 1) {
@@ -1513,11 +1539,7 @@ export default function DoctorInvoice() {
                                     />
                                     {(item.description || searchQuery) && (
                                       <button
-                                        onClick={() => {
-                                          updateItem(item.id, 'description', '');
-                                          setSearchQuery('');
-                                          setDropdownOpen('');
-                                        }}
+                                        onClick={() => clearItem(item.id)}
                                         className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-sm opacity-70 hover:opacity-100 hover:bg-gray-100"
                                       >
                                         <X className="h-3 w-3" />
@@ -1696,11 +1718,7 @@ export default function DoctorInvoice() {
                                     />
                                     {(item.description || searchQuery) && (
                                       <button
-                                        onClick={() => {
-                                          updateItem(item.id, 'description', '');
-                                          setSearchQuery('');
-                                          setDropdownOpen('');
-                                        }}
+                                        onClick={() => clearItem(item.id)}
                                         className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-sm opacity-70 hover:opacity-100 hover:bg-gray-100"
                                       >
                                         <X className="h-3 w-3" />
@@ -1922,11 +1940,7 @@ export default function DoctorInvoice() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            const newItems = invoiceItems.filter(i => i.id !== item.id);
-                            setInvoiceItems(newItems);
-                            saveInvoiceItems(newItems);
-                          }}
+                          onClick={() => removeItem(item.id)}
                           className="h-8 w-8 p-0"
                         >
                           <Minus className="h-4 w-4" />
