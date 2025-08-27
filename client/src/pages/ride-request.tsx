@@ -82,6 +82,8 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   total: number; 
   breakdown: Array<{ name: string; type: string; weight: number; tier: string; cost: number; }>; 
   warnings: string[];
+  consultationFee?: number;
+  serviceCost?: number;
 } => {
   const selectedPets = selectedPetIds
     .map(id => patients.find(p => p.id === id))
@@ -123,9 +125,10 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
     });
 
     // Add flat 575 SAR add-on for fleas-ticks-prevention
+    const serviceCost = total;
     total += 575;
 
-    return { total, breakdown, warnings };
+    return { total, breakdown, warnings, consultationFee: 575, serviceCost };
   }
 
   // Original pricing for other services
@@ -159,7 +162,12 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   }
 
   // Add flat 575 SAR to specific services
-  if (['vaccination', 'deworming', 'fleas-ticks-prevention'].includes(serviceType)) {
+  let consultationFee: number | undefined;
+  let serviceCost: number | undefined;
+  
+  if (['vaccination', 'deworming'].includes(serviceType)) {
+    serviceCost = total;
+    consultationFee = 575;
     total += 575;
   }
 
@@ -172,7 +180,9 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
       tier: 'Standard',
       cost: total / selectedPets.length
     })), 
-    warnings: [] 
+    warnings: [],
+    consultationFee,
+    serviceCost
   };
 };
 
@@ -1397,18 +1407,64 @@ export default function RideRequest() {
                   const costData = getEstimatedCost(selectedPatients, patients, serviceType);
                   return (
                     <>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-purple-800" style={{ 
-                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                        }}>
-                          {language === 'ar' ? 'التكلفة التقديرية:' : 'Estimated Cost:'}
-                        </span>
-                        <span className="text-lg font-bold text-purple-900" style={{ 
-                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                        }}>
-                          {costData.total.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
-                        </span>
-                      </div>
+                      {/* Show breakdown for services with consultation fee */}
+                      {costData.consultationFee && costData.serviceCost !== undefined ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-purple-800" style={{ 
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
+                              {language === 'ar' ? 'رسوم الاستشارة:' : 'Consultation Fees:'}
+                            </span>
+                            <span className="text-sm font-bold text-purple-900" style={{ 
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
+                              {costData.consultationFee.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-purple-800" style={{ 
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
+                              {serviceType === 'vaccination' && (language === 'ar' ? 'التطعيم:' : 'Vaccination:')}
+                              {serviceType === 'deworming' && (language === 'ar' ? 'مكافحة الديدان:' : 'Deworming:')}
+                              {serviceType === 'fleas-ticks-prevention' && (language === 'ar' ? 'مكافحة البراغيث والقراد:' : 'Fleas & Ticks Prevention:')}
+                            </span>
+                            <span className="text-sm font-bold text-purple-900" style={{ 
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
+                              {costData.serviceCost.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                            </span>
+                          </div>
+                          <div className="border-t border-purple-200 pt-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-bold text-purple-800" style={{ 
+                                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                              }}>
+                                {language === 'ar' ? 'الإجمالي:' : 'Total:'}
+                              </span>
+                              <span className="text-lg font-bold text-purple-900" style={{ 
+                                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                              }}>
+                                {costData.total.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-purple-800" style={{ 
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}>
+                            {language === 'ar' ? 'التكلفة التقديرية:' : 'Estimated Cost:'}
+                          </span>
+                          <span className="text-lg font-bold text-purple-900" style={{ 
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}>
+                            {costData.total.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                          </span>
+                        </div>
+                      )}
                       
                       {/* Show breakdown for fleas-ticks-prevention */}
                       {serviceType === 'fleas-ticks-prevention' && costData.breakdown.length > 0 && (
