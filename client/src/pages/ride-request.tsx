@@ -155,6 +155,11 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
     else total = 517.5; // 5+ pets
   }
 
+  // Add flat 575 SAR to specific services
+  if (['vaccination', 'deworming', 'fleas-ticks-prevention'].includes(serviceType)) {
+    total += 575;
+  }
+
   return { 
     total, 
     breakdown: selectedPets.map(pet => ({
