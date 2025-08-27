@@ -6,7 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
-import { LoginIllustration } from "@/components/login/LoginIllustration";
 
 interface AdminLoginData {
   username: string;
@@ -79,36 +78,26 @@ export default function AdminLogin() {
 
   return (
     <div 
-      className="min-h-screen grid md:grid-cols-2 items-center gap-8 p-6 md:p-10 bg-gray-50"
+      className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
       dir={getDirection(language)}
     >
-      {/* Left Side - Illustration */}
-      <div className="hidden md:flex items-center justify-center">
-        <LoginIllustration />
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center mb-4">
+          <LanguageSelector />
+        </div>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          {t('adminLogin')}
+        </h2>
       </div>
 
-      {/* Right Side - Login Form */}
-      <div className="flex flex-col justify-center">
-        <div className="mx-auto w-full max-w-md">
-          <div className="flex justify-center mb-6">
-            <LanguageSelector />
-          </div>
-          
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <div className="mb-8">
-              <h2 className="text-center text-3xl font-extrabold text-gray-900">
-                {t('adminLogin')}
-              </h2>
-              <p className="mt-2 text-center text-sm text-gray-600">
-                {language === 'ar' ? 'مرحباً بك في لوحة التحكم' : 'Welcome to the admin dashboard'}
-              </p>
-            </div>
-
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('username')}
-                </label>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                {t('username')}
+              </label>
+              <div className="mt-1">
                 <input
                   id="username"
                   name="username"
@@ -117,16 +106,18 @@ export default function AdminLogin() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                   placeholder={t('username')}
                   style={{ textAlign: getTextAlign(language) }}
                 />
               </div>
+            </div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('password')}
-                </label>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                {t('password')}
+              </label>
+              <div className="mt-1">
                 <input
                   id="password"
                   name="password"
@@ -135,27 +126,27 @@ export default function AdminLogin() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent text-sm transition-colors"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-#852085 focus:border-purple-600 sm:text-sm"
                   placeholder={t('password')}
                   style={{ textAlign: getTextAlign(language) }}
                 />
               </div>
+            </div>
 
-              <div>
-                <button
-                  type="submit"
-                  disabled={loginMutation.isPending}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 disabled:opacity-50 transition-colors"
-                >
-                  {loginMutation.isPending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    t('login')
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
+            <div>
+              <button
+                type="submit"
+                disabled={loginMutation.isPending}
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-#852085 disabled:opacity-50"
+              >
+                {loginMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t('login')
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
