@@ -122,6 +122,9 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
       total += cost;
     });
 
+    // Add flat 575 SAR add-on for fleas-ticks-prevention
+    total += 575;
+
     return { total, breakdown, warnings };
   }
 
