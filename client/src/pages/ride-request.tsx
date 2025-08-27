@@ -224,15 +224,15 @@ export default function RideRequest() {
         .filter(patient => patient);
       
       console.log('Selected pets for fleas-ticks-prevention:', selectedPetsWithStatus.map(p => ({
-        id: p.id,
-        name: p.name, 
-        weight: p.patientWeight,
-        hasWeight: !(!p.patientWeight || p.patientWeight === 0)
+        id: p?.id,
+        name: p?.name, 
+        weight: p?.patientWeight,
+        hasWeight: !(!p?.patientWeight || p?.patientWeight === 0)
       })));
 
       // Check if any selected pets are missing weight data  
       const petsWithoutWeight = selectedPetsWithStatus
-        .filter(patient => !patient.patientWeight || patient.patientWeight === 0);
+        .filter(patient => patient && (!patient.patientWeight || patient.patientWeight === 0));
       
       if (petsWithoutWeight.length > 0) {
         // Show weight modal for pets without weight
@@ -248,7 +248,7 @@ export default function RideRequest() {
         setWeightErrors({});
         
         setShowWeightModal(true);
-        console.log('Opening weight modal for pets without weight:', petsWithoutWeight.map(p => p.name));
+        console.log('Opening weight modal for pets without weight:', petsWithoutWeight.map(p => p?.name));
         // Don't set service type yet - only after weights are entered
       } else {
         // All pets have weights, proceed normally
