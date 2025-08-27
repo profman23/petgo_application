@@ -1,0 +1,57 @@
+Goal:
+Enhance the left-side animated login illustration with dynamic STATS (circular/donut charts and bar charts) and animated CONTACT icons (phone, email, WhatsApp, chat). Keep it lightweight, looping, and brand-aligned.
+
+Tech:
+- React 18 + TypeScript + Tailwind CSS
+- lottie-react (primary) + framer-motion (subtle float)
+- Local assets only (no network fetches)
+- Colors: Primary Purple #852085, Whites #FFFFFF, Grays #E5E7EB / #9CA3AF / #374151
+- Respect prefers-reduced-motion → show static poster
+
+Files:
+- Component: client/src/components/login/LoginIllustration.tsx
+- Assets (Lottie JSON):
+  - client/src/assets/lottie/dashboard-bars.json
+  - client/src/assets/lottie/dashboard-donut.json
+  - client/src/assets/lottie/icon-phone.json
+  - client/src/assets/lottie/icon-mail.json
+  - client/src/assets/lottie/icon-whatsapp.json
+  - client/src/assets/lottie/icon-chat.json
+
+Layout (inside the illustration):
+- Top area: dashboard mockup (sidebar with 5 icons, cards)
+- Middle: animated STATS row
+  - Donut chart (ring progress 68% → 74% and back, endless loop)
+  - Circular chart 2 (smaller, alternating 40–55%)
+  - KPI counters with count-up numbers (00 → value) synced to donut
+  - Bar chart with 5–7 vertical bars oscillating heights (ease in-out)
+- Bottom-right overlay: CONTACT icons cloud (phone, mail, WhatsApp, chat) gently floating; each icon loops its own micro-animation:
+  - Phone: slight ring/vibrate every 2s
+  - Mail: envelope flap opens/closes (subtle)
+  - WhatsApp: message bubble pops + 3 typing dots
+  - Chat: bubble expands/contracts with dots
+- All animations 3–5s seamless loops; stagger starts (0.2–0.4s) for natural feel.
+
+Styling:
+- Flat/minimal vector look
+- Use #852085 for key strokes/fills, combine with white and grays.
+- Cards have soft shadows, rounded-2xl, bg-white/80 with backdrop-blur.
+- Bar fills: alternating #852085 and #9CA3AF with light gray tracks.
+- Donut track: #E5E7EB; active arc: #852085; center label text: #374151.
+
+Accessibility & Performance:
+- Provide aria-labels for each animation
+- Pause animation if not visible (IntersectionObserver)
+- Fallback static SVG/PNG posters for legacy browsers
+- Keep each Lottie JSON < 300KB; compress if needed.
+
+Integration:
+- In login page (client/src/pages/auth/login.tsx):
+  - Two-column grid; left: <LoginIllustration/>, right: username/password form
+  - On small screens hide illustration (hidden md:flex) or move above
+- Expose props for theme override if needed.
+
+Deliverables:
+- TSX component rendering the dashboard, donut/bars, and contact icons with looping micro-interactions
+- Imported local Lottie JSONs and example posters
+- Verified responsive layout and accessibility
