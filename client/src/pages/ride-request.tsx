@@ -129,7 +129,16 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   const petCount = selectedPets.length;
   let total = 0;
 
-  if (serviceType === 'test-service') {
+  // Special pricing for First Visit, Home Consultation, and General Check-up
+  if (['first-visit', 'home-consultation', 'general-checkup'].includes(serviceType)) {
+    if (petCount <= 2) {
+      total = 575; // 1-2 pets: 575 SAR
+    } else if (petCount <= 4) {
+      total = 575 * 2; // 3-4 pets: 1150 SAR
+    } else {
+      total = 575 * 3; // 5+ pets: 1725 SAR (fixed cap)
+    }
+  } else if (serviceType === 'test-service') {
     total = petCount;
   } else if (serviceType === 'vaccination') {
     total = petCount * 172.5;
