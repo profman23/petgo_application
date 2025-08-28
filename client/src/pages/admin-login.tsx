@@ -3,7 +3,6 @@ import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, Mail, PhoneCall, Brain } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
@@ -18,20 +17,8 @@ interface AdminAuthResponse {
   admin: {
     id: number;
     username: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    authorizationId: number;
-    authorization?: {
-      id: number;
-      name: string;
-      usersHidden: boolean;
-      usersRead: boolean;
-      usersFullControl: boolean;
-      authHidden: boolean;
-      authRead: boolean;
-      authFullControl: boolean;
-    };
+    name: string;
+    role: string;
   };
 }
 
@@ -41,7 +28,6 @@ export default function AdminLogin() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { t, language } = useTranslation();
-  const { login } = useAuth();
 
   // Clear any existing tokens when accessing admin login
   useEffect(() => {
@@ -60,7 +46,8 @@ export default function AdminLogin() {
       return response as AdminAuthResponse;
     },
     onSuccess: (data) => {
-      login(data.token, data.admin);
+      localStorage.setItem("adminToken", data.token);
+      localStorage.setItem("admin", JSON.stringify(data.admin));
       toast({
         title: t('loginSuccessful'),
         description: t('welcomeToAdmin'),

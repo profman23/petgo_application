@@ -6,7 +6,6 @@ import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, P
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 export default function AdministrationAuthorization() {
@@ -52,6 +51,26 @@ export default function AdministrationAuthorization() {
     queryKey: ['/api/admin/authorizations'],
     retry: false,
     refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  // Fetch current admin user's authorization details
+  const {
+    data: currentAdminAuthorization,
+    isLoading: currentAuthLoading,
+    error: currentAuthError
+  } = useQuery({
+    queryKey: ['/api/admin/current-authorization'],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/current-authorization", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch current authorization");
+      return response.json();
+    },
+    enabled: !!adminToken,
+    retry: false,
   });
 
   // Create authorization mutation
@@ -220,24 +239,22 @@ export default function AdministrationAuthorization() {
     }
   };
 
-  const { isAuthenticated, admin, hasPermission, logout, isLoading } = useAuth();
-
   // Check admin authentication
   useEffect(() => {
-    if (!isAuthenticated) {
+    const adminToken = localStorage.getItem("adminToken");
+    if (!adminToken) {
       setLocation("/admin-login");
       return;
     }
-  }, [isAuthenticated, setLocation]);
-  
-  // Check if the current admin has the "Hidden Users" permission
-  const hasHiddenUsersPermission = hasPermission('usersHidden');
+  }, [setLocation]);
+
+  const adminToken = localStorage.getItem("adminToken");
+  const admin = JSON.parse(localStorage.getItem("admin") || "{}");
 
   // Fetch all VetsVan requests for notification counter
   const { data: allVetsVanRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
     queryFn: async () => {
-      const adminToken = localStorage.getItem("adminToken");
       const response = await fetch("/api/admin/vetsvan-requests", {
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -247,7 +264,7 @@ export default function AdministrationAuthorization() {
       return response.json();
     },
     refetchInterval: 3000,
-    enabled: isAuthenticated,
+    enabled: !!adminToken,
   });
 
   // Monitor for new requests and update counter
@@ -267,21 +284,10 @@ export default function AdministrationAuthorization() {
   }, []);
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
     setLocation("/admin-login");
   };
-
-  // Show loading screen while auth context is initializing
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
@@ -363,23 +369,16 @@ export default function AdministrationAuthorization() {
               {/* Administration Submenu */}
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
-                  {/* Users menu item - disabled if user has Hidden Users permission */}
-                  <button
-                    onClick={hasHiddenUsersPermission ? undefined : () => setLocation('/administration/users')}
-                    disabled={hasHiddenUsersPermission}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      hasHiddenUsersPermission 
-                        ? 'text-gray-300 cursor-not-allowed' 
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
-                    title={hasHiddenUsersPermission 
-                      ? (language === 'ar' ? 'ليس لديك صلاحية للوصول إلى هذا القسم' : 'You do not have permission to access this section')
-                      : undefined
-                    }
-                  >
-                    <User className={`h-5 w-5 flex-shrink-0 ${hasHiddenUsersPermission ? 'text-gray-300' : ''}`} />
-                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                  </button>
+                  {/* Users menu item - only show if not hidden by authorization */}
+                  {!currentAdminAuthorization?.usersHidden && (
+                    <button
+                      onClick={() => setLocation('/administration/users')}
+                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <User className="h-5 w-5 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => setLocation('/administration/authorization')}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-100 text-purple-700 hover:bg-purple-200"
