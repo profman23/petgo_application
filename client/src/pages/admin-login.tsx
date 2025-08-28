@@ -17,8 +17,20 @@ interface AdminAuthResponse {
   admin: {
     id: number;
     username: string;
-    name: string;
-    role: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    authorizationId: number;
+    authorization?: {
+      id: number;
+      name: string;
+      usersHidden: boolean;
+      usersRead: boolean;
+      usersFullControl: boolean;
+      authHidden: boolean;
+      authRead: boolean;
+      authFullControl: boolean;
+    };
   };
 }
 
