@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Mail } from "lucide-react";
+import { Loader2, Mail, PhoneCall, Brain } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 
@@ -233,14 +233,37 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            {/* Animated Mail Icon */}
-            <div className="flex justify-center my-6">
+            {/* Animated Icons Row */}
+            <div className="flex justify-center items-center space-x-8 my-6">
+              {/* PhoneCall Icon - Bounce Animation */}
+              <div className="relative">
+                <PhoneCall 
+                  className="w-7 h-7"
+                  style={{ 
+                    color: '#852085',
+                    animation: 'bounce 1.5s ease-in-out infinite'
+                  }}
+                />
+              </div>
+
+              {/* Mail Icon - Swing Animation */}
               <div className="relative">
                 <Mail 
-                  className="w-8 h-8 text-gray-600"
+                  className="w-8 h-8"
                   style={{ 
                     color: '#852085',
                     animation: 'swing 2s ease-in-out infinite'
+                  }}
+                />
+              </div>
+
+              {/* Brain Icon - Pulse + Rotate Animation */}
+              <div className="relative">
+                <Brain 
+                  className="w-7 h-7"
+                  style={{ 
+                    color: '#852085',
+                    animation: 'brainPulse 2.5s ease-in-out infinite'
                   }}
                 />
               </div>
@@ -364,6 +387,16 @@ export default function AdminLogin() {
                 0% { transform: translateX(-10px); }
                 50% { transform: translateX(10px); }
                 100% { transform: translateX(-10px); }
+              }
+              @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                40% { transform: translateY(-8px); }
+                60% { transform: translateY(-4px); }
+              }
+              @keyframes brainPulse {
+                0% { transform: scale(1) rotate(0deg); opacity: 1; }
+                50% { transform: scale(1.1) rotate(2deg); opacity: 0.8; }
+                100% { transform: scale(1) rotate(0deg); opacity: 1; }
               }
             `}
           </style>
