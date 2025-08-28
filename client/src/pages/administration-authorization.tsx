@@ -6,6 +6,7 @@ import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, P
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 export default function AdministrationAuthorization() {
@@ -221,23 +222,22 @@ export default function AdministrationAuthorization() {
 
   // Check admin authentication
   useEffect(() => {
-    const adminToken = localStorage.getItem("adminToken");
-    if (!adminToken) {
+    if (!isAuthenticated) {
       setLocation("/admin-login");
       return;
     }
-  }, [setLocation]);
+  }, [isAuthenticated, setLocation]);
 
-  const adminToken = localStorage.getItem("adminToken");
-  const admin = JSON.parse(localStorage.getItem("admin") || "{}");
+  const { isAuthenticated, admin, hasPermission, logout } = useAuth();
   
   // Check if the current admin has the "Hidden Users" permission
-  const hasHiddenUsersPermission = admin?.authorization?.usersHidden || false;
+  const hasHiddenUsersPermission = hasPermission('usersHidden');
 
   // Fetch all VetsVan requests for notification counter
   const { data: allVetsVanRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
     queryFn: async () => {
+      const adminToken = localStorage.getItem("adminToken");
       const response = await fetch("/api/admin/vetsvan-requests", {
         headers: {
           Authorization: `Bearer ${adminToken}`,
@@ -247,7 +247,7 @@ export default function AdministrationAuthorization() {
       return response.json();
     },
     refetchInterval: 3000,
-    enabled: !!adminToken,
+    enabled: isAuthenticated,
   });
 
   // Monitor for new requests and update counter
@@ -267,8 +267,7 @@ export default function AdministrationAuthorization() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("admin");
+    logout();
     setLocation("/admin-login");
   };
 
