@@ -220,6 +220,8 @@ export default function AdministrationAuthorization() {
     }
   };
 
+  const { isAuthenticated, admin, hasPermission, logout } = useAuth();
+
   // Check admin authentication
   useEffect(() => {
     if (!isAuthenticated) {
@@ -227,8 +229,6 @@ export default function AdministrationAuthorization() {
       return;
     }
   }, [isAuthenticated, setLocation]);
-
-  const { isAuthenticated, admin, hasPermission, logout } = useAuth();
   
   // Check if the current admin has the "Hidden Users" permission
   const hasHiddenUsersPermission = hasPermission('usersHidden');
