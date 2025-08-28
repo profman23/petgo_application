@@ -53,26 +53,6 @@ export default function AdministrationAuthorization() {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 
-  // Fetch current admin user's authorization details
-  const {
-    data: currentAdminAuthorization,
-    isLoading: currentAuthLoading,
-    error: currentAuthError
-  } = useQuery({
-    queryKey: ['/api/admin/current-authorization'],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/current-authorization", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch current authorization");
-      return response.json();
-    },
-    enabled: !!adminToken,
-    retry: false,
-  });
-
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
     mutationFn: async (authData: any) => {
@@ -369,16 +349,13 @@ export default function AdministrationAuthorization() {
               {/* Administration Submenu */}
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
-                  {/* Users menu item - only show if not hidden by authorization */}
-                  {!currentAdminAuthorization?.usersHidden && (
-                    <button
-                      onClick={() => setLocation('/administration/users')}
-                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                    >
-                      <User className="h-5 w-5 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                    </button>
-                  )}
+                  <button
+                    onClick={() => setLocation('/administration/users')}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <User className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                  </button>
                   <button
                     onClick={() => setLocation('/administration/authorization')}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-100 text-purple-700 hover:bg-purple-200"

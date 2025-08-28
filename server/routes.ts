@@ -3001,45 +3001,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get current admin's authorization details
-  app.get('/api/admin/current-authorization', requireAdminAuth, async (req, res) => {
-    try {
-      const session = req.session;
-      if (!session || !session.userData) {
-        return res.status(401).json({ message: 'No session data found' });
-      }
-
-      // Check if it's an admin user (from adminUsers table) or legacy admin (from admins table)
-      if (session.userData.authorizationId) {
-        // Admin user with authorization
-        const [authResult] = await db.select()
-          .from(authorizations)
-          .where(eq(authorizations.id, session.userData.authorizationId));
-        
-        if (!authResult) {
-          return res.status(404).json({ message: 'Authorization not found' });
-        }
-        
-        res.json(authResult);
-      } else {
-        // Legacy admin - return default permissions (full access)
-        res.json({
-          id: 0,
-          name: 'Legacy Admin',
-          usersHidden: false,
-          usersRead: true,
-          usersFullControl: true,
-          authHidden: false,
-          authRead: true,
-          authFullControl: true,
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching current admin authorization:', error);
-      res.status(500).json({ message: 'Error fetching authorization' });
-    }
-  });
-
   // Admin users management routes
   app.get('/api/admin/admin-users', requireAdminAuth, async (req, res) => {
     try {
