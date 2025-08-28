@@ -313,7 +313,7 @@ export default function AdminLogin() {
           </div>
 
           {/* Custom CSS for animations */}
-          <style jsx>{`
+          <style>{`
             @keyframes dash {
               0% { stroke-dashoffset: 125.6; }
               100% { stroke-dashoffset: 50.24; }
