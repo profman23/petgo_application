@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 
@@ -233,6 +233,19 @@ export default function AdminLogin() {
               </div>
             </div>
 
+            {/* Animated Mail Icon */}
+            <div className="flex justify-center my-6">
+              <div className="relative">
+                <Mail 
+                  className="w-8 h-8 text-gray-600"
+                  style={{ 
+                    color: '#852085',
+                    animation: 'swing 2s ease-in-out infinite'
+                  }}
+                />
+              </div>
+            </div>
+
             {/* Animated Bar Charts */}
             <div className="w-full max-w-md space-y-4">
               <h3 className="text-lg font-semibold text-gray-800 text-center">Live Analytics</h3>
@@ -346,6 +359,11 @@ export default function AdminLogin() {
               @keyframes bar4 {
                 0% { width: 30%; }
                 100% { width: 60%; }
+              }
+              @keyframes swing {
+                0% { transform: translateX(-10px); }
+                50% { transform: translateX(10px); }
+                100% { transform: translateX(-10px); }
               }
             `}
           </style>
