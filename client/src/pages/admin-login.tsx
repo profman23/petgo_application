@@ -82,9 +82,271 @@ export default function AdminLogin() {
       dir={getDirection(language)}
     >
       <div className="min-h-screen flex">
-        {/* Left side - Empty placeholder */}
-        <div className="hidden lg:block lg:w-1/2 bg-gray-50">
-          {/* Reserved for future information/design elements */}
+        {/* Left side - Animated Statistics */}
+        <div className="hidden lg:block lg:w-1/2 bg-gray-50 relative overflow-hidden">
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-8 space-y-8">
+            
+            {/* Animated Circular Statistics */}
+            <div className="grid grid-cols-2 gap-8 w-full max-w-md">
+              {/* Active Users Circle */}
+              <div className="relative w-24 h-24 mx-auto">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    className="text-gray-300"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    strokeDasharray="251.2"
+                    strokeDashoffset="75.36"
+                    className="text-purple-600 transition-all duration-1000 ease-in-out"
+                    style={{ 
+                      color: '#852085',
+                      animation: 'dash 3s ease-in-out infinite alternate'
+                    }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-gray-800 animate-pulse">72%</div>
+                    <div className="text-xs text-gray-600">Active</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bookings Circle */}
+              <div className="relative w-24 h-24 mx-auto">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    className="text-gray-300"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    strokeDasharray="251.2"
+                    strokeDashoffset="50.24"
+                    className="text-purple-600 transition-all duration-1000 ease-in-out"
+                    style={{ 
+                      color: '#852085',
+                      animation: 'dash2 2.5s ease-in-out infinite alternate'
+                    }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-gray-800 animate-pulse">85%</div>
+                    <div className="text-xs text-gray-600">Booked</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Revenue Circle */}
+              <div className="relative w-24 h-24 mx-auto">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    className="text-gray-300"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    strokeDasharray="251.2"
+                    strokeDashoffset="125.6"
+                    className="text-purple-600 transition-all duration-1000 ease-in-out"
+                    style={{ 
+                      color: '#852085',
+                      animation: 'dash3 4s ease-in-out infinite alternate'
+                    }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-gray-800 animate-pulse">58%</div>
+                    <div className="text-xs text-gray-600">Revenue</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Satisfaction Circle */}
+              <div className="relative w-24 h-24 mx-auto">
+                <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    className="text-gray-300"
+                  />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    strokeDasharray="251.2"
+                    strokeDashoffset="25.12"
+                    className="text-purple-600 transition-all duration-1000 ease-in-out"
+                    style={{ 
+                      color: '#852085',
+                      animation: 'dash4 3.5s ease-in-out infinite alternate'
+                    }}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-gray-800 animate-pulse">94%</div>
+                    <div className="text-xs text-gray-600">Happy</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Animated Bar Charts */}
+            <div className="w-full max-w-md space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 text-center">Live Analytics</h3>
+              
+              {/* Bar Chart 1 */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>Appointments</span>
+                  <span>78</span>
+                </div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div 
+                    className="h-2 rounded-full transition-all duration-2000 ease-in-out"
+                    style={{ 
+                      backgroundColor: '#852085',
+                      animation: 'bar1 3s ease-in-out infinite alternate',
+                      width: '78%'
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Bar Chart 2 */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>Vets Available</span>
+                  <span>12</span>
+                </div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div 
+                    className="h-2 rounded-full transition-all duration-2000 ease-in-out"
+                    style={{ 
+                      backgroundColor: '#852085',
+                      animation: 'bar2 2.5s ease-in-out infinite alternate',
+                      width: '60%'
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Bar Chart 3 */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>Active Bookings</span>
+                  <span>45</span>
+                </div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div 
+                    className="h-2 rounded-full transition-all duration-2000 ease-in-out"
+                    style={{ 
+                      backgroundColor: '#852085',
+                      animation: 'bar3 4s ease-in-out infinite alternate',
+                      width: '90%'
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Bar Chart 4 */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>Completed Today</span>
+                  <span>23</span>
+                </div>
+                <div className="w-full bg-gray-300 rounded-full h-2">
+                  <div 
+                    className="h-2 rounded-full transition-all duration-2000 ease-in-out"
+                    style={{ 
+                      backgroundColor: '#852085',
+                      animation: 'bar4 3.5s ease-in-out infinite alternate',
+                      width: '45%'
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Custom CSS for animations */}
+          <style jsx>{`
+            @keyframes dash {
+              0% { stroke-dashoffset: 125.6; }
+              100% { stroke-dashoffset: 50.24; }
+            }
+            @keyframes dash2 {
+              0% { stroke-dashoffset: 100.48; }
+              100% { stroke-dashoffset: 25.12; }
+            }
+            @keyframes dash3 {
+              0% { stroke-dashoffset: 150.72; }
+              100% { stroke-dashoffset: 75.36; }
+            }
+            @keyframes dash4 {
+              0% { stroke-dashoffset: 50.24; }
+              100% { stroke-dashoffset: 12.56; }
+            }
+            @keyframes bar1 {
+              0% { width: 60%; }
+              100% { width: 85%; }
+            }
+            @keyframes bar2 {
+              0% { width: 45%; }
+              100% { width: 75%; }
+            }
+            @keyframes bar3 {
+              0% { width: 70%; }
+              100% { width: 95%; }
+            }
+            @keyframes bar4 {
+              0% { width: 30%; }
+              100% { width: 60%; }
+            }
+          `}</style>
         </div>
         
         {/* Right side - Login form */}
