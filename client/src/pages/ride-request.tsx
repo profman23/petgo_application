@@ -1324,12 +1324,7 @@ export default function RideRequest() {
                   </div>
                 </SelectItem>
 
-                <SelectItem value="free-deworming" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Pill className="w-4 h-4 text-green-600" />
-                    <span>{language === 'ar' ? 'ديدان مجاني' : 'Free Deworming'}</span>
-                  </div>
-                </SelectItem>
+
 
                 <SelectItem value="pickup-drop" className="select-item-custom">
                   <div className="flex items-center gap-2">
