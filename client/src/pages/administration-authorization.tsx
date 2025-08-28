@@ -363,16 +363,23 @@ export default function AdministrationAuthorization() {
               {/* Administration Submenu */}
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
-                  {/* Conditionally render Users menu item based on authorization */}
-                  {!hasHiddenUsersPermission && (
-                    <button
-                      onClick={() => setLocation('/administration/users')}
-                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                    >
-                      <User className="h-5 w-5 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                    </button>
-                  )}
+                  {/* Users menu item - disabled if user has Hidden Users permission */}
+                  <button
+                    onClick={hasHiddenUsersPermission ? undefined : () => setLocation('/administration/users')}
+                    disabled={hasHiddenUsersPermission}
+                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
+                      hasHiddenUsersPermission 
+                        ? 'text-gray-300 cursor-not-allowed' 
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                    }`}
+                    title={hasHiddenUsersPermission 
+                      ? (language === 'ar' ? 'ليس لديك صلاحية للوصول إلى هذا القسم' : 'You do not have permission to access this section')
+                      : undefined
+                    }
+                  >
+                    <User className={`h-5 w-5 flex-shrink-0 ${hasHiddenUsersPermission ? 'text-gray-300' : ''}`} />
+                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                  </button>
                   <button
                     onClick={() => setLocation('/administration/authorization')}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-100 text-purple-700 hover:bg-purple-200"
