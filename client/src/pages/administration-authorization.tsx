@@ -230,6 +230,9 @@ export default function AdministrationAuthorization() {
 
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");
+  
+  // Check if the current admin has the "Hidden Users" permission
+  const hasHiddenUsersPermission = admin?.authorization?.usersHidden || false;
 
   // Fetch all VetsVan requests for notification counter
   const { data: allVetsVanRequests } = useQuery({
@@ -349,13 +352,16 @@ export default function AdministrationAuthorization() {
               {/* Administration Submenu */}
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={() => setLocation('/administration/users')}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <User className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                  </button>
+                  {/* Conditionally render Users menu item based on authorization */}
+                  {!hasHiddenUsersPermission && (
+                    <button
+                      onClick={() => setLocation('/administration/users')}
+                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <User className="h-5 w-5 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => setLocation('/administration/authorization')}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-100 text-purple-700 hover:bg-purple-200"

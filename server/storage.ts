@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction } from "@shared/schema";
+import { users, drivers, rides, patients, admins, adminUsers, authorizations, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt, sql } from "drizzle-orm";
 
@@ -429,8 +429,39 @@ export class DatabaseStorage implements IStorage {
 
   // Admin operations
   async getAdminByUsername(username: string): Promise<Admin | undefined> {
-    const [admin] = await db.select().from(adminUsers).where(eq(adminUsers.username, username));
-    return admin;
+    const [result] = await db
+      .select({
+        id: adminUsers.id,
+        firstName: adminUsers.firstName,
+        lastName: adminUsers.lastName,
+        email: adminUsers.email,
+        username: adminUsers.username,
+        password: adminUsers.password,
+        authorizationId: adminUsers.authorizationId,
+        isActive: adminUsers.isActive,
+        createdAt: adminUsers.createdAt,
+        updatedAt: adminUsers.updatedAt,
+        authorization: {
+          id: authorizations.id,
+          name: authorizations.name,
+          usersHidden: authorizations.usersHidden,
+          usersRead: authorizations.usersRead,
+          usersFullControl: authorizations.usersFullControl,
+          authHidden: authorizations.authHidden,
+          authRead: authorizations.authRead,
+          authFullControl: authorizations.authFullControl,
+        }
+      })
+      .from(adminUsers)
+      .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
+      .where(eq(adminUsers.username, username));
+    
+    if (!result) return undefined;
+    
+    return {
+      ...result,
+      authorization: result.authorization || null
+    } as any;
   }
 
   async createDriver(driver: InsertDriver): Promise<Driver> {

@@ -2922,8 +2922,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const adminData = {
         id: admin.id,
         username: admin.username,
-        name: admin.name,
-        role: admin.role
+        firstName: admin.firstName,
+        lastName: admin.lastName,
+        email: admin.email,
+        authorizationId: admin.authorizationId,
+        authorization: admin.authorization
       };
       const sessionId = await sessionService.createSession(admin.id, 'admin', adminData, 24);
 
@@ -2932,8 +2935,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         admin: {
           id: admin.id,
           username: admin.username,
-          name: admin.name,
-          role: admin.role
+          firstName: admin.firstName,
+          lastName: admin.lastName,
+          email: admin.email,
+          authorizationId: admin.authorizationId,
+          authorization: admin.authorization
         }
       });
     } catch (error) {
