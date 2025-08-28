@@ -1316,50 +1316,21 @@ export default function RideRequest() {
                 } />
               </SelectTrigger>
               <SelectContent className="max-h-[240px] overflow-y-auto">
-                <SelectItem value="first-visit" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-4 h-4 text-yellow-600" />
-                    <span>{language === 'ar' ? 'الزيارة الأولى' : 'First Visit'}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="general-checkup" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Stethoscope className="w-4 h-4 text-blue-600" />
-                    <span>{t('generalCheckUp')}</span>
-                  </div>
-                </SelectItem>
+
                 <SelectItem value="home-consultation" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Home className="w-4 h-4 text-green-700" />
                     <span>{language === 'ar' ? 'استشارة منزلية' : 'Home Consultation'}</span>
                   </div>
                 </SelectItem>
-                <SelectItem value="vaccination" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-blue-500" />
-                    <span>{language === 'ar' ? 'التطعيم' : 'Vaccination'}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="deworming" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Pill className="w-4 h-4 text-orange-600" />
-                    <span>{language === 'ar' ? 'الديدان' : 'Deworming'}</span>
-                  </div>
-                </SelectItem>
+
                 <SelectItem value="free-deworming" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Pill className="w-4 h-4 text-green-600" />
                     <span>{language === 'ar' ? 'ديدان مجاني' : 'Free Deworming'}</span>
                   </div>
                 </SelectItem>
-                {!isOnlyBirdsSelected(selectedPatients, patients) && (
-                  <SelectItem value="fleas-ticks-prevention" className="select-item-custom">
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-emerald-600" />
-                      <span>{language === 'ar' ? 'الوقاية من القراد والبراغيث' : 'Fleas & Ticks Prevention'}</span>
-                    </div>
-                  </SelectItem>
-                )}
+
                 <SelectItem value="pickup-drop" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Car className="w-4 h-4 text-indigo-600" />
