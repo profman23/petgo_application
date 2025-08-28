@@ -313,40 +313,42 @@ export default function AdminLogin() {
           </div>
 
           {/* Custom CSS for animations */}
-          <style jsx>{`
-            @keyframes dash {
-              0% { stroke-dashoffset: 125.6; }
-              100% { stroke-dashoffset: 50.24; }
-            }
-            @keyframes dash2 {
-              0% { stroke-dashoffset: 100.48; }
-              100% { stroke-dashoffset: 25.12; }
-            }
-            @keyframes dash3 {
-              0% { stroke-dashoffset: 150.72; }
-              100% { stroke-dashoffset: 75.36; }
-            }
-            @keyframes dash4 {
-              0% { stroke-dashoffset: 50.24; }
-              100% { stroke-dashoffset: 12.56; }
-            }
-            @keyframes bar1 {
-              0% { width: 60%; }
-              100% { width: 85%; }
-            }
-            @keyframes bar2 {
-              0% { width: 45%; }
-              100% { width: 75%; }
-            }
-            @keyframes bar3 {
-              0% { width: 70%; }
-              100% { width: 95%; }
-            }
-            @keyframes bar4 {
-              0% { width: 30%; }
-              100% { width: 60%; }
-            }
-          `}</style>
+          <style>
+            {`
+              @keyframes dash {
+                0% { stroke-dashoffset: 125.6; }
+                100% { stroke-dashoffset: 50.24; }
+              }
+              @keyframes dash2 {
+                0% { stroke-dashoffset: 100.48; }
+                100% { stroke-dashoffset: 25.12; }
+              }
+              @keyframes dash3 {
+                0% { stroke-dashoffset: 150.72; }
+                100% { stroke-dashoffset: 75.36; }
+              }
+              @keyframes dash4 {
+                0% { stroke-dashoffset: 50.24; }
+                100% { stroke-dashoffset: 12.56; }
+              }
+              @keyframes bar1 {
+                0% { width: 60%; }
+                100% { width: 85%; }
+              }
+              @keyframes bar2 {
+                0% { width: 45%; }
+                100% { width: 75%; }
+              }
+              @keyframes bar3 {
+                0% { width: 70%; }
+                100% { width: 95%; }
+              }
+              @keyframes bar4 {
+                0% { width: 30%; }
+                100% { width: 60%; }
+              }
+            `}
+          </style>
         </div>
         
         {/* Right side - Login form */}
