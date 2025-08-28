@@ -153,7 +153,7 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   } else if (serviceType === 'free-deworming') {
     total = 0; // Free service
   } else if (serviceType === 'pickup-drop') {
-    total = 115;
+    total = 230;
   } else {
     // Original pricing for other services
     if (petCount <= 2) total = 172.5;
