@@ -1879,39 +1879,6 @@ export default function RideRequest() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Floating RCM Communication Panel */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <div className="flex flex-col gap-2">
-          {/* WhatsApp Button */}
-          <button
-            onClick={() => window.open('https://wa.me/966920003045', '_blank')}
-            className="w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
-            title={language === 'ar' ? 'واتساب' : 'WhatsApp Support'}
-          >
-            <MessageCircle className="w-6 h-6 text-white" />
-          </button>
-          
-          {/* Phone Call Button */}
-          <button
-            onClick={() => window.open('tel:+966920003045', '_self')}
-            className="w-14 h-14 bg-blue-500 hover:bg-blue-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
-            title={language === 'ar' ? 'اتصال هاتفي' : 'Phone Call'}
-          >
-            <Phone className="w-6 h-6 text-white" />
-          </button>
-          
-          {/* SMS Button */}
-          <button
-            onClick={() => window.open('sms:+966920003045', '_self')}
-            className="w-14 h-14 bg-purple-600 hover:bg-purple-700 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
-            title={language === 'ar' ? 'رسالة نصية' : 'SMS Message'}
-            style={{ backgroundColor: '#852085' }}
-          >
-            <MessageCircle className="w-6 h-6 text-white" />
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
