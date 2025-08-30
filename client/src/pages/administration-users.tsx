@@ -22,6 +22,7 @@ export default function AdministrationUsers() {
   
   // State for popup
   const [showCreateUserPopup, setShowCreateUserPopup] = useState(false);
+  const [showNoPermissionPopup, setShowNoPermissionPopup] = useState(false);
   
   // Form state
   const [firstName, setFirstName] = useState('');
@@ -40,6 +41,27 @@ export default function AdministrationUsers() {
       return;
     }
   }, [setLocation]);
+
+  // Fetch current user's authorization permissions for route guard
+  const {
+    data: currentUserPermissions,
+    isLoading: permissionsLoading,
+    error: permissionsError
+  } = useQuery({
+    queryKey: ['/api/admin/current-user-permissions'],
+    retry: false,
+  });
+
+  // Route guard - redirect if user doesn't have permission to access Users page
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
+      setShowNoPermissionPopup(true);
+      // Redirect back to authorization page after showing popup
+      setTimeout(() => {
+        setLocation('/administration/authorization');
+      }, 2000);
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");
@@ -701,6 +723,34 @@ export default function AdministrationUsers() {
                   ? (language === 'ar' ? 'جاري الإنشاء...' : 'Creating...')
                   : (language === 'ar' ? 'إنشاء' : 'Create')
                 }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No Permission Popup */}
+      {showNoPermissionPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-96 mx-4">
+            <div className="p-6 text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                <Shield className="h-6 w-6 text-red-600" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                {language === 'ar' ? 'ممنوع الوصول' : 'Access Denied'}
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                {language === 'ar' 
+                  ? 'ليس لديك صلاحية للوصول إلى صفحة المستخدمين'
+                  : 'You do not have permission to access the Users page'
+                }
+              </p>
+              <button
+                onClick={() => setShowNoPermissionPopup(false)}
+                className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
+              >
+                {language === 'ar' ? 'حسناً' : 'OK'}
               </button>
             </div>
           </div>
