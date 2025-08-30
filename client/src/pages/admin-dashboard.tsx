@@ -1915,12 +1915,8 @@ export default function AdminDashboard() {
               <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
             </button>
             <button
-              onClick={() => setActiveTab('import')}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                activeTab === 'import'
-                  ? 'bg-purple-600 text-purple-600'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+              onClick={() => setLocation('/admin-dashboard/import')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Upload className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
