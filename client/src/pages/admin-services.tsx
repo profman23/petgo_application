@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Upload, Stethoscope, Package } from "lucide-react";
+import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Upload, Stethoscope, Package, Users, User, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -679,6 +679,7 @@ export default function AdminServices() {
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(true);
 
   // Fetch current requests count for notification badge - matches VetsVan Shifts
   const { data: allVetsVanRequests } = useQuery({
@@ -765,6 +766,44 @@ export default function AdminServices() {
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
+            {/* Administration Module */}
+            <div className="mb-2">
+              <button
+                onClick={() => setIsAdministrationExpanded(!isAdministrationExpanded)}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <Users className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'الإدارة' : 'Administration'}
+                </span>
+                {isAdministrationExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+              
+              {/* Administration Submenu */}
+              {isAdministrationExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => setLocation('/administration/users')}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <User className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                  </button>
+                  <button
+                    onClick={() => setLocation('/administration/authorization')}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Shield className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+            
             <button
               onClick={() => setLocation('/admin-dashboard')}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
