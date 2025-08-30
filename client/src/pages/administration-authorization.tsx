@@ -23,6 +23,7 @@ export default function AdministrationAuthorization() {
   // State for popup
   const [showAddAuthorizationPopup, setShowAddAuthorizationPopup] = useState(false);
   const [showNoPermissionPopup, setShowNoPermissionPopup] = useState(false);
+  const [isNoPermissionDialogOpen, setIsNoPermissionDialogOpen] = useState(false);
   
   // State for checkboxes - Users section
   const [hiddenUsersChecked, setHiddenUsersChecked] = useState(false);
@@ -361,14 +362,24 @@ export default function AdministrationAuthorization() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      
                       // If permissions are still loading, do nothing
                       if (permissionsLoading) {
                         return;
                       }
                       
+                      // If dialog is already open, do nothing
+                      if (isNoPermissionDialogOpen) {
+                        return;
+                      }
+                      
                       if (currentUserPermissions && currentUserPermissions.usersHidden) {
+                        setIsNoPermissionDialogOpen(true);
                         setShowNoPermissionPopup(true);
+                        return;
                       } else {
                         setLocation('/administration/users');
                       }
@@ -806,7 +817,10 @@ export default function AdministrationAuthorization() {
                 {language === 'ar' ? 'ليس لديك صلاحية' : 'No permission'}
               </h2>
               <button
-                onClick={() => setShowNoPermissionPopup(false)}
+                onClick={() => {
+                  setShowNoPermissionPopup(false);
+                  setIsNoPermissionDialogOpen(false);
+                }}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <X className="h-5 w-5" />
@@ -826,7 +840,10 @@ export default function AdministrationAuthorization() {
             {/* Popup Footer */}
             <div className="flex justify-end p-4 border-t">
               <button
-                onClick={() => setShowNoPermissionPopup(false)}
+                onClick={() => {
+                  setShowNoPermissionPopup(false);
+                  setIsNoPermissionDialogOpen(false);
+                }}
                 className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
               >
                 {language === 'ar' ? 'موافق' : 'OK'}
