@@ -25,6 +25,29 @@ interface Driver {
   };
 }
 
+interface VetsVanRequest {
+  id: number;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  location: string | {
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  appointmentDate: string;
+  serviceType: string;
+  vetsvanCode: string;
+  vetsvanName: string;
+  driverId: number;
+  status: string;
+  createdAt: string;
+  pets?: Array<{
+    name: string;
+    type: string;
+  }>;
+}
+
 export default function AdminVetsVanRequests() {
   const [, setLocation] = useLocation();
   const { language, t } = useTranslation();
@@ -58,7 +81,7 @@ export default function AdminVetsVanRequests() {
   });
 
   // Fetch all VetsVan requests - exact copy from admin dashboard
-  const { data: allVetsVanRequests, isLoading: isLoadingRequests } = useQuery({
+  const { data: allVetsVanRequests, isLoading: isLoadingRequests } = useQuery<VetsVanRequest[]>({
     queryKey: ['/api/admin/vetsvan-requests'],
     refetchInterval: 2000, // Poll every 2 seconds for real-time updates
     refetchIntervalInBackground: true,
@@ -75,7 +98,7 @@ export default function AdminVetsVanRequests() {
   };
 
   // Filter VetsVan requests - exact copy from admin dashboard
-  const filteredVetsVanRequests = allVetsVanRequests?.filter(request => {
+  const filteredVetsVanRequests = allVetsVanRequests?.filter((request: VetsVanRequest) => {
     // Search filter - check name, phone, email, pets, vetsvan
     const searchMatch = !requestSearchTerm || 
       request.customerName.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
@@ -83,7 +106,7 @@ export default function AdminVetsVanRequests() {
       request.customerEmail.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
       request.vetsvanCode.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
       request.vetsvanName.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
-      request.pets?.some(pet => 
+      request.pets?.some((pet: any) => 
         pet.name.toLowerCase().includes(requestSearchTerm.toLowerCase()) ||
         pet.type.toLowerCase().includes(requestSearchTerm.toLowerCase())
       );
@@ -594,7 +617,7 @@ export default function AdminVetsVanRequests() {
                 {/* Requests Grid - exact copy from admin dashboard */}
                 {vetsVanRequests && vetsVanRequests.length > 0 ? (
                   <div className="grid gap-4">
-                    {vetsVanRequests.map((request) => (
+                    {vetsVanRequests.map((request: VetsVanRequest) => (
                       <div 
                         key={request.id} 
                         className="bg-white rounded-lg shadow-md border-2 p-4"
@@ -614,7 +637,12 @@ export default function AdminVetsVanRequests() {
                                 <span className="font-medium">{language === 'ar' ? 'الإيميل:' : 'Email:'}</span> {request.customerEmail}
                               </p>
                               <p style={{ textAlign: getTextAlign(language) }}>
-                                <span className="font-medium">{language === 'ar' ? 'العنوان:' : 'Address:'}</span> {request.location}
+                                <span className="font-medium">{language === 'ar' ? 'العنوان:' : 'Address:'}</span>{' '}
+                                {typeof request.location === 'string' 
+                                  ? request.location 
+                                  : request.location?.address || 
+                                    `${request.location?.latitude || 'N/A'}, ${request.location?.longitude || 'N/A'}`
+                                }
                               </p>
                             </div>
                           </div>
@@ -644,7 +672,7 @@ export default function AdminVetsVanRequests() {
                                 <p style={{ textAlign: getTextAlign(language) }}>
                                   <span className="font-medium">{language === 'ar' ? 'الحيوانات الأليفة:' : 'Pets:'}</span>
                                   <br />
-                                  {request.pets.map((pet, index) => (
+                                  {request.pets.map((pet: any, index: number) => (
                                     <span key={index} className="text-xs bg-gray-100 px-2 py-1 rounded-full mr-1 mb-1 inline-block">
                                       {pet.name} ({pet.type})
                                     </span>
