@@ -878,7 +878,7 @@ export default function AdminServices() {
               <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard?tab=import&sub=products')}
+              onClick={() => setLocation('/admin-dashboard/products')}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Package className="h-6 w-6 flex-shrink-0" />
