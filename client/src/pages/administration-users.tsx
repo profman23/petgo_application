@@ -341,7 +341,7 @@ export default function AdministrationUsers() {
                       }
                       
                       // Check for no permission on Authorization
-                      if (currentUserPermissions && currentUserPermissions.authorizationHidden === true) {
+                      if (currentUserPermissions && currentUserPermissions.authHidden === true) {
                         setIsNoPermissionDialogOpen(true);
                         setShowNoPermissionPopup(true);
                         return;

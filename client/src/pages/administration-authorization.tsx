@@ -412,7 +412,7 @@ export default function AdministrationAuthorization() {
                       e.stopPropagation();
                       
                       // Sanity check log
-                      console.log('Authorization clicked - permissions loading:', permissionsLoading, 'authorizationHidden:', currentUserPermissions?.authorizationHidden, 'permissions:', currentUserPermissions);
+                      console.log('Authorization clicked - permissions loading:', permissionsLoading, 'authHidden:', currentUserPermissions?.authHidden, 'permissions:', currentUserPermissions);
                       
                       // If permissions are still loading, do nothing
                       if (permissionsLoading) {
@@ -427,7 +427,7 @@ export default function AdministrationAuthorization() {
                       }
                       
                       // Check for no permission on Authorization
-                      if (currentUserPermissions && currentUserPermissions.authorizationHidden === true) {
+                      if (currentUserPermissions && currentUserPermissions.authHidden === true) {
                         console.log('No permission detected for Authorization, showing popup');
                         setIsNoPermissionDialogOpen(true);
                         setShowNoPermissionPopup(true);
