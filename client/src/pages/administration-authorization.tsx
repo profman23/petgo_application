@@ -407,11 +407,43 @@ export default function AdministrationAuthorization() {
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
-                    onClick={() => setLocation('/administration/authorization')}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      
+                      // Sanity check log
+                      console.log('Authorization clicked - permissions loading:', permissionsLoading, 'authorizationHidden:', currentUserPermissions?.authorizationHidden, 'permissions:', currentUserPermissions);
+                      
+                      // If permissions are still loading, do nothing
+                      if (permissionsLoading) {
+                        console.log('Permissions still loading, blocking click');
+                        return;
+                      }
+                      
+                      // If dialog is already open, do nothing
+                      if (isNoPermissionDialogOpen) {
+                        console.log('Dialog already open, ignoring click');
+                        return;
+                      }
+                      
+                      // Check for no permission on Authorization
+                      if (currentUserPermissions && currentUserPermissions.authorizationHidden === true) {
+                        console.log('No permission detected for Authorization, showing popup');
+                        setIsNoPermissionDialogOpen(true);
+                        setShowNoPermissionPopup(true);
+                        return;
+                      } else {
+                        console.log('Permission granted, navigating to authorization');
+                        setLocation('/administration/authorization');
+                      }
+                    }}
+                    disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      location === '/administration/authorization'
-                        ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                      permissionsLoading || !currentUserPermissions
+                        ? 'text-gray-300 cursor-not-allowed' 
+                        : location === '/administration/authorization'
+                          ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
                   >
                     <Shield className="h-5 w-5 flex-shrink-0" />
@@ -847,8 +879,8 @@ export default function AdministrationAuthorization() {
             <div className="p-4">
               <p className="text-sm text-gray-600">
                 {language === 'ar' 
-                  ? 'ليس لديك صلاحية للوصول إلى المستخدمين. يُرجى التواصل مع المشرف.' 
-                  : "You don't have access to Users. Please contact the administrator."
+                  ? 'ليس لديك صلاحية للوصول إلى هذا القسم. يُرجى التواصل مع المشرف.' 
+                  : "You don't have access to this section. Please contact the administrator."
                 }
               </p>
             </div>
