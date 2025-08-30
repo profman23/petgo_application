@@ -362,7 +362,7 @@ export default function AdministrationUsers() {
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
                 <TrendingUp className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
+                <span className="flex-1 text-left whitespace-nowrap">
                   {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
                 </span>
                 {isNewReportsExpanded ? (
