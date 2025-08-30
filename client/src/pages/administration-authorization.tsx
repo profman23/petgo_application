@@ -651,7 +651,7 @@ export default function AdministrationAuthorization() {
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="hiddenUsers" className="ml-2 text-sm text-gray-600">
-                        {language === 'ar' ? 'المستخدمين المخفيين' : 'Hidden Users'}
+                        بدون صلاحية
                       </label>
                     </div>
                     
@@ -705,7 +705,7 @@ export default function AdministrationAuthorization() {
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="authHiddenUsers" className="ml-2 text-sm text-gray-600">
-                        {language === 'ar' ? 'المستخدمين المخفيين' : 'Hidden Users'}
+                        بدون صلاحية
                       </label>
                     </div>
                     
