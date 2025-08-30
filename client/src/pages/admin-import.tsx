@@ -23,9 +23,25 @@ const ImportManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch import history
-  const { data: importHistory, isLoading, refetch } = useQuery({
+  const { data: importHistory = [], isLoading, refetch } = useQuery({
     queryKey: ['/api/import-history'],
     staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const adminToken = localStorage.getItem("adminToken");
+      const response = await fetch('/api/import-history', {
+        credentials: "include",
+        headers: {
+          'Authorization': `Bearer ${adminToken}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    },
+    enabled: !!localStorage.getItem("adminToken"), // Only fetch if admin token exists
   });
 
   const importMutation = useMutation({
@@ -310,7 +326,7 @@ const ImportManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {importHistory && importHistory.length > 0 ? (
+              {importHistory && Array.isArray(importHistory) && importHistory.length > 0 ? (
                 importHistory.map((item: any) => (
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
