@@ -3006,9 +3006,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const adminId = req.admin.id;
       
-      // Get the admin user with their authorization
+      // Get the admin user with their authorization and username
       const adminUserWithAuth = await db.select({
         id: adminUsers.id,
+        username: adminUsers.username,
         authorizationId: adminUsers.authorizationId,
         usersHidden: authorizations.usersHidden,
         usersRead: authorizations.usersRead,
@@ -3026,7 +3027,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'Admin user not found' });
       }
       
-      const permissions = adminUserWithAuth[0];
+      let permissions = adminUserWithAuth[0];
+      
+      // Super Admin Exception: If username is "admin", grant full permissions regardless of authorization settings
+      if (permissions.username === 'admin') {
+        console.log('🔑 Super Admin detected - granting full permissions to admin user');
+        permissions = {
+          ...permissions,
+          usersHidden: false,
+          usersRead: true,
+          usersFullControl: true,
+          authHidden: false,
+          authRead: true,
+          authFullControl: true
+        };
+      }
+      
       res.json(permissions);
     } catch (error) {
       console.error('Error fetching current user permissions:', error);
