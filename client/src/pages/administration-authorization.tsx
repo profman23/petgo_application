@@ -22,6 +22,7 @@ export default function AdministrationAuthorization() {
   
   // State for popup
   const [showAddAuthorizationPopup, setShowAddAuthorizationPopup] = useState(false);
+  const [showNoPermissionPopup, setShowNoPermissionPopup] = useState(false);
   
   // State for checkboxes - Users section
   const [hiddenUsersChecked, setHiddenUsersChecked] = useState(false);
@@ -350,7 +351,13 @@ export default function AdministrationAuthorization() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => setLocation('/administration/users')}
+                    onClick={() => {
+                      if (hiddenUsersChecked) {
+                        setShowNoPermissionPopup(true);
+                      } else {
+                        setLocation('/administration/users');
+                      }
+                    }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <User className="h-5 w-5 flex-shrink-0" />
@@ -763,6 +770,46 @@ export default function AdministrationAuthorization() {
                     ? (language === 'ar' ? 'تحديث' : 'Update')
                     : (language === 'ar' ? 'حفظ' : 'Save')
                 }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No Permission Popup */}
+      {showNoPermissionPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            {/* Popup Header */}
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {language === 'ar' ? 'ليس لديك صلاحية' : 'No permission'}
+              </h2>
+              <button
+                onClick={() => setShowNoPermissionPopup(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            {/* Popup Body */}
+            <div className="p-4">
+              <p className="text-sm text-gray-600">
+                {language === 'ar' 
+                  ? 'ليس لديك صلاحية للوصول إلى المستخدمين. يُرجى التواصل مع المشرف.' 
+                  : "You don't have access to Users. Please contact the administrator."
+                }
+              </p>
+            </div>
+            
+            {/* Popup Footer */}
+            <div className="flex justify-end p-4 border-t">
+              <button
+                onClick={() => setShowNoPermissionPopup(false)}
+                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
+              >
+                {language === 'ar' ? 'موافق' : 'OK'}
               </button>
             </div>
           </div>
