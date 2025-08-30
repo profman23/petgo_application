@@ -63,6 +63,8 @@ export default function AdministrationAuthorization() {
   } = useQuery({
     queryKey: ['/api/admin/current-user-permissions'],
     retry: false,
+    staleTime: 0, // Always fetch fresh permissions
+    cacheTime: 0, // Don't cache to avoid stale data
   });
 
   // Create authorization mutation
@@ -366,27 +368,35 @@ export default function AdministrationAuthorization() {
                       e.preventDefault();
                       e.stopPropagation();
                       
+                      // Sanity check log
+                      console.log('Users clicked - permissions loading:', permissionsLoading, 'hiddenUsers:', currentUserPermissions?.usersHidden, 'permissions:', currentUserPermissions);
+                      
                       // If permissions are still loading, do nothing
                       if (permissionsLoading) {
+                        console.log('Permissions still loading, blocking click');
                         return;
                       }
                       
                       // If dialog is already open, do nothing
                       if (isNoPermissionDialogOpen) {
+                        console.log('Dialog already open, ignoring click');
                         return;
                       }
                       
-                      if (currentUserPermissions && currentUserPermissions.usersHidden) {
+                      // Check for no permission
+                      if (currentUserPermissions && currentUserPermissions.usersHidden === true) {
+                        console.log('No permission detected, showing popup');
                         setIsNoPermissionDialogOpen(true);
                         setShowNoPermissionPopup(true);
                         return;
                       } else {
+                        console.log('Permission granted, navigating to users');
                         setLocation('/administration/users');
                       }
                     }}
-                    disabled={permissionsLoading}
+                    disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading 
+                      permissionsLoading || !currentUserPermissions
                         ? 'text-gray-300 cursor-not-allowed' 
                         : location === '/administration/users'
                           ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
