@@ -666,7 +666,7 @@ export default function AdministrationAuthorization() {
                         className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${hiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                       <label htmlFor="readUsers" className={`ml-2 text-sm ${hiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'قراءة المستخدمين' : 'Read Users'}
+                        Read
                       </label>
                     </div>
                     
@@ -720,7 +720,7 @@ export default function AdministrationAuthorization() {
                         className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authHiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                       <label htmlFor="authReadUsers" className={`ml-2 text-sm ${authHiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'قراءة المستخدمين' : 'Read Users'}
+                        Read
                       </label>
                     </div>
                     
