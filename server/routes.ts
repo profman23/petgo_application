@@ -3001,6 +3001,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get current user's authorization permissions
+  app.get('/api/admin/current-user-permissions', requireAdminAuth, async (req, res) => {
+    try {
+      const adminId = req.admin.id;
+      
+      // Get the admin user with their authorization
+      const adminUserWithAuth = await db.select({
+        id: adminUsers.id,
+        authorizationId: adminUsers.authorizationId,
+        usersHidden: authorizations.usersHidden,
+        usersRead: authorizations.usersRead,
+        usersFullControl: authorizations.usersFullControl,
+        authHidden: authorizations.authHidden,
+        authRead: authorizations.authRead,
+        authFullControl: authorizations.authFullControl
+      })
+      .from(adminUsers)
+      .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
+      .where(eq(adminUsers.id, adminId))
+      .limit(1);
+      
+      if (!adminUserWithAuth.length) {
+        return res.status(404).json({ message: 'Admin user not found' });
+      }
+      
+      const permissions = adminUserWithAuth[0];
+      res.json(permissions);
+    } catch (error) {
+      console.error('Error fetching current user permissions:', error);
+      res.status(500).json({ message: 'Error fetching permissions' });
+    }
+  });
+
   // Admin users management routes
   app.get('/api/admin/admin-users', requireAdminAuth, async (req, res) => {
     try {

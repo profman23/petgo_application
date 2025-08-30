@@ -54,6 +54,16 @@ export default function AdministrationAuthorization() {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 
+  // Fetch current user's authorization permissions
+  const {
+    data: currentUserPermissions,
+    isLoading: permissionsLoading,
+    error: permissionsError
+  } = useQuery({
+    queryKey: ['/api/admin/current-user-permissions'],
+    retry: false,
+  });
+
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
     mutationFn: async (authData: any) => {
@@ -352,7 +362,7 @@ export default function AdministrationAuthorization() {
                 <div className="ml-6 mt-1 space-y-1">
                   <button
                     onClick={() => {
-                      if (hiddenUsersChecked) {
+                      if (currentUserPermissions && currentUserPermissions.usersHidden) {
                         setShowNoPermissionPopup(true);
                       } else {
                         setLocation('/administration/users');
