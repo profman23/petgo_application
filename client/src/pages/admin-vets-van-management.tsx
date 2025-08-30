@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
+import { getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { playBookingNotification, testAudioNotification, audioNotification } from "@/utils/audio";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -28,8 +28,52 @@ import {
 export default function AdminVetsVanManagement() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const t = useTranslation();
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'ar');
+
+  // Translation function - simplified implementation for the migrated component
+  const t = (key: string) => {
+    const translations: Record<string, Record<string, string>> = {
+      ar: {
+        vetsVanManagement: 'إدارة VETS VAN',
+        addNewVetsVan: 'إضافة VETS VAN جديد',
+        phoneNumber: 'رقم الهاتف',
+        username: 'اسم المستخدم',
+        password: 'كلمة المرور',
+        addVetsVan: 'إضافة VETS VAN',
+        currentVetsVans: 'سيارات VETS VAN الحالية',
+        totalVetsVans: 'إجمالي سيارات VETS VAN',
+        available: 'متاح',
+        notAvailable: 'غير متاح',
+        changeStatus: 'تغيير الحالة',
+        delete: 'حذف',
+        confirmDelete: 'تأكيد الحذف',
+        deleteVetsVanConfirm: 'هل أنت متأكد من حذف',
+        deleteWarning: 'هذا الإجراء لا يمكن التراجع عنه',
+        cancel: 'إلغاء',
+        deleteConfirm: 'حذف'
+      },
+      en: {
+        vetsVanManagement: 'Vets Van Management',
+        addNewVetsVan: 'Add New Vets Van',
+        phoneNumber: 'Phone Number',
+        username: 'Username',
+        password: 'Password',
+        addVetsVan: 'Add Vets Van',
+        currentVetsVans: 'Current Vets Vans',
+        totalVetsVans: 'Total Vets Vans',
+        available: 'Available',
+        notAvailable: 'Not Available',
+        changeStatus: 'Change Status',
+        delete: 'Delete',
+        confirmDelete: 'Confirm Delete',
+        deleteVetsVanConfirm: 'Are you sure you want to delete',
+        deleteWarning: 'This action cannot be undone',
+        cancel: 'Cancel',
+        deleteConfirm: 'Delete'
+      }
+    };
+    return translations[language]?.[key] || key;
+  };
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newDriver, setNewDriver] = useState({
