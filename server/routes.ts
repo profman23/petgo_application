@@ -4235,6 +4235,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin-specific product delete route
+  app.delete('/api/admin/products/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`🗑️ Admin deleting product with ID: ${id}`);
+      await storage.deleteProduct(parseInt(id));
+      res.json({ message: 'Product deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      res.status(500).json({ error: 'Failed to delete product' });
+    }
+  });
+
   // Import endpoints
   app.get('/api/import-history', requireAdminAuth, async (req, res) => {
     try {
