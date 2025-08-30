@@ -686,7 +686,7 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
 }
 
 export default function AdminDashboard() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
@@ -730,6 +730,21 @@ export default function AdminDashboard() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importSubTab, setImportSubTab] = useState<'products' | 'services'>(getInitialImportSubTab());
+  
+  // Handle URL parameter changes
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    const subParam = urlParams.get('sub');
+    
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+    
+    if (tabParam === 'import' && subParam && (subParam === 'products' || subParam === 'services')) {
+      setImportSubTab(subParam);
+    }
+  }, [location, activeTab]);
   
   // Red Zones state
   const [showRedZonesDialog, setShowRedZonesDialog] = useState(false);
