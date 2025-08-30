@@ -368,7 +368,7 @@ export default function AdminVetsVanRequests() {
             </div>
             
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={() => setLocation('/admin-vetsvan-management')}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Car className="h-6 w-6 flex-shrink-0" />

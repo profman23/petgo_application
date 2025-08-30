@@ -26,6 +26,7 @@ import AdminServices from "@/pages/admin-services";
 import AdminProducts from "@/pages/admin-products";
 import AdminImport from "@/pages/admin-import";
 import AdminVetsVanRequests from "@/pages/admin-vetsvan-requests";
+import AdminVetsVanManagement from "@/pages/admin-vetsvan-management";
 import AdministrationUsers from "@/pages/administration-users";
 import AdministrationAuthorization from "@/pages/administration-authorization";
 import SalesReports from "@/pages/sales-reports";
@@ -146,6 +147,7 @@ function Router() {
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
+          <Route path="/admin-vetsvan-management" component={AdminVetsVanManagement} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
           <Route path="/admin-dashboard/products" component={AdminProducts} />
           <Route path="/admin-dashboard/import" component={AdminImport} />
