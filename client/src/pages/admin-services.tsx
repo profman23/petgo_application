@@ -679,7 +679,7 @@ export default function AdminServices() {
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(true);
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false);
 
   // Fetch current requests count for notification badge - matches VetsVan Shifts
   const { data: allVetsVanRequests } = useQuery({

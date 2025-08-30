@@ -75,7 +75,7 @@ export default function VetsVanShifts() {
     duration: 'day' as 'day' | 'week' | 'month'
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(true);
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false);
   
   // State for tracking notifications and audio - matches admin dashboard
   const [audioEnabled, setAudioEnabled] = useState(true);
