@@ -941,25 +941,25 @@ export default function VetsVanBooking() {
             <AlertDialogTitle>Confirm Booking</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to book this time slot?
-              {pendingBooking && (
-                <div className="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
-                  <div className="flex items-center gap-2 text-sm text-purple-800">
-                    <div className="flex items-center gap-1">
-                      <span className="font-medium">VetsVan:</span>
-                      <span>{pendingBooking.vetsVanCode}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="font-medium">Time:</span>
-                      <span>{pendingBooking.timeSlot}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span className="font-medium">Date:</span>
-                      <span>{selectedDate}</span>
-                    </div>
+            </AlertDialogDescription>
+            {pendingBooking && (
+              <div className="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                <div className="flex items-center gap-2 text-sm text-purple-800">
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium">VetsVan:</span>
+                    <span>{pendingBooking.vetsVanCode}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium">Time:</span>
+                    <span>{pendingBooking.timeSlot}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium">Date:</span>
+                    <span>{selectedDate}</span>
                   </div>
                 </div>
-              )}
-            </AlertDialogDescription>
+              </div>
+            )}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCancelBooking}>
