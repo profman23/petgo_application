@@ -690,7 +690,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('reports'); // 'reports', 'shifts', 'requests', or 'import'
+  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false); // Administration module dropdown state
@@ -1845,8 +1845,12 @@ export default function AdminDashboard() {
             </div>
             
             <button
-              onClick={() => setLocation('/admin-vetsvan-management')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              onClick={() => setActiveTab('management')}
+              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
+                activeTab === 'management'
+                  ? 'bg-purple-600 text-purple-600'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
             >
               <Car className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
@@ -1934,7 +1938,198 @@ export default function AdminDashboard() {
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
             <div className="px-1 py-3 sm:px-0">
+              {activeTab === 'management' && (
+                <div>
+                  {/* Add Driver Section */}
+                  <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
+                    <div className="px-4 py-5 sm:p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVanManagement')}</h3>
+                        <button
+                          onClick={() => setShowAddForm(!showAddForm)}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-600"
+                        >
+                          <UserPlus className="h-4 w-4 ml-2" />
+                          {t('addNewVetsVan')}
+                        </button>
+                      </div>
 
+                      {showAddForm && (
+                        <form onSubmit={handleAddDriver} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">VetsVan Code</label>
+                            <input
+                              type="text"
+                              value={newDriver.vetsvanCode}
+                              onChange={(e) => setNewDriver({ ...newDriver, vetsvanCode: e.target.value })}
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              placeholder="V001"
+                              style={{ textAlign: getTextAlign(language) }}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">VetsVan Name</label>
+                            <input
+                              type="text"
+                              value={newDriver.vetsvanName}
+                              onChange={(e) => setNewDriver({ ...newDriver, vetsvanName: e.target.value })}
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              placeholder="VETS VAN 1"
+                              style={{ textAlign: getTextAlign(language) }}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">{t('phoneNumber')}</label>
+                            <input
+                              type="tel"
+                              value={newDriver.phone}
+                              onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              placeholder="05xxxxxxxx"
+                              style={{ textAlign: getTextAlign(language) }}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">{t('username')}</label>
+                            <input
+                              type="text"
+                              value={newDriver.username}
+                              onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              placeholder={t('username')}
+                              style={{ textAlign: getTextAlign(language) }}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">{t('password')}</label>
+                            <input
+                              type="password"
+                              value={newDriver.password}
+                              onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              placeholder={t('password')}
+                              style={{ textAlign: getTextAlign(language) }}
+                            />
+                          </div>
+                          <div className="sm:col-span-2 lg:col-span-5">
+                            <button
+                              type="submit"
+                              disabled={addDriverMutation.isPending}
+                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                            >
+                              {addDriverMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                              ) : (
+                                t('addVetsVan')
+                              )}
+                            </button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Drivers List */}
+                  <div className="bg-white shadow overflow-hidden sm:rounded-md">
+                    <div className="px-4 py-5 sm:px-6">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900">{t('currentVetsVans')}</h3>
+                      <p className="mt-1 max-w-2xl text-sm text-gray-500">{t('totalVetsVans')}: {drivers?.length || 0}</p>
+                    </div>
+                    <ul className="divide-y divide-gray-200">
+                      {drivers?.map((driver) => (
+                        <li key={driver.id} className="px-4 py-4 sm:px-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0">
+                                <div className="h-10 w-10 rounded-full bg-purple-600 flex items-center justify-center">
+                                  <span className="text-sm font-medium text-purple-600">
+                                    {driver.name?.charAt(0) || 'V'}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900">{(driver as any).vetsvanName || driver.name}</div>
+                                <div className="text-sm text-gray-500">{driver.phone}</div>
+                                <div className="text-sm text-gray-500">@{(driver as any).vetsvanCode || driver.username}</div>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  driver.isAvailable
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {driver.isAvailable ? t('available') : t('notAvailable')}
+                              </span>
+                              <button
+                                onClick={() =>
+                                  toggleAvailabilityMutation.mutate({
+                                    driverId: driver.id,
+                                    isAvailable: !driver.isAvailable,
+                                  })
+                                }
+                                className="text-sm text-purple-600 hover:text-purple-600"
+                              >
+                                {t('changeStatus')}
+                              </button>
+                              <button
+                                onClick={() => handleLocationClick(driver)}
+                                className="text-sm text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
+                              >
+                                <MapPin className="w-3 h-3" />
+                                {language === 'ar' ? 'تحديد الموقع' : 'Set Location'}
+                              </button>
+                              <button
+                                onClick={() => handleRedZonesClick(driver)}
+                                className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1"
+                              >
+                                <AlertTriangle className="w-3 h-3" />
+                                {language === 'ar' ? 'المناطق الحمراء' : 'Red Zones'}
+                              </button>
+                              <button
+                                onClick={() => handleEditClick(driver)}
+                                className="text-sm text-green-600 hover:text-green-900 inline-flex items-center gap-1"
+                              >
+                                <Edit className="w-3 h-3" />
+                                {language === 'ar' ? 'تعديل' : 'Edit'}
+                              </button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <button className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1">
+                                    <Trash2 className="w-3 h-3" />
+                                    {t('delete')}
+                                  </button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>{t('confirmDelete')}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      {t('deleteVetsVanConfirm')} {(driver as any).vetsvanCode} - {(driver as any).vetsvanName}?
+                                      <br />
+                                      {t('deleteWarning')}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deleteDriverMutation.mutate(driver.id)}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      {t('deleteConfirm')}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
 
               {activeTab === 'reports' && (
                 <div>
