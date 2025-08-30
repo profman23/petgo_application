@@ -690,7 +690,21 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
+  
+  // Initialize activeTab based on URL parameters
+  const getInitialActiveTab = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    return tabParam || 'management';
+  };
+  
+  const getInitialImportSubTab = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const subParam = urlParams.get('sub');
+    return (subParam === 'products' || subParam === 'services') ? subParam : 'products';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getInitialActiveTab()); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false); // Administration module dropdown state
@@ -715,7 +729,7 @@ export default function AdminDashboard() {
   });
   const [uploadingFile, setUploadingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [importSubTab, setImportSubTab] = useState<'products' | 'services'>('products');
+  const [importSubTab, setImportSubTab] = useState<'products' | 'services'>(getInitialImportSubTab());
   
   // Red Zones state
   const [showRedZonesDialog, setShowRedZonesDialog] = useState(false);
