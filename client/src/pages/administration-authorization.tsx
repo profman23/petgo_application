@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 export default function AdministrationAuthorization() {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { t, language } = useTranslation();
   const { toast } = useToast();
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
@@ -388,7 +388,9 @@ export default function AdministrationAuthorization() {
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
                       permissionsLoading 
                         ? 'text-gray-300 cursor-not-allowed' 
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                        : location === '/administration/users'
+                          ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
                   >
                     <User className="h-5 w-5 flex-shrink-0" />
@@ -396,7 +398,11 @@ export default function AdministrationAuthorization() {
                   </button>
                   <button
                     onClick={() => setLocation('/administration/authorization')}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-100 text-purple-700 hover:bg-purple-200"
+                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
+                      location === '/administration/authorization'
+                        ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                    }`}
                   >
                     <Shield className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
