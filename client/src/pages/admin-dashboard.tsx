@@ -696,9 +696,11 @@ export default function AdminDashboard() {
   // Administration menu state - persist across navigation
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
     const savedState = localStorage.getItem('isAdministrationExpanded');
+    console.log('AdminDashboard: Initializing Administration state from localStorage:', savedState);
     if (savedState !== null) {
       return JSON.parse(savedState);
     }
+    console.log('AdminDashboard: No saved state, defaulting to collapsed');
     return false; // Default to collapsed for dashboard
   });
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
@@ -1318,6 +1320,11 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  // Monitor Administration state changes for debugging
+  useEffect(() => {
+    console.log('AdminDashboard: Administration state changed to:', isAdministrationExpanded);
+  }, [isAdministrationExpanded]);
+
   // Add driver mutation
   const addDriverMutation = useMutation({
     mutationFn: async (data: NewDriverData) => {
@@ -1826,6 +1833,7 @@ export default function AdminDashboard() {
                   e.preventDefault();
                   e.stopPropagation();
                   const newState = !isAdministrationExpanded;
+                  console.log('AdminDashboard: Administration header clicked, toggling from', isAdministrationExpanded, 'to', newState);
                   setIsAdministrationExpanded(newState);
                   localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
                 }}
@@ -1890,6 +1898,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('AdminDashboard: Vets Van Shifts button clicked, Administration state before click:', isAdministrationExpanded);
                 setLocation('/vets-van-shifts');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1954,6 +1963,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('AdminDashboard: Vets Van Requests button clicked, Administration state before click:', isAdministrationExpanded);
                 setLocation('/admin-vetsvan-requests');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1965,6 +1975,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('AdminDashboard: Import button clicked, Administration state before click:', isAdministrationExpanded);
                 setLocation('/admin-dashboard/import');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1976,6 +1987,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('AdminDashboard: Services button clicked, Administration state before click:', isAdministrationExpanded);
                 setLocation('/admin-dashboard/services');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1987,6 +1999,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                console.log('AdminDashboard: Products button clicked, Administration state before click:', isAdministrationExpanded);
                 setLocation('/admin-dashboard/products');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
