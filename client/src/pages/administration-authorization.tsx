@@ -13,7 +13,14 @@ export default function AdministrationAuthorization() {
   const { t, language } = useTranslation();
   const { toast } = useToast();
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(true); // Keep expanded since we're in administration
+  // Administration menu state - persist across navigation
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isAdministrationExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return true; // Default to expanded for authorization page
+  });
   
   // State for tracking notifications and audio
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -360,7 +367,13 @@ export default function AdministrationAuthorization() {
             {/* Administration Module */}
             <div className="mb-2">
               <button
-                onClick={() => setIsAdministrationExpanded(!isAdministrationExpanded)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isAdministrationExpanded;
+                  setIsAdministrationExpanded(newState);
+                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                }}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
                 <Users className="h-6 w-6 flex-shrink-0" />
