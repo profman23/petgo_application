@@ -1336,8 +1336,6 @@ export default function AdminDashboard() {
   // Monitor Administration state changes for debugging
   useEffect(() => {
     console.log('AdminDashboard: Administration state changed to:', isAdministrationExpanded);
-    console.log('AdminDashboard: localStorage value is:', localStorage.getItem('isAdministrationExpanded'));
-    console.trace('AdminDashboard: Stack trace for state change');
   }, [isAdministrationExpanded]);
 
   // Add driver mutation
@@ -1912,11 +1910,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('AdminDashboard: Vets Van Shifts button clicked, Administration state before click:', isAdministrationExpanded);
-                // Explicitly ensure Administration stays collapsed
-                console.log('AdminDashboard: Force preventing Administration expansion for Vets Van Shifts');
-                setForceAdministrationCollapsed(true);
-                setTimeout(() => setForceAdministrationCollapsed(false), 100);
+                console.log('AdminDashboard: Vets Van Shifts button clicked');
                 setLocation('/vets-van-shifts');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1981,11 +1975,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('AdminDashboard: Vets Van Requests button clicked, Administration state before click:', isAdministrationExpanded);
-                // Explicitly ensure Administration stays collapsed
-                console.log('AdminDashboard: Force preventing Administration expansion for Vets Van Requests');
-                setForceAdministrationCollapsed(true);
-                setTimeout(() => setForceAdministrationCollapsed(false), 100);
+                console.log('AdminDashboard: Vets Van Requests button clicked');
                 setLocation('/admin-vetsvan-requests');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1997,11 +1987,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('AdminDashboard: Import button clicked, Administration state before click:', isAdministrationExpanded);
-                // Explicitly ensure Administration stays collapsed
-                console.log('AdminDashboard: Force preventing Administration expansion for Import');
-                setForceAdministrationCollapsed(true);
-                setTimeout(() => setForceAdministrationCollapsed(false), 100);
+                console.log('AdminDashboard: Import button clicked');
                 setLocation('/admin-dashboard/import');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -2013,11 +1999,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('AdminDashboard: Services button clicked, Administration state before click:', isAdministrationExpanded);
-                // Explicitly ensure Administration stays collapsed
-                console.log('AdminDashboard: Force preventing Administration expansion for Services');
-                setForceAdministrationCollapsed(true);
-                setTimeout(() => setForceAdministrationCollapsed(false), 100);
+                console.log('AdminDashboard: Services button clicked');
                 setLocation('/admin-dashboard/services');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -2029,11 +2011,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('AdminDashboard: Products button clicked, Administration state before click:', isAdministrationExpanded);
-                // Explicitly ensure Administration stays collapsed
-                console.log('AdminDashboard: Force preventing Administration expansion for Products');
-                setForceAdministrationCollapsed(true);
-                setTimeout(() => setForceAdministrationCollapsed(false), 100);
+                console.log('AdminDashboard: Products button clicked');
                 setLocation('/admin-dashboard/products');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"

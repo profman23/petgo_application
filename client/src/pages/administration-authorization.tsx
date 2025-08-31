@@ -19,7 +19,7 @@ export default function AdministrationAuthorization() {
     if (savedState !== null) {
       return JSON.parse(savedState);
     }
-    return true; // Default to expanded for authorization page
+    return false; // FIXED: Default to collapsed to maintain consistency
   });
   
   // State for tracking notifications and audio

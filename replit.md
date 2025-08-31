@@ -36,6 +36,7 @@ The application is a full-stack solution. The frontend is built with React 18 an
 - **Data Integrity**: Robust database protection, import data protection, and smart initialization prevent data loss.
 - **User Experience**: Intuitive UI/UX with responsive design, dynamic language switching, custom animations, and clear visual feedback.
 - **Scalability**: Database-backed session management and optimized data handling.
+- **UI State Management**: Consistent Administration menu behavior across all admin pages with persistent localStorage state and proper default collapsed state to prevent unwanted auto-expansion.
 
 ## External Dependencies
 
