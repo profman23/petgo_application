@@ -63,7 +63,7 @@ export default function AdminLogin() {
         title: t('loginSuccessful'),
         description: t('welcomeToAdmin'),
       });
-      setLocation("/my-profile");
+      setLocation("/admin-dashboard");
     },
     onError: (error: Error) => {
       toast({
