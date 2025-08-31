@@ -693,7 +693,14 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(false); // Administration module dropdown state
+  // Administration menu state - persist across navigation
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isAdministrationExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default to collapsed for dashboard
+  });
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
@@ -1809,7 +1816,13 @@ export default function AdminDashboard() {
             {/* Administration Module */}
             <div className="mb-2">
               <button
-                onClick={() => setIsAdministrationExpanded(!isAdministrationExpanded)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isAdministrationExpanded;
+                  setIsAdministrationExpanded(newState);
+                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                }}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
                 <Users className="h-6 w-6 flex-shrink-0" />
