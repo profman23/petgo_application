@@ -333,7 +333,7 @@ export default function AdministrationUsers() {
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
-                    onClick={(e) => {
+                    onClick={currentUserPermissions && currentUserPermissions.authHidden === true ? undefined : (e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       
@@ -347,13 +347,8 @@ export default function AdministrationUsers() {
                         return;
                       }
                       
-                      // Check for no permission on Authorization (allow if user has read or full control)
-                      if (currentUserPermissions && currentUserPermissions.authHidden === true) {
-                        console.log('No permission for Authorization, showing popup');
-                        setIsNoPermissionDialogOpen(true);
-                        setShowNoPermissionPopup(true);
-                        return;
-                      } else if (currentUserPermissions && (currentUserPermissions.authRead === true || currentUserPermissions.authFullControl === true)) {
+                      // Check for valid permissions (read or full control)
+                      if (currentUserPermissions && (currentUserPermissions.authRead === true || currentUserPermissions.authFullControl === true)) {
                         console.log('Permission granted (read or full control), navigating to authorization');
                         setLocation('/administration/authorization');
                       } else {
@@ -362,10 +357,10 @@ export default function AdministrationUsers() {
                         setShowNoPermissionPopup(true);
                       }
                     }}
-                    disabled={permissionsLoading || !currentUserPermissions}
+                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.authHidden === true)}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
-                        ? 'text-gray-300 cursor-not-allowed opacity-50' 
+                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.authHidden === true)
+                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
                         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
                   >

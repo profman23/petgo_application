@@ -386,7 +386,7 @@ export default function AdministrationAuthorization() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={(e) => {
+                    onClick={currentUserPermissions && currentUserPermissions.usersHidden === true ? undefined : (e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       
@@ -405,13 +405,8 @@ export default function AdministrationAuthorization() {
                         return;
                       }
                       
-                      // Check for no permission (allow if user has read or full control)
-                      if (currentUserPermissions && currentUserPermissions.usersHidden === true) {
-                        console.log('No permission detected, showing popup');
-                        setIsNoPermissionDialogOpen(true);
-                        setShowNoPermissionPopup(true);
-                        return;
-                      } else if (currentUserPermissions && (currentUserPermissions.usersRead === true || currentUserPermissions.usersFullControl === true)) {
+                      // Check for valid permissions (read or full control)
+                      if (currentUserPermissions && (currentUserPermissions.usersRead === true || currentUserPermissions.usersFullControl === true)) {
                         console.log('Permission granted (read or full control), navigating to users');
                         setLocation('/administration/users');
                       } else {
@@ -420,10 +415,10 @@ export default function AdministrationAuthorization() {
                         setShowNoPermissionPopup(true);
                       }
                     }}
-                    disabled={permissionsLoading || !currentUserPermissions}
+                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.usersHidden === true)}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
-                        ? 'text-gray-300 cursor-not-allowed opacity-50' 
+                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.usersHidden === true)
+                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
                         : location === '/administration/users'
                           ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
                           : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
@@ -434,7 +429,7 @@ export default function AdministrationAuthorization() {
                     {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                   <button
-                    onClick={(e) => {
+                    onClick={currentUserPermissions && currentUserPermissions.authHidden === true ? undefined : (e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       
@@ -453,13 +448,8 @@ export default function AdministrationAuthorization() {
                         return;
                       }
                       
-                      // Check for no permission on Authorization (allow if user has read or full control)
-                      if (currentUserPermissions && currentUserPermissions.authHidden === true) {
-                        console.log('No permission detected for Authorization, showing popup');
-                        setIsNoPermissionDialogOpen(true);
-                        setShowNoPermissionPopup(true);
-                        return;
-                      } else if (currentUserPermissions && (currentUserPermissions.authRead === true || currentUserPermissions.authFullControl === true)) {
+                      // Check for valid permissions (read or full control)
+                      if (currentUserPermissions && (currentUserPermissions.authRead === true || currentUserPermissions.authFullControl === true)) {
                         console.log('Permission granted (read or full control), navigating to authorization');
                         setLocation('/administration/authorization');
                       } else {
@@ -468,10 +458,10 @@ export default function AdministrationAuthorization() {
                         setShowNoPermissionPopup(true);
                       }
                     }}
-                    disabled={permissionsLoading || !currentUserPermissions}
+                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.authHidden === true)}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
-                        ? 'text-gray-300 cursor-not-allowed opacity-50' 
+                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.authHidden === true)
+                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
                         : location === '/administration/authorization'
                           ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
                           : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
