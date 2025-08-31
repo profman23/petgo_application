@@ -340,7 +340,11 @@ export default function AdministrationUsers() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => setLocation('/administration/users')}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/administration/users');
+                    }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-100 text-purple-700 hover:bg-purple-200"
                   >
                     <User className="h-5 w-5 flex-shrink-0" />
@@ -387,21 +391,33 @@ export default function AdministrationUsers() {
             </div>
             
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Car className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
             </button>
             <button
-              onClick={() => setLocation('/vets-van-shifts')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/vets-van-shifts');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Clock className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <BarChart3 className="h-6 w-6 flex-shrink-0" />
@@ -410,7 +426,11 @@ export default function AdministrationUsers() {
             {/* New Reports & Analytics Dropdown */}
             <div className="mt-2">
               <button
-                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsNewReportsExpanded(!isNewReportsExpanded);
+                }}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
                 <TrendingUp className="h-6 w-6 flex-shrink-0" />
@@ -428,7 +448,11 @@ export default function AdministrationUsers() {
               {isNewReportsExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/new-reports-analytics/sales-report');
+                    }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <BarChart3 className="h-5 w-5 flex-shrink-0" />
@@ -438,28 +462,44 @@ export default function AdministrationUsers() {
               )}
             </div>
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <FileText className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Upload className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard/services')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/services');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Stethoscope className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Package className="h-6 w-6 flex-shrink-0" />
