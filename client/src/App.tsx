@@ -28,6 +28,7 @@ import AdminImport from "@/pages/admin-import";
 import AdminVetsVanRequests from "@/pages/admin-vetsvan-requests";
 import AdministrationUsers from "@/pages/administration-users";
 import AdministrationAuthorization from "@/pages/administration-authorization";
+import MyProfile from "@/pages/my-profile";
 import SalesReports from "@/pages/sales-reports";
 import NewReportsAnalytics from "@/pages/new-reports-analytics";
 import VetsVanShifts from "@/pages/vets-van-shifts";
@@ -145,6 +146,7 @@ function Router() {
           <Route path="/customer-activity" component={() => <AuthCheck><CustomerActivity /></AuthCheck>} />
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
+          <Route path="/my-profile" component={MyProfile} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
           <Route path="/admin-dashboard/products" component={AdminProducts} />

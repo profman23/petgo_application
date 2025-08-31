@@ -357,6 +357,17 @@ export default function AdministrationAuthorization() {
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
+            {/* My Profile */}
+            <div className="mb-4">
+              <button
+                onClick={() => setLocation('/my-profile')}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <User className="h-6 w-6 flex-shrink-0" />
+                <span>{language === 'ar' ? 'ملفي الشخصي' : 'My Profile'}</span>
+              </button>
+            </div>
+            
             {/* Administration Module */}
             <div className="mb-2">
               <button
