@@ -495,7 +495,7 @@ export default function AdministrationAuthorization() {
               <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={() => setLocation('/admin-dashboard?tab=reports')}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <BarChart3 className="h-6 w-6 flex-shrink-0" />
@@ -536,14 +536,14 @@ export default function AdministrationAuthorization() {
               )}
             </div>
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={() => setLocation('/admin-vetsvan-requests')}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <FileText className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={() => setLocation('/admin-dashboard/import')}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Upload className="h-6 w-6 flex-shrink-0" />
@@ -557,7 +557,7 @@ export default function AdministrationAuthorization() {
               <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard')}
+              onClick={() => setLocation('/admin-dashboard/products')}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Package className="h-6 w-6 flex-shrink-0" />
