@@ -1323,6 +1323,8 @@ export default function AdminDashboard() {
   // Monitor Administration state changes for debugging
   useEffect(() => {
     console.log('AdminDashboard: Administration state changed to:', isAdministrationExpanded);
+    console.log('AdminDashboard: localStorage value is:', localStorage.getItem('isAdministrationExpanded'));
+    console.trace('AdminDashboard: Stack trace for state change');
   }, [isAdministrationExpanded]);
 
   // Add driver mutation
@@ -1899,6 +1901,13 @@ export default function AdminDashboard() {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('AdminDashboard: Vets Van Shifts button clicked, Administration state before click:', isAdministrationExpanded);
+                // Explicitly ensure Administration stays collapsed
+                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
+                if (currentAdminState === 'true') {
+                  console.log('AdminDashboard: Force preventing Administration expansion for Vets Van Shifts');
+                  localStorage.setItem('isAdministrationExpanded', 'false');
+                  setIsAdministrationExpanded(false);
+                }
                 setLocation('/vets-van-shifts');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1964,6 +1973,13 @@ export default function AdminDashboard() {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('AdminDashboard: Vets Van Requests button clicked, Administration state before click:', isAdministrationExpanded);
+                // Explicitly ensure Administration stays collapsed
+                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
+                if (currentAdminState === 'true') {
+                  console.log('AdminDashboard: Force preventing Administration expansion for Vets Van Requests');
+                  localStorage.setItem('isAdministrationExpanded', 'false');
+                  setIsAdministrationExpanded(false);
+                }
                 setLocation('/admin-vetsvan-requests');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1976,6 +1992,13 @@ export default function AdminDashboard() {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('AdminDashboard: Import button clicked, Administration state before click:', isAdministrationExpanded);
+                // Explicitly ensure Administration stays collapsed
+                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
+                if (currentAdminState === 'true') {
+                  console.log('AdminDashboard: Force preventing Administration expansion for Import');
+                  localStorage.setItem('isAdministrationExpanded', 'false');
+                  setIsAdministrationExpanded(false);
+                }
                 setLocation('/admin-dashboard/import');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1988,6 +2011,13 @@ export default function AdminDashboard() {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('AdminDashboard: Services button clicked, Administration state before click:', isAdministrationExpanded);
+                // Explicitly ensure Administration stays collapsed
+                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
+                if (currentAdminState === 'true') {
+                  console.log('AdminDashboard: Force preventing Administration expansion for Services');
+                  localStorage.setItem('isAdministrationExpanded', 'false');
+                  setIsAdministrationExpanded(false);
+                }
                 setLocation('/admin-dashboard/services');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -2000,6 +2030,13 @@ export default function AdminDashboard() {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('AdminDashboard: Products button clicked, Administration state before click:', isAdministrationExpanded);
+                // Explicitly ensure Administration stays collapsed
+                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
+                if (currentAdminState === 'true') {
+                  console.log('AdminDashboard: Force preventing Administration expansion for Products');
+                  localStorage.setItem('isAdministrationExpanded', 'false');
+                  setIsAdministrationExpanded(false);
+                }
                 setLocation('/admin-dashboard/products');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
