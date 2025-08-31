@@ -55,7 +55,7 @@ export default function AdministrationAuthorization() {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 
-  // Fetch current user's authorization permissions
+  // Fetch current user's authorization permissions with proper cache management
   const {
     data: currentUserPermissions,
     isLoading: permissionsLoading,
@@ -65,6 +65,8 @@ export default function AdministrationAuthorization() {
     retry: false,
     staleTime: 0, // Always fetch fresh permissions
     cacheTime: 0, // Don't cache to avoid stale data
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary calls
   });
 
   // Create authorization mutation
@@ -414,7 +416,7 @@ export default function AdministrationAuthorization() {
                     disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
                       permissionsLoading || !currentUserPermissions
-                        ? 'text-gray-300 cursor-not-allowed' 
+                        ? 'text-gray-300 cursor-not-allowed opacity-50' 
                         : location === '/administration/users'
                           ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
                           : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
@@ -422,6 +424,7 @@ export default function AdministrationAuthorization() {
                   >
                     <User className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                   <button
                     onClick={(e) => {
@@ -457,7 +460,7 @@ export default function AdministrationAuthorization() {
                     disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
                       permissionsLoading || !currentUserPermissions
-                        ? 'text-gray-300 cursor-not-allowed' 
+                        ? 'text-gray-300 cursor-not-allowed opacity-50' 
                         : location === '/administration/authorization'
                           ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
                           : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
@@ -465,6 +468,7 @@ export default function AdministrationAuthorization() {
                   >
                     <Shield className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                 </div>
               )}

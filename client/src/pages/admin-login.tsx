@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail, PhoneCall, Brain } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
@@ -46,8 +46,19 @@ export default function AdminLogin() {
       return response as AdminAuthResponse;
     },
     onSuccess: (data) => {
+      // Clear any existing tokens and cache before setting new ones
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("admin");
+      
+      // Clear all React Query cache to prevent stale permissions
+      queryClient.clear();
+      
+      // Set new admin tokens
       localStorage.setItem("adminToken", data.token);
       localStorage.setItem("admin", JSON.stringify(data.admin));
+      
       toast({
         title: t('loginSuccessful'),
         description: t('welcomeToAdmin'),

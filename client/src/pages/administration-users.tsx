@@ -43,7 +43,7 @@ export default function AdministrationUsers() {
     }
   }, [setLocation]);
 
-  // Fetch current user's authorization permissions for route guard
+  // Fetch current user's authorization permissions with proper cache management
   const {
     data: currentUserPermissions,
     isLoading: permissionsLoading,
@@ -51,6 +51,10 @@ export default function AdministrationUsers() {
   } = useQuery({
     queryKey: ['/api/admin/current-user-permissions'],
     retry: false,
+    staleTime: 0, // Always fetch fresh permissions
+    cacheTime: 0, // Don't cache to avoid stale data
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
   // Route guard - redirect silently if user doesn't have permission to access Users page
@@ -342,22 +346,25 @@ export default function AdministrationUsers() {
                       
                       // Check for no permission on Authorization
                       if (currentUserPermissions && currentUserPermissions.authHidden === true) {
+                        console.log('No permission for Authorization, showing popup');
                         setIsNoPermissionDialogOpen(true);
                         setShowNoPermissionPopup(true);
                         return;
                       } else {
+                        console.log('Permission granted, navigating to authorization');
                         setLocation('/administration/authorization');
                       }
                     }}
                     disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
                       permissionsLoading || !currentUserPermissions
-                        ? 'text-gray-300 cursor-not-allowed' 
+                        ? 'text-gray-300 cursor-not-allowed opacity-50' 
                         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
                   >
                     <Shield className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                 </div>
               )}
