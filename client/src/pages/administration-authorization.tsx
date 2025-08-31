@@ -247,17 +247,9 @@ export default function AdministrationAuthorization() {
   // Route guard - redirect if user doesn't have permission to access Authorization page
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden === true) {
-      // Show permission popup briefly, then redirect
-      console.log('User has no authorization permission, showing popup then redirecting');
-      setIsNoPermissionDialogOpen(true);
-      setShowNoPermissionPopup(true);
-      
-      // Redirect after 2 seconds to give user time to see the message
-      setTimeout(() => {
-        setShowNoPermissionPopup(false);
-        setIsNoPermissionDialogOpen(false);
-        setLocation('/admin-dashboard');
-      }, 2000);
+      // User should not reach this page with hidden permission, redirect immediately
+      console.log('User has no authorization permission, redirecting');
+      setLocation('/admin-dashboard');
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 

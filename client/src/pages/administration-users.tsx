@@ -60,8 +60,9 @@ export default function AdministrationUsers() {
   // Route guard - redirect silently if user doesn't have permission to access Users page
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
-      // Silent redirect without popup (popup is handled by sidebar)
-      setLocation('/administration/authorization');
+      // User should not reach this page with hidden permission, redirect immediately
+      console.log('User has no users permission, redirecting to dashboard');
+      setLocation('/admin-dashboard');
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
