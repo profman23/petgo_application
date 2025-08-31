@@ -690,7 +690,12 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const { t, language } = useTranslation();
   const [showAddForm, setShowAddForm] = useState(false);
-  const [activeTab, setActiveTab] = useState('management'); // 'management', 'shifts', 'reports', 'requests', or 'import'
+  // Initialize activeTab based on URL parameter
+  const [activeTab, setActiveTab] = useState(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    return tab === 'reports' ? 'reports' : 'management';
+  }); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
   // Administration menu state - persist across navigation
