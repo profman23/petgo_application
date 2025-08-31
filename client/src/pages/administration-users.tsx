@@ -242,6 +242,9 @@ export default function AdministrationUsers() {
     });
   };
 
+  // Determine if page is in read-only mode
+  const isReadOnly = currentUserPermissions && currentUserPermissions.usersRead === true && currentUserPermissions.usersFullControl !== true;
+
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
       {/* Full-width Header with logo and controls */}
@@ -344,15 +347,19 @@ export default function AdministrationUsers() {
                         return;
                       }
                       
-                      // Check for no permission on Authorization
+                      // Check for no permission on Authorization (allow if user has read or full control)
                       if (currentUserPermissions && currentUserPermissions.authHidden === true) {
                         console.log('No permission for Authorization, showing popup');
                         setIsNoPermissionDialogOpen(true);
                         setShowNoPermissionPopup(true);
                         return;
-                      } else {
-                        console.log('Permission granted, navigating to authorization');
+                      } else if (currentUserPermissions && (currentUserPermissions.authRead === true || currentUserPermissions.authFullControl === true)) {
+                        console.log('Permission granted (read or full control), navigating to authorization');
                         setLocation('/administration/authorization');
+                      } else {
+                        console.log('No valid permission for authorization');
+                        setIsNoPermissionDialogOpen(true);
+                        setShowNoPermissionPopup(true);
                       }
                     }}
                     disabled={permissionsLoading || !currentUserPermissions}
@@ -463,8 +470,13 @@ export default function AdministrationUsers() {
                       {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
                     </h1>
                     <button
-                      onClick={() => setShowCreateUserPopup(true)}
-                      className="px-4 py-2 border-2 border-purple-600 bg-white text-purple-600 font-medium rounded-md hover:bg-purple-50 transition-colors duration-200"
+                      onClick={isReadOnly ? undefined : () => setShowCreateUserPopup(true)}
+                      disabled={isReadOnly}
+                      className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
+                        isReadOnly 
+                          ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                          : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+                      }`}
                     >
                       {language === 'ar' ? 'إنشاء مستخدم جديد' : 'Create New User'}
                     </button>
@@ -562,17 +574,24 @@ export default function AdministrationUsers() {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <button
-                                  className="text-blue-600 hover:text-blue-900 mr-4"
+                                  disabled={isReadOnly}
+                                  className={`mr-4 ${
+                                    isReadOnly 
+                                      ? 'text-gray-300 cursor-not-allowed opacity-50'
+                                      : 'text-blue-600 hover:text-blue-900'
+                                  }`}
                                 >
                                   {language === 'ar' ? 'تعديل' : 'Edit'}
                                 </button>
                                 <button
-                                  onClick={() => handleToggleUserStatus(user.id, user.isActive)}
-                                  disabled={toggleUserStatusMutation.isPending}
+                                  onClick={isReadOnly ? undefined : () => handleToggleUserStatus(user.id, user.isActive)}
+                                  disabled={isReadOnly || toggleUserStatusMutation.isPending}
                                   className={`${
-                                    user.isActive 
-                                      ? 'text-red-600 hover:text-red-900' 
-                                      : 'text-green-600 hover:text-green-900'
+                                    isReadOnly 
+                                      ? 'text-gray-300 cursor-not-allowed opacity-50'
+                                      : user.isActive 
+                                        ? 'text-red-600 hover:text-red-900' 
+                                        : 'text-green-600 hover:text-green-900'
                                   } disabled:opacity-50`}
                                 >
                                   {user.isActive 
@@ -595,7 +614,7 @@ export default function AdministrationUsers() {
       </div>
 
       {/* Create New User Popup */}
-      {showCreateUserPopup && (
+      {showCreateUserPopup && !isReadOnly && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style={{ left: '256px', top: '82px' }}>
           <div className="bg-white rounded-lg shadow-xl w-[500px] max-w-2xl mx-4">
             {/* Popup Header */}
