@@ -243,7 +243,7 @@ export default function AdministrationUsers() {
   };
 
   // Determine if page is in read-only mode
-  const isReadOnly = currentUserPermissions && currentUserPermissions.usersRead === true && currentUserPermissions.usersFullControl !== true;
+  const isReadOnly = currentUserPermissions && currentUserPermissions.usersRead === true && !currentUserPermissions.usersFullControl;
 
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>

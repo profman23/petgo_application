@@ -262,7 +262,7 @@ export default function AdministrationAuthorization() {
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   // Determine if page is in read-only mode
-  const isReadOnly = currentUserPermissions && currentUserPermissions.authRead === true && currentUserPermissions.authFullControl !== true;
+  const isReadOnly = currentUserPermissions && currentUserPermissions.authRead === true && !currentUserPermissions.authFullControl;
 
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");
