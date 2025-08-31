@@ -26,7 +26,10 @@ export default function AdminVetsVanRequests() {
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(true);
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isAdministrationExpanded');
+    return savedState !== null ? JSON.parse(savedState) : false;
+  });
 
   // State for VetsVan Requests Filters - exact copy from admin dashboard
   const [requestSearchTerm, setRequestSearchTerm] = useState('');
@@ -332,7 +335,11 @@ export default function AdminVetsVanRequests() {
             {/* Administration Module */}
             <div className="mb-2">
               <button
-                onClick={() => setIsAdministrationExpanded(!isAdministrationExpanded)}
+                onClick={() => {
+                  const newState = !isAdministrationExpanded;
+                  setIsAdministrationExpanded(newState);
+                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                }}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
                 <Users className="h-6 w-6 flex-shrink-0" />
