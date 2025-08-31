@@ -416,7 +416,7 @@ export default function AdministrationUsers() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setLocation('/admin-dashboard');
+                setLocation('/admin-dashboard?tab=reports');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
@@ -465,7 +465,7 @@ export default function AdministrationUsers() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setLocation('/admin-dashboard');
+                setLocation('/admin-vetsvan-requests');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
@@ -476,7 +476,7 @@ export default function AdministrationUsers() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setLocation('/admin-dashboard');
+                setLocation('/admin-dashboard/import');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
@@ -498,7 +498,7 @@ export default function AdministrationUsers() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setLocation('/admin-dashboard');
+                setLocation('/admin-dashboard/products');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
