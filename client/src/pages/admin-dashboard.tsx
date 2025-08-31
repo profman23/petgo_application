@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
@@ -703,6 +703,19 @@ export default function AdminDashboard() {
     console.log('AdminDashboard: No saved state, defaulting to collapsed');
     return false; // Default to collapsed for dashboard
   });
+
+  // Create a custom setter that prevents unwanted expansions
+  const setAdministrationExpandedSafely = useCallback((newValue: boolean) => {
+    console.log('AdminDashboard: setAdministrationExpandedSafely called with:', newValue);
+    setIsAdministrationExpanded(newValue);
+    localStorage.setItem('isAdministrationExpanded', JSON.stringify(newValue));
+  }, []);
+
+  // Force Administration to stay collapsed - ultimate solution
+  const [forceAdministrationCollapsed, setForceAdministrationCollapsed] = useState(false);
+
+  // Override the Administration expansion state when force collapsed
+  const effectiveAdministrationExpanded = forceAdministrationCollapsed ? false : isAdministrationExpanded;
   const [showInvoicePreview, setShowInvoicePreview] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<GeneratedInvoice | null>(null);
   const [showLocationDialog, setShowLocationDialog] = useState(false);
@@ -1836,8 +1849,7 @@ export default function AdminDashboard() {
                   e.stopPropagation();
                   const newState = !isAdministrationExpanded;
                   console.log('AdminDashboard: Administration header clicked, toggling from', isAdministrationExpanded, 'to', newState);
-                  setIsAdministrationExpanded(newState);
-                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                  setAdministrationExpandedSafely(newState);
                 }}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
@@ -1845,7 +1857,7 @@ export default function AdminDashboard() {
                 <span className="flex-1 text-left">
                   {language === 'ar' ? 'الإدارة' : 'Administration'}
                 </span>
-                {isAdministrationExpanded ? (
+                {effectiveAdministrationExpanded ? (
                   <ChevronUp className="h-4 w-4 flex-shrink-0" />
                 ) : (
                   <ChevronDown className="h-4 w-4 flex-shrink-0" />
@@ -1853,7 +1865,7 @@ export default function AdminDashboard() {
               </button>
               
               {/* Administration Submenu */}
-              {isAdministrationExpanded && (
+              {effectiveAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
                     onClick={(e) => {
@@ -1902,12 +1914,9 @@ export default function AdminDashboard() {
                 e.stopPropagation();
                 console.log('AdminDashboard: Vets Van Shifts button clicked, Administration state before click:', isAdministrationExpanded);
                 // Explicitly ensure Administration stays collapsed
-                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
-                if (currentAdminState === 'true') {
-                  console.log('AdminDashboard: Force preventing Administration expansion for Vets Van Shifts');
-                  localStorage.setItem('isAdministrationExpanded', 'false');
-                  setIsAdministrationExpanded(false);
-                }
+                console.log('AdminDashboard: Force preventing Administration expansion for Vets Van Shifts');
+                setForceAdministrationCollapsed(true);
+                setTimeout(() => setForceAdministrationCollapsed(false), 100);
                 setLocation('/vets-van-shifts');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1974,12 +1983,9 @@ export default function AdminDashboard() {
                 e.stopPropagation();
                 console.log('AdminDashboard: Vets Van Requests button clicked, Administration state before click:', isAdministrationExpanded);
                 // Explicitly ensure Administration stays collapsed
-                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
-                if (currentAdminState === 'true') {
-                  console.log('AdminDashboard: Force preventing Administration expansion for Vets Van Requests');
-                  localStorage.setItem('isAdministrationExpanded', 'false');
-                  setIsAdministrationExpanded(false);
-                }
+                console.log('AdminDashboard: Force preventing Administration expansion for Vets Van Requests');
+                setForceAdministrationCollapsed(true);
+                setTimeout(() => setForceAdministrationCollapsed(false), 100);
                 setLocation('/admin-vetsvan-requests');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -1993,12 +1999,9 @@ export default function AdminDashboard() {
                 e.stopPropagation();
                 console.log('AdminDashboard: Import button clicked, Administration state before click:', isAdministrationExpanded);
                 // Explicitly ensure Administration stays collapsed
-                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
-                if (currentAdminState === 'true') {
-                  console.log('AdminDashboard: Force preventing Administration expansion for Import');
-                  localStorage.setItem('isAdministrationExpanded', 'false');
-                  setIsAdministrationExpanded(false);
-                }
+                console.log('AdminDashboard: Force preventing Administration expansion for Import');
+                setForceAdministrationCollapsed(true);
+                setTimeout(() => setForceAdministrationCollapsed(false), 100);
                 setLocation('/admin-dashboard/import');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -2012,12 +2015,9 @@ export default function AdminDashboard() {
                 e.stopPropagation();
                 console.log('AdminDashboard: Services button clicked, Administration state before click:', isAdministrationExpanded);
                 // Explicitly ensure Administration stays collapsed
-                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
-                if (currentAdminState === 'true') {
-                  console.log('AdminDashboard: Force preventing Administration expansion for Services');
-                  localStorage.setItem('isAdministrationExpanded', 'false');
-                  setIsAdministrationExpanded(false);
-                }
+                console.log('AdminDashboard: Force preventing Administration expansion for Services');
+                setForceAdministrationCollapsed(true);
+                setTimeout(() => setForceAdministrationCollapsed(false), 100);
                 setLocation('/admin-dashboard/services');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -2031,12 +2031,9 @@ export default function AdminDashboard() {
                 e.stopPropagation();
                 console.log('AdminDashboard: Products button clicked, Administration state before click:', isAdministrationExpanded);
                 // Explicitly ensure Administration stays collapsed
-                const currentAdminState = localStorage.getItem('isAdministrationExpanded');
-                if (currentAdminState === 'true') {
-                  console.log('AdminDashboard: Force preventing Administration expansion for Products');
-                  localStorage.setItem('isAdministrationExpanded', 'false');
-                  setIsAdministrationExpanded(false);
-                }
+                console.log('AdminDashboard: Force preventing Administration expansion for Products');
+                setForceAdministrationCollapsed(true);
+                setTimeout(() => setForceAdministrationCollapsed(false), 100);
                 setLocation('/admin-dashboard/products');
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
