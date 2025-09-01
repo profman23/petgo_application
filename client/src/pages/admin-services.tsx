@@ -698,6 +698,10 @@ export default function AdminServices() {
       return response.json();
     },
     enabled: !!adminToken,
+    staleTime: 0, // Always fetch fresh permissions
+    gcTime: 0, // Don't cache permissions
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
   });
 
   // Fetch current requests count for notification badge - matches VetsVan Shifts

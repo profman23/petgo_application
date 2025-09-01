@@ -45,6 +45,10 @@ export default function AdminHome() {
       return response.json();
     },
     enabled: !!adminToken,
+    staleTime: 0, // Always fetch fresh permissions
+    gcTime: 0, // Don't cache permissions
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
   });
 
   // Fetch VetsVan requests to match the notification count behavior
