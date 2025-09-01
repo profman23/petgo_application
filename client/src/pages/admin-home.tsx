@@ -139,8 +139,8 @@ export default function AdminHome() {
             <button
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 bg-purple-50 border-l-4 border-purple-600"
             >
-              <Home className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
-              <span style={{ color: '#5e6383' }}>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+              <Home className="h-6 w-6 flex-shrink-0 text-purple-600" />
+              <span className="text-purple-600">{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
             </button>
             
             {/* Administration Module */}
@@ -151,17 +151,16 @@ export default function AdminHome() {
                   setIsAdministrationExpanded(newState);
                   localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
                 }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full hover:bg-gray-50"
-                style={{ color: '#5e6383' }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
-                <Users className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
+                <Users className="h-6 w-6 flex-shrink-0" />
                 <span className="flex-1 text-left">
                   {language === 'ar' ? 'الإدارة' : 'Administration'}
                 </span>
                 {isAdministrationExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" style={{ color: '#5e6383' }} />
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" style={{ color: '#5e6383' }} />
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
                 )}
               </button>
               
@@ -170,18 +169,16 @@ export default function AdminHome() {
                 <div className="ml-6 mt-1 space-y-1">
                   <button
                     onClick={() => setLocation('/administration/users')}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full hover:bg-gray-50"
-                    style={{ color: '#5e6383' }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <User className="h-5 w-5 flex-shrink-0" style={{ color: '#5e6383' }} />
+                    <User className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
                     onClick={() => setLocation('/administration/authorization')}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full hover:bg-gray-50"
-                    style={{ color: '#5e6383' }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <Shield className="h-5 w-5 flex-shrink-0" style={{ color: '#5e6383' }} />
+                    <Shield className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
                   </button>
                 </div>
@@ -193,40 +190,26 @@ export default function AdminHome() {
               disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true)}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
                 permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true)
-                  ? 'border-gray-300 bg-gray-100 cursor-not-allowed opacity-50' 
-                  : 'hover:bg-gray-50'
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
-              style={{ 
-                color: permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true) 
-                  ? '#9ca3af' 
-                  : '#5e6383' 
-              }}
             >
-              <Car 
-                className="h-6 w-6 flex-shrink-0" 
-                style={{ 
-                  color: permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true) 
-                    ? '#9ca3af' 
-                    : '#5e6383' 
-                }}
-              />
+              <Car className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
               {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
             </button>
             <button
               onClick={() => setLocation('/vets-van-shifts')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 hover:bg-gray-50"
-              style={{ color: '#5e6383' }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <Clock className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
+              <Clock className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
             </button>
             <button
               onClick={() => setLocation('/admin-dashboard?tab=reports')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 hover:bg-gray-50"
-              style={{ color: '#5e6383' }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <BarChart3 className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
             </button>
             
@@ -234,17 +217,16 @@ export default function AdminHome() {
             <div className="mt-2">
               <button
                 onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full hover:bg-gray-50"
-                style={{ color: '#5e6383' }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
-                <TrendingUp className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
+                <TrendingUp className="h-6 w-6 flex-shrink-0" />
                 <span className="flex-1 text-left whitespace-nowrap">
                   {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
                 </span>
                 {isNewReportsExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" style={{ color: '#5e6383' }} />
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
                 ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" style={{ color: '#5e6383' }} />
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
                 )}
               </button>
               
@@ -253,10 +235,9 @@ export default function AdminHome() {
                 <div className="ml-6 mt-1 space-y-1">
                   <button
                     onClick={() => setLocation('/new-reports-analytics/sales-report')}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full hover:bg-gray-50"
-                    style={{ color: '#5e6383' }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" style={{ color: '#5e6383' }} />
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
                   </button>
                 </div>
@@ -265,34 +246,30 @@ export default function AdminHome() {
             
             <button
               onClick={() => setLocation('/admin-vetsvan-requests')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 hover:bg-gray-50"
-              style={{ color: '#5e6383' }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <FileText className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
+              <FileText className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
             </button>
             <button
               onClick={() => setLocation('/admin-dashboard/import')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 hover:bg-gray-50"
-              style={{ color: '#5e6383' }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <Upload className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
+              <Upload className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
             </button>
             <button
               onClick={() => setLocation('/admin-dashboard/services')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 hover:bg-gray-50"
-              style={{ color: '#5e6383' }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <Stethoscope className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
+              <Stethoscope className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
             </button>
             <button
               onClick={() => setLocation('/admin-dashboard/products')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 hover:bg-gray-50"
-              style={{ color: '#5e6383' }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <Package className="h-6 w-6 flex-shrink-0" style={{ color: '#5e6383' }} />
+              <Package className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
             </button>
           </nav>
