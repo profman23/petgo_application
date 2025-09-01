@@ -21,6 +21,7 @@ import Patients from "@/pages/patients";
 import Activity from "@/pages/activity";
 import CustomerActivity from "@/pages/customer-activity";
 import AdminLogin from "@/pages/admin-login";
+import AdminHome from "@/pages/admin-home";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminServices from "@/pages/admin-services";
 import AdminProducts from "@/pages/admin-products";
@@ -145,6 +146,7 @@ function Router() {
           <Route path="/customer-activity" component={() => <AuthCheck><CustomerActivity /></AuthCheck>} />
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
+          <Route path="/admin-home" component={AdminHome} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
           <Route path="/admin-dashboard/products" component={AdminProducts} />

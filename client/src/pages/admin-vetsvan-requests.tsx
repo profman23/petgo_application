@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, LogOut, Car, Clock, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, ChevronDown, ChevronUp, Search, Package, Stethoscope, TrendingUp, Shield } from "lucide-react";
+import { Loader2, LogOut, Car, Clock, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, ChevronDown, ChevronUp, Search, Package, Stethoscope, TrendingUp, Shield, Home } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -332,6 +332,15 @@ export default function AdminVetsVanRequests() {
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
+            {/* Home Page */}
+            <button
+              onClick={() => setLocation('/admin-home')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Home className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+            </button>
+            
             {/* Administration Module */}
             <div className="mb-2">
               <button

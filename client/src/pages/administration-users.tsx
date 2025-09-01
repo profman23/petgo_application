@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X, Home } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -313,6 +313,19 @@ export default function AdministrationUsers() {
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
+            {/* Home Page */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-home');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Home className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+            </button>
+            
             {/* Administration Module */}
             <div className="mb-2">
               <button

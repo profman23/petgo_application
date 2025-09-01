@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX, Users, User, Shield } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX, Users, User, Shield, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -422,6 +422,15 @@ export default function VetsVanShifts() {
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
+            {/* Home Page */}
+            <button
+              onClick={() => setLocation('/admin-home')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Home className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+            </button>
+            
             {/* Administration Module */}
             <div className="mb-2">
               <button
