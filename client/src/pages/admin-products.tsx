@@ -627,7 +627,7 @@ export default function AdminProducts() {
       <div className="bg-white shadow-md border-b border-gray-200">
         <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 -ml-2">
             <img 
               src={vetsVanLogo} 
               alt="VETS VAN" 
