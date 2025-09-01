@@ -6,6 +6,7 @@ import { LogOut, Bell, Volume2, VolumeX, Car, Clock, BarChart3, TrendingUp, Chev
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
+import welcomeImage from "@assets/freepik__background__61417_1753095390676.png";
 
 export default function AdminHome() {
   const [, setLocation] = useLocation();
@@ -277,14 +278,21 @@ export default function AdminHome() {
         {/* Main Content Area */}
         <div className="flex-1 p-6">
           <div className="max-w-4xl mx-auto">
-            {/* Welcome Message - Top Left */}
+            {/* Welcome Message - Top Left with Image */}
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                {language === 'ar' 
-                  ? `مرحباً ${adminInfo.username} إلى Vets Van` 
-                  : `Welcome ${adminInfo.username} to Vets Van`
-                }
-              </h1>
+              <div className="flex items-center gap-4">
+                <img 
+                  src={welcomeImage} 
+                  alt="Welcome Background" 
+                  className="w-16 h-16 object-cover rounded-lg shadow-md"
+                />
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {language === 'ar' 
+                    ? `مرحباً ${adminInfo.username} إلى Vets Van` 
+                    : `Welcome ${adminInfo.username} to Vets Van`
+                  }
+                </h1>
+              </div>
             </div>
 
             {/* Home Page Section */}
