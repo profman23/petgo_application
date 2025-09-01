@@ -3016,7 +3016,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         usersFullControl: authorizations.usersFullControl,
         authHidden: authorizations.authHidden,
         authRead: authorizations.authRead,
-        authFullControl: authorizations.authFullControl
+        authFullControl: authorizations.authFullControl,
+        vetsVanHidden: authorizations.vetsVanHidden,
+        vetsVanRead: authorizations.vetsVanRead,
+        vetsVanFullControl: authorizations.vetsVanFullControl
       })
       .from(adminUsers)
       .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))

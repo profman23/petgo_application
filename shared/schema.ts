@@ -730,6 +730,11 @@ export const authorizations = pgTable("authorizations", {
   authRead: boolean("auth_read").notNull().default(false),
   authFullControl: boolean("auth_full_control").notNull().default(false),
   
+  // Vets Van Management permissions
+  vetsVanHidden: boolean("vets_van_hidden").notNull().default(false),
+  vetsVanRead: boolean("vets_van_read").notNull().default(false),
+  vetsVanFullControl: boolean("vets_van_full_control").notNull().default(false),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -756,6 +761,9 @@ export const insertAuthorizationSchema = createInsertSchema(authorizations).pick
   authHidden: true,
   authRead: true,
   authFullControl: true,
+  vetsVanHidden: true,
+  vetsVanRead: true,
+  vetsVanFullControl: true,
 });
 
 export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
