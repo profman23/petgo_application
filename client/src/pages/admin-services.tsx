@@ -910,10 +910,10 @@ export default function AdminServices() {
               <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
             </button>
             <button
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 bg-purple-600 text-purple-600"
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 bg-purple-50 border-l-4 border-purple-600"
             >
-              <Stethoscope className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+              <Stethoscope className="h-6 w-6 flex-shrink-0 text-purple-600" />
+              <span className="text-purple-600">{language === 'ar' ? 'الخدمات' : 'Services'}</span>
             </button>
             <button
               onClick={() => setLocation('/admin-dashboard/products')}

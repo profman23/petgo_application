@@ -515,12 +515,12 @@ export default function AdministrationAuthorization() {
                       permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).authHidden === true)
                         ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
                         : location === '/administration/authorization'
-                          ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                          ? 'bg-purple-50 border-l-4 border-purple-600'
                           : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
                   >
-                    <Shield className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                    <Shield className={`h-5 w-5 flex-shrink-0 ${location === '/administration/authorization' ? 'text-purple-600' : ''}`} />
+                    <span className={location === '/administration/authorization' ? 'text-purple-600' : ''}>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
                     {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                 </div>

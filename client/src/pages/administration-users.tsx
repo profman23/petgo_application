@@ -358,10 +358,10 @@ export default function AdministrationUsers() {
                       e.stopPropagation();
                       setLocation('/administration/users');
                     }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-100 text-purple-700 hover:bg-purple-200"
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
                   >
-                    <User className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                    <User className="h-5 w-5 flex-shrink-0 text-purple-600" />
+                    <span className="text-purple-600">{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
                     onClick={currentUserPermissions && currentUserPermissions.authHidden === true ? undefined : (e) => {

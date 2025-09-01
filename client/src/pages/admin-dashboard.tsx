@@ -1913,12 +1913,12 @@ export default function AdminDashboard() {
               }}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
                 activeTab === 'management'
-                  ? 'bg-purple-600 text-purple-600'
+                  ? 'bg-purple-50 border-l-4 border-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <Car className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
+              <Car className={`h-6 w-6 flex-shrink-0 ${activeTab === 'management' ? 'text-purple-600' : ''}`} />
+              <span className={activeTab === 'management' ? 'text-purple-600' : ''}>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
             </button>
             <button
               onClick={(e) => {
@@ -1940,12 +1940,12 @@ export default function AdminDashboard() {
               }}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
                 activeTab === 'reports'
-                  ? 'bg-purple-600 text-purple-600'
+                  ? 'bg-purple-50 border-l-4 border-purple-600'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <BarChart3 className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+              <BarChart3 className={`h-6 w-6 flex-shrink-0 ${activeTab === 'reports' ? 'text-purple-600' : ''}`} />
+              <span className={activeTab === 'reports' ? 'text-purple-600' : ''}>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
             </button>
             {/* New Reports & Analytics Dropdown */}
             <div className="mt-2">

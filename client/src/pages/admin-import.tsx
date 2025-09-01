@@ -434,10 +434,10 @@ export default function AdminImport() {
               <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
             </button>
             <button
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 bg-purple-600 text-purple-600"
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 bg-purple-50 border-l-4 border-purple-600"
             >
-              <Upload className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
+              <Upload className="h-6 w-6 flex-shrink-0 text-purple-600" />
+              <span className="text-purple-600">{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
             </button>
             <button
               onClick={() => setLocation('/admin-dashboard/services')}
