@@ -42,6 +42,11 @@ export default function AdministrationAuthorization() {
   const [authReadUsersChecked, setAuthReadUsersChecked] = useState(false);
   const [authFullControlChecked, setAuthFullControlChecked] = useState(false);
   
+  // State for checkboxes - Vets Van Management section
+  const [vetsVanHiddenChecked, setVetsVanHiddenChecked] = useState(false);
+  const [vetsVanReadChecked, setVetsVanReadChecked] = useState(false);
+  const [vetsVanFullControlChecked, setVetsVanFullControlChecked] = useState(false);
+  
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
   
@@ -71,7 +76,7 @@ export default function AdministrationAuthorization() {
     queryKey: ['/api/admin/current-user-permissions'],
     retry: false,
     staleTime: 0, // Always fetch fresh permissions
-    cacheTime: 0, // Don't cache to avoid stale data
+    gcTime: 0, // Don't cache to avoid stale data (replaces cacheTime)
     refetchOnMount: true, // Always refetch when component mounts
     refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary calls
   });
@@ -81,7 +86,6 @@ export default function AdministrationAuthorization() {
     mutationFn: async (authData: any) => {
       return apiRequest('/api/admin/authorizations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(authData),
       });
     },
@@ -108,7 +112,6 @@ export default function AdministrationAuthorization() {
     mutationFn: async ({ id, authData }: { id: number; authData: any }) => {
       return apiRequest(`/api/admin/authorizations/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(authData),
       });
     },
@@ -140,6 +143,9 @@ export default function AdministrationAuthorization() {
     setAuthHiddenUsersChecked(false);
     setAuthReadUsersChecked(false);
     setAuthFullControlChecked(false);
+    setVetsVanHiddenChecked(false);
+    setVetsVanReadChecked(false);
+    setVetsVanFullControlChecked(false);
   };
 
   // Handle save authorization
@@ -161,6 +167,9 @@ export default function AdministrationAuthorization() {
       authHidden: authHiddenUsersChecked,
       authRead: authReadUsersChecked,
       authFullControl: authFullControlChecked,
+      vetsVanHidden: vetsVanHiddenChecked,
+      vetsVanRead: vetsVanReadChecked,
+      vetsVanFullControl: vetsVanFullControlChecked,
     };
 
     if (editingAuthorization) {
@@ -180,6 +189,9 @@ export default function AdministrationAuthorization() {
     setAuthHiddenUsersChecked(auth.authHidden);
     setAuthReadUsersChecked(auth.authRead);
     setAuthFullControlChecked(auth.authFullControl);
+    setVetsVanHiddenChecked(auth.vetsVanHidden || false);
+    setVetsVanReadChecked(auth.vetsVanRead || false);
+    setVetsVanFullControlChecked(auth.vetsVanFullControl || false);
     setShowAddAuthorizationPopup(true);
   };
 
@@ -242,6 +254,32 @@ export default function AdministrationAuthorization() {
     }
   };
 
+  // Handlers for Vets Van Management section
+  const handleVetsVanHiddenChange = (checked: boolean) => {
+    setVetsVanHiddenChecked(checked);
+    if (checked) {
+      // If Hidden is checked, uncheck and disable Read and Full Control
+      setVetsVanReadChecked(false);
+      setVetsVanFullControlChecked(false);
+    }
+  };
+
+  const handleVetsVanReadChange = (checked: boolean) => {
+    setVetsVanReadChecked(checked);
+    if (!checked) {
+      // If Read is unchecked, also uncheck Full Control
+      setVetsVanFullControlChecked(false);
+    }
+  };
+
+  const handleVetsVanFullControlChange = (checked: boolean) => {
+    setVetsVanFullControlChecked(checked);
+    if (checked) {
+      // If Full Control is checked, automatically check Read
+      setVetsVanReadChecked(true);
+    }
+  };
+
   // Check admin authentication
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
@@ -253,7 +291,7 @@ export default function AdministrationAuthorization() {
 
   // Route guard - redirect if user doesn't have permission to access Authorization page
   useEffect(() => {
-    if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden === true) {
+    if (!permissionsLoading && currentUserPermissions && (currentUserPermissions as any).authHidden === true) {
       // User should not reach this page with hidden permission, redirect immediately
       console.log('User has no authorization permission, redirecting');
       setLocation('/admin-dashboard');
@@ -261,7 +299,7 @@ export default function AdministrationAuthorization() {
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   // Determine if page is in read-only mode
-  const isReadOnly = currentUserPermissions && currentUserPermissions.authRead === true && !currentUserPermissions.authFullControl;
+  const isReadOnly = currentUserPermissions && (currentUserPermissions as any).authRead === true && !(currentUserPermissions as any).authFullControl;
 
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");
@@ -400,12 +438,12 @@ export default function AdministrationAuthorization() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={currentUserPermissions && currentUserPermissions.usersHidden === true ? undefined : (e) => {
+                    onClick={currentUserPermissions && (currentUserPermissions as any).usersHidden === true ? undefined : (e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       
                       // Sanity check log
-                      console.log('Users clicked - permissions loading:', permissionsLoading, 'hiddenUsers:', currentUserPermissions?.usersHidden, 'permissions:', currentUserPermissions);
+                      console.log('Users clicked - permissions loading:', permissionsLoading, 'hiddenUsers:', (currentUserPermissions as any)?.usersHidden, 'permissions:', currentUserPermissions);
                       
                       // If permissions are still loading, do nothing
                       if (permissionsLoading) {
@@ -420,7 +458,7 @@ export default function AdministrationAuthorization() {
                       }
                       
                       // Check for valid permissions (read or full control)
-                      if (currentUserPermissions && (currentUserPermissions.usersRead === true || currentUserPermissions.usersFullControl === true)) {
+                      if (currentUserPermissions && ((currentUserPermissions as any).usersRead === true || (currentUserPermissions as any).usersFullControl === true)) {
                         console.log('Permission granted (read or full control), navigating to users');
                         setLocation('/administration/users');
                       } else {
@@ -429,9 +467,9 @@ export default function AdministrationAuthorization() {
                         setShowNoPermissionPopup(true);
                       }
                     }}
-                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.usersHidden === true)}
+                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).usersHidden === true)}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.usersHidden === true)
+                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).usersHidden === true)
                         ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
                         : location === '/administration/users'
                           ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
@@ -443,12 +481,12 @@ export default function AdministrationAuthorization() {
                     {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                   <button
-                    onClick={currentUserPermissions && currentUserPermissions.authHidden === true ? undefined : (e) => {
+                    onClick={currentUserPermissions && (currentUserPermissions as any).authHidden === true ? undefined : (e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       
                       // Sanity check log
-                      console.log('Authorization clicked - permissions loading:', permissionsLoading, 'authHidden:', currentUserPermissions?.authHidden, 'permissions:', currentUserPermissions);
+                      console.log('Authorization clicked - permissions loading:', permissionsLoading, 'authHidden:', (currentUserPermissions as any)?.authHidden, 'permissions:', currentUserPermissions);
                       
                       // If permissions are still loading, do nothing
                       if (permissionsLoading) {
@@ -463,7 +501,7 @@ export default function AdministrationAuthorization() {
                       }
                       
                       // Check for valid permissions (read or full control)
-                      if (currentUserPermissions && (currentUserPermissions.authRead === true || currentUserPermissions.authFullControl === true)) {
+                      if (currentUserPermissions && ((currentUserPermissions as any).authRead === true || (currentUserPermissions as any).authFullControl === true)) {
                         console.log('Permission granted (read or full control), navigating to authorization');
                         setLocation('/administration/authorization');
                       } else {
@@ -472,9 +510,9 @@ export default function AdministrationAuthorization() {
                         setShowNoPermissionPopup(true);
                       }
                     }}
-                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.authHidden === true)}
+                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).authHidden === true)}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.authHidden === true)
+                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).authHidden === true)
                         ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
                         : location === '/administration/authorization'
                           ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
@@ -604,7 +642,7 @@ export default function AdministrationAuthorization() {
                         {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
                       </p>
                     </div>
-                  ) : authorizations.length === 0 ? (
+                  ) : (authorizations as any[]).length === 0 ? (
                     <div className="text-center py-12">
                       <Shield className="mx-auto h-12 w-12 text-gray-400" />
                       <h3 className="mt-2 text-sm font-medium text-gray-900">
@@ -618,7 +656,7 @@ export default function AdministrationAuthorization() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {authorizations.map((auth: any) => (
+                      {(authorizations as any[]).map((auth: any) => (
                         <div
                           key={auth.id}
                           className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
@@ -871,6 +909,67 @@ export default function AdministrationAuthorization() {
                         className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authHiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                       <label htmlFor="authFullControl" className={`ml-2 text-sm ${authHiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Vets Van Management Section */}
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
+                </h3>
+                
+                {/* Vets Van Management Section */}
+                <div className="ml-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                    {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
+                  </h4>
+                  
+                  {/* Permission Items */}
+                  <div className="ml-4 space-y-2">
+                    {/* Hidden Vets Van */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="vetsVanHidden"
+                        checked={vetsVanHiddenChecked}
+                        onChange={(e) => handleVetsVanHiddenChange(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="vetsVanHidden" className="ml-2 text-sm text-gray-600">
+                        No Permission
+                      </label>
+                    </div>
+                    
+                    {/* Read Vets Van */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="vetsVanRead"
+                        checked={vetsVanReadChecked}
+                        disabled={vetsVanHiddenChecked}
+                        onChange={(e) => handleVetsVanReadChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      />
+                      <label htmlFor="vetsVanRead" className={`ml-2 text-sm ${vetsVanHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Read
+                      </label>
+                    </div>
+                    
+                    {/* Full Control Vets Van */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="vetsVanFullControl"
+                        checked={vetsVanFullControlChecked}
+                        disabled={vetsVanHiddenChecked}
+                        onChange={(e) => handleVetsVanFullControlChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      />
+                      <label htmlFor="vetsVanFullControl" className={`ml-2 text-sm ${vetsVanHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
