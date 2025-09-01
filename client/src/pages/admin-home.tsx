@@ -60,7 +60,7 @@ export default function AdminHome() {
 
   // Monitor for new requests and update notification count - exact same logic as other admin pages
   useEffect(() => {
-    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
+    if (allVetsVanRequests && Array.isArray(allVetsVanRequests) && allVetsVanRequests.length > 0) {
       const currentCount = allVetsVanRequests.length;
       
       lastRequestCountRef.current = currentCount;
