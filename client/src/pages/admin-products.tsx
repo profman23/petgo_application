@@ -816,10 +816,10 @@ export default function AdminProducts() {
               <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
             </button>
             <button
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 bg-purple-600 text-purple-600"
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 bg-purple-50 border-l-4 border-purple-600"
             >
-              <Package className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
+              <Package className="h-6 w-6 flex-shrink-0 text-purple-600" />
+              <span className="text-purple-600">{language === 'ar' ? 'المنتجات' : 'Products'}</span>
             </button>
           </nav>
         </div>
