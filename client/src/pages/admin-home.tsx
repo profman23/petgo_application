@@ -22,6 +22,9 @@ export default function AdminHome() {
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
   const lastRequestCountRef = useRef(0);
 
+  // Get admin info for welcome message
+  const adminInfo = JSON.parse(localStorage.getItem("admin") || '{"username": "Admin"}');
+
   // Check admin authentication
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
@@ -274,18 +277,28 @@ export default function AdminHome() {
         {/* Main Content Area */}
         <div className="flex-1 p-6">
           <div className="max-w-4xl mx-auto">
-            {/* Welcome Section */}
+            {/* Welcome Message - Top Left */}
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                {language === 'ar' 
+                  ? `مرحباً ${adminInfo.username} إلى Vets Van` 
+                  : `Welcome ${adminInfo.username} to Vets Van`
+                }
+              </h1>
+            </div>
+
+            {/* Home Page Section */}
             <div className="text-center mb-8">
               <div className="flex justify-center mb-6">
                 <Home className="h-24 w-24 text-purple-600" />
               </div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
                 {language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}
-              </h1>
+              </h2>
               <p className="text-xl text-gray-600 mb-8">
                 {language === 'ar' 
-                  ? 'مرحباً بك في نظام إدارة VETS VAN' 
-                  : 'Welcome to VETS VAN Management System'
+                  ? 'نظام إدارة VETS VAN' 
+                  : 'VETS VAN Management System'
                 }
               </p>
             </div>
