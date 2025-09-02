@@ -407,12 +407,22 @@ export default function AdministrationUsers() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setLocation('/admin-dashboard');
+                if (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true) {
+                  setLocation('/admin-home');
+                } else {
+                  setLocation('/admin-dashboard');
+                }
               }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              disabled={permissionsLoading || !currentUserPermissions}
+              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
+                permissionsLoading || !currentUserPermissions
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
             >
               <Car className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
+              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
             </button>
             <button
               onClick={(e) => {

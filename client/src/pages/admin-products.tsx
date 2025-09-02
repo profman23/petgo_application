@@ -736,10 +736,10 @@ export default function AdminProducts() {
             </div>
             
             <button
-              onClick={currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true ? undefined : () => setLocation('/admin-dashboard')}
-              disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true)}
+              onClick={currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}
+              disabled={permissionsLoading || !currentUserPermissions}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
-                permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true)
+                permissionsLoading || !currentUserPermissions
                   ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}

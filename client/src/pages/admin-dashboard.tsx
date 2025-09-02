@@ -1909,16 +1909,24 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                setActiveTab('management');
+                if (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true) {
+                  setLocation('/admin-home');
+                } else {
+                  setActiveTab('management');
+                }
               }}
+              disabled={permissionsLoading || !currentUserPermissions}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
-                activeTab === 'management'
-                  ? 'bg-purple-50 border-l-4 border-purple-600'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                permissionsLoading || !currentUserPermissions
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                  : activeTab === 'management'
+                    ? 'bg-purple-50 border-l-4 border-purple-600'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
               <Car className={`h-6 w-6 flex-shrink-0 ${activeTab === 'management' ? 'text-purple-600' : ''}`} />
               <span className={activeTab === 'management' ? 'text-purple-600' : ''}>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
+              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
             </button>
             <button
               onClick={(e) => {
