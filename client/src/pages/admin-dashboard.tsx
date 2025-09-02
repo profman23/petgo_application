@@ -1110,6 +1110,50 @@ export default function AdminDashboard() {
     localStorage.removeItem("adminToken");
   }
 
+  // Fetch current user permissions
+  const { data: currentUserPermissions, isLoading: permissionsLoading } = useQuery({
+    queryKey: ["/api/admin/current-user-permissions"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/current-user-permissions", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch permissions");
+      return response.json();
+    },
+    enabled: !!adminToken,
+  });
+
+  // Handle Users navigation with permission check
+  const handleUsersNavigation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Check if user has permission to access Users
+    if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
+      // Show popup message
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access Users.",
+        variant: "destructive",
+      });
+
+      // Check current location to determine navigation behavior
+      const currentPath = window.location.pathname;
+      
+      // If not on admin-home, redirect to admin-home
+      if (currentPath !== '/admin-home') {
+        setLocation('/admin-home');
+      }
+      // If already on admin-home, do nothing (just show the popup)
+      return;
+    }
+
+    // User has permission, proceed with normal navigation
+    setLocation('/administration/users');
+  };
+
   // Fetch drivers
   const { data: drivers, isLoading, refetch: refetchDrivers } = useQuery({
     queryKey: ["/api/admin/drivers"],
@@ -1880,11 +1924,7 @@ export default function AdminDashboard() {
               {effectiveAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/administration/users');
-                    }}
+                    onClick={handleUsersNavigation}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <User className="h-5 w-5 flex-shrink-0" />

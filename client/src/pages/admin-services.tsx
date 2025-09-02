@@ -718,6 +718,35 @@ export default function AdminServices() {
     }
   }, [allVetsVanRequests]);
 
+  // Import toast at component level
+  const { toast } = useToast();
+
+  // Handle Users navigation with permission check
+  const handleUsersNavigation = () => {
+    // Check if user has permission to access Users
+    if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
+      // Show popup message
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access Users.",
+        variant: "destructive",
+      });
+
+      // Check current location to determine navigation behavior
+      const currentPath = window.location.pathname;
+      
+      // If not on admin-home, redirect to admin-home
+      if (currentPath !== '/admin-home') {
+        setLocation('/admin-home');
+      }
+      // If already on admin-home, do nothing (just show the popup)
+      return;
+    }
+
+    // User has permission, proceed with normal navigation
+    setLocation('/administration/users');
+  };
+
   return (
     <div 
       className="min-h-screen bg-gray-50"
@@ -819,7 +848,7 @@ export default function AdminServices() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => setLocation('/administration/users')}
+                    onClick={handleUsersNavigation}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <User className="h-5 w-5 flex-shrink-0" />
