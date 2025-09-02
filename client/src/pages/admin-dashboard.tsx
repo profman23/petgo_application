@@ -1898,12 +1898,22 @@ export default function AdminDashboard() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      setLocation('/administration/users');
+                      if (currentUserPermissions && (currentUserPermissions as any).hiddenUsers === true) {
+                        setLocation('/admin-home');
+                      } else {
+                        setLocation('/administration/users');
+                      }
                     }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    disabled={permissionsLoading || !currentUserPermissions}
+                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
+                      permissionsLoading || !currentUserPermissions
+                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+                    }`}
                   >
                     <User className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                   <button
                     onClick={(e) => {
