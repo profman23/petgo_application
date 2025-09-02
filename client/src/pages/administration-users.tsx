@@ -64,17 +64,23 @@ export default function AdministrationUsers() {
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
-  // Route guard - redirect silently if user doesn't have permission to access Users page
+  // Route guard - show permission modal and redirect if user doesn't have permission
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
-      // User should not reach this page with hidden permission, redirect immediately
-      // Use setTimeout to ensure redirect happens after component mount
+      // Show permission denied message
+      toast({
+        title: language === 'ar' ? 'لا يسمح بالوصول' : 'Access Denied',
+        description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى هذه الصفحة' : 'You do not have permission to access this page.',
+        variant: 'destructive',
+      });
+      
+      // Redirect after showing the message
       setTimeout(() => {
         setLocation('/admin-home');
-      }, 0);
+      }, 1500);
       return;
     }
-  }, [currentUserPermissions, permissionsLoading, setLocation]);
+  }, [currentUserPermissions, permissionsLoading, setLocation, toast, language]);
 
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");

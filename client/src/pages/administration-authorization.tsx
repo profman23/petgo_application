@@ -90,17 +90,23 @@ export default function AdministrationAuthorization() {
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
-  // Route guard - redirect silently if user doesn't have permission to access Authorization page
+  // Route guard - show permission modal and redirect if user doesn't have permission
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden) {
-      // User should not reach this page with hidden permission, redirect immediately
-      // Use setTimeout to ensure redirect happens after component mount
+      // Show permission denied message
+      toast({
+        title: language === 'ar' ? 'لا يسمح بالوصول' : 'Access Denied',
+        description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى هذه الصفحة' : 'You do not have permission to access this page.',
+        variant: 'destructive',
+      });
+      
+      // Redirect after showing the message
       setTimeout(() => {
         setLocation('/admin-home');
-      }, 0);
+      }, 1500);
       return;
     }
-  }, [currentUserPermissions, permissionsLoading, setLocation]);
+  }, [currentUserPermissions, permissionsLoading, setLocation, toast, language]);
 
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
