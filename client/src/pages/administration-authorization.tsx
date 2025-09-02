@@ -56,6 +56,15 @@ export default function AdministrationAuthorization() {
   // Query client for cache invalidation
   const queryClient = useQueryClient();
 
+  // Check admin authentication
+  useEffect(() => {
+    const adminToken = localStorage.getItem("adminToken");
+    if (!adminToken) {
+      setLocation("/admin-login");
+      return;
+    }
+  }, [setLocation]);
+
   // Fetch authorizations from API
   const {
     data: authorizations = [],
@@ -76,16 +85,24 @@ export default function AdministrationAuthorization() {
     queryKey: ['/api/admin/current-user-permissions'],
     retry: false,
     staleTime: 0, // Always fetch fresh permissions
-    gcTime: 0, // Don't cache to avoid stale data (replaces cacheTime)
+    cacheTime: 0, // Don't cache to avoid stale data
     refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary calls
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
   // Route guard - redirect silently if user doesn't have permission to access Authorization page
   useEffect(() => {
+    // Debug logging to identify the issue
+    console.log('🔍 Authorization page permission check:', {
+      permissionsLoading,
+      hasPermissions: !!currentUserPermissions,
+      authHidden: currentUserPermissions?.authHidden,
+      fullPermissions: currentUserPermissions
+    });
+    
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden) {
       // User should not reach this page with hidden permission, redirect immediately
-      console.log('User has no authorization permission, redirecting to home page');
+      console.log('🚫 User has no authorization permission, redirecting to home page');
       setLocation('/admin-home');
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
