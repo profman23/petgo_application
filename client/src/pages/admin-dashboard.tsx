@@ -1918,7 +1918,7 @@ export default function AdminDashboard() {
               }`}
             >
               <Car className={`h-6 w-6 flex-shrink-0 ${activeTab === 'management' ? 'text-purple-600' : ''}`} />
-              <span className={activeTab === 'management' ? 'text-purple-600' : ''}>{language === 'ar' ? 'إدارة VETS VAN' : 'Vetsvan Management'}</span>
+              <span className={activeTab === 'management' ? 'text-purple-600' : ''}>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
             </button>
             <button
               onClick={(e) => {
