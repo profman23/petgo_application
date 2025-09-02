@@ -4,7 +4,6 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp, ChevronLeft, ChevronRight, Plus, AlertTriangle, Save, Home } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -699,7 +698,6 @@ export default function AdminDashboard() {
   }); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
-  const [showPermissionModal, setShowPermissionModal] = useState(false);
   // Administration menu state - persist across navigation
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
     const savedState = localStorage.getItem('isAdministrationExpanded');
@@ -1111,46 +1109,6 @@ export default function AdminDashboard() {
     localStorage.removeItem("admin");
     localStorage.removeItem("adminToken");
   }
-
-  // Fetch current user permissions
-  const { data: currentUserPermissions, isLoading: permissionsLoading } = useQuery({
-    queryKey: ["/api/admin/current-user-permissions"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/current-user-permissions", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch permissions");
-      return response.json();
-    },
-    enabled: !!adminToken,
-  });
-
-  // Handle Users navigation with permission check
-  const handleUsersNavigation = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Check if user has permission to access Users
-    if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
-      // Show modal popup
-      setShowPermissionModal(true);
-
-      // Check current location to determine navigation behavior
-      const currentPath = window.location.pathname;
-      
-      // If not on admin-home, redirect to admin-home
-      if (currentPath !== '/admin-home') {
-        setLocation('/admin-home');
-      }
-      // If already on admin-home, do nothing (just show the popup)
-      return;
-    }
-
-    // User has permission, proceed with normal navigation
-    setLocation('/administration/users');
-  };
 
   // Fetch drivers
   const { data: drivers, isLoading, refetch: refetchDrivers } = useQuery({
@@ -1922,7 +1880,11 @@ export default function AdminDashboard() {
               {effectiveAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={handleUsersNavigation}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/administration/users');
+                    }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <User className="h-5 w-5 flex-shrink-0" />
@@ -3817,14 +3779,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-
-      {/* Permission Denied Modal */}
-      <PermissionDeniedModal
-        isOpen={showPermissionModal}
-        onClose={() => setShowPermissionModal(false)}
-        title="Access Denied"
-        description="You do not have permission to access Users."
-      />
     </div>
   );
 }

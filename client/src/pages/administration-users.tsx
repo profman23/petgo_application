@@ -6,7 +6,6 @@ import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, P
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 export default function AdministrationUsers() {
@@ -32,7 +31,6 @@ export default function AdministrationUsers() {
   const [showCreateUserPopup, setShowCreateUserPopup] = useState(false);
   const [showNoPermissionPopup, setShowNoPermissionPopup] = useState(false);
   const [isNoPermissionDialogOpen, setIsNoPermissionDialogOpen] = useState(false);
-  const [showPermissionModal, setShowPermissionModal] = useState(false);
   
   // Form state
   const [firstName, setFirstName] = useState('');
@@ -890,13 +888,6 @@ export default function AdministrationUsers() {
         </div>
       )}
 
-      {/* Permission Denied Modal */}
-      <PermissionDeniedModal
-        isOpen={showPermissionModal}
-        onClose={() => setShowPermissionModal(false)}
-        title="Access Denied"
-        description="You do not have permission to access Users."
-      />
     </div>
   );
 }
