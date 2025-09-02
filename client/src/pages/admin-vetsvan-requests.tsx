@@ -53,6 +53,21 @@ export default function AdminVetsVanRequests() {
   // Admin token for API calls
   const adminToken = localStorage.getItem("adminToken");
 
+  // Fetch current user permissions
+  const { data: currentUserPermissions, isLoading: permissionsLoading } = useQuery({
+    queryKey: ["/api/admin/current-user-permissions"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/current-user-permissions", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch permissions");
+      return response.json();
+    },
+    enabled: !!adminToken,
+  });
+
   // Authentication check - redirect if not admin
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");

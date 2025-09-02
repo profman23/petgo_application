@@ -1110,6 +1110,21 @@ export default function AdminDashboard() {
     localStorage.removeItem("adminToken");
   }
 
+  // Fetch current user permissions
+  const { data: currentUserPermissions, isLoading: permissionsLoading } = useQuery({
+    queryKey: ["/api/admin/current-user-permissions"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/current-user-permissions", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch permissions");
+      return response.json();
+    },
+    enabled: !!adminToken,
+  });
+
   // Fetch drivers
   const { data: drivers, isLoading, refetch: refetchDrivers } = useQuery({
     queryKey: ["/api/admin/drivers"],
