@@ -64,36 +64,14 @@ export default function AdministrationUsers() {
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
-  // Route guard - show permission modal and redirect if user doesn't have permission
+  // Route guard - redirect silently if user doesn't have permission to access Users page
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
-      // Show permission denied message
-      toast({
-        title: language === 'ar' ? 'لا يسمح بالوصول' : 'Access Denied',
-        description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى هذه الصفحة' : 'You do not have permission to access this page.',
-        variant: 'destructive',
-      });
-      
-      // Redirect after showing the message
-      setTimeout(() => {
-        setLocation('/admin-home');
-      }, 1500);
-      return;
+      // User should not reach this page with hidden permission, redirect immediately
+      console.log('User has no users permission, redirecting to dashboard');
+      setLocation('/admin-dashboard');
     }
-  }, [currentUserPermissions, permissionsLoading, setLocation, toast, language]);
-
-  // Early return to prevent page rendering during permission check or when access is denied
-  if (permissionsLoading || (currentUserPermissions && currentUserPermissions.usersHidden) || !localStorage.getItem("adminToken")) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg font-medium text-gray-900">
-            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");

@@ -56,49 +56,6 @@ export default function VetsVanShifts() {
     }
   }, [setLocation, toast, language]);
 
-  // Fetch current user's permissions for Vets Van Management access control
-  const {
-    data: currentUserPermissions,
-    isLoading: permissionsLoading,
-  } = useQuery({
-    queryKey: ['/api/admin/current-user-permissions'],
-    retry: false,
-    staleTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: false,
-  });
-
-  // Route guard - show permission modal and redirect if user doesn't have permission
-  useEffect(() => {
-    if (!permissionsLoading && currentUserPermissions && currentUserPermissions.vetsVanHidden) {
-      // Show permission denied message
-      toast({
-        title: language === 'ar' ? 'لا يسمح بالوصول' : 'Access Denied',
-        description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى هذه الصفحة' : 'You do not have permission to access this page.',
-        variant: 'destructive',
-      });
-      
-      // Redirect after showing the message
-      setTimeout(() => {
-        setLocation('/admin-home');
-      }, 1500);
-      return;
-    }
-  }, [currentUserPermissions, permissionsLoading, setLocation, toast, language]);
-
-  // Early return to prevent page rendering during permission check or when access is denied
-  if (permissionsLoading || (currentUserPermissions && currentUserPermissions.vetsVanHidden) || !localStorage.getItem("adminToken")) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg font-medium text-gray-900">
-            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const adminToken = localStorage.getItem("adminToken");
   
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {

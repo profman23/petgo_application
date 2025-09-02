@@ -56,15 +56,6 @@ export default function AdministrationAuthorization() {
   // Query client for cache invalidation
   const queryClient = useQueryClient();
 
-  // Check admin authentication
-  useEffect(() => {
-    const adminToken = localStorage.getItem("adminToken");
-    if (!adminToken) {
-      setLocation("/admin-login");
-      return;
-    }
-  }, [setLocation]);
-
   // Fetch authorizations from API
   const {
     data: authorizations = [],
@@ -85,41 +76,10 @@ export default function AdministrationAuthorization() {
     queryKey: ['/api/admin/current-user-permissions'],
     retry: false,
     staleTime: 0, // Always fetch fresh permissions
-    cacheTime: 0, // Don't cache to avoid stale data
+    gcTime: 0, // Don't cache to avoid stale data (replaces cacheTime)
     refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary calls
   });
-
-  // Route guard - show permission modal and redirect if user doesn't have permission
-  useEffect(() => {
-    if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden) {
-      // Show permission denied message
-      toast({
-        title: language === 'ar' ? 'لا يسمح بالوصول' : 'Access Denied',
-        description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى هذه الصفحة' : 'You do not have permission to access this page.',
-        variant: 'destructive',
-      });
-      
-      // Redirect after showing the message
-      setTimeout(() => {
-        setLocation('/admin-home');
-      }, 1500);
-      return;
-    }
-  }, [currentUserPermissions, permissionsLoading, setLocation, toast, language]);
-
-  // Early return to prevent page rendering during permission check or when access is denied
-  if (permissionsLoading || (currentUserPermissions && currentUserPermissions.authHidden) || permissionsError) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-lg font-medium text-gray-900">
-            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
