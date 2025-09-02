@@ -364,33 +364,10 @@ export default function AdministrationUsers() {
                     <span className="text-purple-600">{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
-                    onClick={currentUserPermissions && currentUserPermissions.authHidden === true ? undefined : (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      
-                      // If permissions are still loading, do nothing
-                      if (permissionsLoading) {
-                        return;
-                      }
-                      
-                      // If dialog is already open, do nothing
-                      if (isNoPermissionDialogOpen) {
-                        return;
-                      }
-                      
-                      // Check for valid permissions (read or full control)
-                      if (currentUserPermissions && (currentUserPermissions.authRead === true || currentUserPermissions.authFullControl === true)) {
-                        console.log('Permission granted (read or full control), navigating to authorization');
-                        setLocation('/administration/authorization');
-                      } else {
-                        console.log('No valid permission for authorization');
-                        setIsNoPermissionDialogOpen(true);
-                        setShowNoPermissionPopup(true);
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.authHidden === true)}
+                    onClick={currentUserPermissions && currentUserPermissions.authHidden === true ? () => setLocation('/admin-home') : () => setLocation('/administration/authorization')}
+                    disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && currentUserPermissions.authHidden === true)
+                      permissionsLoading || !currentUserPermissions
                         ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
                         : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
                     }`}
