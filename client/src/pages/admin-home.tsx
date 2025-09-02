@@ -343,17 +343,7 @@ export default function AdminHome() {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 {language === 'ar' ? 'إجراءات سريعة' : 'Quick Actions'}
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <button
-                  onClick={() => setLocation('/admin-dashboard')}
-                  className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <BarChart3 className="h-8 w-8 text-purple-600 mb-2" />
-                  <span className="text-sm font-medium text-gray-900">
-                    {language === 'ar' ? 'لوحة التحكم' : 'Dashboard'}
-                  </span>
-                </button>
-
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <button
                   onClick={() => setLocation('/vets-van-shifts')}
                   className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
