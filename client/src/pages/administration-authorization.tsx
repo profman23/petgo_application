@@ -47,8 +47,8 @@ export default function AdministrationAuthorization() {
   const [vetsVanReadChecked, setVetsVanReadChecked] = useState(false);
   const [vetsVanFullControlChecked, setVetsVanFullControlChecked] = useState(false);
   
-  // State for radio buttons - Vets Van Shifts section
-  const [vetsVanShiftsPermission, setVetsVanShiftsPermission] = useState('noPermission');
+  // State for checkboxes - Vets Van Shifts section (single-select behavior)
+  const [vetsVanShiftsPermission, setVetsVanShiftsPermission] = useState('none');
   
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
@@ -804,11 +804,14 @@ export default function AdministrationAuthorization() {
                 />
               </div>
               
-              {/* Administration Tab */}
+              {/* Administration Tab with Scrollable Container */}
               <div className="mb-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-2">
                   {language === 'ar' ? 'الإدارة' : 'Administration'}
                 </h3>
+                
+                {/* Scrollable permissions container */}
+                <div className="max-h-[70vh] overflow-y-auto pr-2">
                 
                 {/* Users Section */}
                 <div className="ml-4">
@@ -987,18 +990,16 @@ export default function AdministrationAuthorization() {
                     {language === 'ar' ? 'ورديات VETS VAN' : 'Vets Van Shifts'}
                   </h4>
                   
-                  {/* Permission Items as Radio Buttons */}
+                  {/* Permission Items as Checkboxes with single-select behavior */}
                   <div className="ml-4 space-y-2">
                     {/* No Permission */}
                     <div className="flex items-center">
                       <input
-                        type="radio"
+                        type="checkbox"
                         id="vetsVanShiftsNoPermission"
-                        name="vetsVanShifts"
-                        value="noPermission"
                         checked={vetsVanShiftsPermission === 'noPermission'}
-                        onChange={(e) => setVetsVanShiftsPermission(e.target.value)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                        onChange={(e) => setVetsVanShiftsPermission(e.target.checked ? 'noPermission' : 'none')}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="vetsVanShiftsNoPermission" className="ml-2 text-sm text-gray-600">
                         No Permission
@@ -1008,13 +1009,11 @@ export default function AdministrationAuthorization() {
                     {/* Read */}
                     <div className="flex items-center">
                       <input
-                        type="radio"
+                        type="checkbox"
                         id="vetsVanShiftsRead"
-                        name="vetsVanShifts"
-                        value="read"
                         checked={vetsVanShiftsPermission === 'read'}
-                        onChange={(e) => setVetsVanShiftsPermission(e.target.value)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                        onChange={(e) => setVetsVanShiftsPermission(e.target.checked ? 'read' : 'none')}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="vetsVanShiftsRead" className="ml-2 text-sm text-gray-600">
                         Read
@@ -1024,13 +1023,11 @@ export default function AdministrationAuthorization() {
                     {/* Full Control */}
                     <div className="flex items-center">
                       <input
-                        type="radio"
+                        type="checkbox"
                         id="vetsVanShiftsFullControl"
-                        name="vetsVanShifts"
-                        value="fullControl"
                         checked={vetsVanShiftsPermission === 'fullControl'}
-                        onChange={(e) => setVetsVanShiftsPermission(e.target.value)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                        onChange={(e) => setVetsVanShiftsPermission(e.target.checked ? 'fullControl' : 'none')}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="vetsVanShiftsFullControl" className="ml-2 text-sm text-gray-600">
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
@@ -1039,6 +1036,7 @@ export default function AdministrationAuthorization() {
                   </div>
                 </div>
               </div>
+                </div>
             </div>
             
             {/* Popup Footer */}
