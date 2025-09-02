@@ -277,23 +277,24 @@ export default function AdminHome() {
 
         {/* Main Content Area */}
         <div className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto">
-            {/* Welcome Message - Top Left with Image */}
-            <div className="mb-8">
-              <div className="flex items-center gap-4">
-                <img 
-                  src={welcomeImage} 
-                  alt="Welcome Background" 
-                  className="w-16 h-16 object-cover rounded-lg shadow-md"
-                />
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {language === 'ar' 
-                    ? `مرحباً ${adminInfo.username} إلى Vets Van` 
-                    : `Welcome ${adminInfo.username} to Vets Van`
-                  }
-                </h1>
-              </div>
+          {/* Welcome Message - Far Left Aligned */}
+          <div className="mb-8">
+            <div className="flex items-center gap-4">
+              <img 
+                src={welcomeImage} 
+                alt="Welcome Background" 
+                className="w-16 h-16 object-cover rounded-lg shadow-md"
+              />
+              <h1 className="text-2xl font-bold text-gray-900">
+                {language === 'ar' 
+                  ? `مرحباً ${adminInfo.username} إلى Vets Van` 
+                  : `Welcome ${adminInfo.username} to Vets Van`
+                }
+              </h1>
             </div>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
 
             {/* Home Page Section */}
             <div className="text-center mb-8">
