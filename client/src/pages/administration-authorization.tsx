@@ -81,6 +81,15 @@ export default function AdministrationAuthorization() {
     refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary calls
   });
 
+  // Route guard - redirect silently if user doesn't have permission to access Authorization page
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden) {
+      // User should not reach this page with hidden permission, redirect immediately
+      console.log('User has no authorization permission, redirecting to home page');
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
+
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
     mutationFn: async (authData: any) => {

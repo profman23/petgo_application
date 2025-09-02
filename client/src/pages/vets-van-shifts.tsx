@@ -56,6 +56,27 @@ export default function VetsVanShifts() {
     }
   }, [setLocation, toast, language]);
 
+  // Fetch current user's permissions for Vets Van Management access control
+  const {
+    data: currentUserPermissions,
+    isLoading: permissionsLoading,
+  } = useQuery({
+    queryKey: ['/api/admin/current-user-permissions'],
+    retry: false,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
+
+  // Route guard - redirect silently if user doesn't have permission to access Vets Van Management
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions && currentUserPermissions.vetsVanHidden) {
+      // User should not reach this page with hidden permission, redirect immediately
+      console.log('User has no vets van management permission, redirecting to home page');
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
+
   const adminToken = localStorage.getItem("adminToken");
   
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
