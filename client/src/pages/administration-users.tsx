@@ -66,10 +66,18 @@ export default function AdministrationUsers() {
 
   // Route guard - redirect silently if user doesn't have permission to access Users page
   useEffect(() => {
+    console.log('🔍 Users permission check:', {
+      permissionsLoading,
+      hasPermissions: !!currentUserPermissions,
+      usersHidden: currentUserPermissions?.usersHidden,
+      attempting_redirect: !permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden
+    });
+    
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
       // User should not reach this page with hidden permission, redirect immediately
-      console.log('User has no users permission, redirecting to home page');
+      console.log('🚫 USERS: Redirecting to /admin-home due to usersHidden=true');
       setLocation('/admin-home');
+      return; // Prevent further execution
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
