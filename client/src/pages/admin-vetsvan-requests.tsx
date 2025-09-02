@@ -94,6 +94,32 @@ export default function AdminVetsVanRequests() {
     setLocation('/administration/users');
   };
 
+  // Handle Authorization navigation with permission check
+  const handleAuthorizationNavigation = () => {
+    // Check if user has permission to access Authorization
+    if (currentUserPermissions && (currentUserPermissions as any).authorizationHidden === true) {
+      // Show popup message
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access Authorization.",
+        variant: "destructive",
+      });
+
+      // Check current location to determine navigation behavior
+      const currentPath = window.location.pathname;
+      
+      // If not on admin-home, redirect to admin-home
+      if (currentPath !== '/admin-home') {
+        setLocation('/admin-home');
+      }
+      // If already on admin-home, do nothing (just show the popup)
+      return;
+    }
+
+    // User has permission, proceed with normal navigation
+    setLocation('/administration/authorization');
+  };
+
   // Authentication check - redirect if not admin
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
@@ -414,7 +440,7 @@ export default function AdminVetsVanRequests() {
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
-                    onClick={() => setLocation('/administration/authorization')}
+                    onClick={handleAuthorizationNavigation}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <Shield className="h-5 w-5 flex-shrink-0" />
