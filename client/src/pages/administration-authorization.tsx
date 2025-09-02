@@ -108,6 +108,19 @@ export default function AdministrationAuthorization() {
     }
   }, [currentUserPermissions, permissionsLoading, setLocation, toast, language]);
 
+  // Early return to prevent page rendering during permission check or when access is denied
+  if (permissionsLoading || (currentUserPermissions && currentUserPermissions.authHidden) || permissionsError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium text-gray-900">
+            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
     mutationFn: async (authData: any) => {

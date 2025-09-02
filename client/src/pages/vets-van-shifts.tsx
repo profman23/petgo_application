@@ -86,6 +86,19 @@ export default function VetsVanShifts() {
     }
   }, [currentUserPermissions, permissionsLoading, setLocation, toast, language]);
 
+  // Early return to prevent page rendering during permission check or when access is denied
+  if (permissionsLoading || (currentUserPermissions && currentUserPermissions.vetsVanHidden) || !localStorage.getItem("adminToken")) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-lg font-medium text-gray-900">
+            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const adminToken = localStorage.getItem("adminToken");
   
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
