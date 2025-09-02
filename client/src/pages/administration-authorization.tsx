@@ -47,6 +47,9 @@ export default function AdministrationAuthorization() {
   const [vetsVanReadChecked, setVetsVanReadChecked] = useState(false);
   const [vetsVanFullControlChecked, setVetsVanFullControlChecked] = useState(false);
   
+  // State for radio buttons - Vets Van Shifts section
+  const [vetsVanShiftsPermission, setVetsVanShiftsPermission] = useState('noPermission');
+  
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
   
@@ -970,6 +973,66 @@ export default function AdministrationAuthorization() {
                         className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                       <label htmlFor="vetsVanFullControl" className={`ml-2 text-sm ${vetsVanHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Vets Van Shifts Section */}
+              <div className="mb-4">
+                <div className="ml-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                    {language === 'ar' ? 'ورديات VETS VAN' : 'Vets Van Shifts'}
+                  </h4>
+                  
+                  {/* Permission Items as Radio Buttons */}
+                  <div className="ml-4 space-y-2">
+                    {/* No Permission */}
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        id="vetsVanShiftsNoPermission"
+                        name="vetsVanShifts"
+                        value="noPermission"
+                        checked={vetsVanShiftsPermission === 'noPermission'}
+                        onChange={(e) => setVetsVanShiftsPermission(e.target.value)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                      />
+                      <label htmlFor="vetsVanShiftsNoPermission" className="ml-2 text-sm text-gray-600">
+                        No Permission
+                      </label>
+                    </div>
+                    
+                    {/* Read */}
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        id="vetsVanShiftsRead"
+                        name="vetsVanShifts"
+                        value="read"
+                        checked={vetsVanShiftsPermission === 'read'}
+                        onChange={(e) => setVetsVanShiftsPermission(e.target.value)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                      />
+                      <label htmlFor="vetsVanShiftsRead" className="ml-2 text-sm text-gray-600">
+                        Read
+                      </label>
+                    </div>
+                    
+                    {/* Full Control */}
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        id="vetsVanShiftsFullControl"
+                        name="vetsVanShifts"
+                        value="fullControl"
+                        checked={vetsVanShiftsPermission === 'fullControl'}
+                        onChange={(e) => setVetsVanShiftsPermission(e.target.value)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500"
+                      />
+                      <label htmlFor="vetsVanShiftsFullControl" className="ml-2 text-sm text-gray-600">
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
