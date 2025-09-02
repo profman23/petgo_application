@@ -92,17 +92,8 @@ export default function AdministrationAuthorization() {
 
   // Route guard - redirect silently if user doesn't have permission to access Authorization page
   useEffect(() => {
-    // Debug logging to identify the issue
-    console.log('🔍 Authorization page permission check:', {
-      permissionsLoading,
-      hasPermissions: !!currentUserPermissions,
-      authHidden: currentUserPermissions?.authHidden,
-      fullPermissions: currentUserPermissions
-    });
-    
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden) {
       // User should not reach this page with hidden permission, redirect immediately
-      console.log('🚫 User has no authorization permission, redirecting to home page');
       setLocation('/admin-home');
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
