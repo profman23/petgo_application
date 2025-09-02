@@ -68,8 +68,8 @@ export default function AdministrationUsers() {
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
       // User should not reach this page with hidden permission, redirect immediately
-      console.log('User has no users permission, redirecting to dashboard');
-      setLocation('/admin-dashboard');
+      console.log('User has no users permission, redirecting to home page');
+      setLocation('/admin-home');
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
