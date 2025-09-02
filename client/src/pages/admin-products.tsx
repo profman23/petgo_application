@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Upload, Stethoscope, Package, Users, User, Shield, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     nameAr: '',
     price: ''
   });
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   const { data: products, isLoading, refetch } = useQuery({
     queryKey: ['/api/admin/products'],
@@ -624,12 +626,8 @@ export default function AdminProducts() {
   const handleUsersNavigation = () => {
     // Check if user has permission to access Users
     if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
-      // Show popup message
-      toast({
-        title: "Access Denied",
-        description: "You do not have permission to access Users.",
-        variant: "destructive",
-      });
+      // Show modal popup
+      setShowPermissionModal(true);
 
       // Check current location to determine navigation behavior
       const currentPath = window.location.pathname;
@@ -644,32 +642,6 @@ export default function AdminProducts() {
 
     // User has permission, proceed with normal navigation
     setLocation('/administration/users');
-  };
-
-  // Handle Authorization navigation with permission check
-  const handleAuthorizationNavigation = () => {
-    // Check if user has permission to access Authorization
-    if (currentUserPermissions && (currentUserPermissions as any).authorizationHidden === true) {
-      // Show popup message
-      toast({
-        title: "Access Denied",
-        description: "You do not have permission to access Authorization.",
-        variant: "destructive",
-      });
-
-      // Check current location to determine navigation behavior
-      const currentPath = window.location.pathname;
-      
-      // If not on admin-home, redirect to admin-home
-      if (currentPath !== '/admin-home') {
-        setLocation('/admin-home');
-      }
-      // If already on admin-home, do nothing (just show the popup)
-      return;
-    }
-
-    // User has permission, proceed with normal navigation
-    setLocation('/administration/authorization');
   };
 
   return (
@@ -780,7 +752,7 @@ export default function AdminProducts() {
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
-                    onClick={handleAuthorizationNavigation}
+                    onClick={() => setLocation('/administration/authorization')}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <Shield className="h-5 w-5 flex-shrink-0" />
@@ -888,6 +860,14 @@ export default function AdminProducts() {
           </div>
         </div>
       </div>
+
+      {/* Permission Denied Modal */}
+      <PermissionDeniedModal
+        isOpen={showPermissionModal}
+        onClose={() => setShowPermissionModal(false)}
+        title="Access Denied"
+        description="You do not have permission to access Users."
+      />
     </div>
   );
 }

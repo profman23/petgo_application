@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { apiRequest } from "@/lib/queryClient";
@@ -79,6 +80,7 @@ export default function VetsVanShifts() {
     const savedState = localStorage.getItem('isAdministrationExpanded');
     return savedState !== null ? JSON.parse(savedState) : false;
   });
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
   
   // State for tracking notifications and audio - matches admin dashboard
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -102,32 +104,6 @@ export default function VetsVanShifts() {
       setCurrentRequestCount(currentCount);
     }
   }, [allVetsVanRequests]);
-
-  // Handle Authorization navigation with permission check
-  const handleAuthorizationNavigation = () => {
-    // Check if user has permission to access Authorization
-    if (currentUserPermissions && (currentUserPermissions as any).authorizationHidden === true) {
-      // Show popup message
-      toast({
-        title: "Access Denied",
-        description: "You do not have permission to access Authorization.",
-        variant: "destructive",
-      });
-
-      // Check current location to determine navigation behavior
-      const currentPath = window.location.pathname;
-      
-      // If not on admin-home, redirect to admin-home
-      if (currentPath !== '/admin-home') {
-        setLocation('/admin-home');
-      }
-      // If already on admin-home, do nothing (just show the popup)
-      return;
-    }
-
-    // User has permission, proceed with normal navigation
-    setLocation('/administration/authorization');
-  };
 
   // تحديد نطاق التواريخ للعرض (7 أيام من بداية الأسبوع)
   const getDateRange = () => {
@@ -489,7 +465,7 @@ export default function VetsVanShifts() {
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
-                    onClick={handleAuthorizationNavigation}
+                    onClick={() => setLocation('/administration/authorization')}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <Shield className="h-5 w-5 flex-shrink-0" />
@@ -807,6 +783,14 @@ export default function VetsVanShifts() {
           </div>
         </div>
       </div>
+
+      {/* Permission Denied Modal */}
+      <PermissionDeniedModal
+        isOpen={showPermissionModal}
+        onClose={() => setShowPermissionModal(false)}
+        title="Access Denied"
+        description="You do not have permission to access Users."
+      />
     </div>
   );
 }

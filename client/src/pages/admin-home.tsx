@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { LogOut, Bell, Volume2, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home, Upload } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
@@ -21,6 +22,7 @@ export default function AdminHome() {
     return saved ? JSON.parse(saved) : false;
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
   const lastRequestCountRef = useRef(0);
 
   // Get admin info for welcome message
@@ -72,12 +74,8 @@ export default function AdminHome() {
   const handleUsersNavigation = () => {
     // Check if user has permission to access Users
     if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
-      // Show popup message
-      toast({
-        title: "Access Denied",
-        description: "You do not have permission to access Users.",
-        variant: "destructive",
-      });
+      // Show modal popup
+      setShowPermissionModal(true);
 
       // Check current location to determine navigation behavior
       const currentPath = window.location.pathname;
@@ -92,32 +90,6 @@ export default function AdminHome() {
 
     // User has permission, proceed with normal navigation
     setLocation('/administration/users');
-  };
-
-  // Handle Authorization navigation with permission check
-  const handleAuthorizationNavigation = () => {
-    // Check if user has permission to access Authorization
-    if (currentUserPermissions && (currentUserPermissions as any).authorizationHidden === true) {
-      // Show popup message
-      toast({
-        title: "Access Denied",
-        description: "You do not have permission to access Authorization.",
-        variant: "destructive",
-      });
-
-      // Check current location to determine navigation behavior
-      const currentPath = window.location.pathname;
-      
-      // If not on admin-home, redirect to admin-home
-      if (currentPath !== '/admin-home') {
-        setLocation('/admin-home');
-      }
-      // If already on admin-home, do nothing (just show the popup)
-      return;
-    }
-
-    // User has permission, proceed with normal navigation
-    setLocation('/administration/authorization');
   };
 
   return (
@@ -227,7 +199,7 @@ export default function AdminHome() {
                     <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
                   </button>
                   <button
-                    onClick={handleAuthorizationNavigation}
+                    onClick={() => setLocation('/administration/authorization')}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <Shield className="h-5 w-5 flex-shrink-0" />
@@ -453,6 +425,14 @@ export default function AdminHome() {
           </div>
         </div>
       </div>
+
+      {/* Permission Denied Modal */}
+      <PermissionDeniedModal
+        isOpen={showPermissionModal}
+        onClose={() => setShowPermissionModal(false)}
+        title="Access Denied"
+        description="You do not have permission to access Users."
+      />
     </div>
   );
 }

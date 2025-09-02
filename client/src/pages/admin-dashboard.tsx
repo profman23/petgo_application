@@ -4,6 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp, ChevronLeft, ChevronRight, Plus, AlertTriangle, Save, Home } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -698,6 +699,7 @@ export default function AdminDashboard() {
   }); // 'management', 'shifts', 'reports', 'requests', or 'import'
   const [reportsSubTab, setReportsSubTab] = useState<'analytics' | 'sales'>('analytics'); // Sub-tabs for Reports section
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false); // New Reports & Analytics dropdown state
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
   // Administration menu state - persist across navigation
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
     const savedState = localStorage.getItem('isAdministrationExpanded');
@@ -1132,12 +1134,8 @@ export default function AdminDashboard() {
     
     // Check if user has permission to access Users
     if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
-      // Show popup message
-      toast({
-        title: "Access Denied",
-        description: "You do not have permission to access Users.",
-        variant: "destructive",
-      });
+      // Show modal popup
+      setShowPermissionModal(true);
 
       // Check current location to determine navigation behavior
       const currentPath = window.location.pathname;
@@ -3819,6 +3817,14 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* Permission Denied Modal */}
+      <PermissionDeniedModal
+        isOpen={showPermissionModal}
+        onClose={() => setShowPermissionModal(false)}
+        title="Access Denied"
+        description="You do not have permission to access Users."
+      />
     </div>
   );
 }
