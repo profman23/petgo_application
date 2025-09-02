@@ -84,13 +84,6 @@ export default function AdministrationAuthorization() {
     refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary calls
   });
 
-  // Redirect to admin-home if user has no permission for authorization
-  useEffect(() => {
-    if (!permissionsLoading && currentUserPermissions && (currentUserPermissions as any).authHidden === true) {
-      setLocation('/admin-home');
-    }
-  }, [currentUserPermissions, permissionsLoading, setLocation]);
-
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
     mutationFn: async (authData: any) => {
