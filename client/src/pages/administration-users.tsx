@@ -68,8 +68,8 @@ export default function AdministrationUsers() {
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
       // User should not reach this page with hidden permission, redirect immediately
-      console.log('User has no users permission, redirecting to dashboard');
-      setLocation('/admin-dashboard');
+      console.log('User has no users permission, redirecting to admin home');
+      setLocation('/admin-home');
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
@@ -356,7 +356,7 @@ export default function AdministrationUsers() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (currentUserPermissions && (currentUserPermissions as any).hiddenUsers === true) {
+                      if (currentUserPermissions && currentUserPermissions.usersHidden === true) {
                         setLocation('/admin-home');
                       } else {
                         setLocation('/administration/users');

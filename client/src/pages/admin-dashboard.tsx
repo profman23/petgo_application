@@ -1898,7 +1898,7 @@ export default function AdminDashboard() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (currentUserPermissions && (currentUserPermissions as any).hiddenUsers === true) {
+                      if (currentUserPermissions && currentUserPermissions.usersHidden === true) {
                         setLocation('/admin-home');
                       } else {
                         setLocation('/administration/users');

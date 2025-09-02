@@ -471,7 +471,7 @@ export default function VetsVanShifts() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={currentUserPermissions && (currentUserPermissions as any).hiddenUsers === true ? () => setLocation('/admin-home') : () => setLocation('/administration/users')}
+                    onClick={currentUserPermissions && currentUserPermissions.usersHidden === true ? () => setLocation('/admin-home') : () => setLocation('/administration/users')}
                     disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
                       permissionsLoading || !currentUserPermissions
