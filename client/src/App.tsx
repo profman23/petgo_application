@@ -32,7 +32,6 @@ import AdministrationAuthorization from "@/pages/administration-authorization";
 import SalesReports from "@/pages/sales-reports";
 import NewReportsAnalytics from "@/pages/new-reports-analytics";
 import VetsVanShifts from "@/pages/vets-van-shifts";
-import VetsVanManagement from "@/pages/vets-van-management";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { PaymentTest } from "@/pages/payment-test";
@@ -148,12 +147,7 @@ function Router() {
           <Route path="/admin-login" component={AdminLogin} />
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-home" component={AdminHome} />
-          <Route path="/vets-van/management" component={VetsVanManagement} />
-          <Route path="/admin-dashboard" component={() => {
-            // Redirect old path to new path
-            window.location.replace('/vets-van/management');
-            return null;
-          }} />
+          <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/admin-dashboard/services" component={AdminServices} />
           <Route path="/admin-dashboard/products" component={AdminProducts} />
           <Route path="/admin-dashboard/import" component={AdminImport} />
