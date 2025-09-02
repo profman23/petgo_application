@@ -92,20 +92,13 @@ export default function AdministrationAuthorization() {
 
   // Route guard - redirect silently if user doesn't have permission to access Authorization page
   useEffect(() => {
-    console.log('🔍 Authorization permission check:', {
-      permissionsLoading,
-      hasPermissions: !!currentUserPermissions,
-      authHidden: currentUserPermissions?.authHidden,
-      attempting_redirect: !permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden
-    });
-    
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden) {
       // User should not reach this page with hidden permission, redirect immediately
-      console.log('🚫 AUTHORIZATION: Redirecting to /admin-home due to authHidden=true');
-      setLocation('/admin-home');
+      console.log('🚫 AUTHORIZATION: Forcing navigation to /admin-home due to authHidden=true');
+      window.location.href = '/admin-home';
       return; // Prevent further execution
     }
-  }, [currentUserPermissions, permissionsLoading, setLocation]);
+  }, [currentUserPermissions, permissionsLoading]);
 
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
