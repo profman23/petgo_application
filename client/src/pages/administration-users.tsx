@@ -68,11 +68,13 @@ export default function AdministrationUsers() {
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
       // User should not reach this page with hidden permission, redirect immediately
-      console.log('🚫 USERS: Forcing navigation to /admin-home due to usersHidden=true');
-      window.location.href = '/admin-home';
-      return; // Prevent further execution
+      // Use setTimeout to ensure redirect happens after component mount
+      setTimeout(() => {
+        setLocation('/admin-home');
+      }, 0);
+      return;
     }
-  }, [currentUserPermissions, permissionsLoading]);
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   const adminToken = localStorage.getItem("adminToken");
   const admin = JSON.parse(localStorage.getItem("admin") || "{}");

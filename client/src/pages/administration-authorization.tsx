@@ -94,11 +94,13 @@ export default function AdministrationAuthorization() {
   useEffect(() => {
     if (!permissionsLoading && currentUserPermissions && currentUserPermissions.authHidden) {
       // User should not reach this page with hidden permission, redirect immediately
-      console.log('🚫 AUTHORIZATION: Forcing navigation to /admin-home due to authHidden=true');
-      window.location.href = '/admin-home';
-      return; // Prevent further execution
+      // Use setTimeout to ensure redirect happens after component mount
+      setTimeout(() => {
+        setLocation('/admin-home');
+      }, 0);
+      return;
     }
-  }, [currentUserPermissions, permissionsLoading]);
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   // Create authorization mutation
   const createAuthorizationMutation = useMutation({
