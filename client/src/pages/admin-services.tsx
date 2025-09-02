@@ -4,7 +4,6 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Upload, Stethoscope, Package, Users, User, Shield, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +35,6 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     nameAr: '',
     price: ''
   });
-  const [showPermissionModal, setShowPermissionModal] = useState(false);
 
   const { data: services, isLoading, refetch } = useQuery({
     queryKey: ['/api/admin/services'],
@@ -727,8 +725,12 @@ export default function AdminServices() {
   const handleUsersNavigation = () => {
     // Check if user has permission to access Users
     if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
-      // Show modal popup
-      setShowPermissionModal(true);
+      // Show popup message
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access Users.",
+        variant: "destructive",
+      });
 
       // Check current location to determine navigation behavior
       const currentPath = window.location.pathname;
@@ -961,14 +963,6 @@ export default function AdminServices() {
           </div>
         </div>
       </div>
-
-      {/* Permission Denied Modal */}
-      <PermissionDeniedModal
-        isOpen={showPermissionModal}
-        onClose={() => setShowPermissionModal(false)}
-        title="Access Denied"
-        description="You do not have permission to access Users."
-      />
     </div>
   );
 }

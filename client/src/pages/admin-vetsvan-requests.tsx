@@ -4,7 +4,6 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { Loader2, LogOut, Car, Clock, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, ChevronDown, ChevronUp, Search, Package, Stethoscope, TrendingUp, Shield, Home } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -27,7 +26,6 @@ export default function AdminVetsVanRequests() {
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
     const savedState = localStorage.getItem('isAdministrationExpanded');
     return savedState !== null ? JSON.parse(savedState) : false;
@@ -74,8 +72,12 @@ export default function AdminVetsVanRequests() {
   const handleUsersNavigation = () => {
     // Check if user has permission to access Users
     if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
-      // Show modal popup
-      setShowPermissionModal(true);
+      // Show popup message
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access Users.",
+        variant: "destructive",
+      });
 
       // Check current location to determine navigation behavior
       const currentPath = window.location.pathname;
@@ -919,14 +921,6 @@ export default function AdminVetsVanRequests() {
           </div>
         </div>
       </div>
-
-      {/* Permission Denied Modal */}
-      <PermissionDeniedModal
-        isOpen={showPermissionModal}
-        onClose={() => setShowPermissionModal(false)}
-        title="Access Denied"
-        description="You do not have permission to access Users."
-      />
     </div>
   );
 }

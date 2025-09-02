@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { apiRequest } from "@/lib/queryClient";
@@ -80,7 +79,6 @@ export default function VetsVanShifts() {
     const savedState = localStorage.getItem('isAdministrationExpanded');
     return savedState !== null ? JSON.parse(savedState) : false;
   });
-  const [showPermissionModal, setShowPermissionModal] = useState(false);
   
   // State for tracking notifications and audio - matches admin dashboard
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -783,14 +781,6 @@ export default function VetsVanShifts() {
           </div>
         </div>
       </div>
-
-      {/* Permission Denied Modal */}
-      <PermissionDeniedModal
-        isOpen={showPermissionModal}
-        onClose={() => setShowPermissionModal(false)}
-        title="Access Denied"
-        description="You do not have permission to access Users."
-      />
     </div>
   );
 }

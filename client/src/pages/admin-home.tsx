@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { PermissionDeniedModal } from "@/components/PermissionDeniedModal";
 import { LogOut, Bell, Volume2, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home, Upload } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
@@ -22,7 +21,6 @@ export default function AdminHome() {
     return saved ? JSON.parse(saved) : false;
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  const [showPermissionModal, setShowPermissionModal] = useState(false);
   const lastRequestCountRef = useRef(0);
 
   // Get admin info for welcome message
@@ -74,8 +72,12 @@ export default function AdminHome() {
   const handleUsersNavigation = () => {
     // Check if user has permission to access Users
     if (currentUserPermissions && (currentUserPermissions as any).usersHidden === true) {
-      // Show modal popup
-      setShowPermissionModal(true);
+      // Show popup message
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access Users.",
+        variant: "destructive",
+      });
 
       // Check current location to determine navigation behavior
       const currentPath = window.location.pathname;
@@ -425,14 +427,6 @@ export default function AdminHome() {
           </div>
         </div>
       </div>
-
-      {/* Permission Denied Modal */}
-      <PermissionDeniedModal
-        isOpen={showPermissionModal}
-        onClose={() => setShowPermissionModal(false)}
-        title="Access Denied"
-        description="You do not have permission to access Users."
-      />
     </div>
   );
 }
