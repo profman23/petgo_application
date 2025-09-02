@@ -47,9 +47,6 @@ export default function AdministrationAuthorization() {
   const [vetsVanReadChecked, setVetsVanReadChecked] = useState(false);
   const [vetsVanFullControlChecked, setVetsVanFullControlChecked] = useState(false);
   
-  // State for checkboxes - Vets Van Shifts section (single-select behavior)
-  const [vetsVanShiftsPermission, setVetsVanShiftsPermission] = useState('none');
-  
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
   
@@ -804,14 +801,11 @@ export default function AdministrationAuthorization() {
                 />
               </div>
               
-              {/* Administration Tab with Scrollable Container */}
+              {/* Administration Tab */}
               <div className="mb-4">
                 <h3 className="text-sm font-medium text-gray-900 mb-2">
                   {language === 'ar' ? 'الإدارة' : 'Administration'}
                 </h3>
-                
-                {/* Scrollable permissions container */}
-                <div className="max-h-[70vh] overflow-y-auto pr-2">
                 
                 {/* Users Section */}
                 <div className="ml-4">
@@ -982,61 +976,6 @@ export default function AdministrationAuthorization() {
                   </div>
                 </div>
               </div>
-              
-              {/* Vets Van Shifts Section */}
-              <div className="mb-4">
-                <div className="ml-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
-                    {language === 'ar' ? 'ورديات VETS VAN' : 'Vets Van Shifts'}
-                  </h4>
-                  
-                  {/* Permission Items as Checkboxes with single-select behavior */}
-                  <div className="ml-4 space-y-2">
-                    {/* No Permission */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanShiftsNoPermission"
-                        checked={vetsVanShiftsPermission === 'noPermission'}
-                        onChange={(e) => setVetsVanShiftsPermission(e.target.checked ? 'noPermission' : 'none')}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="vetsVanShiftsNoPermission" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
-                    </div>
-                    
-                    {/* Read */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanShiftsRead"
-                        checked={vetsVanShiftsPermission === 'read'}
-                        onChange={(e) => setVetsVanShiftsPermission(e.target.checked ? 'read' : 'none')}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="vetsVanShiftsRead" className="ml-2 text-sm text-gray-600">
-                        Read
-                      </label>
-                    </div>
-                    
-                    {/* Full Control */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanShiftsFullControl"
-                        checked={vetsVanShiftsPermission === 'fullControl'}
-                        onChange={(e) => setVetsVanShiftsPermission(e.target.checked ? 'fullControl' : 'none')}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="vetsVanShiftsFullControl" className="ml-2 text-sm text-gray-600">
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-                </div>
             </div>
             
             {/* Popup Footer */}
