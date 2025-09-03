@@ -52,6 +52,10 @@ export default function AdministrationAuthorization() {
   const [vetsVanShiftsReadChecked, setVetsVanShiftsReadChecked] = useState(false);
   const [vetsVanShiftsFullControlChecked, setVetsVanShiftsFullControlChecked] = useState(false);
   
+  // State for checkboxes - Import section
+  const [importHiddenChecked, setImportHiddenChecked] = useState(false);
+  const [importFullControlChecked, setImportFullControlChecked] = useState(false);
+  
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
   
@@ -154,6 +158,8 @@ export default function AdministrationAuthorization() {
     setVetsVanShiftsHiddenChecked(true);
     setVetsVanShiftsReadChecked(false);
     setVetsVanShiftsFullControlChecked(false);
+    setImportHiddenChecked(false);
+    setImportFullControlChecked(false);
   };
 
   // Handle save authorization
@@ -181,6 +187,8 @@ export default function AdministrationAuthorization() {
       vetsVanShiftsHidden: vetsVanShiftsHiddenChecked,
       vetsVanShiftsRead: vetsVanShiftsReadChecked,
       vetsVanShiftsFullControl: vetsVanShiftsFullControlChecked,
+      importHidden: importHiddenChecked,
+      importFullControl: importFullControlChecked,
     };
 
     if (editingAuthorization) {
@@ -206,6 +214,8 @@ export default function AdministrationAuthorization() {
     setVetsVanShiftsHiddenChecked(auth.vetsVanShiftsHidden !== undefined ? auth.vetsVanShiftsHidden : true);
     setVetsVanShiftsReadChecked(auth.vetsVanShiftsRead || false);
     setVetsVanShiftsFullControlChecked(auth.vetsVanShiftsFullControl || false);
+    setImportHiddenChecked(auth.importHidden || false);
+    setImportFullControlChecked(auth.importFullControl || false);
     setShowAddAuthorizationPopup(true);
   };
 
@@ -318,6 +328,19 @@ export default function AdministrationAuthorization() {
       // If Full Control is checked, automatically check Read
       setVetsVanShiftsReadChecked(true);
     }
+  };
+
+  // Handlers for Import section
+  const handleImportHiddenChange = (checked: boolean) => {
+    setImportHiddenChecked(checked);
+    if (checked) {
+      // If Hidden is checked, uncheck and disable Full Control
+      setImportFullControlChecked(false);
+    }
+  };
+
+  const handleImportFullControlChange = (checked: boolean) => {
+    setImportFullControlChecked(checked);
   };
 
   // Check admin authentication
@@ -1138,6 +1161,8 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="importHidden"
+                        checked={importHiddenChecked}
+                        onChange={(e) => handleImportHiddenChange(e.target.checked)}
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="importHidden" className="ml-2 text-sm text-gray-600">
@@ -1150,9 +1175,12 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="importFullControl"
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        checked={importFullControlChecked}
+                        disabled={importHiddenChecked}
+                        onChange={(e) => handleImportFullControlChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${importHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="importFullControl" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="importFullControl" className={`ml-2 text-sm ${importHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
