@@ -1103,6 +1103,7 @@ export default function AdministrationAuthorization() {
                   </div>
                 </div>
               </div>
+              </div>
             </div>
             
             {/* Popup Footer */}
