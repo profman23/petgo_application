@@ -2090,27 +2090,16 @@ export default function AdminDashboard() {
                     <div className="px-4 py-5 sm:p-6">
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVanManagement')}</h3>
-                        {/* Show Add button only if user has full control, not just read access */}
-                        {currentUserPermissions && currentUserPermissions.vetsVanFullControl && (
-                          <button
-                            onClick={() => setShowAddForm(!showAddForm)}
-                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-600"
-                          >
-                            <UserPlus className="h-4 w-4 ml-2" />
-                            {t('addNewVetsVan')}
-                          </button>
-                        )}
-                        {/* Show read-only indicator if user has only read access */}
-                        {currentUserPermissions && currentUserPermissions.vetsVanRead && !currentUserPermissions.vetsVanFullControl && (
-                          <div className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-500 bg-gray-100 cursor-not-allowed">
-                            <Shield className="h-4 w-4 ml-2" />
-                            {language === 'ar' ? 'عرض فقط' : 'Read Only'}
-                          </div>
-                        )}
+                        <button
+                          onClick={() => setShowAddForm(!showAddForm)}
+                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-600"
+                        >
+                          <UserPlus className="h-4 w-4 ml-2" />
+                          {t('addNewVetsVan')}
+                        </button>
                       </div>
 
-                      {/* Only show add form if user has full control */}
-                      {showAddForm && currentUserPermissions && currentUserPermissions.vetsVanFullControl && (
+                      {showAddForm && (
                         <form onSubmit={handleAddDriver} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
                           <div>
                             <label className="block text-sm font-medium text-gray-700">VetsVan Code</label>
@@ -2219,49 +2208,45 @@ export default function AdminDashboard() {
                               >
                                 {driver.isAvailable ? t('available') : t('notAvailable')}
                               </span>
-                              
-                              {/* Only show action buttons if user has full control */}
-                              {currentUserPermissions && currentUserPermissions.vetsVanFullControl && (
-                                <>
-                                  <button
-                                    onClick={() =>
-                                      toggleAvailabilityMutation.mutate({
-                                        driverId: driver.id,
-                                        isAvailable: !driver.isAvailable,
-                                      })
-                                    }
-                                    className="text-sm text-purple-600 hover:text-purple-600"
-                                  >
-                                    {t('changeStatus')}
+                              <button
+                                onClick={() =>
+                                  toggleAvailabilityMutation.mutate({
+                                    driverId: driver.id,
+                                    isAvailable: !driver.isAvailable,
+                                  })
+                                }
+                                className="text-sm text-purple-600 hover:text-purple-600"
+                              >
+                                {t('changeStatus')}
+                              </button>
+                              <button
+                                onClick={() => handleLocationClick(driver)}
+                                className="text-sm text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
+                              >
+                                <MapPin className="w-3 h-3" />
+                                {language === 'ar' ? 'تحديد الموقع' : 'Set Location'}
+                              </button>
+                              <button
+                                onClick={() => handleRedZonesClick(driver)}
+                                className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1"
+                              >
+                                <AlertTriangle className="w-3 h-3" />
+                                {language === 'ar' ? 'المناطق الحمراء' : 'Red Zones'}
+                              </button>
+                              <button
+                                onClick={() => handleEditClick(driver)}
+                                className="text-sm text-green-600 hover:text-green-900 inline-flex items-center gap-1"
+                              >
+                                <Edit className="w-3 h-3" />
+                                {language === 'ar' ? 'تعديل' : 'Edit'}
+                              </button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <button className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1">
+                                    <Trash2 className="w-3 h-3" />
+                                    {t('delete')}
                                   </button>
-                                  <button
-                                    onClick={() => handleLocationClick(driver)}
-                                    className="text-sm text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
-                                  >
-                                    <MapPin className="w-3 h-3" />
-                                    {language === 'ar' ? 'تحديد الموقع' : 'Set Location'}
-                                  </button>
-                                  <button
-                                    onClick={() => handleRedZonesClick(driver)}
-                                    className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1"
-                                  >
-                                    <AlertTriangle className="w-3 h-3" />
-                                    {language === 'ar' ? 'المناطق الحمراء' : 'Red Zones'}
-                                  </button>
-                                  <button
-                                    onClick={() => handleEditClick(driver)}
-                                    className="text-sm text-green-600 hover:text-green-900 inline-flex items-center gap-1"
-                                  >
-                                    <Edit className="w-3 h-3" />
-                                    {language === 'ar' ? 'تعديل' : 'Edit'}
-                                  </button>
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <button className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1">
-                                        <Trash2 className="w-3 h-3" />
-                                        {t('delete')}
-                                      </button>
-                                    </AlertDialogTrigger>
+                                </AlertDialogTrigger>
                                 <AlertDialogContent>
                                   <AlertDialogHeader>
                                     <AlertDialogTitle>{t('confirmDelete')}</AlertDialogTitle>
@@ -2282,15 +2267,6 @@ export default function AdminDashboard() {
                                   </AlertDialogFooter>
                                 </AlertDialogContent>
                               </AlertDialog>
-                                </>
-                              )}
-                              
-                              {/* Show read-only indicator if user has only read access */}
-                              {currentUserPermissions && currentUserPermissions.vetsVanRead && !currentUserPermissions.vetsVanFullControl && (
-                                <span className="text-xs text-gray-400 italic">
-                                  {language === 'ar' ? 'عرض فقط' : 'Read Only'}
-                                </span>
-                              )}
                             </div>
                           </div>
                         </li>

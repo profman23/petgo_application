@@ -198,13 +198,7 @@ export default function AdminHome() {
             </div>
             
             <button
-              onClick={() => {
-                if (currentUserPermissions && currentUserPermissions.vetsVanHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  setLocation('/admin-dashboard');
-                }
-              }}
+              onClick={currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}
               disabled={permissionsLoading || !currentUserPermissions}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
                 permissionsLoading || !currentUserPermissions
@@ -217,23 +211,11 @@ export default function AdminHome() {
               {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
             </button>
             <button
-              onClick={() => {
-                if (currentUserPermissions && currentUserPermissions.vetsVanHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  setLocation('/vets-van-shifts');
-                }
-              }}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+              onClick={() => setLocation('/vets-van-shifts')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Clock className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
             </button>
             <button
               onClick={() => setLocation('/admin-dashboard?tab=reports')}
