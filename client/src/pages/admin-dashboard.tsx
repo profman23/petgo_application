@@ -2231,28 +2231,50 @@ export default function AdminDashboard() {
                               </button>
                               <button
                                 onClick={() => handleLocationClick(driver)}
-                                className="text-sm text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
+                                disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                className={`text-sm inline-flex items-center gap-1 ${
+                                  currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-blue-600 hover:text-blue-900'
+                                }`}
                               >
                                 <MapPin className="w-3 h-3" />
                                 {language === 'ar' ? 'تحديد الموقع' : 'Set Location'}
                               </button>
                               <button
                                 onClick={() => handleRedZonesClick(driver)}
-                                className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1"
+                                disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                className={`text-sm inline-flex items-center gap-1 ${
+                                  currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-red-600 hover:text-red-900'
+                                }`}
                               >
                                 <AlertTriangle className="w-3 h-3" />
                                 {language === 'ar' ? 'المناطق الحمراء' : 'Red Zones'}
                               </button>
                               <button
                                 onClick={() => handleEditClick(driver)}
-                                className="text-sm text-green-600 hover:text-green-900 inline-flex items-center gap-1"
+                                disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                className={`text-sm inline-flex items-center gap-1 ${
+                                  currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-green-600 hover:text-green-900'
+                                }`}
                               >
                                 <Edit className="w-3 h-3" />
                                 {language === 'ar' ? 'تعديل' : 'Edit'}
                               </button>
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                  <button className="text-sm text-red-600 hover:text-red-900 inline-flex items-center gap-1">
+                                  <button 
+                                    disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                    className={`text-sm inline-flex items-center gap-1 ${
+                                      currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
+                                        ? 'text-gray-400 cursor-not-allowed'
+                                        : 'text-red-600 hover:text-red-900'
+                                    }`}
+                                  >
                                     <Trash2 className="w-3 h-3" />
                                     {t('delete')}
                                   </button>
