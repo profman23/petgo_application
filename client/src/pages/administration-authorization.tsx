@@ -874,7 +874,8 @@ export default function AdministrationAuthorization() {
               
               {/* Administration Tab */}
               <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <Users className="h-4 w-4 text-gray-500" />
                   {language === 'ar' ? 'الإدارة' : 'Administration'}
                 </h3>
                 
@@ -995,7 +996,8 @@ export default function AdministrationAuthorization() {
               
               {/* Vets Van Management Section */}
               <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <Car className="h-4 w-4 text-gray-500" />
                   {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
                 </h3>
                 
@@ -1060,7 +1062,8 @@ export default function AdministrationAuthorization() {
               {/* Vets Van Shifts Section */}
               <div className="mb-4">
                 <div className="ml-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-gray-500" />
                     {language === 'ar' ? 'نوبات VETS VAN' : 'Vets Van Shifts'}
                   </h4>
                   
@@ -1117,7 +1120,8 @@ export default function AdministrationAuthorization() {
                 
                 {/* Import Section */}
                 <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Upload className="h-4 w-4 text-gray-500" />
                     {language === 'ar' ? 'استيراد' : 'Import'}
                   </h3>
                   
@@ -1154,7 +1158,8 @@ export default function AdministrationAuthorization() {
                 
                 {/* Services Section */}
                 <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Stethoscope className="h-4 w-4 text-gray-500" />
                     {language === 'ar' ? 'الخدمات' : 'Services'}
                   </h3>
                   
@@ -1203,7 +1208,8 @@ export default function AdministrationAuthorization() {
                 
                 {/* Products Section */}
                 <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Package className="h-4 w-4 text-gray-500" />
                     {language === 'ar' ? 'المنتجات' : 'Products'}
                   </h3>
                   
