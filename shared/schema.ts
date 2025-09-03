@@ -735,6 +735,11 @@ export const authorizations = pgTable("authorizations", {
   vetsVanRead: boolean("vets_van_read").notNull().default(false),
   vetsVanFullControl: boolean("vets_van_full_control").notNull().default(false),
   
+  // Vets Van Shifts permissions
+  vetsVanShiftsHidden: boolean("vets_van_shifts_hidden").notNull().default(true),
+  vetsVanShiftsRead: boolean("vets_van_shifts_read").notNull().default(false),
+  vetsVanShiftsFullControl: boolean("vets_van_shifts_full_control").notNull().default(false),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

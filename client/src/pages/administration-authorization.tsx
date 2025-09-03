@@ -47,6 +47,11 @@ export default function AdministrationAuthorization() {
   const [vetsVanReadChecked, setVetsVanReadChecked] = useState(false);
   const [vetsVanFullControlChecked, setVetsVanFullControlChecked] = useState(false);
   
+  // State for checkboxes - Vets Van Shifts section
+  const [vetsVanShiftsHiddenChecked, setVetsVanShiftsHiddenChecked] = useState(true);
+  const [vetsVanShiftsReadChecked, setVetsVanShiftsReadChecked] = useState(false);
+  const [vetsVanShiftsFullControlChecked, setVetsVanShiftsFullControlChecked] = useState(false);
+  
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
   
@@ -146,6 +151,9 @@ export default function AdministrationAuthorization() {
     setVetsVanHiddenChecked(false);
     setVetsVanReadChecked(false);
     setVetsVanFullControlChecked(false);
+    setVetsVanShiftsHiddenChecked(true);
+    setVetsVanShiftsReadChecked(false);
+    setVetsVanShiftsFullControlChecked(false);
   };
 
   // Handle save authorization
@@ -170,6 +178,9 @@ export default function AdministrationAuthorization() {
       vetsVanHidden: vetsVanHiddenChecked,
       vetsVanRead: vetsVanReadChecked,
       vetsVanFullControl: vetsVanFullControlChecked,
+      vetsVanShiftsHidden: vetsVanShiftsHiddenChecked,
+      vetsVanShiftsRead: vetsVanShiftsReadChecked,
+      vetsVanShiftsFullControl: vetsVanShiftsFullControlChecked,
     };
 
     if (editingAuthorization) {
@@ -192,6 +203,9 @@ export default function AdministrationAuthorization() {
     setVetsVanHiddenChecked(auth.vetsVanHidden || false);
     setVetsVanReadChecked(auth.vetsVanRead || false);
     setVetsVanFullControlChecked(auth.vetsVanFullControl || false);
+    setVetsVanShiftsHiddenChecked(auth.vetsVanShiftsHidden !== undefined ? auth.vetsVanShiftsHidden : true);
+    setVetsVanShiftsReadChecked(auth.vetsVanShiftsRead || false);
+    setVetsVanShiftsFullControlChecked(auth.vetsVanShiftsFullControl || false);
     setShowAddAuthorizationPopup(true);
   };
 
@@ -277,6 +291,32 @@ export default function AdministrationAuthorization() {
     if (checked) {
       // If Full Control is checked, automatically check Read
       setVetsVanReadChecked(true);
+    }
+  };
+
+  // Vets Van Shifts handlers
+  const handleVetsVanShiftsHiddenChange = (checked: boolean) => {
+    setVetsVanShiftsHiddenChecked(checked);
+    if (checked) {
+      // If hidden is checked, uncheck both Read and Full Control
+      setVetsVanShiftsReadChecked(false);
+      setVetsVanShiftsFullControlChecked(false);
+    }
+  };
+
+  const handleVetsVanShiftsReadChange = (checked: boolean) => {
+    setVetsVanShiftsReadChecked(checked);
+    if (!checked) {
+      // If Read is unchecked, also uncheck Full Control
+      setVetsVanShiftsFullControlChecked(false);
+    }
+  };
+
+  const handleVetsVanShiftsFullControlChange = (checked: boolean) => {
+    setVetsVanShiftsFullControlChecked(checked);
+    if (checked) {
+      // If Full Control is checked, automatically check Read
+      setVetsVanShiftsReadChecked(true);
     }
   };
 
@@ -976,6 +1016,62 @@ export default function AdministrationAuthorization() {
                         className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                       <label htmlFor="vetsVanFullControl" className={`ml-2 text-sm ${vetsVanHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vets Van Shifts Section */}
+              <div className="mb-4">
+                <div className="ml-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                    {language === 'ar' ? 'نوبات VETS VAN' : 'Vets Van Shifts'}
+                  </h4>
+                  
+                  {/* Permission Items */}
+                  <div className="ml-4 space-y-2">
+                    {/* Hidden Vets Van Shifts */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="vetsVanShiftsHidden"
+                        checked={vetsVanShiftsHiddenChecked}
+                        onChange={(e) => handleVetsVanShiftsHiddenChange(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="vetsVanShiftsHidden" className="ml-2 text-sm text-gray-600">
+                        No Permission
+                      </label>
+                    </div>
+                    
+                    {/* Read Vets Van Shifts */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="vetsVanShiftsRead"
+                        checked={vetsVanShiftsReadChecked}
+                        disabled={vetsVanShiftsHiddenChecked}
+                        onChange={(e) => handleVetsVanShiftsReadChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanShiftsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      />
+                      <label htmlFor="vetsVanShiftsRead" className={`ml-2 text-sm ${vetsVanShiftsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Read
+                      </label>
+                    </div>
+                    
+                    {/* Full Control Vets Van Shifts */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="vetsVanShiftsFullControl"
+                        checked={vetsVanShiftsFullControlChecked}
+                        disabled={vetsVanShiftsHiddenChecked}
+                        onChange={(e) => handleVetsVanShiftsFullControlChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanShiftsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      />
+                      <label htmlFor="vetsVanShiftsFullControl" className={`ml-2 text-sm ${vetsVanShiftsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
