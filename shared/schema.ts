@@ -769,6 +769,9 @@ export const insertAuthorizationSchema = createInsertSchema(authorizations).pick
   vetsVanHidden: true,
   vetsVanRead: true,
   vetsVanFullControl: true,
+  vetsVanShiftsHidden: true,
+  vetsVanShiftsRead: true,
+  vetsVanShiftsFullControl: true,
 });
 
 export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
