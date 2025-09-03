@@ -825,7 +825,7 @@ export default function AdministrationAuthorization() {
       {/* Add New Authorization Popup */}
       {showAddAuthorizationPopup && !isReadOnly && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style={{ left: '256px', top: '82px' }}>
-          <div className="bg-white rounded-lg shadow-xl w-[500px] max-w-2xl mx-4">
+          <div className="bg-white rounded-lg shadow-xl w-[800px] max-w-4xl mx-4 flex flex-col max-h-[85vh]">
             {/* Popup Header */}
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900">
@@ -842,8 +842,30 @@ export default function AdministrationAuthorization() {
               </button>
             </div>
             
-            {/* Popup Content */}
-            <div className="p-4">
+            {/* Popup Content with Custom Scrollbar */}
+            <div className="relative flex-1 overflow-hidden">
+              {/* Scroll Up Arrow */}
+              <button
+                onClick={() => {
+                  const scrollContainer = document.getElementById('authorization-scroll-container');
+                  if (scrollContainer) {
+                    scrollContainer.scrollBy({ top: -100, behavior: 'smooth' });
+                  }
+                }}
+                className="absolute top-2 right-2 z-10 bg-white border border-gray-300 rounded-full p-1 shadow-sm hover:bg-gray-50 transition-colors"
+              >
+                <ChevronUp className="h-4 w-4 text-gray-600" />
+              </button>
+              
+              {/* Scrollable Content */}
+              <div 
+                id="authorization-scroll-container"
+                className="h-full overflow-y-auto p-4 pr-12 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
+                style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#9CA3AF #F3F4F6'
+                }}
+              >
               {/* Authorization Name Field */}
               <div className="mb-6">
                 <label htmlFor="authorizationName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -1092,6 +1114,20 @@ export default function AdministrationAuthorization() {
                   </div>
                 </div>
               </div>
+              
+              {/* Scroll Down Arrow */}
+              <button
+                onClick={() => {
+                  const scrollContainer = document.getElementById('authorization-scroll-container');
+                  if (scrollContainer) {
+                    scrollContainer.scrollBy({ top: 100, behavior: 'smooth' });
+                  }
+                }}
+                className="absolute bottom-2 right-2 z-10 bg-white border border-gray-300 rounded-full p-1 shadow-sm hover:bg-gray-50 transition-colors"
+              >
+                <ChevronDown className="h-4 w-4 text-gray-600" />
+              </button>
+            </div>
             </div>
             
             {/* Popup Footer */}
