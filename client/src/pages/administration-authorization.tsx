@@ -1102,6 +1102,132 @@ export default function AdministrationAuthorization() {
                     </div>
                   </div>
                 </div>
+                
+                {/* Import Section */}
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">
+                    {language === 'ar' ? 'استيراد' : 'Import'}
+                  </h3>
+                  
+                  {/* Permission Items */}
+                  <div className="ml-4 space-y-2">
+                    {/* No Permission Import */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="importHidden"
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="importHidden" className="ml-2 text-sm text-gray-600">
+                        No Permission
+                      </label>
+                    </div>
+                    
+                    {/* Full Control Import */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="importFullControl"
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="importFullControl" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Services Section */}
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">
+                    {language === 'ar' ? 'الخدمات' : 'Services'}
+                  </h3>
+                  
+                  {/* Permission Items */}
+                  <div className="ml-4 space-y-2">
+                    {/* No Permission Services */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="servicesHidden"
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="servicesHidden" className="ml-2 text-sm text-gray-600">
+                        No Permission
+                      </label>
+                    </div>
+                    
+                    {/* Read Services */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="servicesRead"
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="servicesRead" className="ml-2 text-sm text-gray-600">
+                        Read
+                      </label>
+                    </div>
+                    
+                    {/* Full Control Services */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="servicesFullControl"
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="servicesFullControl" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Products Section */}
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">
+                    {language === 'ar' ? 'المنتجات' : 'Products'}
+                  </h3>
+                  
+                  {/* Permission Items */}
+                  <div className="ml-4 space-y-2">
+                    {/* No Permission Products */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="productsHidden"
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="productsHidden" className="ml-2 text-sm text-gray-600">
+                        No Permission
+                      </label>
+                    </div>
+                    
+                    {/* Read Products */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="productsRead"
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="productsRead" className="ml-2 text-sm text-gray-600">
+                        Read
+                      </label>
+                    </div>
+                    
+                    {/* Full Control Products */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="productsFullControl"
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="productsFullControl" className="ml-2 text-sm text-gray-600">
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
               </div>
             </div>
