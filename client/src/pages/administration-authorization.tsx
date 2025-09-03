@@ -56,6 +56,16 @@ export default function AdministrationAuthorization() {
   const [importHiddenChecked, setImportHiddenChecked] = useState(false);
   const [importFullControlChecked, setImportFullControlChecked] = useState(false);
   
+  // State for checkboxes - Services section
+  const [servicesHiddenChecked, setServicesHiddenChecked] = useState(false);
+  const [servicesReadChecked, setServicesReadChecked] = useState(false);
+  const [servicesFullControlChecked, setServicesFullControlChecked] = useState(false);
+  
+  // State for checkboxes - Products section
+  const [productsHiddenChecked, setProductsHiddenChecked] = useState(false);
+  const [productsReadChecked, setProductsReadChecked] = useState(false);
+  const [productsFullControlChecked, setProductsFullControlChecked] = useState(false);
+  
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
   
@@ -160,6 +170,12 @@ export default function AdministrationAuthorization() {
     setVetsVanShiftsFullControlChecked(false);
     setImportHiddenChecked(false);
     setImportFullControlChecked(false);
+    setServicesHiddenChecked(false);
+    setServicesReadChecked(false);
+    setServicesFullControlChecked(false);
+    setProductsHiddenChecked(false);
+    setProductsReadChecked(false);
+    setProductsFullControlChecked(false);
   };
 
   // Handle save authorization
@@ -189,6 +205,12 @@ export default function AdministrationAuthorization() {
       vetsVanShiftsFullControl: vetsVanShiftsFullControlChecked,
       importHidden: importHiddenChecked,
       importFullControl: importFullControlChecked,
+      servicesHidden: servicesHiddenChecked,
+      servicesRead: servicesReadChecked,
+      servicesFullControl: servicesFullControlChecked,
+      productsHidden: productsHiddenChecked,
+      productsRead: productsReadChecked,
+      productsFullControl: productsFullControlChecked,
     };
 
     if (editingAuthorization) {
@@ -216,6 +238,12 @@ export default function AdministrationAuthorization() {
     setVetsVanShiftsFullControlChecked(auth.vetsVanShiftsFullControl || false);
     setImportHiddenChecked(auth.importHidden || false);
     setImportFullControlChecked(auth.importFullControl || false);
+    setServicesHiddenChecked(auth.servicesHidden || false);
+    setServicesReadChecked(auth.servicesRead || false);
+    setServicesFullControlChecked(auth.servicesFullControl || false);
+    setProductsHiddenChecked(auth.productsHidden || false);
+    setProductsReadChecked(auth.productsRead || false);
+    setProductsFullControlChecked(auth.productsFullControl || false);
     setShowAddAuthorizationPopup(true);
   };
 
@@ -341,6 +369,58 @@ export default function AdministrationAuthorization() {
 
   const handleImportFullControlChange = (checked: boolean) => {
     setImportFullControlChecked(checked);
+  };
+
+  // Handlers for Services section
+  const handleServicesHiddenChange = (checked: boolean) => {
+    setServicesHiddenChecked(checked);
+    if (checked) {
+      // If Hidden is checked, uncheck and disable Read and Full Control
+      setServicesReadChecked(false);
+      setServicesFullControlChecked(false);
+    }
+  };
+
+  const handleServicesReadChange = (checked: boolean) => {
+    setServicesReadChecked(checked);
+    if (!checked) {
+      // If Read is unchecked, also uncheck Full Control
+      setServicesFullControlChecked(false);
+    }
+  };
+
+  const handleServicesFullControlChange = (checked: boolean) => {
+    setServicesFullControlChecked(checked);
+    if (checked) {
+      // If Full Control is checked, automatically check Read
+      setServicesReadChecked(true);
+    }
+  };
+
+  // Handlers for Products section
+  const handleProductsHiddenChange = (checked: boolean) => {
+    setProductsHiddenChecked(checked);
+    if (checked) {
+      // If Hidden is checked, uncheck and disable Read and Full Control
+      setProductsReadChecked(false);
+      setProductsFullControlChecked(false);
+    }
+  };
+
+  const handleProductsReadChange = (checked: boolean) => {
+    setProductsReadChecked(checked);
+    if (!checked) {
+      // If Read is unchecked, also uncheck Full Control
+      setProductsFullControlChecked(false);
+    }
+  };
+
+  const handleProductsFullControlChange = (checked: boolean) => {
+    setProductsFullControlChecked(checked);
+    if (checked) {
+      // If Full Control is checked, automatically check Read
+      setProductsReadChecked(true);
+    }
   };
 
   // Check admin authentication
@@ -1211,6 +1291,8 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="servicesHidden"
+                        checked={servicesHiddenChecked}
+                        onChange={(e) => handleServicesHiddenChange(e.target.checked)}
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="servicesHidden" className="ml-2 text-sm text-gray-600">
@@ -1223,9 +1305,12 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="servicesRead"
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        checked={servicesReadChecked}
+                        disabled={servicesHiddenChecked}
+                        onChange={(e) => handleServicesReadChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="servicesRead" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="servicesRead" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         Read
                       </label>
                     </div>
@@ -1235,9 +1320,12 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="servicesFullControl"
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        checked={servicesFullControlChecked}
+                        disabled={servicesHiddenChecked}
+                        onChange={(e) => handleServicesFullControlChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="servicesFullControl" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="servicesFullControl" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
@@ -1268,6 +1356,8 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="productsHidden"
+                        checked={productsHiddenChecked}
+                        onChange={(e) => handleProductsHiddenChange(e.target.checked)}
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="productsHidden" className="ml-2 text-sm text-gray-600">
@@ -1280,9 +1370,12 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="productsRead"
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        checked={productsReadChecked}
+                        disabled={productsHiddenChecked}
+                        onChange={(e) => handleProductsReadChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${productsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="productsRead" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="productsRead" className={`ml-2 text-sm ${productsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         Read
                       </label>
                     </div>
@@ -1292,9 +1385,12 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="productsFullControl"
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        checked={productsFullControlChecked}
+                        disabled={productsHiddenChecked}
+                        onChange={(e) => handleProductsFullControlChange(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${productsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
-                      <label htmlFor="productsFullControl" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="productsFullControl" className={`ml-2 text-sm ${productsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
