@@ -2220,7 +2220,12 @@ export default function AdminDashboard() {
                                     isAvailable: !driver.isAvailable,
                                   })
                                 }
-                                className="text-sm text-purple-600 hover:text-purple-600"
+                                disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                className={`text-sm ${
+                                  currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-purple-600 hover:text-purple-700'
+                                }`}
                               >
                                 {t('changeStatus')}
                               </button>
