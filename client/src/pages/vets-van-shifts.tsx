@@ -501,7 +501,13 @@ export default function VetsVanShifts() {
             </div>
             
             <button
-              onClick={currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}
+              onClick={() => {
+                if (currentUserPermissions && currentUserPermissions.vetsVanHidden === true) {
+                  setLocation('/admin-home');
+                } else {
+                  setLocation('/admin-dashboard');
+                }
+              }}
               disabled={permissionsLoading || !currentUserPermissions}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
                 permissionsLoading || !currentUserPermissions
@@ -597,7 +603,16 @@ export default function VetsVanShifts() {
               <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>{t('shiftsSchedule')}</span>
+              <div className="flex items-center gap-4">
+                <span>{t('shiftsSchedule')}</span>
+                {/* Show read-only indicator if user has only read access */}
+                {currentUserPermissions && currentUserPermissions.vetsVanRead && !currentUserPermissions.vetsVanFullControl && (
+                  <Badge variant="secondary" className="text-xs">
+                    <Shield className="w-3 h-3 mr-1" />
+                    {language === 'ar' ? 'عرض فقط' : 'Read Only'}
+                  </Badge>
+                )}
+              </div>
               <div className="flex items-center gap-4">
                 {/* أسهم التنقل بين الأسابيع */}
                 <div className="flex items-center gap-2">
@@ -692,14 +707,17 @@ export default function VetsVanShifts() {
                                   <div className="text-xs text-gray-600 mt-1">
                                     {shift.startTime} - {shift.endTime}
                                   </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="absolute -top-1 -right-1 h-5 w-5 p-0 text-red-500 hover:text-red-700"
-                                    onClick={() => deleteShiftMutation.mutate(shift.id)}
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </Button>
+                                  {/* Only show delete button if user has full control */}
+                                  {currentUserPermissions && currentUserPermissions.vetsVanFullControl && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="absolute -top-1 -right-1 h-5 w-5 p-0 text-red-500 hover:text-red-700"
+                                      onClick={() => deleteShiftMutation.mutate(shift.id)}
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </Button>
+                                  )}
                                 </div>
                               ) : (
                                 <Dialog open={isAddShiftOpen && selectedVetsVan === van.id} onOpenChange={(open) => {
@@ -715,6 +733,7 @@ export default function VetsVanShifts() {
                                         setSelectedVetsVan(van.id);
                                         setNewShift(prev => ({ ...prev, date }));
                                       }}
+                                      disabled={currentUserPermissions && !currentUserPermissions.vetsVanFullControl}
                                     >
                                       <Plus className="w-4 h-4" />
                                     </Button>
@@ -779,7 +798,7 @@ export default function VetsVanShifts() {
                                       <div className="flex gap-2 pt-4">
                                         <Button 
                                           onClick={handleAddShift}
-                                          disabled={addShiftMutation.isPending}
+                                          disabled={addShiftMutation.isPending || !currentUserPermissions?.vetsVanFullControl}
                                           className="flex-1"
                                         >
                                           {addShiftMutation.isPending ? t('loading') : t('addShift')}
