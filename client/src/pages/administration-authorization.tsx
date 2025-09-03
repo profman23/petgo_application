@@ -860,10 +860,12 @@ export default function AdministrationAuthorization() {
               {/* Scrollable Content */}
               <div 
                 id="authorization-scroll-container"
-                className="h-full overflow-y-auto p-4 pr-12 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
+                className="overflow-y-auto p-4 pr-12 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
                 style={{
                   scrollbarWidth: 'thin',
-                  scrollbarColor: '#9CA3AF #F3F4F6'
+                  scrollbarColor: '#9CA3AF #F3F4F6',
+                  height: '60vh',
+                  maxHeight: '500px'
                 }}
               >
               {/* Authorization Name Field */}
