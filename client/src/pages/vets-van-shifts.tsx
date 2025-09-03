@@ -72,6 +72,18 @@ export default function VetsVanShifts() {
     },
     enabled: !!adminToken,
   });
+
+  // Route guard - redirect if user doesn't have permission to access Vets Van Shifts page
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions && (currentUserPermissions as any).vetsVanShiftsHidden === true) {
+      // User should not reach this page with hidden permission, redirect immediately
+      console.log('User has no Vets Van Shifts permission, redirecting');
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
+
+  // Determine if page is in read-only mode
+  const isReadOnly = currentUserPermissions && (currentUserPermissions as any).vetsVanShiftsRead === true && !(currentUserPermissions as any).vetsVanShiftsFullControl;
   
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {
     const today = new Date();
@@ -591,6 +603,26 @@ export default function VetsVanShifts() {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
+          {/* Read-Only Mode Indicator */}
+          {isReadOnly && (
+            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-4 mx-6 mt-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-amber-700">
+                    {language === 'ar' 
+                      ? 'وضع القراءة فقط - يمكنك عرض المناوبات ولكن لا يمكنك إجراء تعديلات'
+                      : 'Read-Only Mode - You can view shifts but cannot make modifications'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
             <div className="px-1 py-3 sm:px-0">
               {/* جدول النوبات */}
@@ -695,8 +727,13 @@ export default function VetsVanShifts() {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="absolute -top-1 -right-1 h-5 w-5 p-0 text-red-500 hover:text-red-700"
-                                    onClick={() => deleteShiftMutation.mutate(shift.id)}
+                                    disabled={isReadOnly}
+                                    className={`absolute -top-1 -right-1 h-5 w-5 p-0 ${
+                                      isReadOnly 
+                                        ? 'text-gray-400 cursor-not-allowed opacity-50' 
+                                        : 'text-red-500 hover:text-red-700'
+                                    }`}
+                                    onClick={() => !isReadOnly && deleteShiftMutation.mutate(shift.id)}
                                   >
                                     <X className="w-3 h-3" />
                                   </Button>
@@ -710,10 +747,17 @@ export default function VetsVanShifts() {
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      className="h-8 w-8 p-0"
+                                      disabled={isReadOnly}
+                                      className={`h-8 w-8 p-0 ${
+                                        isReadOnly 
+                                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50 border-gray-300' 
+                                          : ''
+                                      }`}
                                       onClick={() => {
-                                        setSelectedVetsVan(van.id);
-                                        setNewShift(prev => ({ ...prev, date }));
+                                        if (!isReadOnly) {
+                                          setSelectedVetsVan(van.id);
+                                          setNewShift(prev => ({ ...prev, date }));
+                                        }
                                       }}
                                     >
                                       <Plus className="w-4 h-4" />
