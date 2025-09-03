@@ -2092,7 +2092,12 @@ export default function AdminDashboard() {
                         <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVanManagement')}</h3>
                         <button
                           onClick={() => setShowAddForm(!showAddForm)}
-                          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-600"
+                          disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md ${
+                            currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
+                              ? 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                              : 'text-white bg-purple-600 hover:bg-purple-700'
+                          }`}
                         >
                           <UserPlus className="h-4 w-4 ml-2" />
                           {t('addNewVetsVan')}

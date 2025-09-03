@@ -394,7 +394,7 @@ export default function AdministrationUsers() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true) {
+                if (currentUserPermissions && currentUserPermissions.vetsVanHidden === true) {
                   setLocation('/admin-home');
                 } else {
                   setLocation('/admin-dashboard');
