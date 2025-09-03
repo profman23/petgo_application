@@ -1125,8 +1125,14 @@ export default function AdministrationAuthorization() {
                     {language === 'ar' ? 'استيراد' : 'Import'}
                   </h3>
                   
-                  {/* Permission Items */}
-                  <div className="ml-4 flex flex-row gap-6">
+                  {/* Import Sub-section */}
+                  <div className="ml-8">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      {language === 'ar' ? 'استيراد' : 'Import'}
+                    </h4>
+                    
+                    {/* Permission Items */}
+                    <div className="ml-4 flex flex-row gap-6">
                     {/* No Permission Import */}
                     <div className="flex items-center">
                       <input
@@ -1150,10 +1156,11 @@ export default function AdministrationAuthorization() {
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
+                    </div>
+                    
+                    {/* Purple divider line */}
+                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
-                  
-                  {/* Purple divider line */}
-                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
                 
                 {/* Services Section */}
@@ -1163,8 +1170,14 @@ export default function AdministrationAuthorization() {
                     {language === 'ar' ? 'الخدمات' : 'Services'}
                   </h3>
                   
-                  {/* Permission Items */}
-                  <div className="ml-4 flex flex-row gap-6">
+                  {/* Services Sub-section */}
+                  <div className="ml-8">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      {language === 'ar' ? 'الخدمات' : 'Services'}
+                    </h4>
+                    
+                    {/* Permission Items */}
+                    <div className="ml-4 flex flex-row gap-6">
                     {/* No Permission Services */}
                     <div className="flex items-center">
                       <input
@@ -1200,10 +1213,11 @@ export default function AdministrationAuthorization() {
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
+                    </div>
+                    
+                    {/* Purple divider line */}
+                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
-                  
-                  {/* Purple divider line */}
-                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
                 
                 {/* Products Section */}
@@ -1213,8 +1227,14 @@ export default function AdministrationAuthorization() {
                     {language === 'ar' ? 'المنتجات' : 'Products'}
                   </h3>
                   
-                  {/* Permission Items */}
-                  <div className="ml-4 flex flex-row gap-6">
+                  {/* Products Sub-section */}
+                  <div className="ml-8">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      {language === 'ar' ? 'المنتجات' : 'Products'}
+                    </h4>
+                    
+                    {/* Permission Items */}
+                    <div className="ml-4 flex flex-row gap-6">
                     {/* No Permission Products */}
                     <div className="flex items-center">
                       <input
@@ -1250,6 +1270,10 @@ export default function AdministrationAuthorization() {
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                       </label>
                     </div>
+                    </div>
+                    
+                    {/* Purple divider line */}
+                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
                 </div>
               </div>
