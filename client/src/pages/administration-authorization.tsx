@@ -880,7 +880,7 @@ export default function AdministrationAuthorization() {
                 </h3>
                 
                 {/* Users Section */}
-                <div className="ml-4">
+                <div className="ml-8">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">
                     {language === 'ar' ? 'المستخدمين' : 'Users'}
                   </h4>
@@ -937,7 +937,7 @@ export default function AdministrationAuthorization() {
                 </div>
                 
                 {/* Authorization Section */}
-                <div className="ml-4">
+                <div className="ml-8">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">
                     {language === 'ar' ? 'التصريح' : 'Authorization'}
                   </h4>
@@ -1002,7 +1002,7 @@ export default function AdministrationAuthorization() {
                 </h3>
                 
                 {/* Vets Van Management Section */}
-                <div className="ml-4">
+                <div className="ml-8">
                   <h4 className="text-sm font-medium text-gray-700 mb-3">
                     {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
                   </h4>
@@ -1061,7 +1061,7 @@ export default function AdministrationAuthorization() {
 
               {/* Vets Van Shifts Section */}
               <div className="mb-4">
-                <div className="ml-4">
+                <div className="ml-8">
                   <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                     <Clock className="h-4 w-4 text-gray-500" />
                     {language === 'ar' ? 'نوبات VETS VAN' : 'Vets Van Shifts'}
