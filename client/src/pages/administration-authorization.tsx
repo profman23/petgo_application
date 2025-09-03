@@ -844,19 +844,6 @@ export default function AdministrationAuthorization() {
             
             {/* Popup Content with Custom Scrollbar */}
             <div className="relative flex-1 overflow-hidden">
-              {/* Scroll Up Arrow */}
-              <button
-                onClick={() => {
-                  const scrollContainer = document.getElementById('authorization-scroll-container');
-                  if (scrollContainer) {
-                    scrollContainer.scrollBy({ top: -100, behavior: 'smooth' });
-                  }
-                }}
-                className="absolute top-2 right-2 z-10 bg-white border border-gray-300 rounded-full p-1 shadow-sm hover:bg-gray-50 transition-colors"
-              >
-                <ChevronUp className="h-4 w-4 text-gray-600" />
-              </button>
-              
               {/* Scrollable Content */}
               <div 
                 id="authorization-scroll-container"
@@ -1116,20 +1103,6 @@ export default function AdministrationAuthorization() {
                   </div>
                 </div>
               </div>
-              
-              {/* Scroll Down Arrow */}
-              <button
-                onClick={() => {
-                  const scrollContainer = document.getElementById('authorization-scroll-container');
-                  if (scrollContainer) {
-                    scrollContainer.scrollBy({ top: 100, behavior: 'smooth' });
-                  }
-                }}
-                className="absolute bottom-2 right-2 z-10 bg-white border border-gray-300 rounded-full p-1 shadow-sm hover:bg-gray-50 transition-colors"
-              >
-                <ChevronDown className="h-4 w-4 text-gray-600" />
-              </button>
-            </div>
             </div>
             
             {/* Popup Footer */}
