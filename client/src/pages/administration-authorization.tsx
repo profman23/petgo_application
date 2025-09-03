@@ -825,7 +825,7 @@ export default function AdministrationAuthorization() {
       {/* Add New Authorization Popup */}
       {showAddAuthorizationPopup && !isReadOnly && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style={{ left: '256px', top: '82px' }}>
-          <div className="bg-white rounded-lg shadow-xl w-[800px] max-w-4xl mx-4 flex flex-col max-h-[85vh]">
+          <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[90vh]">
             {/* Popup Header */}
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900">
@@ -851,8 +851,8 @@ export default function AdministrationAuthorization() {
                 style={{
                   scrollbarWidth: 'thin',
                   scrollbarColor: '#9CA3AF #F3F4F6',
-                  height: '60vh',
-                  maxHeight: '500px'
+                  height: '70vh',
+                  maxHeight: '650px'
                 }}
               >
               {/* Authorization Name Field */}
