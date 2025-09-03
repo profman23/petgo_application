@@ -3019,7 +3019,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         authFullControl: authorizations.authFullControl,
         vetsVanHidden: authorizations.vetsVanHidden,
         vetsVanRead: authorizations.vetsVanRead,
-        vetsVanFullControl: authorizations.vetsVanFullControl
+        vetsVanFullControl: authorizations.vetsVanFullControl,
+        vetsVanShiftsHidden: authorizations.vetsVanShiftsHidden,
+        vetsVanShiftsRead: authorizations.vetsVanShiftsRead,
+        vetsVanShiftsFullControl: authorizations.vetsVanShiftsFullControl
       })
       .from(adminUsers)
       .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
@@ -3042,7 +3045,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           usersFullControl: true,
           authHidden: false,
           authRead: true,
-          authFullControl: true
+          authFullControl: true,
+          vetsVanHidden: false,
+          vetsVanRead: true,
+          vetsVanFullControl: true,
+          vetsVanShiftsHidden: false,
+          vetsVanShiftsRead: true,
+          vetsVanShiftsFullControl: true
         };
       }
       
