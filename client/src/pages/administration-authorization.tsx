@@ -885,7 +885,7 @@ export default function AdministrationAuthorization() {
                   </h4>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 space-y-2">
+                  <div className="ml-4 flex flex-row gap-6">
                     {/* Hidden Users */}
                     <div className="flex items-center">
                       <input
@@ -930,6 +930,9 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                   </div>
+                  
+                  {/* Purple divider line */}
+                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
                 
                 {/* Authorization Section */}
@@ -939,7 +942,7 @@ export default function AdministrationAuthorization() {
                   </h4>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 space-y-2">
+                  <div className="ml-4 flex flex-row gap-6">
                     {/* Hidden Users */}
                     <div className="flex items-center">
                       <input
@@ -984,6 +987,9 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                   </div>
+                  
+                  {/* Purple divider line */}
+                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
               </div>
               
@@ -1000,7 +1006,7 @@ export default function AdministrationAuthorization() {
                   </h4>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 space-y-2">
+                  <div className="ml-4 flex flex-row gap-6">
                     {/* Hidden Vets Van */}
                     <div className="flex items-center">
                       <input
@@ -1045,6 +1051,9 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                   </div>
+                  
+                  {/* Purple divider line */}
+                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
               </div>
 
@@ -1056,7 +1065,7 @@ export default function AdministrationAuthorization() {
                   </h4>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 space-y-2">
+                  <div className="ml-4 flex flex-row gap-6">
                     {/* Hidden Vets Van Shifts */}
                     <div className="flex items-center">
                       <input
@@ -1101,6 +1110,9 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                   </div>
+                  
+                  {/* Purple divider line */}
+                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
                 
                 {/* Import Section */}
@@ -1110,7 +1122,7 @@ export default function AdministrationAuthorization() {
                   </h3>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 space-y-2">
+                  <div className="ml-4 flex flex-row gap-6">
                     {/* No Permission Import */}
                     <div className="flex items-center">
                       <input
@@ -1135,6 +1147,9 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                   </div>
+                  
+                  {/* Purple divider line */}
+                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
                 
                 {/* Services Section */}
@@ -1144,7 +1159,7 @@ export default function AdministrationAuthorization() {
                   </h3>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 space-y-2">
+                  <div className="ml-4 flex flex-row gap-6">
                     {/* No Permission Services */}
                     <div className="flex items-center">
                       <input
@@ -1181,6 +1196,9 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                   </div>
+                  
+                  {/* Purple divider line */}
+                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
                 
                 {/* Products Section */}
@@ -1190,7 +1208,7 @@ export default function AdministrationAuthorization() {
                   </h3>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 space-y-2">
+                  <div className="ml-4 flex flex-row gap-6">
                     {/* No Permission Products */}
                     <div className="flex items-center">
                       <input
