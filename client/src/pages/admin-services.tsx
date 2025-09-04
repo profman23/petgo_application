@@ -267,7 +267,7 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
         <h2 className="text-2xl font-bold flex items-center gap-2" style={{ 
           direction: getDirection(language), 
           textAlign: getTextAlign(language),
-          fontFamily: 'Roboto Flex'
+          fontFamily: 'Arimo'
         }}>
           <Stethoscope className="h-6 w-6 text-purple-600" />
           {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
