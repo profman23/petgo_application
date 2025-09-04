@@ -244,6 +244,7 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
         <div className="flex flex-col gap-2 items-end">
           <Button
             onClick={() => setShowAddForm(true)}
+disabled={false}
             className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
             style={{ direction: 'ltr' }}
           >
@@ -253,6 +254,7 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
           
           <Button
             onClick={toggleSelectAll}
+disabled={false}
             variant="outline"
             className="border-purple-300 text-purple-700 hover:bg-purple-50"
             style={{ direction: 'ltr' }}
