@@ -218,6 +218,10 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     }
   };
 
+  // Check if all visible products are selected (matching Services logic)
+  const areAllVisibleSelected = currentProducts.length > 0 && 
+    currentProducts.every((product: any) => selectedProducts.includes(product.id));
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -245,6 +249,15 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Product
+          </Button>
+          
+          <Button
+            onClick={toggleSelectAll}
+            variant="outline"
+            className="border-purple-300 text-purple-700 hover:bg-purple-50"
+            style={{ direction: 'ltr' }}
+          >
+            {areAllVisibleSelected ? (language === 'ar' ? 'إلغاء تحديد الكل' : 'Deselect All') : (language === 'ar' ? 'تحديد الكل' : 'Select All')}
           </Button>
           
           {selectedProducts.length > 0 && (
