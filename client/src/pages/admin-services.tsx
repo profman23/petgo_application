@@ -596,9 +596,10 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
             </tbody>
           </table>
         </div>
+      </div>
 
-        {/* Enhanced Pagination */}
-        <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4">
+      {/* Enhanced Pagination */}
+      <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4">
           {/* Results Info & Items Per Page */}
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <div className="text-sm text-gray-700" style={{ 
@@ -667,9 +668,7 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
               </Button>
             </div>
           )}
-
         </div>
-      </div>
     </div>
   );
 };
