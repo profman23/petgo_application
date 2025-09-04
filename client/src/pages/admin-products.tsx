@@ -377,7 +377,7 @@ disabled={false}
             placeholder={language === 'ar' ? 'البحث في المنتجات...' : 'Search products...'}
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            className="pl-10 border-purple-300 focus:border-purple-500 focus:ring-purple-500"
+            className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10 border-purple-300 focus:border-purple-500 focus:ring-purple-500"
             style={{ 
               direction: getDirection(language), 
               textAlign: getTextAlign(language),
