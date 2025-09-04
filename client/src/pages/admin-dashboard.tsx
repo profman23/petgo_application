@@ -2099,7 +2099,7 @@ export default function AdminDashboard() {
                   <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
                     <div className="px-4 py-5 sm:p-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">{t('vetsVanManagement')}</h3>
+                        <h3 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('vetsVanManagement')}</h3>
                         <button
                           onClick={() => setShowAddForm(!showAddForm)}
                           disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
