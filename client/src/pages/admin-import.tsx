@@ -62,6 +62,14 @@ export default function AdminImport() {
     }
   }, [allVetsVanRequests]);
 
+  // Permission check - redirect users with "No Permission" for Import
+  useEffect(() => {
+    if (currentUserPermissions && currentUserPermissions.importHidden === true) {
+      console.log('🚫 User has no permission for Import - redirecting to admin home');
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, setLocation]);
+
   // Download template function - exact copy from admin dashboard
   const downloadTemplate = async (type: 'products' | 'services') => {
     try {
