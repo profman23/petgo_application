@@ -264,10 +264,11 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
     <div className="space-y-6">
       {/* Header with Add Service Button */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold" style={{ 
+        <h2 className="text-2xl font-bold flex items-center gap-2" style={{ 
           direction: getDirection(language), 
           textAlign: getTextAlign(language) 
         }}>
+          <Stethoscope className="h-6 w-6 text-purple-600" />
           {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
         </h2>
         
