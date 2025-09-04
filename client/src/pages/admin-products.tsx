@@ -231,7 +231,7 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold" style={{ 
