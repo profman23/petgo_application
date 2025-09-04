@@ -234,9 +234,10 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold" style={{ 
+        <h2 className="text-2xl font-bold text-gray-600" style={{ 
           direction: getDirection(language), 
-          textAlign: getTextAlign(language) 
+          textAlign: getTextAlign(language),
+          fontFamily: 'Arimo'
         }}>
           {language === 'ar' ? 'إدارة المنتجات' : 'Products Management'}
         </h2>

@@ -819,7 +819,7 @@ export default function AdministrationAuthorization() {
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
                       {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
                     </h1>
                     <button

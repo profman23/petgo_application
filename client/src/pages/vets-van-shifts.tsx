@@ -629,7 +629,7 @@ export default function VetsVanShifts() {
               <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>{t('shiftsSchedule')}</span>
+              <span className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('shiftsSchedule')}</span>
               <div className="flex items-center gap-4">
                 {/* أسهم التنقل بين الأسابيع */}
                 <div className="flex items-center gap-2">

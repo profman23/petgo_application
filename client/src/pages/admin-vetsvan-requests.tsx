@@ -520,7 +520,7 @@ export default function AdminVetsVanRequests() {
               {/* VetsVan Requests Section - exact copy from admin dashboard */}
               <div className="space-y-3" dir={getDirection(language)}>
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
+                  <h2 className="text-2xl font-bold text-gray-600 mb-2" style={{ textAlign: getTextAlign(language), fontFamily: 'Arimo' }}>
                     {language === 'ar' ? 'جميع طلبات VETS VAN' : 'All VetsVan Requests'}
                   </h2>
                   <p className="text-gray-600" style={{ textAlign: getTextAlign(language) }}>

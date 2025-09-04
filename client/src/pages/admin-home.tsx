@@ -312,7 +312,7 @@ export default function AdminHome() {
                   alt="Welcome Background" 
                   className="w-16 h-16 object-cover rounded-lg shadow-md"
                 />
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
                   {language === 'ar' 
                     ? `مرحباً ${adminInfo.username} إلى Vets Van` 
                     : `Welcome ${adminInfo.username} to Vets Van`

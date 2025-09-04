@@ -498,7 +498,7 @@ export default function AdminImport() {
               <div>
                 <div className="bg-white overflow-hidden shadow rounded-lg">
                   <div className="px-4 py-5 sm:p-6">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6" style={{ textAlign: getTextAlign(language) }}>
+                    <h3 className="text-2xl font-bold text-gray-600 mb-6" style={{ textAlign: getTextAlign(language), fontFamily: 'Arimo' }}>
                       {language === 'ar' ? 'استيراد البيانات' : 'Import Data'}
                     </h3>
                     
