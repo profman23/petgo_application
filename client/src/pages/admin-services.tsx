@@ -470,6 +470,7 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
                   <Checkbox
                     checked={areAllVisibleSelected}
                     onCheckedChange={() => handleSelectAll()}
+                    disabled={isReadOnly}
                     className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                   />
                 </th>
@@ -500,6 +501,7 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
                     <Checkbox
                       checked={selectedServices.includes(service.id)}
                       onCheckedChange={(checked) => handleServiceSelection(service.id, !!checked)}
+                      disabled={isReadOnly}
                       className="data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
                     />
                   </td>
