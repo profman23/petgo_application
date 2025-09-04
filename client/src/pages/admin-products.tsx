@@ -405,13 +405,16 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
                   {language === 'ar' ? 'المعرف' : 'ID'}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
-                  {language === 'ar' ? 'الاسم بالإنجليزية' : 'English Name'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
-                  {language === 'ar' ? 'الاسم بالعربية' : 'Arabic Name'}
+                  {language === 'ar' ? 'اسم المنتج' : 'Product Name'}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
+                  {language === 'ar' ? 'الفئة' : 'Category'}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
+                  {language === 'ar' ? 'الحالة' : 'Status'}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'الإجراءات' : 'Actions'}
@@ -428,14 +431,18 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
                       className="border-gray-400"
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {product.id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {product.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" style={{ direction: 'rtl' }}>
-                    {product.nameAr}
+                    <div className="space-y-1">
+                      <div className="font-medium">{product.name}</div>
+                      {product.nameAr && (
+                        <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
+                          {product.nameAr}
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {editingProduct?.id === product.id ? (
@@ -449,6 +456,28 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
                     ) : (
                       `${parseFloat(product.price).toFixed(2)} SAR`
                     )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div className="space-y-1">
+                      <div>{product.category || (language === 'ar' ? 'غير محدد' : 'Uncategorized')}</div>
+                      {product.categoryAr && product.category !== product.categoryAr && (
+                        <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
+                          {product.categoryAr}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      product.isActive 
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {product.isActive 
+                        ? (language === 'ar' ? 'نشط' : 'Active')
+                        : (language === 'ar' ? 'غير نشط' : 'Inactive')
+                      }
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {editingProduct?.id === product.id ? (
