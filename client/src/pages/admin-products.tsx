@@ -454,7 +454,7 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
                         style={{ direction: 'ltr' }}
                       />
                     ) : (
-                      `${parseFloat(product.price).toFixed(2)} SAR`
+                      <span className="font-medium">{parseFloat(product.price).toFixed(2)}</span>
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
