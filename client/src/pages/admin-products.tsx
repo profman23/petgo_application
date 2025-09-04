@@ -508,9 +508,10 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
                         size="sm"
                         variant="outline"
                         onClick={() => handleEditClick(product)}
-                        className="border-purple-300 hover:bg-purple-50"
+                        className="h-8 px-3 border-purple-300 text-purple-600 hover:bg-purple-50"
                       >
-                        <Edit className="h-3 w-3" />
+                        <Edit className="h-3 w-3 mr-1" />
+                        {language === 'ar' ? 'تعديل' : 'Edit'}
                       </Button>
                     )}
                   </td>
