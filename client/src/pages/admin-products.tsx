@@ -354,27 +354,38 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
       )}
 
       {/* Search and Filters */}
-      <div className="mt-6 mb-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+      <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
+            type="text"
             placeholder={language === 'ar' ? 'البحث في المنتجات...' : 'Search products...'}
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
-            className="pl-10 border-gray-300 focus:border-purple-500"
+            className="pl-10 border-purple-300 focus:border-purple-500 focus:ring-purple-500"
             style={{ 
               direction: getDirection(language), 
-              textAlign: getTextAlign(language) 
+              textAlign: getTextAlign(language),
+              paddingLeft: language === 'ar' ? '12px' : '40px',
+              paddingRight: language === 'ar' ? '40px' : '12px'
             }}
           />
+          {language === 'ar' && (
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          )}
         </div>
         
-        <div className="text-sm text-gray-600">
-          {language === 'ar' 
-            ? `عرض ${currentProducts.length} من ${filteredProducts.length} منتج`
-            : `Showing ${currentProducts.length} of ${filteredProducts.length} products`
-          }
-        </div>
+        {filterText && (
+          <div className="mt-2 text-sm text-gray-600" style={{ 
+            direction: getDirection(language), 
+            textAlign: getTextAlign(language) 
+          }}>
+            {language === 'ar' 
+              ? `عرض ${filteredProducts.length} من ${displayProducts.length} منتج`
+              : `Showing ${filteredProducts.length} of ${displayProducts.length} products`
+            }
+          </div>
+        )}
       </div>
 
       {/* Products Table */}
@@ -609,7 +620,7 @@ export default function AdminProducts() {
 
   // Monitor for new requests and update notification count - exact same logic as VetsVan Shifts
   useEffect(() => {
-    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
+    if (allVetsVanRequests && Array.isArray(allVetsVanRequests) && allVetsVanRequests.length > 0) {
       const currentCount = allVetsVanRequests.length;
       
       lastRequestCountRef.current = currentCount;
