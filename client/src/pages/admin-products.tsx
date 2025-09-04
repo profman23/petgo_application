@@ -617,6 +617,14 @@ export default function AdminProducts() {
     }
   }, [allVetsVanRequests]);
 
+  // Permission check - redirect users with "No Permission" for Products
+  useEffect(() => {
+    if (currentUserPermissions && currentUserPermissions.productsHidden === true) {
+      console.log('🚫 User has no permission for Products - redirecting to admin home');
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, setLocation]);
+
   return (
     <div 
       className="min-h-screen bg-gray-50"

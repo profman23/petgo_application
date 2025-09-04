@@ -718,6 +718,14 @@ export default function AdminServices() {
     }
   }, [allVetsVanRequests]);
 
+  // Permission check - redirect users with "No Permission" for Services
+  useEffect(() => {
+    if (currentUserPermissions && currentUserPermissions.servicesHidden === true) {
+      console.log('🚫 User has no permission for Services - redirecting to admin home');
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, setLocation]);
+
   return (
     <div 
       className="min-h-screen bg-gray-50"
