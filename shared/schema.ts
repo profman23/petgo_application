@@ -740,6 +740,20 @@ export const authorizations = pgTable("authorizations", {
   vetsVanShiftsRead: boolean("vets_van_shifts_read").notNull().default(false),
   vetsVanShiftsFullControl: boolean("vets_van_shifts_full_control").notNull().default(false),
   
+  // Import permissions
+  importHidden: boolean("import_hidden").notNull().default(false),
+  importFullControl: boolean("import_full_control").notNull().default(false),
+  
+  // Services permissions
+  servicesHidden: boolean("services_hidden").notNull().default(false),
+  servicesRead: boolean("services_read").notNull().default(false),
+  servicesFullControl: boolean("services_full_control").notNull().default(false),
+  
+  // Products permissions
+  productsHidden: boolean("products_hidden").notNull().default(false),
+  productsRead: boolean("products_read").notNull().default(false),
+  productsFullControl: boolean("products_full_control").notNull().default(false),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -772,6 +786,14 @@ export const insertAuthorizationSchema = createInsertSchema(authorizations).pick
   vetsVanShiftsHidden: true,
   vetsVanShiftsRead: true,
   vetsVanShiftsFullControl: true,
+  importHidden: true,
+  importFullControl: true,
+  servicesHidden: true,
+  servicesRead: true,
+  servicesFullControl: true,
+  productsHidden: true,
+  productsRead: true,
+  productsFullControl: true,
 });
 
 export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
