@@ -14,7 +14,7 @@ import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 // Services Management Component
-const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
+const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'en'; isReadOnly: boolean }) => {
   const { toast } = useToast();
   const [editingService, setEditingService] = useState<{ id: number; price: string } | null>(null);
   const [editedServices, setEditedServices] = useState<{ [key: number]: string }>({});
@@ -712,7 +712,7 @@ export default function AdminServices() {
 
   // Monitor for new requests and update notification count - exact same logic as VetsVan Shifts
   useEffect(() => {
-    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
+    if (allVetsVanRequests && Array.isArray(allVetsVanRequests) && allVetsVanRequests.length > 0) {
       const currentCount = allVetsVanRequests.length;
       
       lastRequestCountRef.current = currentCount;
@@ -970,7 +970,7 @@ export default function AdminServices() {
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
             <div className="px-1 py-3 sm:px-0">
-              <ServicesManagementTable language={language} />
+              <ServicesManagementTable language={language} isReadOnly={isReadOnly} />
             </div>
           </div>
         </div>
