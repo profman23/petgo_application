@@ -1,0 +1,13 @@
+<thead data-replit-metadata="client/src/pages/admin-services.tsx:467:12" data-component-name="thead" class="bg-gradient-to-r from-purple-50 to-purple-100">
+  <tr data-replit-metadata="client/src/pages/admin-services.tsx:468:14" data-component-name="tr">
+    <th data-replit-metadata="client/src/pages/admin-services.tsx:469:16" data-component-name="th" class="px-6 py-3 text-left">
+      <button type="button" role="checkbox" aria-checked="false" data-state="unchecked" value="on" data-replit-metadata="client/src/pages/admin-services.tsx:470:18" data-component-name="Checkbox" class="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:text-primary-foreground data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"></button>
+    </th>
+    <th data-replit-metadata="client/src/pages/admin-services.tsx:477:16" data-component-name="th" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">ID</th>
+    <th data-replit-metadata="client/src/pages/admin-services.tsx:480:16" data-component-name="th" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Service Name</th>
+    <th data-replit-metadata="client/src/pages/admin-services.tsx:483:16" data-component-name="th" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Price (SAR)</th>
+    <th data-replit-metadata="client/src/pages/admin-services.tsx:486:16" data-component-name="th" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Category</th>
+    <th data-replit-metadata="client/src/pages/admin-services.tsx:489:16" data-component-name="th" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Status</th>
+    <th data-replit-metadata="client/src/pages/admin-services.tsx:492:16" data-component-name="th" class="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">Actions</th>
+  </tr>
+</thead>

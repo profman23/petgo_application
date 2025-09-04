@@ -392,7 +392,7 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gradient-to-r from-purple-50 to-purple-100">
               <tr>
                 <th className="px-6 py-3 text-left">
                   <Checkbox
@@ -401,19 +401,19 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
                     className="border-gray-400"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'المعرف' : 'ID'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'الاسم بالإنجليزية' : 'English Name'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'الاسم بالعربية' : 'Arabic Name'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
                   {language === 'ar' ? 'الإجراءات' : 'Actions'}
                 </th>
               </tr>
