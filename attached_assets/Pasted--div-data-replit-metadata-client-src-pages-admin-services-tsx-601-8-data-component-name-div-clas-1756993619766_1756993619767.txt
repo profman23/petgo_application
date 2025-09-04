@@ -1,0 +1,19 @@
+<div data-replit-metadata="client/src/pages/admin-services.tsx:601:8" data-component-name="div" class="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4">
+  <div data-replit-metadata="client/src/pages/admin-services.tsx:603:10" data-component-name="div" class="flex flex-col sm:flex-row items-center gap-4">
+    <div data-replit-metadata="client/src/pages/admin-services.tsx:604:12" data-component-name="div" class="text-sm text-gray-700" style="direction: ltr; text-align: left;">Showing 10 of 1048 services (Total: 1048)</div>
+    <div data-replit-metadata="client/src/pages/admin-services.tsx:614:12" data-component-name="div" class="flex items-center gap-2" style="direction: ltr;">
+      <span data-replit-metadata="client/src/pages/admin-services.tsx:615:14" data-component-name="span" class="text-sm text-gray-600">Show:</span>
+      <select data-replit-metadata="client/src/pages/admin-services.tsx:618:14" data-component-name="select" class="border border-purple-300 rounded px-3 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white" style="direction: ltr;">
+        <option data-replit-metadata="client/src/pages/admin-services.tsx:627:16" data-component-name="option" value="10">10</option>
+        <option data-replit-metadata="client/src/pages/admin-services.tsx:628:16" data-component-name="option" value="50">50</option>
+        <option data-replit-metadata="client/src/pages/admin-services.tsx:629:16" data-component-name="option" value="100">100</option>
+      </select>
+      <span data-replit-metadata="client/src/pages/admin-services.tsx:631:14" data-component-name="span" class="text-sm text-gray-600">per page</span>
+    </div>
+  </div>
+  <div data-replit-metadata="client/src/pages/admin-services.tsx:639:10" data-component-name="div" class="flex items-center gap-2">
+    <button data-replit-metadata="client/src/pages/admin-services.tsx:640:14" data-component-name="Button" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:text-accent-foreground h-9 rounded-md px-3 border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled="">Previous</button>
+    <div data-replit-metadata="client/src/pages/admin-services.tsx:650:14" data-component-name="div" class="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
+      <span data-replit-metadata="client/src/pages/admin-services.tsx:651:16" data-component-name="span" class="text-sm font-medium text-purple-700">Page 1 of 105</span>
+    </div>
+    <button data-replit-metadata="client/src/pages/admin-services.tsx:659:14" data-component-name="Button" class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border bg-background hover:text-accent-fo_]()_]()_]()
