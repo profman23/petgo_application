@@ -753,21 +753,57 @@ export default function AdministrationAuthorization() {
               <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard/import')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Check if user has import permissions
+                if (currentUserPermissions && (currentUserPermissions as any).importHidden === true) {
+                  // User has No Permission for Import, redirect to admin home
+                  setLocation('/admin-home');
+                } else {
+                  // User has Full Control or no specific restrictions, allow access
+                  setLocation('/admin-dashboard/import');
+                }
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Upload className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard/services')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Check if user has services permissions
+                if (currentUserPermissions && (currentUserPermissions as any).servicesHidden === true) {
+                  // User has No Permission for Services, redirect to admin home
+                  setLocation('/admin-home');
+                } else {
+                  // User has Full Control or Read access, allow access
+                  setLocation('/admin-dashboard/services');
+                }
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Stethoscope className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard/products')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Check if user has products permissions
+                if (currentUserPermissions && (currentUserPermissions as any).productsHidden === true) {
+                  // User has No Permission for Products, redirect to admin home
+                  setLocation('/admin-home');
+                } else {
+                  // User has Full Control or Read access, allow access
+                  setLocation('/admin-dashboard/products');
+                }
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Package className="h-6 w-6 flex-shrink-0" />
@@ -788,7 +824,7 @@ export default function AdministrationAuthorization() {
                     </h1>
                     <button
                       onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
-                      disabled={isReadOnly}
+                      disabled={!!isReadOnly}
                       className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
                         isReadOnly 
                           ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
@@ -891,7 +927,7 @@ export default function AdministrationAuthorization() {
                             <div className="ml-4">
                               <button
                                 onClick={isReadOnly ? undefined : () => handleEditAuthorization(auth)}
-                                disabled={isReadOnly}
+                                disabled={!!isReadOnly}
                                 className={`p-2 rounded-full transition-colors ${
                                   isReadOnly 
                                     ? 'text-gray-300 cursor-not-allowed opacity-50'
