@@ -274,6 +274,7 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
         <div className="flex flex-col gap-2 items-end">
           <Button
             onClick={() => setShowAddForm(true)}
+            disabled={isReadOnly}
             className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
             style={{ direction: 'ltr' }}
           >
@@ -283,6 +284,7 @@ const ServicesManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
           
           <Button
             onClick={handleSelectAll}
+            disabled={isReadOnly}
             variant="outline"
             className="border-purple-300 text-purple-700 hover:bg-purple-50"
             style={{ direction: 'ltr' }}
@@ -725,6 +727,11 @@ export default function AdminServices() {
       setLocation('/admin-home');
     }
   }, [currentUserPermissions, setLocation]);
+
+  // Check if user has read-only access (can view but not modify)
+  const isReadOnly = currentUserPermissions && 
+    currentUserPermissions.servicesRead === true && 
+    currentUserPermissions.servicesFullControl === false;
 
   return (
     <div 
