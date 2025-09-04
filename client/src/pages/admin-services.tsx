@@ -583,6 +583,7 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
                         size="sm"
                         variant="outline"
                         onClick={() => handlePriceEdit(service.id, service.price.toString())}
+                        disabled={isReadOnly}
                         className="h-8 px-3 border-purple-300 text-purple-600 hover:bg-purple-50"
                       >
                         <Edit className="h-3 w-3 mr-1" />
