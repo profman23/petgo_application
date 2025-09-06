@@ -307,10 +307,12 @@ export default function AdminHome() {
             {/* Welcome Message - Top Left with Image */}
             <div className="mb-8">
               <div className="flex items-center gap-4">
-                <img 
-                  src={welcomeImage} 
-                  alt="Welcome Background" 
-                  className="w-16 h-16 object-cover rounded-lg shadow-md"
+                <lord-icon
+                  src="https://cdn.lordicon.com/hfadyleu.json"
+                  trigger="loop"
+                  stroke="light"
+                  colors="primary:#852085,secondary:#848484"
+                  style={{width: '64px', height: '64px'}}
                 />
                 <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
                   {language === 'ar' 
