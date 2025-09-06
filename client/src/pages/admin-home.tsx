@@ -321,7 +321,6 @@ export default function AdminHome() {
                 </h1>
               </div>
             </div>
-          </div>
 
           <div className="max-w-4xl mx-auto">
             {/* Home Page Section */}
