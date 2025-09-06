@@ -632,7 +632,7 @@ export default function VetsVanShifts() {
               <div className="flex items-center gap-3">
                 <lord-icon
                   src="https://cdn.lordicon.com/warimioc.json"
-                  trigger="hover"
+                  trigger="loop"
                   stroke="bold"
                   colors="primary:#852085,secondary:#b4b4b4"
                   style={{width: '50px', height: '50px'}}
