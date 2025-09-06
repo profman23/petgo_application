@@ -247,7 +247,7 @@ export const translations = {
     adminLogin: 'Admin Login',
     adminDashboard: 'Admin Dashboard',
     welcome: 'Welcome',
-    vetsVanManagement: 'VETS VAN Management',
+    vetsVanManagement: 'Vetsvan Management',
     vetsVanShifts: 'VETS VAN Shifts',
     addNewVetsVan: 'Add New VETS VAN',
     vetsVanCode: 'VetsVan Code',
