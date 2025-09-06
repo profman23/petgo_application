@@ -623,8 +623,8 @@ export default function VetsVanShifts() {
               </div>
             </div>
           )}
-          <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
-            <div className="px-1 py-3 sm:px-0">
+          <div className="w-full mx-auto py-3 px-4">
+            <div className="w-full py-3">
               {/* جدول النوبات */}
               <Card>
           <CardHeader>
