@@ -311,9 +311,8 @@ export default function AdminHome() {
                   src="https://cdn.lordicon.com/hfadyleu.json"
                   trigger="loop"
                   delay="3000"
-                  stroke="light"
                   colors="primary:#852085,secondary:#848484"
-                  style={{width: '64px', height: '64px'}}
+                  style={{width: '300px', height: '300px'}}
                 />
                 <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
                   {language === 'ar' 
