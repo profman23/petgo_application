@@ -312,7 +312,7 @@ export default function AdminHome() {
                   trigger="loop"
                   delay="3000"
                   colors="primary:#852085,secondary:#848484"
-                  style={{width: '300px', height: '300px'}}
+                  style={{width: '250px', height: '250px'}}
                 />
                 <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
                   {language === 'ar' 
