@@ -303,10 +303,9 @@ export default function AdminHome() {
 
         {/* Main Content Area */}
         <div className="flex-1 p-6">
-          <div className="max-w-4xl mx-auto">
-            {/* Welcome Message - Top Left with Image */}
-            <div className="mb-8">
-              <div className="flex items-center justify-start gap-4">
+          {/* Welcome Message - Top Left with Image */}
+          <div className="mb-8">
+            <div className="flex items-center justify-start gap-4">
                 <lord-icon
                   src="https://cdn.lordicon.com/hfadyleu.json"
                   trigger="loop"
@@ -322,7 +321,9 @@ export default function AdminHome() {
                 </h1>
               </div>
             </div>
+          </div>
 
+          <div className="max-w-4xl mx-auto">
             {/* Home Page Section */}
             <div className="text-center mb-8">
               <div className="flex justify-center mb-6">
