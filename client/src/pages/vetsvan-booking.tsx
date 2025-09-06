@@ -603,7 +603,14 @@ export default function VetsVanBooking() {
     const shiftEnd = shift.endTime;
     
     // Check if the time slot falls within the shift time range
-    return slotTime24 >= shiftStart && slotTime24 < shiftEnd;
+    // Handle cross-midnight shifts (e.g., 18:00 to 03:00)
+    if (shiftEnd < shiftStart) {
+      // Cross-midnight shift: time is available if it's after start OR before end
+      return slotTime24 >= shiftStart || slotTime24 < shiftEnd;
+    } else {
+      // Normal shift: time is available if it's between start and end
+      return slotTime24 >= shiftStart && slotTime24 < shiftEnd;
+    }
   };
 
   // Function to check if a time slot is in the past
