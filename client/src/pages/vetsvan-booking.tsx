@@ -254,15 +254,27 @@ export default function VetsVanBooking() {
     retry: false,
   });
 
-  // Generate time slots from 9:00 AM to 9:00 PM
+  // Generate time slots for 24 hours from 9:00 AM to 9:00 AM (next day)
   const generateTimeSlots = () => {
     const slots = [];
-    for (let hour = 9; hour <= 21; hour++) {
-      const time12hour = hour > 12 ? `${hour - 12}:00 PM` : 
-                        hour === 12 ? `${hour}:00 PM` : 
-                        `${hour}:00 AM`;
+    
+    // Morning hours: 9:00 AM to 11:59 AM
+    for (let hour = 9; hour <= 11; hour++) {
+      slots.push(`${hour}:00 AM`);
+    }
+    
+    // Noon and afternoon: 12:00 PM to 11:59 PM
+    for (let hour = 12; hour <= 23; hour++) {
+      const time12hour = hour > 12 ? `${hour - 12}:00 PM` : `${hour}:00 PM`;
       slots.push(time12hour);
     }
+    
+    // Late night/early morning: 12:00 AM to 8:59 AM
+    for (let hour = 0; hour <= 8; hour++) {
+      const time12hour = hour === 0 ? '12:00 AM' : `${hour}:00 AM`;
+      slots.push(time12hour);
+    }
+    
     return slots;
   };
 
