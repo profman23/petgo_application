@@ -306,13 +306,13 @@ export default function AdminHome() {
           <div className="max-w-4xl mx-auto">
             {/* Welcome Message - Top Left with Image */}
             <div className="mb-8">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-start gap-4">
                 <lord-icon
                   src="https://cdn.lordicon.com/hfadyleu.json"
                   trigger="loop"
                   delay="3000"
                   colors="primary:#852085,secondary:#848484"
-                  style={{width: '250px', height: '250px'}}
+                  style={{width: '125px', height: '125px'}}
                 />
                 <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
                   {language === 'ar' 
