@@ -634,6 +634,22 @@ export default function VetsVanBooking() {
       const slotTime24 = convertTo24Hour(timeSlot);
       const currentTime = now.toTimeString().split(' ')[0].substring(0, 5); // HH:MM format
       
+      // Special handling for 24-hour operation (9:00 AM to 9:00 AM next day)
+      // Early morning slots (12:00 AM - 8:59 AM) are for next day service
+      const slotHour = parseInt(slotTime24.split(':')[0]);
+      const currentHour = parseInt(currentTime.split(':')[0]);
+      
+      // If current time is before 9:00 AM and slot is early morning (0-8), treat as same day
+      if (currentHour < 9 && slotHour < 9) {
+        return slotTime24 <= currentTime;
+      }
+      
+      // If current time is after 9:00 AM and slot is early morning (0-8), treat as next day
+      if (currentHour >= 9 && slotHour < 9) {
+        return false; // Early morning slots are for tomorrow
+      }
+      
+      // Normal comparison for other slots
       return slotTime24 <= currentTime;
     }
     
