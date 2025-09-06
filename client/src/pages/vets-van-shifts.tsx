@@ -629,7 +629,16 @@ export default function VetsVanShifts() {
               <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('shiftsSchedule')}</span>
+              <div className="flex items-center gap-3">
+                <lord-icon
+                  src="https://cdn.lordicon.com/warimioc.json"
+                  trigger="hover"
+                  stroke="bold"
+                  colors="primary:#852085,secondary:#b4b4b4"
+                  style={{width: '50px', height: '50px'}}
+                />
+                <span className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('shiftsSchedule')}</span>
+              </div>
               <div className="flex items-center gap-4">
                 {/* أسهم التنقل بين الأسابيع */}
                 <div className="flex items-center gap-2">
