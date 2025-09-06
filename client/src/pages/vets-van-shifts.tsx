@@ -635,7 +635,7 @@ export default function VetsVanShifts() {
                   trigger="loop"
                   stroke="bold"
                   colors="primary:#852085,secondary:#b4b4b4"
-                  style={{width: '50px', height: '50px'}}
+                  style={{width: '80px', height: '80px'}}
                 />
                 <span className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('shiftsSchedule')}</span>
               </div>
