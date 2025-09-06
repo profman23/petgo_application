@@ -310,6 +310,7 @@ export default function AdminHome() {
                 <lord-icon
                   src="https://cdn.lordicon.com/hfadyleu.json"
                   trigger="loop"
+                  delay="4000"
                   stroke="light"
                   colors="primary:#852085,secondary:#848484"
                   style={{width: '64px', height: '64px'}}
