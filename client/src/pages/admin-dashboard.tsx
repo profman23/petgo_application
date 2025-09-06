@@ -2099,7 +2099,16 @@ export default function AdminDashboard() {
                   <div className="bg-white overflow-hidden shadow rounded-lg mb-6">
                     <div className="px-4 py-5 sm:p-6">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('vetsVanManagement')}</h3>
+                        <div className="flex items-center gap-3">
+                          <lord-icon
+                            src="https://cdn.lordicon.com/papxnmwt.json"
+                            trigger="loop"
+                            delay="3000"
+                            colors="primary:#852085,secondary:#848484"
+                            style={{width: '250px', height: '250px'}}
+                          />
+                          <h3 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('vetsVanManagement')}</h3>
+                        </div>
                         <button
                           onClick={() => setShowAddForm(!showAddForm)}
                           disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
