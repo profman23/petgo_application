@@ -75,7 +75,7 @@ export default function FinancialCreditNote() {
   // Update request count when data changes
   useEffect(() => {
     if (allVetsVanRequests && Array.isArray(allVetsVanRequests)) {
-      const currentCount = allVetsVanRequests.length; // Use total count for now
+      const currentCount = allVetsVanRequests.filter((req: any) => req.status === 'pending').length;
       setCurrentRequestCount(currentCount);
     }
   }, [allVetsVanRequests]);
