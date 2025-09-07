@@ -271,6 +271,94 @@ export default function AdministrationUsers() {
             />
           </div>
 
+          {/* Mobile Menu Button */}
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                <Menu className="h-6 w-6" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-0">
+              <nav className="mt-4 px-2">
+                <button
+                  onClick={() => {
+                    setLocation('/admin-home');
+                    setIsMobileSidebarOpen(false);
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <Home className="h-6 w-6 flex-shrink-0" />
+                  <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+                </button>
+                
+                <div className="mb-2">
+                  <button
+                    onClick={() => {
+                      const newState = !isAdministrationExpanded;
+                      setIsAdministrationExpanded(newState);
+                      localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <Users className="h-6 w-6 flex-shrink-0" />
+                    <span className="flex-1 text-left">
+                      {language === 'ar' ? 'الإدارة' : 'Administration'}
+                    </span>
+                    {isAdministrationExpanded ? (
+                      <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                    )}
+                  </button>
+                  
+                  {isAdministrationExpanded && (
+                    <div className="ml-6 mt-1 space-y-1">
+                      <button
+                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
+                      >
+                        <User className="h-5 w-5 flex-shrink-0 text-purple-600" />
+                        <span className="text-purple-600">{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          setLocation('/administration/authorization');
+                          setIsMobileSidebarOpen(false);
+                        }}
+                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      >
+                        <Shield className="h-5 w-5 flex-shrink-0" />
+                        <span>{language === 'ar' ? 'التفويضات' : 'Authorization'}</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setLocation('/sales-reports');
+                    setIsMobileSidebarOpen(false);
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <DollarSign className="h-6 w-6 flex-shrink-0" />
+                  <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setLocation('/vets-van-shifts');
+                    setIsMobileSidebarOpen(false);
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <Car className="h-6 w-6 flex-shrink-0" />
+                  <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'VetsVan Management'}</span>
+                </button>
+              </nav>
+            </SheetContent>
+          </Sheet>
+
           {/* Header Controls */}
           <div className="flex items-center gap-4">
             <LanguageSelector />
