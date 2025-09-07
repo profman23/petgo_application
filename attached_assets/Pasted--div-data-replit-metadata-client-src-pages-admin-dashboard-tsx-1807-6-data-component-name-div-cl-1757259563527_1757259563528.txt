@@ -1,0 +1,24 @@
+<div data-replit-metadata="client/src/pages/admin-dashboard.tsx:1807:6" data-component-name="div" class="bg-white shadow-md border-b border-gray-200">
+  <div data-replit-metadata="client/src/pages/admin-dashboard.tsx:1808:8" data-component-name="div" class="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+    <div data-replit-metadata="client/src/pages/admin-dashboard.tsx:1810:10" data-component-name="div" class="flex-shrink-0 -ml-6">
+      <img data-replit-metadata="client/src/pages/admin-dashboard.tsx:1811:12" data-component-name="img" src="/@fs/home/runner/workspace/attached_assets/Screenshot%202025-07-10%20182605_1753012202060.png" alt="VETS VAN" class="h-14 w-auto object-contain">
+    </div>
+    <div data-replit-metadata="client/src/pages/admin-dashboard.tsx:1819:10" data-component-name="div" class="flex items-center gap-4">
+      <button data-replit-metadata="client/src/components/language-selector.tsx:38:8" data-component-name="Button" class="inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 border-input hover:text-accent-foreground h-9 relative px-2 py-1 text-xs border bg-white hover:bg-gray-50 transition-all duration-200 rounded-md shadow-sm" type="button" id="radix-:rgc:" aria-haspopup="menu" aria-expanded="false" data-state="closed" style="border-color: rgb(209, 213, 219); color: rgb(107, 114, 128);">
+        <span data-replit-metadata="client/src/components/language-selector.tsx:47:10" data-component-name="span" class="text-xs font-medium">EN</span>
+        <span data-replit-metadata="client/src/components/language-selector.tsx:50:10" data-component-name="span" class="sr-only">Select Language</span>
+      </button>
+      <button data-replit-metadata="client/src/pages/admin-dashboard.tsx:1823:12" data-component-name="button" class="p-2 rounded-full transition-colors duration-200 bg-green-100 text-green-600 hover:bg-green-200" title="Disable audio notifications">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-volume2 h-5 w-5" data-replit-metadata="client/src/pages/admin-dashboard.tsx:1835:30" data-component-name="Volume2"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"></path><path d="M16 9a5 5 0 0 1 0 6"></path><path d="M19.364 18.364a9 9 0 0 0 0-12.728"></path></svg>
+      </button>
+      <div data-replit-metadata="client/src/pages/admin-dashboard.tsx:1840:12" data-component-name="div" class="relative">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bell h-6 w-6 text-purple-600" data-replit-metadata="client/src/pages/admin-dashboard.tsx:1841:16" data-component-name="Bell"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+        <span data-replit-metadata="client/src/pages/admin-dashboard.tsx:1842:16" data-component-name="span" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">99+</span>
+      </div>
+      <button data-replit-metadata="client/src/pages/admin-dashboard.tsx:1848:12" data-component-name="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out h-4 w-4 ml-2" data-replit-metadata="client/src/pages/admin-dashboard.tsx:1852:14" data-component-name="LogOut"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
+        Logout
+      </button>
+    </div>
+  </div>
+</div>
