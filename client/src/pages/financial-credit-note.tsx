@@ -72,10 +72,10 @@ export default function FinancialCreditNote() {
     return savedState !== null ? JSON.parse(savedState) : true;
   });
 
-  // Update request count when data changes
+  // Update request count when data changes - match admin-home.tsx logic
   useEffect(() => {
-    if (allVetsVanRequests && Array.isArray(allVetsVanRequests)) {
-      const currentCount = allVetsVanRequests.filter((req: any) => req.status === 'pending_review').length;
+    if (allVetsVanRequests && Array.isArray(allVetsVanRequests) && allVetsVanRequests.length > 0) {
+      const currentCount = allVetsVanRequests.length; // Use total count like other admin pages
       setCurrentRequestCount(currentCount);
     }
   }, [allVetsVanRequests]);
@@ -346,11 +346,6 @@ export default function FinancialCreditNote() {
                     >
                       <FileText className="h-6 w-6 flex-shrink-0" />
                       <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
-                      {currentRequestCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                          {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                        </span>
-                      )}
                     </button>
 
                     {/* Import */}
@@ -590,11 +585,6 @@ export default function FinancialCreditNote() {
             >
               <FileText className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
-              {currentRequestCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                </span>
-              )}
             </button>
             
             {/* Import */}
