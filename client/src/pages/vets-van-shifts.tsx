@@ -451,7 +451,11 @@ export default function VetsVanShifts() {
           <nav className="mt-4 px-2">
             {/* Home Page */}
             <button
-              onClick={() => setLocation('/admin-home')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-home');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Home className="h-6 w-6 flex-shrink-0" />
@@ -532,7 +536,11 @@ export default function VetsVanShifts() {
               <span className="text-purple-600">{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard?tab=reports')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard?tab=reports');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <BarChart3 className="h-6 w-6 flex-shrink-0" />
@@ -560,7 +568,11 @@ export default function VetsVanShifts() {
               {isNewReportsExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/new-reports-analytics/sales-report');
+                    }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
                     <BarChart3 className="h-5 w-5 flex-shrink-0" />
@@ -571,14 +583,22 @@ export default function VetsVanShifts() {
             </div>
             
             <button
-              onClick={() => setLocation('/admin-vetsvan-requests')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-vetsvan-requests');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <FileText className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
             </button>
             <button
-              onClick={() => setLocation('/admin-dashboard/import')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/import');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Upload className="h-6 w-6 flex-shrink-0" />

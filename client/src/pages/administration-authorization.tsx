@@ -547,7 +547,11 @@ export default function AdministrationAuthorization() {
           <nav className="mt-4 px-2">
             {/* Home Page */}
             <button
-              onClick={() => setLocation('/admin-home')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-home');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Home className="h-6 w-6 flex-shrink-0" />

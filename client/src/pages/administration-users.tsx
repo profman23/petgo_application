@@ -374,7 +374,15 @@ export default function AdministrationUsers() {
                     {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                   <button
-                    onClick={currentUserPermissions && currentUserPermissions.authHidden === true ? () => setLocation('/admin-home') : () => setLocation('/administration/authorization')}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (currentUserPermissions && currentUserPermissions.authHidden === true) {
+                        setLocation('/admin-home');
+                      } else {
+                        setLocation('/administration/authorization');
+                      }
+                    }}
                     disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
                       permissionsLoading || !currentUserPermissions
