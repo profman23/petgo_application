@@ -2112,10 +2112,10 @@ export default function AdminDashboard() {
                         <button
                           onClick={() => setShowAddForm(!showAddForm)}
                           disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
-                          className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md ${
+                          className={`inline-flex items-center px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
                             currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
-                              ? 'text-gray-400 bg-gray-300 cursor-not-allowed'
-                              : 'text-white bg-purple-600 hover:bg-purple-700'
+                              ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                              : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
                           }`}
                         >
                           <UserPlus className="h-4 w-4 ml-2" />
