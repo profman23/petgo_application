@@ -520,7 +520,7 @@ export default function AdminVetsVanRequests() {
               {/* VetsVan Requests Section - exact copy from admin dashboard */}
               <div className="space-y-3" dir={getDirection(language)}>
                 <div className="text-center">
-                  <div className="flex items-center justify-center gap-3 mb-2">
+                  <div className="flex items-center justify-start gap-3 mb-2">
                     <lord-icon
                       src="https://cdn.lordicon.com/nwwurnnq.json"
                       trigger="loop"
