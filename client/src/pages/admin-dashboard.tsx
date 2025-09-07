@@ -2103,9 +2103,9 @@ export default function AdminDashboard() {
                           <lord-icon
                             src="https://cdn.lordicon.com/papxnmwt.json"
                             trigger="loop"
-                            delay="3000"
+                            delay="2000"
                             colors="primary:#852085,secondary:#848484"
-                            style={{width: '80px', height: '80px'}}
+                            style={{width: '90px', height: '90px'}}
                           />
                           <h3 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('vetsVanManagement')}</h3>
                         </div>
