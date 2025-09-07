@@ -264,12 +264,18 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
     <div className="space-y-6">
       {/* Header with Add Service Button */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold flex items-center gap-2 text-gray-600" style={{ 
+        <h2 className="text-2xl font-bold flex items-center gap-3 text-gray-600" style={{ 
           direction: getDirection(language), 
           textAlign: getTextAlign(language),
           fontFamily: 'Arimo'
         }}>
-          <Stethoscope className="h-8 w-8 text-gray-600" />
+          <lord-icon
+            src="https://cdn.lordicon.com/ngjmdtwg.json"
+            trigger="loop"
+            delay="2000"
+            colors="primary:#852085,secondary:#848484"
+            style={{width: '90px', height: '90px'}}
+          />
           {language === 'ar' ? 'إدارة الخدمات' : 'Services Management'}
         </h2>
         

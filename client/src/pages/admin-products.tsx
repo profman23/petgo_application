@@ -234,11 +234,18 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-600" style={{ 
+        <h2 className="text-2xl font-bold flex items-center gap-3 text-gray-600" style={{ 
           direction: getDirection(language), 
           textAlign: getTextAlign(language),
           fontFamily: 'Arimo'
         }}>
+          <lord-icon
+            src="https://cdn.lordicon.com/nppnalch.json"
+            trigger="loop"
+            delay="2000"
+            colors="primary:#852085,secondary:#848484"
+            style={{width: '90px', height: '90px'}}
+          />
           {language === 'ar' ? 'إدارة المنتجات' : 'Products Management'}
         </h2>
         
