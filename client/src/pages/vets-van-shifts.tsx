@@ -435,7 +435,7 @@ export default function VetsVanShifts() {
                 localStorage.removeItem("adminToken");
                 setLocation("/admin-login");
               }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+              className="inline-flex items-center px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
             >
               <LogOut className="h-4 w-4 ml-2" />
               {t('logout')}
