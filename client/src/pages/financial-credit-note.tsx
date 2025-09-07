@@ -257,42 +257,6 @@ export default function FinancialCreditNote() {
                       )}
                     </div>
 
-                    {/* Services */}
-                    <button
-                      onClick={() => {
-                        setLocation('/admin-services');
-                        setIsMobileSidebarOpen(false);
-                      }}
-                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    >
-                      <Stethoscope className="h-6 w-6 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
-                    </button>
-
-                    {/* Products */}
-                    <button
-                      onClick={() => {
-                        setLocation('/admin-products');
-                        setIsMobileSidebarOpen(false);
-                      }}
-                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    >
-                      <Package className="h-6 w-6 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-                    </button>
-
-                    {/* Import */}
-                    <button
-                      onClick={() => {
-                        setLocation('/admin-import');
-                        setIsMobileSidebarOpen(false);
-                      }}
-                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                    >
-                      <Upload className="h-6 w-6 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'استيراد' : 'Import'}</span>
-                    </button>
-
                     {/* VetsVan Management */}
                     <button
                       onClick={() => {
@@ -305,23 +269,6 @@ export default function FinancialCreditNote() {
                       <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'VetsVan Management'}</span>
                     </button>
 
-                    {/* VetsVan Requests */}
-                    <button
-                      onClick={() => {
-                        setLocation('/admin-vetsvan-requests');
-                        setIsMobileSidebarOpen(false);
-                      }}
-                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 relative"
-                    >
-                      <FileText className="h-6 w-6 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'طلبات الفيتس فان' : 'VetsVan Requests'}</span>
-                      {currentRequestCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                          {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                        </span>
-                      )}
-                    </button>
-
                     {/* Vets Van Shifts */}
                     <button
                       onClick={() => {
@@ -331,7 +278,72 @@ export default function FinancialCreditNote() {
                       className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     >
                       <Clock className="h-6 w-6 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'نوبات الفيتس فان' : 'Vets Van Shifts'}</span>
+                      <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
+                    </button>
+
+                    {/* Reports */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard?tab=reports');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <BarChart3 className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+                    </button>
+
+                    {/* VetsVan Requests */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-vetsvan-requests');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 relative"
+                    >
+                      <FileText className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+                      {currentRequestCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Import */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard/import');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Upload className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
+                    </button>
+
+                    {/* Services */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard/services');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Stethoscope className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+                    </button>
+
+                    {/* Products */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard/products');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Package className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
                     </button>
                   </nav>
                 </div>
@@ -454,45 +466,6 @@ export default function FinancialCreditNote() {
               )}
             </div>
             
-            {/* Services */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-services');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Stethoscope className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
-            </button>
-            
-            {/* Products */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-products');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Package className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-            </button>
-            
-            {/* Import */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-import');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Upload className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'استيراد' : 'Import'}</span>
-            </button>
-            
             {/* VetsVan Management */}
             <button
               onClick={(e) => {
@@ -506,24 +479,6 @@ export default function FinancialCreditNote() {
               <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'VetsVan Management'}</span>
             </button>
 
-            {/* VetsVan Requests */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-vetsvan-requests');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 relative"
-            >
-              <FileText className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'طلبات الفيتس فان' : 'VetsVan Requests'}</span>
-              {currentRequestCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                </span>
-              )}
-            </button>
-
             {/* Vets Van Shifts */}
             <button
               onClick={(e) => {
@@ -534,7 +489,77 @@ export default function FinancialCreditNote() {
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Clock className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'نوبات الفيتس فان' : 'Vets Van Shifts'}</span>
+              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
+            </button>
+            
+            {/* Reports */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard?tab=reports');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+            </button>
+
+            {/* VetsVan Requests */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-vetsvan-requests');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 relative"
+            >
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+              {currentRequestCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                </span>
+              )}
+            </button>
+            
+            {/* Import */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/import');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Upload className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
+            </button>
+            
+            {/* Services */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/services');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Stethoscope className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+            </button>
+            
+            {/* Products */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/products');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Package className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
             </button>
           </nav>
         </div>
