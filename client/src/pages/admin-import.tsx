@@ -501,8 +501,7 @@ export default function AdminImport() {
                     <h3 className="text-2xl font-bold flex items-center gap-3 text-gray-600 mb-6" style={{ textAlign: getTextAlign(language), fontFamily: 'Arimo' }}>
                       <lord-icon
                         src="https://cdn.lordicon.com/qkyvpnmr.json"
-                        trigger="loop"
-                        delay="2000"
+                        trigger="hover"
                         colors="primary:#852085,secondary:#848484"
                         style={{width: '90px', height: '90px'}}
                       />
