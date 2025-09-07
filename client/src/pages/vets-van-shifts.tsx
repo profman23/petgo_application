@@ -24,7 +24,7 @@ interface VetsVan extends Driver {
   vetsvanName: string;
 }
 
-interface Shift extends ShiftType {
+interface Shift extends Omit<ShiftType, 'duration'> {
   duration: 'day' | 'week' | 'month';
   status: 'scheduled' | 'active' | 'completed' | 'cancelled';
 }

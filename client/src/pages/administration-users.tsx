@@ -63,7 +63,7 @@ export default function AdministrationUsers() {
     queryKey: ['/api/admin/current-user-permissions'],
     retry: false,
     staleTime: 0, // Always fetch fresh permissions
-    cacheTime: 0, // Don't cache to avoid stale data
+    gcTime: 0, // Don't cache to avoid stale data (updated for TanStack Query v5)
     refetchOnMount: true, // Always refetch when component mounts
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
