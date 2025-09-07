@@ -447,7 +447,7 @@ export default function VetsVanShifts() {
       {/* Main Content with Sidebar */}
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg min-h-screen">
+        <div className="hidden md:block w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
             {/* Home Page */}
             <button
