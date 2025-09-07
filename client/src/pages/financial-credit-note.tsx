@@ -66,11 +66,19 @@ export default function FinancialCreditNote() {
     enabled: !!adminToken,
   });
 
-  const currentRequestCount = allVetsVanRequests?.filter((req: any) => req.status === 'pending').length || 0;
+  const [currentRequestCount, setCurrentRequestCount] = useState(0);
   const [audioEnabled, setAudioEnabled] = useState(() => {
     const savedState = localStorage.getItem('audioNotificationsEnabled');
     return savedState !== null ? JSON.parse(savedState) : true;
   });
+
+  // Update request count when data changes
+  useEffect(() => {
+    if (allVetsVanRequests && Array.isArray(allVetsVanRequests)) {
+      const currentCount = allVetsVanRequests.length; // Use total count for now
+      setCurrentRequestCount(currentCount);
+    }
+  }, [allVetsVanRequests]);
 
   const toggleAudio = () => {
     const newState = !audioEnabled;
