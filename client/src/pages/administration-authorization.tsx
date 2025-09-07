@@ -4,7 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit, Home, Menu, DollarSign } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit, Home, Menu, DollarSign, Receipt } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,14 @@ export default function AdministrationAuthorization() {
   // Administration menu state - persist across navigation
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
     const savedState = localStorage.getItem('isAdministrationExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default to collapsed to maintain consistency
+  });
+  // Financial menu state - persist across navigation
+  const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isFinancialExpanded');
     if (savedState !== null) {
       return JSON.parse(savedState);
     }
@@ -767,17 +775,55 @@ export default function AdministrationAuthorization() {
             </div>
 
             {/* Financial Section */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/sales-reports');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <DollarSign className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
-            </button>
+            <div className="mb-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isFinancialExpanded;
+                  setIsFinancialExpanded(newState);
+                  localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
+                }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <DollarSign className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'المالية' : 'Financial'}
+                </span>
+                {isFinancialExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+
+              {isFinancialExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/sales-reports');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/financial/credit-note');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Receipt className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
             
             <button
               onClick={currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}

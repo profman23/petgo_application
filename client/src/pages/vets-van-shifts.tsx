@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX, Users, User, Shield, Home, Menu, DollarSign } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX, Users, User, Shield, Home, Menu, DollarSign, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -108,6 +108,10 @@ export default function VetsVanShifts() {
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
   const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
     const savedState = localStorage.getItem('isAdministrationExpanded');
+    return savedState !== null ? JSON.parse(savedState) : false;
+  });
+  const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isFinancialExpanded');
     return savedState !== null ? JSON.parse(savedState) : false;
   });
   
@@ -609,17 +613,55 @@ export default function VetsVanShifts() {
             </div>
 
             {/* Financial Section */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/sales-reports');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <DollarSign className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
-            </button>
+            <div className="mb-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isFinancialExpanded;
+                  setIsFinancialExpanded(newState);
+                  localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
+                }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <DollarSign className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'المالية' : 'Financial'}
+                </span>
+                {isFinancialExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+
+              {isFinancialExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/sales-reports');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/financial/credit-note');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Receipt className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
             
             <button
               onClick={currentUserPermissions && currentUserPermissions.vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}
