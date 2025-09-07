@@ -489,6 +489,19 @@ export default function AdministrationUsers() {
                 </div>
               )}
             </div>
+
+            {/* Financial Section */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/sales-reports');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <DollarSign className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
+            </button>
             
             <button
               onClick={(e) => {
