@@ -22,6 +22,7 @@ export default function FinancialCreditNote() {
     const savedState = localStorage.getItem('isFinancialExpanded');
     return savedState !== null ? JSON.parse(savedState) : true; // Default to expanded since we're on Financial page
   });
+  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
 
   // Check admin authentication
   useEffect(() => {
@@ -293,6 +294,40 @@ export default function FinancialCreditNote() {
                       <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
                     </button>
 
+                    {/* New Reports & Analytics Dropdown */}
+                    <div className="mb-2">
+                      <button
+                        onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                        className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      >
+                        <TrendingUp className="h-6 w-6 flex-shrink-0" />
+                        <span className="flex-1 text-left whitespace-nowrap">
+                          {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                        </span>
+                        {isNewReportsExpanded ? (
+                          <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                        )}
+                      </button>
+                      
+                      {/* Dropdown Items */}
+                      {isNewReportsExpanded && (
+                        <div className="ml-6 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setLocation('/new-reports-analytics/sales-report');
+                              setIsMobileSidebarOpen(false);
+                            }}
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                          >
+                            <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                            <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
                     {/* VetsVan Requests */}
                     <button
                       onClick={() => {
@@ -504,6 +539,37 @@ export default function FinancialCreditNote() {
               <BarChart3 className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
             </button>
+            
+            {/* New Reports & Analytics Dropdown */}
+            <div className="mb-2">
+              <button
+                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <TrendingUp className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left whitespace-nowrap">
+                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                </span>
+                {isNewReportsExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+              
+              {/* Dropdown Items */}
+              {isNewReportsExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* VetsVan Requests */}
             <button
