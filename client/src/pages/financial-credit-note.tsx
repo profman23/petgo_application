@@ -83,19 +83,75 @@ export default function FinancialCreditNote() {
     localStorage.setItem('audioNotificationsEnabled', JSON.stringify(newState));
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
+    setLocation("/admin-login");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
-      {/* Top Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Mobile menu button */}
-            <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-              <SheetTrigger asChild>
-                <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-                  <Menu className="h-6 w-6" />
-                </button>
-              </SheetTrigger>
+      {/* Full-width Header with logo and controls */}
+      <div className="bg-white shadow-md border-b border-gray-200">
+        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+          {/* Logo */}
+          <div className="flex-shrink-0 -ml-6">
+            <img 
+              src={vetsVanLogo} 
+              alt="VETS VAN" 
+              className="h-14 w-auto object-contain"
+            />
+          </div>
+
+          {/* Header Controls */}
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            
+            {/* Audio notification toggle */}
+            <button
+              onClick={toggleAudio}
+              className={`p-2 rounded-full transition-colors duration-200 ${
+                audioEnabled 
+                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={audioEnabled 
+                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
+                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
+              }
+            >
+              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            </button>
+
+            {/* Notifications counter */}
+            {currentRequestCount > 0 && (
+              <div className="relative">
+                <Bell className="h-6 w-6 text-purple-600" />
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                </span>
+              </div>
+            )}
+            
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            >
+              <LogOut className="h-4 w-4 ml-2" />
+              {t('logout')}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu sheet */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          {/* Hidden trigger - mobile menu would be opened programmatically if needed */}
+          <button className="hidden">
+            <Menu className="h-6 w-6" />
+          </button>
+        </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0">
                 <div className="flex flex-col h-full bg-white">
                   <div className="p-4 border-b">
@@ -288,54 +344,10 @@ export default function FinancialCreditNote() {
               </SheetContent>
             </Sheet>
 
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              <img src={vetsVanLogo} alt="VetsVan Logo" className="h-8 w-8" />
-              <span className="text-lg font-semibold text-purple-800">VetsVan</span>
-            </div>
-
-            {/* Right side controls */}
-            <div className="flex items-center gap-4">
-              <LanguageSelector />
-              
-              <button
-                onClick={toggleAudio}
-                className="p-2 rounded-full hover:bg-gray-100"
-                title={
-                  audioEnabled 
-                    ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
-                    : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
-                }
-              >
-                {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-              </button>
-
-              {/* Notifications counter */}
-              {currentRequestCount > 0 && (
-                <div className="relative">
-                  <Bell className="h-6 w-6 text-purple-600" />
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                  </span>
-                </div>
-              )}
-              
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-              >
-                <LogOut className="h-4 w-4 ml-2" />
-                {t('logout')}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content with Sidebar */}
       <div className="flex">
         {/* Sidebar */}
-        <div className="hidden md:block w-64 bg-white shadow-lg min-h-screen">
+        <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
             {/* Home Page */}
             <button
