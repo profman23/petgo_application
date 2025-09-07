@@ -520,9 +520,18 @@ export default function AdminVetsVanRequests() {
               {/* VetsVan Requests Section - exact copy from admin dashboard */}
               <div className="space-y-3" dir={getDirection(language)}>
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-gray-600 mb-2" style={{ textAlign: getTextAlign(language), fontFamily: 'Arimo' }}>
-                    {language === 'ar' ? 'جميع طلبات VETS VAN' : 'All VetsVan Requests'}
-                  </h2>
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <lord-icon
+                      src="https://cdn.lordicon.com/nwwurnnq.json"
+                      trigger="loop"
+                      delay="2000"
+                      colors="primary:#852085,secondary:#848484"
+                      style={{width: '80px', height: '80px'}}
+                    />
+                    <h2 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+                      {language === 'ar' ? 'جميع طلبات VETS VAN' : 'All VetsVan Requests'}
+                    </h2>
+                  </div>
                   <p className="text-gray-600" style={{ textAlign: getTextAlign(language) }}>
                     {language === 'ar' ? 'عرض جميع طلبات العملاء لكل سيارات VETS VAN' : 'View all customer requests for all VetsVan vehicles'}
                   </p>
