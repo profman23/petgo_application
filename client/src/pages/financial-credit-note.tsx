@@ -71,12 +71,6 @@ export default function FinancialCreditNote() {
     return savedState !== null ? JSON.parse(savedState) : true;
   });
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("admin");
-    setLocation("/admin-login");
-  };
-
   const toggleAudio = () => {
     const newState = !audioEnabled;
     setAudioEnabled(newState);
