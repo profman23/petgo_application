@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX, Users, User, Shield, Home } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX, Users, User, Shield, Home, Menu, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { apiRequest } from "@/lib/queryClient";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
@@ -32,6 +34,8 @@ export default function VetsVanShifts() {
   const { t, language } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   // Check admin authentication and prevent doctors access
   useEffect(() => {

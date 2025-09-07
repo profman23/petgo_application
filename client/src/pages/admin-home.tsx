@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Bell, Volume2, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home, Upload } from "lucide-react";
+import { LogOut, Bell, Volume2, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home, Upload, Menu, DollarSign } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 import welcomeImage from "@assets/freepik__background__61417_1753095390676.png";
 
@@ -21,7 +23,9 @@ export default function AdminHome() {
     return saved ? JSON.parse(saved) : false;
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const lastRequestCountRef = useRef(0);
+  const isMobile = useIsMobile();
 
   // Get admin info for welcome message
   const adminInfo = JSON.parse(localStorage.getItem("admin") || '{"username": "Admin"}');
@@ -85,6 +89,123 @@ export default function AdminHome() {
               className="h-14 w-auto object-contain"
             />
           </div>
+
+          {/* Mobile Menu Button */}
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                <Menu className="h-6 w-6" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64 p-0">
+              {/* Mobile Sidebar Content - Copy of desktop sidebar */}
+              <nav className="mt-4 px-2">
+                {/* Home Page */}
+                <button
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 bg-purple-50 border-l-4 border-purple-600"
+                >
+                  <Home className="h-6 w-6 flex-shrink-0 text-purple-600" />
+                  <span className="text-purple-600">{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+                </button>
+                
+                {/* Administration Module */}
+                <div className="mb-2">
+                  <button
+                    onClick={() => {
+                      const newState = !isAdministrationExpanded;
+                      setIsAdministrationExpanded(newState);
+                      localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  >
+                    <Users className="h-6 w-6 flex-shrink-0" />
+                    <span className="flex-1 text-left">
+                      {language === 'ar' ? 'الإدارة' : 'Administration'}
+                    </span>
+                    {isAdministrationExpanded ? (
+                      <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                    )}
+                  </button>
+                  
+                  {/* Administration Submenu */}
+                  {isAdministrationExpanded && (
+                    <div className="ml-6 mt-1 space-y-1">
+                      <button
+                        onClick={() => {
+                          setLocation('/administration/users');
+                          setIsMobileSidebarOpen(false);
+                        }}
+                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      >
+                        <User className="h-5 w-5 flex-shrink-0" />
+                        <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          setLocation('/administration/authorization');
+                          setIsMobileSidebarOpen(false);
+                        }}
+                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      >
+                        <Shield className="h-5 w-5 flex-shrink-0" />
+                        <span>{language === 'ar' ? 'التفويضات' : 'Authorization'}</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Financial Section */}
+                <button
+                  onClick={() => {
+                    setLocation('/sales-reports');
+                    setIsMobileSidebarOpen(false);
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <DollarSign className="h-6 w-6 flex-shrink-0" />
+                  <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
+                </button>
+
+                {/* VetsVan Management */}
+                <button
+                  onClick={() => {
+                    setLocation('/vets-van-shifts');
+                    setIsMobileSidebarOpen(false);
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <Car className="h-6 w-6 flex-shrink-0" />
+                  <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'VetsVan Management'}</span>
+                </button>
+
+                {/* More menu items... */}
+                <button
+                  onClick={() => {
+                    setLocation('/admin-dashboard/services');
+                    setIsMobileSidebarOpen(false);
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <Stethoscope className="h-6 w-6 flex-shrink-0" />
+                  <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setLocation('/admin-dashboard/products');
+                    setIsMobileSidebarOpen(false);
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <Package className="h-6 w-6 flex-shrink-0" />
+                  <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
+                </button>
+              </nav>
+            </SheetContent>
+          </Sheet>
 
           {/* Header Controls */}
           <div className="flex items-center gap-4">
