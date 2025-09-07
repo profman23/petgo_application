@@ -882,7 +882,15 @@ export default function AdminServices() {
             </button>
             
             <button
-              onClick={currentUserPermissions && currentUserPermissions.vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentUserPermissions && currentUserPermissions.vetsVanHidden === true) {
+                  setLocation('/admin-home');
+                } else {
+                  setLocation('/admin-dashboard');
+                }
+              }}
               disabled={permissionsLoading || !currentUserPermissions}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
                 permissionsLoading || !currentUserPermissions

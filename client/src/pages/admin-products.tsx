@@ -777,7 +777,11 @@ export default function AdminProducts() {
           <nav className="mt-4 px-2">
             {/* Home Page */}
             <button
-              onClick={() => setLocation('/admin-home')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-home');
+              }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Home className="h-6 w-6 flex-shrink-0" />
@@ -809,7 +813,15 @@ export default function AdminProducts() {
               {isAdministrationExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={currentUserPermissions && currentUserPermissions.usersHidden === true ? () => setLocation('/admin-home') : () => setLocation('/administration/users')}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (currentUserPermissions && currentUserPermissions.usersHidden === true) {
+                        setLocation('/admin-home');
+                      } else {
+                        setLocation('/administration/users');
+                      }
+                    }}
                     disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
                       permissionsLoading || !currentUserPermissions
@@ -822,7 +834,15 @@ export default function AdminProducts() {
                     {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
                   </button>
                   <button
-                    onClick={currentUserPermissions && (currentUserPermissions as any).authHidden === true ? () => setLocation('/admin-home') : () => setLocation('/administration/authorization')}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (currentUserPermissions && (currentUserPermissions as any).authHidden === true) {
+                        setLocation('/admin-home');
+                      } else {
+                        setLocation('/administration/authorization');
+                      }
+                    }}
                     disabled={permissionsLoading || !currentUserPermissions}
                     className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
                       permissionsLoading || !currentUserPermissions
@@ -847,7 +867,15 @@ export default function AdminProducts() {
             </button>
             
             <button
-              onClick={currentUserPermissions && currentUserPermissions.vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (currentUserPermissions && currentUserPermissions.vetsVanHidden === true) {
+                  setLocation('/admin-home');
+                } else {
+                  setLocation('/admin-dashboard');
+                }
+              }}
               disabled={permissionsLoading || !currentUserPermissions}
               className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
                 permissionsLoading || !currentUserPermissions
