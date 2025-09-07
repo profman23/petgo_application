@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Upload, Stethoscope, Package, Users, User, Shield, Home } from "lucide-react";
+import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Upload, Stethoscope, Package, Users, User, Shield, Home, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -837,6 +837,14 @@ export default function AdminProducts() {
                 </div>
               )}
             </div>
+            
+            {/* Financial Module */}
+            <button
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <DollarSign className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
+            </button>
             
             <button
               onClick={currentUserPermissions && currentUserPermissions.vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}

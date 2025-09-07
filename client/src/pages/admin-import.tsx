@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Upload, Loader2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home, DollarSign } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -386,6 +386,14 @@ export default function AdminImport() {
                 </div>
               )}
             </div>
+            
+            {/* Financial Module */}
+            <button
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <DollarSign className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
+            </button>
             
             <button
               onClick={currentUserPermissions && currentUserPermissions.vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}
