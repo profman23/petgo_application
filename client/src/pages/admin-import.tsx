@@ -502,6 +502,7 @@ export default function AdminImport() {
                       <lord-icon
                         src="https://cdn.lordicon.com/qkyvpnmr.json"
                         trigger="hover"
+                        state="hover-slide"
                         colors="primary:#852085,secondary:#848484"
                         style={{width: '90px', height: '90px'}}
                       />
