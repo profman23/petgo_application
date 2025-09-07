@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Upload, Loader2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home, DollarSign } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -382,6 +382,15 @@ export default function AdminImport() {
                     <Shield className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
                     {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      // No behavior for now
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
                   </button>
                 </div>
               )}

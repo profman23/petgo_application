@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp, ChevronLeft, ChevronRight, Plus, AlertTriangle, Save, Home } from "lucide-react";
+import { Loader2, UserPlus, Shield, LogOut, Car, Clock, Trash2, MapPin, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, Download, Edit, ChevronDown, ChevronUp, Search, Package, Stethoscope, X, TrendingUp, ChevronLeft, ChevronRight, Plus, AlertTriangle, Save, Home, DollarSign } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -1935,6 +1935,15 @@ export default function AdminDashboard() {
                     <Shield className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
                     {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
+                  </button>
+                  <button
+                    onClick={() => {
+                      // No behavior for now
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
                   </button>
                 </div>
               )}
