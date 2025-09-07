@@ -32,6 +32,7 @@ import AdministrationAuthorization from "@/pages/administration-authorization";
 import SalesReports from "@/pages/sales-reports";
 import NewReportsAnalytics from "@/pages/new-reports-analytics";
 import VetsVanShifts from "@/pages/vets-van-shifts";
+import FinancialCreditNote from "@/pages/financial-credit-note";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { PaymentTest } from "@/pages/payment-test";
@@ -155,6 +156,7 @@ function Router() {
           <Route path="/administration/users" component={AdministrationUsers} />
           <Route path="/administration/authorization" component={AdministrationAuthorization} />
           <Route path="/sales-reports" component={SalesReports} />
+          <Route path="/financial/credit-note" component={FinancialCreditNote} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
