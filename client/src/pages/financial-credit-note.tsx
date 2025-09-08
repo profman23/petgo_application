@@ -31,6 +31,8 @@ export default function FinancialCreditNote() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [invoiceItems, setInvoiceItems] = useState<any[]>([]);
+  const [loadingItems, setLoadingItems] = useState(false);
 
   // Check admin authentication
   useEffect(() => {
@@ -140,10 +142,31 @@ export default function FinancialCreditNote() {
   };
 
   // Handle selecting an invoice for credit note creation
-  const handleSelectInvoice = (invoice: any) => {
+  const handleSelectInvoice = async (invoice: any) => {
     setSelectedInvoice(invoice);
     setSearchResults([]); // Hide search results
     setInvoiceNumber(""); // Clear search field
+    
+    // Fetch invoice items from database
+    if (invoice.bookingId) {
+      setLoadingItems(true);
+      try {
+        const response = await fetch(`/api/invoice-items/${invoice.bookingId}`, {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+        if (response.ok) {
+          const items = await response.json();
+          setInvoiceItems(items);
+        }
+      } catch (error) {
+        console.error('Failed to fetch invoice items:', error);
+        setInvoiceItems([]);
+      } finally {
+        setLoadingItems(false);
+      }
+    }
   };
 
   // Handle going back to search
@@ -151,6 +174,7 @@ export default function FinancialCreditNote() {
     setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
+    setInvoiceItems([]);
   };
 
   // Handle modal close
@@ -159,6 +183,7 @@ export default function FinancialCreditNote() {
     setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
+    setInvoiceItems([]);
   };
 
   return (
@@ -885,18 +910,30 @@ export default function FinancialCreditNote() {
 
                   {/* Items and Services */}
                   <div className="space-y-4">
-                    {/* Items */}
-                    {selectedInvoice.items && selectedInvoice.items.length > 0 && (
+                    {/* Loading Items */}
+                    {loadingItems && (
+                      <div className="text-center py-4">
+                        <div className="text-gray-600" style={{textAlign: getTextAlign(language)}}>
+                          {language === 'ar' ? 'جاري تحميل عناصر الفاتورة...' : 'Loading invoice items...'}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Items and Services Table */}
+                    {!loadingItems && invoiceItems.length > 0 && (
                       <div>
                         <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
-                          {language === 'ar' ? 'المنتجات' : 'Items'}
+                          {language === 'ar' ? 'المنتجات والخدمات' : 'Items and Services'}
                         </h3>
                         <div className="overflow-x-auto">
                           <table className="w-full border-collapse border border-gray-300">
                             <thead>
                               <tr className="bg-gray-50">
                                 <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'المنتج' : 'Item'}
+                                  {language === 'ar' ? 'النوع' : 'Type'}
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'الاسم' : 'Name'}
                                 </th>
                                 <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
                                   {language === 'ar' ? 'الكمية' : 'Quantity'}
@@ -910,8 +947,20 @@ export default function FinancialCreditNote() {
                               </tr>
                             </thead>
                             <tbody>
-                              {selectedInvoice.items.map((item: any, index: number) => (
+                              {invoiceItems.map((item: any, index: number) => (
                                 <tr key={index}>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                      item.type === 'product' 
+                                        ? 'bg-blue-100 text-blue-800' 
+                                        : 'bg-green-100 text-green-800'
+                                    }`}>
+                                      {item.type === 'product' 
+                                        ? (language === 'ar' ? 'منتج' : 'Product')
+                                        : (language === 'ar' ? 'خدمة' : 'Service')
+                                      }
+                                    </span>
+                                  </td>
                                   <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
                                     {item.name}
                                   </td>
@@ -932,49 +981,12 @@ export default function FinancialCreditNote() {
                       </div>
                     )}
 
-                    {/* Services */}
-                    {selectedInvoice.services && selectedInvoice.services.length > 0 && (
-                      <div>
-                        <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
-                          {language === 'ar' ? 'الخدمات' : 'Services'}
-                        </h3>
-                        <div className="overflow-x-auto">
-                          <table className="w-full border-collapse border border-gray-300">
-                            <thead>
-                              <tr className="bg-gray-50">
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'الخدمة' : 'Service'}
-                                </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'الكمية' : 'Quantity'}
-                                </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'السعر' : 'Price'}
-                                </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'المجموع' : 'Total'}
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {selectedInvoice.services.map((service: any, index: number) => (
-                                <tr key={index}>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    {service.name}
-                                  </td>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    {service.quantity}
-                                  </td>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    {service.price} SAR
-                                  </td>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    {(service.quantity * service.price).toFixed(2)} SAR
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                    {/* No Items Message */}
+                    {!loadingItems && invoiceItems.length === 0 && selectedInvoice && (
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="text-lg mb-2">📋</div>
+                        <div style={{textAlign: getTextAlign(language)}}>
+                          {language === 'ar' ? 'لا توجد عناصر في هذه الفاتورة' : 'No items found for this invoice'}
                         </div>
                       </div>
                     )}
