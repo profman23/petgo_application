@@ -1002,8 +1002,8 @@ export default function FinancialCreditNote() {
                                 // Step 4: Calculate VAT (15%)
                                 const vatAmount = totalBeforeVat * 0.15;
                                 
-                                // Step 5: Total After VAT = Total Before VAT + VAT
-                                const totalAfterVat = totalBeforeVat + vatAmount;
+                                // Step 5: Total After VAT = Total Before VAT + VAT (negative for credit notes)
+                                const totalAfterVat = -(totalBeforeVat + vatAmount);
                                 
                                 return (
                                   <tr key={index} className="border-b">
