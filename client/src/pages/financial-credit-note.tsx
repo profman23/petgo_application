@@ -2,8 +2,11 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -23,6 +26,8 @@ export default function FinancialCreditNote() {
     return savedState !== null ? JSON.parse(savedState) : true; // Default to expanded since we're on Financial page
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
+  const [isCreateCreditNoteModalOpen, setIsCreateCreditNoteModalOpen] = useState(false);
+  const [invoiceNumber, setInvoiceNumber] = useState("");
 
   // Check admin authentication
   useEffect(() => {
@@ -652,10 +657,7 @@ export default function FinancialCreditNote() {
 
             {/* Right side - Create New Credit Note Button */}
             <button
-              onClick={() => {
-                // TODO: Add functionality to create new credit note
-                console.log('Create New Credit Note clicked');
-              }}
+              onClick={() => setIsCreateCreditNoteModalOpen(true)}
               className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
             >
               {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
@@ -663,6 +665,60 @@ export default function FinancialCreditNote() {
           </div>
         </div>
       </div>
+
+      {/* Create New Credit Note Modal */}
+      <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={setIsCreateCreditNoteModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+              {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="invoice-search" className="text-sm font-medium text-gray-700">
+                {language === 'ar' ? 'البحث برقم الفاتورة' : 'Search by Invoice Number'}
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  id="invoice-search"
+                  type="text"
+                  value={invoiceNumber}
+                  onChange={(e) => setInvoiceNumber(e.target.value)}
+                  placeholder={language === 'ar' ? 'أدخل رقم الفاتورة...' : 'Enter invoice number...'}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsCreateCreditNoteModalOpen(false);
+                  setInvoiceNumber("");
+                }}
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </Button>
+              <Button
+                onClick={() => {
+                  // TODO: Handle invoice search and credit note creation
+                  console.log('Searching for invoice:', invoiceNumber);
+                  setIsCreateCreditNoteModalOpen(false);
+                  setInvoiceNumber("");
+                }}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+                disabled={!invoiceNumber.trim()}
+              >
+                {language === 'ar' ? 'بحث' : 'Search'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Load lord-icon script */}
       <script src="https://cdn.lordicon.com/lordicon.js"></script>
