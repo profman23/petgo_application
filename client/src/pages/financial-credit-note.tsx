@@ -983,10 +983,27 @@ export default function FinancialCreditNote() {
                                 // Get the discount from discountType field
                                 const discountType = item.discountType || 'none';
                                 
-                                // Use pre-calculated values from database
-                                const vatAmount = parseFloat(item.vatAmount || 0);
-                                const totalBeforeVat = parseFloat(item.totalBeforeVat || 0);
-                                const totalAfterVat = parseFloat(item.totalAfterVat || 0);
+                                // Real-time calculations for Credit Note screen
+                                // Step 1: Quantity × Unit Price = Total Before VAT (before discount)
+                                const totalBeforeDiscount = currentQuantity * unitPrice;
+                                
+                                // Step 2: Apply discount if any
+                                let discountAmount = 0;
+                                if (discountType !== 'none') {
+                                  if (discountType.includes('%')) {
+                                    const discountPercent = parseFloat(discountType.replace('%', '')) / 100;
+                                    discountAmount = totalBeforeDiscount * discountPercent;
+                                  }
+                                }
+                                
+                                // Step 3: Total Before VAT (after discount)
+                                const totalBeforeVat = totalBeforeDiscount - discountAmount;
+                                
+                                // Step 4: Calculate VAT (15%)
+                                const vatAmount = totalBeforeVat * 0.15;
+                                
+                                // Step 5: Total After VAT = Total Before VAT + VAT
+                                const totalAfterVat = totalBeforeVat + vatAmount;
                                 
                                 return (
                                   <tr key={index} className="border-b">
