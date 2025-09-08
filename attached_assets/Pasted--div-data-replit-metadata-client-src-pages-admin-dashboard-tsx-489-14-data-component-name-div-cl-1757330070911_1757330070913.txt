@@ -1,0 +1,40 @@
+<div data-replit-metadata="client/src/pages/admin-dashboard.tsx:489:14" data-component-name="div" class="overflow-x-auto">
+  <table data-replit-metadata="client/src/pages/admin-dashboard.tsx:490:16" data-component-name="table" class="w-full mb-4">
+    <thead data-replit-metadata="client/src/pages/admin-dashboard.tsx:491:18" data-component-name="thead">
+      <tr data-replit-metadata="client/src/pages/admin-dashboard.tsx:492:20" data-component-name="tr" class="border-b">
+        <th class="text-left py-2 px-2" style="text-align: left; width: 35%;">Description</th>
+        <th class="text-center py-2 px-2 w-24">Quantity</th>
+        <th class="text-center py-2 px-2 w-32">Unit Price (SAR)</th>
+        <th class="text-center py-2 px-2 w-28">Discount</th>
+        <th class="text-center py-2 px-2 w-24">VAT (15%)</th>
+        <th class="text-center py-2 px-2 w-32">Total Before VAT (SAR)</th>
+        <th class="text-center py-2 px-2 w-32">Total After VAT (SAR)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="border-b">
+        <td class="py-2 px-2" style="width: 35%;">
+          <div class="bg-gray-100 p-2 rounded text-gray-700">Test 1 SAR</div>
+        </td>
+        <td class="py-2 px-2">
+          <div class="bg-gray-100 p-2 rounded text-center text-gray-700">1</div>
+        </td>
+        <td class="py-2 px-2">
+          <div class="bg-gray-100 p-2 rounded text-center text-gray-700">1.00</div>
+        </td>
+        <td class="py-2 px-2">
+          <div class="bg-gray-100 p-2 rounded text-center text-gray-700">No Discount</div>
+        </td>
+        <td class="py-2 px-2 text-center">
+          <div class="bg-green-100 p-2 rounded text-green-700">0.15</div>
+        </td>
+        <td class="py-2 px-2 text-center">
+          <div class="bg-gray-100 p-2 rounded text-gray-700">1.00</div>
+        </td>
+        <td class="py-2 px-2 text-center">
+          <div class="bg-gray-100 p-2 rounded text-gray-700 font-semibold">1.15</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

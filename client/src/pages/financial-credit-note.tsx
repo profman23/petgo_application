@@ -926,55 +926,90 @@ export default function FinancialCreditNote() {
                           {language === 'ar' ? 'المنتجات والخدمات' : 'Items and Services'}
                         </h3>
                         <div className="overflow-x-auto">
-                          <table className="w-full border-collapse border border-gray-300">
+                          <table className="w-full mb-4">
                             <thead>
-                              <tr className="bg-gray-50">
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'النوع' : 'Type'}
+                              <tr className="border-b">
+                                <th className="text-left py-2 px-2" style={{textAlign: getTextAlign(language), width: '35%'}}>
+                                  {language === 'ar' ? 'الوصف' : 'Description'}
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'الاسم' : 'Name'}
-                                </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                <th className="text-center py-2 px-2 w-24">
                                   {language === 'ar' ? 'الكمية' : 'Quantity'}
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'السعر' : 'Price'}
+                                <th className="text-center py-2 px-2 w-32">
+                                  {language === 'ar' ? 'سعر الوحدة (ر.س)' : 'Unit Price (SAR)'}
                                 </th>
-                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
-                                  {language === 'ar' ? 'المجموع' : 'Total'}
+                                <th className="text-center py-2 px-2 w-28">
+                                  {language === 'ar' ? 'الخصم' : 'Discount'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-24">
+                                  {language === 'ar' ? 'ضريبة القيمة المضافة (15%)' : 'VAT (15%)'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-32">
+                                  {language === 'ar' ? 'المجموع قبل الضريبة (ر.س)' : 'Total Before VAT (SAR)'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-32">
+                                  {language === 'ar' ? 'المجموع بعد الضريبة (ر.س)' : 'Total After VAT (SAR)'}
                                 </th>
                               </tr>
                             </thead>
                             <tbody>
-                              {invoiceItems.map((item: any, index: number) => (
-                                <tr key={index}>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                      item.type === 'product' 
-                                        ? 'bg-blue-100 text-blue-800' 
-                                        : 'bg-green-100 text-green-800'
-                                    }`}>
-                                      {item.type === 'product' 
-                                        ? (language === 'ar' ? 'منتج' : 'Product')
-                                        : (language === 'ar' ? 'خدمة' : 'Service')
-                                      }
-                                    </span>
-                                  </td>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    {item.name}
-                                  </td>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    {item.quantity}
-                                  </td>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    {item.price} SAR
-                                  </td>
-                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
-                                    {(item.quantity * item.price).toFixed(2)} SAR
-                                  </td>
-                                </tr>
-                              ))}
+                              {invoiceItems.map((item: any, index: number) => {
+                                const unitPrice = parseFloat(item.price) || 0;
+                                const quantity = parseInt(item.quantity) || 0;
+                                const totalBeforeVat = unitPrice * quantity;
+                                const vatAmount = totalBeforeVat * 0.15;
+                                const totalAfterVat = totalBeforeVat + vatAmount;
+                                
+                                return (
+                                  <tr key={index} className="border-b">
+                                    <td className="py-2 px-2" style={{width: '35%'}}>
+                                      <div className="bg-gray-100 p-2 rounded text-gray-700" style={{textAlign: getTextAlign(language)}}>
+                                        <span className={`inline-block px-2 py-1 rounded text-xs font-medium mr-2 ${
+                                          item.type === 'product' 
+                                            ? 'bg-blue-100 text-blue-800' 
+                                            : 'bg-green-100 text-green-800'
+                                        }`}>
+                                          {item.type === 'product' 
+                                            ? (language === 'ar' ? 'منتج' : 'Product')
+                                            : (language === 'ar' ? 'خدمة' : 'Service')
+                                          }
+                                        </span>
+                                        {item.name}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2">
+                                      <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                        {quantity}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2">
+                                      <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                        {unitPrice.toFixed(2)}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2">
+                                      <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                        {language === 'ar' ? 'لا يوجد خصم' : 'No Discount'}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-center">
+                                      <div className="bg-green-100 p-2 rounded text-green-700">
+                                        {vatAmount.toFixed(2)}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-center">
+                                      <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                        {totalBeforeVat.toFixed(2)}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-center">
+                                      <div className="bg-gray-100 p-2 rounded text-gray-700 font-semibold">
+                                        {totalAfterVat.toFixed(2)}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
                           </table>
                         </div>
