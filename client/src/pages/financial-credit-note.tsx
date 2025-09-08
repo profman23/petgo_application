@@ -116,14 +116,33 @@ export default function FinancialCreditNote() {
 
   // Handle invoice search
   const handleInvoiceSearch = () => {
-    if (!allInvoices || !invoiceNumber.trim()) return;
+    if (!invoiceNumber.trim()) return;
 
     setIsSearching(true);
     
+    // Debug: Log the data we're working with
+    console.log('All invoices data:', allInvoices);
+    console.log('Search term:', invoiceNumber);
+    
+    if (!allInvoices) {
+      console.log('No invoice data available yet');
+      setIsSearching(false);
+      return;
+    }
+    
     // Filter invoices by invoice number (partial match)
-    const results = allInvoices.filter((invoice: any) => 
-      invoice.invoiceNumber.toLowerCase().includes(invoiceNumber.toLowerCase())
-    );
+    const results = allInvoices.filter((invoice: any) => {
+      const invoiceNum = invoice.invoiceNumber || '';
+      const searchTerm = invoiceNumber.toLowerCase();
+      const match = invoiceNum.toLowerCase().includes(searchTerm);
+      
+      // Debug logging for each invoice
+      console.log(`Checking invoice: ${invoiceNum} against ${searchTerm} = ${match}`);
+      
+      return match;
+    });
+    
+    console.log('Search results:', results);
     
     setTimeout(() => {
       setSearchResults(results);
