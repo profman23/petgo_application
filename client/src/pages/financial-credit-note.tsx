@@ -954,11 +954,17 @@ export default function FinancialCreditNote() {
                             </thead>
                             <tbody>
                               {invoiceItems.map((item: any, index: number) => {
-                                const unitPrice = parseFloat(item.price) || 0;
-                                const quantity = parseInt(item.quantity) || 0;
-                                const totalBeforeVat = unitPrice * quantity;
-                                const vatAmount = totalBeforeVat * 0.15;
-                                const totalAfterVat = totalBeforeVat + vatAmount;
+                                // Use the correct field names from the database
+                                const unitPrice = parseFloat(item.unitPrice || item.price || 0);
+                                const quantity = parseInt(item.quantity || 1);
+                                const discount = parseFloat(item.discount || 0);
+                                const itemName = item.description || item.name || item.itemName || 'Unknown Item';
+                                
+                                const totalBeforeDiscount = unitPrice * quantity;
+                                const discountAmount = totalBeforeDiscount * (discount / 100);
+                                const totalAfterDiscount = totalBeforeDiscount - discountAmount;
+                                const vatAmount = totalAfterDiscount * 0.15;
+                                const totalAfterVat = totalAfterDiscount + vatAmount;
                                 
                                 return (
                                   <tr key={index} className="border-b">
@@ -974,7 +980,7 @@ export default function FinancialCreditNote() {
                                             : (language === 'ar' ? 'خدمة' : 'Service')
                                           }
                                         </span>
-                                        {item.name}
+                                        {itemName}
                                       </div>
                                     </td>
                                     <td className="py-2 px-2">
@@ -989,7 +995,10 @@ export default function FinancialCreditNote() {
                                     </td>
                                     <td className="py-2 px-2">
                                       <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
-                                        {language === 'ar' ? 'لا يوجد خصم' : 'No Discount'}
+                                        {discount > 0 
+                                          ? `${discount.toFixed(1)}%` 
+                                          : (language === 'ar' ? 'لا يوجد خصم' : 'No Discount')
+                                        }
                                       </div>
                                     </td>
                                     <td className="py-2 px-2 text-center">
@@ -999,7 +1008,7 @@ export default function FinancialCreditNote() {
                                     </td>
                                     <td className="py-2 px-2 text-center">
                                       <div className="bg-gray-100 p-2 rounded text-gray-700">
-                                        {totalBeforeVat.toFixed(2)}
+                                        {totalAfterDiscount.toFixed(2)}
                                       </div>
                                     </td>
                                     <td className="py-2 px-2 text-center">
