@@ -28,6 +28,8 @@ export default function FinancialCreditNote() {
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
   const [isCreateCreditNoteModalOpen, setIsCreateCreditNoteModalOpen] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   // Check admin authentication
   useEffect(() => {
@@ -71,6 +73,21 @@ export default function FinancialCreditNote() {
     enabled: !!adminToken,
   });
 
+  // Fetch generated invoices for search
+  const { data: allInvoices } = useQuery({
+    queryKey: ["/api/admin/generated-invoices"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/generated-invoices", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch invoices");
+      return response.json();
+    },
+    enabled: !!adminToken,
+  });
+
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
   const [audioEnabled, setAudioEnabled] = useState(() => {
     const savedState = localStorage.getItem('audioNotificationsEnabled');
@@ -95,6 +112,32 @@ export default function FinancialCreditNote() {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("admin");
     setLocation("/admin-login");
+  };
+
+  // Handle invoice search
+  const handleInvoiceSearch = () => {
+    if (!allInvoices || !invoiceNumber.trim()) return;
+
+    setIsSearching(true);
+    
+    // Filter invoices by invoice number (partial match)
+    const results = allInvoices.filter((invoice: any) => 
+      invoice.invoiceNumber.toLowerCase().includes(invoiceNumber.toLowerCase())
+    );
+    
+    setTimeout(() => {
+      setSearchResults(results);
+      setIsSearching(false);
+    }, 500); // Small delay for better UX
+  };
+
+  // Handle selecting an invoice for credit note creation
+  const handleSelectInvoice = (invoice: any) => {
+    console.log('Selected invoice for credit note:', invoice);
+    // TODO: Navigate to credit note creation with selected invoice
+    setIsCreateCreditNoteModalOpen(false);
+    setInvoiceNumber("");
+    setSearchResults([]);
   };
 
   return (
@@ -691,9 +734,57 @@ export default function FinancialCreditNote() {
                   className={language === 'ar' ? 'pr-10' : 'pl-10'}
                   style={{textAlign: getTextAlign(language)}}
                   dir={getDirection(language)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleInvoiceSearch();
+                    }
+                  }}
                 />
               </div>
             </div>
+
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="space-y-2" dir={getDirection(language)}>
+                <label className="text-sm font-medium text-gray-700" style={{textAlign: getTextAlign(language)}}>
+                  {language === 'ar' ? 'نتائج البحث' : 'Search Results'}
+                </label>
+                <div className="max-h-64 overflow-y-auto space-y-2 border rounded-md p-2 bg-gray-50">
+                  {searchResults.map((invoice: any) => (
+                    <div 
+                      key={invoice.id} 
+                      className="bg-white p-3 rounded border cursor-pointer hover:bg-purple-50 transition-colors"
+                      onClick={() => handleSelectInvoice(invoice)}
+                    >
+                      <div className="flex justify-between items-start mb-2" style={{textAlign: getTextAlign(language)}}>
+                        <div>
+                          <div className="font-semibold text-purple-600">
+                            {invoice.invoiceNumber}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {invoice.customerName}
+                          </div>
+                        </div>
+                        <div className="text-sm font-medium text-green-600">
+                          {invoice.finalTotal} SAR
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-500" style={{textAlign: getTextAlign(language)}}>
+                        {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                        {new Date(invoice.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* No Results Message */}
+            {!isSearching && searchResults.length === 0 && invoiceNumber.trim() && (
+              <div className="text-center py-4 text-gray-500" style={{textAlign: getTextAlign(language)}}>
+                {language === 'ar' ? 'لم يتم العثور على فواتير' : 'No invoices found'}
+              </div>
+            )}
             
             <div className={`flex gap-2 pt-4 ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
               <Button
@@ -706,16 +797,18 @@ export default function FinancialCreditNote() {
                 {language === 'ar' ? 'إلغاء' : 'Cancel'}
               </Button>
               <Button
-                onClick={() => {
-                  // TODO: Handle invoice search and credit note creation
-                  console.log('Searching for invoice:', invoiceNumber);
-                  setIsCreateCreditNoteModalOpen(false);
-                  setInvoiceNumber("");
-                }}
+                onClick={handleInvoiceSearch}
                 className="bg-purple-600 hover:bg-purple-700 text-white"
-                disabled={!invoiceNumber.trim()}
+                disabled={!invoiceNumber.trim() || isSearching}
               >
-                {language === 'ar' ? 'بحث' : 'Search'}
+                {isSearching ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    {language === 'ar' ? 'جارٍ البحث...' : 'Searching...'}
+                  </div>
+                ) : (
+                  language === 'ar' ? 'بحث' : 'Search'
+                )}
               </Button>
             </div>
           </div>
