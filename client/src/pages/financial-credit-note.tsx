@@ -33,6 +33,17 @@ export default function FinancialCreditNote() {
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [invoiceItems, setInvoiceItems] = useState<any[]>([]);
   const [loadingItems, setLoadingItems] = useState(false);
+  const [editedQuantities, setEditedQuantities] = useState<{[key: number]: number}>({});
+
+  // Handle quantity changes (decrease only for credit notes)
+  const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
+    if (newQuantity <= originalQuantity && newQuantity >= 0) {
+      setEditedQuantities(prev => ({
+        ...prev,
+        [itemId]: newQuantity
+      }));
+    }
+  };
 
   // Check admin authentication
   useEffect(() => {
@@ -956,7 +967,8 @@ export default function FinancialCreditNote() {
                               {invoiceItems.map((item: any, index: number) => {
                                 // Use the correct field names from the database  
                                 const unitPrice = parseFloat(item.unitPrice || 0);
-                                const quantity = parseInt(item.quantity || 1);
+                                const originalQuantity = parseInt(item.quantity || 1);
+                                const currentQuantity = editedQuantities[item.id] ?? originalQuantity;
                                 const itemName = item.description || 'Unknown Item';
                                 
                                 // Get the discount from discountType field
@@ -985,8 +997,35 @@ export default function FinancialCreditNote() {
                                       </div>
                                     </td>
                                     <td className="py-2 px-2">
-                                      <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
-                                        {quantity}
+                                      <div className="flex items-center space-x-2 bg-white border rounded p-1">
+                                        <button
+                                          onClick={() => handleQuantityChange(item.id, originalQuantity, currentQuantity - 1)}
+                                          disabled={currentQuantity <= 0}
+                                          className="w-8 h-8 rounded bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white text-sm font-bold"
+                                        >
+                                          -
+                                        </button>
+                                        <input
+                                          type="number"
+                                          value={currentQuantity}
+                                          onChange={(e) => {
+                                            const newValue = parseInt(e.target.value) || 0;
+                                            handleQuantityChange(item.id, originalQuantity, newValue);
+                                          }}
+                                          className="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm"
+                                          min="0"
+                                          max={originalQuantity}
+                                        />
+                                        <button
+                                          onClick={() => handleQuantityChange(item.id, originalQuantity, currentQuantity + 1)}
+                                          disabled={currentQuantity >= originalQuantity}
+                                          className="w-8 h-8 rounded bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white text-sm font-bold"
+                                        >
+                                          +
+                                        </button>
+                                      </div>
+                                      <div className="text-xs text-gray-500 text-center mt-1">
+                                        {language === 'ar' ? `الأصلي: ${originalQuantity}` : `Original: ${originalQuantity}`}
                                       </div>
                                     </td>
                                     <td className="py-2 px-2">
