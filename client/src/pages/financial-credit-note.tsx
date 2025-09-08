@@ -30,6 +30,7 @@ export default function FinancialCreditNote() {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
 
   // Check admin authentication
   useEffect(() => {
@@ -140,9 +141,22 @@ export default function FinancialCreditNote() {
 
   // Handle selecting an invoice for credit note creation
   const handleSelectInvoice = (invoice: any) => {
-    console.log('Selected invoice for credit note:', invoice);
-    // TODO: Navigate to credit note creation with selected invoice
+    setSelectedInvoice(invoice);
+    setSearchResults([]); // Hide search results
+    setInvoiceNumber(""); // Clear search field
+  };
+
+  // Handle going back to search
+  const handleBackToSearch = () => {
+    setSelectedInvoice(null);
+    setInvoiceNumber("");
+    setSearchResults([]);
+  };
+
+  // Handle modal close
+  const handleModalClose = () => {
     setIsCreateCreditNoteModalOpen(false);
+    setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
   };
@@ -717,7 +731,7 @@ export default function FinancialCreditNote() {
       </div>
 
       {/* Create New Credit Note Modal */}
-      <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={setIsCreateCreditNoteModalOpen}>
+      <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={handleModalClose}>
         <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo', textAlign: getTextAlign(language)}}>
@@ -790,6 +804,202 @@ export default function FinancialCreditNote() {
             {!isSearching && searchResults.length === 0 && invoiceNumber.trim() && (
               <div className="text-center py-4 text-gray-500" style={{textAlign: getTextAlign(language)}}>
                 {language === 'ar' ? 'لم يتم العثور على فواتير' : 'No invoices found'}
+              </div>
+            )}
+
+            {/* Selected Invoice Display */}
+            {selectedInvoice && (
+              <div className="space-y-4" dir={getDirection(language)}>
+                {/* Back Button */}
+                <div className={`flex ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
+                  <Button
+                    variant="outline"
+                    onClick={handleBackToSearch}
+                    className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                  >
+                    {language === 'ar' ? '← العودة للبحث' : '← Back to Search'}
+                  </Button>
+                </div>
+
+                {/* Invoice Details */}
+                <div className="bg-white border rounded-lg p-6 shadow-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {/* Invoice Information */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
+                        {language === 'ar' ? 'معلومات الفاتورة' : 'Invoice Information'}
+                      </h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'رقم الفاتورة:' : 'Invoice Number:'}
+                          </span>
+                          <span className="text-purple-600 font-semibold">{selectedInvoice.invoiceNumber}</span>
+                        </div>
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'التاريخ:' : 'Date:'}
+                          </span>
+                          <span className="text-gray-600">
+                            {new Date(selectedInvoice.appointmentDate).toLocaleDateString(
+                              language === 'ar' ? 'ar-SA' : 'en-US'
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
+                          </span>
+                          <span className="text-green-600 font-bold">{selectedInvoice.finalTotal} SAR</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Customer Information */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
+                        {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
+                      </h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
+                          </span>
+                          <span className="text-gray-600">{selectedInvoice.customerName}</span>
+                        </div>
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'}
+                          </span>
+                          <span className="text-gray-600">{selectedInvoice.customerPhone}</span>
+                        </div>
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'العنوان:' : 'Address:'}
+                          </span>
+                          <span className="text-gray-600">{selectedInvoice.customerAddress}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Items and Services */}
+                  <div className="space-y-4">
+                    {/* Items */}
+                    {selectedInvoice.items && selectedInvoice.items.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
+                          {language === 'ar' ? 'المنتجات' : 'Items'}
+                        </h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse border border-gray-300">
+                            <thead>
+                              <tr className="bg-gray-50">
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'المنتج' : 'Item'}
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'الكمية' : 'Quantity'}
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'السعر' : 'Price'}
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'المجموع' : 'Total'}
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {selectedInvoice.items.map((item: any, index: number) => (
+                                <tr key={index}>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    {item.name}
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    {item.quantity}
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    {item.price} SAR
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    {(item.quantity * item.price).toFixed(2)} SAR
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Services */}
+                    {selectedInvoice.services && selectedInvoice.services.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
+                          {language === 'ar' ? 'الخدمات' : 'Services'}
+                        </h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse border border-gray-300">
+                            <thead>
+                              <tr className="bg-gray-50">
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'الخدمة' : 'Service'}
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'الكمية' : 'Quantity'}
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'السعر' : 'Price'}
+                                </th>
+                                <th className="border border-gray-300 px-4 py-2 text-left" style={{textAlign: getTextAlign(language)}}>
+                                  {language === 'ar' ? 'المجموع' : 'Total'}
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {selectedInvoice.services.map((service: any, index: number) => (
+                                <tr key={index}>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    {service.name}
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    {service.quantity}
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    {service.price} SAR
+                                  </td>
+                                  <td className="border border-gray-300 px-4 py-2" style={{textAlign: getTextAlign(language)}}>
+                                    {(service.quantity * service.price).toFixed(2)} SAR
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className={`flex gap-3 pt-6 border-t ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
+                    <Button
+                      variant="outline"
+                      onClick={handleBackToSearch}
+                      className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                    >
+                      {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                    </Button>
+                    <Button
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                      onClick={() => {
+                        // TODO: Implement credit note creation
+                        console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
+                      }}
+                    >
+                      {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
             
