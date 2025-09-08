@@ -630,22 +630,36 @@ export default function FinancialCreditNote() {
 
         {/* Main Content */}
         <div className="flex-1 p-8">
-          <div className="flex items-center gap-4 mb-8">
-            {/* Lord Icon */}
-            <div className="flex-shrink-0">
-              <lord-icon
-                src="https://cdn.lordicon.com/lbrbofig.json"
-                trigger="loop"
-                delay="1500"
-                colors="primary:#852085,secondary:#848484"
-                style={{width: '80px', height: '80px'}}
-              />
+          <div className="flex items-center justify-between mb-8">
+            {/* Left side - Lord Icon and Title */}
+            <div className="flex items-center gap-4">
+              {/* Lord Icon */}
+              <div className="flex-shrink-0">
+                <lord-icon
+                  src="https://cdn.lordicon.com/lbrbofig.json"
+                  trigger="loop"
+                  delay="1500"
+                  colors="primary:#852085,secondary:#848484"
+                  style={{width: '80px', height: '80px'}}
+                />
+              </div>
+              
+              {/* Credit Note Title */}
+              <h1 className="text-2xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+                {language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}
+              </h1>
             </div>
-            
-            {/* Credit Note Title */}
-            <h1 className="text-2xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
-              {language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}
-            </h1>
+
+            {/* Right side - Create New Credit Note Button */}
+            <button
+              onClick={() => {
+                // TODO: Add functionality to create new credit note
+                console.log('Create New Credit Note clicked');
+              }}
+              className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+            >
+              {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
+            </button>
           </div>
         </div>
       </div>
