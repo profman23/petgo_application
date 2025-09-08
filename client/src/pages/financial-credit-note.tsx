@@ -635,7 +635,8 @@ export default function FinancialCreditNote() {
             <div className="flex-shrink-0">
               <lord-icon
                 src="https://cdn.lordicon.com/lbrbofig.json"
-                trigger="hover"
+                trigger="loop"
+                delay="1500"
                 colors="primary:#852085,secondary:#848484"
                 style={{width: '80px', height: '80px'}}
               />
