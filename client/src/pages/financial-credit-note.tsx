@@ -954,8 +954,8 @@ export default function FinancialCreditNote() {
                             </thead>
                             <tbody>
                               {invoiceItems.map((item: any, index: number) => {
-                                // Debug: Log item data to see available fields
-                                console.log('Invoice item data:', item);
+                                // Debug: Log item data to see ALL available fields
+                                console.log('Invoice item data (full):', JSON.stringify(item, null, 2));
                                 
                                 // Use the correct field names from the database
                                 const unitPrice = parseFloat(item.unitPrice || item.price || 0);
