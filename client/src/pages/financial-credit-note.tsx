@@ -120,12 +120,7 @@ export default function FinancialCreditNote() {
 
     setIsSearching(true);
     
-    // Debug: Log the data we're working with
-    console.log('All invoices data:', allInvoices);
-    console.log('Search term:', invoiceNumber);
-    
     if (!allInvoices) {
-      console.log('No invoice data available yet');
       setIsSearching(false);
       return;
     }
@@ -134,15 +129,8 @@ export default function FinancialCreditNote() {
     const results = allInvoices.filter((invoice: any) => {
       const invoiceNum = invoice.invoiceNumber || '';
       const searchTerm = invoiceNumber.toLowerCase();
-      const match = invoiceNum.toLowerCase().includes(searchTerm);
-      
-      // Debug logging for each invoice
-      console.log(`Checking invoice: ${invoiceNum} against ${searchTerm} = ${match}`);
-      
-      return match;
+      return invoiceNum.toLowerCase().includes(searchTerm);
     });
-    
-    console.log('Search results:', results);
     
     setTimeout(() => {
       setSearchResults(results);
@@ -730,7 +718,7 @@ export default function FinancialCreditNote() {
 
       {/* Create New Credit Note Modal */}
       <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={setIsCreateCreditNoteModalOpen}>
-        <DialogContent className="sm:max-w-md" dir={getDirection(language)}>
+        <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo', textAlign: getTextAlign(language)}}>
               {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
