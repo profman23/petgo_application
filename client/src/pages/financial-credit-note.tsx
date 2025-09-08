@@ -668,32 +668,34 @@ export default function FinancialCreditNote() {
 
       {/* Create New Credit Note Modal */}
       <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={setIsCreateCreditNoteModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" dir={getDirection(language)}>
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+            <DialogTitle className="text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo', textAlign: getTextAlign(language)}}>
               {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4" dir={getDirection(language)}>
             <div className="space-y-2">
-              <label htmlFor="invoice-search" className="text-sm font-medium text-gray-700">
+              <label htmlFor="invoice-search" className="text-sm font-medium text-gray-700" style={{textAlign: getTextAlign(language)}}>
                 {language === 'ar' ? 'البحث برقم الفاتورة' : 'Search by Invoice Number'}
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4`} />
                 <Input
                   id="invoice-search"
                   type="text"
                   value={invoiceNumber}
                   onChange={(e) => setInvoiceNumber(e.target.value)}
                   placeholder={language === 'ar' ? 'أدخل رقم الفاتورة...' : 'Enter invoice number...'}
-                  className="pl-10"
+                  className={language === 'ar' ? 'pr-10' : 'pl-10'}
+                  style={{textAlign: getTextAlign(language)}}
+                  dir={getDirection(language)}
                 />
               </div>
             </div>
             
-            <div className="flex justify-end gap-2 pt-4">
+            <div className={`flex gap-2 pt-4 ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
               <Button
                 variant="outline"
                 onClick={() => {
