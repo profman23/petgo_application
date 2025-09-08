@@ -954,21 +954,18 @@ export default function FinancialCreditNote() {
                             </thead>
                             <tbody>
                               {invoiceItems.map((item: any, index: number) => {
-                                // Debug: Log item data to see ALL available fields
-                                console.log('Invoice item data (full):', JSON.stringify(item, null, 2));
-                                
-                                // Use the correct field names from the database
-                                const unitPrice = parseFloat(item.unitPrice || item.price || 0);
+                                // Use the correct field names from the database  
+                                const unitPrice = parseFloat(item.unitPrice || 0);
                                 const quantity = parseInt(item.quantity || 1);
-                                // Try different possible field names for discount
-                                const discount = parseFloat(item.discount || item.discountPercentage || item.discountAmount || item.discountValue || 0);
-                                const itemName = item.description || item.name || item.itemName || 'Unknown Item';
+                                const itemName = item.description || 'Unknown Item';
                                 
-                                const totalBeforeDiscount = unitPrice * quantity;
-                                const discountAmount = totalBeforeDiscount * (discount / 100);
-                                const totalAfterDiscount = totalBeforeDiscount - discountAmount;
-                                const vatAmount = totalAfterDiscount * 0.15;
-                                const totalAfterVat = totalAfterDiscount + vatAmount;
+                                // Get the discount from discountType field
+                                const discountType = item.discountType || 'none';
+                                
+                                // Use pre-calculated values from database
+                                const vatAmount = parseFloat(item.vatAmount || 0);
+                                const totalBeforeVat = parseFloat(item.totalBeforeVat || 0);
+                                const totalAfterVat = parseFloat(item.totalAfterVat || 0);
                                 
                                 return (
                                   <tr key={index} className="border-b">
@@ -999,9 +996,9 @@ export default function FinancialCreditNote() {
                                     </td>
                                     <td className="py-2 px-2">
                                       <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
-                                        {discount > 0 
-                                          ? `${discount.toFixed(1)}%` 
-                                          : (language === 'ar' ? 'لا يوجد خصم' : 'No Discount')
+                                        {discountType === 'none' 
+                                          ? (language === 'ar' ? 'لا يوجد خصم' : 'No Discount')
+                                          : discountType
                                         }
                                       </div>
                                     </td>
@@ -1012,7 +1009,7 @@ export default function FinancialCreditNote() {
                                     </td>
                                     <td className="py-2 px-2 text-center">
                                       <div className="bg-gray-100 p-2 rounded text-gray-700">
-                                        {totalAfterDiscount.toFixed(2)}
+                                        {totalBeforeVat.toFixed(2)}
                                       </div>
                                     </td>
                                     <td className="py-2 px-2 text-center">
