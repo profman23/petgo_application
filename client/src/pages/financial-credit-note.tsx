@@ -954,10 +954,14 @@ export default function FinancialCreditNote() {
                             </thead>
                             <tbody>
                               {invoiceItems.map((item: any, index: number) => {
+                                // Debug: Log item data to see available fields
+                                console.log('Invoice item data:', item);
+                                
                                 // Use the correct field names from the database
                                 const unitPrice = parseFloat(item.unitPrice || item.price || 0);
                                 const quantity = parseInt(item.quantity || 1);
-                                const discount = parseFloat(item.discount || 0);
+                                // Try different possible field names for discount
+                                const discount = parseFloat(item.discount || item.discountPercentage || item.discountAmount || item.discountValue || 0);
                                 const itemName = item.description || item.name || item.itemName || 'Unknown Item';
                                 
                                 const totalBeforeDiscount = unitPrice * quantity;
