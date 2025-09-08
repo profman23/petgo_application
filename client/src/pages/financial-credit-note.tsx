@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -34,6 +34,7 @@ export default function FinancialCreditNote() {
   const [invoiceItems, setInvoiceItems] = useState<any[]>([]);
   const [loadingItems, setLoadingItems] = useState(false);
   const [editedQuantities, setEditedQuantities] = useState<{[key: number]: number}>({});
+  const [removedItems, setRemovedItems] = useState<Set<number>>(new Set());
 
   // Handle quantity changes (decrease only for credit notes)
   const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
@@ -43,6 +44,11 @@ export default function FinancialCreditNote() {
         [itemId]: newQuantity
       }));
     }
+  };
+
+  // Handle item removal
+  const handleRemoveItem = (itemId: number) => {
+    setRemovedItems(prev => new Set(prev).add(itemId));
   };
 
   // Check admin authentication
@@ -961,10 +967,13 @@ export default function FinancialCreditNote() {
                                 <th className="text-center py-2 px-2 w-32">
                                   {language === 'ar' ? 'المجموع بعد الضريبة (ر.س)' : 'Total After VAT (SAR)'}
                                 </th>
+                                <th className="text-center py-2 px-2 w-16">
+                                  {language === 'ar' ? 'حذف' : 'Remove'}
+                                </th>
                               </tr>
                             </thead>
                             <tbody>
-                              {invoiceItems.map((item: any, index: number) => {
+                              {invoiceItems.filter(item => !removedItems.has(item.id)).map((item: any, index: number) => {
                                 // Use the correct field names from the database  
                                 const unitPrice = parseFloat(item.unitPrice || 0);
                                 const originalQuantity = parseInt(item.quantity || 1);
@@ -1055,6 +1064,14 @@ export default function FinancialCreditNote() {
                                       <div className="bg-gray-100 p-2 rounded text-gray-700 font-semibold">
                                         {totalAfterVat.toFixed(2)}
                                       </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-center">
+                                      <Button
+                                        onClick={() => handleRemoveItem(item.id)}
+                                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 w-8 p-0"
+                                      >
+                                        <Minus className="h-4 w-4" />
+                                      </Button>
                                     </td>
                                   </tr>
                                 );
