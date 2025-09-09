@@ -866,7 +866,7 @@ export default function FinancialCreditNote() {
 
                 {/* Invoice Details */}
                 <div className="bg-white border rounded-lg p-6 shadow-sm">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 items-start">
                     {/* Invoice Information */}
                     <div className="space-y-3">
                       <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
