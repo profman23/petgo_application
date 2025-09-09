@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -820,6 +820,9 @@ export default function FinancialCreditNote() {
               />
               <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              {language === 'ar' ? 'نموذج لإنشاء مذكرة ائتمان جديدة للعملاء' : 'Form to create a new credit note for customers'}
+            </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4 py-4" dir={getDirection(language)}>
