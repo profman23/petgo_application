@@ -207,35 +207,37 @@ export default function FinancialCreditNote() {
   const creditNoteTotals = useMemo(() => {
     const activeItems = invoiceItems.filter(item => !removedItems.has(item.id));
     
-    let subtotal = 0;
-    let totalDiscount = 0;
+    let totalBeforeVatSum = 0;
     
     activeItems.forEach(item => {
-      const currentQuantity = editedQuantities[item.id] ?? item.quantity;
-      const unitPrice = parseFloat(item.unitPrice) || 0;
-      const itemTotal = currentQuantity * unitPrice;
+      const unitPrice = parseFloat(item.unitPrice || 0);
+      const originalQuantity = parseInt(item.quantity || 1);
+      const currentQuantity = editedQuantities[item.id] ?? originalQuantity;
+      const discountType = item.discountType || 'none';
       
-      subtotal += itemTotal;
+      // Same calculation as individual items
+      const totalBeforeDiscount = currentQuantity * unitPrice;
       
-      // Calculate discount for this item
-      if (item.discountType === 'percentage') {
-        const discountPercent = parseFloat(item.discount) || 0;
-        totalDiscount += (itemTotal * discountPercent / 100);
-      } else if (item.discountType === 'fixed') {
-        const discountAmount = parseFloat(item.discount) || 0;
-        totalDiscount += discountAmount;
+      let discountAmount = 0;
+      if (discountType !== 'none') {
+        if (discountType.includes('%')) {
+          const discountPercent = parseFloat(discountType.replace('%', '')) / 100;
+          discountAmount = totalBeforeDiscount * discountPercent;
+        }
       }
+      
+      // Total Before VAT (after discount) - same as displayed in individual rows
+      const totalBeforeVat = totalBeforeDiscount - discountAmount;
+      totalBeforeVatSum += totalBeforeVat;
     });
     
-    const subtotalAfterDiscount = subtotal - totalDiscount;
-    const vatAmount = subtotalAfterDiscount * 0.15; // 15% VAT
-    const finalTotal = subtotalAfterDiscount + vatAmount;
+    const vatAmount = totalBeforeVatSum * 0.15; // 15% VAT
+    const finalTotal = totalBeforeVatSum + vatAmount;
     
     return {
-      subtotal,
+      totalBeforeVatSum,
       vatAmount,
-      finalTotal,
-      totalDiscount
+      finalTotal
     };
   }, [invoiceItems, editedQuantities, removedItems]);
 
@@ -1180,7 +1182,7 @@ export default function FinancialCreditNote() {
                       <div className="w-80">
                         <div className="flex justify-between mb-2">
                           <span>{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
-                          <span>-{(creditNoteTotals.subtotal - creditNoteTotals.totalDiscount).toFixed(2)} SAR</span>
+                          <span>-{creditNoteTotals.totalBeforeVatSum.toFixed(2)} SAR</span>
                         </div>
                         <div className="flex justify-between mb-2">
                           <span>{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
