@@ -804,6 +804,17 @@ export default function FinancialCreditNote() {
                   }}
                 />
               </div>
+              
+              {/* Search Button */}
+              <div className={`flex pt-2 ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
+                <Button
+                  onClick={handleInvoiceSearch}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  disabled={!invoiceNumber.trim() || isSearching}
+                >
+                  {isSearching ? (language === 'ar' ? 'جاري البحث...' : 'Searching...') : (language === 'ar' ? 'بحث' : 'Search')}
+                </Button>
+              </div>
             </div>
 
             {/* Search Results */}
@@ -1142,20 +1153,6 @@ export default function FinancialCreditNote() {
                 }}
               >
                 {language === 'ar' ? 'إلغاء' : 'Cancel'}
-              </Button>
-              <Button
-                onClick={handleInvoiceSearch}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-                disabled={!invoiceNumber.trim() || isSearching}
-              >
-                {isSearching ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    {language === 'ar' ? 'جارٍ البحث...' : 'Searching...'}
-                  </div>
-                ) : (
-                  language === 'ar' ? 'بحث' : 'Search'
-                )}
               </Button>
             </div>
           </div>
