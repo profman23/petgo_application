@@ -1120,13 +1120,6 @@ export default function FinancialCreditNote() {
                   {/* Action Buttons */}
                   <div className="flex gap-3 pt-6 border-t justify-start">
                     <Button
-                      variant="outline"
-                      onClick={handleBackToSearch}
-                      className="text-gray-600 border-gray-300 hover:bg-gray-50"
-                    >
-                      {language === 'ar' ? 'إلغاء' : 'Cancel'}
-                    </Button>
-                    <Button
                       className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                       onClick={() => {
                         // TODO: Implement credit note creation
@@ -1134,6 +1127,13 @@ export default function FinancialCreditNote() {
                       }}
                     >
                       {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleBackToSearch}
+                      className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                    >
+                      {language === 'ar' ? 'إلغاء' : 'Cancel'}
                     </Button>
                   </div>
                 </div>
