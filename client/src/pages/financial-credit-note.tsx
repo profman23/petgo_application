@@ -27,6 +27,7 @@ export default function FinancialCreditNote() {
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
   const [isCreateCreditNoteModalOpen, setIsCreateCreditNoteModalOpen] = useState(false);
+  const [isOutgoingPaymentModalOpen, setIsOutgoingPaymentModalOpen] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -1141,8 +1142,7 @@ export default function FinancialCreditNote() {
                       <Button
                         className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                         onClick={() => {
-                          // TODO: Implement outgoing payment functionality
-                          console.log('Outgoing payment for invoice:', selectedInvoice.invoiceNumber);
+                          setIsOutgoingPaymentModalOpen(true);
                         }}
                       >
                         {language === 'ar' ? 'دفع صادر' : 'Outgoing Payment'}
@@ -1153,6 +1153,112 @@ export default function FinancialCreditNote() {
               </div>
             )}
             
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Outgoing Payment Modal */}
+      <Dialog open={isOutgoingPaymentModalOpen} onOpenChange={setIsOutgoingPaymentModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto" dir={getDirection(language)}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo', textAlign: getTextAlign(language)}}>
+              <DollarSign className="h-5 w-5" />
+              {language === 'ar' ? 'دفع صادر' : 'Outgoing Payment'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4" dir={getDirection(language)}>
+            {selectedInvoice && (
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-700 mb-2" style={{textAlign: getTextAlign(language)}}>
+                  {language === 'ar' ? 'معلومات الفاتورة' : 'Invoice Information'}
+                </h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium text-gray-600">{language === 'ar' ? 'رقم الفاتورة:' : 'Invoice Number:'}</p>
+                    <p className="text-purple-600 font-semibold">{selectedInvoice.invoiceNumber}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-600">{language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}</p>
+                    <p className="text-gray-900">{selectedInvoice.customerName}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-600">{language === 'ar' ? 'المبلغ الإجمالي:' : 'Total Amount:'}</p>
+                    <p className="text-green-600 font-bold">{selectedInvoice.finalTotal} SAR</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-600">{language === 'ar' ? 'التاريخ:' : 'Date:'}</p>
+                    <p className="text-gray-900">
+                      {new Date(selectedInvoice.appointmentDate).toLocaleDateString(
+                        language === 'ar' ? 'ar-SA' : 'en-US'
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{textAlign: getTextAlign(language)}}>
+                  {language === 'ar' ? 'المبلغ' : 'Amount'} <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  className="w-full"
+                  style={{textAlign: getTextAlign(language)}}
+                  dir={getDirection(language)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{textAlign: getTextAlign(language)}}>
+                  {language === 'ar' ? 'وصف الدفعة' : 'Payment Description'}
+                </label>
+                <Input
+                  type="text"
+                  placeholder={language === 'ar' ? 'أدخل وصف الدفعة...' : 'Enter payment description...'}
+                  className="w-full"
+                  style={{textAlign: getTextAlign(language)}}
+                  dir={getDirection(language)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{textAlign: getTextAlign(language)}}>
+                  {language === 'ar' ? 'تاريخ الدفع' : 'Payment Date'}
+                </label>
+                <Input
+                  type="date"
+                  className="w-full"
+                  style={{textAlign: getTextAlign(language)}}
+                  dir={getDirection(language)}
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className={`flex gap-3 pt-4 border-t ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
+              <Button
+                variant="outline"
+                onClick={() => setIsOutgoingPaymentModalOpen(false)}
+                className="text-gray-600 border-gray-300 hover:bg-gray-50"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </Button>
+              <Button
+                className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                onClick={() => {
+                  // TODO: Implement outgoing payment creation
+                  console.log('Creating outgoing payment for invoice:', selectedInvoice?.invoiceNumber);
+                  setIsOutgoingPaymentModalOpen(false);
+                }}
+              >
+                {language === 'ar' ? 'إنشاء دفعة صادرة' : 'Create Outgoing Payment'}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
