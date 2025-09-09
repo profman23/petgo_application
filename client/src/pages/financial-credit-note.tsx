@@ -218,18 +218,12 @@ export default function FinancialCreditNote() {
     const activeItems = invoiceItems.filter(item => !removedItems.has(item.id));
     
     let totalBeforeVatSum = 0;
-    let hasValidItems = false;
     
     activeItems.forEach(item => {
       const unitPrice = parseFloat(item.unitPrice || 0);
       const originalQuantity = parseInt(item.quantity || 1);
       const currentQuantity = editedQuantities[item.id] ?? originalQuantity;
       const discountType = item.discountType || 'none';
-      
-      // Check if this item has valid quantity
-      if (currentQuantity > 0) {
-        hasValidItems = true;
-      }
       
       // Same calculation as individual items
       const totalBeforeDiscount = currentQuantity * unitPrice;
@@ -247,24 +241,13 @@ export default function FinancialCreditNote() {
       totalBeforeVatSum += totalBeforeVat;
     });
     
-    // If no valid items (all quantities are 0), return zeros
-    if (!hasValidItems) {
-      return {
-        totalBeforeVatSum: 0,
-        vatAmount: 0,
-        finalTotal: 0,
-        isValid: false
-      };
-    }
-    
     const vatAmount = totalBeforeVatSum * 0.15; // 15% VAT
     const finalTotal = totalBeforeVatSum + vatAmount;
     
     return {
       totalBeforeVatSum,
       vatAmount,
-      finalTotal,
-      isValid: true
+      finalTotal
     };
   }, [invoiceItems, editedQuantities, removedItems]);
 
@@ -1196,17 +1179,10 @@ export default function FinancialCreditNote() {
                     {/* Left side - Action Buttons */}
                     <div className="flex gap-3">
                       <Button
-                        disabled={!creditNoteTotals.isValid}
-                        className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
-                          creditNoteTotals.isValid 
-                            ? 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50' 
-                            : 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-                        }`}
+                        className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                         onClick={() => {
-                          if (creditNoteTotals.isValid) {
-                            // TODO: Implement credit note creation
-                            console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
-                          }
+                          // TODO: Implement credit note creation
+                          console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
                         }}
                       >
                         {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
@@ -1225,15 +1201,15 @@ export default function FinancialCreditNote() {
                       <div className="w-80">
                         <div className="flex justify-between mb-2">
                           <span>{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
-                          <span>{creditNoteTotals.isValid ? '-' : ''}{creditNoteTotals.totalBeforeVatSum.toFixed(2)} SAR</span>
+                          <span>-{creditNoteTotals.totalBeforeVatSum.toFixed(2)} SAR</span>
                         </div>
                         <div className="flex justify-between mb-2">
                           <span>{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
-                          <span>{creditNoteTotals.isValid ? '-' : ''}{creditNoteTotals.vatAmount.toFixed(2)} SAR</span>
+                          <span>-{creditNoteTotals.vatAmount.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
                         </div>
                         <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
                           <span>{language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}</span>
-                          <span>{creditNoteTotals.isValid ? '-' : ''}{creditNoteTotals.finalTotal.toFixed(2)} SAR</span>
+                          <span>-{creditNoteTotals.finalTotal.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
                         </div>
                       </div>
                     )}
