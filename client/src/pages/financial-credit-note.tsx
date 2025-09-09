@@ -164,6 +164,10 @@ export default function FinancialCreditNote() {
     setSearchResults([]); // Hide search results
     setInvoiceNumber(""); // Clear search field
     
+    // Reset credit note editing states for clean slate
+    setEditedQuantities({});
+    setRemovedItems(new Set());
+    
     // Fetch invoice items from database
     if (invoice.bookingId) {
       setLoadingItems(true);
@@ -192,6 +196,9 @@ export default function FinancialCreditNote() {
     setInvoiceNumber("");
     setSearchResults([]);
     setInvoiceItems([]);
+    // Reset credit note editing states when returning to search
+    setEditedQuantities({});
+    setRemovedItems(new Set());
   };
 
   // Handle modal close
@@ -201,6 +208,9 @@ export default function FinancialCreditNote() {
     setInvoiceNumber("");
     setSearchResults([]);
     setInvoiceItems([]);
+    // Reset credit note editing states when closing modal
+    setEditedQuantities({});
+    setRemovedItems(new Set());
   };
 
   // Calculate credit note totals (negative values)
