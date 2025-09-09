@@ -863,16 +863,6 @@ export default function FinancialCreditNote() {
             {/* Selected Invoice Display */}
             {selectedInvoice && (
               <div className="space-y-4" dir={getDirection(language)}>
-                {/* Back Button */}
-                <div className={`flex ${language === 'ar' ? 'justify-end' : 'justify-start'}`}>
-                  <Button
-                    variant="outline"
-                    onClick={handleBackToSearch}
-                    className="text-purple-600 border-purple-600 hover:bg-purple-50"
-                  >
-                    {language === 'ar' ? '← العودة للبحث' : '← Back to Search'}
-                  </Button>
-                </div>
 
                 {/* Invoice Details */}
                 <div className="bg-white border rounded-lg p-6 shadow-sm">
