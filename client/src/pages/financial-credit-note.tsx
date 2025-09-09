@@ -926,6 +926,9 @@ export default function FinancialCreditNote() {
                     </div>
                   </div>
 
+                  {/* Divider Line */}
+                  <hr className="border-t border-gray-200 my-6" />
+
                   {/* Items and Services */}
                   <div className="space-y-4">
                     {/* Loading Items */}
