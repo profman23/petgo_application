@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -202,6 +202,42 @@ export default function FinancialCreditNote() {
     setSearchResults([]);
     setInvoiceItems([]);
   };
+
+  // Calculate credit note totals (negative values)
+  const creditNoteTotals = useMemo(() => {
+    const activeItems = invoiceItems.filter(item => !removedItems.has(item.id));
+    
+    let subtotal = 0;
+    let totalDiscount = 0;
+    
+    activeItems.forEach(item => {
+      const currentQuantity = editedQuantities[item.id] ?? item.quantity;
+      const unitPrice = parseFloat(item.unitPrice) || 0;
+      const itemTotal = currentQuantity * unitPrice;
+      
+      subtotal += itemTotal;
+      
+      // Calculate discount for this item
+      if (item.discountType === 'percentage') {
+        const discountPercent = parseFloat(item.discount) || 0;
+        totalDiscount += (itemTotal * discountPercent / 100);
+      } else if (item.discountType === 'fixed') {
+        const discountAmount = parseFloat(item.discount) || 0;
+        totalDiscount += discountAmount;
+      }
+    });
+    
+    const subtotalAfterDiscount = subtotal - totalDiscount;
+    const vatAmount = subtotalAfterDiscount * 0.15; // 15% VAT
+    const finalTotal = subtotalAfterDiscount + vatAmount;
+    
+    return {
+      subtotal,
+      vatAmount,
+      finalTotal,
+      totalDiscount
+    };
+  }, [invoiceItems, editedQuantities, removedItems]);
 
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
@@ -1117,24 +1153,45 @@ export default function FinancialCreditNote() {
                     )}
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex gap-3 pt-6 border-t justify-start">
-                    <Button
-                      className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                      onClick={() => {
-                        // TODO: Implement credit note creation
-                        console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
-                      }}
-                    >
-                      {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={handleBackToSearch}
-                      className="text-gray-600 border-gray-300 hover:bg-gray-50"
-                    >
-                      {language === 'ar' ? 'إلغاء' : 'Cancel'}
-                    </Button>
+                  {/* Action Buttons and Totals */}
+                  <div className="flex justify-between items-start pt-6 border-t">
+                    {/* Left side - Action Buttons */}
+                    <div className="flex gap-3">
+                      <Button
+                        className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                        onClick={() => {
+                          // TODO: Implement credit note creation
+                          console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
+                        }}
+                      >
+                        {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleBackToSearch}
+                        className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                      >
+                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                      </Button>
+                    </div>
+
+                    {/* Right side - Credit Note Totals */}
+                    {invoiceItems.length > 0 && (
+                      <div className="w-80">
+                        <div className="flex justify-between mb-2">
+                          <span>{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
+                          <span>-{creditNoteTotals.subtotal.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
+                        </div>
+                        <div className="flex justify-between mb-2">
+                          <span>{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
+                          <span>-{creditNoteTotals.vatAmount.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
+                        </div>
+                        <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
+                          <span>{language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}</span>
+                          <span>-{creditNoteTotals.finalTotal.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
