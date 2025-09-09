@@ -1118,23 +1118,36 @@ export default function FinancialCreditNote() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-3 pt-6 border-t justify-start">
-                    <Button
-                      className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                      onClick={() => {
-                        // TODO: Implement credit note creation
-                        console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
-                      }}
-                    >
-                      {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={handleBackToSearch}
-                      className="text-gray-600 border-gray-300 hover:bg-gray-50"
-                    >
-                      {language === 'ar' ? 'إلغاء' : 'Cancel'}
-                    </Button>
+                  <div className="space-y-3 pt-6 border-t">
+                    <div className="flex gap-3 justify-start">
+                      <Button
+                        className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                        onClick={() => {
+                          // TODO: Implement credit note creation
+                          console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
+                        }}
+                      >
+                        {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleBackToSearch}
+                        className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                      >
+                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                      </Button>
+                    </div>
+                    <div className="flex justify-start">
+                      <Button
+                        className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                        onClick={() => {
+                          // TODO: Implement outgoing payment functionality
+                          console.log('Outgoing payment for invoice:', selectedInvoice.invoiceNumber);
+                        }}
+                      >
+                        {language === 'ar' ? 'دفع صادر' : 'Outgoing Payment'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
