@@ -1144,17 +1144,6 @@ export default function FinancialCreditNote() {
               </div>
             )}
             
-            <div className={`flex gap-2 pt-4 ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsCreateCreditNoteModalOpen(false);
-                  setInvoiceNumber("");
-                }}
-              >
-                {language === 'ar' ? 'إلغاء' : 'Cancel'}
-              </Button>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
