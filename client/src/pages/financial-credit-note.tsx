@@ -51,29 +51,6 @@ export default function FinancialCreditNote() {
     setRemovedItems(prev => new Set(prev).add(itemId));
   };
 
-  // Handle direct invoice loading (skip search modal)
-  const handleDirectInvoiceLoad = async () => {
-    try {
-      // Fetch the most recent invoice
-      const response = await fetch('/api/admin/generated-invoices', {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      
-      if (response.ok) {
-        const invoices = await response.json();
-        if (invoices && invoices.length > 0) {
-          // Select the most recent invoice (first one in the array)
-          const mostRecentInvoice = invoices[0];
-          await handleSelectInvoice(mostRecentInvoice);
-          setIsCreateCreditNoteModalOpen(true);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading invoice:', error);
-    }
-  };
 
   // Check admin authentication
   useEffect(() => {
@@ -787,7 +764,7 @@ export default function FinancialCreditNote() {
 
             {/* Right side - Create New Credit Note Button */}
             <button
-              onClick={handleDirectInvoiceLoad}
+              onClick={() => setIsCreateCreditNoteModalOpen(true)}
               className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
             >
               {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
@@ -806,7 +783,7 @@ export default function FinancialCreditNote() {
           </DialogHeader>
           
           <div className="space-y-4 py-4" dir={getDirection(language)}>
-            {/* Search Interface - Only show when no invoice is selected */}
+            {/* Search Interface - Always visible */}
             {!selectedInvoice && (
               <>
                 <div className="space-y-2">
