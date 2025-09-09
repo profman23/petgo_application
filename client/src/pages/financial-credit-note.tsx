@@ -809,10 +809,10 @@ export default function FinancialCreditNote() {
               </div>
               
               {/* Search Button */}
-              <div className={`flex pt-2 ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
+              <div className="flex pt-2 justify-start">
                 <Button
                   onClick={handleInvoiceSearch}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                   disabled={!invoiceNumber.trim() || isSearching}
                 >
                   {isSearching ? (language === 'ar' ? 'جاري البحث...' : 'Searching...') : (language === 'ar' ? 'بحث' : 'Search')}
@@ -1118,7 +1118,7 @@ export default function FinancialCreditNote() {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className={`flex gap-3 pt-6 border-t ${language === 'ar' ? 'justify-start' : 'justify-end'}`}>
+                  <div className="flex gap-3 pt-6 border-t justify-start">
                     <Button
                       variant="outline"
                       onClick={handleBackToSearch}
@@ -1127,7 +1127,7 @@ export default function FinancialCreditNote() {
                       {language === 'ar' ? 'إلغاء' : 'Cancel'}
                     </Button>
                     <Button
-                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                      className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                       onClick={() => {
                         // TODO: Implement credit note creation
                         console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
