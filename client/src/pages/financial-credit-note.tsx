@@ -1174,9 +1174,29 @@ export default function FinancialCreditNote() {
                     )}
                   </div>
 
-                  {/* Action Buttons and Totals */}
-                  <div className="flex justify-between items-start pt-6 border-t">
-                    {/* Left side - Action Buttons */}
+                  {/* Credit Note Totals and Action Buttons */}
+                  <div className="pt-6 border-t">
+                    {/* Credit Note Totals */}
+                    {invoiceItems.length > 0 && (
+                      <div className="flex justify-end mb-4">
+                        <div className="w-80">
+                          <div className="flex justify-between mb-2">
+                            <span>{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
+                            <span>-{creditNoteTotals.totalBeforeVatSum.toFixed(2)} SAR</span>
+                          </div>
+                          <div className="flex justify-between mb-2">
+                            <span>{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
+                            <span>-{creditNoteTotals.vatAmount.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
+                          </div>
+                          <div className="flex justify-between font-bold text-lg border-t pt-2">
+                            <span>{language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}</span>
+                            <span>-{creditNoteTotals.finalTotal.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons - Left Aligned Below Totals */}
                     <div className="flex gap-3">
                       <Button
                         className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
@@ -1195,24 +1215,6 @@ export default function FinancialCreditNote() {
                         {language === 'ar' ? 'إلغاء' : 'Cancel'}
                       </Button>
                     </div>
-
-                    {/* Right side - Credit Note Totals */}
-                    {invoiceItems.length > 0 && (
-                      <div className="w-80">
-                        <div className="flex justify-between mb-2">
-                          <span>{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
-                          <span>-{creditNoteTotals.totalBeforeVatSum.toFixed(2)} SAR</span>
-                        </div>
-                        <div className="flex justify-between mb-2">
-                          <span>{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
-                          <span>-{creditNoteTotals.vatAmount.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
-                        </div>
-                        <div className="flex justify-between font-bold text-lg border-t pt-2 mb-4">
-                          <span>{language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}</span>
-                          <span>-{creditNoteTotals.finalTotal.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
