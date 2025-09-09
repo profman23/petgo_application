@@ -1022,6 +1022,10 @@ export default function FinancialCreditNote() {
                             </thead>
                             <tbody>
                               {invoiceItems.filter(item => !removedItems.has(item.id)).map((item: any, index: number) => {
+                                // Calculate remaining active items for delete protection
+                                const activeItemsCount = invoiceItems.filter(i => !removedItems.has(i.id)).length;
+                                const isLastItem = activeItemsCount <= 1;
+                                
                                 // Use the correct field names from the database  
                                 const unitPrice = parseFloat(item.unitPrice || 0);
                                 const originalQuantity = parseInt(item.quantity || 1);
@@ -1132,8 +1136,10 @@ export default function FinancialCreditNote() {
                                     </td>
                                     <td className="py-2 px-2 text-center">
                                       <Button
-                                        onClick={() => handleRemoveItem(item.id)}
+                                        onClick={() => !isLastItem && handleRemoveItem(item.id)}
+                                        disabled={isLastItem}
                                         className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 w-8 p-0"
+                                        title={isLastItem ? (language === 'ar' ? 'لا يمكن حذف العنصر الأخير' : 'Cannot delete the last item') : ''}
                                       >
                                         <Minus className="h-4 w-4 text-gray-700 font-bold" />
                                       </Button>
