@@ -1132,7 +1132,7 @@ export default function FinancialCreditNote() {
                                         onClick={() => handleRemoveItem(item.id)}
                                         className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 w-8 p-0"
                                       >
-                                        <Minus className="h-4 w-4" />
+                                        <Minus className="h-4 w-4 text-gray-700 font-bold" />
                                       </Button>
                                     </td>
                                   </tr>
