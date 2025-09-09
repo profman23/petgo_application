@@ -746,12 +746,10 @@ export default function FinancialCreditNote() {
             <div className="flex items-center gap-4">
               {/* Lord Icon */}
               <div className="flex-shrink-0">
-                <lord-icon
-                  src="https://cdn.lordicon.com/lbrbofig.json"
-                  trigger="loop"
-                  delay="1500"
-                  colors="primary:#852085,secondary:#848484"
-                  style={{width: '80px', height: '80px'}}
+                <div 
+                  dangerouslySetInnerHTML={{
+                    __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="loop" delay="1500" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                  }}
                 />
               </div>
               
@@ -776,8 +774,13 @@ export default function FinancialCreditNote() {
       <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={handleModalClose}>
         <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo', textAlign: getTextAlign(language)}}>
-              {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
+            <DialogTitle className="flex items-center gap-3 text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo', textAlign: getTextAlign(language)}}>
+              <div 
+                dangerouslySetInnerHTML={{
+                  __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                }}
+              />
+              <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
             </DialogTitle>
           </DialogHeader>
           
