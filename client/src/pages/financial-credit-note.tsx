@@ -1180,7 +1180,7 @@ export default function FinancialCreditNote() {
                       <div className="w-80">
                         <div className="flex justify-between mb-2">
                           <span>{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
-                          <span>-{creditNoteTotals.subtotal.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
+                          <span>-{(creditNoteTotals.subtotal - creditNoteTotals.totalDiscount).toFixed(2)} SAR</span>
                         </div>
                         <div className="flex justify-between mb-2">
                           <span>{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
