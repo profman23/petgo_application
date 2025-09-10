@@ -1621,6 +1621,12 @@ export default function FinancialCreditNote() {
               {/* Action Buttons */}
               <div className="flex justify-end gap-3">
                 <Button
+                  onClick={() => console.log('Download credit note:', selectedCreditNoteToView.id)}
+                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-green-600 bg-white text-green-600 hover:bg-green-50"
+                >
+                  {language === 'ar' ? 'تحميل' : 'Download'}
+                </Button>
+                <Button
                   onClick={() => console.log('Print credit note:', selectedCreditNoteToView.id)}
                   className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-blue-600 bg-white text-blue-600 hover:bg-blue-50"
                 >
