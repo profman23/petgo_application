@@ -37,6 +37,7 @@ export default function FinancialCreditNote() {
   const [removedItems, setRemovedItems] = useState<Set<number>>(new Set());
   const [creditNotes, setCreditNotes] = useState<any[]>([]);
   const [isLoadingCreditNotes, setIsLoadingCreditNotes] = useState(false);
+  const [currentCreditNoteNumber, setCurrentCreditNoteNumber] = useState<string>("");
 
   // Handle quantity changes (decrease only for credit notes)
   const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
@@ -213,6 +214,8 @@ export default function FinancialCreditNote() {
     // Reset credit note editing states when closing modal
     setEditedQuantities({});
     setRemovedItems(new Set());
+    // Reset credit note number so a fresh one is generated next time
+    setCurrentCreditNoteNumber("");
   };
 
   // Calculate credit note totals (negative values)
@@ -281,10 +284,30 @@ export default function FinancialCreditNote() {
     fetchCreditNotes();
   }, []);
 
+  // Fetch next credit note number
+  const fetchNextCreditNoteNumber = async () => {
+    try {
+      const response = await fetch('/api/admin/credit-notes/next-number', {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentCreditNoteNumber(data.nextNumber);
+      } else {
+        console.error('Failed to fetch next credit note number:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching next credit note number:', error);
+    }
+  };
+
   // Handle creating credit note
   const handleCreateCreditNote = async () => {
-    if (!selectedInvoice || invoiceItems.length === 0) {
-      console.error('No invoice selected or no items to create credit note');
+    if (!selectedInvoice || invoiceItems.length === 0 || !currentCreditNoteNumber) {
+      console.error('No invoice selected, no items, or no credit note number generated');
       return;
     }
 
@@ -303,6 +326,7 @@ export default function FinancialCreditNote() {
       }));
 
       const creditNoteData = {
+        creditNoteNumber: currentCreditNoteNumber, // Use the pre-generated number
         invoiceId: selectedInvoice.id,
         invoiceNumber: selectedInvoice.invoiceNumber,
         customerName: selectedInvoice.customerName,
@@ -900,7 +924,10 @@ export default function FinancialCreditNote() {
 
             {/* Right side - Create New Credit Note Button */}
             <button
-              onClick={() => setIsCreateCreditNoteModalOpen(true)}
+              onClick={async () => {
+                await fetchNextCreditNoteNumber();
+                setIsCreateCreditNoteModalOpen(true);
+              }}
               className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
             >
               {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
@@ -1017,7 +1044,7 @@ export default function FinancialCreditNote() {
                       readOnly
                     />
                     <Input
-                      value="000123"
+                      value={currentCreditNoteNumber || "..."}
                       disabled
                       className="w-20 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
                       readOnly

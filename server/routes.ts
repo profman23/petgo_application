@@ -3397,14 +3397,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const creditNoteData = req.body;
       
-      // Generate next credit note number
-      const creditNoteNumber = await storage.getNextCreditNoteNumber();
-      
-      // Create credit note with generated number
-      const newCreditNote = await storage.createCreditNote({
-        ...creditNoteData,
-        creditNoteNumber,
-      });
+      // Create credit note with provided data (including creditNoteNumber)
+      const newCreditNote = await storage.createCreditNote(creditNoteData);
       
       res.status(201).json(newCreditNote);
     } catch (error) {
@@ -3421,6 +3415,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching credit notes:', error);
       res.status(500).json({ message: 'Failed to fetch credit notes' });
+    }
+  });
+
+  // Admin: Get next credit note number
+  app.get('/api/admin/credit-notes/next-number', requireAdminAuth, async (req, res) => {
+    try {
+      const nextNumber = await storage.getNextCreditNoteNumber();
+      res.json({ nextNumber });
+    } catch (error) {
+      console.error('Error fetching next credit note number:', error);
+      res.status(500).json({ message: 'Failed to fetch next credit note number' });
     }
   });
 
