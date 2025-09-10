@@ -35,6 +35,8 @@ export default function FinancialCreditNote() {
   const [loadingItems, setLoadingItems] = useState(false);
   const [editedQuantities, setEditedQuantities] = useState<{[key: number]: number}>({});
   const [removedItems, setRemovedItems] = useState<Set<number>>(new Set());
+  const [creditNotes, setCreditNotes] = useState<any[]>([]);
+  const [isLoadingCreditNotes, setIsLoadingCreditNotes] = useState(false);
 
   // Handle quantity changes (decrease only for credit notes)
   const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
@@ -251,6 +253,34 @@ export default function FinancialCreditNote() {
     };
   }, [invoiceItems, editedQuantities, removedItems]);
 
+  // Fetch credit notes from API
+  const fetchCreditNotes = async () => {
+    setIsLoadingCreditNotes(true);
+    try {
+      const response = await fetch('/api/admin/credit-notes', {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCreditNotes(data);
+      } else {
+        console.error('Failed to fetch credit notes:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching credit notes:', error);
+    } finally {
+      setIsLoadingCreditNotes(false);
+    }
+  };
+
+  // Fetch credit notes on component mount
+  useEffect(() => {
+    fetchCreditNotes();
+  }, []);
+
   // Handle creating credit note
   const handleCreateCreditNote = async () => {
     if (!selectedInvoice || invoiceItems.length === 0) {
@@ -299,8 +329,8 @@ export default function FinancialCreditNote() {
         const newCreditNote = await response.json();
         console.log('Credit note created successfully:', newCreditNote);
         
-        // Navigate to credit note page to show all credit notes
-        setLocation('/financial/credit-note');
+        // Refresh credit notes list
+        await fetchCreditNotes();
         
         // Close the modal
         handleModalClose();
@@ -875,6 +905,84 @@ export default function FinancialCreditNote() {
             >
               {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
             </button>
+          </div>
+
+          {/* Credit Notes Table */}
+          <div className="bg-white rounded-lg shadow">
+            {isLoadingCreditNotes ? (
+              <div className="p-8 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                <p className="mt-2 text-gray-600">{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
+              </div>
+            ) : creditNotes.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                <p>{language === 'ar' ? 'لا توجد مذكرات ائتمان حتى الآن' : 'No credit notes found'}</p>
+                <p className="text-sm">{language === 'ar' ? 'ابدأ بإنشاء مذكرة ائتمان جديدة' : 'Start by creating a new credit note'}</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'رقم مذكرة الائتمان' : 'Credit Note No.'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'رقم الفاتورة' : 'Invoice No.'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'اسم العميل' : 'Customer Name'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'المجموع النهائي' : 'Final Total'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {creditNotes.map((creditNote) => (
+                      <tr key={creditNote.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          CRN{creditNote.creditNoteNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {creditNote.invoiceNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {creditNote.customerName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(creditNote.postingDate).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          -{creditNote.finalTotal} SAR
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => console.log('View credit note:', creditNote.id)}
+                            className="text-purple-600 hover:text-purple-900 mr-4"
+                          >
+                            {language === 'ar' ? 'عرض' : 'View'}
+                          </button>
+                          <button
+                            onClick={() => console.log('Print credit note:', creditNote.id)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            {language === 'ar' ? 'طباعة' : 'Print'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
