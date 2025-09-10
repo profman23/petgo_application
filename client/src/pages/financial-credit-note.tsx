@@ -40,6 +40,10 @@ export default function FinancialCreditNote() {
   const [currentCreditNoteNumber, setCurrentCreditNoteNumber] = useState<string>("");
   const [selectedCreditNoteToView, setSelectedCreditNoteToView] = useState<any>(null);
   const [isViewCreditNoteModalOpen, setIsViewCreditNoteModalOpen] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [selectedInvoiceForMap, setSelectedInvoiceForMap] = useState<any>(null);
+  const [creditNotesForMap, setCreditNotesForMap] = useState<any[]>([]);
+  const [boxPositions, setBoxPositions] = useState<{[key: string]: {x: number, y: number}}>({});
 
   // Handle quantity changes (decrease only for credit notes)
   const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
@@ -371,6 +375,49 @@ export default function FinancialCreditNote() {
   const handleCloseViewModal = () => {
     setIsViewCreditNoteModalOpen(false);
     setSelectedCreditNoteToView(null);
+  };
+
+  // Handle opening map modal
+  const handleMapClick = async (creditNote: any) => {
+    try {
+      // Find the invoice details for this credit note
+      const invoice = {
+        invoiceNumber: creditNote.invoiceNumber,
+        customerName: creditNote.customerName
+      };
+      
+      // Fetch all credit notes for this invoice
+      const creditNotesForInvoice = creditNotes.filter(cn => cn.invoiceNumber === creditNote.invoiceNumber);
+      
+      // Set initial positions for boxes
+      const initialPositions: {[key: string]: {x: number, y: number}} = {};
+      
+      // Center invoice box
+      initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 200, y: 300 };
+      
+      // Position credit notes to the right of invoice
+      creditNotesForInvoice.forEach((cn, index) => {
+        initialPositions[`creditnote-${cn.id}`] = { 
+          x: 600, 
+          y: 200 + (index * 150) 
+        };
+      });
+      
+      setSelectedInvoiceForMap(invoice);
+      setCreditNotesForMap(creditNotesForInvoice);
+      setBoxPositions(initialPositions);
+      setIsMapModalOpen(true);
+    } catch (error) {
+      console.error('Error opening map:', error);
+    }
+  };
+
+  // Handle closing map modal
+  const handleCloseMapModal = () => {
+    setIsMapModalOpen(false);
+    setSelectedInvoiceForMap(null);
+    setCreditNotesForMap([]);
+    setBoxPositions({});
   };
 
   // Handle creating credit note
@@ -1073,7 +1120,7 @@ export default function FinancialCreditNote() {
                             {language === 'ar' ? 'طباعة' : 'Print'}
                           </button>
                           <button
-                            onClick={() => console.log('Map credit note:', creditNote.id)}
+                            onClick={() => handleMapClick(creditNote)}
                             className="text-green-600 hover:text-green-900"
                           >
                             {language === 'ar' ? 'خريطة' : 'Map'}
