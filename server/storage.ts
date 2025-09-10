@@ -1259,22 +1259,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getNextCreditNoteNumber(): Promise<string> {
-    // Get the latest credit note number to generate the next one
+    // Get the highest credit note number to generate the next one
     const [lastCreditNote] = await db.select({ creditNoteNumber: creditNotes.creditNoteNumber })
       .from(creditNotes)
-      .orderBy(desc(creditNotes.id))
+      .orderBy(desc(creditNotes.creditNoteNumber))
       .limit(1);
 
     if (!lastCreditNote) {
-      return "CRN000001"; // First credit note
+      return "90001"; // First credit note starts from 90001
     }
 
-    // Extract number from CRN000123 format
-    const lastNumber = parseInt(lastCreditNote.creditNoteNumber.replace("CRN", ""));
+    // Extract number from current format (assuming it's just the number)
+    const lastNumber = parseInt(lastCreditNote.creditNoteNumber);
     const nextNumber = lastNumber + 1;
     
-    // Format with leading zeros (6 digits)
-    return `CRN${nextNumber.toString().padStart(6, "0")}`;
+    return nextNumber.toString();
   }
 }
 
