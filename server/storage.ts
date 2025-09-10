@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction } from "@shared/schema";
+import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, creditNotes, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction, type CreditNote, type InsertCreditNote } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt, sql } from "drizzle-orm";
 
@@ -178,6 +178,13 @@ export interface IStorage {
   updatePaymentTransaction(id: number, data: Partial<SelectPaymentTransaction>): Promise<SelectPaymentTransaction | undefined>;
   updatePaymentTransactionStatus(id: number, status: string, paidAt?: Date): Promise<void>;
   getAllPaymentTransactions(): Promise<SelectPaymentTransaction[]>;
+
+  // Credit Note operations
+  createCreditNote(creditNote: InsertCreditNote): Promise<CreditNote>;
+  getAllCreditNotes(): Promise<CreditNote[]>;
+  getCreditNote(id: number): Promise<CreditNote | undefined>;
+  getCreditNoteByNumber(creditNoteNumber: string): Promise<CreditNote | undefined>;
+  getNextCreditNoteNumber(): Promise<string>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1224,6 +1231,50 @@ export class DatabaseStorage implements IStorage {
   async getAllPaymentTransactions(): Promise<SelectPaymentTransaction[]> {
     return await db.select().from(paymentTransactions)
       .orderBy(desc(paymentTransactions.createdAt));
+  }
+
+  // Credit Note operations
+  async createCreditNote(creditNote: InsertCreditNote): Promise<CreditNote> {
+    const [newCreditNote] = await db.insert(creditNotes)
+      .values(creditNote)
+      .returning();
+    return newCreditNote;
+  }
+
+  async getAllCreditNotes(): Promise<CreditNote[]> {
+    return await db.select().from(creditNotes)
+      .orderBy(desc(creditNotes.createdAt));
+  }
+
+  async getCreditNote(id: number): Promise<CreditNote | undefined> {
+    const [creditNote] = await db.select().from(creditNotes)
+      .where(eq(creditNotes.id, id));
+    return creditNote;
+  }
+
+  async getCreditNoteByNumber(creditNoteNumber: string): Promise<CreditNote | undefined> {
+    const [creditNote] = await db.select().from(creditNotes)
+      .where(eq(creditNotes.creditNoteNumber, creditNoteNumber));
+    return creditNote;
+  }
+
+  async getNextCreditNoteNumber(): Promise<string> {
+    // Get the latest credit note number to generate the next one
+    const [lastCreditNote] = await db.select({ creditNoteNumber: creditNotes.creditNoteNumber })
+      .from(creditNotes)
+      .orderBy(desc(creditNotes.id))
+      .limit(1);
+
+    if (!lastCreditNote) {
+      return "CRN000001"; // First credit note
+    }
+
+    // Extract number from CRN000123 format
+    const lastNumber = parseInt(lastCreditNote.creditNoteNumber.replace("CRN", ""));
+    const nextNumber = lastNumber + 1;
+    
+    // Format with leading zeros (6 digits)
+    return `CRN${nextNumber.toString().padStart(6, "0")}`;
   }
 }
 
