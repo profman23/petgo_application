@@ -1068,9 +1068,15 @@ export default function FinancialCreditNote() {
                           </button>
                           <button
                             onClick={() => console.log('Print credit note:', creditNote.id)}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="text-blue-600 hover:text-blue-900 mr-4"
                           >
                             {language === 'ar' ? 'طباعة' : 'Print'}
+                          </button>
+                          <button
+                            onClick={() => console.log('Map credit note:', creditNote.id)}
+                            className="text-green-600 hover:text-green-900"
+                          >
+                            {language === 'ar' ? 'خريطة' : 'Map'}
                           </button>
                         </td>
                       </tr>
