@@ -836,7 +836,7 @@ export default function FinancialCreditNote() {
               {/* Right side - Credit Note Details */}
               <div className="flex flex-col gap-2">
                 {/* Credit Note Number */}
-                <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
+                <div className="flex items-center gap-2 w-80" style={{textAlign: getTextAlign(language)}}>
                   <label className="text-sm font-medium text-gray-700 w-28 text-right">
                     {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
                   </label>
@@ -855,16 +855,18 @@ export default function FinancialCreditNote() {
                 </div>
                 
                 {/* Posting Date */}
-                <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
+                <div className="flex items-center gap-2 w-80" style={{textAlign: getTextAlign(language)}}>
                   <label className="text-sm font-medium text-gray-700 w-28 text-right">
                     {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
                   </label>
-                  <Input
-                    value={new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                    disabled
-                    className="w-32 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
-                    readOnly
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      value={new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      disabled
+                      className="w-36 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
+                      readOnly
+                    />
+                  </div>
                 </div>
               </div>
             </DialogTitle>
