@@ -380,10 +380,13 @@ export default function FinancialCreditNote() {
   // Handle opening map modal
   const handleMapClick = async (creditNote: any) => {
     try {
-      // Find the invoice details for this credit note
+      // Find the full invoice details for this credit note
+      const fullInvoice = allInvoices?.find(inv => inv.invoiceNumber === creditNote.invoiceNumber);
       const invoice = {
         invoiceNumber: creditNote.invoiceNumber,
-        customerName: creditNote.customerName
+        customerName: creditNote.customerName,
+        finalTotal: fullInvoice?.finalTotal,
+        appointmentDate: fullInvoice?.appointmentDate
       };
       
       // Fetch all credit notes for this invoice
@@ -1821,7 +1824,7 @@ export default function FinancialCreditNote() {
                   }}
                 >
                   {/* Header Section */}
-                  <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center gap-2" style={{ direction: language === 'en' ? 'rtl' : 'ltr' }}>
+                  <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center justify-center gap-2">
                     <InvoiceIcon className="h-4 w-4 text-purple-600" />
                     <span className="text-sm font-semibold text-gray-700">
                       {language === 'ar' ? 'فاتورة' : 'Invoice'}
@@ -1829,13 +1832,18 @@ export default function FinancialCreditNote() {
                   </div>
                   
                   {/* Content Section */}
-                  <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'en' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'right' : 'left' }}>
+                  <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
                     <div className="text-lg font-bold text-gray-800 mb-2">
                       {selectedInvoiceForMap.invoiceNumber}
                     </div>
                     <div className="text-sm text-gray-600 mb-2">
                       {selectedInvoiceForMap.customerName}
                     </div>
+                    {selectedInvoiceForMap.finalTotal && (
+                      <div className="text-sm font-semibold text-green-600 mb-2">
+                        {parseFloat(selectedInvoiceForMap.finalTotal).toFixed(2)} SAR
+                      </div>
+                    )}
                     <div className="text-xs text-gray-500">
                       {/* Find appointment date from credit notes data */}
                       {creditNotesForMap.length > 0 && creditNotesForMap[0].appointmentDate && (
@@ -1889,7 +1897,7 @@ export default function FinancialCreditNote() {
                     }}
                   >
                     {/* Header Section */}
-                    <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center gap-2" style={{ direction: language === 'en' ? 'rtl' : 'ltr' }}>
+                    <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center justify-center gap-2">
                       <CreditCard className="h-4 w-4 text-purple-600" />
                       <span className="text-sm font-semibold text-gray-700">
                         {language === 'ar' ? 'مذكرة ائتمان' : 'Credit Note'}
@@ -1897,7 +1905,7 @@ export default function FinancialCreditNote() {
                     </div>
                     
                     {/* Content Section */}
-                    <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'en' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'right' : 'left' }}>
+                    <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
                       <div className="text-base font-bold text-gray-800 mb-1">
                         CRN{creditNote.creditNoteNumber}
                       </div>
