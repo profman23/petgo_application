@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -1773,9 +1773,9 @@ export default function FinancialCreditNote() {
                       <line
                         key={`line-${creditNote.id}`}
                         x1={invoicePos.x + 150} // Invoice box center + half width
-                        y1={invoicePos.y + 75}  // Invoice box center + half height
+                        y1={invoicePos.y + 85}  // Invoice box center + half height
                         x2={creditNotePos.x}    // Credit note box left edge
-                        y2={creditNotePos.y + 75} // Credit note box center + half height
+                        y2={creditNotePos.y + 80} // Credit note box center + half height
                         stroke="#8B2F8B"
                         strokeWidth="2"
                         strokeDasharray="none"
@@ -1795,7 +1795,7 @@ export default function FinancialCreditNote() {
                     top: boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].y,
                     borderColor: '#8B2F8B',
                     width: '300px',
-                    height: '150px'
+                    height: '170px'
                   }}
                   onMouseDown={(e) => {
                     const startX = e.clientX - boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].x;
@@ -1820,12 +1820,30 @@ export default function FinancialCreditNote() {
                     document.addEventListener('mouseup', handleMouseUp);
                   }}
                 >
-                  <div className="p-4 h-full flex flex-col justify-center items-center text-center">
+                  {/* Header Section */}
+                  <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center gap-2" style={{ direction: language === 'en' ? 'rtl' : 'ltr' }}>
+                    <InvoiceIcon className="h-4 w-4 text-purple-600" />
+                    <span className="text-sm font-semibold text-gray-700">
+                      {language === 'ar' ? 'فاتورة' : 'Invoice'}
+                    </span>
+                  </div>
+                  
+                  {/* Content Section */}
+                  <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'en' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'right' : 'left' }}>
                     <div className="text-lg font-bold text-gray-800 mb-2">
                       {selectedInvoiceForMap.invoiceNumber}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 mb-2">
                       {selectedInvoiceForMap.customerName}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {/* Find appointment date from credit notes data */}
+                      {creditNotesForMap.length > 0 && creditNotesForMap[0].appointmentDate && (
+                        <>
+                          {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                          {new Date(creditNotesForMap[0].appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1845,7 +1863,7 @@ export default function FinancialCreditNote() {
                       top: position.y,
                       borderColor: '#8B2F8B',
                       width: '250px',
-                      height: '140px'
+                      height: '160px'
                     }}
                     onMouseDown={(e) => {
                       const startX = e.clientX - position.x;
@@ -1870,15 +1888,28 @@ export default function FinancialCreditNote() {
                       document.addEventListener('mouseup', handleMouseUp);
                     }}
                   >
-                    <div className="p-3 h-full flex flex-col justify-center items-center text-center">
+                    {/* Header Section */}
+                    <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center gap-2" style={{ direction: language === 'en' ? 'rtl' : 'ltr' }}>
+                      <CreditCard className="h-4 w-4 text-purple-600" />
+                      <span className="text-sm font-semibold text-gray-700">
+                        {language === 'ar' ? 'مذكرة ائتمان' : 'Credit Note'}
+                      </span>
+                    </div>
+                    
+                    {/* Content Section */}
+                    <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'en' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'right' : 'left' }}>
                       <div className="text-base font-bold text-gray-800 mb-1">
                         CRN{creditNote.creditNoteNumber}
                       </div>
                       <div className="text-sm text-gray-600 mb-1">
                         {creditNote.customerName}
                       </div>
-                      <div className="text-sm font-semibold text-red-600">
+                      <div className="text-sm font-semibold text-red-600 mb-2">
                         -{creditNote.finalTotal} SAR
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                        {new Date(creditNote.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                       </div>
                     </div>
                   </div>
