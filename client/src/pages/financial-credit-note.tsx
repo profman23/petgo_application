@@ -840,30 +840,30 @@ export default function FinancialCreditNote() {
               <label htmlFor="invoice-search" className="text-sm font-medium text-gray-700" style={{textAlign: getTextAlign(language)}}>
                 {language === 'ar' ? 'البحث برقم الفاتورة' : 'Search by Invoice Number'}
               </label>
-              <div className="relative">
-                <Search className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4`} />
-                <Input
-                  id="invoice-search"
-                  type="text"
-                  value={invoiceNumber}
-                  onChange={(e) => setInvoiceNumber(e.target.value)}
-                  placeholder={language === 'ar' ? 'أدخل رقم الفاتورة...' : 'Enter invoice number...'}
-                  className={language === 'ar' ? 'pr-10' : 'pl-10'}
-                  style={{textAlign: getTextAlign(language)}}
-                  dir={getDirection(language)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleInvoiceSearch();
-                    }
-                  }}
-                />
-              </div>
-              
-              {/* Search Button */}
-              <div className="flex pt-2 justify-start">
+              <div className="flex gap-3 items-center">
+                <div className="relative flex-1">
+                  <Search className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4`} />
+                  <Input
+                    id="invoice-search"
+                    type="text"
+                    value={invoiceNumber}
+                    onChange={(e) => setInvoiceNumber(e.target.value)}
+                    placeholder={language === 'ar' ? 'أدخل رقم الفاتورة...' : 'Enter invoice number...'}
+                    className={`${language === 'ar' ? 'pr-10' : 'pl-10'} w-full max-w-md`}
+                    style={{textAlign: getTextAlign(language)}}
+                    dir={getDirection(language)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleInvoiceSearch();
+                      }
+                    }}
+                  />
+                </div>
+                
+                {/* Search Button */}
                 <Button
                   onClick={handleInvoiceSearch}
-                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50 flex-shrink-0"
                   disabled={!invoiceNumber.trim() || isSearching}
                 >
                   {isSearching ? (language === 'ar' ? 'جاري البحث...' : 'Searching...') : (language === 'ar' ? 'بحث' : 'Search')}
