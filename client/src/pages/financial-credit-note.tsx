@@ -1732,6 +1732,163 @@ export default function FinancialCreditNote() {
         </DialogContent>
       </Dialog>
 
+      {/* Map Modal */}
+      <Dialog open={isMapModalOpen} onOpenChange={handleCloseMapModal}>
+        <DialogContent className="w-screen h-screen max-w-none p-0 m-0 border-0 rounded-none overflow-hidden" dir={getDirection(language)}>
+          <div className="relative w-full h-full bg-gray-50" style={{ fontFamily: 'Arimo' }}>
+            {/* Header */}
+            <div className="absolute top-0 left-0 right-0 z-20 bg-white border-b px-6 py-4 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-bold text-gray-800">
+                  {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
+                </h2>
+                {selectedInvoiceForMap && (
+                  <span className="text-sm text-gray-600">
+                    {selectedInvoiceForMap.invoiceNumber}
+                  </span>
+                )}
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleCloseMapModal}
+                className="text-gray-600 border-gray-300 hover:bg-gray-50"
+              >
+                {language === 'ar' ? 'إغلاق' : 'Close'}
+              </Button>
+            </div>
+
+            {/* Map Canvas */}
+            <div className="absolute inset-0 pt-20 overflow-hidden">
+              <svg 
+                className="absolute inset-0 w-full h-full pointer-events-none z-10"
+                style={{ zIndex: 10 }}
+              >
+                {/* Draw lines from invoice to each credit note */}
+                {selectedInvoiceForMap && creditNotesForMap.map((creditNote) => {
+                  const invoicePos = boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`];
+                  const creditNotePos = boxPositions[`creditnote-${creditNote.id}`];
+                  
+                  if (invoicePos && creditNotePos) {
+                    return (
+                      <line
+                        key={`line-${creditNote.id}`}
+                        x1={invoicePos.x + 150} // Invoice box center + half width
+                        y1={invoicePos.y + 75}  // Invoice box center + half height
+                        x2={creditNotePos.x}    // Credit note box left edge
+                        y2={creditNotePos.y + 75} // Credit note box center + half height
+                        stroke="#8B2F8B"
+                        strokeWidth="2"
+                        strokeDasharray="none"
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </svg>
+
+              {/* Invoice Box */}
+              {selectedInvoiceForMap && boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`] && (
+                <div
+                  className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
+                  style={{
+                    left: boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].x,
+                    top: boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].y,
+                    borderColor: '#8B2F8B',
+                    width: '300px',
+                    height: '150px'
+                  }}
+                  onMouseDown={(e) => {
+                    const startX = e.clientX - boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].x;
+                    const startY = e.clientY - boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].y;
+                    
+                    const handleMouseMove = (e: MouseEvent) => {
+                      const newX = e.clientX - startX;
+                      const newY = e.clientY - startY;
+                      
+                      setBoxPositions(prev => ({
+                        ...prev,
+                        [`invoice-${selectedInvoiceForMap.invoiceNumber}`]: { x: newX, y: newY }
+                      }));
+                    };
+                    
+                    const handleMouseUp = () => {
+                      document.removeEventListener('mousemove', handleMouseMove);
+                      document.removeEventListener('mouseup', handleMouseUp);
+                    };
+                    
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                  }}
+                >
+                  <div className="p-4 h-full flex flex-col justify-center items-center text-center">
+                    <div className="text-lg font-bold text-gray-800 mb-2">
+                      {selectedInvoiceForMap.invoiceNumber}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {selectedInvoiceForMap.customerName}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Credit Note Boxes */}
+              {creditNotesForMap.map((creditNote) => {
+                const position = boxPositions[`creditnote-${creditNote.id}`];
+                if (!position) return null;
+
+                return (
+                  <div
+                    key={`box-${creditNote.id}`}
+                    className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
+                    style={{
+                      left: position.x,
+                      top: position.y,
+                      borderColor: '#8B2F8B',
+                      width: '250px',
+                      height: '140px'
+                    }}
+                    onMouseDown={(e) => {
+                      const startX = e.clientX - position.x;
+                      const startY = e.clientY - position.y;
+                      
+                      const handleMouseMove = (e: MouseEvent) => {
+                        const newX = e.clientX - startX;
+                        const newY = e.clientY - startY;
+                        
+                        setBoxPositions(prev => ({
+                          ...prev,
+                          [`creditnote-${creditNote.id}`]: { x: newX, y: newY }
+                        }));
+                      };
+                      
+                      const handleMouseUp = () => {
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                      };
+                      
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                    }}
+                  >
+                    <div className="p-3 h-full flex flex-col justify-center items-center text-center">
+                      <div className="text-base font-bold text-gray-800 mb-1">
+                        CRN{creditNote.creditNoteNumber}
+                      </div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        {creditNote.customerName}
+                      </div>
+                      <div className="text-sm font-semibold text-red-600">
+                        -{creditNote.finalTotal} SAR
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Load lord-icon script */}
       <script src="https://cdn.lordicon.com/lordicon.js"></script>
     </div>
