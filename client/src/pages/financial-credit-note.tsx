@@ -1021,7 +1021,7 @@ export default function FinancialCreditNote() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <button
-                            onClick={() => console.log('View credit note:', creditNote.id)}
+                            onClick={() => handleViewCreditNote(creditNote.id)}
                             className="text-purple-600 hover:text-purple-900 mr-4"
                           >
                             {language === 'ar' ? 'عرض' : 'View'}
@@ -1485,6 +1485,157 @@ export default function FinancialCreditNote() {
             )}
             
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Credit Note Modal */}
+      <Dialog open={isViewCreditNoteModalOpen} onOpenChange={handleCloseViewModal}>
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
+          <DialogHeader>
+            <DialogTitle className="flex justify-between items-start text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+              {/* Left side - Icon and Title */}
+              <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
+                <div 
+                  dangerouslySetInnerHTML={{
+                    __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:60px;height:60px"></lord-icon>'
+                  }}
+                />
+                <span>{language === 'ar' ? 'تفاصيل مذكرة الائتمان' : 'Credit Note Details'}</span>
+              </div>
+              
+              {/* Right side - Credit Note Info */}
+              {selectedCreditNoteToView && (
+                <div className="flex flex-col gap-1 text-right">
+                  <div className="text-sm text-gray-500">
+                    {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
+                  </div>
+                  <div className="text-lg font-bold text-purple-600">
+                    CRN{selectedCreditNoteToView.creditNoteNumber}
+                  </div>
+                </div>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedCreditNoteToView && (
+            <div className="space-y-6 py-4" dir={getDirection(language)}>
+              {/* Credit Note Header Info */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'رقم الفاتورة الأصلية:' : 'Original Invoice No.:'}
+                    </label>
+                    <p className="text-gray-900">{selectedCreditNoteToView.invoiceNumber}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
+                    </label>
+                    <p className="text-gray-900">{selectedCreditNoteToView.customerName}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
+                    </label>
+                    <p className="text-gray-900">
+                      {new Date(selectedCreditNoteToView.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'تاريخ الموعد الأصلي:' : 'Original Appointment Date:'}
+                    </label>
+                    <p className="text-gray-900">
+                      {new Date(selectedCreditNoteToView.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Credit Note Items */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  {language === 'ar' ? 'العناصر المعتمدة' : 'Credited Items'}
+                </h3>
+                <div className="bg-white border rounded-lg overflow-hidden">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'الوصف' : 'Description'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'الكمية المعتمدة' : 'Credit Quantity'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT Amount'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {selectedCreditNoteToView.items && selectedCreditNoteToView.items.map((item: any, index: number) => (
+                        <tr key={index}>
+                          <td className="px-4 py-4 text-sm text-gray-900">{item.description}</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">{item.creditQuantity}</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">{item.unitPrice.toFixed(2)} SAR</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">-{item.totalBeforeVat.toFixed(2)} SAR</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">-{item.vatAmount.toFixed(2)} SAR</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">-{item.totalAfterVat.toFixed(2)} SAR</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Credit Note Totals */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex justify-end">
+                  <div className="w-80">
+                    <div className="flex justify-between mb-2">
+                      <span className="font-medium">{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
+                      <span className="font-semibold text-red-600">-{parseFloat(selectedCreditNoteToView.totalBeforeVat).toFixed(2)} SAR</span>
+                    </div>
+                    <div className="flex justify-between mb-2">
+                      <span className="font-medium">{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
+                      <span className="font-semibold text-red-600">-{parseFloat(selectedCreditNoteToView.vatAmount).toFixed(2)} SAR</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg border-t pt-2">
+                      <span>{language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}</span>
+                      <span className="text-red-600">-{parseFloat(selectedCreditNoteToView.finalTotal).toFixed(2)} SAR</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3">
+                <Button
+                  onClick={() => console.log('Print credit note:', selectedCreditNoteToView.id)}
+                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-blue-600 bg-white text-blue-600 hover:bg-blue-50"
+                >
+                  {language === 'ar' ? 'طباعة' : 'Print'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleCloseViewModal}
+                  className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                >
+                  {language === 'ar' ? 'إغلاق' : 'Close'}
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
