@@ -834,10 +834,10 @@ export default function FinancialCreditNote() {
               </div>
               
               {/* Right side - Credit Note Details */}
-              <div className="flex flex-col gap-2 items-end">
+              <div className="flex flex-col gap-2">
                 {/* Credit Note Number */}
                 <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-gray-700 w-28 text-right">
                     {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
                   </label>
                   <Input
@@ -856,7 +856,7 @@ export default function FinancialCreditNote() {
                 
                 {/* Posting Date */}
                 <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
-                  <label className="text-sm font-medium text-gray-700 w-24 text-right">
+                  <label className="text-sm font-medium text-gray-700 w-28 text-right">
                     {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
                   </label>
                   <Input
