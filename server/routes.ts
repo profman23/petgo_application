@@ -3429,6 +3429,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get credited items for a specific invoice
+  app.get('/api/admin/credit-notes/credited-items/:invoiceNumber', requireAdminAuth, async (req, res) => {
+    try {
+      const { invoiceNumber } = req.params;
+      const creditedItems = await storage.getCreditedItemsForInvoice(invoiceNumber);
+      res.json(creditedItems);
+    } catch (error) {
+      console.error('Error fetching credited items:', error);
+      res.status(500).json({ message: 'Failed to fetch credited items' });
+    }
+  });
+
   // Admin: Get credit note by ID
   app.get('/api/admin/credit-notes/:id', requireAdminAuth, async (req, res) => {
     try {

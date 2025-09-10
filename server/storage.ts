@@ -185,6 +185,7 @@ export interface IStorage {
   getCreditNote(id: number): Promise<CreditNote | undefined>;
   getCreditNoteByNumber(creditNoteNumber: string): Promise<CreditNote | undefined>;
   getNextCreditNoteNumber(): Promise<string>;
+  getCreditedItemsForInvoice(invoiceNumber: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1287,6 +1288,31 @@ export class DatabaseStorage implements IStorage {
 
     const nextNumber = highestNumber + 1;
     return nextNumber.toString();
+  }
+
+  async getCreditedItemsForInvoice(invoiceNumber: string): Promise<any[]> {
+    // Get all credit notes for this invoice
+    const creditNotesForInvoice = await db.select()
+      .from(creditNotes)
+      .where(eq(creditNotes.invoiceNumber, invoiceNumber));
+
+    const creditedItems: any[] = [];
+    
+    // Extract items from each credit note
+    for (const creditNote of creditNotesForInvoice) {
+      if (creditNote.items && Array.isArray(creditNote.items)) {
+        // Add each credited item with its credited quantity
+        creditNote.items.forEach((item: any) => {
+          creditedItems.push({
+            id: item.id,
+            description: item.description,
+            creditedQuantity: item.creditQuantity || 0
+          });
+        });
+      }
+    }
+
+    return creditedItems;
   }
 }
 
