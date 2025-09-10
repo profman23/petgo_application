@@ -836,3 +836,46 @@ export const insertRedZoneSchema = createInsertSchema(redZones).pick({
 // Type exports for red zones
 export type RedZone = typeof redZones.$inferSelect;
 export type InsertRedZone = z.infer<typeof insertRedZoneSchema>;
+
+// Credit Notes table
+export const creditNotes = pgTable("credit_notes", {
+  id: serial("id").primaryKey(),
+  creditNoteNumber: varchar("credit_note_number", { length: 50 }).notNull().unique(),
+  invoiceId: integer("invoice_id").notNull(),
+  invoiceNumber: varchar("invoice_number", { length: 100 }).notNull(),
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  appointmentDate: text("appointment_date").notNull(),
+  postingDate: text("posting_date").notNull(),
+  items: jsonb("items").$type<Array<{
+    id: number;
+    description: string;
+    originalQuantity: number;
+    creditQuantity: number;
+    unitPrice: number;
+    totalBeforeVat: number;
+    vatAmount: number;
+    totalAfterVat: number;
+  }>>().notNull(),
+  totalBeforeVat: decimal("total_before_vat", { precision: 10, scale: 2 }).notNull(),
+  vatAmount: decimal("vat_amount", { precision: 10, scale: 2 }).notNull(),
+  finalTotal: decimal("final_total", { precision: 10, scale: 2 }).notNull(),
+  createdBy: varchar("created_by", { length: 100 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCreditNoteSchema = createInsertSchema(creditNotes).pick({
+  creditNoteNumber: true,
+  invoiceId: true,
+  invoiceNumber: true,
+  customerName: true,
+  appointmentDate: true,
+  postingDate: true,
+  items: true,
+  totalBeforeVat: true,
+  vatAmount: true,
+  finalTotal: true,
+  createdBy: true,
+});
+
+export type CreditNote = typeof creditNotes.$inferSelect;
+export type InsertCreditNote = z.infer<typeof insertCreditNoteSchema>;
