@@ -1259,20 +1259,33 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getNextCreditNoteNumber(): Promise<string> {
-    // Get the highest credit note number to generate the next one
-    const [lastCreditNote] = await db.select({ creditNoteNumber: creditNotes.creditNoteNumber })
+    // Get all credit note numbers to find the highest one
+    const allCreditNotes = await db.select({ creditNoteNumber: creditNotes.creditNoteNumber })
       .from(creditNotes)
-      .orderBy(desc(creditNotes.creditNoteNumber))
-      .limit(1);
+      .orderBy(desc(creditNotes.id));
 
-    if (!lastCreditNote) {
-      return "90001"; // First credit note starts from 90001
+    let highestNumber = 90000; // Start from 90000 so next will be 90001
+
+    for (const creditNote of allCreditNotes) {
+      const cnNumber = creditNote.creditNoteNumber;
+      let parsedNumber: number;
+      
+      // Handle different formats
+      if (cnNumber.startsWith('CRN')) {
+        // Old format: CRN000123
+        parsedNumber = parseInt(cnNumber.replace('CRN', ''));
+      } else {
+        // New format: just the number
+        parsedNumber = parseInt(cnNumber);
+      }
+      
+      // Only consider numbers >= 90001 (our new range)
+      if (!isNaN(parsedNumber) && parsedNumber >= 90001 && parsedNumber > highestNumber) {
+        highestNumber = parsedNumber;
+      }
     }
 
-    // Extract number from current format (assuming it's just the number)
-    const lastNumber = parseInt(lastCreditNote.creditNoteNumber);
-    const nextNumber = lastNumber + 1;
-    
+    const nextNumber = highestNumber + 1;
     return nextNumber.toString();
   }
 }
