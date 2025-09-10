@@ -822,34 +822,52 @@ export default function FinancialCreditNote() {
       <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={handleModalClose}>
         <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
           <DialogHeader>
-            <DialogTitle className="flex justify-between items-center text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
-              {/* Left side - Icon and Title */}
-              <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
-                <div 
-                  dangerouslySetInnerHTML={{
-                    __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
-                  }}
-                />
-                <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
+            <DialogTitle className="flex flex-col gap-3 text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+              {/* Top row - Icon, Title, and Credit Note Number */}
+              <div className="flex justify-between items-center">
+                {/* Left side - Icon and Title */}
+                <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
+                  <div 
+                    dangerouslySetInnerHTML={{
+                      __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                    }}
+                  />
+                  <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
+                </div>
+                
+                {/* Right side - Credit Note Number */}
+                <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
+                  <label className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
+                  </label>
+                  <Input
+                    value="CRN"
+                    disabled
+                    className="w-16 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
+                    readOnly
+                  />
+                  <Input
+                    value="000123"
+                    disabled
+                    className="w-20 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
+                    readOnly
+                  />
+                </div>
               </div>
               
-              {/* Right side - Credit Note Number */}
-              <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
-                <label className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
-                </label>
-                <Input
-                  value="CRN"
-                  disabled
-                  className="w-16 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
-                  readOnly
-                />
-                <Input
-                  value="000123"
-                  disabled
-                  className="w-20 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
-                  readOnly
-                />
+              {/* Bottom row - Posting Date */}
+              <div className="flex justify-end">
+                <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
+                  <label className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
+                  </label>
+                  <Input
+                    value={new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                    disabled
+                    className="w-32 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
+                    readOnly
+                  />
+                </div>
               </div>
             </DialogTitle>
             <DialogDescription className="sr-only">
