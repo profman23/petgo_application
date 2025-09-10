@@ -38,6 +38,8 @@ export default function FinancialCreditNote() {
   const [creditNotes, setCreditNotes] = useState<any[]>([]);
   const [isLoadingCreditNotes, setIsLoadingCreditNotes] = useState(false);
   const [currentCreditNoteNumber, setCurrentCreditNoteNumber] = useState<string>("");
+  const [selectedCreditNoteToView, setSelectedCreditNoteToView] = useState<any>(null);
+  const [isViewCreditNoteModalOpen, setIsViewCreditNoteModalOpen] = useState(false);
 
   // Handle quantity changes (decrease only for credit notes)
   const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
@@ -302,6 +304,33 @@ export default function FinancialCreditNote() {
     } catch (error) {
       console.error('Error fetching next credit note number:', error);
     }
+  };
+
+  // Handle viewing credit note
+  const handleViewCreditNote = async (creditNoteId: number) => {
+    try {
+      const response = await fetch(`/api/admin/credit-notes/${creditNoteId}`, {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      
+      if (response.ok) {
+        const creditNoteDetails = await response.json();
+        setSelectedCreditNoteToView(creditNoteDetails);
+        setIsViewCreditNoteModalOpen(true);
+      } else {
+        console.error('Failed to fetch credit note details:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching credit note details:', error);
+    }
+  };
+
+  // Handle closing view modal
+  const handleCloseViewModal = () => {
+    setIsViewCreditNoteModalOpen(false);
+    setSelectedCreditNoteToView(null);
   };
 
   // Handle creating credit note
