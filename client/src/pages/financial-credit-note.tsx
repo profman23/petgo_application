@@ -251,6 +251,67 @@ export default function FinancialCreditNote() {
     };
   }, [invoiceItems, editedQuantities, removedItems]);
 
+  // Handle creating credit note
+  const handleCreateCreditNote = async () => {
+    if (!selectedInvoice || invoiceItems.length === 0) {
+      console.error('No invoice selected or no items to create credit note');
+      return;
+    }
+
+    try {
+      // Prepare credit note data
+      const activeItems = invoiceItems.filter(item => !removedItems.has(item.id));
+      const creditNoteItems = activeItems.map(item => ({
+        id: item.id,
+        description: item.description,
+        originalQuantity: item.quantity,
+        creditQuantity: editedQuantities[item.id] || item.quantity,
+        unitPrice: parseFloat(item.unitPrice),
+        totalBeforeVat: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice),
+        vatAmount: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice) * 0.15,
+        totalAfterVat: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice) * 1.15
+      }));
+
+      const creditNoteData = {
+        invoiceId: selectedInvoice.id,
+        invoiceNumber: selectedInvoice.invoiceNumber,
+        customerName: selectedInvoice.customerName,
+        appointmentDate: selectedInvoice.appointmentDate,
+        postingDate: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD format
+        items: creditNoteItems,
+        totalBeforeVat: creditNoteTotals.totalBeforeVatSum.toFixed(2),
+        vatAmount: creditNoteTotals.vatAmount.toFixed(2),
+        finalTotal: creditNoteTotals.finalTotal.toFixed(2),
+        createdBy: adminToken // Using admin token as created by identifier
+      };
+
+      // Save credit note via API
+      const response = await fetch('/api/admin/credit-notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify(creditNoteData),
+      });
+
+      if (response.ok) {
+        const newCreditNote = await response.json();
+        console.log('Credit note created successfully:', newCreditNote);
+        
+        // Navigate to credit note page to show all credit notes
+        setLocation('/financial/credit-note');
+        
+        // Close the modal
+        handleModalClose();
+      } else {
+        console.error('Failed to create credit note:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error creating credit note:', error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
       {/* Full-width Header with logo and controls */}
@@ -1242,10 +1303,7 @@ export default function FinancialCreditNote() {
                     <div className="flex gap-3">
                       <Button
                         className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                        onClick={() => {
-                          // TODO: Implement credit note creation
-                          console.log('Creating credit note for invoice:', selectedInvoice.invoiceNumber);
-                        }}
+                        onClick={handleCreateCreditNote}
                       >
                         {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
                       </Button>

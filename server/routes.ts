@@ -3392,6 +3392,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Create a new credit note
+  app.post('/api/admin/credit-notes', requireAdminAuth, async (req, res) => {
+    try {
+      const creditNoteData = req.body;
+      
+      // Generate next credit note number
+      const creditNoteNumber = await storage.getNextCreditNoteNumber();
+      
+      // Create credit note with generated number
+      const newCreditNote = await storage.createCreditNote({
+        ...creditNoteData,
+        creditNoteNumber,
+      });
+      
+      res.status(201).json(newCreditNote);
+    } catch (error) {
+      console.error('Error creating credit note:', error);
+      res.status(500).json({ message: 'Failed to create credit note' });
+    }
+  });
+
+  // Admin: Get all credit notes
+  app.get('/api/admin/credit-notes', requireAdminAuth, async (req, res) => {
+    try {
+      const creditNotes = await storage.getAllCreditNotes();
+      res.json(creditNotes);
+    } catch (error) {
+      console.error('Error fetching credit notes:', error);
+      res.status(500).json({ message: 'Failed to fetch credit notes' });
+    }
+  });
+
+  // Admin: Get credit note by ID
+  app.get('/api/admin/credit-notes/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const creditNote = await storage.getCreditNote(parseInt(id));
+      
+      if (!creditNote) {
+        return res.status(404).json({ message: 'Credit note not found' });
+      }
+      
+      res.json(creditNote);
+    } catch (error) {
+      console.error('Error fetching credit note:', error);
+      res.status(500).json({ message: 'Failed to fetch credit note' });
+    }
+  });
+
   // Doctor VetsVan location endpoint
   app.get('/api/doctor/vetsvan-location', requireAuth, async (req: any, res) => {
     try {
