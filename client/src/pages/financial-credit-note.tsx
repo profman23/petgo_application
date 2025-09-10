@@ -822,20 +822,20 @@ export default function FinancialCreditNote() {
       <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={handleModalClose}>
         <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
           <DialogHeader>
-            <DialogTitle className="flex flex-col gap-3 text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
-              {/* Top row - Icon, Title, and Credit Note Number */}
-              <div className="flex justify-between items-center">
-                {/* Left side - Icon and Title */}
-                <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
-                  <div 
-                    dangerouslySetInnerHTML={{
-                      __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
-                    }}
-                  />
-                  <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
-                </div>
-                
-                {/* Right side - Credit Note Number */}
+            <DialogTitle className="flex justify-between items-start text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+              {/* Left side - Icon and Title */}
+              <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
+                <div 
+                  dangerouslySetInnerHTML={{
+                    __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                  }}
+                />
+                <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
+              </div>
+              
+              {/* Right side - Credit Note Details */}
+              <div className="flex flex-col gap-2 items-end">
+                {/* Credit Note Number */}
                 <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
                   <label className="text-sm font-medium text-gray-700">
                     {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
@@ -853,12 +853,10 @@ export default function FinancialCreditNote() {
                     readOnly
                   />
                 </div>
-              </div>
-              
-              {/* Bottom row - Posting Date */}
-              <div className="flex justify-end">
+                
+                {/* Posting Date */}
                 <div className="flex items-center gap-2" style={{textAlign: getTextAlign(language)}}>
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-gray-700 w-24 text-right">
                     {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
                   </label>
                   <Input
