@@ -177,14 +177,54 @@ export default function FinancialCreditNote() {
     if (invoice.bookingId) {
       setLoadingItems(true);
       try {
-        const response = await fetch(`/api/invoice-items/${invoice.bookingId}`, {
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
-        });
-        if (response.ok) {
-          const items = await response.json();
-          setInvoiceItems(items);
+        // Fetch both invoice items and credited items in parallel
+        const [itemsResponse, creditedItemsResponse] = await Promise.all([
+          fetch(`/api/invoice-items/${invoice.bookingId}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          }),
+          fetch(`/api/admin/credit-notes/credited-items/${invoice.invoiceNumber}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          })
+        ]);
+        
+        if (itemsResponse.ok && creditedItemsResponse.ok) {
+          const items = await itemsResponse.json();
+          const creditedItems = await creditedItemsResponse.json();
+          
+          // Create a map of credited items for easy lookup
+          const creditedItemsMap = new Map();
+          creditedItems.forEach((creditedItem: any) => {
+            const existingCredited = creditedItemsMap.get(creditedItem.id) || 0;
+            creditedItemsMap.set(creditedItem.id, existingCredited + creditedItem.creditedQuantity);
+          });
+          
+          // Filter items to exclude those that are fully credited
+          const availableItems = items.filter((item: any) => {
+            const totalCredited = creditedItemsMap.get(item.id) || 0;
+            const originalQuantity = parseInt(item.quantity);
+            return totalCredited < originalQuantity; // Only show items that haven't been fully credited
+          }).map((item: any) => {
+            // Adjust available quantity by subtracting credited quantity
+            const totalCredited = creditedItemsMap.get(item.id) || 0;
+            const originalQuantity = parseInt(item.quantity);
+            const availableQuantity = originalQuantity - totalCredited;
+            
+            return {
+              ...item,
+              quantity: availableQuantity.toString(), // Update quantity to show only available amount
+              originalQuantity: originalQuantity, // Keep track of original quantity for reference
+              creditedQuantity: totalCredited // Keep track of how much has been credited
+            };
+          });
+          
+          setInvoiceItems(availableItems);
+        } else {
+          console.error('Failed to fetch invoice items or credited items');
+          setInvoiceItems([]);
         }
       } catch (error) {
         console.error('Failed to fetch invoice items:', error);
