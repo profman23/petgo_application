@@ -55,6 +55,7 @@ export default function FinancialCreditNote() {
   const [paymentsForMap, setPaymentsForMap] = useState<any[]>([]);
   const [boxPositions, setBoxPositions] = useState<{[key: string]: {x: number, y: number}}>({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchInput, setSearchInput] = useState("");
 
   // Filter credit notes based on search term
   const filteredCreditNotes = useMemo(() => {
@@ -73,6 +74,18 @@ export default function FinancialCreditNote() {
       return creditNoteNumberMatch || invoiceNumberMatch || customerNameMatch || customerPhoneMatch || postingDateMatch;
     });
   }, [creditNotes, searchTerm]);
+
+  // Handle search button click
+  const handleSearchClick = () => {
+    setSearchTerm(searchInput.trim());
+  };
+
+  // Handle Enter key press in search input
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearchClick();
+    }
+  };
 
   // Handle quantity changes (decrease only for credit notes)
   const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
@@ -1116,15 +1129,16 @@ export default function FinancialCreditNote() {
                 <Input
                   type="text"
                   placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الفاتورة، رقم مذكرة الائتمان، أو تاريخ النشر' : 'Search by customer name, phone number, invoice number, credit note number, or posting date'}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  className="w-full focus:border-purple-600 focus:ring-purple-600"
                   data-testid="input-search-credit-notes"
                   dir={getDirection(language)}
                 />
               </div>
               <Button
-                onClick={() => {/* Search is already handled by the input onChange */}}
+                onClick={handleSearchClick}
                 className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                 data-testid="button-search-credit-notes"
               >
