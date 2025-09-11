@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard, Download } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -1151,14 +1151,37 @@ export default function FinancialCreditNote() {
                   dir={getDirection(language)}
                 />
               </div>
-              <Button
-                onClick={handleSearchClick}
-                className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                data-testid="button-search-credit-notes"
-              >
-                <Search className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'بحث' : 'Search'}
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleSearchClick}
+                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                  data-testid="button-search-credit-notes"
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'بحث' : 'Search'}
+                </Button>
+                <Button
+                  onClick={() => console.log('Export credit notes')}
+                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-opacity-90"
+                  style={{ 
+                    borderColor: '#852085', 
+                    color: '#852085',
+                    backgroundColor: 'white'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#852085';
+                    e.currentTarget.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'white';
+                    e.currentTarget.style.color = '#852085';
+                  }}
+                  data-testid="button-export-credit-notes"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'تصدير' : 'Export'}
+                </Button>
+              </div>
             </div>
           </div>
 
