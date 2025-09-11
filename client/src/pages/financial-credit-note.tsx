@@ -54,6 +54,25 @@ export default function FinancialCreditNote() {
   const [creditNotesForMap, setCreditNotesForMap] = useState<any[]>([]);
   const [paymentsForMap, setPaymentsForMap] = useState<any[]>([]);
   const [boxPositions, setBoxPositions] = useState<{[key: string]: {x: number, y: number}}>({});
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter credit notes based on search term
+  const filteredCreditNotes = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return creditNotes;
+    }
+    
+    const searchLower = searchTerm.toLowerCase();
+    return creditNotes.filter((creditNote) => {
+      const creditNoteNumberMatch = creditNote.creditNoteNumber?.toString().toLowerCase().includes(searchLower);
+      const invoiceNumberMatch = creditNote.invoiceNumber?.toString().toLowerCase().includes(searchLower);
+      const customerNameMatch = creditNote.customerName?.toLowerCase().includes(searchLower);
+      const customerPhoneMatch = creditNote.customerPhone?.toString().toLowerCase().includes(searchLower);
+      const postingDateMatch = creditNote.postingDate?.toString().toLowerCase().includes(searchLower);
+      
+      return creditNoteNumberMatch || invoiceNumberMatch || customerNameMatch || customerPhoneMatch || postingDateMatch;
+    });
+  }, [creditNotes, searchTerm]);
 
   // Handle quantity changes (decrease only for credit notes)
   const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
@@ -1090,6 +1109,31 @@ export default function FinancialCreditNote() {
             </button>
           </div>
 
+          {/* Search Field */}
+          <div className="mb-6">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الفاتورة، رقم مذكرة الائتمان، أو تاريخ النشر' : 'Search by customer name, phone number, invoice number, credit note number, or posting date'}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                  data-testid="input-search-credit-notes"
+                  dir={getDirection(language)}
+                />
+              </div>
+              <Button
+                onClick={() => {/* Search is already handled by the input onChange */}}
+                className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                data-testid="button-search-credit-notes"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'بحث' : 'Search'}
+              </Button>
+            </div>
+          </div>
+
           {/* Credit Notes Table */}
           <div className="bg-white rounded-lg shadow">
             {isLoadingCreditNotes ? (
@@ -1097,11 +1141,20 @@ export default function FinancialCreditNote() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
                 <p className="mt-2 text-gray-600">{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
               </div>
-            ) : creditNotes.length === 0 ? (
+            ) : filteredCreditNotes.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                 <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p>{language === 'ar' ? 'لا توجد مذكرات ائتمان حتى الآن' : 'No credit notes found'}</p>
-                <p className="text-sm">{language === 'ar' ? 'ابدأ بإنشاء مذكرة ائتمان جديدة' : 'Start by creating a new credit note'}</p>
+                {searchTerm.trim() ? (
+                  <>
+                    <p>{language === 'ar' ? 'لا توجد نتائج مطابقة لبحثك' : 'No credit notes match your search'}</p>
+                    <p className="text-sm">{language === 'ar' ? 'جرب مصطلحات بحث مختلفة' : 'Try different search terms'}</p>
+                  </>
+                ) : (
+                  <>
+                    <p>{language === 'ar' ? 'لا توجد مذكرات ائتمان حتى الآن' : 'No credit notes found'}</p>
+                    <p className="text-sm">{language === 'ar' ? 'ابدأ بإنشاء مذكرة ائتمان جديدة' : 'Start by creating a new credit note'}</p>
+                  </>
+                )}
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -1129,7 +1182,7 @@ export default function FinancialCreditNote() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {creditNotes.map((creditNote) => (
+                    {filteredCreditNotes.map((creditNote) => (
                       <tr key={creditNote.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           CRN{creditNote.creditNoteNumber}
