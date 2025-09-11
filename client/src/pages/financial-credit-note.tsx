@@ -1256,7 +1256,7 @@ export default function FinancialCreditNote() {
           </div>
 
           {/* Enhanced Pagination */}
-          <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4">
+          <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4 mt-6">
             {/* Results Info & Items Per Page */}
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="text-sm text-gray-700" style={{ 
