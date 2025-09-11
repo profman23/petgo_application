@@ -1132,7 +1132,7 @@ export default function FinancialCreditNote() {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
-                  className="w-full focus:border-purple-600 focus:ring-purple-600 focus-visible:ring-purple-600"
+                  className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
                   data-testid="input-search-credit-notes"
                   dir={getDirection(language)}
                 />
