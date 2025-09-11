@@ -4,7 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit, Home, Menu, DollarSign, Receipt } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit, Home, Menu, DollarSign, Receipt, FilePlus } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -996,12 +996,13 @@ export default function AdministrationAuthorization() {
                     <button
                       onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
                       disabled={!!isReadOnly}
-                      className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
+                      className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
                         isReadOnly 
                           ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
                           : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
                       }`}
                     >
+                      <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
                       {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
                     </button>
                   </div>
