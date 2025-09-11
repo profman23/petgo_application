@@ -1002,7 +1002,7 @@ export default function AdministrationAuthorization() {
                           : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
                       }`}
                     >
-                      <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
+                      <FilePlus style={{ color: '#852085' }} className="w-5 h-5" strokeWidth={0.5} />
                       {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
                     </button>
                   </div>
