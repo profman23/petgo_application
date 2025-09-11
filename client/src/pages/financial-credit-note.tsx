@@ -11,6 +11,15 @@ import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
+// Declare lord-icon custom element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'lord-icon': any;
+    }
+  }
+}
+
 export default function FinancialCreditNote() {
   const [, setLocation] = useLocation();
   const { t, language } = useTranslation();
@@ -1770,6 +1779,13 @@ export default function FinancialCreditNote() {
             {/* Header */}
             <div className="absolute top-0 left-0 right-0 z-20 bg-white border-b px-6 py-4 flex justify-between items-center">
               <div className="flex items-center gap-3">
+                <lord-icon
+                  src="https://cdn.lordicon.com/wsvtrygf.json"
+                  trigger="loop"
+                  delay="1500"
+                  colors="primary:#852085,secondary:#545454"
+                  style={{ width: '80px', height: '80px' }}
+                ></lord-icon>
                 <h2 className="text-xl font-bold text-gray-800">
                   {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
                 </h2>
