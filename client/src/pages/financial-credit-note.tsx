@@ -108,7 +108,8 @@ export default function FinancialCreditNote() {
     const measureButtonWidth = () => {
       if (createButtonRef.current) {
         const width = createButtonRef.current.offsetWidth;
-        setButtonContainerWidth(width);
+        // Subtract the gap-3 (12px) between Search and Export buttons
+        setButtonContainerWidth(width - 12);
       }
     };
 
