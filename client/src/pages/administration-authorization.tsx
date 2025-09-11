@@ -1161,9 +1161,18 @@ export default function AdministrationAuthorization() {
                   </h2>
                 </div>
               ) : (
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
-                </h2>
+                <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                  <lord-icon 
+                    src="https://cdn.lordicon.com/avbhqgrw.json" 
+                    trigger="loop" 
+                    delay="1500" 
+                    colors="primary:#852085,secondary:#545454" 
+                    style={{ width: '80px', height: '80px' }}
+                  />
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+                  </h2>
+                </div>
               )}
               <button
                 onClick={handleClosePopup}
