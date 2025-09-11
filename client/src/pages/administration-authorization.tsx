@@ -10,6 +10,15 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
+// Declare lord-icon custom element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'lord-icon': any;
+    }
+  }
+}
+
 export default function AdministrationAuthorization() {
   const [location, setLocation] = useLocation();
   const { t, language } = useTranslation();
@@ -974,9 +983,16 @@ export default function AdministrationAuthorization() {
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
-                      {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
-                    </h1>
+                    <div className="flex items-center gap-4">
+                      <div 
+                        dangerouslySetInnerHTML={{
+                          __html: '<lord-icon src="https://cdn.lordicon.com/gjlzobte.json" trigger="hover" colors="primary:#852085,secondary:#545454" style="width:80px;height:80px"></lord-icon>'
+                        }}
+                      />
+                      <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+                        {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
+                      </h1>
+                    </div>
                     <button
                       onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
                       disabled={!!isReadOnly}
