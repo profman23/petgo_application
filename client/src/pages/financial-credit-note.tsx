@@ -1775,6 +1775,14 @@ export default function FinancialCreditNote() {
       {/* Map Modal */}
       <Dialog open={isMapModalOpen} onOpenChange={handleCloseMapModal}>
         <DialogContent className="w-screen h-screen max-w-none p-0 m-0 border-0 rounded-none overflow-hidden" dir={getDirection(language)}>
+          <DialogHeader className="sr-only">
+            <DialogTitle>
+              {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
+            </DialogTitle>
+            <DialogDescription>
+              {language === 'ar' ? 'عرض مرئي للفاتورة والعناصر المرتبطة بها' : 'Visual representation of invoice and related items'}
+            </DialogDescription>
+          </DialogHeader>
           <div className="relative w-full h-full bg-gray-50" style={{ fontFamily: 'Arimo' }}>
             {/* Header */}
             <div className="absolute top-0 left-0 right-0 z-20 bg-white border-b px-6 py-4 flex justify-between items-center">
