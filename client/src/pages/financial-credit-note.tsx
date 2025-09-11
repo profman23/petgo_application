@@ -56,6 +56,8 @@ export default function FinancialCreditNote() {
   const [boxPositions, setBoxPositions] = useState<{[key: string]: {x: number, y: number}}>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Filter credit notes based on search term
   const filteredCreditNotes = useMemo(() => {
@@ -75,9 +77,21 @@ export default function FinancialCreditNote() {
     });
   }, [creditNotes, searchTerm]);
 
+  // Pagination calculations
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCreditNotes = filteredCreditNotes.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(filteredCreditNotes.length / itemsPerPage);
+
+  // Handle page change
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
   // Handle search button click
   const handleSearchClick = () => {
     setSearchTerm(searchInput.trim());
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   // Handle Enter key press in search input
@@ -1196,7 +1210,7 @@ export default function FinancialCreditNote() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredCreditNotes.map((creditNote) => (
+                    {paginatedCreditNotes.map((creditNote) => (
                       <tr key={creditNote.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           CRN{creditNote.creditNoteNumber}
@@ -1237,6 +1251,78 @@ export default function FinancialCreditNote() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+          </div>
+
+          {/* Enhanced Pagination */}
+          <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4">
+            {/* Results Info & Items Per Page */}
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="text-sm text-gray-700" style={{ 
+                direction: getDirection(language), 
+                textAlign: getTextAlign(language) 
+              }}>
+                {language === 'ar' 
+                  ? `عرض ${paginatedCreditNotes.length} من أصل ${filteredCreditNotes.length} مذكرة ائتمان (المجموع: ${Array.isArray(creditNotes) ? creditNotes.length : 0})`
+                  : `Showing ${paginatedCreditNotes.length} of ${filteredCreditNotes.length} credit notes (Total: ${Array.isArray(creditNotes) ? creditNotes.length : 0})`
+                }
+              </div>
+              
+              <div className="flex items-center gap-2" style={{ direction: getDirection(language) }}>
+                <span className="text-sm text-gray-600">
+                  {language === 'ar' ? 'عرض:' : 'Show:'}
+                </span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    handlePageChange(1);
+                  }}
+                  className="border border-purple-300 rounded px-3 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white"
+                  style={{ direction: 'ltr' }}
+                >
+                  <option value={10}>10</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-sm text-gray-600">
+                  {language === 'ar' ? 'لكل صفحة' : 'per page'}
+                </span>
+              </div>
+            </div>
+            
+            {/* Navigation Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {language === 'ar' ? 'السابق' : 'Previous'}
+                </Button>
+                
+                <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
+                  <span className="text-sm font-medium text-purple-700">
+                    {language === 'ar' 
+                      ? `صفحة ${currentPage} من ${totalPages}`
+                      : `Page ${currentPage} of ${totalPages}`
+                    }
+                  </span>
+                </div>
+                
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {language === 'ar' ? 'التالي' : 'Next'}
+                </Button>
               </div>
             )}
           </div>
