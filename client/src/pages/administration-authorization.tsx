@@ -87,6 +87,12 @@ export default function AdministrationAuthorization() {
   const [productsReadChecked, setProductsReadChecked] = useState(false);
   const [productsFullControlChecked, setProductsFullControlChecked] = useState(false);
   
+  // State for checkboxes - Financial Credit Note section
+  const [creditNoteNoPermissionChecked, setCreditNoteNoPermissionChecked] = useState(false);
+  const [creditNoteReadChecked, setCreditNoteReadChecked] = useState(false);
+  const [creditNoteFullControlChecked, setCreditNoteFullControlChecked] = useState(false);
+  const [creditNoteExportChecked, setCreditNoteExportChecked] = useState(false);
+  
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
   
@@ -1296,6 +1302,86 @@ export default function AdministrationAuthorization() {
                       />
                       <label htmlFor="authFullControl" className={`ml-2 text-sm ${authHiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
                         {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                  </div>
+                  
+                  {/* Purple divider line */}
+                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
+                </div>
+              </div>
+              
+              {/* Financial Tab */}
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-gray-500" />
+                  {language === 'ar' ? 'المالية' : 'Financial'}
+                </h3>
+                
+                {/* Credit Note Section */}
+                <div className="ml-8">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                    {language === 'ar' ? 'إشعار الخصم' : 'Credit Note'}
+                  </h4>
+                  
+                  {/* Permission Items */}
+                  <div className="ml-4 flex flex-row gap-6">
+                    {/* No Permission */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="creditNoteNoPermission"
+                        checked={creditNoteNoPermissionChecked}
+                        onChange={(e) => setCreditNoteNoPermissionChecked(e.target.checked)}
+                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                      />
+                      <label htmlFor="creditNoteNoPermission" className="ml-2 text-sm text-gray-600">
+                        No Permission
+                      </label>
+                    </div>
+                    
+                    {/* Read */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="creditNoteRead"
+                        checked={creditNoteReadChecked}
+                        disabled={creditNoteNoPermissionChecked}
+                        onChange={(e) => setCreditNoteReadChecked(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      />
+                      <label htmlFor="creditNoteRead" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        Read
+                      </label>
+                    </div>
+                    
+                    {/* Full Control */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="creditNoteFullControl"
+                        checked={creditNoteFullControlChecked}
+                        disabled={creditNoteNoPermissionChecked}
+                        onChange={(e) => setCreditNoteFullControlChecked(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      />
+                      <label htmlFor="creditNoteFullControl" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                      </label>
+                    </div>
+                    
+                    {/* Export */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="creditNoteExport"
+                        checked={creditNoteExportChecked}
+                        disabled={creditNoteNoPermissionChecked}
+                        onChange={(e) => setCreditNoteExportChecked(e.target.checked)}
+                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      />
+                      <label htmlFor="creditNoteExport" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {language === 'ar' ? 'تصدير' : 'Export'}
                       </label>
                     </div>
                   </div>
