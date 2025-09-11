@@ -978,7 +978,7 @@ export default function AdministrationAuthorization() {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto py-6 px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto py-6 px-6 lg:px-6">
             <div className="px-4 py-6 sm:px-0">
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
