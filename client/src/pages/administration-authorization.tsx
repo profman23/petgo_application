@@ -989,11 +989,12 @@ export default function AdministrationAuthorization() {
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="flex justify-between items-center mb-4">
-                    <div className="flex items-center gap-4">
-                      <div 
-                        dangerouslySetInnerHTML={{
-                          __html: '<lord-icon src="https://cdn.lordicon.com/gjlzobte.json" trigger="hover" colors="primary:#852085,secondary:#545454" style="width:80px;height:80px"></lord-icon>'
-                        }}
+                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                      <lord-icon 
+                        src="https://cdn.lordicon.com/gjlzobte.json" 
+                        trigger="hover" 
+                        colors="primary:#852085,secondary:#545454" 
+                        style={{ width: '80px', height: '80px' }}
                       />
                       <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
                         {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
@@ -1145,12 +1146,25 @@ export default function AdministrationAuthorization() {
           <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[90vh]">
             {/* Popup Header */}
             <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {editingAuthorization 
-                  ? (language === 'ar' ? 'تعديل التصريح' : 'Edit Authorization')
-                  : (language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization')
-                }
-              </h2>
+              {editingAuthorization ? (
+                <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                  <lord-icon 
+                    src="https://cdn.lordicon.com/exymduqj.json" 
+                    trigger="loop" 
+                    delay="1500" 
+                    state="hover-line" 
+                    colors="primary:#852085,secondary:#545454" 
+                    style={{ width: '80px', height: '80px' }}
+                  />
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {language === 'ar' ? 'تعديل التصريح' : 'Edit Authorization'}
+                  </h2>
+                </div>
+              ) : (
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+                </h2>
+              )}
               <button
                 onClick={handleClosePopup}
                 className="text-gray-400 hover:text-gray-600"
