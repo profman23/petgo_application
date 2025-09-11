@@ -43,6 +43,7 @@ export default function FinancialCreditNote() {
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [selectedInvoiceForMap, setSelectedInvoiceForMap] = useState<any>(null);
   const [creditNotesForMap, setCreditNotesForMap] = useState<any[]>([]);
+  const [paymentsForMap, setPaymentsForMap] = useState<any[]>([]);
   const [boxPositions, setBoxPositions] = useState<{[key: string]: {x: number, y: number}}>({});
 
   // Handle quantity changes (decrease only for credit notes)
@@ -381,7 +382,7 @@ export default function FinancialCreditNote() {
   const handleMapClick = async (creditNote: any) => {
     try {
       // Find the full invoice details for this credit note
-      const fullInvoice = allInvoices?.find(inv => inv.invoiceNumber === creditNote.invoiceNumber);
+      const fullInvoice = allInvoices?.find((inv: any) => inv.invoiceNumber === creditNote.invoiceNumber);
       const invoice = {
         invoiceNumber: creditNote.invoiceNumber,
         customerName: creditNote.customerName,
@@ -391,6 +392,23 @@ export default function FinancialCreditNote() {
       
       // Fetch all credit notes for this invoice
       const creditNotesForInvoice = creditNotes.filter(cn => cn.invoiceNumber === creditNote.invoiceNumber);
+      
+      // Fetch payments for this invoice's booking
+      let paymentsForInvoice: any[] = [];
+      if (fullInvoice?.bookingId) {
+        try {
+          const paymentsResponse = await fetch(`/api/invoice-payments/${fullInvoice.bookingId}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
+          if (paymentsResponse.ok) {
+            paymentsForInvoice = await paymentsResponse.json();
+          }
+        } catch (paymentError) {
+          console.error('Error fetching payments:', paymentError);
+        }
+      }
       
       // Set initial positions for boxes
       const initialPositions: {[key: string]: {x: number, y: number}} = {};
@@ -406,8 +424,17 @@ export default function FinancialCreditNote() {
         };
       });
       
+      // Position payment boxes to the left of invoice (visible within canvas)
+      paymentsForInvoice.forEach((payment, index) => {
+        initialPositions[`payment-${payment.id}`] = { 
+          x: Math.max(20, 200 - 350), // 20px margin from left edge, or left of invoice with spacing
+          y: 200 + (index * 150) 
+        };
+      });
+      
       setSelectedInvoiceForMap(invoice);
       setCreditNotesForMap(creditNotesForInvoice);
+      setPaymentsForMap(paymentsForInvoice);
       setBoxPositions(initialPositions);
       setIsMapModalOpen(true);
     } catch (error) {
@@ -420,6 +447,7 @@ export default function FinancialCreditNote() {
     setIsMapModalOpen(false);
     setSelectedInvoiceForMap(null);
     setCreditNotesForMap([]);
+    setPaymentsForMap([]);
     setBoxPositions({});
   };
 
@@ -1787,6 +1815,28 @@ export default function FinancialCreditNote() {
                   }
                   return null;
                 })}
+                
+                {/* Draw lines from invoice to each payment */}
+                {selectedInvoiceForMap && paymentsForMap.map((payment) => {
+                  const invoicePos = boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`];
+                  const paymentPos = boxPositions[`payment-${payment.id}`];
+                  
+                  if (invoicePos && paymentPos) {
+                    return (
+                      <line
+                        key={`line-payment-${payment.id}`}
+                        x1={invoicePos.x} // Invoice box left edge
+                        y1={invoicePos.y + 85}  // Invoice box center + half height
+                        x2={paymentPos.x + 250}    // Payment box right edge
+                        y2={paymentPos.y + 80} // Payment box center + half height
+                        stroke="#4CAF50"
+                        strokeWidth="2"
+                        strokeDasharray="none"
+                      />
+                    );
+                  }
+                  return null;
+                })}
               </svg>
 
               {/* Invoice Box */}
@@ -1918,6 +1968,81 @@ export default function FinancialCreditNote() {
                       <div className="text-xs text-gray-500">
                         {language === 'ar' ? 'التاريخ: ' : 'Date: '}
                         {new Date(creditNote.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Income Payment Boxes */}
+              {paymentsForMap.map((payment) => {
+                const position = boxPositions[`payment-${payment.id}`];
+                if (!position) return null;
+
+                return (
+                  <div
+                    key={`payment-box-${payment.id}`}
+                    className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
+                    style={{
+                      left: position.x,
+                      top: position.y,
+                      borderColor: '#4CAF50',
+                      width: '250px',
+                      height: '160px'
+                    }}
+                    onMouseDown={(e) => {
+                      const startX = e.clientX - position.x;
+                      const startY = e.clientY - position.y;
+                      
+                      const handleMouseMove = (e: MouseEvent) => {
+                        const newX = e.clientX - startX;
+                        const newY = e.clientY - startY;
+                        
+                        setBoxPositions(prev => ({
+                          ...prev,
+                          [`payment-${payment.id}`]: { x: newX, y: newY }
+                        }));
+                      };
+                      
+                      const handleMouseUp = () => {
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                      };
+                      
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                    }}
+                  >
+                    {/* Header Section */}
+                    <div className="bg-green-50 px-3 py-2 border-b border-green-200 rounded-t-lg flex items-center justify-center gap-2">
+                      <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                      </svg>
+                      <span className="text-sm font-semibold text-green-700">
+                        {language === 'ar' ? 'دفعة دخل' : 'Income Payment'}
+                      </span>
+                    </div>
+                    
+                    {/* Content Section */}
+                    <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
+                      <div className="text-base font-bold text-green-600 mb-1">
+                        +{parseFloat(payment.amount).toFixed(2)} SAR
+                      </div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        {language === 'ar' ? 'طريقة الدفع: ' : 'Method: '}
+                        {payment.paymentType === 'cash' ? (language === 'ar' ? 'نقدي' : 'Cash') : 
+                         payment.paymentType === 'card' ? (language === 'ar' ? 'كارت' : 'Card') : 
+                         payment.paymentType === 'transfer' ? (language === 'ar' ? 'تحويل' : 'Transfer') : 
+                         payment.paymentType}
+                      </div>
+                      {payment.description && (
+                        <div className="text-xs text-gray-500 mb-2">
+                          {payment.description}
+                        </div>
+                      )}
+                      <div className="text-xs text-gray-500">
+                        {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                        {new Date(payment.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                       </div>
                     </div>
                   </div>
