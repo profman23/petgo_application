@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -58,6 +58,8 @@ export default function FinancialCreditNote() {
   const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [buttonContainerWidth, setButtonContainerWidth] = useState<number | undefined>(undefined);
+  const createButtonRef = useRef<HTMLButtonElement>(null);
 
   // Filter credit notes based on search term
   const filteredCreditNotes = useMemo(() => {
@@ -100,6 +102,23 @@ export default function FinancialCreditNote() {
       handleSearchClick();
     }
   };
+
+  // Measure the "Create New Credit Note" button width and apply it to search buttons container
+  useLayoutEffect(() => {
+    const measureButtonWidth = () => {
+      if (createButtonRef.current) {
+        const width = createButtonRef.current.offsetWidth;
+        setButtonContainerWidth(width);
+      }
+    };
+
+    measureButtonWidth();
+    window.addEventListener('resize', measureButtonWidth);
+    
+    return () => {
+      window.removeEventListener('resize', measureButtonWidth);
+    };
+  }, []);
 
   // Handle quantity changes (decrease only for credit notes)
   const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
@@ -1126,6 +1145,7 @@ export default function FinancialCreditNote() {
 
             {/* Right side - Create New Credit Note Button */}
             <button
+              ref={createButtonRef}
               onClick={async () => {
                 await fetchNextCreditNoteNumber();
                 setIsCreateCreditNoteModalOpen(true);
@@ -1151,10 +1171,10 @@ export default function FinancialCreditNote() {
                   dir={getDirection(language)}
                 />
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-3" style={{ width: buttonContainerWidth ? `${buttonContainerWidth}px` : 'auto' }}>
                 <Button
                   onClick={handleSearchClick}
-                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                   data-testid="button-search-credit-notes"
                 >
                   <Search className="h-4 w-4 mr-2" />
@@ -1162,19 +1182,10 @@ export default function FinancialCreditNote() {
                 </Button>
                 <Button
                   onClick={() => console.log('Export credit notes')}
-                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-opacity-90"
+                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
                   style={{ 
                     borderColor: '#852085', 
-                    color: '#852085',
-                    backgroundColor: 'white'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = '#852085';
-                    e.currentTarget.style.color = 'white';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'white';
-                    e.currentTarget.style.color = '#852085';
+                    color: '#852085'
                   }}
                   data-testid="button-export-credit-notes"
                 >
