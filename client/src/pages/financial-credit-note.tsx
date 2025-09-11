@@ -10,6 +10,8 @@ import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, P
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -100,6 +102,126 @@ export default function FinancialCreditNote() {
   const handleSearchKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearchClick();
+    }
+  };
+
+  // Export credit notes to Excel
+  const handleExportToExcel = () => {
+    try {
+      // Check if there's data to export
+      if (!filteredCreditNotes || filteredCreditNotes.length === 0) {
+        alert(language === 'ar' ? 'لا توجد بيانات للتصدير' : 'No data to export');
+        return;
+      }
+
+      // Helper function to safely convert values to numbers
+      const safeNumber = (value: any): number => {
+        const num = Number(value);
+        return Number.isFinite(num) ? num : 0;
+      };
+
+      // Helper function to format dates consistently
+      const formatDate = (dateStr: string): string => {
+        try {
+          return new Date(dateStr).toISOString().split('T')[0]; // YYYY-MM-DD format
+        } catch {
+          return dateStr || '';
+        }
+      };
+
+      // Create localized headers
+      const headers = {
+        creditNoteNo: language === 'ar' ? 'رقم مذكرة الائتمان' : 'Credit Note No.',
+        invoiceNo: language === 'ar' ? 'رقم الفاتورة' : 'Invoice No.',
+        customerName: language === 'ar' ? 'اسم العميل' : 'Customer Name',
+        postingDate: language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date',
+        appointmentDate: language === 'ar' ? 'تاريخ الموعد الأصلي' : 'Appointment Date',
+        itemDescription: language === 'ar' ? 'وصف المنتج/الخدمة' : 'Item/Service Description',
+        creditQuantity: language === 'ar' ? 'الكمية المرتجعة' : 'Credit Quantity',
+        unitPrice: language === 'ar' ? 'سعر الوحدة (ر.س)' : 'Unit Price (SAR)',
+        totalBeforeVAT: language === 'ar' ? 'المجموع قبل الضريبة (ر.س)' : 'Total Before VAT (SAR)',
+        vatAmount: language === 'ar' ? 'مبلغ الضريبة (ر.س)' : 'VAT Amount (SAR)',
+        totalAfterVAT: language === 'ar' ? 'المجموع بعد الضريبة (ر.س)' : 'Total After VAT (SAR)',
+        creditNoteTotal: language === 'ar' ? 'مجموع مذكرة الائتمان (ر.س)' : 'Credit Note Total (SAR)'
+      };
+
+      const dataToExport = filteredCreditNotes.flatMap(creditNote => {
+        if (creditNote.items && creditNote.items.length > 0) {
+          return creditNote.items.map((item: any, index: number) => ({
+            [headers.creditNoteNo]: `CRN${creditNote.creditNoteNumber}`,
+            [headers.invoiceNo]: creditNote.invoiceNumber || '',
+            [headers.customerName]: creditNote.customerName || '',
+            [headers.postingDate]: formatDate(creditNote.postingDate),
+            [headers.appointmentDate]: creditNote.appointmentDate ? formatDate(creditNote.appointmentDate) : '',
+            [headers.itemDescription]: item.description || '',
+            [headers.creditQuantity]: safeNumber(item.creditQuantity),
+            [headers.unitPrice]: safeNumber(item.unitPrice),
+            [headers.totalBeforeVAT]: -safeNumber(item.totalBeforeVat), // Negative for credit
+            [headers.vatAmount]: -safeNumber(item.vatAmount), // Negative for credit
+            [headers.totalAfterVAT]: -safeNumber(item.totalAfterVat), // Negative for credit
+            [headers.creditNoteTotal]: index === 0 ? -safeNumber(creditNote.finalTotal) : '' // Only show on first item
+          }));
+        } else {
+          return [{
+            [headers.creditNoteNo]: `CRN${creditNote.creditNoteNumber}`,
+            [headers.invoiceNo]: creditNote.invoiceNumber || '',
+            [headers.customerName]: creditNote.customerName || '',
+            [headers.postingDate]: formatDate(creditNote.postingDate),
+            [headers.appointmentDate]: creditNote.appointmentDate ? formatDate(creditNote.appointmentDate) : '',
+            [headers.itemDescription]: language === 'ar' ? 'لا توجد عناصر' : 'No items found',
+            [headers.creditQuantity]: '',
+            [headers.unitPrice]: '',
+            [headers.totalBeforeVAT]: '',
+            [headers.vatAmount]: '',
+            [headers.totalAfterVAT]: '',
+            [headers.creditNoteTotal]: -safeNumber(creditNote.finalTotal)
+          }];
+        }
+      });
+
+      // Create worksheet with proper number formatting
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, language === 'ar' ? 'مذكرات الائتمان' : 'Credit Notes');
+
+      // Set column widths for better readability
+      const columnWidths = [
+        { wch: 18 }, // Credit Note No.
+        { wch: 15 }, // Invoice No.
+        { wch: 25 }, // Customer Name
+        { wch: 15 }, // Posting Date
+        { wch: 18 }, // Appointment Date
+        { wch: 40 }, // Item/Service Description
+        { wch: 12 }, // Credit Quantity
+        { wch: 15 }, // Unit Price
+        { wch: 20 }, // Total Before VAT
+        { wch: 15 }, // VAT Amount
+        { wch: 20 }, // Total After VAT
+        { wch: 22 }  // Credit Note Total
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Apply number formatting to numeric columns
+      const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+      for (let row = range.s.r + 1; row <= range.e.r; row++) {
+        // Format numeric columns with 2 decimal places
+        [7, 8, 9, 10, 11].forEach(col => { // Unit Price, Total Before VAT, VAT Amount, Total After VAT, Credit Note Total
+          const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+          if (worksheet[cellAddress] && typeof worksheet[cellAddress].v === 'number') {
+            worksheet[cellAddress].z = '#,##0.00';
+          }
+        });
+      }
+
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
+      const fileName = `${language === 'ar' ? 'تصدير_مذكرات_الائتمان' : 'Credit_Notes_Export'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      saveAs(data, fileName);
+
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      alert(language === 'ar' ? 'حدث خطأ أثناء تصدير البيانات' : 'Error exporting data');
     }
   };
 
@@ -1182,7 +1304,7 @@ export default function FinancialCreditNote() {
                   {language === 'ar' ? 'بحث' : 'Search'}
                 </Button>
                 <Button
-                  onClick={() => console.log('Export credit notes')}
+                  onClick={handleExportToExcel}
                   className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
                   style={{ 
                     borderColor: '#852085', 
