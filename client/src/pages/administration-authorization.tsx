@@ -1031,39 +1031,41 @@ export default function AdministrationAuthorization() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-auto">
-          {/* Authorization Management Header - aligned to far left and top */}
-          <div className="flex items-center gap-4 p-4">
-            <div className="flex-shrink-0">
-              <lord-icon 
-                src="https://cdn.lordicon.com/gjlzobte.json" 
-                trigger="hover" 
-                colors="primary:#852085,secondary:#545454" 
-                style={{ width: '80px', height: '80px' }}
-              />
+        <div className="flex-1 overflow-auto relative">
+          {/* Top Header Section */}
+          <div className="flex items-center justify-between p-4">
+            {/* Authorization Management Header - aligned to far left */}
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0">
+                <lord-icon 
+                  src="https://cdn.lordicon.com/gjlzobte.json" 
+                  trigger="hover" 
+                  colors="primary:#852085,secondary:#545454" 
+                  style={{ width: '80px', height: '80px' }}
+                />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+                {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
+              </h1>
             </div>
-            <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
-              {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
-            </h1>
+
+            {/* Add Authorization Button - top-right corner */}
+            <button
+              onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
+              disabled={!!isReadOnly}
+              className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+                isReadOnly 
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                  : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+              }`}
+            >
+              <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
+              {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+            </button>
           </div>
 
           <div className="max-w-7xl mx-auto py-6 px-6" style={{ paddingLeft: '18px', paddingRight: '18px' }}>
             <div className="px-4 py-6 sm:px-0">
-              {/* Add Authorization Button */}
-              <div className="flex justify-end mb-8">
-                <button
-                  onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
-                  disabled={!!isReadOnly}
-                  className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
-                    isReadOnly 
-                      ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                      : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
-                  }`}
-                >
-                  <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
-                  {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
-                </button>
-              </div>
 
               {/* Authorization Content */}
               <div className="bg-white rounded-lg">
