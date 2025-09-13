@@ -1088,9 +1088,10 @@ export default function AdministrationAuthorization() {
                           className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                         >
                           <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="text-lg font-medium text-gray-900">
-                                {language === 'ar' ? 'اسم التصريح:' : 'Authorization Name:'} {auth.name}
+                            <div className="flex-1 flex items-center gap-3">
+                              <Shield className="h-6 w-6" style={{ color: '#852085' }} />
+                              <p className="text-lg font-medium" style={{ fontFamily: 'Arimo', color: '#26282b' }}>
+                                {language === 'ar' ? 'اسم التصريح: ' : 'Authorization Name: '}{auth.name}
                               </p>
                             </div>
                             <div className="ml-4">
