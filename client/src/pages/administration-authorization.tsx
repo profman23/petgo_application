@@ -1087,7 +1087,7 @@ export default function AdministrationAuthorization() {
           </div>
 
           {/* Search Field */}
-          <div className="px-8 mb-6">
+          <div className="px-4 mb-6">
             <div className="flex items-center gap-3">
               <div className="flex-1">
                 <Input
@@ -1124,7 +1124,7 @@ export default function AdministrationAuthorization() {
           </div>
 
           {/* Authorization Content */}
-          <div className="px-8 mb-6">
+          <div className="px-4 mb-6">
             {authorizationsLoading ? (
               <div className="text-center py-12 bg-gray-50 rounded-lg">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
