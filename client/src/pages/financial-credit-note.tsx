@@ -304,6 +304,9 @@ export default function FinancialCreditNote() {
     currentUserPermissions.creditNoteRead === true && 
     currentUserPermissions.creditNoteFullControl !== true;
 
+  // Determine if user can export (requires separate export permission)
+  const canExport = currentUserPermissions && currentUserPermissions.creditNoteExport === true;
+
   // Fetch all VetsVan requests for notification counter
   const { data: allVetsVanRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
@@ -1332,19 +1335,19 @@ export default function FinancialCreditNote() {
                   {language === 'ar' ? 'بحث' : 'Search'}
                 </Button>
                 <Button
-                  onClick={isReadOnlyMode ? undefined : handleExportToExcel}
-                  disabled={isReadOnlyMode}
+                  onClick={canExport ? handleExportToExcel : undefined}
+                  disabled={!canExport}
                   className={`flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
-                    isReadOnlyMode 
+                    !canExport 
                       ? 'bg-gray-100 hover:bg-gray-100 cursor-not-allowed' 
                       : 'bg-white hover:bg-purple-50'
                   }`}
                   style={{ 
-                    borderColor: isReadOnlyMode ? '#D1D5DB' : '#852085', 
-                    color: isReadOnlyMode ? '#9CA3AF' : '#852085'
+                    borderColor: !canExport ? '#D1D5DB' : '#852085', 
+                    color: !canExport ? '#9CA3AF' : '#852085'
                   }}
                   data-testid="button-export-credit-notes"
-                  title={isReadOnlyMode ? (language === 'ar' ? 'غير مسموح - صلاحية القراءة فقط' : 'Not allowed - Read-only permission') : ''}
+                  title={!canExport ? (language === 'ar' ? 'غير مسموح - لا توجد صلاحية تصدير' : 'Not allowed - No export permission') : ''}
                 >
                   <Download className="h-4 w-4 mr-2" />
                   {language === 'ar' ? 'تصدير' : 'Export'}
