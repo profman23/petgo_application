@@ -283,6 +283,14 @@ export default function FinancialCreditNote() {
     enabled: !!adminToken,
   });
 
+  // Permission check - redirect users with "No Permission" for Credit Note
+  useEffect(() => {
+    if (currentUserPermissions && currentUserPermissions.creditNoteNoPermission === true) {
+      console.log('🚫 User has no permission for Credit Note - redirecting to admin home');
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, setLocation]);
+
   // Fetch all VetsVan requests for notification counter
   const { data: allVetsVanRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
