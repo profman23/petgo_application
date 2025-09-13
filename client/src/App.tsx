@@ -104,7 +104,7 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
   const adminToken = localStorage.getItem("adminToken");
 
   const { data: currentUserPermissions, isLoading, error } = useQuery({
-    queryKey: ["/api/admin/current-user-permissions", Date.now()], // Add timestamp for cache busting
+    queryKey: ["/api/admin/current-user-permissions"], // Fixed: removed Date.now() to prevent infinite loop
     queryFn: async () => {
       const response = await fetch(`/api/admin/current-user-permissions?_t=${Date.now()}`, {
         method: 'GET',
@@ -123,7 +123,7 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: 'always',
-    refetchOnWindowFocus: 'always',
+    refetchOnWindowFocus: false, // Reduced to prevent excessive refetching
     refetchOnReconnect: 'always',
   });
 
@@ -155,9 +155,9 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
     hasNoPermField: currentUserPermissions?.hasOwnProperty('creditNoteNoPermission')
   });
 
-  // DEFAULT-DENY LOGIC: Only allow access if user has explicit read or full control permission
+  // DEFAULT-DENY LOGIC: Only allow access if user has explicit read or full control permission  
   // Redirect in useEffect to avoid state updates during render
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentUserPermissions) {
       // Check for explicit "No Permission" flag
       if (currentUserPermissions.creditNoteNoPermission === true) {
