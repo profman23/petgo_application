@@ -1036,7 +1036,7 @@ export default function AdministrationAuthorization() {
             <div className="px-4 py-6 sm:px-0">
               <div className="bg-white shadow rounded-lg">
                 <div className="px-4 py-5 sm:p-6">
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex justify-between items-center mb-6 bg-gray-50 p-4 rounded-lg">
                     <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
                       <lord-icon 
                         src="https://cdn.lordicon.com/gjlzobte.json" 
