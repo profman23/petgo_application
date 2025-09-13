@@ -754,6 +754,12 @@ export const authorizations = pgTable("authorizations", {
   productsRead: boolean("products_read").notNull().default(false),
   productsFullControl: boolean("products_full_control").notNull().default(false),
   
+  // Credit Note permissions
+  creditNoteNoPermission: boolean("credit_note_no_permission").notNull().default(false),
+  creditNoteRead: boolean("credit_note_read").notNull().default(false),
+  creditNoteFullControl: boolean("credit_note_full_control").notNull().default(false),
+  creditNoteExport: boolean("credit_note_export").notNull().default(false),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -794,6 +800,10 @@ export const insertAuthorizationSchema = createInsertSchema(authorizations).pick
   productsHidden: true,
   productsRead: true,
   productsFullControl: true,
+  creditNoteNoPermission: true,
+  creditNoteRead: true,
+  creditNoteFullControl: true,
+  creditNoteExport: true,
 });
 
 export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
