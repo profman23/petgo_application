@@ -1032,23 +1032,25 @@ export default function AdministrationAuthorization() {
 
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
+          {/* Authorization Management Header - aligned to far left and top */}
+          <div className="flex items-center gap-4 p-4">
+            <div className="flex-shrink-0">
+              <lord-icon 
+                src="https://cdn.lordicon.com/gjlzobte.json" 
+                trigger="hover" 
+                colors="primary:#852085,secondary:#545454" 
+                style={{ width: '80px', height: '80px' }}
+              />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+              {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
+            </h1>
+          </div>
+
           <div className="max-w-7xl mx-auto py-6 px-6" style={{ paddingLeft: '18px', paddingRight: '18px' }}>
             <div className="px-4 py-6 sm:px-0">
-              {/* Authorization Management Header - positioned like Credit Note */}
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0">
-                    <lord-icon 
-                      src="https://cdn.lordicon.com/gjlzobte.json" 
-                      trigger="hover" 
-                      colors="primary:#852085,secondary:#545454" 
-                      style={{ width: '80px', height: '80px' }}
-                    />
-                  </div>
-                  <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
-                    {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
-                  </h1>
-                </div>
+              {/* Add Authorization Button */}
+              <div className="flex justify-end mb-8">
                 <button
                   onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
                   disabled={!!isReadOnly}
