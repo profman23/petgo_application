@@ -1,0 +1,44 @@
+<div data-replit-metadata="client/src/pages/administration-authorization.tsx:1037:14" 
+     data-component-name="div" 
+     class="bg-white shadow rounded-lg">
+  <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1038:16" 
+       data-component-name="div" 
+       class="px-4 py-5 sm:p-6 bg-gray-50">
+    <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1039:18" 
+         data-component-name="div" 
+         class="flex justify-between items-center mb-6 bg-gray-50 p-4 rounded-lg">
+      <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1040:20" 
+           data-component-name="div" 
+           class="flex items-center gap-4 ">
+        <lord-icon src="https://cdn.lordicon.com/gjlzobte.json" 
+                   trigger="hover" 
+                   colors="primary:#852085,secondary:#545454" 
+                   style="width: 80px; height: 80px;">
+        </lord-icon>
+        <h1 class="text-2xl font-bold text-gray-600" 
+            style="font-family: Arimo;">
+          Authorization Management
+        </h1>
+      </div>
+      <button class="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 border-purple-600 bg-white text-purple-600 hover:bg-purple-50">
+        <svg xmlns="http://www.w3.org/2000/svg" 
+             width="24" height="24" 
+             viewBox="0 0 24 24" 
+             fill="none" 
+             stroke="currentColor" 
+             stroke-width="2" 
+             stroke-linecap="round" 
+             stroke-linejoin="round" 
+             class="lucide lucide-file-plus w-5 h-5" 
+             style="color: rgb(133, 32, 133);">
+          <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
+          <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
+          <path d="M9 15h6"></path>
+          <path d="M12 18v-6"></path>
+        </svg>
+        Add New Authorization
+      </button>
+    </div>
+    ...
+  </div>
+</div>

@@ -1034,7 +1034,7 @@ export default function AdministrationAuthorization() {
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto py-6 px-6" style={{ paddingLeft: '18px', paddingRight: '18px' }}>
             <div className="px-4 py-6 sm:px-0">
-              <div className="bg-white shadow rounded-lg">
+              <div className="bg-white rounded-lg">
                 <div className="px-4 py-5 sm:p-6 bg-gray-50">
                   <div className="flex justify-between items-center mb-6 bg-gray-50 p-4 rounded-lg">
                     <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
