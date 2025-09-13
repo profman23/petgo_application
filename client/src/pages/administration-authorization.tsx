@@ -1149,7 +1149,7 @@ export default function AdministrationAuthorization() {
                 {(authorizations as any[]).map((auth: any) => (
                   <div
                     key={auth.id}
-                    className="bg-white border border-gray-200 rounded-lg p-8 hover:shadow-md transition-shadow"
+                    className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1 flex items-center gap-3">
