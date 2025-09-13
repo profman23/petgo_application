@@ -1081,7 +1081,7 @@ export default function AdministrationAuthorization() {
                       </p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
                       {(authorizations as any[]).map((auth: any) => (
                         <div
                           key={auth.id}
