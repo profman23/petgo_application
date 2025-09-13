@@ -1,0 +1,44 @@
+<input data-replit-metadata="client/src/pages/financial-credit-note.tsx:1317:16" data-component-name="Input" 
+type="text" 
+class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background 
+file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground 
+placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 
+md:text-sm w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] 
+focus-visible:ring-offset-2" 
+placeholder="Search by customer name, phone number, invoice number, credit note number, or posting date" 
+data-testid="input-search-credit-notes" dir="ltr" value="">
+
+<button data-replit-metadata="client/src/pages/financial-credit-note.tsx:1329:16" data-component-name="Button" 
+class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background 
+focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 
+h-10 flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 
+border-purple-600 bg-white text-purple-600 hover:bg-purple-50" 
+data-testid="button-search-credit-notes">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
+  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+  class="lucide lucide-search h-4 w-4 mr-2" data-replit-metadata="client/src/pages/financial-credit-note.tsx:1334:18" 
+  data-component-name="Search">
+    <circle cx="11" cy="11" r="8"></circle>
+    <path d="m21 21-4.3-4.3"></path>
+  </svg>
+  Search
+</button>
+
+<button data-replit-metadata="client/src/pages/financial-credit-note.tsx:1337:16" data-component-name="Button" 
+class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background 
+focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 
+text-primary-foreground h-10 flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 
+bg-white hover:bg-purple-50" data-testid="button-export-credit-notes" title="" 
+style="border-color: rgb(133, 32, 133); color: rgb(133, 32, 133);">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
+  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+  class="lucide lucide-download h-4 w-4 mr-2" data-replit-metadata="client/src/pages/financial-credit-note.tsx:1352:18" 
+  data-component-name="Download">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+    <polyline points="7 10 12 15 17 10"></polyline>
+    <line x1="12" x2="12" y1="15" y2="3"></line>
+  </svg>
+  Export
+</button>

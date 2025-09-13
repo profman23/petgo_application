@@ -4,10 +4,12 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit, Home, Menu, DollarSign, Receipt, FilePlus } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit, Home, Menu, DollarSign, Receipt, FilePlus, Search, Download } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 // Declare lord-icon custom element for TypeScript
@@ -52,6 +54,26 @@ export default function AdministrationAuthorization() {
   const [showAddAuthorizationPopup, setShowAddAuthorizationPopup] = useState(false);
   const [showNoPermissionPopup, setShowNoPermissionPopup] = useState(false);
   const [isNoPermissionDialogOpen, setIsNoPermissionDialogOpen] = useState(false);
+  
+  // Search state
+  const [searchInput, setSearchInput] = useState("");
+  
+  // Search handlers
+  const handleSearchClick = () => {
+    // Search functionality can be implemented here
+    console.log('Search clicked with:', searchInput);
+  };
+  
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearchClick();
+    }
+  };
+  
+  const handleExportClick = () => {
+    // Export functionality can be implemented here
+    console.log('Export clicked');
+  };
   
   // State for checkboxes - Users section
   const [hiddenUsersChecked, setHiddenUsersChecked] = useState(false);
@@ -1062,6 +1084,43 @@ export default function AdministrationAuthorization() {
               <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
               {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
             </button>
+          </div>
+
+          {/* Search Field */}
+          <div className="px-8 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder={language === 'ar' ? 'البحث بحسب اسم التصريح أو المستخدم' : 'Search by authorization name or user'}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
+                  data-testid="input-search-authorizations"
+                  dir={getDirection(language)}
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button
+                  onClick={handleSearchClick}
+                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                  data-testid="button-search-authorizations"
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'بحث' : 'Search'}
+                </Button>
+                <Button
+                  onClick={handleExportClick}
+                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
+                  data-testid="button-export-authorizations"
+                  style={{ borderColor: '#852085', color: '#852085' }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'تصدير' : 'Export'}
+                </Button>
+              </div>
+            </div>
           </div>
 
           <div className="max-w-7xl mx-auto py-6 px-6" style={{ paddingLeft: '18px', paddingRight: '18px' }}>
