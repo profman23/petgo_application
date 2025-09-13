@@ -127,6 +127,31 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
     refetchOnReconnect: 'always',
   });
 
+  // DEFAULT-DENY LOGIC: Only allow access if user has explicit read or full control permission  
+  // Redirect in useEffect to avoid state updates during render - MUST be called before conditional returns
+  useEffect(() => {
+    if (currentUserPermissions) {
+      // Check for explicit "No Permission" flag
+      if (currentUserPermissions.creditNoteNoPermission === true) {
+        console.log('🚫 [PERMS_GATE] REDIRECTING: User has explicit no permission for Credit Note');
+        setLocation('/admin-home');
+        return;
+      }
+
+      // Check if user has any valid Credit Note permissions
+      const hasValidPermission = currentUserPermissions.creditNoteRead === true || 
+                                 currentUserPermissions.creditNoteFullControl === true;
+      
+      if (!hasValidPermission) {
+        console.log('🚫 [PERMS_GATE] REDIRECTING: User lacks valid Credit Note permissions');
+        setLocation('/admin-home');
+        return;
+      }
+
+      console.log('✅ [PERMS_GATE] ALLOWING: User has valid Credit Note permissions');
+    }
+  }, [currentUserPermissions, setLocation]);
+
   // Show loading while fetching permissions
   if (isLoading || !adminToken) {
     return (
@@ -154,31 +179,6 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
     creditNoteFullControl: currentUserPermissions?.creditNoteFullControl,
     hasNoPermField: currentUserPermissions?.hasOwnProperty('creditNoteNoPermission')
   });
-
-  // DEFAULT-DENY LOGIC: Only allow access if user has explicit read or full control permission  
-  // Redirect in useEffect to avoid state updates during render
-  useEffect(() => {
-    if (currentUserPermissions) {
-      // Check for explicit "No Permission" flag
-      if (currentUserPermissions.creditNoteNoPermission === true) {
-        console.log('🚫 [PERMS_GATE] REDIRECTING: User has explicit no permission for Credit Note');
-        setLocation('/admin-home');
-        return;
-      }
-
-      // Check if user has any valid Credit Note permissions
-      const hasValidPermission = currentUserPermissions.creditNoteRead === true || 
-                                 currentUserPermissions.creditNoteFullControl === true;
-      
-      if (!hasValidPermission) {
-        console.log('🚫 [PERMS_GATE] REDIRECTING: User lacks valid Credit Note permissions');
-        setLocation('/admin-home');
-        return;
-      }
-
-      console.log('✅ [PERMS_GATE] ALLOWING: User has valid Credit Note permissions');
-    }
-  }, [currentUserPermissions, setLocation]);
 
   // DEFAULT-DENY: Only render children if user has explicit permissions
   const hasValidPermission = currentUserPermissions && (
