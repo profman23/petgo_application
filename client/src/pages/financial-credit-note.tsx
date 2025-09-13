@@ -275,19 +275,27 @@ export default function FinancialCreditNote() {
       const response = await fetch("/api/admin/current-user-permissions", {
         headers: {
           Authorization: `Bearer ${adminToken}`,
+          'Cache-Control': 'no-cache',
         },
       });
       if (!response.ok) throw new Error("Failed to fetch permissions");
       return response.json();
     },
     enabled: !!adminToken,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache the data
   });
 
   // Permission check - redirect users with "No Permission" for Credit Note
   useEffect(() => {
-    if (currentUserPermissions && currentUserPermissions.creditNoteNoPermission === true) {
-      console.log('🚫 User has no permission for Credit Note - redirecting to admin home');
-      setLocation('/admin-home');
+    if (currentUserPermissions) {
+      console.log('🔍 Current user permissions:', currentUserPermissions);
+      console.log('🔍 Credit Note No Permission status:', currentUserPermissions.creditNoteNoPermission);
+      
+      if (currentUserPermissions.creditNoteNoPermission === true) {
+        console.log('🚫 User has no permission for Credit Note - redirecting to admin home');
+        setLocation('/admin-home');
+      }
     }
   }, [currentUserPermissions, setLocation]);
 

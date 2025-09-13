@@ -3030,7 +3030,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         servicesFullControl: authorizations.servicesFullControl,
         productsHidden: authorizations.productsHidden,
         productsRead: authorizations.productsRead,
-        productsFullControl: authorizations.productsFullControl
+        productsFullControl: authorizations.productsFullControl,
+        creditNoteNoPermission: authorizations.creditNoteNoPermission,
+        creditNoteRead: authorizations.creditNoteRead,
+        creditNoteFullControl: authorizations.creditNoteFullControl,
+        creditNoteExport: authorizations.creditNoteExport
       })
       .from(adminUsers)
       .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
@@ -3067,9 +3071,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           servicesFullControl: true,
           productsHidden: false,
           productsRead: true,
-          productsFullControl: true
+          productsFullControl: true,
+          creditNoteNoPermission: false,
+          creditNoteRead: true,
+          creditNoteFullControl: true,
+          creditNoteExport: true
         };
       }
+      
+      // Set cache control headers to prevent stale permission data
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      
+      // Debug: Log Credit Note permissions for troubleshooting
+      console.log('🔍 [BACKEND] Permissions for user:', permissions.username, 'Credit Note:', {
+        creditNoteNoPermission: permissions.creditNoteNoPermission,
+        creditNoteRead: permissions.creditNoteRead,
+        creditNoteFullControl: permissions.creditNoteFullControl,
+        creditNoteExport: permissions.creditNoteExport
+      });
       
       res.json(permissions);
     } catch (error) {

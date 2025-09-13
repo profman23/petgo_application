@@ -42,6 +42,7 @@ import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 
 // Check for expired tokens on app start (skip for admin routes)
 const checkAndClearExpiredTokens = async () => {
@@ -95,6 +96,102 @@ if (token) {
       }
     }
   });
+}
+
+// Credit Note Permission Gate
+function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
+  const [, setLocation] = useLocation();
+  const adminToken = localStorage.getItem("adminToken");
+
+  const { data: currentUserPermissions, isLoading, error } = useQuery({
+    queryKey: ["/api/admin/current-user-permissions", Date.now()], // Add timestamp for cache busting
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/current-user-permissions?_t=${Date.now()}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error("Failed to fetch permissions");
+      return response.json();
+    },
+    enabled: !!adminToken,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: 'always',
+    refetchOnReconnect: 'always',
+  });
+
+  // Show loading while fetching permissions
+  if (isLoading || !adminToken) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">Loading permissions...</div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    console.error('[PERMS_GATE] Permission fetch failed:', error);
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-red-600">Error loading permissions</div>
+      </div>
+    );
+  }
+
+  // Debug: Log received permissions
+  console.log('[PERMS_GATE] User permissions received:', {
+    username: currentUserPermissions?.username,
+    creditNoteNoPermission: currentUserPermissions?.creditNoteNoPermission,
+    creditNoteRead: currentUserPermissions?.creditNoteRead,
+    creditNoteFullControl: currentUserPermissions?.creditNoteFullControl,
+    hasNoPermField: currentUserPermissions?.hasOwnProperty('creditNoteNoPermission')
+  });
+
+  // DEFAULT-DENY LOGIC: Only allow access if user has explicit read or full control permission
+  // Redirect in useEffect to avoid state updates during render
+  React.useEffect(() => {
+    if (currentUserPermissions) {
+      // Check for explicit "No Permission" flag
+      if (currentUserPermissions.creditNoteNoPermission === true) {
+        console.log('🚫 [PERMS_GATE] REDIRECTING: User has explicit no permission for Credit Note');
+        setLocation('/admin-home');
+        return;
+      }
+
+      // Check if user has any valid Credit Note permissions
+      const hasValidPermission = currentUserPermissions.creditNoteRead === true || 
+                                 currentUserPermissions.creditNoteFullControl === true;
+      
+      if (!hasValidPermission) {
+        console.log('🚫 [PERMS_GATE] REDIRECTING: User lacks valid Credit Note permissions');
+        setLocation('/admin-home');
+        return;
+      }
+
+      console.log('✅ [PERMS_GATE] ALLOWING: User has valid Credit Note permissions');
+    }
+  }, [currentUserPermissions, setLocation]);
+
+  // DEFAULT-DENY: Only render children if user has explicit permissions
+  const hasValidPermission = currentUserPermissions && (
+    currentUserPermissions.creditNoteRead === true || 
+    currentUserPermissions.creditNoteFullControl === true
+  ) && currentUserPermissions.creditNoteNoPermission !== true;
+
+  if (!hasValidPermission) {
+    // Don't render anything while redirect is happening
+    return null;
+  }
+
+  return <>{children}</>;
 }
 
 function AuthCheck({ children }: { children: React.ReactNode }) {
@@ -156,7 +253,7 @@ function Router() {
           <Route path="/administration/users" component={AdministrationUsers} />
           <Route path="/administration/authorization" component={AdministrationAuthorization} />
           <Route path="/sales-reports" component={SalesReports} />
-          <Route path="/financial/credit-note" component={FinancialCreditNote} />
+          <Route path="/financial/credit-note" component={() => <CreditNotePermissionGate><FinancialCreditNote /></CreditNotePermissionGate>} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
