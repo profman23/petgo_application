@@ -299,6 +299,11 @@ export default function FinancialCreditNote() {
     }
   }, [currentUserPermissions, setLocation]);
 
+  // Determine if user is in READ-ONLY mode (has read access but not full control)
+  const isReadOnlyMode = currentUserPermissions && 
+    currentUserPermissions.creditNoteRead === true && 
+    currentUserPermissions.creditNoteFullControl !== true;
+
   // Fetch all VetsVan requests for notification counter
   const { data: allVetsVanRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
@@ -1285,12 +1290,19 @@ export default function FinancialCreditNote() {
             <button
               ref={createButtonRef}
               onClick={async () => {
+                if (isReadOnlyMode) return; // Prevent action in read-only mode
                 await fetchNextCreditNoteNumber();
                 setIsCreateCreditNoteModalOpen(true);
               }}
-              className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50 flex items-center gap-2"
+              disabled={isReadOnlyMode}
+              className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+                isReadOnlyMode 
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed' 
+                  : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+              }`}
+              title={isReadOnlyMode ? (language === 'ar' ? 'غير مسموح - صلاحية القراءة فقط' : 'Not allowed - Read-only permission') : ''}
             >
-              <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+              <FilePlus className="h-4 w-4" style={{ color: isReadOnlyMode ? '#9CA3AF' : '#852085' }} />
               {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
             </button>
           </div>
@@ -1320,13 +1332,19 @@ export default function FinancialCreditNote() {
                   {language === 'ar' ? 'بحث' : 'Search'}
                 </Button>
                 <Button
-                  onClick={handleExportToExcel}
-                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
+                  onClick={isReadOnlyMode ? undefined : handleExportToExcel}
+                  disabled={isReadOnlyMode}
+                  className={`flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
+                    isReadOnlyMode 
+                      ? 'bg-gray-100 hover:bg-gray-100 cursor-not-allowed' 
+                      : 'bg-white hover:bg-purple-50'
+                  }`}
                   style={{ 
-                    borderColor: '#852085', 
-                    color: '#852085'
+                    borderColor: isReadOnlyMode ? '#D1D5DB' : '#852085', 
+                    color: isReadOnlyMode ? '#9CA3AF' : '#852085'
                   }}
                   data-testid="button-export-credit-notes"
+                  title={isReadOnlyMode ? (language === 'ar' ? 'غير مسموح - صلاحية القراءة فقط' : 'Not allowed - Read-only permission') : ''}
                 >
                   <Download className="h-4 w-4 mr-2" />
                   {language === 'ar' ? 'تصدير' : 'Export'}
