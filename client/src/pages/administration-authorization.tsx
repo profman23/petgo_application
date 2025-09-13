@@ -1154,6 +1154,7 @@ export default function AdministrationAuthorization() {
                         <div
                           key={auth.id}
                           className="bg-white border border-gray-200 rounded-lg p-8 hover:shadow-md transition-shadow"
+                          style={{ width: '1091px' }}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1 flex items-center gap-3">
