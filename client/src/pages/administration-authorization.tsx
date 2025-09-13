@@ -1034,33 +1034,38 @@ export default function AdministrationAuthorization() {
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto py-6 px-6" style={{ paddingLeft: '18px', paddingRight: '18px' }}>
             <div className="px-4 py-6 sm:px-0">
+              {/* Authorization Management Header - positioned like Credit Note */}
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0">
+                    <lord-icon 
+                      src="https://cdn.lordicon.com/gjlzobte.json" 
+                      trigger="hover" 
+                      colors="primary:#852085,secondary:#545454" 
+                      style={{ width: '80px', height: '80px' }}
+                    />
+                  </div>
+                  <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+                    {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
+                  </h1>
+                </div>
+                <button
+                  onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
+                  disabled={!!isReadOnly}
+                  className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+                    isReadOnly 
+                      ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                      : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+                  }`}
+                >
+                  <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
+                  {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+                </button>
+              </div>
+
+              {/* Authorization Content */}
               <div className="bg-white rounded-lg">
                 <div className="px-4 py-5 sm:p-6 bg-gray-50">
-                  <div className="flex justify-between items-center mb-6 bg-gray-50 p-4 rounded-lg">
-                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-                      <lord-icon 
-                        src="https://cdn.lordicon.com/gjlzobte.json" 
-                        trigger="hover" 
-                        colors="primary:#852085,secondary:#545454" 
-                        style={{ width: '80px', height: '80px' }}
-                      />
-                      <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
-                        {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
-                      </h1>
-                    </div>
-                    <button
-                      onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
-                      disabled={!!isReadOnly}
-                      className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
-                        isReadOnly 
-                          ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                          : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
-                      }`}
-                    >
-                      <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
-                      {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
-                    </button>
-                  </div>
                   {authorizationsLoading ? (
                     <div className="text-center py-12">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
