@@ -1088,7 +1088,7 @@ export default function AdministrationAuthorization() {
 
           {/* Search Field */}
           <div className="px-4 mb-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3" style={{ width: '1166px' }}>
               <div className="flex-1">
                 <Input
                   type="text"
