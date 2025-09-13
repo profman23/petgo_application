@@ -203,6 +203,10 @@ export default function AdministrationAuthorization() {
     setProductsHiddenChecked(false);
     setProductsReadChecked(false);
     setProductsFullControlChecked(false);
+    setCreditNoteNoPermissionChecked(false);
+    setCreditNoteReadChecked(false);
+    setCreditNoteFullControlChecked(false);
+    setCreditNoteExportChecked(false);
   };
 
   // Handle save authorization
@@ -238,6 +242,10 @@ export default function AdministrationAuthorization() {
       productsHidden: productsHiddenChecked,
       productsRead: productsReadChecked,
       productsFullControl: productsFullControlChecked,
+      creditNoteNoPermission: creditNoteNoPermissionChecked,
+      creditNoteRead: creditNoteReadChecked,
+      creditNoteFullControl: creditNoteFullControlChecked,
+      creditNoteExport: creditNoteExportChecked,
     };
 
     if (editingAuthorization) {
@@ -271,6 +279,10 @@ export default function AdministrationAuthorization() {
     setProductsHiddenChecked(auth.productsHidden || false);
     setProductsReadChecked(auth.productsRead || false);
     setProductsFullControlChecked(auth.productsFullControl || false);
+    setCreditNoteNoPermissionChecked(auth.creditNoteNoPermission || false);
+    setCreditNoteReadChecked(auth.creditNoteRead || false);
+    setCreditNoteFullControlChecked(auth.creditNoteFullControl || false);
+    setCreditNoteExportChecked(auth.creditNoteExport || false);
     setShowAddAuthorizationPopup(true);
   };
 
@@ -447,6 +459,42 @@ export default function AdministrationAuthorization() {
     if (checked) {
       // If Full Control is checked, automatically check Read
       setProductsReadChecked(true);
+    }
+  };
+
+  // Handlers for Credit Note section
+  const handleCreditNoteNoPermissionChange = (checked: boolean) => {
+    setCreditNoteNoPermissionChecked(checked);
+    if (checked) {
+      // If No Permission is checked, uncheck Read, Full Control, and Export
+      setCreditNoteReadChecked(false);
+      setCreditNoteFullControlChecked(false);
+      setCreditNoteExportChecked(false);
+    }
+  };
+
+  const handleCreditNoteReadChange = (checked: boolean) => {
+    setCreditNoteReadChecked(checked);
+    if (!checked) {
+      // If Read is unchecked, also uncheck Full Control and Export
+      setCreditNoteFullControlChecked(false);
+      setCreditNoteExportChecked(false);
+    }
+  };
+
+  const handleCreditNoteFullControlChange = (checked: boolean) => {
+    setCreditNoteFullControlChecked(checked);
+    if (checked) {
+      // If Full Control is checked, automatically check Read
+      setCreditNoteReadChecked(true);
+    }
+  };
+
+  const handleCreditNoteExportChange = (checked: boolean) => {
+    setCreditNoteExportChecked(checked);
+    if (checked) {
+      // If Export is checked, automatically check Read
+      setCreditNoteReadChecked(true);
     }
   };
 
@@ -1355,7 +1403,7 @@ export default function AdministrationAuthorization() {
                         type="checkbox"
                         id="creditNoteNoPermission"
                         checked={creditNoteNoPermissionChecked}
-                        onChange={(e) => setCreditNoteNoPermissionChecked(e.target.checked)}
+                        onChange={(e) => handleCreditNoteNoPermissionChange(e.target.checked)}
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                       />
                       <label htmlFor="creditNoteNoPermission" className="ml-2 text-sm text-gray-600">
@@ -1370,7 +1418,7 @@ export default function AdministrationAuthorization() {
                         id="creditNoteRead"
                         checked={creditNoteReadChecked}
                         disabled={creditNoteNoPermissionChecked}
-                        onChange={(e) => setCreditNoteReadChecked(e.target.checked)}
+                        onChange={(e) => handleCreditNoteReadChange(e.target.checked)}
                         className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                       <label htmlFor="creditNoteRead" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -1385,7 +1433,7 @@ export default function AdministrationAuthorization() {
                         id="creditNoteFullControl"
                         checked={creditNoteFullControlChecked}
                         disabled={creditNoteNoPermissionChecked}
-                        onChange={(e) => setCreditNoteFullControlChecked(e.target.checked)}
+                        onChange={(e) => handleCreditNoteFullControlChange(e.target.checked)}
                         className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                       <label htmlFor="creditNoteFullControl" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -1400,7 +1448,7 @@ export default function AdministrationAuthorization() {
                         id="creditNoteExport"
                         checked={creditNoteExportChecked}
                         disabled={creditNoteNoPermissionChecked}
-                        onChange={(e) => setCreditNoteExportChecked(e.target.checked)}
+                        onChange={(e) => handleCreditNoteExportChange(e.target.checked)}
                         className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       />
                       <label htmlFor="creditNoteExport" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
