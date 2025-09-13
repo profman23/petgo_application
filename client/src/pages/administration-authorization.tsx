@@ -1033,7 +1033,7 @@ export default function AdministrationAuthorization() {
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto relative">
           {/* Top Header Section */}
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between p-8">
             {/* Authorization Management Header - aligned to far left */}
             <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
