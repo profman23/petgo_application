@@ -1123,67 +1123,60 @@ export default function AdministrationAuthorization() {
             </div>
           </div>
 
-          <div className="max-w-7xl mx-auto py-6 px-6" style={{ paddingLeft: '18px', paddingRight: '18px' }}>
-            <div className="px-4 py-6 sm:px-0">
-
-              {/* Authorization Content */}
-              <div className="bg-white rounded-lg">
-                <div className="px-4 py-5 sm:p-6 bg-gray-50">
-                  {authorizationsLoading ? (
-                    <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-                      <p className="mt-2 text-sm text-gray-500">
-                        {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-                      </p>
-                    </div>
-                  ) : (authorizations as any[]).length === 0 ? (
-                    <div className="text-center py-12">
-                      <Shield className="mx-auto h-12 w-12 text-gray-400" />
-                      <h3 className="mt-2 text-sm font-medium text-gray-900">
-                        {language === 'ar' ? 'لا توجد تصريحات' : 'No Authorizations'}
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {language === 'ar' 
-                          ? 'اضغط على "إضافة تصريح جديد" لإنشاء تصريح جديد' 
-                          : 'Click "Add New Authorization" to create your first authorization'}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4 bg-gray-50 p-8 rounded-lg">
-                      {(authorizations as any[]).map((auth: any) => (
-                        <div
-                          key={auth.id}
-                          className="bg-white border border-gray-200 rounded-lg p-8 hover:shadow-md transition-shadow min-w-full"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1 flex items-center gap-3">
-                              <Shield className="h-6 w-6" style={{ color: '#852085' }} />
-                              <p className="text-lg font-medium" style={{ fontFamily: 'Arimo', color: '#26282b' }}>
-                                {language === 'ar' ? 'اسم التصريح: ' : 'Authorization Name: '}{auth.name}
-                              </p>
-                            </div>
-                            <div className="ml-4">
-                              <button
-                                onClick={isReadOnly ? undefined : () => handleEditAuthorization(auth)}
-                                disabled={!!isReadOnly}
-                                className={`p-2 rounded-full transition-colors ${
-                                  isReadOnly 
-                                    ? 'text-gray-300 cursor-not-allowed opacity-50'
-                                    : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
-                                }`}
-                                title={language === 'ar' ? 'تعديل' : 'Edit'}
-                              >
-                                <Edit className="h-5 w-5" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          {/* Authorization Content */}
+          <div className="px-8 mb-6">
+            {authorizationsLoading ? (
+              <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+                <p className="mt-2 text-sm text-gray-500">
+                  {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+                </p>
               </div>
-            </div>
+            ) : (authorizations as any[]).length === 0 ? (
+              <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <Shield className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">
+                  {language === 'ar' ? 'لا توجد تصريحات' : 'No Authorizations'}
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  {language === 'ar' 
+                    ? 'اضغط على "إضافة تصريح جديد" لإنشاء تصريح جديد' 
+                    : 'Click "Add New Authorization" to create your first authorization'}
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4 bg-gray-50 p-8 rounded-lg">
+                {(authorizations as any[]).map((auth: any) => (
+                  <div
+                    key={auth.id}
+                    className="bg-white border border-gray-200 rounded-lg p-8 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 flex items-center gap-3">
+                        <Shield className="h-6 w-6" style={{ color: '#852085' }} />
+                        <p className="text-lg font-medium" style={{ fontFamily: 'Arimo', color: '#26282b' }}>
+                          {language === 'ar' ? 'اسم التصريح: ' : 'Authorization Name: '}{auth.name}
+                        </p>
+                      </div>
+                      <div className="ml-4">
+                        <button
+                          onClick={isReadOnly ? undefined : () => handleEditAuthorization(auth)}
+                          disabled={!!isReadOnly}
+                          className={`p-2 rounded-full transition-colors ${
+                            isReadOnly 
+                              ? 'text-gray-300 cursor-not-allowed opacity-50'
+                              : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
+                          }`}
+                          title={language === 'ar' ? 'تعديل' : 'Edit'}
+                        >
+                          <Edit className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
