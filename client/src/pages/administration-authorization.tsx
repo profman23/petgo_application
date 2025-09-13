@@ -1089,67 +1089,9 @@ export default function AdministrationAuthorization() {
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                                {auth.name}
-                              </h3>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Users Permissions */}
-                                <div>
-                                  <h4 className="text-sm font-medium text-gray-700 mb-2">
-                                    {language === 'ar' ? 'المستخدمين:' : 'Users:'}
-                                  </h4>
-                                  <div className="flex flex-wrap gap-2">
-                                    {auth.usersHidden && (
-                                      <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
-                                        {language === 'ar' ? 'مخفي' : 'Hidden'}
-                                      </span>
-                                    )}
-                                    {auth.usersRead && (
-                                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
-                                        {language === 'ar' ? 'قراءة' : 'Read'}
-                                      </span>
-                                    )}
-                                    {auth.usersFullControl && (
-                                      <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
-                                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                                      </span>
-                                    )}
-                                    {!auth.usersHidden && !auth.usersRead && !auth.usersFullControl && (
-                                      <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
-                                        {language === 'ar' ? 'لا توجد صلاحيات' : 'No permissions'}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                                {/* Authorization Permissions */}
-                                <div>
-                                  <h4 className="text-sm font-medium text-gray-700 mb-2">
-                                    {language === 'ar' ? 'التصريحات:' : 'Authorization:'}
-                                  </h4>
-                                  <div className="flex flex-wrap gap-2">
-                                    {auth.authHidden && (
-                                      <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded">
-                                        {language === 'ar' ? 'مخفي' : 'Hidden'}
-                                      </span>
-                                    )}
-                                    {auth.authRead && (
-                                      <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
-                                        {language === 'ar' ? 'قراءة' : 'Read'}
-                                      </span>
-                                    )}
-                                    {auth.authFullControl && (
-                                      <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
-                                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                                      </span>
-                                    )}
-                                    {!auth.authHidden && !auth.authRead && !auth.authFullControl && (
-                                      <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">
-                                        {language === 'ar' ? 'لا توجد صلاحيات' : 'No permissions'}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
+                              <p className="text-lg font-medium text-gray-900">
+                                {language === 'ar' ? 'اسم التصريح:' : 'Authorization Name:'} {auth.name}
+                              </p>
                             </div>
                             <div className="ml-4">
                               <button
@@ -1165,17 +1107,6 @@ export default function AdministrationAuthorization() {
                                 <Edit className="h-5 w-5" />
                               </button>
                             </div>
-                          </div>
-                          <div className="mt-3 text-xs text-gray-500">
-                            {language === 'ar' ? 'تم الإنشاء في:' : 'Created:'} {new Date(auth.created_at).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                            {auth.updated_at && new Date(auth.updated_at) > new Date(auth.created_at) && (
-                              <span className="mx-2">•</span>
-                            )}
-                            {auth.updated_at && new Date(auth.updated_at) > new Date(auth.created_at) && (
-                              <span>
-                                {language === 'ar' ? 'تم التحديث:' : 'Updated:'} {new Date(auth.updated_at).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                              </span>
-                            )}
                           </div>
                         </div>
                       ))}
