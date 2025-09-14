@@ -222,7 +222,8 @@ export default function FinancialOutgoingPayment() {
       {isMobile && (
         <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
           <SheetTrigger asChild>
-            <button className="fixed top-4 left-4 z-50 p-2 bg-white rounded-md shadow-lg lg:hidden">
+            {/* Hidden trigger - mobile menu would be opened programmatically if needed */}
+            <button className="hidden">
               <Menu className="h-6 w-6" />
             </button>
           </SheetTrigger>
