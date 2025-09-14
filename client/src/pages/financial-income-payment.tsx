@@ -235,9 +235,10 @@ export default function FinancialIncomePayment() {
 
             {/* Reports */}
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 setLocation('/admin-dashboard?tab=reports');
-                setIsMobileSidebarOpen(false);
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
@@ -260,7 +261,13 @@ export default function FinancialIncomePayment() {
             {/* New Reports & Analytics Dropdown */}
             <div className="mb-2">
               <button
-                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isNewReportsExpanded;
+                  setIsNewReportsExpanded(newState);
+                  localStorage.setItem('isNewReportsExpanded', JSON.stringify(newState));
+                }}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
                 <TrendingUp className="h-6 w-6 flex-shrink-0" />
@@ -278,9 +285,10 @@ export default function FinancialIncomePayment() {
               {isNewReportsExpanded && (
                 <div className="ml-6 mt-1 space-y-1">
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       setLocation('/new-reports-analytics/sales-report');
-                      setIsMobileSidebarOpen(false);
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
