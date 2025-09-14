@@ -613,9 +613,9 @@ export default function FinancialOutgoingPayment() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             {/* Top Row - Title on Left, Posting Date on Right */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6" dir="ltr">
               {/* Left Side - Title and Customer Info */}
-              <div className="space-y-4">
+              <div className="space-y-4" dir={getDirection(language)}>
                 <div className="flex items-center gap-4">
                   <lord-icon 
                     src="https://cdn.lordicon.com/uemybdyy.json" 
@@ -654,7 +654,7 @@ export default function FinancialOutgoingPayment() {
               </div>
               
               {/* Right Side - Posting Date */}
-              <div className="space-y-4">
+              <div className="space-y-4" dir={getDirection(language)}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <Calendar className="inline h-4 w-4 mr-2" />
