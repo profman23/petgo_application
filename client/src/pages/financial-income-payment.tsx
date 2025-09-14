@@ -781,56 +781,64 @@ export default function FinancialIncomePayment() {
               </div>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {language === 'ar' ? 'الوصف' : 'Description'}
-              </label>
-              <textarea 
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
-              />
-            </div>
-            
-            {/* Payment Method */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
-              </label>
-              <div className="flex gap-6">
-                <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="paymentMethod" 
-                    value="cash"
-                    className="mr-2 text-purple-600 focus:ring-purple-500"
+            {/* Description and Payment Method Grid - Force LTR layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="ltr">
+              {/* Description - Full width */}
+              <div className="md:col-span-2">
+                <div dir={getDirection(language)}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'الوصف' : 'Description'}
+                  </label>
+                  <textarea 
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
                   />
-                  <span className="text-sm text-gray-700">
-                    {language === 'ar' ? 'نقداً' : 'Cash'}
-                  </span>
-                </label>
-                <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="paymentMethod" 
-                    value="card"
-                    className="mr-2 text-purple-600 focus:ring-purple-500"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {language === 'ar' ? 'بطاقة' : 'Card'}
-                  </span>
-                </label>
-                <label className="flex items-center">
-                  <input 
-                    type="radio" 
-                    name="paymentMethod" 
-                    value="bank"
-                    className="mr-2 text-purple-600 focus:ring-purple-500"
-                  />
-                  <span className="text-sm text-gray-700">
-                    {language === 'ar' ? 'تحويل مصرفي' : 'Bank Transfer'}
-                  </span>
-                </label>
+                </div>
+              </div>
+              
+              {/* Payment Method - Force to left column */}
+              <div className="md:col-start-1 md:col-span-1">
+                <div dir={getDirection(language)}>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
+                  </label>
+                  <div className={`flex gap-6 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className="flex items-center">
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="cash"
+                        className="mr-2 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {language === 'ar' ? 'نقداً' : 'Cash'}
+                      </span>
+                    </label>
+                    <label className="flex items-center">
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="card"
+                        className="mr-2 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {language === 'ar' ? 'بطاقة' : 'Card'}
+                      </span>
+                    </label>
+                    <label className="flex items-center">
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value="bank"
+                        className="mr-2 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {language === 'ar' ? 'تحويل مصرفي' : 'Bank Transfer'}
+                      </span>
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
             
