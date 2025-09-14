@@ -624,7 +624,7 @@ export default function FinancialIncomePayment() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-8">
           {/* Content Header */}
           <div className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-4">
@@ -662,12 +662,6 @@ export default function FinancialIncomePayment() {
             </button>
           </div>
 
-          {/* Content placeholder - can be expanded later */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <p className="text-gray-500 text-center">
-              {language === 'ar' ? 'محتوى صفحة الدفع الوارد سيتم إضافته هنا' : 'Income Payment content will be added here'}
-            </p>
-          </div>
         </div>
       </div>
     </div>
