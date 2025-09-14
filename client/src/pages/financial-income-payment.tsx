@@ -641,11 +641,8 @@ export default function FinancialIncomePayment() {
               {/* Page Title */}
               <div>
                 <h1 
-                  className="text-2xl font-semibold text-gray-900"
-                  style={{ 
-                    fontFamily: 'Arimo', 
-                    color: '#26282b' 
-                  }}
+                  className="text-2xl font-bold text-gray-600"
+                  style={{ fontFamily: 'Arimo' }}
                 >
                   {language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}
                 </h1>
