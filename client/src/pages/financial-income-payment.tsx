@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus, Bell, Volume2, VolumeX, Truck } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -52,6 +53,7 @@ export default function FinancialIncomePayment() {
   });
   
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const isMobile = useIsMobile();
   
 
@@ -677,6 +679,7 @@ export default function FinancialIncomePayment() {
 
             {/* Create Income Payment Button */}
             <button
+              onClick={() => setIsCreateModalOpen(true)}
               className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
               data-testid="button-create-income-payment"
             >
@@ -687,6 +690,76 @@ export default function FinancialIncomePayment() {
 
         </div>
       </div>
+
+      {/* Create Income Payment Modal */}
+      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center gap-4 mb-6">
+              <lord-icon 
+                src="https://cdn.lordicon.com/uemybdyy.json" 
+                trigger="hover" 
+                colors="primary:#852085,secondary:#848484" 
+                style={{ width: '80px', height: '80px' }}>
+              </lord-icon>
+              <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+                {language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}
+              </h1>
+            </div>
+          </DialogHeader>
+          
+          {/* Modal Content - Identical structure for both modals */}
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'المرجع' : 'Reference'}
+                </label>
+                <input 
+                  type="text" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder={language === 'ar' ? 'أدخل المرجع' : 'Enter reference'}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'المبلغ' : 'Amount'}
+                </label>
+                <input 
+                  type="number" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder={language === 'ar' ? 'أدخل المبلغ' : 'Enter amount'}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {language === 'ar' ? 'الوصف' : 'Description'}
+              </label>
+              <textarea 
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
+              />
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-4">
+              <button
+                onClick={() => setIsCreateModalOpen(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+              <button
+                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+              >
+                {language === 'ar' ? 'حفظ' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
