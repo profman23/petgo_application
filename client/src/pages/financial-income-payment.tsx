@@ -4,7 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus, Bell, Volume2, VolumeX, Truck } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus, Bell, Volume2, VolumeX, Truck, TrendingDown } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -201,13 +201,13 @@ export default function FinancialIncomePayment() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <TrendingDown className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
                   </button>
                   <button
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
                   >
-                    <DollarSign className="h-5 w-5 flex-shrink-0 text-purple-600" />
+                    <TrendingUp className="h-5 w-5 flex-shrink-0 text-purple-600" />
                     <span className="text-purple-600">{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
                   <button
@@ -491,13 +491,13 @@ export default function FinancialIncomePayment() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <TrendingDown className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
                   </button>
                   <button
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
                   >
-                    <DollarSign className="h-5 w-5 flex-shrink-0 text-purple-600" />
+                    <TrendingUp className="h-5 w-5 flex-shrink-0 text-purple-600" />
                     <span className="text-purple-600">{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
                   <button

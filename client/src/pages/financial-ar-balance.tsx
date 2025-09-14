@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { 
   Home, Users, User, Shield, DollarSign, Car, Clock, 
   Upload, Stethoscope, Package, BarChart3, TrendingUp, FileText, Receipt,
-  ChevronDown, ChevronUp, Bell, Volume2, VolumeX, LogOut, Menu, FilePlus 
+  ChevronDown, ChevronUp, Bell, Volume2, VolumeX, LogOut, Menu, FilePlus, BanknoteArrowUp, ArrowDown 
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -176,7 +176,7 @@ export default function FinancialARBalance() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <ArrowDown className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
                   </button>
                   <button
@@ -186,7 +186,7 @@ export default function FinancialARBalance() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <BanknoteArrowUp className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
                   <button
@@ -466,7 +466,7 @@ export default function FinancialARBalance() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <ArrowDown className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
                   </button>
                   <button
@@ -477,7 +477,7 @@ export default function FinancialARBalance() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <BanknoteArrowUp className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
                   <button
