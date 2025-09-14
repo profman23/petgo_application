@@ -24,7 +24,7 @@ export default function AdminImport() {
   });
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
     const savedState = localStorage.getItem('isFinancialExpanded');
-    return savedState !== null ? JSON.parse(savedState) : false;
+    return savedState !== null ? JSON.parse(savedState) : true; // Default expanded for consistent Financial menu visibility
   });
 
   // Import-specific state - extracted from admin dashboard
@@ -58,7 +58,7 @@ export default function AdminImport() {
 
   // Monitor for new requests and update notification count
   useEffect(() => {
-    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
+    if (allVetsVanRequests && Array.isArray(allVetsVanRequests) && allVetsVanRequests.length > 0) {
       const currentCount = allVetsVanRequests.length;
       
       lastRequestCountRef.current = currentCount;
