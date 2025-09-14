@@ -758,16 +758,30 @@ export default function FinancialIncomePayment() {
           
           {/* Modal Content */}
           <div className="space-y-6">
-            {/* Reference Section - Single column, left aligned */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {language === 'ar' ? 'المرجع' : 'Reference'}
-              </label>
-              <input 
-                type="text" 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder={language === 'ar' ? 'أدخل المرجع' : 'Enter reference'}
-              />
+            {/* Reference and Transaction Type Section - 2 columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="ltr">
+              <div dir={getDirection(language)}>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'المرجع' : 'Reference'}
+                </label>
+                <input 
+                  type="text" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder={language === 'ar' ? 'أدخل المرجع' : 'Enter reference'}
+                />
+              </div>
+              <div dir={getDirection(language)}>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'نوع المعاملة' : 'Transaction Type'}
+                </label>
+                <select 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="invoice">
+                    {language === 'ar' ? 'فاتورة' : 'Invoice'}
+                  </option>
+                </select>
+              </div>
             </div>
             
             {/* Description and Payment Method Grid - Force LTR layout */}
