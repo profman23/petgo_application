@@ -654,7 +654,7 @@ export default function FinancialIncomePayment() {
               className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
               data-testid="button-create-income-payment"
             >
-              <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+              <FilePlus className="h-4 w-4" style={{ color: 'rgb(133, 32, 133)' }} />
               {language === 'ar' ? 'إنشاء دفع وارد' : 'Create Income Payment'}
             </button>
           </div>
