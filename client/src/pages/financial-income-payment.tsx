@@ -48,7 +48,7 @@ export default function FinancialIncomePayment() {
     if (savedState !== null) {
       return JSON.parse(savedState);
     }
-    return false; // Default to collapsed to maintain consistency
+    return true; // Default expanded for financial pages
   });
   
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -77,6 +77,11 @@ export default function FinancialIncomePayment() {
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
       {/* Mobile Sidebar Sheet */}
       <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 fixed top-4 right-4 z-50">
+            <Menu className="h-6 w-6" />
+          </button>
+        </SheetTrigger>
         <SheetContent side="left" className="w-64 p-0">
           <div className="p-4 border-b border-gray-200">
             <img 

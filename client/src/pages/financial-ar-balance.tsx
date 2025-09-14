@@ -52,7 +52,7 @@ export default function FinancialARBalance() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
       {/* Mobile Sidebar */}
       <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
         <SheetTrigger asChild className="md:hidden">

@@ -791,8 +791,7 @@ export default function FinancialCreditNote() {
       {/* Mobile menu sheet */}
       <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
         <SheetTrigger asChild>
-          {/* Hidden trigger - mobile menu would be opened programmatically if needed */}
-          <button className="hidden">
+          <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 fixed top-4 right-4 z-50">
             <Menu className="h-6 w-6" />
           </button>
         </SheetTrigger>
