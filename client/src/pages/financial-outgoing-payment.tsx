@@ -4,7 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit, Home, Menu, DollarSign, Receipt, FilePlus } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -46,10 +46,6 @@ export default function FinancialOutgoingPayment() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const isMobile = useIsMobile();
   
-  // State for tracking notifications and audio
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const lastRequestCountRef = useRef(0);
-  const [currentRequestCount, setCurrentRequestCount] = useState(0);
 
   // Lord-icon animation trigger state
   const [triggerAnimation, setTriggerAnimation] = useState("hover");
@@ -236,7 +232,7 @@ export default function FinancialOutgoingPayment() {
       </Sheet>
 
       {/* Main Content with Sidebar */}
-      <div className="flex">
+      <div className="flex" dir="ltr">
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-lg min-h-screen">
           <nav className="mt-4 px-2">
