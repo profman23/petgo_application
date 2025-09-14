@@ -231,6 +231,42 @@ export default function FinancialOutgoingPayment() {
         </SheetContent>
       </Sheet>
 
+      {/* Full-width Header with logo and controls */}
+      <div className="bg-white shadow-md border-b border-gray-200">
+        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+          {/* Logo */}
+          <div className="flex-shrink-0 -ml-6">
+            <img 
+              src={vetsVanLogo} 
+              alt="VETS VAN" 
+              className="h-14 w-auto object-contain"
+            />
+          </div>
+
+          {/* Mobile Menu Button */}
+          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+            <SheetTrigger asChild>
+              <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+                <Menu className="h-6 w-6" />
+              </button>
+            </SheetTrigger>
+          </Sheet>
+
+          {/* Header Controls */}
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              {language === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content with Sidebar */}
       <div className="flex" dir="ltr">
         {/* Sidebar */}
