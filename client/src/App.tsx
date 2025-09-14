@@ -34,6 +34,7 @@ import NewReportsAnalytics from "@/pages/new-reports-analytics";
 import VetsVanShifts from "@/pages/vets-van-shifts";
 import FinancialCreditNote from "@/pages/financial-credit-note";
 import FinancialOutgoingPayment from "@/pages/financial-outgoing-payment";
+import FinancialIncomePayment from "@/pages/financial-income-payment";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { PaymentTest } from "@/pages/payment-test";
@@ -256,6 +257,7 @@ function Router() {
           <Route path="/sales-reports" component={SalesReports} />
           <Route path="/financial/credit-note" component={() => <CreditNotePermissionGate><FinancialCreditNote /></CreditNotePermissionGate>} />
           <Route path="/financial/outgoing-payment" component={FinancialOutgoingPayment} />
+          <Route path="/financial/income-payment" component={FinancialIncomePayment} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
