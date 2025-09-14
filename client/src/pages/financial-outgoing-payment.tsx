@@ -214,7 +214,7 @@ export default function FinancialOutgoingPayment() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 flex" dir="ltr">
       {/* Desktop Sidebar */}
       {!isMobile && <Sidebar />}
 
@@ -234,7 +234,7 @@ export default function FinancialOutgoingPayment() {
 
       {/* Main Content */}
       <div className="flex-1 p-8">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-8">
           {/* Left side - Lord Icon and Title */}
           <div className="flex items-center gap-4">
             {/* Lord Icon */}
