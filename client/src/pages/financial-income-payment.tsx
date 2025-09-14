@@ -695,9 +695,9 @@ export default function FinancialIncomePayment() {
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            {/* Top Row - Title on Left, Posting Date on Right */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6" dir="ltr">
-              {/* Left Side - Title and Customer Info */}
+            {/* Top Row - Title on Left */}
+            <div className="mb-6" dir="ltr">
+              {/* Title and Customer/Posting Info */}
               <div className="space-y-4" dir={getDirection(language)}>
                 <div className="flex items-center gap-4">
                   <lord-icon 
@@ -711,42 +711,46 @@ export default function FinancialIncomePayment() {
                   </h1>
                 </div>
                 
-                {/* Customer Phone */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {language === 'ar' ? 'هاتف العميل' : 'Customer Phone'}
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
-                  />
-                </div>
-                
-                {/* Customer Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {language === 'ar' ? 'اسم العميل' : 'Customer Name'}
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
-                  />
-                </div>
-              </div>
-              
-              {/* Right Side - Posting Date */}
-              <div className="space-y-4" dir={getDirection(language)}>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Calendar className="inline h-4 w-4 mr-2" />
-                    {language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date'}
-                  </label>
-                  <input 
-                    type="date" 
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
+                {/* Customer Fields and Posting Date in same row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Left: Customer Fields */}
+                  <div className="space-y-3">
+                    {/* Customer Phone - Horizontal Layout */}
+                    <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                        {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
+                      </label>
+                      <input 
+                        type="text" 
+                        className="flex-1 w-full md:max-w-[200px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
+                      />
+                    </div>
+                    
+                    {/* Customer Name - Horizontal Layout */}
+                    <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                        {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
+                      </label>
+                      <input 
+                        type="text" 
+                        className="flex-1 w-full md:max-w-[200px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Right: Posting Date - Aligned with Customer Phone level */}
+                  <div className={`flex items-center gap-3 mt-1 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className={`text-sm font-medium text-gray-700 flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <Calendar className="h-4 w-4" />
+                      {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
+                    </label>
+                    <input 
+                      type="date" 
+                      className="w-full md:max-w-[160px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -786,6 +790,48 @@ export default function FinancialIncomePayment() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
               />
+            </div>
+            
+            {/* Payment Method */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
+              </label>
+              <div className="flex gap-6">
+                <label className="flex items-center">
+                  <input 
+                    type="radio" 
+                    name="paymentMethod" 
+                    value="cash"
+                    className="mr-2 text-purple-600 focus:ring-purple-500"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {language === 'ar' ? 'نقداً' : 'Cash'}
+                  </span>
+                </label>
+                <label className="flex items-center">
+                  <input 
+                    type="radio" 
+                    name="paymentMethod" 
+                    value="card"
+                    className="mr-2 text-purple-600 focus:ring-purple-500"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {language === 'ar' ? 'بطاقة' : 'Card'}
+                  </span>
+                </label>
+                <label className="flex items-center">
+                  <input 
+                    type="radio" 
+                    name="paymentMethod" 
+                    value="bank"
+                    className="mr-2 text-purple-600 focus:ring-purple-500"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {language === 'ar' ? 'تحويل مصرفي' : 'Bank Transfer'}
+                  </span>
+                </label>
+              </div>
             </div>
             
             {/* Footer with Payment Icon */}
