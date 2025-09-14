@@ -5,7 +5,7 @@ import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus, Bell, Volume2, VolumeX } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus, Bell, Volume2, VolumeX, ArrowUpRight, Calendar } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -612,20 +612,64 @@ export default function FinancialOutgoingPayment() {
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center gap-4 mb-6">
-              <lord-icon 
-                src="https://cdn.lordicon.com/uemybdyy.json" 
-                trigger="hover" 
-                colors="primary:#852085,secondary:#848484" 
-                style={{ width: '80px', height: '80px' }}>
-              </lord-icon>
-              <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
-                {language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}
-              </h1>
+            {/* Top Row - Title on Left, Posting Date on Right */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Left Side - Title and Customer Info */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <lord-icon 
+                    src="https://cdn.lordicon.com/uemybdyy.json" 
+                    trigger="hover" 
+                    colors="primary:#852085,secondary:#848484" 
+                    style={{ width: '80px', height: '80px' }}>
+                  </lord-icon>
+                  <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+                    {language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}
+                  </h1>
+                </div>
+                
+                {/* Customer Phone */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'هاتف العميل' : 'Customer Phone'}
+                  </label>
+                  <input 
+                    type="text" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
+                  />
+                </div>
+                
+                {/* Customer Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'اسم العميل' : 'Customer Name'}
+                  </label>
+                  <input 
+                    type="text" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
+                  />
+                </div>
+              </div>
+              
+              {/* Right Side - Posting Date */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Calendar className="inline h-4 w-4 mr-2" />
+                    {language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date'}
+                  </label>
+                  <input 
+                    type="date" 
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+              </div>
             </div>
           </DialogHeader>
           
-          {/* Modal Content - Identical structure for both modals */}
+          {/* Modal Content */}
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -661,18 +705,28 @@ export default function FinancialOutgoingPayment() {
               />
             </div>
             
-            <div className="flex justify-end gap-3 pt-4">
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                {language === 'ar' ? 'إلغاء' : 'Cancel'}
-              </button>
-              <button
-                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
-              >
-                {language === 'ar' ? 'حفظ' : 'Save'}
-              </button>
+            {/* Footer with Payment Icon */}
+            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+              <div className="flex items-center gap-2 text-red-600">
+                <ArrowUpRight className="h-5 w-5" />
+                <span className="text-sm font-medium">
+                  {language === 'ar' ? 'دفع صادر' : 'Outgoing Payment'}
+                </span>
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                >
+                  {language === 'ar' ? 'حفظ' : 'Save'}
+                </button>
+              </div>
             </div>
           </div>
         </DialogContent>
