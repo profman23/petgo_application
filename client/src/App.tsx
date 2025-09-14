@@ -259,7 +259,7 @@ function Router() {
           <Route path="/financial/credit-note" component={() => <CreditNotePermissionGate><FinancialCreditNote /></CreditNotePermissionGate>} />
           <Route path="/financial/outgoing-payment" component={FinancialOutgoingPayment} />
           <Route path="/financial/income-payment" component={FinancialIncomePayment} />
-          <Route path="/financial" component={FinancialARBalance} />
+          <Route path="/financial/ar-balance" component={FinancialARBalance} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />

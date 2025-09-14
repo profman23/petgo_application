@@ -239,7 +239,7 @@ export default function FinancialOutgoingPayment() {
                     </button>
                     <button
                       onClick={() => {
-                        setLocation('/financial');
+                        setLocation('/financial/ar-balance');
                         setIsMobileSidebarOpen(false);
                       }}
                       className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
@@ -452,7 +452,7 @@ export default function FinancialOutgoingPayment() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      setLocation('/financial');
+                      setLocation('/financial/ar-balance');
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
