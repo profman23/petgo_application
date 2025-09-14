@@ -238,7 +238,7 @@ export default function FinancialOutgoingPayment() {
 
       {/* Full-width Header with logo and controls */}
       <div className="bg-white shadow-md border-b border-gray-200">
-        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4" dir="ltr">
           {/* Logo */}
           <div className="flex-shrink-0 -ml-6">
             <img 
@@ -269,14 +269,10 @@ export default function FinancialOutgoingPayment() {
             </button>
 
             {/* Notifications counter */}
-            {currentRequestCount > 0 && (
-              <div className="relative">
-                <Bell className="h-6 w-6 text-purple-600" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                </span>
-              </div>
-            )}
+            <div className="relative">
+              <Bell className="h-6 w-6 text-purple-600" />
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">99+</span>
+            </div>
             
             <button
               onClick={handleLogout}
