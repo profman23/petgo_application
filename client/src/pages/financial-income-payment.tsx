@@ -210,6 +210,16 @@ export default function FinancialIncomePayment() {
                     <DollarSign className="h-5 w-5 flex-shrink-0 text-purple-600" />
                     <span className="text-purple-600">{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
+                  <button
+                    onClick={() => {
+                      setLocation('/financial/ar-balance');
+                      setIsMobileSidebarOpen(false);
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}</span>
+                  </button>
                 </div>
               )}
             </div>
