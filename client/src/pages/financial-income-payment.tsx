@@ -4,7 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus, Bell, Volume2, VolumeX } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus, Bell, Volume2, VolumeX, Truck } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +23,10 @@ export default function FinancialIncomePayment() {
   const [location, setLocation] = useLocation();
   const { t, language } = useTranslation();
   const { toast } = useToast();
-  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
+  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isNewReportsExpanded');
+    return savedState !== null ? JSON.parse(savedState) : false;
+  });
   
   // Audio notification state - matches other admin pages
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -206,6 +209,19 @@ export default function FinancialIncomePayment() {
               )}
             </div>
 
+            {/* VetsVan Management */}
+            <button
+              onClick={() => {
+                setLocation('/admin-dashboard');
+                setIsMobileSidebarOpen(false);
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Car className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
+            </button>
+
+            {/* Vets Van Shifts */}
             <button
               onClick={() => {
                 setLocation('/vets-van-shifts');
@@ -213,9 +229,67 @@ export default function FinancialIncomePayment() {
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <Car className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'VetsVan Management'}</span>
+              <Clock className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
             </button>
+
+            {/* Reports */}
+            <button
+              onClick={() => {
+                setLocation('/admin-dashboard?tab=reports');
+                setIsMobileSidebarOpen(false);
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+            </button>
+
+            {/* VetsVan Request */}
+            <button
+              onClick={() => {
+                setLocation('/admin-vetsvan-requests');
+                setIsMobileSidebarOpen(false);
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Truck className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'VetsVan Request'}</span>
+            </button>
+
+            {/* New Reports & Analytics Dropdown */}
+            <div className="mb-2">
+              <button
+                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <TrendingUp className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left whitespace-nowrap">
+                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                </span>
+                {isNewReportsExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+              
+              {/* Dropdown Items */}
+              {isNewReportsExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => {
+                      setLocation('/new-reports-analytics/sales-report');
+                      setIsMobileSidebarOpen(false);
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </nav>
         </SheetContent>
       </Sheet>
