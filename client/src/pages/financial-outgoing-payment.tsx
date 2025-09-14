@@ -675,27 +675,16 @@ export default function FinancialOutgoingPayment() {
           
           {/* Modal Content */}
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {language === 'ar' ? 'المرجع' : 'Reference'}
-                </label>
-                <input 
-                  type="text" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder={language === 'ar' ? 'أدخل المرجع' : 'Enter reference'}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {language === 'ar' ? 'المبلغ' : 'Amount'}
-                </label>
-                <input 
-                  type="number" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder={language === 'ar' ? 'أدخل المبلغ' : 'Enter amount'}
-                />
-              </div>
+            {/* Reference Section - Single column, left aligned */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {language === 'ar' ? 'المرجع' : 'Reference'}
+              </label>
+              <input 
+                type="text" 
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder={language === 'ar' ? 'أدخل المرجع' : 'Enter reference'}
+              />
             </div>
             
             {/* Description and Payment Method Grid - Force LTR layout */}
@@ -725,7 +714,7 @@ export default function FinancialOutgoingPayment() {
                     <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <label className="flex items-center min-w-[120px]">
                         <input 
-                          type="radio" 
+                          type="checkbox" 
                           name="paymentMethod" 
                           value="cash"
                           className="mr-2 text-purple-600 focus:ring-purple-500"
@@ -750,7 +739,7 @@ export default function FinancialOutgoingPayment() {
                     <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <label className="flex items-center min-w-[120px]">
                         <input 
-                          type="radio" 
+                          type="checkbox" 
                           name="paymentMethod" 
                           value="card"
                           className="mr-2 text-purple-600 focus:ring-purple-500"
@@ -775,7 +764,7 @@ export default function FinancialOutgoingPayment() {
                     <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <label className="flex items-center min-w-[120px]">
                         <input 
-                          type="radio" 
+                          type="checkbox" 
                           name="paymentMethod" 
                           value="bank"
                           className="mr-2 text-purple-600 focus:ring-purple-500"
