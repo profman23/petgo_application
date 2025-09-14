@@ -242,20 +242,8 @@ export default function FinancialIncomePayment() {
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <FileText className="h-6 w-6 flex-shrink-0" />
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
-            </button>
-
-            {/* VetsVan Request */}
-            <button
-              onClick={() => {
-                setLocation('/admin-vetsvan-requests');
-                setIsMobileSidebarOpen(false);
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Truck className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'VetsVan Request'}</span>
             </button>
 
             {/* New Reports & Analytics Dropdown */}
@@ -298,6 +286,18 @@ export default function FinancialIncomePayment() {
                 </div>
               )}
             </div>
+
+            {/* Vets Van Requests */}
+            <button
+              onClick={() => {
+                setLocation('/admin-vetsvan-requests');
+                setIsMobileSidebarOpen(false);
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+            </button>
           </nav>
         </SheetContent>
       </Sheet>
@@ -563,7 +563,7 @@ export default function FinancialIncomePayment() {
               }}
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              <FileText className="h-6 w-6 flex-shrink-0" />
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
               <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
             </button>
 
@@ -607,6 +607,19 @@ export default function FinancialIncomePayment() {
                 </div>
               )}
             </div>
+
+            {/* Vets Van Requests */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-vetsvan-requests');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+            </button>
           </nav>
         </div>
 
