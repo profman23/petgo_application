@@ -99,142 +99,432 @@ export default function FinancialOutgoingPayment() {
     // Functionality will be implemented later
   };
 
-  const Sidebar = () => (
-    <div className="bg-white border-r border-gray-200 w-64 flex flex-col" style={{ fontFamily: 'Arimo' }}>
-      {/* Logo */}
-      <div className="p-4 border-b border-gray-200">
-        <img
-          src={vetsVanLogo}
-          alt="VetsVan Logo"
-          className="h-12 w-auto mx-auto"
-        />
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Desktop Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <img src={vetsVanLogo} alt="VetsVan Logo" className="h-8 w-8" />
+              <span className="text-xl font-semibold text-purple-800">VetsVan</span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              {/* Audio Toggle */}
+              <button
+                onClick={() => setAudioEnabled(!audioEnabled)}
+                className={`p-2 rounded-md ${
+                  audioEnabled ? 'text-purple-600 bg-purple-50' : 'text-gray-400 bg-gray-100'
+                }`}
+              >
+                {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+              </button>
+
+              {/* Notifications counter */}
+              <div className="relative">
+                <Bell className="h-6 w-6 text-purple-600" />
+                {currentRequestCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                  </span>
+                )}
+              </div>
+              
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+              >
+                <LogOut className="h-4 w-4 ml-2" />
+                {t('logout')}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-        {/* Admin Home */}
-        <button
-          onClick={() => setLocation('/admin-home')}
-          className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-        >
-          <Home className="h-6 w-6 flex-shrink-0" />
-          <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Admin Home'}</span>
-        </button>
-
-        {/* VetsVan Requests */}
-        <button
-          onClick={() => setLocation('/admin-dashboard/vetsvan-requests')}
-          className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-        >
-          <Car className="h-6 w-6 flex-shrink-0" />
-          <span>{language === 'ar' ? 'طلبات الطبيب البيطري' : 'VetsVan Requests'}</span>
-        </button>
-
-        {/* Financial */}
-        <div className="mb-2">
-          <button
-            onClick={handleFinancialClick}
-            className="group flex items-center justify-between px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-          >
-            <div className="flex items-center gap-3">
-              <DollarSign className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
-            </div>
-            {isFinancialExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+      {/* Mobile menu sheet */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          {/* Hidden trigger - mobile menu would be opened programmatically if needed */}
+          <button className="hidden">
+            <Menu className="h-6 w-6" />
           </button>
-          
-          {isFinancialExpanded && (
-            <div className="ml-8 mt-2 space-y-1">
+        </SheetTrigger>
+        <SheetContent side="left" className="w-64 p-0">
+          <div className="flex flex-col h-full bg-white">
+            <div className="p-4 border-b">
+              <div className="flex items-center gap-2">
+                <img src={vetsVanLogo} alt="VetsVan Logo" className="h-8 w-8" />
+                <span className="text-lg font-semibold text-purple-800">VetsVan</span>
+              </div>
+            </div>
+            <nav className="flex-1 px-2 py-4 space-y-1">
+              {/* Home Page */}
               <button
-                onClick={() => setLocation('/financial/credit-note')}
+                onClick={() => {
+                  setLocation('/admin-home');
+                  setIsMobileSidebarOpen(false);
+                }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <Home className="h-6 w-6 flex-shrink-0" />
+                <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+              </button>
+
+              {/* Administration Module */}
+              <div className="mb-2">
+                <button
+                  onClick={() => {
+                    const newState = !isAdministrationExpanded;
+                    setIsAdministrationExpanded(newState);
+                    localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <Users className="h-6 w-6 flex-shrink-0" />
+                  <span className="flex-1 text-left">
+                    {language === 'ar' ? 'الإدارة' : 'Administration'}
+                  </span>
+                  {isAdministrationExpanded ? (
+                    <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                  )}
+                </button>
+
+                {isAdministrationExpanded && (
+                  <div className="ml-6 mt-1 space-y-1">
+                    <button
+                      onClick={() => {
+                        setLocation('/administration/users');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <User className="h-5 w-5 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLocation('/administration/authorization');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <Shield className="h-5 w-5 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Financial Section */}
+              <div className="mb-2">
+                <button
+                  onClick={() => {
+                    const newState = !isFinancialExpanded;
+                    setIsFinancialExpanded(newState);
+                    localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
+                  }}
+                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  <DollarSign className="h-6 w-6 flex-shrink-0" />
+                  <span className="flex-1 text-left">
+                    {language === 'ar' ? 'المالية' : 'Financial'}
+                  </span>
+                  {isFinancialExpanded ? (
+                    <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                  )}
+                </button>
+
+                {isFinancialExpanded && (
+                  <div className="ml-6 mt-1 space-y-1">
+                    <button
+                      onClick={() => {
+                        setLocation('/sales-reports');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLocation('/financial/credit-note');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                    >
+                      <Receipt className="h-5 w-5 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
+                    </button>
+                    <button
+                      className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
+                    >
+                      <DollarSign className="h-5 w-5 flex-shrink-0 text-purple-600" />
+                      <span className="text-purple-600">{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </nav>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Main Content with Sidebar */}
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white shadow-lg min-h-screen">
+          <nav className="mt-4 px-2">
+            {/* Home Page */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-home');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Home className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+            </button>
+            
+            {/* Administration Module */}
+            <div className="mb-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isAdministrationExpanded;
+                  setIsAdministrationExpanded(newState);
+                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                }}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
-                <Receipt className="h-6 w-6 flex-shrink-0" />
-                <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
+                <Users className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'الإدارة' : 'Administration'}
+                </span>
+                {isAdministrationExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
               </button>
+              
+              {/* Administration Submenu */}
+              {isAdministrationExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/administration/users');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <User className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/administration/authorization');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Shield className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Financial Section */}
+            <div className="mb-2">
               <button
-                onClick={() => setLocation('/financial/outgoing-payment')}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isFinancialExpanded;
+                  setIsFinancialExpanded(newState);
+                  localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
+                }}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
                 <DollarSign className="h-6 w-6 flex-shrink-0" />
-                <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'المالية' : 'Financial'}
+                </span>
+                {isFinancialExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
               </button>
-            </div>
-          )}
-        </div>
 
-        {/* Administration */}
-        <div className="mb-2">
-          <button
-            onClick={handleAdministrationClick}
-            className="group flex items-center justify-between px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-          >
-            <div className="flex items-center gap-3">
-              <Users className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الإدارة' : 'Administration'}</span>
+              {isFinancialExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/sales-reports');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/financial/credit-note');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Receipt className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
+                  </button>
+                  <button
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
+                  >
+                    <DollarSign className="h-5 w-5 flex-shrink-0 text-purple-600" />
+                    <span className="text-purple-600">{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
+                  </button>
+                </div>
+              )}
             </div>
-            {isAdministrationExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
-          
-          {isAdministrationExpanded && (
-            <div className="ml-8 mt-2 space-y-1">
+            
+            {/* VetsVan Management */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Car className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'Vets Van Management'}</span>
+            </button>
+
+            {/* Vets Van Shifts */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/vets-van-shifts');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Clock className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
+            </button>
+            
+            {/* Reports */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard?tab=reports');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+            </button>
+            
+            {/* New Reports & Analytics Dropdown */}
+            <div className="mb-2">
               <button
-                onClick={() => setLocation('/administration/authorization')}
+                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
                 className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               >
-                <Shield className="h-6 w-6 flex-shrink-0" />
-                <span>{language === 'ar' ? 'التصريحات' : 'Authorization'}</span>
+                <TrendingUp className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left whitespace-nowrap">
+                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                </span>
+                {isNewReportsExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
               </button>
+              
+              {/* Dropdown Items */}
+              {isNewReportsExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
+                  </button>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Vets Van Requests */}
+            <button
+              onClick={() => setLocation('/admin-vetsvan-requests')}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+            </button>
+
+            {/* Import */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/import');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Upload className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
+            </button>
+            
+            {/* Services */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/services');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Stethoscope className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+            </button>
+            
+            {/* Products */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/products');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Package className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
+            </button>
+          </nav>
         </div>
 
-        {/* Products */}
-        <button
-          onClick={() => setLocation('/admin-dashboard/products')}
-          className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-        >
-          <Package className="h-6 w-6 flex-shrink-0" />
-          <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-        </button>
-      </nav>
-
-      {/* Bottom section with Language Selector and Logout */}
-      <div className="p-4 border-t border-gray-200 space-y-4">
-        <LanguageSelector />
-        <button
-          onClick={handleLogout}
-          className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-red-600 hover:bg-red-50"
-        >
-          <LogOut className="h-6 w-6 flex-shrink-0" />
-          <span>{language === 'ar' ? 'تسجيل الخروج' : 'Logout'}</span>
-        </button>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex" dir="ltr">
-      {/* Desktop Sidebar */}
-      {!isMobile && <Sidebar />}
-
-      {/* Mobile Sidebar */}
-      {isMobile && (
-        <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-          <SheetTrigger asChild>
-            {/* Hidden trigger - mobile menu would be opened programmatically if needed */}
-            <button className="hidden">
-              <Menu className="h-6 w-6" />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-64">
-            <Sidebar />
-          </SheetContent>
-        </Sheet>
-      )}
-
-      {/* Main Content */}
-      <div className="flex-1 p-8">
+        {/* Main Content */}
+        <div className="flex-1 p-8">
         <div className="flex items-center justify-between mb-8">
           {/* Left side - Lord Icon and Title */}
           <div className="flex items-center gap-4">
@@ -263,6 +553,7 @@ export default function FinancialOutgoingPayment() {
             <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
             {language === 'ar' ? 'إنشاء دفع صادر' : 'Create Outgoing Payment'}
           </button>
+        </div>
         </div>
       </div>
     </div>
