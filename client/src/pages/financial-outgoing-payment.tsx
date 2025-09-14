@@ -101,47 +101,6 @@ export default function FinancialOutgoingPayment() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Desktop Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <img src={vetsVanLogo} alt="VetsVan Logo" className="h-8 w-8" />
-              <span className="text-xl font-semibold text-purple-800">VetsVan</span>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              {/* Audio Toggle */}
-              <button
-                onClick={() => setAudioEnabled(!audioEnabled)}
-                className={`p-2 rounded-md ${
-                  audioEnabled ? 'text-purple-600 bg-purple-50' : 'text-gray-400 bg-gray-100'
-                }`}
-              >
-                {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-              </button>
-
-              {/* Notifications counter */}
-              <div className="relative">
-                <Bell className="h-6 w-6 text-purple-600" />
-                {currentRequestCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                  </span>
-                )}
-              </div>
-              
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-              >
-                <LogOut className="h-4 w-4 ml-2" />
-                {t('logout')}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Mobile menu sheet */}
       <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
