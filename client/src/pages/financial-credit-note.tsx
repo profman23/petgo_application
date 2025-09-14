@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard, Download, FilePlus, BanknoteArrowUp, ArrowDown } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard, Download, FilePlus } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -1178,7 +1178,7 @@ export default function FinancialCreditNote() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <ArrowDown className="h-5 w-5 flex-shrink-0" />
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
                   </button>
                   <button
@@ -1189,7 +1189,7 @@ export default function FinancialCreditNote() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <BanknoteArrowUp className="h-5 w-5 flex-shrink-0" />
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
                   <button

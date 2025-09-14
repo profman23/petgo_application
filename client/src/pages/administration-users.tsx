@@ -4,7 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X, Home, Menu, DollarSign, Receipt, BanknoteArrowUp, ArrowDown } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X, Home, Menu, DollarSign, Receipt } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -553,7 +553,7 @@ export default function AdministrationUsers() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <ArrowDown className="h-5 w-5 flex-shrink-0" />
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
                   </button>
                   <button
@@ -562,7 +562,7 @@ export default function AdministrationUsers() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <BanknoteArrowUp className="h-5 w-5 flex-shrink-0" />
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
                   <button

@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, LogOut, Car, Clock, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, ChevronDown, ChevronUp, Search, Package, Stethoscope, TrendingUp, Shield, Home, DollarSign, Receipt, BanknoteArrowUp, ArrowDown } from "lucide-react";
+import { Loader2, LogOut, Car, Clock, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, ChevronDown, ChevronUp, Search, Package, Stethoscope, TrendingUp, Shield, Home, DollarSign, Receipt } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -489,7 +489,7 @@ export default function AdminVetsVanRequests() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <ArrowDown className="h-5 w-5 flex-shrink-0" />
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
                   </button>
                   <button
@@ -500,7 +500,7 @@ export default function AdminVetsVanRequests() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <BanknoteArrowUp className="h-5 w-5 flex-shrink-0" />
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
                   <button

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX, Users, User, Shield, Home, Menu, DollarSign, Receipt, BanknoteArrowUp, ArrowDown } from "lucide-react";
+import { ArrowLeft, Plus, Calendar, Clock, X, ChevronLeft, ChevronRight, Car, BarChart3, FileText, Upload, Package, Stethoscope, TrendingUp, ChevronDown, ChevronUp, Bell, Volume2, LogOut, VolumeX, Users, User, Shield, Home, Menu, DollarSign, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -667,7 +667,7 @@ export default function VetsVanShifts() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <ArrowDown className="h-5 w-5 flex-shrink-0" />
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
                   </button>
                   <button
@@ -678,7 +678,7 @@ export default function VetsVanShifts() {
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
-                    <BanknoteArrowUp className="h-5 w-5 flex-shrink-0" />
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
                     <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
                   </button>
                   <button
