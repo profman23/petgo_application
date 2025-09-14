@@ -54,6 +54,7 @@ export default function FinancialIncomePayment() {
   
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [businessPartnerType, setBusinessPartnerType] = useState('customer');
   const isMobile = useIsMobile();
   
 
@@ -711,6 +712,43 @@ export default function FinancialIncomePayment() {
                   </h1>
                 </div>
                 
+                {/* Select Business Partner Master Data */}
+                <div className="flex items-center gap-4">
+                  <label className="text-sm font-medium text-gray-700">
+                    {language === 'ar' ? 'تحديد بيانات شريك العمل الرئيسية:' : 'Select Business Partner Master Data:'}
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="radio" 
+                        name="businessPartnerType" 
+                        value="customer" 
+                        checked={businessPartnerType === 'customer'}
+                        onChange={(e) => setBusinessPartnerType(e.target.value)}
+                        className="text-purple-600 focus:ring-purple-500"
+                        data-testid="radio-partner-customer"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {language === 'ar' ? 'عميل' : 'Customer'}
+                      </span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="radio" 
+                        name="businessPartnerType" 
+                        value="supplier" 
+                        checked={businessPartnerType === 'supplier'}
+                        onChange={(e) => setBusinessPartnerType(e.target.value)}
+                        className="text-purple-600 focus:ring-purple-500"
+                        data-testid="radio-partner-supplier"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {language === 'ar' ? 'مورد' : 'Supplier'}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+                
                 {/* Customer Fields and Posting Date in same row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Left: Customer Fields */}
@@ -718,24 +756,34 @@ export default function FinancialIncomePayment() {
                     {/* Customer Phone - Horizontal Layout */}
                     <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                        {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
+                        {businessPartnerType === 'supplier' 
+                          ? (language === 'ar' ? 'هاتف المورد:' : 'Supplier Phone:') 
+                          : (language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:')}
                       </label>
                       <input 
                         type="text" 
                         className="flex-1 w-full md:max-w-[200px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
+                        data-testid="input-partner-phone"
+                        placeholder={businessPartnerType === 'supplier' 
+                          ? (language === 'ar' ? 'أدخل هاتف المورد' : 'Enter supplier phone') 
+                          : (language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone')}
                       />
                     </div>
                     
                     {/* Customer Name - Horizontal Layout */}
                     <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                        {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
+                        {businessPartnerType === 'supplier' 
+                          ? (language === 'ar' ? 'اسم المورد:' : 'Supplier Name:') 
+                          : (language === 'ar' ? 'اسم العميل:' : 'Customer Name:')}
                       </label>
                       <input 
                         type="text" 
                         className="flex-1 w-full md:max-w-[200px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
+                        data-testid="input-partner-name"
+                        placeholder={businessPartnerType === 'supplier' 
+                          ? (language === 'ar' ? 'أدخل اسم المورد' : 'Enter supplier name') 
+                          : (language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name')}
                       />
                     </div>
                   </div>
