@@ -1,0 +1,56 @@
+Done successfully. When clicking, the Sidebar stays on the right, but when clicking on any other item from the Side Bar, the Outgoing Payment disappears, except when clicking on the Home Page, it does not disappear.
+
+You previously sent me the following analysis to avoid and solve this issue:
+
+What was happening:
+Some admin pages (Services, Products, Import) had the Financial tab in both desktop sidebar and mobile navigation.
+Other admin pages (Home, Users, Authorization, Vets Van Shifts) only had the Financial tab in mobile navigation but it was missing from the desktop sidebar.
+
+Why This Happened:
+When navigation features are added to admin pages, there are two separate navigation structures that need to be updated:
+
+Desktop Sidebar – The <nav> section with hidden md:block class
+
+Mobile Navigation – The <Sheet> overlay component with hamburger menu
+
+The Financial tab was previously added to mobile navigation during mobile fixes, but the desktop sidebars on some pages were never updated.
+
+How It Was Solved:
+
+Identified the pattern: found that working pages had Financial tab in both locations.
+
+Located the insertion point: desktop sidebars needed Financial tab positioned between Administration module and VetsVan Management section.
+
+Added consistent code: inserted identical Financial button code in all missing desktop sidebars:
+
+{/* Financial Section */}
+<button
+  onClick={(e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLocation('/sales-reports');
+  }}
+  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+>
+  <DollarSign className="h-6 w-6 flex-shrink-0" />
+  <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
+</button>
+
+
+Future Prevention Strategy:
+When adding new navigation items in the future:
+
+Check both navigation types
+
+Update all admin pages
+
+Use search tools to ensure consistency
+
+Test mobile and desktop
+
+Quick Fix Checklist:
+✅ Search for missing navigation item across all admin pages
+✅ Identify which pages have it vs. which are missing it
+✅ Copy the working implementation to missing locations
+✅ Ensure proper positioning
+✅ Test both mobile and desktop
