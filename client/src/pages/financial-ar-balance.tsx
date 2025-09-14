@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useTranslation } from '@/hooks/useTranslation';
+import { useTranslation, getDirection } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
-import { LanguageSelector } from '@/components/LanguageSelector';
-import vetsVanLogo from '@assets/vets-van-logo.png';
+import { LanguageSelector } from '@/components/language-selector';
+import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 export default function FinancialARBalance() {
   const [location, setLocation] = useLocation();
