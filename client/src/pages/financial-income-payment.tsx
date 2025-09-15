@@ -846,7 +846,7 @@ export default function FinancialIncomePayment() {
           <div className="space-y-6">
             {/* Referenced Document Section */}
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-4 text-left">
                 {language === 'ar' ? 'المستند المرجعي:' : 'Referenced Document:'}
               </h3>
               
