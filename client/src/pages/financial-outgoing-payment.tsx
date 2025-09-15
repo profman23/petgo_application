@@ -611,7 +611,7 @@ export default function FinancialOutgoingPayment() {
 
       {/* Create Outgoing Payment Modal */}
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             {/* Top Row - Title on Left */}
             <div className="mb-6" dir="ltr">
