@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { 
   Home, Users, User, Shield, DollarSign, Car, Clock, 
   Upload, Stethoscope, Package, BarChart3, TrendingUp, FileText, Receipt,
-  ChevronDown, ChevronUp, Bell, Volume2, VolumeX, LogOut, Menu, FilePlus 
+  ChevronDown, ChevronUp, Bell, Volume2, VolumeX, LogOut, Menu, FilePlus, Handshake 
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -27,6 +27,15 @@ export default function FinancialARBalance() {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
     const savedState = localStorage.getItem('isFinancialExpanded');
     return savedState !== null ? JSON.parse(savedState) : true; // Default expanded for financial pages
+  });
+  
+  // Business Partner menu state - persist across navigation
+  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default collapsed
   });
   const [audioEnabled, setAudioEnabled] = useState(() => {
     const saved = localStorage.getItem('audioNotificationsEnabled');

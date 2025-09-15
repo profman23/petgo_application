@@ -4,7 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X, Home, Menu, DollarSign, Receipt } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X, Home, Menu, DollarSign, Receipt, Handshake } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +30,15 @@ export default function AdministrationUsers() {
       return JSON.parse(savedState);
     }
     return false; // Default to collapsed to maintain consistency
+  });
+  
+  // Business Partner menu state - persist across navigation
+  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default collapsed
   });
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const isMobile = useIsMobile();

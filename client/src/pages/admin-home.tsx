@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, Bell, Volume2, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home, Upload, Menu, DollarSign, Receipt } from "lucide-react";
+import { LogOut, Bell, Volume2, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Stethoscope, Package, Users, User, Shield, Home, Upload, Menu, DollarSign, Receipt, Handshake } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -26,6 +26,15 @@ export default function AdminHome() {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
     const saved = localStorage.getItem('isFinancialExpanded');
     return saved ? JSON.parse(saved) : false;
+  });
+  
+  // Business Partner menu state - persist across navigation
+  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default collapsed
   });
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const lastRequestCountRef = useRef(0);

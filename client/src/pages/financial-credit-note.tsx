@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard, Download, FilePlus } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard, Download, FilePlus, Handshake } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -35,6 +35,15 @@ export default function FinancialCreditNote() {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
     const savedState = localStorage.getItem('isFinancialExpanded');
     return savedState !== null ? JSON.parse(savedState) : true; // Default to expanded since we're on Financial page
+  });
+  
+  // Business Partner menu state - persist across navigation
+  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default collapsed
   });
   const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
   const [isCreateCreditNoteModalOpen, setIsCreateCreditNoteModalOpen] = useState(false);

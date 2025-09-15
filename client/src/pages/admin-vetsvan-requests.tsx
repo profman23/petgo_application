@@ -4,7 +4,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, LogOut, Car, Clock, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, ChevronDown, ChevronUp, Search, Package, Stethoscope, TrendingUp, Shield, Home, DollarSign, Receipt } from "lucide-react";
+import { Loader2, LogOut, Car, Clock, BarChart3, MessageSquare, FileText, User, Users, Phone, Calendar, Mail, Volume2, VolumeX, Bell, Upload, ChevronDown, ChevronUp, Search, Package, Stethoscope, TrendingUp, Shield, Home, DollarSign, Receipt, Handshake } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,15 @@ export default function AdminVetsVanRequests() {
   const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
     const savedState = localStorage.getItem('isFinancialExpanded');
     return savedState !== null ? JSON.parse(savedState) : true; // Default expanded for consistent Financial menu visibility
+  });
+  
+  // Business Partner menu state - persist across navigation
+  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default collapsed
   });
 
   // State for VetsVan Requests Filters - exact copy from admin dashboard
