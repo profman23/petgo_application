@@ -65,7 +65,7 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "credit-note",
         i18nKey: { en: "Credit Note", ar: "إشعار دائن" },
         route: "/financial/credit-note",
-        icon: FileText
+        icon: Receipt
       },
       {
         id: "outgoing-payment",
@@ -98,7 +98,13 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "partner-management",
         i18nKey: { en: "Partner Management", ar: "إدارة الشركاء" },
         route: "/business-partner/partner-management",
-        icon: Handshake
+        icon: Users
+      },
+      {
+        id: "partnership-contracts",
+        i18nKey: { en: "Partnership Contracts", ar: "عقود الشراكة" },
+        route: "/business-partner/contracts",
+        icon: FileText
       }
     ]
   },
