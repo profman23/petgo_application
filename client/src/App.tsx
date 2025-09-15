@@ -36,6 +36,7 @@ import FinancialCreditNote from "@/pages/financial-credit-note";
 import FinancialOutgoingPayment from "@/pages/financial-outgoing-payment";
 import FinancialIncomePayment from "@/pages/financial-income-payment";
 import FinancialARBalance from "@/pages/financial-ar-balance";
+import BusinessPartnerManagement from "@/pages/business-partner-management";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
 import { PaymentTest } from "@/pages/payment-test";
@@ -260,6 +261,7 @@ function Router() {
           <Route path="/financial/outgoing-payment" component={FinancialOutgoingPayment} />
           <Route path="/financial/income-payment" component={FinancialIncomePayment} />
           <Route path="/financial/ar-balance" component={FinancialARBalance} />
+          <Route path="/business-partner/partner-management" component={BusinessPartnerManagement} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
           <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
