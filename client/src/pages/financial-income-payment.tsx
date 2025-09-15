@@ -1077,9 +1077,9 @@ export default function FinancialIncomePayment() {
                   {language === 'ar' ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
-                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                 >
-                  {language === 'ar' ? 'حفظ' : 'Save'}
+                  {language === 'ar' ? 'إنشاء دفع وارد' : 'Create Income Payment'}
                 </button>
               </div>
             </div>
