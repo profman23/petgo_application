@@ -675,7 +675,7 @@ export default function FinancialOutgoingPayment() {
                     </label>
                     <input 
                       type="text" 
-                      className="w-full md:max-w-[160px] px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                      className="w-[170px] px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
                       disabled
                       value="OPN001"
                       data-testid="input-payment-no"
@@ -696,7 +696,7 @@ export default function FinancialOutgoingPayment() {
                       </label>
                       <input 
                         type="text" 
-                        className="flex-1 w-full md:max-w-[200px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                         data-testid="input-partner-phone"
                         placeholder={businessPartnerType === 'supplier' 
                           ? (language === 'ar' ? 'أدخل هاتف المورد' : 'Enter supplier phone') 
@@ -713,7 +713,7 @@ export default function FinancialOutgoingPayment() {
                       </label>
                       <input 
                         type="text" 
-                        className="flex-1 w-full md:max-w-[200px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                         data-testid="input-partner-name"
                         placeholder={businessPartnerType === 'supplier' 
                           ? (language === 'ar' ? 'أدخل اسم المورد' : 'Enter supplier name') 
@@ -730,7 +730,7 @@ export default function FinancialOutgoingPayment() {
                     </label>
                     <input 
                       type="date" 
-                      className="w-full md:max-w-[160px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                 </div>
@@ -747,7 +747,7 @@ export default function FinancialOutgoingPayment() {
                   {language === 'ar' ? 'نوع المعاملة' : 'Transaction Type'}
                 </label>
                 <select 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 >
                   <option value="invoice">
                     {language === 'ar' ? 'فاتورة' : 'Invoice'}
@@ -760,7 +760,7 @@ export default function FinancialOutgoingPayment() {
                 </label>
                 <input 
                   type="text" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder={language === 'ar' ? 'أدخل رقم الوثيقة' : 'Enter document number'}
                 />
               </div>
@@ -776,7 +776,7 @@ export default function FinancialOutgoingPayment() {
                   </label>
                   <textarea 
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
                   />
                 </div>
@@ -808,7 +808,7 @@ export default function FinancialOutgoingPayment() {
                         </label>
                         <input 
                           type="number" 
-                          className="w-32 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                          className="w-[170px] px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                         />
                       </div>
@@ -833,7 +833,7 @@ export default function FinancialOutgoingPayment() {
                         </label>
                         <input 
                           type="number" 
-                          className="w-32 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                          className="w-[170px] px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                         />
                       </div>
@@ -858,7 +858,7 @@ export default function FinancialOutgoingPayment() {
                         </label>
                         <input 
                           type="number" 
-                          className="w-32 px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                          className="w-[170px] px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                         />
                       </div>
