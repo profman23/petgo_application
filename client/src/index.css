@@ -8,6 +8,9 @@
   .input-compact-20 {
     @apply h-[20px] py-0 leading-[20px] text-[12px] rounded-sm focus:outline-none focus:ring-1 focus:ring-purple-500 min-h-0;
   }
+  .description-field {
+    @apply w-[200px] h-[50px] px-2 py-1 text-[12px] leading-[14px] rounded-sm focus:outline-none focus:ring-1 focus:ring-purple-500 resize-none;
+  }
   .select-reset {
     @apply appearance-none min-h-0;
   }

@@ -849,105 +849,101 @@ export default function FinancialIncomePayment() {
               </div>
             </div>
             
-            {/* Description and Payment Method Grid - Force LTR layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="ltr">
-              {/* Description - Full width */}
-              <div className="md:col-span-2">
-                <div dir={getDirection(language)}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {language === 'ar' ? 'الوصف' : 'Description'}
-                  </label>
-                  <textarea 
-                    rows={4}
-                    className="w-[170px] px-2 input-compact-20 select-reset border border-gray-300"
-                    placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
-                  />
-                </div>
-              </div>
-              
-              {/* Payment Method - Force to left column */}
-              <div className="md:col-start-1 md:col-span-1">
-                <div dir={getDirection(language)}>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
-                  </label>
-                  <div className="space-y-3">
-                    {/* Cash Option */}
-                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <label className="flex items-center min-w-[120px]">
-                        <input 
-                          type="checkbox" 
-                          name="paymentMethod" 
-                          value="cash"
-                          className="mr-2 text-purple-600 focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {language === 'ar' ? 'نقداً' : 'Cash'}
-                        </span>
+            {/* Payment Method Section */}
+            <div>
+              <div dir={getDirection(language)}>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
+                </label>
+                <div className="space-y-3">
+                  {/* Cash Option */}
+                  <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className="flex items-center min-w-[120px]">
+                      <input 
+                        type="checkbox" 
+                        name="paymentMethod" 
+                        value="cash"
+                        className="mr-2 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {language === 'ar' ? 'نقداً' : 'Cash'}
+                      </span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'المبلغ:' : 'Amount:'}
                       </label>
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
-                        </label>
-                        <input 
-                          type="number" 
-                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
-                        />
-                      </div>
+                      <input 
+                        type="number" 
+                        className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                        placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                      />
                     </div>
-                    
-                    {/* Card Option */}
-                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <label className="flex items-center min-w-[120px]">
-                        <input 
-                          type="checkbox" 
-                          name="paymentMethod" 
-                          value="card"
-                          className="mr-2 text-purple-600 focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {language === 'ar' ? 'بطاقة' : 'Card'}
-                        </span>
+                  </div>
+                  
+                  {/* Card Option */}
+                  <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className="flex items-center min-w-[120px]">
+                      <input 
+                        type="checkbox" 
+                        name="paymentMethod" 
+                        value="card"
+                        className="mr-2 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {language === 'ar' ? 'بطاقة' : 'Card'}
+                      </span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'المبلغ:' : 'Amount:'}
                       </label>
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
-                        </label>
-                        <input 
-                          type="number" 
-                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
-                        />
-                      </div>
+                      <input 
+                        type="number" 
+                        className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                        placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                      />
                     </div>
-                    
-                    {/* Bank Transfer Option */}
-                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <label className="flex items-center min-w-[120px]">
-                        <input 
-                          type="checkbox" 
-                          name="paymentMethod" 
-                          value="bank"
-                          className="mr-2 text-purple-600 focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {language === 'ar' ? 'تحويل مصرفي' : 'Bank Transfer'}
-                        </span>
+                  </div>
+                  
+                  {/* Bank Transfer Option */}
+                  <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className="flex items-center min-w-[120px]">
+                      <input 
+                        type="checkbox" 
+                        name="paymentMethod" 
+                        value="bank"
+                        className="mr-2 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {language === 'ar' ? 'تحويل مصرفي' : 'Bank Transfer'}
+                      </span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'المبلغ:' : 'Amount:'}
                       </label>
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
-                        </label>
-                        <input 
-                          type="number" 
-                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
-                        />
-                      </div>
+                      <input 
+                        type="number" 
+                        className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                        placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                      />
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            
+            {/* Description Section - Moved below Payment Method */}
+            <div>
+              <div dir={getDirection(language)}>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'الوصف' : 'Description'}
+                </label>
+                <textarea 
+                  className="description-field border border-gray-300"
+                  placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
+                />
               </div>
             </div>
             
