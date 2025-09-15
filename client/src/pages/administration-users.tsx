@@ -1,52 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
-import { useTranslation, getDirection } from "@/lib/i18n";
-import { LanguageSelector } from "@/components/language-selector";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Plus, X, Home, Menu, DollarSign, Receipt, Handshake } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
+import { Shield, LogOut, User, Users, X, Plus } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
+import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 
 export default function AdministrationUsers() {
   const [, setLocation] = useLocation();
   const { t, language } = useTranslation();
   const { toast } = useToast();
-  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  // Administration menu state - persist across navigation
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isAdministrationExpanded');
-    if (savedState !== null) {
-      return JSON.parse(savedState);
-    }
-    return false; // Default to collapsed to maintain consistency
-  });
-  // Financial menu state - persist across navigation
-  const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isFinancialExpanded');
-    if (savedState !== null) {
-      return JSON.parse(savedState);
-    }
-    return false; // Default to collapsed to maintain consistency
-  });
-  
-  // Business Partner menu state - persist across navigation
-  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
-    if (savedState !== null) {
-      return JSON.parse(savedState);
-    }
-    return false; // Default collapsed
-  });
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const isMobile = useIsMobile();
-  
-  // State for tracking notifications and audio
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const lastRequestCountRef = useRef(0);
-  const [currentRequestCount, setCurrentRequestCount] = useState(0);
   
   // State for popup
   const [showCreateUserPopup, setShowCreateUserPopup] = useState(false);
@@ -95,23 +59,6 @@ export default function AdministrationUsers() {
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   const adminToken = localStorage.getItem("adminToken");
-  const admin = JSON.parse(localStorage.getItem("admin") || "{}");
-
-  // Fetch all VetsVan requests for notification counter
-  const { data: allVetsVanRequests } = useQuery({
-    queryKey: ["/api/admin/vetsvan-requests"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/vetsvan-requests", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch requests");
-      return response.json();
-    },
-    refetchInterval: 3000,
-    enabled: !!adminToken,
-  });
 
   // Fetch authorizations for dropdown
   const {
@@ -124,28 +71,6 @@ export default function AdministrationUsers() {
     refetchInterval: 30000, // Refetch every 30 seconds
     enabled: !!adminToken,
   });
-
-  // Monitor for new requests and update counter
-  useEffect(() => {
-    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
-      const currentCount = allVetsVanRequests.length;
-      lastRequestCountRef.current = currentCount;
-      setCurrentRequestCount(currentCount);
-    }
-  }, [allVetsVanRequests]);
-
-  // Request browser notification permission on component mount
-  useEffect(() => {
-    if (Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("admin");
-    setLocation("/admin-login");
-  };
 
   // Reset form function
   const resetForm = () => {
@@ -275,766 +200,157 @@ export default function AdministrationUsers() {
   const isReadOnly = currentUserPermissions && currentUserPermissions.usersRead === true && !currentUserPermissions.usersFullControl;
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
-      {/* Full-width Header with logo and controls */}
-      <div className="bg-white shadow-md border-b border-gray-200">
-        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
-          {/* Logo */}
-          <div className="flex-shrink-0 -ml-6">
-            <img 
-              src={vetsVanLogo} 
-              alt="VETS VAN" 
-              className="h-14 w-auto object-contain"
-            />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-            <SheetTrigger asChild>
-              <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-                <Menu className="h-6 w-6" />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
-              <nav className="mt-4 px-2">
-                <button
-                  onClick={() => {
-                    setLocation('/admin-home');
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                >
-                  <Home className="h-6 w-6 flex-shrink-0" />
-                  <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
-                </button>
-                
-                <div className="mb-2">
+    <AdminLayout>
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto py-6 px-6 lg:px-8">
+          <div className="px-4 py-6 sm:px-0">
+            <div className="bg-white shadow rounded-lg">
+              <div className="px-4 py-5 sm:p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+                    {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
+                  </h1>
                   <button
-                    onClick={() => {
-                      const newState = !isAdministrationExpanded;
-                      setIsAdministrationExpanded(newState);
-                      localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  >
-                    <Users className="h-6 w-6 flex-shrink-0" />
-                    <span className="flex-1 text-left">
-                      {language === 'ar' ? 'الإدارة' : 'Administration'}
-                    </span>
-                    {isAdministrationExpanded ? (
-                      <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                    )}
-                  </button>
-                  
-                  {isAdministrationExpanded && (
-                    <div className="ml-6 mt-1 space-y-1">
-                      <button
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
-                      >
-                        <User className="h-5 w-5 flex-shrink-0 text-purple-600" />
-                        <span className="text-purple-600">{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                      </button>
-                      
-                      <button
-                        onClick={() => {
-                          setLocation('/administration/authorization');
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                      >
-                        <Shield className="h-5 w-5 flex-shrink-0" />
-                        <span>{language === 'ar' ? 'التفويضات' : 'Authorization'}</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Financial Module */}
-                <div className="mb-2">
-                  <button
-                    onClick={() => {
-                      const newState = !isFinancialExpanded;
-                      setIsFinancialExpanded(newState);
-                      localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  >
-                    <DollarSign className="h-6 w-6 flex-shrink-0" />
-                    <span className="flex-1 text-left">
-                      {language === 'ar' ? 'المالية' : 'Financial'}
-                    </span>
-                    {isFinancialExpanded ? (
-                      <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                    )}
-                  </button>
-
-                  {isFinancialExpanded && (
-                    <div className="ml-6 mt-1 space-y-1">
-                      <button
-                        onClick={() => {
-                          setLocation('/financial/credit-note');
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                      >
-                        <FileText className="h-5 w-5 flex-shrink-0" />
-                        <span>{language === 'ar' ? 'إشعار دائن' : 'Credit Note'}</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setLocation('/financial/outgoing-payment');
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                      >
-                        <DollarSign className="h-5 w-5 flex-shrink-0" />
-                        <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setLocation('/financial/income-payment');
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                      >
-                        <DollarSign className="h-5 w-5 flex-shrink-0" />
-                        <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setLocation('/financial/ar-balance');
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                      >
-                        <DollarSign className="h-5 w-5 flex-shrink-0" />
-                        <span>{language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Business Partner Module */}
-                <div className="mb-2">
-                  <button
-                    data-testid="button-toggle-business-partner"
-                    onClick={() => {
-                      const newState = !isBusinessPartnerExpanded;
-                      setIsBusinessPartnerExpanded(newState);
-                      localStorage.setItem('isBusinessPartnerExpanded', JSON.stringify(newState));
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  >
-                    <Handshake className="h-6 w-6 flex-shrink-0" />
-                    <span className="flex-1 text-left">
-                      {language === 'ar' ? 'شريك الأعمال' : 'Business Partner'}
-                    </span>
-                    {isBusinessPartnerExpanded ? (
-                      <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                    )}
-                  </button>
-
-                  {isBusinessPartnerExpanded && (
-                    <div className="ml-6 mt-1 space-y-1">
-                      <button
-                        data-testid="button-business-partner-partner-management"
-                        onClick={() => {
-                          setLocation('/business-partner/partner-management');
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                      >
-                        <Users className="h-5 w-5 flex-shrink-0" />
-                        <span>{language === 'ar' ? 'إدارة الشركاء' : 'Partner Management'}</span>
-                      </button>
-                      <button
-                        data-testid="button-business-partner-contracts"
-                        onClick={() => {
-                          // Placeholder for now
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                      >
-                        <FileText className="h-5 w-5 flex-shrink-0" />
-                        <span>{language === 'ar' ? 'عقود الشراكة' : 'Partnership Contracts'}</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => {
-                    setLocation('/vets-van-shifts');
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                >
-                  <Car className="h-6 w-6 flex-shrink-0" />
-                  <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'VetsVan Management'}</span>
-                </button>
-              </nav>
-            </SheetContent>
-          </Sheet>
-
-          {/* Header Controls */}
-          <div className="flex items-center gap-4">
-            <LanguageSelector />
-            
-            {/* Audio notification toggle */}
-            <button
-              onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`p-2 rounded-full transition-colors duration-200 ${
-                audioEnabled 
-                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-              title={audioEnabled 
-                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
-                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
-              }
-            >
-              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-            </button>
-
-            {/* Notifications counter */}
-            {currentRequestCount > 0 && (
-              <div className="relative">
-                <Bell className="h-6 w-6 text-purple-600" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                </span>
-              </div>
-            )}
-            
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-            >
-              <LogOut className="h-4 w-4 ml-2" />
-              {t('logout')}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content with Sidebar */}
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="hidden md:block w-64 bg-white shadow-lg min-h-screen">
-          <nav className="mt-4 px-2">
-            {/* Home Page */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-home');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Home className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
-            </button>
-            
-            {/* Administration Module */}
-            <div className="mb-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isAdministrationExpanded;
-                  setIsAdministrationExpanded(newState);
-                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <Users className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'الإدارة' : 'Administration'}
-                </span>
-                {isAdministrationExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-              
-              {/* Administration Submenu */}
-              {isAdministrationExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (currentUserPermissions && currentUserPermissions.usersHidden === true) {
-                        setLocation('/admin-home');
-                      } else {
-                        setLocation('/administration/users');
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
+                    data-testid="button-create-user"
+                    onClick={isReadOnly ? undefined : () => setShowCreateUserPopup(true)}
+                    disabled={isReadOnly}
+                    className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
+                      isReadOnly 
                         ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                        : 'bg-purple-50 border-l-4 border-purple-600'
+                        : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
                     }`}
                   >
-                    <User className={`h-5 w-5 flex-shrink-0 ${permissionsLoading || !currentUserPermissions ? '' : 'text-purple-600'}`} />
-                    <span className={permissionsLoading || !currentUserPermissions ? '' : 'text-purple-600'}>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (currentUserPermissions && currentUserPermissions.authHidden === true) {
-                        setLocation('/admin-home');
-                      } else {
-                        setLocation('/administration/authorization');
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
-                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
-                  >
-                    <Shield className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
-                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
+                    {language === 'ar' ? 'إنشاء مستخدم جديد' : 'Create New User'}
                   </button>
                 </div>
-              )}
-            </div>
-
-            {/* Financial Section */}
-            <div className="mb-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isFinancialExpanded;
-                  setIsFinancialExpanded(newState);
-                  localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <DollarSign className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'المالية' : 'Financial'}
-                </span>
-                {isFinancialExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-
-              {isFinancialExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/sales-reports');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/credit-note');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <Receipt className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/outgoing-payment');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setLocation('/financial/income-payment');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/ar-balance');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Business Partner Section */}
-            <div className="mb-2">
-              <button
-                data-testid="button-toggle-business-partner"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isBusinessPartnerExpanded;
-                  setIsBusinessPartnerExpanded(newState);
-                  localStorage.setItem('isBusinessPartnerExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <Handshake className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'شريك الأعمال' : 'Business Partner'}
-                </span>
-                {isBusinessPartnerExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-
-              {isBusinessPartnerExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    data-testid="button-business-partner-partner-management"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/business-partner/partner-management');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <Users className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'إدارة الشركاء' : 'Partner Management'}</span>
-                  </button>
-                  <button
-                    data-testid="button-business-partner-contracts"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      // Placeholder for now
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <FileText className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'عقود الشراكة' : 'Partnership Contracts'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (currentUserPermissions && currentUserPermissions.vetsVanHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  setLocation('/admin-dashboard');
-                }
-              }}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Car className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (currentUserPermissions && (currentUserPermissions as any).vetsVanShiftsHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  setLocation('/vets-van-shifts');
-                }
-              }}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Clock className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-dashboard?tab=reports');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <BarChart3 className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
-            </button>
-            {/* New Reports & Analytics Dropdown */}
-            <div className="mt-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsNewReportsExpanded(!isNewReportsExpanded);
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <TrendingUp className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left whitespace-nowrap">
-                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
-                </span>
-                {isNewReportsExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-              
-              {/* Dropdown Items */}
-              {isNewReportsExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/new-reports-analytics/sales-report');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-vetsvan-requests');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <FileText className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-dashboard/import');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Upload className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-dashboard/services');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Stethoscope className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-dashboard/products');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Package className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto py-6 px-6 lg:px-8">
-            <div className="px-4 py-6 sm:px-0">
-              <div className="bg-white shadow rounded-lg">
-                <div className="px-4 py-5 sm:p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
-                      {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
-                    </h1>
-                    <button
-                      onClick={isReadOnly ? undefined : () => setShowCreateUserPopup(true)}
-                      disabled={isReadOnly}
-                      className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
-                        isReadOnly 
-                          ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                          : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
-                      }`}
-                    >
-                      {language === 'ar' ? 'إنشاء مستخدم جديد' : 'Create New User'}
-                    </button>
+                {/* Users List */}
+                {usersLoading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                    <p className="mt-2 text-sm text-gray-500">
+                      {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+                    </p>
                   </div>
-                  {/* Users List */}
-                  {usersLoading ? (
-                    <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-                      <p className="mt-2 text-sm text-gray-500">
-                        {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-                      </p>
-                    </div>
-                  ) : usersError ? (
-                    <div className="text-center py-12">
-                      <User className="mx-auto h-12 w-12 text-red-400" />
-                      <h3 className="mt-2 text-sm font-medium text-gray-900">
-                        {language === 'ar' ? 'خطأ في التحميل' : 'Loading Error'}
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {language === 'ar' ? 'فشل في تحميل المستخدمين' : 'Failed to load users'}
-                      </p>
-                    </div>
-                  ) : adminUsers.length === 0 ? (
-                    <div className="text-center py-12">
-                      <User className="mx-auto h-12 w-12 text-gray-400" />
-                      <h3 className="mt-2 text-sm font-medium text-gray-900">
-                        {language === 'ar' ? 'لا يوجد مستخدمين' : 'No Users'}
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        {language === 'ar' ? 'ابدأ بإنشاء مستخدم جديد' : 'Start by creating a new user'}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              {language === 'ar' ? 'المستخدم' : 'User'}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              {language === 'ar' ? 'اسم المستخدم' : 'Username'}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              {language === 'ar' ? 'التصريح' : 'Authorization'}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              {language === 'ar' ? 'الحالة' : 'Status'}
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              {language === 'ar' ? 'الإجراءات' : 'Actions'}
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {adminUsers.map((user: any) => (
-                            <tr key={user.id}>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <div className="flex-shrink-0 h-10 w-10">
-                                    <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
-                                      <User className="h-5 w-5 text-purple-600" />
-                                    </div>
-                                  </div>
-                                  <div className="ml-4">
-                                    <div className="text-sm font-medium text-gray-900">
-                                      {user.firstName} {user.lastName}
-                                    </div>
+                ) : usersError ? (
+                  <div className="text-center py-12">
+                    <User className="mx-auto h-12 w-12 text-red-400" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                      {language === 'ar' ? 'خطأ في التحميل' : 'Loading Error'}
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {language === 'ar' ? 'فشل في تحميل المستخدمين' : 'Failed to load users'}
+                    </p>
+                  </div>
+                ) : adminUsers.length === 0 ? (
+                  <div className="text-center py-12">
+                    <User className="mx-auto h-12 w-12 text-gray-400" />
+                    <h3 className="mt-2 text-sm font-medium text-gray-900">
+                      {language === 'ar' ? 'لا يوجد مستخدمين' : 'No Users'}
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {language === 'ar' ? 'ابدأ بإنشاء مستخدم جديد' : 'Start by creating a new user'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'المستخدم' : 'User'}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'اسم المستخدم' : 'Username'}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'التصريح' : 'Authorization'}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'الحالة' : 'Status'}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {adminUsers.map((user: any) => (
+                          <tr key={user.id} data-testid={`row-user-${user.id}`}>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0 h-10 w-10">
+                                  <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <User className="h-5 w-5 text-purple-600" />
                                   </div>
                                 </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {user.email}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {user.username}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {user.authorizationName || user.authorizationId}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                  user.isActive 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : 'bg-red-100 text-red-800'
-                                }`}>
-                                  {user.isActive 
-                                    ? (language === 'ar' ? 'نشط' : 'Active')
-                                    : (language === 'ar' ? 'معطل' : 'Disabled')
-                                  }
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <button
-                                  disabled={isReadOnly}
-                                  className={`mr-4 ${
-                                    isReadOnly 
-                                      ? 'text-gray-300 cursor-not-allowed opacity-50'
-                                      : 'text-blue-600 hover:text-blue-900'
-                                  }`}
-                                >
-                                  {language === 'ar' ? 'تعديل' : 'Edit'}
-                                </button>
-                                <button
-                                  onClick={isReadOnly ? undefined : () => handleToggleUserStatus(user.id, user.isActive)}
-                                  disabled={isReadOnly || toggleUserStatusMutation.isPending}
-                                  className={`${
-                                    isReadOnly 
-                                      ? 'text-gray-300 cursor-not-allowed opacity-50'
-                                      : user.isActive 
-                                        ? 'text-red-600 hover:text-red-900' 
-                                        : 'text-green-600 hover:text-green-900'
-                                  } disabled:opacity-50`}
-                                >
-                                  {user.isActive 
-                                    ? (language === 'ar' ? 'تعطيل' : 'Disable')
-                                    : (language === 'ar' ? 'تفعيل' : 'Enable')
-                                  }
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-gray-900" data-testid={`text-username-${user.id}`}>
+                                    {user.firstName} {user.lastName}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" data-testid={`text-email-${user.id}`}>
+                              {user.email}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" data-testid={`text-login-${user.id}`}>
+                              {user.username}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900" data-testid={`text-authorization-${user.id}`}>
+                              {user.authorizationName || user.authorizationId}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                user.isActive 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`} data-testid={`status-user-${user.id}`}>
+                                {user.isActive 
+                                  ? (language === 'ar' ? 'نشط' : 'Active')
+                                  : (language === 'ar' ? 'معطل' : 'Disabled')
+                                }
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <button
+                                data-testid={`button-edit-${user.id}`}
+                                disabled={isReadOnly}
+                                className={`mr-4 ${
+                                  isReadOnly 
+                                    ? 'text-gray-300 cursor-not-allowed opacity-50'
+                                    : 'text-blue-600 hover:text-blue-900'
+                                }`}
+                              >
+                                {language === 'ar' ? 'تعديل' : 'Edit'}
+                              </button>
+                              <button
+                                data-testid={`button-toggle-${user.id}`}
+                                onClick={isReadOnly ? undefined : () => handleToggleUserStatus(user.id, user.isActive)}
+                                disabled={isReadOnly || toggleUserStatusMutation.isPending}
+                                className={`${
+                                  isReadOnly 
+                                    ? 'text-gray-300 cursor-not-allowed opacity-50'
+                                    : user.isActive 
+                                      ? 'text-red-600 hover:text-red-900' 
+                                      : 'text-green-600 hover:text-green-900'
+                                } disabled:opacity-50`}
+                              >
+                                {user.isActive 
+                                  ? (language === 'ar' ? 'تعطيل' : 'Disable')
+                                  : (language === 'ar' ? 'تفعيل' : 'Enable')
+                                }
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1051,6 +367,7 @@ export default function AdministrationUsers() {
                 {language === 'ar' ? 'إنشاء مستخدم جديد' : 'Create New User'}
               </h2>
               <button
+                data-testid="button-close-popup"
                 onClick={handleClosePopup}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -1069,6 +386,7 @@ export default function AdministrationUsers() {
                   <input
                     type="text"
                     id="firstName"
+                    data-testid="input-first-name"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -1084,6 +402,7 @@ export default function AdministrationUsers() {
                   <input
                     type="text"
                     id="lastName"
+                    data-testid="input-last-name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -1099,6 +418,7 @@ export default function AdministrationUsers() {
                   <input
                     type="email"
                     id="email"
+                    data-testid="input-email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -1114,6 +434,7 @@ export default function AdministrationUsers() {
                   <input
                     type="text"
                     id="username"
+                    data-testid="input-username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -1129,6 +450,7 @@ export default function AdministrationUsers() {
                   <input
                     type="password"
                     id="password"
+                    data-testid="input-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -1144,6 +466,7 @@ export default function AdministrationUsers() {
                   <input
                     type="password"
                     id="confirmPassword"
+                    data-testid="input-confirm-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -1158,6 +481,7 @@ export default function AdministrationUsers() {
                   </label>
                   <select
                     id="authorization"
+                    data-testid="select-authorization"
                     value={selectedAuthorization}
                     onChange={(e) => setSelectedAuthorization(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -1187,6 +511,7 @@ export default function AdministrationUsers() {
             {/* Popup Footer */}
             <div className="flex justify-end gap-2 p-4 border-t">
               <button
+                data-testid="button-cancel"
                 onClick={handleClosePopup}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
               >
@@ -1194,6 +519,7 @@ export default function AdministrationUsers() {
               </button>
               <button
                 type="button"
+                data-testid="button-save-user"
                 onClick={handleSaveUser}
                 disabled={createUserMutation.isPending}
                 className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 disabled:opacity-50"
@@ -1218,6 +544,7 @@ export default function AdministrationUsers() {
                 {language === 'ar' ? 'ليس لديك صلاحية' : 'No permission'}
               </h2>
               <button
+                data-testid="button-close-no-permission"
                 onClick={() => {
                   setShowNoPermissionPopup(false);
                   setIsNoPermissionDialogOpen(false);
@@ -1241,6 +568,7 @@ export default function AdministrationUsers() {
             {/* Popup Footer */}
             <div className="flex justify-end p-4 border-t">
               <button
+                data-testid="button-ok"
                 onClick={() => {
                   setShowNoPermissionPopup(false);
                   setIsNoPermissionDialogOpen(false);
@@ -1253,7 +581,6 @@ export default function AdministrationUsers() {
           </div>
         </div>
       )}
-
-    </div>
+    </AdminLayout>
   );
 }

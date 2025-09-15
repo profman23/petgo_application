@@ -1,16 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
-import { useTranslation, getDirection } from "@/lib/i18n";
-import { LanguageSelector } from "@/components/language-selector";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, X, Plus, Edit, Home, Menu, DollarSign, Receipt, FilePlus, Search, Download, Handshake } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
+import { Shield, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, DollarSign, Receipt, FilePlus, Search, Download, X, Plus, Edit } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
+import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -21,43 +18,13 @@ declare global {
   }
 }
 
+// Helper function for text direction 
+const getDirection = (lang: string) => lang === 'ar' ? 'rtl' : 'ltr';
+
 export default function AdministrationAuthorization() {
   const [location, setLocation] = useLocation();
   const { t, language } = useTranslation();
   const { toast } = useToast();
-  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  // Administration menu state - persist across navigation
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isAdministrationExpanded');
-    if (savedState !== null) {
-      return JSON.parse(savedState);
-    }
-    return false; // Default to collapsed to maintain consistency
-  });
-  // Financial menu state - persist across navigation
-  const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isFinancialExpanded');
-    if (savedState !== null) {
-      return JSON.parse(savedState);
-    }
-    return false; // Default to collapsed to maintain consistency
-  });
-  
-  // Business Partner menu state - persist across navigation
-  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
-    if (savedState !== null) {
-      return JSON.parse(savedState);
-    }
-    return false; // Default collapsed
-  });
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const isMobile = useIsMobile();
-  
-  // State for tracking notifications and audio
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const lastRequestCountRef = useRef(0);
-  const [currentRequestCount, setCurrentRequestCount] = useState(0);
   
   // State for popup
   const [showAddAuthorizationPopup, setShowAddAuthorizationPopup] = useState(false);
@@ -328,7 +295,6 @@ export default function AdministrationAuthorization() {
   const handleHiddenUsersChange = (checked: boolean) => {
     setHiddenUsersChecked(checked);
     if (checked) {
-      // If Hidden is checked, uncheck and disable Read and Full Control
       setReadUsersChecked(false);
       setFullControlChecked(false);
     }
@@ -337,7 +303,6 @@ export default function AdministrationAuthorization() {
   const handleReadUsersChange = (checked: boolean) => {
     setReadUsersChecked(checked);
     if (!checked) {
-      // If Read is unchecked, also uncheck Full Control
       setFullControlChecked(false);
     }
   };
@@ -345,7 +310,6 @@ export default function AdministrationAuthorization() {
   const handleFullControlChange = (checked: boolean) => {
     setFullControlChecked(checked);
     if (checked) {
-      // If Full Control is checked, automatically check Read
       setReadUsersChecked(true);
     }
   };
@@ -354,7 +318,6 @@ export default function AdministrationAuthorization() {
   const handleAuthHiddenUsersChange = (checked: boolean) => {
     setAuthHiddenUsersChecked(checked);
     if (checked) {
-      // If Hidden is checked, uncheck and disable Read and Full Control
       setAuthReadUsersChecked(false);
       setAuthFullControlChecked(false);
     }
@@ -363,7 +326,6 @@ export default function AdministrationAuthorization() {
   const handleAuthReadUsersChange = (checked: boolean) => {
     setAuthReadUsersChecked(checked);
     if (!checked) {
-      // If Read is unchecked, also uncheck Full Control
       setAuthFullControlChecked(false);
     }
   };
@@ -371,7 +333,6 @@ export default function AdministrationAuthorization() {
   const handleAuthFullControlChange = (checked: boolean) => {
     setAuthFullControlChecked(checked);
     if (checked) {
-      // If Full Control is checked, automatically check Read
       setAuthReadUsersChecked(true);
     }
   };
@@ -380,7 +341,6 @@ export default function AdministrationAuthorization() {
   const handleVetsVanHiddenChange = (checked: boolean) => {
     setVetsVanHiddenChecked(checked);
     if (checked) {
-      // If Hidden is checked, uncheck and disable Read and Full Control
       setVetsVanReadChecked(false);
       setVetsVanFullControlChecked(false);
     }
@@ -389,7 +349,6 @@ export default function AdministrationAuthorization() {
   const handleVetsVanReadChange = (checked: boolean) => {
     setVetsVanReadChecked(checked);
     if (!checked) {
-      // If Read is unchecked, also uncheck Full Control
       setVetsVanFullControlChecked(false);
     }
   };
@@ -397,7 +356,6 @@ export default function AdministrationAuthorization() {
   const handleVetsVanFullControlChange = (checked: boolean) => {
     setVetsVanFullControlChecked(checked);
     if (checked) {
-      // If Full Control is checked, automatically check Read
       setVetsVanReadChecked(true);
     }
   };
@@ -406,7 +364,6 @@ export default function AdministrationAuthorization() {
   const handleVetsVanShiftsHiddenChange = (checked: boolean) => {
     setVetsVanShiftsHiddenChecked(checked);
     if (checked) {
-      // If hidden is checked, uncheck both Read and Full Control
       setVetsVanShiftsReadChecked(false);
       setVetsVanShiftsFullControlChecked(false);
     }
@@ -415,7 +372,6 @@ export default function AdministrationAuthorization() {
   const handleVetsVanShiftsReadChange = (checked: boolean) => {
     setVetsVanShiftsReadChecked(checked);
     if (!checked) {
-      // If Read is unchecked, also uncheck Full Control
       setVetsVanShiftsFullControlChecked(false);
     }
   };
@@ -423,7 +379,6 @@ export default function AdministrationAuthorization() {
   const handleVetsVanShiftsFullControlChange = (checked: boolean) => {
     setVetsVanShiftsFullControlChecked(checked);
     if (checked) {
-      // If Full Control is checked, automatically check Read
       setVetsVanShiftsReadChecked(true);
     }
   };
@@ -432,7 +387,6 @@ export default function AdministrationAuthorization() {
   const handleImportHiddenChange = (checked: boolean) => {
     setImportHiddenChecked(checked);
     if (checked) {
-      // If Hidden is checked, uncheck and disable Full Control
       setImportFullControlChecked(false);
     }
   };
@@ -445,7 +399,6 @@ export default function AdministrationAuthorization() {
   const handleServicesHiddenChange = (checked: boolean) => {
     setServicesHiddenChecked(checked);
     if (checked) {
-      // If Hidden is checked, uncheck and disable Read and Full Control
       setServicesReadChecked(false);
       setServicesFullControlChecked(false);
     }
@@ -454,7 +407,6 @@ export default function AdministrationAuthorization() {
   const handleServicesReadChange = (checked: boolean) => {
     setServicesReadChecked(checked);
     if (!checked) {
-      // If Read is unchecked, also uncheck Full Control
       setServicesFullControlChecked(false);
     }
   };
@@ -462,7 +414,6 @@ export default function AdministrationAuthorization() {
   const handleServicesFullControlChange = (checked: boolean) => {
     setServicesFullControlChecked(checked);
     if (checked) {
-      // If Full Control is checked, automatically check Read
       setServicesReadChecked(true);
     }
   };
@@ -471,7 +422,6 @@ export default function AdministrationAuthorization() {
   const handleProductsHiddenChange = (checked: boolean) => {
     setProductsHiddenChecked(checked);
     if (checked) {
-      // If Hidden is checked, uncheck and disable Read and Full Control
       setProductsReadChecked(false);
       setProductsFullControlChecked(false);
     }
@@ -480,7 +430,6 @@ export default function AdministrationAuthorization() {
   const handleProductsReadChange = (checked: boolean) => {
     setProductsReadChecked(checked);
     if (!checked) {
-      // If Read is unchecked, also uncheck Full Control
       setProductsFullControlChecked(false);
     }
   };
@@ -488,7 +437,6 @@ export default function AdministrationAuthorization() {
   const handleProductsFullControlChange = (checked: boolean) => {
     setProductsFullControlChecked(checked);
     if (checked) {
-      // If Full Control is checked, automatically check Read
       setProductsReadChecked(true);
     }
   };
@@ -497,7 +445,6 @@ export default function AdministrationAuthorization() {
   const handleCreditNoteNoPermissionChange = (checked: boolean) => {
     setCreditNoteNoPermissionChecked(checked);
     if (checked) {
-      // If No Permission is checked, uncheck Read, Full Control, and Export
       setCreditNoteReadChecked(false);
       setCreditNoteFullControlChecked(false);
       setCreditNoteExportChecked(false);
@@ -507,7 +454,6 @@ export default function AdministrationAuthorization() {
   const handleCreditNoteReadChange = (checked: boolean) => {
     setCreditNoteReadChecked(checked);
     if (!checked) {
-      // If Read is unchecked, also uncheck Full Control and Export
       setCreditNoteFullControlChecked(false);
       setCreditNoteExportChecked(false);
     }
@@ -516,7 +462,6 @@ export default function AdministrationAuthorization() {
   const handleCreditNoteFullControlChange = (checked: boolean) => {
     setCreditNoteFullControlChecked(checked);
     if (checked) {
-      // If Full Control is checked, automatically check Read
       setCreditNoteReadChecked(true);
     }
   };
@@ -524,7 +469,6 @@ export default function AdministrationAuthorization() {
   const handleCreditNoteExportChange = (checked: boolean) => {
     setCreditNoteExportChecked(checked);
     if (checked) {
-      // If Export is checked, automatically check Read
       setCreditNoteReadChecked(true);
     }
   };
@@ -543,744 +487,150 @@ export default function AdministrationAuthorization() {
     if (!permissionsLoading && currentUserPermissions && (currentUserPermissions as any).authHidden === true) {
       // User should not reach this page with hidden permission, redirect immediately
       console.log('User has no authorization permission, redirecting');
-      setLocation('/admin-dashboard');
+      setLocation('/admin-home');
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   // Determine if page is in read-only mode
   const isReadOnly = currentUserPermissions && (currentUserPermissions as any).authRead === true && !(currentUserPermissions as any).authFullControl;
 
-  const adminToken = localStorage.getItem("adminToken");
-  const admin = JSON.parse(localStorage.getItem("admin") || "{}");
-
-  // Fetch all VetsVan requests for notification counter
-  const { data: allVetsVanRequests } = useQuery({
-    queryKey: ["/api/admin/vetsvan-requests"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/vetsvan-requests", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch requests");
-      return response.json();
-    },
-    refetchInterval: 3000,
-    enabled: !!adminToken,
-  });
-
-  // Monitor for new requests and update counter
-  useEffect(() => {
-    if (allVetsVanRequests && allVetsVanRequests.length > 0) {
-      const currentCount = allVetsVanRequests.length;
-      lastRequestCountRef.current = currentCount;
-      setCurrentRequestCount(currentCount);
-    }
-  }, [allVetsVanRequests]);
-
-  // Request browser notification permission on component mount
-  useEffect(() => {
-    if (Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("admin");
-    setLocation("/admin-login");
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
-      {/* Full-width Header with logo and controls */}
-      <div className="bg-white shadow-md border-b border-gray-200">
-        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
-          {/* Logo */}
-          <div className="flex-shrink-0 -ml-6">
-            <img 
-              src={vetsVanLogo} 
-              alt="VETS VAN" 
-              className="h-14 w-auto object-contain"
-            />
-          </div>
-
-          {/* Mobile Menu Button */}
-          <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
-            <SheetTrigger asChild>
-              <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-                <Menu className="h-6 w-6" />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
-              <nav className="mt-4 px-2">
-                <button
-                  onClick={() => {
-                    setLocation('/admin-home');
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                >
-                  <Home className="h-6 w-6 flex-shrink-0" />
-                  <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
-                </button>
-                
-                <div className="mb-2">
-                  <button
-                    onClick={() => {
-                      const newState = !isAdministrationExpanded;
-                      setIsAdministrationExpanded(newState);
-                      localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  >
-                    <Users className="h-6 w-6 flex-shrink-0" />
-                    <span className="flex-1 text-left">
-                      {language === 'ar' ? 'الإدارة' : 'Administration'}
-                    </span>
-                    {isAdministrationExpanded ? (
-                      <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                    )}
-                  </button>
-                  
-                  {isAdministrationExpanded && (
-                    <div className="ml-6 mt-1 space-y-1">
-                      <button
-                        onClick={() => {
-                          setLocation('/administration/users');
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                      >
-                        <User className="h-5 w-5 flex-shrink-0" />
-                        <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                      </button>
-                      
-                      <button
-                        className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
-                      >
-                        <Shield className="h-5 w-5 flex-shrink-0 text-purple-600" />
-                        <span className="text-purple-600">{language === 'ar' ? 'التفويضات' : 'Authorization'}</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => {
-                    setLocation('/sales-reports');
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                >
-                  <DollarSign className="h-6 w-6 flex-shrink-0" />
-                  <span>{language === 'ar' ? 'المالية' : 'Financial'}</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setLocation('/vets-van-shifts');
-                    setIsMobileSidebarOpen(false);
-                  }}
-                  className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                >
-                  <Car className="h-6 w-6 flex-shrink-0" />
-                  <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'VetsVan Management'}</span>
-                </button>
-              </nav>
-            </SheetContent>
-          </Sheet>
-
-          {/* Header Controls */}
-          <div className="flex items-center gap-4">
-            <LanguageSelector />
-            
-            {/* Audio notification toggle */}
-            <button
-              onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`p-2 rounded-full transition-colors duration-200 ${
-                audioEnabled 
-                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-              title={audioEnabled 
-                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
-                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
-              }
-            >
-              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-            </button>
-
-            {/* Notifications counter */}
-            {currentRequestCount > 0 && (
-              <div className="relative">
-                <Bell className="h-6 w-6 text-purple-600" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                </span>
-              </div>
-            )}
-            
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-            >
-              <LogOut className="h-4 w-4 ml-2" />
-              {t('logout')}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content with Sidebar */}
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="hidden md:block w-64 bg-white shadow-lg min-h-screen">
-          <nav className="mt-4 px-2">
-            {/* Home Page */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-home');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Home className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
-            </button>
-            
-            {/* Administration Module */}
-            <div className="mb-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isAdministrationExpanded;
-                  setIsAdministrationExpanded(newState);
-                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <Users className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'الإدارة' : 'Administration'}
-                </span>
-                {isAdministrationExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-              
-              {/* Administration Submenu */}
-              {isAdministrationExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={currentUserPermissions && (currentUserPermissions as any).usersHidden === true ? undefined : (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      
-                      // Sanity check log
-                      console.log('Users clicked - permissions loading:', permissionsLoading, 'hiddenUsers:', (currentUserPermissions as any)?.usersHidden, 'permissions:', currentUserPermissions);
-                      
-                      // If permissions are still loading, do nothing
-                      if (permissionsLoading) {
-                        console.log('Permissions still loading, blocking click');
-                        return;
-                      }
-                      
-                      // If dialog is already open, do nothing
-                      if (isNoPermissionDialogOpen) {
-                        console.log('Dialog already open, ignoring click');
-                        return;
-                      }
-                      
-                      // Check for valid permissions (read or full control)
-                      if (currentUserPermissions && ((currentUserPermissions as any).usersRead === true || (currentUserPermissions as any).usersFullControl === true)) {
-                        console.log('Permission granted (read or full control), navigating to users');
-                        setLocation('/administration/users');
-                      } else {
-                        console.log('No valid permission for users');
-                        setIsNoPermissionDialogOpen(true);
-                        setShowNoPermissionPopup(true);
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).usersHidden === true)}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).usersHidden === true)
-                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                        : location === '/administration/users'
-                          ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
-                  >
-                    <User className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-                  </button>
-                  <button
-                    onClick={currentUserPermissions && (currentUserPermissions as any).authHidden === true ? undefined : (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      
-                      // Sanity check log
-                      console.log('Authorization clicked - permissions loading:', permissionsLoading, 'authHidden:', (currentUserPermissions as any)?.authHidden, 'permissions:', currentUserPermissions);
-                      
-                      // If permissions are still loading, do nothing
-                      if (permissionsLoading) {
-                        console.log('Permissions still loading, blocking click');
-                        return;
-                      }
-                      
-                      // If dialog is already open, do nothing
-                      if (isNoPermissionDialogOpen) {
-                        console.log('Dialog already open, ignoring click');
-                        return;
-                      }
-                      
-                      // Check for valid permissions (read or full control)
-                      if (currentUserPermissions && ((currentUserPermissions as any).authRead === true || (currentUserPermissions as any).authFullControl === true)) {
-                        console.log('Permission granted (read or full control), navigating to authorization');
-                        setLocation('/administration/authorization');
-                      } else {
-                        console.log('No valid permission for authorization');
-                        setIsNoPermissionDialogOpen(true);
-                        setShowNoPermissionPopup(true);
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).authHidden === true)}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions || (currentUserPermissions && (currentUserPermissions as any).authHidden === true)
-                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                        : location === '/administration/authorization'
-                          ? 'bg-purple-50 border-l-4 border-purple-600'
-                          : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
-                  >
-                    <Shield className={`h-5 w-5 flex-shrink-0 ${location === '/administration/authorization' ? 'text-purple-600' : ''}`} />
-                    <span className={location === '/administration/authorization' ? 'text-purple-600' : ''}>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
-                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Financial Section */}
-            <div className="mb-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isFinancialExpanded;
-                  setIsFinancialExpanded(newState);
-                  localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <DollarSign className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'المالية' : 'Financial'}
-                </span>
-                {isFinancialExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-
-              {isFinancialExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/sales-reports');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/credit-note');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <Receipt className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/outgoing-payment');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/income-payment');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/ar-balance');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Business Partner Section */}
-            <div className="mb-2">
-              <button
-                data-testid="button-toggle-business-partner"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isBusinessPartnerExpanded;
-                  setIsBusinessPartnerExpanded(newState);
-                  localStorage.setItem('isBusinessPartnerExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <Handshake className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'شريك الأعمال' : 'Business Partner'}
-                </span>
-                {isBusinessPartnerExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-
-              {isBusinessPartnerExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    data-testid="button-business-partner-partner-management"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/business-partner/partner-management');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <Users className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'إدارة الشركاء' : 'Partner Management'}</span>
-                  </button>
-                  
-                  <button
-                    data-testid="button-business-partner-contracts"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      // Placeholder for now
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <FileText className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'عقود الشراكة' : 'Partnership Contracts'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            <button
-              onClick={currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true ? () => setLocation('/admin-home') : () => setLocation('/admin-dashboard')}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Car className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (currentUserPermissions && (currentUserPermissions as any).vetsVanShiftsHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  setLocation('/vets-van-shifts');
-                }
-              }}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Clock className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-            </button>
-            <button
-              onClick={() => setLocation('/admin-dashboard?tab=reports')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <BarChart3 className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
-            </button>
-            {/* New Reports & Analytics Dropdown */}
-            <div className="mt-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsNewReportsExpanded(!isNewReportsExpanded);
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <TrendingUp className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left whitespace-nowrap">
-                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
-                </span>
-                {isNewReportsExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-              
-              {/* Dropdown Items */}
-              {isNewReportsExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-            <button
-              onClick={() => setLocation('/admin-vetsvan-requests')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <FileText className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Check if user has import permissions
-                if (currentUserPermissions && (currentUserPermissions as any).importHidden === true) {
-                  // User has No Permission for Import, redirect to admin home
-                  setLocation('/admin-home');
-                } else {
-                  // User has Full Control or no specific restrictions, allow access
-                  setLocation('/admin-dashboard/import');
-                }
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Upload className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Check if user has services permissions
-                if (currentUserPermissions && (currentUserPermissions as any).servicesHidden === true) {
-                  // User has No Permission for Services, redirect to admin home
-                  setLocation('/admin-home');
-                } else {
-                  // User has Full Control or Read access, allow access
-                  setLocation('/admin-dashboard/services');
-                }
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Stethoscope className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Check if user has products permissions
-                if (currentUserPermissions && (currentUserPermissions as any).productsHidden === true) {
-                  // User has No Permission for Products, redirect to admin home
-                  setLocation('/admin-home');
-                } else {
-                  // User has Full Control or Read access, allow access
-                  setLocation('/admin-dashboard/products');
-                }
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Package className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-            </button>
-          </nav>
-        </div>
-
+    <AdminLayout>
+      <div className="flex-1 relative">
         {/* Main Content Area */}
         <div className="flex-1 overflow-auto relative">
-          {/* Top Header Section */}
-          <div className="flex items-center justify-between p-8">
-            {/* Authorization Management Header - aligned to far left */}
-            <div className="flex items-center gap-4">
-              <div className="flex-shrink-0">
-                <lord-icon 
-                  src="https://cdn.lordicon.com/gjlzobte.json" 
-                  trigger="hover" 
-                  colors="primary:#852085,secondary:#545454" 
-                  style={{ width: '80px', height: '80px' }}
-                />
-              </div>
-              <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
-                {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
-              </h1>
+        {/* Top Header Section */}
+        <div className="flex items-center justify-between p-8">
+          {/* Authorization Management Header - aligned to far left */}
+          <div className="flex items-center gap-4">
+            <div className="flex-shrink-0">
+              <lord-icon 
+                src="https://cdn.lordicon.com/gjlzobte.json" 
+                trigger="hover" 
+                colors="primary:#852085,secondary:#545454" 
+                style={{ width: '80px', height: '80px' }}
+              />
             </div>
-
-            {/* Add Authorization Button - top-right corner */}
-            <button
-              onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
-              disabled={!!isReadOnly}
-              className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
-                isReadOnly 
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                  : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
-              }`}
-            >
-              <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
-              {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
-            </button>
+            <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+              {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
+            </h1>
           </div>
 
-          {/* Search Field */}
-          <div className="px-8 mb-6">
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <Input
-                  type="text"
-                  placeholder={language === 'ar' ? 'البحث بحسب اسم التصريح أو المستخدم' : 'Search by authorization name or user'}
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onKeyPress={handleSearchKeyPress}
-                  className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
-                  data-testid="input-search-authorizations"
-                  dir={getDirection(language)}
-                />
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleSearchClick}
-                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                  data-testid="button-search-authorizations"
-                >
-                  <Search className="h-4 w-4 mr-2" />
-                  {language === 'ar' ? 'بحث' : 'Search'}
-                </Button>
-                <Button
-                  onClick={handleExportClick}
-                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
-                  data-testid="button-export-authorizations"
-                  style={{ borderColor: '#852085', color: '#852085' }}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  {language === 'ar' ? 'تصدير' : 'Export'}
-                </Button>
-              </div>
+          {/* Add Authorization Button - top-right corner */}
+          <button
+            data-testid="button-add-authorization"
+            onClick={isReadOnly ? undefined : () => setShowAddAuthorizationPopup(true)}
+            disabled={!!isReadOnly}
+            className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+              isReadOnly 
+                ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+            }`}
+          >
+            <FilePlus style={{ color: '#852085' }} className="w-5 h-5" />
+            {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+          </button>
+        </div>
+
+        {/* Search Field */}
+        <div className="px-8 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <Input
+                type="text"
+                placeholder={language === 'ar' ? 'البحث بحسب اسم التصريح أو المستخدم' : 'Search by authorization name or user'}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
+                data-testid="input-search-authorizations"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleSearchClick}
+                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                data-testid="button-search-authorizations"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'بحث' : 'Search'}
+              </Button>
+              <Button
+                onClick={handleExportClick}
+                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
+                data-testid="button-export-authorizations"
+                style={{ borderColor: '#852085', color: '#852085' }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'تصدير' : 'Export'}
+              </Button>
             </div>
           </div>
+        </div>
 
-          {/* Authorization Content */}
-          <div className="px-4 mb-6">
-            {authorizationsLoading ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-                <p className="mt-2 text-sm text-gray-500">
-                  {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-                </p>
-              </div>
-            ) : (authorizations as any[]).length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <Shield className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  {language === 'ar' ? 'لا توجد تصريحات' : 'No Authorizations'}
-                </h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  {language === 'ar' 
-                    ? 'اضغط على "إضافة تصريح جديد" لإنشاء تصريح جديد' 
-                    : 'Click "Add New Authorization" to create your first authorization'}
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                {(authorizations as any[]).map((auth: any) => (
-                  <div
-                    key={auth.id}
-                    className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 flex items-center gap-3">
-                        <Shield className="h-6 w-6" style={{ color: '#852085' }} />
-                        <p className="text-lg font-medium" style={{ fontFamily: 'Arimo', color: '#26282b' }}>
-                          {language === 'ar' ? 'اسم التصريح: ' : 'Authorization Name: '}{auth.name}
-                        </p>
-                      </div>
-                      <div className="ml-4">
-                        <button
-                          onClick={isReadOnly ? undefined : () => handleEditAuthorization(auth)}
-                          disabled={!!isReadOnly}
-                          className={`p-2 rounded-full transition-colors ${
-                            isReadOnly 
-                              ? 'text-gray-300 cursor-not-allowed opacity-50'
-                              : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
-                          }`}
-                          title={language === 'ar' ? 'تعديل' : 'Edit'}
-                        >
-                          <Edit className="h-5 w-5" />
-                        </button>
-                      </div>
+        {/* Authorization Content */}
+        <div className="px-4 mb-6">
+          {authorizationsLoading ? (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+              <p className="mt-2 text-sm text-gray-500">
+                {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+              </p>
+            </div>
+          ) : (authorizations as any[]).length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <Shield className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">
+                {language === 'ar' ? 'لا توجد تصريحات' : 'No Authorizations'}
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                {language === 'ar' 
+                  ? 'اضغط على "إضافة تصريح جديد" لإنشاء تصريح جديد' 
+                  : 'Click "Add New Authorization" to create your first authorization'}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+              {(authorizations as any[]).map((auth: any) => (
+                <div
+                  key={auth.id}
+                  data-testid={`card-authorization-${auth.id}`}
+                  className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 flex items-center gap-3">
+                      <Shield className="h-6 w-6" style={{ color: '#852085' }} />
+                      <p className="text-lg font-medium" style={{ fontFamily: 'Arimo', color: '#26282b' }} data-testid={`text-auth-name-${auth.id}`}>
+                        {language === 'ar' ? 'اسم التصريح: ' : 'Authorization Name: '}{auth.name}
+                      </p>
+                    </div>
+                    <div className="ml-4">
+                      <button
+                        data-testid={`button-edit-${auth.id}`}
+                        onClick={isReadOnly ? undefined : () => handleEditAuthorization(auth)}
+                        disabled={!!isReadOnly}
+                        className={`p-2 rounded-full transition-colors ${
+                          isReadOnly 
+                            ? 'text-gray-300 cursor-not-allowed opacity-50'
+                            : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
+                        }`}
+                        title={language === 'ar' ? 'تعديل' : 'Edit'}
+                      >
+                        <Edit className="h-5 w-5" />
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         </div>
       </div>
 
       {/* Add New Authorization Popup */}
       {showAddAuthorizationPopup && !isReadOnly && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style={{ left: '256px', top: '82px' }}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[90vh]">
             {/* Popup Header */}
             <div className="flex justify-between items-center p-4 border-b">
@@ -1313,6 +663,7 @@ export default function AdministrationAuthorization() {
                 </div>
               )}
               <button
+                data-testid="button-close-popup"
                 onClick={handleClosePopup}
                 className="text-gray-400 hover:text-gray-600"
               >
@@ -1322,54 +673,38 @@ export default function AdministrationAuthorization() {
             
             {/* Popup Content with Custom Scrollbar */}
             <div className="relative flex-1 overflow-hidden">
-              {/* Scrollable Content */}
-              <div 
-                id="authorization-scroll-container"
-                className="overflow-y-auto p-4 pr-12 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
-                style={{
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: '#9CA3AF #F3F4F6',
-                  height: '70vh',
-                  maxHeight: '650px'
-                }}
-              >
-              {/* Authorization Name Field */}
-              <div className="mb-6">
-                <label htmlFor="authorizationName" className="block text-sm font-medium text-gray-700 mb-2">
-                  {language === 'ar' ? 'اسم التصريح:' : 'Authorization Name:'}
-                  <span className="text-red-500 ml-1">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="authorizationName"
-                  value={authorizationName}
-                  onChange={(e) => setAuthorizationName(e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                  placeholder={language === 'ar' ? 'أدخل اسم التصريح' : 'Enter authorization name'}
-                />
-              </div>
-              
-              {/* Administration Tab */}
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  {language === 'ar' ? 'الإدارة' : 'Administration'}
-                </h3>
-                
-                {/* Users Section */}
-                <div className="ml-8">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
-                    {language === 'ar' ? 'المستخدمين' : 'Users'}
-                  </h4>
+              <div className="p-4 h-full overflow-y-auto custom-scrollbar">
+                {/* Authorization Name */}
+                <div className="mb-6">
+                  <label htmlFor="authorizationName" className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'اسم التصريح:' : 'Authorization Name:'}
+                  </label>
+                  <input
+                    type="text"
+                    id="authorizationName"
+                    data-testid="input-authorization-name"
+                    value={authorizationName}
+                    onChange={(e) => setAuthorizationName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    placeholder={language === 'ar' ? 'أدخل اسم التصريح' : 'Enter authorization name'}
+                  />
+                </div>
+
+                {/* Users Tab */}
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Users className="h-4 w-4 text-gray-500" />
+                    {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
+                  </h3>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 flex flex-row gap-6">
+                  <div className="ml-8 flex flex-row gap-6">
                     {/* Hidden Users */}
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         id="hiddenUsers"
+                        data-testid="checkbox-users-hidden"
                         checked={hiddenUsersChecked}
                         onChange={(e) => handleHiddenUsersChange(e.target.checked)}
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
@@ -1384,6 +719,7 @@ export default function AdministrationAuthorization() {
                       <input
                         type="checkbox"
                         id="readUsers"
+                        data-testid="checkbox-users-read"
                         checked={readUsersChecked}
                         disabled={hiddenUsersChecked}
                         onChange={(e) => handleReadUsersChange(e.target.checked)}
@@ -1394,11 +730,12 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                     
-                    {/* Full Control */}
+                    {/* Full Control Users */}
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         id="fullControl"
+                        data-testid="checkbox-users-full-control"
                         checked={fullControlChecked}
                         disabled={hiddenUsersChecked}
                         onChange={(e) => handleFullControlChange(e.target.checked)}
@@ -1413,20 +750,22 @@ export default function AdministrationAuthorization() {
                   {/* Purple divider line */}
                   <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
-                
-                {/* Authorization Section */}
-                <div className="ml-8">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
-                    {language === 'ar' ? 'التصريح' : 'Authorization'}
-                  </h4>
+
+                {/* Authorization Tab */}
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-gray-500" />
+                    {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
+                  </h3>
                   
                   {/* Permission Items */}
-                  <div className="ml-4 flex flex-row gap-6">
-                    {/* Hidden Users */}
+                  <div className="ml-8 flex flex-row gap-6">
+                    {/* Hidden Authorization */}
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         id="authHiddenUsers"
+                        data-testid="checkbox-auth-hidden"
                         checked={authHiddenUsersChecked}
                         onChange={(e) => handleAuthHiddenUsersChange(e.target.checked)}
                         className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
@@ -1436,11 +775,12 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                     
-                    {/* Read Users */}
+                    {/* Read Authorization */}
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         id="authReadUsers"
+                        data-testid="checkbox-auth-read"
                         checked={authReadUsersChecked}
                         disabled={authHiddenUsersChecked}
                         onChange={(e) => handleAuthReadUsersChange(e.target.checked)}
@@ -1451,11 +791,12 @@ export default function AdministrationAuthorization() {
                       </label>
                     </div>
                     
-                    {/* Full Control */}
+                    {/* Full Control Authorization */}
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         id="authFullControl"
+                        data-testid="checkbox-auth-full-control"
                         checked={authFullControlChecked}
                         disabled={authHiddenUsersChecked}
                         onChange={(e) => handleAuthFullControlChange(e.target.checked)}
@@ -1470,398 +811,416 @@ export default function AdministrationAuthorization() {
                   {/* Purple divider line */}
                   <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
-              </div>
-              
-              {/* Financial Tab */}
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-gray-500" />
-                  {language === 'ar' ? 'المالية' : 'Financial'}
-                </h3>
-                
-                {/* Credit Note Section */}
-                <div className="ml-8">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
-                    {language === 'ar' ? 'إشعار الخصم' : 'Credit Note'}
-                  </h4>
+
+                {/* Financial Tab */}
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-gray-500" />
+                    {language === 'ar' ? 'المالية' : 'Financial'}
+                  </h3>
                   
-                  {/* Permission Items */}
-                  <div className="ml-4 flex flex-row gap-6">
-                    {/* No Permission */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="creditNoteNoPermission"
-                        checked={creditNoteNoPermissionChecked}
-                        onChange={(e) => handleCreditNoteNoPermissionChange(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="creditNoteNoPermission" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
+                  {/* Credit Note Section */}
+                  <div className="ml-8">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      {language === 'ar' ? 'إشعار الخصم' : 'Credit Note'}
+                    </h4>
+                    
+                    {/* Permission Items */}
+                    <div className="ml-4 flex flex-row gap-6">
+                      {/* No Permission */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="creditNoteNoPermission"
+                          data-testid="checkbox-credit-note-no-permission"
+                          checked={creditNoteNoPermissionChecked}
+                          onChange={(e) => handleCreditNoteNoPermissionChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="creditNoteNoPermission" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      
+                      {/* Read */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="creditNoteRead"
+                          data-testid="checkbox-credit-note-read"
+                          checked={creditNoteReadChecked}
+                          disabled={creditNoteNoPermissionChecked}
+                          onChange={(e) => handleCreditNoteReadChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="creditNoteRead" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Read
+                        </label>
+                      </div>
+                      
+                      {/* Full Control */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="creditNoteFullControl"
+                          data-testid="checkbox-credit-note-full-control"
+                          checked={creditNoteFullControlChecked}
+                          disabled={creditNoteNoPermissionChecked}
+                          onChange={(e) => handleCreditNoteFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="creditNoteFullControl" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                        </label>
+                      </div>
+                      
+                      {/* Export */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="creditNoteExport"
+                          data-testid="checkbox-credit-note-export"
+                          checked={creditNoteExportChecked}
+                          disabled={creditNoteNoPermissionChecked}
+                          onChange={(e) => handleCreditNoteExportChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="creditNoteExport" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {language === 'ar' ? 'تصدير' : 'Export'}
+                        </label>
+                      </div>
                     </div>
                     
-                    {/* Read */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="creditNoteRead"
-                        checked={creditNoteReadChecked}
-                        disabled={creditNoteNoPermissionChecked}
-                        onChange={(e) => handleCreditNoteReadChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="creditNoteRead" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Read
-                      </label>
-                    </div>
-                    
-                    {/* Full Control */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="creditNoteFullControl"
-                        checked={creditNoteFullControlChecked}
-                        disabled={creditNoteNoPermissionChecked}
-                        onChange={(e) => handleCreditNoteFullControlChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="creditNoteFullControl" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
-                    </div>
-                    
-                    {/* Export */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="creditNoteExport"
-                        checked={creditNoteExportChecked}
-                        disabled={creditNoteNoPermissionChecked}
-                        onChange={(e) => handleCreditNoteExportChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="creditNoteExport" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تصدير' : 'Export'}
-                      </label>
-                    </div>
+                    {/* Purple divider line */}
+                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
-                  
-                  {/* Purple divider line */}
-                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
-              </div>
-              
-              {/* Vets Van Management Section */}
-              <div className="mb-4">
-                <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                  <Car className="h-4 w-4 text-gray-500" />
-                  {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
-                </h3>
                 
                 {/* Vets Van Management Section */}
-                <div className="ml-8">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Car className="h-4 w-4 text-gray-500" />
                     {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
-                  </h4>
+                  </h3>
                   
-                  {/* Permission Items */}
-                  <div className="ml-4 flex flex-row gap-6">
-                    {/* Hidden Vets Van */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanHidden"
-                        checked={vetsVanHiddenChecked}
-                        onChange={(e) => handleVetsVanHiddenChange(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="vetsVanHidden" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
+                  {/* Vets Van Management Section */}
+                  <div className="ml-8">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                      {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
+                    </h4>
+                    
+                    {/* Permission Items */}
+                    <div className="ml-4 flex flex-row gap-6">
+                      {/* Hidden Vets Van */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="vetsVanHidden"
+                          data-testid="checkbox-vets-van-hidden"
+                          checked={vetsVanHiddenChecked}
+                          onChange={(e) => handleVetsVanHiddenChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="vetsVanHidden" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      
+                      {/* Read Vets Van */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="vetsVanRead"
+                          data-testid="checkbox-vets-van-read"
+                          checked={vetsVanReadChecked}
+                          disabled={vetsVanHiddenChecked}
+                          onChange={(e) => handleVetsVanReadChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="vetsVanRead" className={`ml-2 text-sm ${vetsVanHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Read
+                        </label>
+                      </div>
+                      
+                      {/* Full Control Vets Van */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="vetsVanFullControl"
+                          data-testid="checkbox-vets-van-full-control"
+                          checked={vetsVanFullControlChecked}
+                          disabled={vetsVanHiddenChecked}
+                          onChange={(e) => handleVetsVanFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="vetsVanFullControl" className={`ml-2 text-sm ${vetsVanHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                        </label>
+                      </div>
                     </div>
                     
-                    {/* Read Vets Van */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanRead"
-                        checked={vetsVanReadChecked}
-                        disabled={vetsVanHiddenChecked}
-                        onChange={(e) => handleVetsVanReadChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="vetsVanRead" className={`ml-2 text-sm ${vetsVanHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Read
-                      </label>
-                    </div>
-                    
-                    {/* Full Control Vets Van */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanFullControl"
-                        checked={vetsVanFullControlChecked}
-                        disabled={vetsVanHiddenChecked}
-                        onChange={(e) => handleVetsVanFullControlChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="vetsVanFullControl" className={`ml-2 text-sm ${vetsVanHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
-                    </div>
+                    {/* Purple divider line */}
+                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
-                  
-                  {/* Purple divider line */}
-                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
                 </div>
-              </div>
 
-              {/* Vets Van Shifts Section */}
-              <div className="mb-4">
-                <div className="ml-8">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-gray-500" />
-                    {language === 'ar' ? 'نوبات VETS VAN' : 'Vets Van Shifts'}
-                  </h4>
-                  
-                  {/* Permission Items */}
-                  <div className="ml-4 flex flex-row gap-6">
-                    {/* Hidden Vets Van Shifts */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanShiftsHidden"
-                        checked={vetsVanShiftsHiddenChecked}
-                        onChange={(e) => handleVetsVanShiftsHiddenChange(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="vetsVanShiftsHidden" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
+                {/* Vets Van Shifts Section */}
+                <div className="mb-4">
+                  <div className="ml-8">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-gray-500" />
+                      {language === 'ar' ? 'نوبات VETS VAN' : 'Vets Van Shifts'}
+                    </h4>
+                    
+                    {/* Permission Items */}
+                    <div className="ml-4 flex flex-row gap-6">
+                      {/* Hidden Vets Van Shifts */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="vetsVanShiftsHidden"
+                          data-testid="checkbox-vets-van-shifts-hidden"
+                          checked={vetsVanShiftsHiddenChecked}
+                          onChange={(e) => handleVetsVanShiftsHiddenChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="vetsVanShiftsHidden" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      
+                      {/* Read Vets Van Shifts */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="vetsVanShiftsRead"
+                          data-testid="checkbox-vets-van-shifts-read"
+                          checked={vetsVanShiftsReadChecked}
+                          disabled={vetsVanShiftsHiddenChecked}
+                          onChange={(e) => handleVetsVanShiftsReadChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanShiftsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="vetsVanShiftsRead" className={`ml-2 text-sm ${vetsVanShiftsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Read
+                        </label>
+                      </div>
+                      
+                      {/* Full Control Vets Van Shifts */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="vetsVanShiftsFullControl"
+                          data-testid="checkbox-vets-van-shifts-full-control"
+                          checked={vetsVanShiftsFullControlChecked}
+                          disabled={vetsVanShiftsHiddenChecked}
+                          onChange={(e) => handleVetsVanShiftsFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanShiftsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="vetsVanShiftsFullControl" className={`ml-2 text-sm ${vetsVanShiftsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                        </label>
+                      </div>
                     </div>
                     
-                    {/* Read Vets Van Shifts */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanShiftsRead"
-                        checked={vetsVanShiftsReadChecked}
-                        disabled={vetsVanShiftsHiddenChecked}
-                        onChange={(e) => handleVetsVanShiftsReadChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanShiftsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="vetsVanShiftsRead" className={`ml-2 text-sm ${vetsVanShiftsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Read
-                      </label>
-                    </div>
-                    
-                    {/* Full Control Vets Van Shifts */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="vetsVanShiftsFullControl"
-                        checked={vetsVanShiftsFullControlChecked}
-                        disabled={vetsVanShiftsHiddenChecked}
-                        onChange={(e) => handleVetsVanShiftsFullControlChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${vetsVanShiftsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="vetsVanShiftsFullControl" className={`ml-2 text-sm ${vetsVanShiftsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
-                    </div>
+                    {/* Purple divider line */}
+                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
                   
-                  {/* Purple divider line */}
-                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
-                </div>
-                
-                {/* Import Section */}
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                    <Upload className="h-4 w-4 text-gray-500" />
-                    {language === 'ar' ? 'استيراد' : 'Import'}
-                  </h3>
-                  
-                  {/* Import Sub-section */}
-                  <div className="ml-8">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                  {/* Import Section */}
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                      <Upload className="h-4 w-4 text-gray-500" />
                       {language === 'ar' ? 'استيراد' : 'Import'}
-                    </h4>
+                    </h3>
                     
-                    {/* Permission Items */}
-                    <div className="ml-4 flex flex-row gap-6">
-                    {/* No Permission Import */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="importHidden"
-                        checked={importHiddenChecked}
-                        onChange={(e) => handleImportHiddenChange(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="importHidden" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
+                    {/* Import Sub-section */}
+                    <div className="ml-8">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">
+                        {language === 'ar' ? 'استيراد' : 'Import'}
+                      </h4>
+                      
+                      {/* Permission Items */}
+                      <div className="ml-4 flex flex-row gap-6">
+                      {/* No Permission Import */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="importHidden"
+                          data-testid="checkbox-import-hidden"
+                          checked={importHiddenChecked}
+                          onChange={(e) => handleImportHiddenChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="importHidden" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      
+                      {/* Full Control Import */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="importFullControl"
+                          data-testid="checkbox-import-full-control"
+                          checked={importFullControlChecked}
+                          disabled={importHiddenChecked}
+                          onChange={(e) => handleImportFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${importHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="importFullControl" className={`ml-2 text-sm ${importHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                        </label>
+                      </div>
+                      </div>
+                      
+                      {/* Purple divider line */}
+                      <div className="border-b border-purple-600 mt-3 mb-4"></div>
                     </div>
-                    
-                    {/* Full Control Import */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="importFullControl"
-                        checked={importFullControlChecked}
-                        disabled={importHiddenChecked}
-                        onChange={(e) => handleImportFullControlChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${importHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="importFullControl" className={`ml-2 text-sm ${importHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
-                    </div>
-                    </div>
-                    
-                    {/* Purple divider line */}
-                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
-                </div>
-                
-                {/* Services Section */}
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                    <Stethoscope className="h-4 w-4 text-gray-500" />
-                    {language === 'ar' ? 'الخدمات' : 'Services'}
-                  </h3>
                   
-                  {/* Services Sub-section */}
-                  <div className="ml-8">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                  {/* Services Section */}
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                      <Stethoscope className="h-4 w-4 text-gray-500" />
                       {language === 'ar' ? 'الخدمات' : 'Services'}
-                    </h4>
+                    </h3>
                     
-                    {/* Permission Items */}
-                    <div className="ml-4 flex flex-row gap-6">
-                    {/* No Permission Services */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="servicesHidden"
-                        checked={servicesHiddenChecked}
-                        onChange={(e) => handleServicesHiddenChange(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="servicesHidden" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
+                    {/* Services Sub-section */}
+                    <div className="ml-8">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">
+                        {language === 'ar' ? 'الخدمات' : 'Services'}
+                      </h4>
+                      
+                      {/* Permission Items */}
+                      <div className="ml-4 flex flex-row gap-6">
+                      {/* No Permission Services */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="servicesHidden"
+                          data-testid="checkbox-services-hidden"
+                          checked={servicesHiddenChecked}
+                          onChange={(e) => handleServicesHiddenChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="servicesHidden" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      
+                      {/* Read Services */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="servicesRead"
+                          data-testid="checkbox-services-read"
+                          checked={servicesReadChecked}
+                          disabled={servicesHiddenChecked}
+                          onChange={(e) => handleServicesReadChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="servicesRead" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Read
+                        </label>
+                      </div>
+                      
+                      {/* Full Control Services */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="servicesFullControl"
+                          data-testid="checkbox-services-full-control"
+                          checked={servicesFullControlChecked}
+                          disabled={servicesHiddenChecked}
+                          onChange={(e) => handleServicesFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="servicesFullControl" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                        </label>
+                      </div>
+                      </div>
+                      
+                      {/* Purple divider line */}
+                      <div className="border-b border-purple-600 mt-3 mb-4"></div>
                     </div>
-                    
-                    {/* Read Services */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="servicesRead"
-                        checked={servicesReadChecked}
-                        disabled={servicesHiddenChecked}
-                        onChange={(e) => handleServicesReadChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="servicesRead" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Read
-                      </label>
-                    </div>
-                    
-                    {/* Full Control Services */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="servicesFullControl"
-                        checked={servicesFullControlChecked}
-                        disabled={servicesHiddenChecked}
-                        onChange={(e) => handleServicesFullControlChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="servicesFullControl" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
-                    </div>
-                    </div>
-                    
-                    {/* Purple divider line */}
-                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
-                </div>
-                
-                {/* Products Section */}
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                    <Package className="h-4 w-4 text-gray-500" />
-                    {language === 'ar' ? 'المنتجات' : 'Products'}
-                  </h3>
                   
-                  {/* Products Sub-section */}
-                  <div className="ml-8">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">
+                  {/* Products Section */}
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                      <Package className="h-4 w-4 text-gray-500" />
                       {language === 'ar' ? 'المنتجات' : 'Products'}
-                    </h4>
+                    </h3>
                     
-                    {/* Permission Items */}
-                    <div className="ml-4 flex flex-row gap-6">
-                    {/* No Permission Products */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="productsHidden"
-                        checked={productsHiddenChecked}
-                        onChange={(e) => handleProductsHiddenChange(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="productsHidden" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
+                    {/* Products Sub-section */}
+                    <div className="ml-8">
+                      <h4 className="text-sm font-medium text-gray-700 mb-3">
+                        {language === 'ar' ? 'المنتجات' : 'Products'}
+                      </h4>
+                      
+                      {/* Permission Items */}
+                      <div className="ml-4 flex flex-row gap-6">
+                      {/* No Permission Products */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="productsHidden"
+                          data-testid="checkbox-products-hidden"
+                          checked={productsHiddenChecked}
+                          onChange={(e) => handleProductsHiddenChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="productsHidden" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      
+                      {/* Read Products */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="productsRead"
+                          data-testid="checkbox-products-read"
+                          checked={productsReadChecked}
+                          disabled={productsHiddenChecked}
+                          onChange={(e) => handleProductsReadChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${productsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="productsRead" className={`ml-2 text-sm ${productsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Read
+                        </label>
+                      </div>
+                      
+                      {/* Full Control Products */}
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="productsFullControl"
+                          data-testid="checkbox-products-full-control"
+                          checked={productsFullControlChecked}
+                          disabled={productsHiddenChecked}
+                          onChange={(e) => handleProductsFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${productsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="productsFullControl" className={`ml-2 text-sm ${productsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                        </label>
+                      </div>
+                      
+                      {/* Purple divider line */}
+                      <div className="border-b border-purple-600 mt-3 mb-4"></div>
                     </div>
-                    
-                    {/* Read Products */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="productsRead"
-                        checked={productsReadChecked}
-                        disabled={productsHiddenChecked}
-                        onChange={(e) => handleProductsReadChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${productsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="productsRead" className={`ml-2 text-sm ${productsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Read
-                      </label>
-                    </div>
-                    
-                    {/* Full Control Products */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="productsFullControl"
-                        checked={productsFullControlChecked}
-                        disabled={productsHiddenChecked}
-                        onChange={(e) => handleProductsFullControlChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${productsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="productsFullControl" className={`ml-2 text-sm ${productsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
-                    </div>
-                    </div>
-                    
-                    {/* Purple divider line */}
-                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
                 </div>
-              </div>
+                </div>
               </div>
             </div>
             
             {/* Popup Footer */}
             <div className="flex justify-end gap-2 p-4 border-t">
               <button
+                data-testid="button-cancel"
                 onClick={handleClosePopup}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
               >
@@ -1869,6 +1228,7 @@ export default function AdministrationAuthorization() {
               </button>
               <button
                 type="button"
+                data-testid="button-save-authorization"
                 onClick={handleSaveAuthorization}
                 disabled={createAuthorizationMutation.isPending || updateAuthorizationMutation.isPending}
                 className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1895,6 +1255,7 @@ export default function AdministrationAuthorization() {
                 {language === 'ar' ? 'ليس لديك صلاحية' : 'No permission'}
               </h2>
               <button
+                data-testid="button-close-no-permission"
                 onClick={() => {
                   setShowNoPermissionPopup(false);
                   setIsNoPermissionDialogOpen(false);
@@ -1918,6 +1279,7 @@ export default function AdministrationAuthorization() {
             {/* Popup Footer */}
             <div className="flex justify-end p-4 border-t">
               <button
+                data-testid="button-ok"
                 onClick={() => {
                   setShowNoPermissionPopup(false);
                   setIsNoPermissionDialogOpen(false);
@@ -1930,6 +1292,6 @@ export default function AdministrationAuthorization() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }
