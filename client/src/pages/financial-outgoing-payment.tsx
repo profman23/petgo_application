@@ -77,8 +77,22 @@ export default function FinancialOutgoingPayment() {
       
       setPostingDate(format(targetDate, 'yyyy-MM-dd'));
     } else {
-      // Regular date input
+      // Allow clearing and regular date input
       setPostingDate(value);
+    }
+  };
+  
+  // Handle key input for shortcuts
+  const handlePostingDateKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const value = e.currentTarget.value;
+    
+    // If user starts typing + or -, clear the field first
+    if ((e.key === '+' || e.key === '-') && value) {
+      setPostingDate('');
+    }
+    
+    if (e.key === 'Enter') {
+      handlePostingDateChange(e.currentTarget.value);
     }
   };
   const [businessPartnerType, setBusinessPartnerType] = useState('customer');
@@ -780,15 +794,11 @@ export default function FinancialOutgoingPayment() {
                       {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
                     </label>
                     <input 
-                      type="date" 
+                      type="text" 
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       value={postingDate}
                       onChange={(e) => handlePostingDateChange(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          handlePostingDateChange(e.currentTarget.value);
-                        }
-                      }}
+                      onKeyDown={handlePostingDateKeyDown}
                       placeholder={language === 'ar' ? '+3 أو -2 للتاريخ' : '+3 or -2 for date'}
                       data-testid="input-posting-date"
                     />
