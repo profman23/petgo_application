@@ -762,42 +762,36 @@ export default function FinancialOutgoingPayment() {
           {/* Modal Content */}
           <div className="space-y-6">
             {/* Referenced Document Section */}
-            <div dir={getDirection(language)}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div>
+              <h3 className="text-sm font-medium text-gray-700 mb-4">
                 {language === 'ar' ? 'المستند المرجعي:' : 'Referenced Document:'}
-              </label>
-              <input 
-                type="text" 
-                className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                placeholder={language === 'ar' ? 'أدخل المستند المرجعي' : 'Enter referenced document'}
-                data-testid="input-referenced-document"
-              />
+              </h3>
+              
+              {/* Transaction Type and Document No. Section - 2 columns */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="ltr">
+                <div dir={getDirection(language)}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'نوع المعاملة' : 'Transaction Type'}
+                  </label>
+                  <select 
+                    className="w-[170px] px-2 input-compact-20 select-reset border border-gray-300"
+                  >
+                    <option value="invoice">
+                      {language === 'ar' ? 'فاتورة' : 'Invoice'}
+                    </option>
+                  </select>
+                </div>
+                <div dir={getDirection(language)}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {language === 'ar' ? 'رقم الوثيقة' : 'Document No.'}
+                  </label>
+                  <input 
+                    type="text" 
+                    className="w-[170px] px-2 input-compact-20 select-reset border border-gray-300"
+                    placeholder={language === 'ar' ? 'أدخل رقم الوثيقة' : 'Enter document number'}
+                  />
+                </div>
             </div>
-
-            {/* Transaction Type and Document No. Section - 2 columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="ltr">
-              <div dir={getDirection(language)}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {language === 'ar' ? 'نوع المعاملة' : 'Transaction Type'}
-                </label>
-                <select 
-                  className="w-[170px] px-2 input-compact-20 select-reset border border-gray-300"
-                >
-                  <option value="invoice">
-                    {language === 'ar' ? 'فاتورة' : 'Invoice'}
-                  </option>
-                </select>
-              </div>
-              <div dir={getDirection(language)}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {language === 'ar' ? 'رقم الوثيقة' : 'Document No.'}
-                </label>
-                <input 
-                  type="text" 
-                  className="w-[170px] px-2 input-compact-20 select-reset border border-gray-300"
-                  placeholder={language === 'ar' ? 'أدخل رقم الوثيقة' : 'Enter document number'}
-                />
-              </div>
             </div>
             
             {/* Payment Method Section */}
