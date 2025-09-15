@@ -844,6 +844,19 @@ export default function FinancialIncomePayment() {
           
           {/* Modal Content */}
           <div className="space-y-6">
+            {/* Referenced Document Section */}
+            <div dir={getDirection(language)}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {language === 'ar' ? 'المستند المرجعي:' : 'Referenced Document:'}
+              </label>
+              <input 
+                type="text" 
+                className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                placeholder={language === 'ar' ? 'أدخل المستند المرجعي' : 'Enter referenced document'}
+                data-testid="input-referenced-document"
+              />
+            </div>
+
             {/* Transaction Type and Document No. Section - 2 columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="ltr">
               <div dir={getDirection(language)}>
