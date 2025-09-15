@@ -716,6 +716,15 @@ export default function AdminDashboard() {
     }
     return true; // Default expanded for consistent Financial menu visibility
   });
+  
+  // Business Partner menu state - persist across navigation
+  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default collapsed
+  });
 
   // Create a custom setter that prevents unwanted expansions
   const setAdministrationExpandedSafely = useCallback((newValue: boolean) => {
