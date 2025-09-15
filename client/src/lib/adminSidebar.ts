@@ -71,19 +71,19 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "outgoing-payment",
         i18nKey: { en: "Outgoing Payment", ar: "الدفع الصادر" },
         route: "/financial/outgoing-payment",
-        icon: ArrowUpRight
+        icon: DollarSign
       },
       {
         id: "income-payment",
         i18nKey: { en: "Income Payment", ar: "الدفع الوارد" },
         route: "/financial/income-payment",
-        icon: ArrowDownLeft
+        icon: DollarSign
       },
       {
         id: "ar-balance",
         i18nKey: { en: "A/R Balance", ar: "رصيد الحسابات المدينة" },
         route: "/financial/ar-balance",
-        icon: Receipt
+        icon: DollarSign
       }
     ]
   },
