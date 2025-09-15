@@ -52,6 +52,27 @@ export default function FinancialOutgoingPayment() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [businessPartnerType, setBusinessPartnerType] = useState('customer');
+  const [paymentMethods, setPaymentMethods] = useState({
+    cash: { checked: false, amount: 0 },
+    card: { checked: false, amount: 0 },
+    bank: { checked: false, amount: 0 }
+  });
+
+  const handlePaymentMethodChange = (method: string, field: 'checked' | 'amount', value: boolean | number) => {
+    setPaymentMethods(prev => ({
+      ...prev,
+      [method]: {
+        ...prev[method as keyof typeof prev],
+        [field]: value
+      }
+    }));
+  };
+
+  const calculateTotal = () => {
+    return Object.values(paymentMethods).reduce((total, method) => {
+      return total + (method.checked ? method.amount : 0);
+    }, 0);
+  };
   const isMobile = useIsMobile();
   
 
@@ -780,6 +801,8 @@ export default function FinancialOutgoingPayment() {
                         type="checkbox" 
                         name="paymentMethod" 
                         value="cash"
+                        checked={paymentMethods.cash.checked}
+                        onChange={(e) => handlePaymentMethodChange('cash', 'checked', e.target.checked)}
                         className="mr-2 text-purple-600 focus:ring-purple-500"
                       />
                       <span className="text-sm text-gray-700">
@@ -794,6 +817,9 @@ export default function FinancialOutgoingPayment() {
                         type="number" 
                         className="w-[170px] px-2 input-compact-20 border border-gray-300"
                         placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                        value={paymentMethods.cash.amount || ''}
+                        onChange={(e) => handlePaymentMethodChange('cash', 'amount', parseFloat(e.target.value) || 0)}
+                        disabled={!paymentMethods.cash.checked}
                       />
                     </div>
                   </div>
@@ -805,6 +831,8 @@ export default function FinancialOutgoingPayment() {
                         type="checkbox" 
                         name="paymentMethod" 
                         value="card"
+                        checked={paymentMethods.card.checked}
+                        onChange={(e) => handlePaymentMethodChange('card', 'checked', e.target.checked)}
                         className="mr-2 text-purple-600 focus:ring-purple-500"
                       />
                       <span className="text-sm text-gray-700">
@@ -819,6 +847,9 @@ export default function FinancialOutgoingPayment() {
                         type="number" 
                         className="w-[170px] px-2 input-compact-20 border border-gray-300"
                         placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                        value={paymentMethods.card.amount || ''}
+                        onChange={(e) => handlePaymentMethodChange('card', 'amount', parseFloat(e.target.value) || 0)}
+                        disabled={!paymentMethods.card.checked}
                       />
                     </div>
                   </div>
@@ -830,6 +861,8 @@ export default function FinancialOutgoingPayment() {
                         type="checkbox" 
                         name="paymentMethod" 
                         value="bank"
+                        checked={paymentMethods.bank.checked}
+                        onChange={(e) => handlePaymentMethodChange('bank', 'checked', e.target.checked)}
                         className="mr-2 text-purple-600 focus:ring-purple-500"
                       />
                       <span className="text-sm text-gray-700">
@@ -844,6 +877,9 @@ export default function FinancialOutgoingPayment() {
                         type="number" 
                         className="w-[170px] px-2 input-compact-20 border border-gray-300"
                         placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                        value={paymentMethods.bank.amount || ''}
+                        onChange={(e) => handlePaymentMethodChange('bank', 'amount', parseFloat(e.target.value) || 0)}
+                        disabled={!paymentMethods.bank.checked}
                       />
                     </div>
                   </div>
@@ -861,6 +897,7 @@ export default function FinancialOutgoingPayment() {
                           type="number" 
                           className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-50 font-semibold"
                           placeholder={language === 'ar' ? 'الإجمالي' : 'Total'}
+                          value={calculateTotal()}
                           readOnly
                           data-testid="input-total-amount"
                         />
