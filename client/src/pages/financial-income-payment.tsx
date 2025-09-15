@@ -758,7 +758,7 @@ export default function FinancialIncomePayment() {
                     </label>
                     <input 
                       type="text" 
-                      className="w-[170px] px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                      className="w-[170px] px-2 input-compact-10 border border-gray-300 bg-gray-100 cursor-not-allowed"
                       disabled
                       value="IPN001"
                       data-testid="input-payment-no"
@@ -779,7 +779,7 @@ export default function FinancialIncomePayment() {
                       </label>
                       <input 
                         type="text" 
-                        className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-[170px] px-2 input-compact-10 border border-gray-300"
                         data-testid="input-partner-phone"
                         placeholder={businessPartnerType === 'supplier' 
                           ? (language === 'ar' ? 'أدخل هاتف المورد' : 'Enter supplier phone') 
@@ -796,7 +796,7 @@ export default function FinancialIncomePayment() {
                       </label>
                       <input 
                         type="text" 
-                        className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        className="w-[170px] px-2 input-compact-10 border border-gray-300"
                         data-testid="input-partner-name"
                         placeholder={businessPartnerType === 'supplier' 
                           ? (language === 'ar' ? 'أدخل اسم المورد' : 'Enter supplier name') 
@@ -813,7 +813,7 @@ export default function FinancialIncomePayment() {
                     </label>
                     <input 
                       type="date" 
-                      className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-[170px] px-2 input-compact-10 border border-gray-300"
                     />
                   </div>
                 </div>
@@ -830,7 +830,7 @@ export default function FinancialIncomePayment() {
                   {language === 'ar' ? 'نوع المعاملة' : 'Transaction Type'}
                 </label>
                 <select 
-                  className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-[170px] px-2 input-compact-10 select-reset border border-gray-300"
                 >
                   <option value="invoice">
                     {language === 'ar' ? 'فاتورة' : 'Invoice'}
@@ -843,7 +843,7 @@ export default function FinancialIncomePayment() {
                 </label>
                 <input 
                   type="text" 
-                  className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-[170px] px-2 input-compact-10 select-reset border border-gray-300"
                   placeholder={language === 'ar' ? 'أدخل رقم الوثيقة' : 'Enter document number'}
                 />
               </div>
@@ -859,7 +859,7 @@ export default function FinancialIncomePayment() {
                   </label>
                   <textarea 
                     rows={4}
-                    className="w-[170px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-[170px] px-2 input-compact-10 select-reset border border-gray-300"
                     placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
                   />
                 </div>
@@ -891,7 +891,7 @@ export default function FinancialIncomePayment() {
                         </label>
                         <input 
                           type="number" 
-                          className="w-[170px] px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                          className="w-[170px] px-2 input-compact-10 border border-gray-300"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                         />
                       </div>
@@ -916,7 +916,7 @@ export default function FinancialIncomePayment() {
                         </label>
                         <input 
                           type="number" 
-                          className="w-[170px] px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                          className="w-[170px] px-2 input-compact-10 border border-gray-300"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                         />
                       </div>
@@ -941,7 +941,7 @@ export default function FinancialIncomePayment() {
                         </label>
                         <input 
                           type="number" 
-                          className="w-[170px] px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                          className="w-[170px] px-2 input-compact-10 border border-gray-300"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                         />
                       </div>

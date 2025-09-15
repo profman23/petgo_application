@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .input-compact-10 {
+    @apply h-[10px] py-0 leading-[10px] text-[10px] rounded-sm focus:outline-none focus:ring-1 focus:ring-purple-500 min-h-0;
+  }
+  .select-reset {
+    @apply appearance-none min-h-0;
+  }
+}
+
 /* Custom scrollbar styles for Authorization Modal */
 .scrollbar-thin {
   scrollbar-width: thin;
