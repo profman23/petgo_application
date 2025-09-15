@@ -301,6 +301,42 @@ export default function BusinessPartnerManagement() {
               )}
             </div>
 
+            {/* VetsVan Management */}
+            <button
+              onClick={() => {
+                setLocation('/admin-dashboard');
+                setIsMobileSidebarOpen(false);
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Car className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'VetsVan Management'}</span>
+            </button>
+
+            {/* Vets Van Shifts */}
+            <button
+              onClick={() => {
+                setLocation('/vets-van-shifts');
+                setIsMobileSidebarOpen(false);
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Clock className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'نوبات VETS VAN' : 'Vets Van Shifts'}</span>
+            </button>
+
+            {/* Reports */}
+            <button
+              onClick={() => {
+                setLocation('/admin-dashboard?tab=reports');
+                setIsMobileSidebarOpen(false);
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+            </button>
+
             {/* Other navigation items */}
             <button
               onClick={() => {
@@ -571,6 +607,45 @@ export default function BusinessPartnerManagement() {
                 </div>
               )}
             </div>
+
+            {/* VetsVan Management */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Car className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'VetsVan Management'}</span>
+            </button>
+
+            {/* Vets Van Shifts */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/vets-van-shifts');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Clock className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'نوبات VETS VAN' : 'Vets Van Shifts'}</span>
+            </button>
+
+            {/* Reports */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard?tab=reports');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+            </button>
 
             {/* New Reports */}
             <div className="mb-2">
