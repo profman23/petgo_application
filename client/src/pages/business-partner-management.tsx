@@ -51,7 +51,7 @@ export default function BusinessPartnerManagement() {
     if (savedState !== null) {
       return JSON.parse(savedState);
     }
-    return true; // Default expanded for business partner pages
+    return false; // Default collapsed
   });
   
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
