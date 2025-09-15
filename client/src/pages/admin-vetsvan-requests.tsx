@@ -558,7 +558,7 @@ export default function AdminVetsVanRequests() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      // Placeholder for now
+                      setLocation('/business-partner/partner-management');
                     }}
                     className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                   >
