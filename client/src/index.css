@@ -5,8 +5,8 @@
 @tailwind utilities;
 
 @layer utilities {
-  .input-compact-10 {
-    @apply h-[10px] py-0 leading-[10px] text-[10px] rounded-sm focus:outline-none focus:ring-1 focus:ring-purple-500 min-h-0;
+  .input-compact-20 {
+    @apply h-[20px] py-0 leading-[20px] text-[12px] rounded-sm focus:outline-none focus:ring-1 focus:ring-purple-500 min-h-0;
   }
   .select-reset {
     @apply appearance-none min-h-0;
