@@ -677,7 +677,7 @@ export default function BusinessPartnerManagement() {
                 src="https://cdn.lordicon.com/rcuovkuy.json"
                 trigger={triggerAnimation}
                 colors="primary:#852085,secondary:#545454"
-                style={{width:'250px',height:'250px'}}
+                style={{width:'80px',height:'80px'}}
               />
               
               {/* Page Title */}
