@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, Calendar } from "lucide-react";
+import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar } from "lucide-react";
 
 export interface SidebarMenuItem {
   id: string;
@@ -71,13 +71,13 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "outgoing-payment",
         i18nKey: { en: "Outgoing Payment", ar: "الدفع الصادر" },
         route: "/financial/outgoing-payment",
-        icon: DollarSign
+        icon: ArrowUpRight
       },
       {
         id: "income-payment",
         i18nKey: { en: "Income Payment", ar: "الدفع الوارد" },
         route: "/financial/income-payment",
-        icon: DollarSign
+        icon: ArrowDownLeft
       },
       {
         id: "ar-balance",
@@ -130,7 +130,7 @@ export const adminSidebarConfig: SidebarSection[] = [
   // New Reports & Analytics
   {
     id: "new-reports",
-    i18nKey: { en: "New Reports", ar: "التقارير الجديدة" },
+    i18nKey: { en: "New Reports & Analytics", ar: "تقارير وتحليلات جديدة" },
     icon: TrendingUp,
     items: [
       {
