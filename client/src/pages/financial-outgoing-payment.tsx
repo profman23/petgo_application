@@ -847,6 +847,26 @@ export default function FinancialOutgoingPayment() {
                       />
                     </div>
                   </div>
+                  
+                  {/* Total Amount */}
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <label className="flex items-center min-w-[120px] font-semibold">
+                        <span className="text-sm text-gray-800">
+                          {language === 'ar' ? 'المبلغ الإجمالي:' : 'Total Amount:'}
+                        </span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input 
+                          type="number" 
+                          className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-50 font-semibold"
+                          placeholder={language === 'ar' ? 'الإجمالي' : 'Total'}
+                          readOnly
+                          data-testid="input-total-amount"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
