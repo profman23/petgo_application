@@ -712,40 +712,57 @@ export default function FinancialIncomePayment() {
                   </h1>
                 </div>
                 
-                {/* Select Business Partner Master Data */}
-                <div className="flex items-center gap-4">
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'تحديد بيانات شريك العمل الرئيسية:' : 'Select Business Partner Master Data:'}
-                  </label>
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-2">
-                      <input 
-                        type="radio" 
-                        name="businessPartnerType" 
-                        value="customer" 
-                        checked={businessPartnerType === 'customer'}
-                        onChange={(e) => setBusinessPartnerType(e.target.value)}
-                        className="text-purple-600 focus:ring-purple-500"
-                        data-testid="radio-partner-customer"
-                      />
-                      <span className="text-sm text-gray-700">
-                        {language === 'ar' ? 'عميل' : 'Customer'}
-                      </span>
+                {/* Business Partner Selection and Payment No. Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Left: Select Business Partner Master Data */}
+                  <div className="flex items-center gap-4">
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'تحديد بيانات شريك العمل الرئيسية:' : 'Select Business Partner Master Data:'}
                     </label>
-                    <label className="flex items-center gap-2">
-                      <input 
-                        type="radio" 
-                        name="businessPartnerType" 
-                        value="supplier" 
-                        checked={businessPartnerType === 'supplier'}
-                        onChange={(e) => setBusinessPartnerType(e.target.value)}
-                        className="text-purple-600 focus:ring-purple-500"
-                        data-testid="radio-partner-supplier"
-                      />
-                      <span className="text-sm text-gray-700">
-                        {language === 'ar' ? 'مورد' : 'Supplier'}
-                      </span>
+                    <div className="flex gap-4">
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="businessPartnerType" 
+                          value="customer" 
+                          checked={businessPartnerType === 'customer'}
+                          onChange={(e) => setBusinessPartnerType(e.target.value)}
+                          className="text-purple-600 focus:ring-purple-500"
+                          data-testid="radio-partner-customer"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {language === 'ar' ? 'عميل' : 'Customer'}
+                        </span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input 
+                          type="radio" 
+                          name="businessPartnerType" 
+                          value="supplier" 
+                          checked={businessPartnerType === 'supplier'}
+                          onChange={(e) => setBusinessPartnerType(e.target.value)}
+                          className="text-purple-600 focus:ring-purple-500"
+                          data-testid="radio-partner-supplier"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {language === 'ar' ? 'مورد' : 'Supplier'}
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                  
+                  {/* Right: Income Payment No. */}
+                  <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                      {language === 'ar' ? 'رقم الدفع الوارد:' : 'Income Payment No.:'}
                     </label>
+                    <input 
+                      type="text" 
+                      className="w-full md:max-w-[160px] px-3 py-2 border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
+                      disabled
+                      value="IPN001"
+                      data-testid="input-payment-no"
+                    />
                   </div>
                 </div>
                 
@@ -806,18 +823,8 @@ export default function FinancialIncomePayment() {
           
           {/* Modal Content */}
           <div className="space-y-6">
-            {/* Reference and Transaction Type Section - 2 columns */}
+            {/* Transaction Type and Document No. Section - 2 columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4" dir="ltr">
-              <div dir={getDirection(language)}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {language === 'ar' ? 'المرجع' : 'Reference'}
-                </label>
-                <input 
-                  type="text" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  placeholder={language === 'ar' ? 'أدخل المرجع' : 'Enter reference'}
-                />
-              </div>
               <div dir={getDirection(language)}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {language === 'ar' ? 'نوع المعاملة' : 'Transaction Type'}
@@ -829,6 +836,16 @@ export default function FinancialIncomePayment() {
                     {language === 'ar' ? 'فاتورة' : 'Invoice'}
                   </option>
                 </select>
+              </div>
+              <div dir={getDirection(language)}>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'ar' ? 'رقم الوثيقة' : 'Document No.'}
+                </label>
+                <input 
+                  type="text" 
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder={language === 'ar' ? 'أدخل رقم الوثيقة' : 'Enter document number'}
+                />
               </div>
             </div>
             
