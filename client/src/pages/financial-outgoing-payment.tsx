@@ -763,8 +763,8 @@ export default function FinancialOutgoingPayment() {
           <div className="space-y-6">
             {/* Referenced Document Section */}
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-4 text-left">
-                {language === 'ar' ? 'المستند المرجعي:' : 'Referenced Document:'}
+              <h3 className="refdoc-title text-sm font-medium text-gray-700 mb-4 text-left" dir={getDirection(language)}>
+                {language === 'ar' ? 'المستند المرجعي' : 'Referenced Document'}
               </h3>
               
               {/* Transaction Type and Document No. Section - 2 columns */}

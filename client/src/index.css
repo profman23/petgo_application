@@ -563,4 +563,15 @@
     color: white !important;
     stroke: white !important;
   }
+
+  /* Referenced Document title with proper colon positioning for RTL/LTR */
+  [dir="ltr"] .refdoc-title::after {
+    content: ":";
+    margin-left: 0.25rem;
+  }
+
+  [dir="rtl"] .refdoc-title::before {
+    content: ":";
+    margin-right: 0.25rem;
+  }
 }
