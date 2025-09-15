@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { format, addDays, subDays } from "date-fns";
 import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
@@ -53,7 +54,36 @@ export default function FinancialIncomePayment() {
   });
   
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  
+  // Posting Date state
+  const [postingDate, setPostingDate] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  
+  // Initialize posting date when modal opens
+  useEffect(() => {
+    if (isCreateModalOpen) {
+      setPostingDate(format(new Date(), 'yyyy-MM-dd'));
+    }
+  }, [isCreateModalOpen]);
+  
+  // Handle posting date changes and shortcuts
+  const handlePostingDateChange = (value: string) => {
+    // Check for shortcut patterns like +3, -2, etc.
+    const shortcutMatch = value.match(/^([+-])(\d+)$/);
+    
+    if (shortcutMatch) {
+      const [, operator, days] = shortcutMatch;
+      const today = new Date();
+      const targetDate = operator === '+' 
+        ? addDays(today, parseInt(days))
+        : subDays(today, parseInt(days));
+      
+      setPostingDate(format(targetDate, 'yyyy-MM-dd'));
+    } else {
+      // Regular date input
+      setPostingDate(value);
+    }
+  };
   const [businessPartnerType, setBusinessPartnerType] = useState('customer');
   const [paymentMethods, setPaymentMethods] = useState({
     cash: { checked: false, amount: 0 },
@@ -835,6 +865,15 @@ export default function FinancialIncomePayment() {
                     <input 
                       type="date" 
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                      value={postingDate}
+                      onChange={(e) => handlePostingDateChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handlePostingDateChange(e.currentTarget.value);
+                        }
+                      }}
+                      placeholder={language === 'ar' ? '+3 أو -2 للتاريخ' : '+3 or -2 for date'}
+                      data-testid="input-posting-date"
                     />
                   </div>
                 </div>
