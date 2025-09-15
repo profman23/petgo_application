@@ -4,7 +4,7 @@ import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Home, Menu, DollarSign, Receipt, FilePlus, Bell, Volume2, VolumeX, Truck, ArrowDownLeft, Calendar } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -761,6 +761,12 @@ export default function FinancialIncomePayment() {
       <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
+            <DialogTitle className="sr-only">
+              {language === 'ar' ? 'إنشاء دفع وارد' : 'Create Income Payment'}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {language === 'ar' ? 'نموذج إنشاء دفع وارد جديد' : 'Form to create a new income payment'}
+            </DialogDescription>
             {/* Top Row - Title on Left */}
             <div className="mb-6" dir="ltr">
               {/* Title and Customer/Posting Info */}
