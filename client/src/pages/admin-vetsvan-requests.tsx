@@ -526,6 +526,60 @@ export default function AdminVetsVanRequests() {
                 </div>
               )}
             </div>
+
+            {/* Business Partner Section */}
+            <div className="mb-2">
+              <button
+                data-testid="button-toggle-business-partner"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isBusinessPartnerExpanded;
+                  setIsBusinessPartnerExpanded(newState);
+                  localStorage.setItem('isBusinessPartnerExpanded', JSON.stringify(newState));
+                }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <Handshake className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'شريك الأعمال' : 'Business Partner'}
+                </span>
+                {isBusinessPartnerExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+
+              {isBusinessPartnerExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    data-testid="button-business-partner-partner-management"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // Placeholder for now
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Users className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'إدارة الشركاء' : 'Partner Management'}</span>
+                  </button>
+                  <button
+                    data-testid="button-business-partner-contracts"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // Placeholder for now
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <FileText className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'عقود الشراكة' : 'Partnership Contracts'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
             
             <button
               onClick={(e) => {
