@@ -77,7 +77,7 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "income-payment",
         i18nKey: { en: "Income Payment", ar: "الدفع الوارد" },
         route: "/financial/income-payment",
-        icon: DollarSign
+        icon: TrendingUp
       },
       {
         id: "ar-balance",
