@@ -49,10 +49,6 @@ localPort = 34823
 externalPort = 3002
 
 [[ports]]
-localPort = 35195
-externalPort = 5000
-
-[[ports]]
 localPort = 38401
 externalPort = 3001
 
@@ -63,6 +59,10 @@ externalPort = 3003
 [[ports]]
 localPort = 43223
 externalPort = 5173
+
+[[ports]]
+localPort = 45153
+externalPort = 5000
 
 [agent]
 integrations = ["javascript_database==1.0.0"]
