@@ -176,7 +176,8 @@ export default function FinancialCreditNote() {
   };
 
   const handleMapClick = (creditNote: any) => {
-    console.log("TODO: Handle map click", creditNote);
+    // Map functionality is not yet implemented
+    console.log("Map functionality not yet implemented", creditNote);
   };
 
   const handleCloseViewModal = () => {

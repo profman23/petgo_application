@@ -779,6 +779,7 @@ export class DatabaseStorage implements IStorage {
       id: item.id,
       bookingId: item.bookingId,
       description: item.description,
+      itemName: item.description, // Frontend expects itemName
       quantity: item.quantity,
       unitPrice: item.unitPrice,
       discount: item.discount,
