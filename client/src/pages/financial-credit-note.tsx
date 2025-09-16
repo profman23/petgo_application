@@ -99,11 +99,22 @@ export default function FinancialCreditNote() {
   // Check authentication and permissions
   useEffect(() => {
     const checkAuth = async () => {
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        setLocation("/admin-login");
+        return;
+      }
+      
+      setAdminToken(token);
+      
       try {
-        const response = await fetch('/api/admin/current-user-permissions');
+        const response = await fetch('/api/admin/current-user-permissions', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (response.ok) {
           const permissions = await response.json();
-          setAdminToken(response.headers.get('authorization') || 'authenticated');
           setIsReadOnlyMode(!permissions.creditNoteFullControl);
           setCanExport(permissions.creditNoteExport);
         }
@@ -112,7 +123,7 @@ export default function FinancialCreditNote() {
       }
     };
     checkAuth();
-  }, []);
+  }, [setLocation]);
 
   // Fetch credit notes
   const fetchCreditNotes = async () => {
