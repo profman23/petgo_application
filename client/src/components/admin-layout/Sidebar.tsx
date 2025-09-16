@@ -5,6 +5,21 @@ import { adminSidebarConfig, SidebarSection, SidebarMenuItem } from '@/lib/admin
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
+// Centralized active item styling constants
+const ACTIVE_ITEM_STYLES = {
+  background: 'bg-gray-100',
+  textColor: 'text-gray-700', 
+  border: 'border-l-4 border-[#852085]',
+  underlineColor: 'bg-[#852085]',
+  transition: 'transition-all duration-300'
+};
+
+// Helper function to check if an item is active based on current route
+const isActiveItem = (itemRoute: string | undefined, currentLocation: string): boolean => {
+  if (!itemRoute) return false;
+  return currentLocation === itemRoute;
+};
+
 interface SidebarProps {
   className?: string;
 }
@@ -54,23 +69,19 @@ export function Sidebar({ className = "" }: SidebarProps) {
       currentUserPermissions && 
       permissions[item.requiresPermission] === true);
     
-    // Special styling for specific items when active (mutually exclusive)
-    const isARBalance = item.id === 'ar-balance';
-    const isIncomePayment = item.id === 'income-payment';
-    const isActiveARBalance = isARBalance && location === '/financial/ar-balance';
-    const isActiveIncomePayment = isIncomePayment && location === '/financial/income-payment';
-    const hasSpecialStyling = isActiveARBalance || isActiveIncomePayment;
+    // Centralized active item detection
+    const isActive = isActiveItem(item.route, location);
 
     return (
       <div key={item.id} className="relative">
         <button
           onClick={() => handleItemClick(item, isMobile)}
           disabled={isDisabled}
-          className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full transition-all duration-300 ${
+          className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${ACTIVE_ITEM_STYLES.transition} ${
             isDisabled
               ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-              : hasSpecialStyling
-              ? 'text-gray-700 bg-gray-100 border-l-4 border-[#852085]'
+              : isActive
+              ? `${ACTIVE_ITEM_STYLES.textColor} ${ACTIVE_ITEM_STYLES.background} ${ACTIVE_ITEM_STYLES.border}`
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           }`}
         >
@@ -78,14 +89,12 @@ export function Sidebar({ className = "" }: SidebarProps) {
           <span>{item.i18nKey[language] || item.i18nKey.en}</span>
         </button>
         
-        {/* Animated underline for special items */}
-        {(isARBalance || isIncomePayment) && (
-          <div 
-            className={`absolute bottom-0 left-2 right-2 h-0.5 bg-[#852085] transition-all duration-300 ease-in-out ${
-              hasSpecialStyling ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
-            }`}
-          />
-        )}
+        {/* Animated underline for active items */}
+        <div 
+          className={`absolute bottom-0 left-2 right-2 h-0.5 ${ACTIVE_ITEM_STYLES.underlineColor} transition-all duration-300 ease-in-out ${
+            isActive ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+          }`}
+        />
       </div>
     );
   };
@@ -93,6 +102,7 @@ export function Sidebar({ className = "" }: SidebarProps) {
   const renderSection = (section: SidebarSection, isMobile: boolean = false) => {
     const Icon = section.icon;
     const isExpanded = Boolean(expandedSections[section.id]);
+    const isActive = isActiveItem(section.route, location);
 
     if (section.items) {
       // Collapsible section with subitems
@@ -123,14 +133,26 @@ export function Sidebar({ className = "" }: SidebarProps) {
     } else {
       // Simple navigation item
       return (
-        <button
-          key={section.id}
-          onClick={() => handleSectionClick(section, isMobile)}
-          className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-        >
-          <Icon className="h-6 w-6 flex-shrink-0" />
-          <span>{section.i18nKey[language] || section.i18nKey.en}</span>
-        </button>
+        <div key={section.id} className="relative mb-2">
+          <button
+            onClick={() => handleSectionClick(section, isMobile)}
+            className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${ACTIVE_ITEM_STYLES.transition} ${
+              isActive
+                ? `${ACTIVE_ITEM_STYLES.textColor} ${ACTIVE_ITEM_STYLES.background} ${ACTIVE_ITEM_STYLES.border}`
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <Icon className="h-6 w-6 flex-shrink-0" />
+            <span>{section.i18nKey[language] || section.i18nKey.en}</span>
+          </button>
+          
+          {/* Animated underline for active sections */}
+          <div 
+            className={`absolute bottom-0 left-2 right-2 h-0.5 ${ACTIVE_ITEM_STYLES.underlineColor} transition-all duration-300 ease-in-out ${
+              isActive ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+            }`}
+          />
+        </div>
       );
     }
   };
@@ -188,23 +210,19 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
       currentUserPermissions && 
       permissions[item.requiresPermission] === true);
     
-    // Special styling for specific items when active (mutually exclusive)
-    const isARBalance = item.id === 'ar-balance';
-    const isIncomePayment = item.id === 'income-payment';
-    const isActiveARBalance = isARBalance && location === '/financial/ar-balance';
-    const isActiveIncomePayment = isIncomePayment && location === '/financial/income-payment';
-    const hasSpecialStyling = isActiveARBalance || isActiveIncomePayment;
+    // Centralized active item detection
+    const isActive = isActiveItem(item.route, location);
 
     return (
       <div key={item.id} className="relative">
         <button
           onClick={() => handleItemClick(item)}
           disabled={isDisabled}
-          className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full transition-all duration-300 ${
+          className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${ACTIVE_ITEM_STYLES.transition} ${
             isDisabled
               ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-              : hasSpecialStyling
-              ? 'text-gray-700 bg-gray-100 border-l-4 border-[#852085]'
+              : isActive
+              ? `${ACTIVE_ITEM_STYLES.textColor} ${ACTIVE_ITEM_STYLES.background} ${ACTIVE_ITEM_STYLES.border}`
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           }`}
         >
@@ -212,14 +230,12 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
           <span>{item.i18nKey[language] || item.i18nKey.en}</span>
         </button>
         
-        {/* Animated underline for special items */}
-        {(isARBalance || isIncomePayment) && (
-          <div 
-            className={`absolute bottom-0 left-2 right-2 h-0.5 bg-[#852085] transition-all duration-300 ease-in-out ${
-              hasSpecialStyling ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
-            }`}
-          />
-        )}
+        {/* Animated underline for active items */}
+        <div 
+          className={`absolute bottom-0 left-2 right-2 h-0.5 ${ACTIVE_ITEM_STYLES.underlineColor} transition-all duration-300 ease-in-out ${
+            isActive ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+          }`}
+        />
       </div>
     );
   };
@@ -227,6 +243,7 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
   const renderSection = (section: SidebarSection) => {
     const Icon = section.icon;
     const isExpanded = Boolean(expandedSections[section.id]);
+    const isActive = isActiveItem(section.route, location);
 
     if (section.items) {
       // Collapsible section with subitems
@@ -257,14 +274,26 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
     } else {
       // Simple navigation item
       return (
-        <button
-          key={section.id}
-          onClick={() => handleSectionClick(section)}
-          className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-        >
-          <Icon className="h-6 w-6 flex-shrink-0" />
-          <span>{section.i18nKey[language] || section.i18nKey.en}</span>
-        </button>
+        <div key={section.id} className="relative mb-2">
+          <button
+            onClick={() => handleSectionClick(section)}
+            className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${ACTIVE_ITEM_STYLES.transition} ${
+              isActive
+                ? `${ACTIVE_ITEM_STYLES.textColor} ${ACTIVE_ITEM_STYLES.background} ${ACTIVE_ITEM_STYLES.border}`
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
+          >
+            <Icon className="h-6 w-6 flex-shrink-0" />
+            <span>{section.i18nKey[language] || section.i18nKey.en}</span>
+          </button>
+          
+          {/* Animated underline for active sections */}
+          <div 
+            className={`absolute bottom-0 left-2 right-2 h-0.5 ${ACTIVE_ITEM_STYLES.underlineColor} transition-all duration-300 ease-in-out ${
+              isActive ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+            }`}
+          />
+        </div>
       );
     }
   };
