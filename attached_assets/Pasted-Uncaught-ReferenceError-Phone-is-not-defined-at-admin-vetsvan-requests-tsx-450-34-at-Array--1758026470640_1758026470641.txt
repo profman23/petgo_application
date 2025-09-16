@@ -1,0 +1,36 @@
+Uncaught ReferenceError: Phone is not defined
+    at admin-vetsvan-requests.tsx:450:34
+    at Array.map (<anonymous>)
+    at AdminVetsVanRequests (admin-vetsvan-requests.tsx:441:38)
+    at renderWithHooks (chunk-276SZO74.js?v=2887fead:11548:26)
+    at mountIndeterminateComponent (chunk-276SZO74.js?v=2887fead:14926:21)
+    at beginWork (chunk-276SZO74.js?v=2887fead:15914:22)
+    at HTMLUnknownElement.callCallback2 (chunk-276SZO74.js?v=2887fead:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-276SZO74.js?v=2887fead:3699:24)
+    at invokeGuardedCallback (chunk-276SZO74.js?v=2887fead:3733:39)
+    at beginWork$1 (chunk-276SZO74.js?v=2887fead:19765:15)Understand this error
+chunk-276SZO74.js?v=2887fead:14032 The above error occurred in the <AdminVetsVanRequests> component:
+
+    at AdminVetsVanRequests (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/admin-vetsvan-requests.tsx?t=1758026203206:35:27)
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=2887fead:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=2887fead:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?t=1758026203206&v=EMNwJ2OlXpSPLJnX2FEqO:223:22)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=2887fead:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?t=1758026203206&v=EMNwJ2OlXpSPLJnX2FEqO:559:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-276SZO74.js?v=2887fead:14032Understand this error
+chunk-276SZO74.js?v=2887fead:9129 Uncaught ReferenceError: Phone is not defined
+    at admin-vetsvan-requests.tsx:450:34
+    at Array.map (<anonymous>)
+    at AdminVetsVanRequests (admin-vetsvan-requests.tsx:441:38)
+    at renderWithHooks (chunk-276SZO74.js?v=2887fead:11548:26)
+    at mountIndeterminateComponent (chunk-276SZO74.js?v=2887fead:14926:21)
+    at beginWork (chunk-276SZO74.js?v=2887fead:15914:22)
+    at beginWork$1 (chunk-276SZO74.js?v=2887fead:19753:22)
+    at performUnitOfWork (chunk-276SZO74.js?v=2887fead:19198:20)
+    at workLoopSync (chunk-276SZO74.js?v=2887fead:19137:13)
+    at renderRootSync (chunk-276SZO74.js?v=2887fead:19116:15)
