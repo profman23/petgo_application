@@ -54,9 +54,12 @@ export function Sidebar({ className = "" }: SidebarProps) {
       currentUserPermissions && 
       permissions[item.requiresPermission] === true);
     
-    // Special styling for A/R Balance item when active
+    // Special styling for specific items when active (mutually exclusive)
     const isARBalance = item.id === 'ar-balance';
+    const isIncomePayment = item.id === 'income-payment';
     const isActiveARBalance = isARBalance && location === '/financial/ar-balance';
+    const isActiveIncomePayment = isIncomePayment && location === '/financial/income-payment';
+    const hasSpecialStyling = isActiveARBalance || isActiveIncomePayment;
 
     return (
       <div key={item.id} className="relative">
@@ -66,7 +69,7 @@ export function Sidebar({ className = "" }: SidebarProps) {
           className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full transition-all duration-300 ${
             isDisabled
               ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-              : isActiveARBalance
+              : hasSpecialStyling
               ? 'text-gray-700 bg-gray-100 border-l-4 border-[#852085]'
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           }`}
@@ -75,11 +78,11 @@ export function Sidebar({ className = "" }: SidebarProps) {
           <span>{item.i18nKey[language] || item.i18nKey.en}</span>
         </button>
         
-        {/* Animated underline for A/R Balance */}
-        {isARBalance && (
+        {/* Animated underline for special items */}
+        {(isARBalance || isIncomePayment) && (
           <div 
             className={`absolute bottom-0 left-2 right-2 h-0.5 bg-[#852085] transition-all duration-300 ease-in-out ${
-              isActiveARBalance ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+              hasSpecialStyling ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
             }`}
           />
         )}
@@ -185,9 +188,12 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
       currentUserPermissions && 
       permissions[item.requiresPermission] === true);
     
-    // Special styling for A/R Balance item when active
+    // Special styling for specific items when active (mutually exclusive)
     const isARBalance = item.id === 'ar-balance';
+    const isIncomePayment = item.id === 'income-payment';
     const isActiveARBalance = isARBalance && location === '/financial/ar-balance';
+    const isActiveIncomePayment = isIncomePayment && location === '/financial/income-payment';
+    const hasSpecialStyling = isActiveARBalance || isActiveIncomePayment;
 
     return (
       <div key={item.id} className="relative">
@@ -197,7 +203,7 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
           className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full transition-all duration-300 ${
             isDisabled
               ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-              : isActiveARBalance
+              : hasSpecialStyling
               ? 'text-gray-700 bg-gray-100 border-l-4 border-[#852085]'
               : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
           }`}
@@ -206,11 +212,11 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
           <span>{item.i18nKey[language] || item.i18nKey.en}</span>
         </button>
         
-        {/* Animated underline for A/R Balance */}
-        {isARBalance && (
+        {/* Animated underline for special items */}
+        {(isARBalance || isIncomePayment) && (
           <div 
             className={`absolute bottom-0 left-2 right-2 h-0.5 bg-[#852085] transition-all duration-300 ease-in-out ${
-              isActiveARBalance ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+              hasSpecialStyling ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
             }`}
           />
         )}
