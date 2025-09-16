@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar, Layout, BanknoteArrowUp, BanknoteArrowDown } from "lucide-react";
+import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar, Layout, BanknoteArrowUp, BanknoteArrowDown, ArrowUpDown } from "lucide-react";
 
 export interface SidebarMenuItem {
   id: string;
@@ -83,7 +83,7 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "ar-balance",
         i18nKey: { en: "A/R Balance", ar: "رصيد الحسابات المدينة" },
         route: "/financial/ar-balance",
-        icon: DollarSign
+        icon: ArrowUpDown
       },
       {
         id: "page",
