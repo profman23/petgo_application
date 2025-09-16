@@ -9,17 +9,28 @@ import { useQuery } from '@tanstack/react-query';
 const ACTIVE_ITEM_STYLES = {
   background: 'bg-gray-100',
   textColor: 'text-gray-700', 
-  border: 'border-l-4 border-[#852085]',
+  border: 'border-s-4 border-[#852085]',
   underlineColor: 'bg-[#852085]',
   transition: 'transition-all duration-300'
+};
+
+// Helper function to normalize paths by removing trailing slashes and query params
+const normalize = (path: string): string => {
+  return path.split('?')[0].replace(/\/+$/, '');
 };
 
 // Helper function to check if an item is active based on current route
 const isActiveItem = (itemRoute: string | undefined, currentLocation: string): boolean => {
   if (!itemRoute) return false;
   
+  const curr = normalize(currentLocation);
+  const item = normalize(itemRoute);
+  
   // Handle exact matches first
-  if (currentLocation === itemRoute) return true;
+  if (curr === item) return true;
+  
+  // Handle nested paths (current path starts with item route)
+  if (curr.startsWith(item + '/')) return true;
   
   // Handle query parameter routes (like /admin-dashboard?tab=reports)
   if (itemRoute.includes('?')) {
