@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar, Layout } from "lucide-react";
+import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar, Layout, BanknoteArrowUp } from "lucide-react";
 
 export interface SidebarMenuItem {
   id: string;
@@ -77,7 +77,7 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "income-payment",
         i18nKey: { en: "Income Payment", ar: "الدفع الوارد" },
         route: "/financial/income-payment",
-        icon: TrendingUp
+        icon: BanknoteArrowUp
       },
       {
         id: "ar-balance",
