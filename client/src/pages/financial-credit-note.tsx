@@ -96,9 +96,62 @@ export default function FinancialCreditNote() {
     }
   };
 
-  // TODO: Add all the essential functions here
+  // Check authentication and permissions
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/admin/current-user-permissions');
+        if (response.ok) {
+          const permissions = await response.json();
+          setAdminToken(response.headers.get('authorization') || 'authenticated');
+          setIsReadOnlyMode(!permissions.creditNoteFullControl);
+          setCanExport(permissions.creditNoteExport);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  // Fetch credit notes
   const fetchCreditNotes = async () => {
-    console.log("TODO: Fetch credit notes");
+    if (!adminToken) return;
+    
+    setIsLoadingCreditNotes(true);
+    try {
+      const response = await fetch('/api/admin/credit-notes', {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCreditNotes(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch credit notes:', error);
+    } finally {
+      setIsLoadingCreditNotes(false);
+    }
+  };
+
+  useEffect(() => {
+    if (adminToken) {
+      fetchCreditNotes();
+    }
+  }, [adminToken]);
+
+  const fetchNextCreditNoteNumber = async () => {
+    try {
+      const response = await fetch('/api/admin/credit-notes/next-number', {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentCreditNoteNumber(data.nextNumber);
+      }
+    } catch (error) {
+      console.error('Failed to fetch next credit note number:', error);
+    }
   };
 
   const handleModalClose = () => {
@@ -112,7 +165,7 @@ export default function FinancialCreditNote() {
   };
 
   const handleMapClick = (creditNote: any) => {
-    console.log("TODO: Handle map click");
+    console.log("TODO: Handle map click", creditNote);
   };
 
   const handleCloseViewModal = () => {
@@ -134,16 +187,269 @@ export default function FinancialCreditNote() {
   return (
     <AdminLayout>
       <div dir={getDirection(language)} className="p-8">
-        <h1 className="text-2xl font-bold text-gray-600 mb-8">
-          {language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}
-        </h1>
-        
-        <div className="text-center py-8">
-          <p className="text-gray-500">
-            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
-          </p>
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-8">
+          {/* Left side - Lord Icon and Title */}
+          <div className="flex items-center gap-4">
+            {/* Lord Icon */}
+            <div className="flex-shrink-0">
+              <div 
+                dangerouslySetInnerHTML={{
+                  __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="loop" delay="1500" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                }}
+              />
+            </div>
+            
+            {/* Credit Note Title */}
+            <h1 className="text-2xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+              {language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}
+            </h1>
+          </div>
+
+          {/* Right side - Create New Credit Note Button */}
+          <button
+            ref={createButtonRef}
+            onClick={async () => {
+              if (isReadOnlyMode) return;
+              await fetchNextCreditNoteNumber();
+              setIsCreateCreditNoteModalOpen(true);
+            }}
+            disabled={isReadOnlyMode}
+            className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+              isReadOnlyMode 
+                ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed' 
+                : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+            }`}
+            title={isReadOnlyMode ? (language === 'ar' ? 'غير مسموح - صلاحية القراءة فقط' : 'Not allowed - Read-only permission') : ''}
+            data-testid="button-create-credit-note"
+          >
+            <FilePlus className="h-4 w-4" style={{ color: isReadOnlyMode ? '#9CA3AF' : '#852085' }} />
+            {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
+          </button>
         </div>
+
+        {/* Search Field */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <Input
+                type="text"
+                placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الفاتورة، رقم مذكرة الائتمان، أو تاريخ النشر' : 'Search by customer name, phone number, invoice number, credit note number, or posting date'}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
+                data-testid="input-search-credit-notes"
+                dir={getDirection(language)}
+              />
+            </div>
+            <div className="flex gap-3" style={{ width: buttonContainerWidth ? `${buttonContainerWidth}px` : 'auto' }}>
+              <Button
+                onClick={handleSearchClick}
+                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                data-testid="button-search-credit-notes"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'بحث' : 'Search'}
+              </Button>
+              <Button
+                onClick={canExport ? handleExportToExcel : undefined}
+                disabled={!canExport}
+                className={`flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
+                  !canExport 
+                    ? 'bg-gray-100 hover:bg-gray-100 cursor-not-allowed' 
+                    : 'bg-white hover:bg-purple-50'
+                }`}
+                style={{ 
+                  borderColor: !canExport ? '#D1D5DB' : '#852085', 
+                  color: !canExport ? '#9CA3AF' : '#852085'
+                }}
+                data-testid="button-export-credit-notes"
+                title={!canExport ? (language === 'ar' ? 'غير مسموح - لا توجد صلاحية تصدير' : 'Not allowed - No export permission') : ''}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'تصدير' : 'Export'}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Credit Notes Table */}
+        <div className="bg-white rounded-lg shadow">
+          {isLoadingCreditNotes ? (
+            <div className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600">{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
+            </div>
+          ) : filteredCreditNotes.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">
+              <div className="h-12 w-12 mx-auto mb-4 text-gray-400">📄</div>
+              {searchTerm.trim() ? (
+                <>
+                  <p>{language === 'ar' ? 'لا توجد نتائج مطابقة لبحثك' : 'No credit notes match your search'}</p>
+                  <p className="text-sm">{language === 'ar' ? 'جرب مصطلحات بحث مختلفة' : 'Try different search terms'}</p>
+                </>
+              ) : (
+                <>
+                  <p>{language === 'ar' ? 'لا توجد مذكرات ائتمان حتى الآن' : 'No credit notes found'}</p>
+                  <p className="text-sm">{language === 'ar' ? 'ابدأ بإنشاء مذكرة ائتمان جديدة' : 'Start by creating a new credit note'}</p>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {language === 'ar' ? 'رقم مذكرة الائتمان' : 'Credit Note No.'}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {language === 'ar' ? 'رقم الفاتورة' : 'Invoice No.'}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {language === 'ar' ? 'اسم العميل' : 'Customer Name'}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date'}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {language === 'ar' ? 'المبلغ النهائي' : 'Final Amount'}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {paginatedCreditNotes.map((creditNote) => (
+                    <tr key={creditNote.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        CRN{creditNote.creditNoteNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {creditNote.invoiceNumber}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {creditNote.customerName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(creditNote.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        -{parseFloat(creditNote.finalTotal).toFixed(2)} SAR
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedCreditNoteToView(creditNote);
+                              setIsViewCreditNoteModalOpen(true);
+                            }}
+                            className="text-purple-600 hover:text-purple-900 p-1 rounded-md hover:bg-purple-50"
+                            title={language === 'ar' ? 'عرض مذكرة الائتمان' : 'View Credit Note'}
+                            data-testid={`button-view-credit-note-${creditNote.id}`}
+                          >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleMapClick(creditNote)}
+                            className="text-blue-600 hover:text-blue-900 p-1 rounded-md hover:bg-blue-50"
+                            title={language === 'ar' ? 'عرض الخريطة' : 'View Map'}
+                            data-testid={`button-map-credit-note-${creditNote.id}`}
+                          >
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Enhanced Pagination */}
+        {totalPages > 1 && (
+          <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4 mt-6">
+            {/* Results Info & Items Per Page */}
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="text-sm text-gray-700" style={{ 
+                direction: getDirection(language), 
+                textAlign: getTextAlign(language) 
+              }}>
+                {language === 'ar' 
+                  ? `عرض ${paginatedCreditNotes.length} من أصل ${filteredCreditNotes.length} مذكرة ائتمان (المجموع: ${Array.isArray(creditNotes) ? creditNotes.length : 0})`
+                  : `Showing ${paginatedCreditNotes.length} of ${filteredCreditNotes.length} credit notes (Total: ${Array.isArray(creditNotes) ? creditNotes.length : 0})`
+                }
+              </div>
+              
+              <div className="flex items-center gap-2" style={{ direction: getDirection(language) }}>
+                <span className="text-sm text-gray-600">
+                  {language === 'ar' ? 'عرض:' : 'Show:'}
+                </span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => {
+                    setItemsPerPage(Number(e.target.value));
+                    handlePageChange(1);
+                  }}
+                  className="border border-purple-300 rounded px-3 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white"
+                  style={{ direction: 'ltr' }}
+                >
+                  <option value={10}>10</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span className="text-sm text-gray-600">
+                  {language === 'ar' ? 'لكل صفحة' : 'per page'}
+                </span>
+              </div>
+            </div>
+            
+            {/* Navigation Controls */}
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {language === 'ar' ? 'السابق' : 'Previous'}
+              </Button>
+              
+              <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
+                <span className="text-sm font-medium text-purple-700">
+                  {language === 'ar' 
+                    ? `صفحة ${currentPage} من ${totalPages}`
+                    : `Page ${currentPage} of ${totalPages}`
+                  }
+                </span>
+              </div>
+              
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {language === 'ar' ? 'التالي' : 'Next'}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Load lord-icon script */}
+      <script src="https://cdn.lordicon.com/lordicon.js"></script>
     </AdminLayout>
   );
 }
