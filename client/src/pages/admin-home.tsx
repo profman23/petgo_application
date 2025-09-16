@@ -21,7 +21,7 @@ export default function AdminHome() {
   // Lord-icon animation trigger state
   const [triggerAnimation, setTriggerAnimation] = useState("hover");
 
-  // Effect to trigger lord-icon animation every minute
+  // Effect to trigger lord-icon animation every 1.5 seconds
   useEffect(() => {
     let timeoutId: NodeJS.Timeout | null = null;
     
@@ -29,7 +29,7 @@ export default function AdminHome() {
       setTriggerAnimation("loop");
       // Reset to hover after a brief moment
       timeoutId = setTimeout(() => setTriggerAnimation("hover"), 1000);
-    }, 60000); // 60 seconds = 1 minute
+    }, 1500); // 1.5 seconds
 
     return () => {
       clearInterval(interval);
