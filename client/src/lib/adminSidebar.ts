@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, Handshake, Car, Clock, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar, BanknoteArrowUp, BanknoteArrowDown, ArrowUpDown } from "lucide-react";
+import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar, BanknoteArrowUp, BanknoteArrowDown, ArrowUpDown } from "lucide-react";
 
 export interface SidebarMenuItem {
   id: string;

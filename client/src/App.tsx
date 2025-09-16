@@ -29,14 +29,12 @@ import AdminImport from "@/pages/admin-import";
 import AdminVetsVanRequests from "@/pages/admin-vetsvan-requests";
 import AdministrationUsers from "@/pages/administration-users";
 import AdministrationAuthorization from "@/pages/administration-authorization";
-import SalesReports from "@/pages/sales-reports";
 import NewReportsAnalytics from "@/pages/new-reports-analytics";
 import VetsVanShifts from "@/pages/vets-van-shifts";
 import FinancialCreditNote from "@/pages/financial-credit-note";
 import FinancialOutgoingPayment from "@/pages/financial-outgoing-payment";
 import FinancialIncomePayment from "@/pages/financial-income-payment";
 import FinancialARBalance from "@/pages/financial-ar-balance";
-import FinancialARBalancePage from "@/pages/financial-ar-balance-page";
 import BusinessPartnerManagement from "@/pages/business-partner-management";
 import VetsVanBooking from "@/pages/vetsvan-booking";
 import PaymentProcessing from "@/pages/payment-processing";
@@ -257,15 +255,12 @@ function Router() {
           <Route path="/admin-vetsvan-requests" component={AdminVetsVanRequests} />
           <Route path="/administration/users" component={AdministrationUsers} />
           <Route path="/administration/authorization" component={AdministrationAuthorization} />
-          <Route path="/sales-reports" component={SalesReports} />
           <Route path="/financial/credit-note" component={() => <CreditNotePermissionGate><FinancialCreditNote /></CreditNotePermissionGate>} />
           <Route path="/financial/outgoing-payment" component={FinancialOutgoingPayment} />
           <Route path="/financial/income-payment" component={FinancialIncomePayment} />
           <Route path="/financial/ar-balance" component={FinancialARBalance} />
-          <Route path="/financial/ar-balance/page" component={FinancialARBalancePage} />
           <Route path="/business-partner/partner-management" component={BusinessPartnerManagement} />
           <Route path="/new-reports-analytics" component={NewReportsAnalytics} />
-          <Route path="/new-reports-analytics/sales-report" component={SalesReports} />
           <Route path="/vets-van-shifts" component={VetsVanShifts} />
           <Route path="/payment-processing" component={PaymentProcessing} />
           <Route path="/payment-test" component={() => <AuthCheck><PaymentTest /></AuthCheck>} />
