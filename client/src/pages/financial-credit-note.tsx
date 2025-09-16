@@ -192,7 +192,52 @@ export default function FinancialCreditNote() {
   };
 
   const handleExportToExcel = () => {
-    console.log("TODO: Export to Excel");
+    try {
+      // Prepare data for export
+      const exportData = filteredCreditNotes.map((creditNote, index) => ({
+        [language === 'ar' ? 'الرقم' : 'No.']: index + 1,
+        [language === 'ar' ? 'رقم إشعار الخصم' : 'Credit Note Number']: creditNote.creditNoteNumber,
+        [language === 'ar' ? 'رقم الفاتورة' : 'Invoice Number']: creditNote.invoiceNumber,
+        [language === 'ar' ? 'اسم العميل' : 'Customer Name']: creditNote.customerName,
+        [language === 'ar' ? 'رقم الهاتف' : 'Phone Number']: creditNote.customerPhone,
+        [language === 'ar' ? 'تاريخ الإرسال' : 'Posting Date']: creditNote.postingDate ? new Date(creditNote.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US') : '',
+        [language === 'ar' ? 'المبلغ' : 'Amount']: creditNote.amount || 0,
+        [language === 'ar' ? 'الحالة' : 'Status']: creditNote.status || ''
+      }));
+
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(exportData);
+
+      // Set column widths for better readability
+      const colWidths = [
+        { wch: 8 },  // No.
+        { wch: 20 }, // Credit Note Number
+        { wch: 20 }, // Invoice Number
+        { wch: 25 }, // Customer Name
+        { wch: 15 }, // Phone Number
+        { wch: 15 }, // Posting Date
+        { wch: 15 }, // Amount
+        { wch: 15 }  // Status
+      ];
+      ws['!cols'] = colWidths;
+
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, language === 'ar' ? 'إشعارات الخصم' : 'Credit Notes');
+
+      // Generate filename with current date
+      const currentDate = new Date().toISOString().split('T')[0];
+      const fileName = `${language === 'ar' ? 'إشعارات_الخصم' : 'Credit_Notes'}_${currentDate}.xlsx`;
+
+      // Generate and save file
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      saveAs(blob, fileName);
+
+      console.log(`Exported ${filteredCreditNotes.length} credit notes to Excel`);
+    } catch (error) {
+      console.error('Failed to export to Excel:', error);
+    }
   };
 
   // Handle invoice search for credit note creation
