@@ -213,37 +213,40 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                   />
                 </div>
                 
-                {/* Customer Name - Horizontal Layout */}
-                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                    {businessPartnerType === 'supplier' 
-                      ? (language === 'ar' ? 'اسم المورد:' : 'Supplier Name:') 
-                      : (language === 'ar' ? 'اسم العميل:' : 'Customer Name:')}
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                    data-testid="input-partner-name"
-                    placeholder={businessPartnerType === 'supplier' 
-                      ? (language === 'ar' ? 'أدخل اسم المورد' : 'Enter supplier name') 
-                      : (language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name')}
-                  />
-                </div>
-                
-                {/* Posting Date - Horizontal Layout */}
-                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                    {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                    value={postingDate}
-                    onChange={(e) => handlePostingDateChange(e.target.value)}
-                    onKeyDown={handlePostingDateKeyDown}
-                    placeholder={language === 'ar' ? 'تاريخ أو +3، -2' : 'Date or +3, -2'}
-                    data-testid="input-posting-date"
-                  />
+                {/* Customer Name and Posting Date - Side by Side Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Left: Customer Name */}
+                  <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                      {businessPartnerType === 'supplier' 
+                        ? (language === 'ar' ? 'اسم المورد:' : 'Supplier Name:') 
+                        : (language === 'ar' ? 'اسم العميل:' : 'Customer Name:')}
+                    </label>
+                    <input 
+                      type="text" 
+                      className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                      data-testid="input-partner-name"
+                      placeholder={businessPartnerType === 'supplier' 
+                        ? (language === 'ar' ? 'أدخل اسم المورد' : 'Enter supplier name') 
+                        : (language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name')}
+                    />
+                  </div>
+                  
+                  {/* Right: Posting Date */}
+                  <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                      {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
+                    </label>
+                    <input 
+                      type="text" 
+                      className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                      value={postingDate}
+                      onChange={(e) => handlePostingDateChange(e.target.value)}
+                      onKeyDown={handlePostingDateKeyDown}
+                      placeholder={language === 'ar' ? 'تاريخ أو +3، -2' : 'Date or +3, -2'}
+                      data-testid="input-posting-date"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
