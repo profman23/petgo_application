@@ -10,7 +10,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ className = "" }: SidebarProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { language } = useTranslation();
   const { expandedSections, toggleSection, setIsMobileSidebarOpen } = useSidebarState();
 
@@ -53,21 +53,37 @@ export function Sidebar({ className = "" }: SidebarProps) {
     const isDisabled = Boolean(item.requiresPermission && 
       currentUserPermissions && 
       permissions[item.requiresPermission] === true);
+    
+    // Special styling for A/R Balance item when active
+    const isARBalance = item.id === 'ar-balance';
+    const isActiveARBalance = isARBalance && location === '/financial/ar-balance';
 
     return (
-      <button
-        key={item.id}
-        onClick={() => handleItemClick(item, isMobile)}
-        disabled={isDisabled}
-        className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-          isDisabled
-            ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-        }`}
-      >
-        <Icon className="h-5 w-5 flex-shrink-0" />
-        <span>{item.i18nKey[language] || item.i18nKey.en}</span>
-      </button>
+      <div key={item.id} className="relative">
+        <button
+          onClick={() => handleItemClick(item, isMobile)}
+          disabled={isDisabled}
+          className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full transition-all duration-300 ${
+            isDisabled
+              ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+              : isActiveARBalance
+              ? 'text-gray-700 bg-gray-100 border-l-4 border-[#852085]'
+              : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+          }`}
+        >
+          <Icon className="h-5 w-5 flex-shrink-0" />
+          <span>{item.i18nKey[language] || item.i18nKey.en}</span>
+        </button>
+        
+        {/* Animated underline for A/R Balance */}
+        {isARBalance && (
+          <div 
+            className={`absolute bottom-0 left-2 right-2 h-0.5 bg-[#852085] transition-all duration-300 ease-in-out ${
+              isActiveARBalance ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+            }`}
+          />
+        )}
+      </div>
     );
   };
 
@@ -125,7 +141,7 @@ export function Sidebar({ className = "" }: SidebarProps) {
 
 // Mobile version that passes the mobile flag
 export function MobileSidebar({ className = "" }: SidebarProps) {
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { language } = useTranslation();
   const { expandedSections, toggleSection, setIsMobileSidebarOpen } = useSidebarState();
 
@@ -168,21 +184,37 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
     const isDisabled = Boolean(item.requiresPermission && 
       currentUserPermissions && 
       permissions[item.requiresPermission] === true);
+    
+    // Special styling for A/R Balance item when active
+    const isARBalance = item.id === 'ar-balance';
+    const isActiveARBalance = isARBalance && location === '/financial/ar-balance';
 
     return (
-      <button
-        key={item.id}
-        onClick={() => handleItemClick(item)}
-        disabled={isDisabled}
-        className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-          isDisabled
-            ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-        }`}
-      >
-        <Icon className="h-5 w-5 flex-shrink-0" />
-        <span>{item.i18nKey[language] || item.i18nKey.en}</span>
-      </button>
+      <div key={item.id} className="relative">
+        <button
+          onClick={() => handleItemClick(item)}
+          disabled={isDisabled}
+          className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full transition-all duration-300 ${
+            isDisabled
+              ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+              : isActiveARBalance
+              ? 'text-gray-700 bg-gray-100 border-l-4 border-[#852085]'
+              : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+          }`}
+        >
+          <Icon className="h-5 w-5 flex-shrink-0" />
+          <span>{item.i18nKey[language] || item.i18nKey.en}</span>
+        </button>
+        
+        {/* Animated underline for A/R Balance */}
+        {isARBalance && (
+          <div 
+            className={`absolute bottom-0 left-2 right-2 h-0.5 bg-[#852085] transition-all duration-300 ease-in-out ${
+              isActiveARBalance ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
+            }`}
+          />
+        )}
+      </div>
     );
   };
 
