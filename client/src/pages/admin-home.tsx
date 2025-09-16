@@ -4,14 +4,40 @@ import { useLocation } from "wouter";
 import { Car, Clock, TrendingUp } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
-import welcomeImage from "@assets/freepik__background__61417_1753095390676.png";
+
+// Declare lord-icon custom element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'lord-icon': any;
+    }
+  }
+}
 
 export default function AdminHome() {
   const [, setLocation] = useLocation();
   const { language } = useTranslation();
 
-  // Get admin info for welcome message
-  const adminInfo = JSON.parse(localStorage.getItem("admin") || '{"username": "Admin"}');
+  // Lord-icon animation trigger state
+  const [triggerAnimation, setTriggerAnimation] = useState("hover");
+
+  // Effect to trigger lord-icon animation every minute
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+    
+    const interval = setInterval(() => {
+      setTriggerAnimation("loop");
+      // Reset to hover after a brief moment
+      timeoutId = setTimeout(() => setTriggerAnimation("hover"), 1000);
+    }, 60000); // 60 seconds = 1 minute
+
+    return () => {
+      clearInterval(interval);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, []);
 
   // Check admin authentication
   useEffect(() => {
@@ -43,27 +69,26 @@ export default function AdminHome() {
       <div className="p-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <div 
-            className="bg-gradient-to-r from-purple-600 to-purple-800 rounded-lg p-8 text-white"
-            style={{
-              backgroundImage: `url(${welcomeImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundBlendMode: 'overlay'
-            }}
-          >
-            <h1 className="text-3xl font-bold mb-2">
-              {language === 'ar' 
-                ? `مرحباً ${adminInfo.username}!` 
-                : `Welcome ${adminInfo.username}!`
+          <div className="flex items-center gap-4">
+            {/* Lord Icon */}
+            <div className="flex-shrink-0">
+              <lord-icon
+                src="https://cdn.lordicon.com/hfadyleu.json"
+                trigger={triggerAnimation}
+                colors="primary:#852085,secondary:#848484"
+                style={{ width: '80px', height: '80px' }}
+              />
+            </div>
+            
+            {/* Welcome Username */}
+            <h1 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
+              {currentUserPermissions?.username 
+                ? (language === 'ar' 
+                   ? `مرحباً ${currentUserPermissions.username}` 
+                   : `Welcome ${currentUserPermissions.username}`)
+                : (language === 'ar' ? 'مرحباً Admin' : 'Welcome Admin')
               }
             </h1>
-            <p className="text-purple-100 text-lg">
-              {language === 'ar'
-                ? 'إدارة خدمات العيادة البيطرية المتنقلة'
-                : 'Manage your mobile veterinary clinic services'
-              }
-            </p>
           </div>
         </div>
 
