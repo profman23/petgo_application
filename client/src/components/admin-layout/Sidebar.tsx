@@ -75,13 +75,9 @@ export function Sidebar({ className = "" }: SidebarProps) {
           <span>{item.i18nKey[language] || item.i18nKey.en}</span>
         </button>
         
-        {/* Animated underline for A/R Balance */}
-        {isARBalance && (
-          <div 
-            className={`absolute bottom-0 left-2 right-2 h-0.5 bg-[#852085] transition-all duration-300 ease-in-out ${
-              isActiveARBalance ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
-            }`}
-          />
+        {/* Animated border for A/R Balance */}
+        {isARBalance && isActiveARBalance && (
+          <div className="absolute inset-0 rounded-md animate-moving-border pointer-events-none"></div>
         )}
       </div>
     );
@@ -206,13 +202,9 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
           <span>{item.i18nKey[language] || item.i18nKey.en}</span>
         </button>
         
-        {/* Animated underline for A/R Balance */}
-        {isARBalance && (
-          <div 
-            className={`absolute bottom-0 left-2 right-2 h-0.5 bg-[#852085] transition-all duration-300 ease-in-out ${
-              isActiveARBalance ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
-            }`}
-          />
+        {/* Animated border for A/R Balance */}
+        {isARBalance && isActiveARBalance && (
+          <div className="absolute inset-0 rounded-md animate-moving-border pointer-events-none"></div>
         )}
       </div>
     );
