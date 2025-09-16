@@ -25,6 +25,7 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
+import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 
 
 // Products Management Component
@@ -1811,440 +1812,8 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
-      {/* Full-width Header with logo and controls */}
-      <div className="bg-white shadow-md border-b border-gray-200">
-        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
-          {/* Logo */}
-          <div className="flex-shrink-0 -ml-6">
-            <img 
-              src={vetsVanLogo} 
-              alt="VETS VAN" 
-              className="h-14 w-auto object-contain"
-            />
-          </div>
-
-          {/* Header Controls */}
-          <div className="flex items-center gap-4">
-            <LanguageSelector />
-            
-            {/* Audio notification toggle */}
-            <button
-              onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`p-2 rounded-full transition-colors duration-200 ${
-                audioEnabled 
-                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-              title={audioEnabled 
-                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
-                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
-              }
-            >
-              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-            </button>
-
-            {/* Notifications counter */}
-            {currentRequestCount > 0 && (
-              <div className="relative">
-                <Bell className="h-6 w-6 text-purple-600" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                </span>
-              </div>
-            )}
-            
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-            >
-              <LogOut className="h-4 w-4 ml-2" />
-              {t('logout')}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content with Sidebar */}
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg min-h-screen">
-          <nav className="mt-4 px-2">
-            {/* Home Page */}
-            <button
-              onClick={() => setLocation('/admin-home')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Home className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
-            </button>
-            
-            {/* Administration Module */}
-            <div 
-              className="mb-2"
-              onClick={(e) => {
-                // Prevent any clicks within Administration container from bubbling up
-                e.stopPropagation();
-              }}
-            >
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isAdministrationExpanded;
-                  console.log('AdminDashboard: Administration header clicked, toggling from', isAdministrationExpanded, 'to', newState);
-                  setAdministrationExpandedSafely(newState);
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <Users className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'الإدارة' : 'Administration'}
-                </span>
-                {effectiveAdministrationExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-              
-              {/* Administration Submenu */}
-              {effectiveAdministrationExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (currentUserPermissions && currentUserPermissions.usersHidden === true) {
-                        setLocation('/admin-home');
-                      } else {
-                        setLocation('/administration/users');
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
-                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
-                  >
-                    <User className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (currentUserPermissions && (currentUserPermissions as any).authHidden === true) {
-                        setLocation('/admin-home');
-                      } else {
-                        setLocation('/administration/authorization');
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
-                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
-                  >
-                    <Shield className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
-                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            {/* Financial Section */}
-            <div className="mb-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isFinancialExpanded;
-                  setIsFinancialExpanded(newState);
-                  localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <DollarSign className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'المالية' : 'Financial'}
-                </span>
-                {isFinancialExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-
-              {isFinancialExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/sales-reports');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/credit-note');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <Receipt className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/outgoing-payment');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/income-payment');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/ar-balance');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Business Partner Section */}
-            <div className="mb-2">
-              <button
-                data-testid="button-toggle-business-partner"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isBusinessPartnerExpanded;
-                  setIsBusinessPartnerExpanded(newState);
-                  localStorage.setItem('isBusinessPartnerExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <Handshake className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'شريك الأعمال' : 'Business Partner'}
-                </span>
-                {isBusinessPartnerExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-
-              {isBusinessPartnerExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    data-testid="button-business-partner-partner-management"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/business-partner/partner-management');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <Users className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'إدارة الشركاء' : 'Partner Management'}</span>
-                  </button>
-                  <button
-                    data-testid="button-business-partner-contracts"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      // Placeholder for now
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <FileText className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'عقود الشراكة' : 'Partnership Contracts'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (currentUserPermissions && (currentUserPermissions as any).vetsVanHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  setActiveTab('management');
-                }
-              }}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                  : activeTab === 'management'
-                    ? 'bg-purple-50 border-l-4 border-purple-600'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Car className={`h-6 w-6 flex-shrink-0 ${activeTab === 'management' ? 'text-purple-600' : ''}`} />
-              <span className={activeTab === 'management' ? 'text-purple-600' : ''}>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (currentUserPermissions && (currentUserPermissions as any).vetsVanShiftsHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  console.log('AdminDashboard: Vets Van Shifts button clicked');
-                  setLocation('/vets-van-shifts');
-                }
-              }}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Clock className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setActiveTab('reports');
-              }}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                activeTab === 'reports'
-                  ? 'bg-purple-50 border-l-4 border-purple-600'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <BarChart3 className={`h-6 w-6 flex-shrink-0 ${activeTab === 'reports' ? 'text-purple-600' : ''}`} />
-              <span className={activeTab === 'reports' ? 'text-purple-600' : ''}>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
-            </button>
-            {/* New Reports & Analytics Dropdown */}
-            <div className="mt-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsNewReportsExpanded(!isNewReportsExpanded);
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <TrendingUp className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left whitespace-nowrap">
-                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
-                </span>
-                {isNewReportsExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-              
-              {/* Dropdown Items */}
-              {isNewReportsExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/new-reports-analytics/sales-report');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('AdminDashboard: Vets Van Requests button clicked');
-                setLocation('/admin-vetsvan-requests');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <FileText className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('AdminDashboard: Import button clicked');
-                setLocation('/admin-dashboard/import');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Upload className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('AdminDashboard: Services button clicked');
-                setLocation('/admin-dashboard/services');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Stethoscope className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('AdminDashboard: Products button clicked');
-                setLocation('/admin-dashboard/products');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Package className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Main Content Area */}
+    <AdminLayout>
+      {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
           <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
             <div className="px-1 py-3 sm:px-0">
@@ -2265,6 +1834,7 @@ export default function AdminDashboard() {
                           <h3 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('vetsVanManagement')}</h3>
                         </div>
                         <button
+                          data-testid="button-add-new-vets-van"
                           onClick={() => setShowAddForm(!showAddForm)}
                           disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
                           className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md ${
@@ -2388,6 +1958,7 @@ export default function AdminDashboard() {
                                 {driver.isAvailable ? t('available') : t('notAvailable')}
                               </span>
                               <button
+                                data-testid="button-change-status"
                                 onClick={() =>
                                   toggleAvailabilityMutation.mutate({
                                     driverId: driver.id,
@@ -2404,6 +1975,7 @@ export default function AdminDashboard() {
                                 {t('changeStatus')}
                               </button>
                               <button
+                                data-testid="button-set-location"
                                 onClick={() => handleLocationClick(driver)}
                                 disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
                                 className={`text-sm inline-flex items-center gap-1 ${
@@ -2428,6 +2000,7 @@ export default function AdminDashboard() {
                                 {language === 'ar' ? 'المناطق الحمراء' : 'Red Zones'}
                               </button>
                               <button
+                                data-testid="button-edit"
                                 onClick={() => handleEditClick(driver)}
                                 disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
                                 className={`text-sm inline-flex items-center gap-1 ${
@@ -3548,7 +3121,6 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-      </div>
 
       {/* Location Update Dialog */}
       {showLocationDialog && selectedDriver && (
@@ -3729,6 +3301,7 @@ export default function AdminDashboard() {
                   {language === 'ar' ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
+                  data-testid="button-update-data"
                   type="submit"
                   disabled={editDriverMutation.isPending}
                   className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -4028,6 +3601,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }
