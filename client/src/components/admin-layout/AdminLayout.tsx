@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SidebarStateProvider, useSidebarState } from './sidebar-state';
 import { Sidebar, MobileSidebar } from './Sidebar';
-import { LogOut, Bell, Volume2, VolumeX, Menu, BanknoteArrowDown } from 'lucide-react';
+import { LogOut, Bell, Volume2, VolumeX, Menu } from 'lucide-react';
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 
 interface AdminLayoutProps {
@@ -87,7 +87,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   <div className="flex flex-col h-full bg-white">
                     <div className="p-4 border-b">
                       <div className="flex items-center gap-2">
-                        <BanknoteArrowDown className="h-8 w-8 text-purple-800" />
+                        <img src={vetsVanLogo} alt="VetsVan Logo" className="h-8 w-8" />
                         <span className="text-lg font-semibold text-purple-800">VetsVan</span>
                       </div>
                     </div>
@@ -98,8 +98,10 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
               {/* Logo */}
               <div className="flex items-center">
-                <BanknoteArrowDown 
-                  className="h-12 w-12 text-purple-800"
+                <img 
+                  src={vetsVanLogo} 
+                  alt="VETS VAN" 
+                  className="h-12 w-auto object-contain"
                 />
               </div>
             </div>
