@@ -1,12 +1,15 @@
 import { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Minus, FileText as InvoiceIcon, Download, FilePlus, FileText } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard, Download, FilePlus, Handshake } from "lucide-react";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
-import { AdminLayout } from "@/components/admin-layout/AdminLayout";
+import { LanguageSelector } from "@/components/language-selector";
+import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 
@@ -23,6 +26,26 @@ export default function FinancialCreditNote() {
   const [, setLocation] = useLocation();
   const { t, language } = useTranslation();
   const queryClient = useQueryClient();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isAdministrationExpanded');
+    return savedState !== null ? JSON.parse(savedState) : false;
+  });
+  const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isFinancialExpanded');
+    return savedState !== null ? JSON.parse(savedState) : true; // Default to expanded since we're on Financial page
+  });
+  
+  // Business Partner menu state - persist across navigation
+  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
+    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
+    if (savedState !== null) {
+      return JSON.parse(savedState);
+    }
+    return false; // Default collapsed
+  });
+  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
   const [isCreateCreditNoteModalOpen, setIsCreateCreditNoteModalOpen] = useState(false);
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -48,11 +71,6 @@ export default function FinancialCreditNote() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [buttonContainerWidth, setButtonContainerWidth] = useState<number | undefined>(undefined);
   const createButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Add authentication and permission states
-  const [adminToken, setAdminToken] = useState<string | null>(null);
-  const [isReadOnlyMode, setIsReadOnlyMode] = useState(false);
-  const [canExport, setCanExport] = useState(false);
 
   // Filter credit notes based on search term
   const filteredCreditNotes = useMemo(() => {
@@ -96,263 +114,608 @@ export default function FinancialCreditNote() {
     }
   };
 
-  // Check authentication and permissions
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        setLocation("/admin-login");
+  // Export credit notes to Excel
+  const handleExportToExcel = () => {
+    try {
+      // Check if there's data to export
+      if (!filteredCreditNotes || filteredCreditNotes.length === 0) {
+        alert(language === 'ar' ? 'لا توجد بيانات للتصدير' : 'No data to export');
         return;
       }
-      
-      setAdminToken(token);
-      
-      try {
-        const response = await fetch('/api/admin/current-user-permissions', {
-          headers: {
-            'Authorization': `Bearer ${token}`
+
+      // Helper function to safely convert values to numbers
+      const safeNumber = (value: any): number => {
+        const num = Number(value);
+        return Number.isFinite(num) ? num : 0;
+      };
+
+      // Helper function to format dates consistently
+      const formatDate = (dateStr: string): string => {
+        try {
+          return new Date(dateStr).toISOString().split('T')[0]; // YYYY-MM-DD format
+        } catch {
+          return dateStr || '';
+        }
+      };
+
+      // Create localized headers
+      const headers = {
+        creditNoteNo: language === 'ar' ? 'رقم مذكرة الائتمان' : 'Credit Note No.',
+        invoiceNo: language === 'ar' ? 'رقم الفاتورة' : 'Invoice No.',
+        customerName: language === 'ar' ? 'اسم العميل' : 'Customer Name',
+        postingDate: language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date',
+        appointmentDate: language === 'ar' ? 'تاريخ الموعد الأصلي' : 'Appointment Date',
+        itemDescription: language === 'ar' ? 'وصف المنتج/الخدمة' : 'Item/Service Description',
+        creditQuantity: language === 'ar' ? 'الكمية المرتجعة' : 'Credit Quantity',
+        unitPrice: language === 'ar' ? 'سعر الوحدة (ر.س)' : 'Unit Price (SAR)',
+        totalBeforeVAT: language === 'ar' ? 'المجموع قبل الضريبة (ر.س)' : 'Total Before VAT (SAR)',
+        vatAmount: language === 'ar' ? 'مبلغ الضريبة (ر.س)' : 'VAT Amount (SAR)',
+        totalAfterVAT: language === 'ar' ? 'المجموع بعد الضريبة (ر.س)' : 'Total After VAT (SAR)',
+        creditNoteTotal: language === 'ar' ? 'مجموع مذكرة الائتمان (ر.س)' : 'Credit Note Total (SAR)'
+      };
+
+      const dataToExport = filteredCreditNotes.flatMap(creditNote => {
+        if (creditNote.items && creditNote.items.length > 0) {
+          return creditNote.items.map((item: any, index: number) => ({
+            [headers.creditNoteNo]: `CRN${creditNote.creditNoteNumber}`,
+            [headers.invoiceNo]: creditNote.invoiceNumber || '',
+            [headers.customerName]: creditNote.customerName || '',
+            [headers.postingDate]: formatDate(creditNote.postingDate),
+            [headers.appointmentDate]: creditNote.appointmentDate ? formatDate(creditNote.appointmentDate) : '',
+            [headers.itemDescription]: item.description || '',
+            [headers.creditQuantity]: safeNumber(item.creditQuantity),
+            [headers.unitPrice]: safeNumber(item.unitPrice),
+            [headers.totalBeforeVAT]: -safeNumber(item.totalBeforeVat), // Negative for credit
+            [headers.vatAmount]: -safeNumber(item.vatAmount), // Negative for credit
+            [headers.totalAfterVAT]: -safeNumber(item.totalAfterVat), // Negative for credit
+            [headers.creditNoteTotal]: index === 0 ? -safeNumber(creditNote.finalTotal) : '' // Only show on first item
+          }));
+        } else {
+          return [{
+            [headers.creditNoteNo]: `CRN${creditNote.creditNoteNumber}`,
+            [headers.invoiceNo]: creditNote.invoiceNumber || '',
+            [headers.customerName]: creditNote.customerName || '',
+            [headers.postingDate]: formatDate(creditNote.postingDate),
+            [headers.appointmentDate]: creditNote.appointmentDate ? formatDate(creditNote.appointmentDate) : '',
+            [headers.itemDescription]: language === 'ar' ? 'لا توجد عناصر' : 'No items found',
+            [headers.creditQuantity]: '',
+            [headers.unitPrice]: '',
+            [headers.totalBeforeVAT]: '',
+            [headers.vatAmount]: '',
+            [headers.totalAfterVAT]: '',
+            [headers.creditNoteTotal]: -safeNumber(creditNote.finalTotal)
+          }];
+        }
+      });
+
+      // Create worksheet with proper number formatting
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, language === 'ar' ? 'مذكرات الائتمان' : 'Credit Notes');
+
+      // Set column widths for better readability
+      const columnWidths = [
+        { wch: 18 }, // Credit Note No.
+        { wch: 15 }, // Invoice No.
+        { wch: 25 }, // Customer Name
+        { wch: 15 }, // Posting Date
+        { wch: 18 }, // Appointment Date
+        { wch: 40 }, // Item/Service Description
+        { wch: 12 }, // Credit Quantity
+        { wch: 15 }, // Unit Price
+        { wch: 20 }, // Total Before VAT
+        { wch: 15 }, // VAT Amount
+        { wch: 20 }, // Total After VAT
+        { wch: 22 }  // Credit Note Total
+      ];
+      worksheet['!cols'] = columnWidths;
+
+      // Apply number formatting to numeric columns
+      const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+      for (let row = range.s.r + 1; row <= range.e.r; row++) {
+        // Format numeric columns with 2 decimal places
+        [7, 8, 9, 10, 11].forEach(col => { // Unit Price, Total Before VAT, VAT Amount, Total After VAT, Credit Note Total
+          const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+          if (worksheet[cellAddress] && typeof worksheet[cellAddress].v === 'number') {
+            worksheet[cellAddress].z = '#,##0.00';
           }
         });
-        if (response.ok) {
-          const permissions = await response.json();
-          setIsReadOnlyMode(!permissions.creditNoteFullControl);
-          setCanExport(permissions.creditNoteExport);
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
+      }
+
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      
+      const fileName = `${language === 'ar' ? 'تصدير_مذكرات_الائتمان' : 'Credit_Notes_Export'}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      saveAs(data, fileName);
+
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      alert(language === 'ar' ? 'حدث خطأ أثناء تصدير البيانات' : 'Error exporting data');
+    }
+  };
+
+  // Measure the "Create New Credit Note" button width and apply it to search buttons container
+  useLayoutEffect(() => {
+    const measureButtonWidth = () => {
+      if (createButtonRef.current) {
+        const width = createButtonRef.current.offsetWidth;
+        setButtonContainerWidth(width);
       }
     };
-    checkAuth();
+
+    measureButtonWidth();
+    window.addEventListener('resize', measureButtonWidth);
+    
+    return () => {
+      window.removeEventListener('resize', measureButtonWidth);
+    };
+  }, []);
+
+  // Handle quantity changes (decrease only for credit notes)
+  const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
+    if (newQuantity <= originalQuantity && newQuantity >= 0) {
+      setEditedQuantities(prev => ({
+        ...prev,
+        [itemId]: newQuantity
+      }));
+    }
+  };
+
+  // Handle item removal
+  const handleRemoveItem = (itemId: number) => {
+    setRemovedItems(prev => new Set(prev).add(itemId));
+  };
+
+  // Check admin authentication
+  useEffect(() => {
+    const adminToken = localStorage.getItem("adminToken");
+    if (!adminToken) {
+      setLocation("/admin-login");
+      return;
+    }
   }, [setLocation]);
 
-  // Fetch credit notes
-  const fetchCreditNotes = async () => {
-    if (!adminToken) return;
+  const adminToken = localStorage.getItem("adminToken");
+  
+  // Fetch current user permissions
+  const { data: currentUserPermissions, isLoading: permissionsLoading } = useQuery({
+    queryKey: ["/api/admin/current-user-permissions"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/current-user-permissions", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Cache-Control': 'no-cache',
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch permissions");
+      return response.json();
+    },
+    enabled: !!adminToken,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache the data
+  });
+
+  // Permission check - redirect users with "No Permission" for Credit Note
+  useEffect(() => {
+    if (currentUserPermissions) {
+      console.log('🔍 Current user permissions:', currentUserPermissions);
+      console.log('🔍 Credit Note No Permission status:', currentUserPermissions.creditNoteNoPermission);
+      
+      if (currentUserPermissions.creditNoteNoPermission === true) {
+        console.log('🚫 User has no permission for Credit Note - redirecting to admin home');
+        setLocation('/admin-home');
+      }
+    }
+  }, [currentUserPermissions, setLocation]);
+
+  // Determine if user is in READ-ONLY mode (has read access but not full control)
+  const isReadOnlyMode = currentUserPermissions && 
+    currentUserPermissions.creditNoteRead === true && 
+    currentUserPermissions.creditNoteFullControl !== true;
+
+  // Determine if user can export (requires separate export permission)
+  const canExport = currentUserPermissions && currentUserPermissions.creditNoteExport === true;
+
+  // Fetch all VetsVan requests for notification counter
+  const { data: allVetsVanRequests } = useQuery({
+    queryKey: ["/api/admin/vetsvan-requests"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/vetsvan-requests", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch requests");
+      return response.json();
+    },
+    refetchInterval: 3000,
+    enabled: !!adminToken,
+  });
+
+  // Fetch generated invoices for search
+  const { data: allInvoices } = useQuery({
+    queryKey: ["/api/admin/generated-invoices"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/generated-invoices", {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error("Failed to fetch invoices");
+      return response.json();
+    },
+    enabled: !!adminToken,
+  });
+
+  const [currentRequestCount, setCurrentRequestCount] = useState(0);
+  const [audioEnabled, setAudioEnabled] = useState(() => {
+    const savedState = localStorage.getItem('audioNotificationsEnabled');
+    return savedState !== null ? JSON.parse(savedState) : true;
+  });
+
+  // Update request count when data changes - match admin-home.tsx logic
+  useEffect(() => {
+    if (allVetsVanRequests && Array.isArray(allVetsVanRequests) && allVetsVanRequests.length > 0) {
+      const currentCount = allVetsVanRequests.length; // Use total count like other admin pages
+      setCurrentRequestCount(currentCount);
+    }
+  }, [allVetsVanRequests]);
+
+  const toggleAudio = () => {
+    const newState = !audioEnabled;
+    setAudioEnabled(newState);
+    localStorage.setItem('audioNotificationsEnabled', JSON.stringify(newState));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
+    setLocation("/admin-login");
+  };
+
+  // Handle invoice search
+  const handleInvoiceSearch = () => {
+    if (!invoiceNumber.trim()) return;
+
+    setIsSearching(true);
     
+    if (!allInvoices) {
+      setIsSearching(false);
+      return;
+    }
+    
+    // Filter invoices by invoice number (partial match)
+    const results = allInvoices.filter((invoice: any) => {
+      const invoiceNum = invoice.invoiceNumber || '';
+      const searchTerm = invoiceNumber.toLowerCase();
+      return invoiceNum.toLowerCase().includes(searchTerm);
+    });
+    
+    setTimeout(() => {
+      setSearchResults(results);
+      setIsSearching(false);
+    }, 500); // Small delay for better UX
+  };
+
+  // Handle selecting an invoice for credit note creation
+  const handleSelectInvoice = async (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setSearchResults([]); // Hide search results
+    setInvoiceNumber(""); // Clear search field
+    
+    // Reset credit note editing states for clean slate
+    setEditedQuantities({});
+    setRemovedItems(new Set());
+    
+    // Fetch invoice items from database
+    if (invoice.bookingId) {
+      setLoadingItems(true);
+      try {
+        // Fetch both invoice items and credited items in parallel
+        const [itemsResponse, creditedItemsResponse] = await Promise.all([
+          fetch(`/api/invoice-items/${invoice.bookingId}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          }),
+          fetch(`/api/admin/credit-notes/credited-items/${invoice.invoiceNumber}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          })
+        ]);
+        
+        if (itemsResponse.ok && creditedItemsResponse.ok) {
+          const items = await itemsResponse.json();
+          const creditedItems = await creditedItemsResponse.json();
+          
+          // Create a map of credited items for easy lookup
+          const creditedItemsMap = new Map();
+          creditedItems.forEach((creditedItem: any) => {
+            const existingCredited = creditedItemsMap.get(creditedItem.id) || 0;
+            creditedItemsMap.set(creditedItem.id, existingCredited + creditedItem.creditedQuantity);
+          });
+          
+          // Filter items to exclude those that are fully credited
+          const availableItems = items.filter((item: any) => {
+            const totalCredited = creditedItemsMap.get(item.id) || 0;
+            const originalQuantity = parseInt(item.quantity);
+            return totalCredited < originalQuantity; // Only show items that haven't been fully credited
+          }).map((item: any) => {
+            // Adjust available quantity by subtracting credited quantity
+            const totalCredited = creditedItemsMap.get(item.id) || 0;
+            const originalQuantity = parseInt(item.quantity);
+            const availableQuantity = originalQuantity - totalCredited;
+            
+            return {
+              ...item,
+              quantity: availableQuantity.toString(), // Update quantity to show only available amount
+              originalQuantity: originalQuantity, // Keep track of original quantity for reference
+              creditedQuantity: totalCredited // Keep track of how much has been credited
+            };
+          });
+          
+          setInvoiceItems(availableItems);
+        } else {
+          console.error('Failed to fetch invoice items or credited items');
+          setInvoiceItems([]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch invoice items:', error);
+        setInvoiceItems([]);
+      } finally {
+        setLoadingItems(false);
+      }
+    }
+  };
+
+  // Handle going back to search
+  const handleBackToSearch = () => {
+    setSelectedInvoice(null);
+    setInvoiceNumber("");
+    setSearchResults([]);
+    setInvoiceItems([]);
+    // Reset credit note editing states when returning to search
+    setEditedQuantities({});
+    setRemovedItems(new Set());
+  };
+
+  // Handle modal close
+  const handleModalClose = () => {
+    setIsCreateCreditNoteModalOpen(false);
+    setSelectedInvoice(null);
+    setInvoiceNumber("");
+    setSearchResults([]);
+    setInvoiceItems([]);
+    // Reset credit note editing states when closing modal
+    setEditedQuantities({});
+    setRemovedItems(new Set());
+    // Reset credit note number so a fresh one is generated next time
+    setCurrentCreditNoteNumber("");
+  };
+
+  // Calculate credit note totals (negative values)
+  const creditNoteTotals = useMemo(() => {
+    const activeItems = invoiceItems.filter(item => !removedItems.has(item.id));
+    
+    let totalBeforeVatSum = 0;
+    
+    activeItems.forEach(item => {
+      const unitPrice = parseFloat(item.unitPrice || 0);
+      const originalQuantity = parseInt(item.quantity || 1);
+      const currentQuantity = editedQuantities[item.id] ?? originalQuantity;
+      const discountType = item.discountType || 'none';
+      
+      // Same calculation as individual items
+      const totalBeforeDiscount = currentQuantity * unitPrice;
+      
+      let discountAmount = 0;
+      if (discountType !== 'none') {
+        if (discountType.includes('%')) {
+          const discountPercent = parseFloat(discountType.replace('%', '')) / 100;
+          discountAmount = totalBeforeDiscount * discountPercent;
+        }
+      }
+      
+      // Total Before VAT (after discount) - same as displayed in individual rows
+      const totalBeforeVat = totalBeforeDiscount - discountAmount;
+      totalBeforeVatSum += totalBeforeVat;
+    });
+    
+    const vatAmount = totalBeforeVatSum * 0.15; // 15% VAT
+    const finalTotal = totalBeforeVatSum + vatAmount;
+    
+    return {
+      totalBeforeVatSum,
+      vatAmount,
+      finalTotal
+    };
+  }, [invoiceItems, editedQuantities, removedItems]);
+
+  // Fetch credit notes from API
+  const fetchCreditNotes = async () => {
     setIsLoadingCreditNotes(true);
     try {
       const response = await fetch('/api/admin/credit-notes', {
-        headers: { Authorization: `Bearer ${adminToken}` }
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
       });
+      
       if (response.ok) {
         const data = await response.json();
         setCreditNotes(data);
+      } else {
+        console.error('Failed to fetch credit notes:', response.statusText);
       }
     } catch (error) {
-      console.error('Failed to fetch credit notes:', error);
+      console.error('Error fetching credit notes:', error);
     } finally {
       setIsLoadingCreditNotes(false);
     }
   };
 
+  // Fetch credit notes on component mount
   useEffect(() => {
-    if (adminToken) {
-      fetchCreditNotes();
-    }
-  }, [adminToken]);
+    fetchCreditNotes();
+  }, []);
 
+  // Fetch next credit note number
   const fetchNextCreditNoteNumber = async () => {
     try {
       const response = await fetch('/api/admin/credit-notes/next-number', {
-        headers: { Authorization: `Bearer ${adminToken}` }
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
       });
+      
       if (response.ok) {
         const data = await response.json();
         setCurrentCreditNoteNumber(data.nextNumber);
+      } else {
+        console.error('Failed to fetch next credit note number:', response.statusText);
       }
     } catch (error) {
-      console.error('Failed to fetch next credit note number:', error);
+      console.error('Error fetching next credit note number:', error);
     }
   };
 
-  const handleModalClose = () => {
-    setIsCreateCreditNoteModalOpen(false);
-    setSelectedInvoice(null);
-    setInvoiceItems([]);
-    setEditedQuantities({});
-    setRemovedItems(new Set());
-    setSearchResults([]);
-    setInvoiceNumber("");
+  // Handle viewing credit note
+  const handleViewCreditNote = async (creditNoteId: number) => {
+    try {
+      const response = await fetch(`/api/admin/credit-notes/${creditNoteId}`, {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      
+      if (response.ok) {
+        const creditNoteDetails = await response.json();
+        setSelectedCreditNoteToView(creditNoteDetails);
+        setIsViewCreditNoteModalOpen(true);
+      } else {
+        console.error('Failed to fetch credit note details:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching credit note details:', error);
+    }
   };
 
-  const handleMapClick = (creditNote: any) => {
-    // Map functionality is not yet implemented
-    console.log("Map functionality not yet implemented", creditNote);
-  };
-
+  // Handle closing view modal
   const handleCloseViewModal = () => {
     setIsViewCreditNoteModalOpen(false);
     setSelectedCreditNoteToView(null);
   };
 
+  // Handle opening map modal
+  const handleMapClick = async (creditNote: any) => {
+    try {
+      // Find the full invoice details for this credit note
+      const fullInvoice = allInvoices?.find((inv: any) => inv.invoiceNumber === creditNote.invoiceNumber);
+      const invoice = {
+        invoiceNumber: creditNote.invoiceNumber,
+        customerName: creditNote.customerName,
+        finalTotal: fullInvoice?.finalTotal,
+        appointmentDate: fullInvoice?.appointmentDate
+      };
+      
+      // Fetch all credit notes for this invoice
+      const creditNotesForInvoice = creditNotes.filter(cn => cn.invoiceNumber === creditNote.invoiceNumber);
+      
+      // Fetch payments for this invoice's booking
+      let paymentsForInvoice: any[] = [];
+      if (fullInvoice?.bookingId) {
+        try {
+          const paymentsResponse = await fetch(`/api/invoice-payments/${fullInvoice.bookingId}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
+          if (paymentsResponse.ok) {
+            paymentsForInvoice = await paymentsResponse.json();
+          }
+        } catch (paymentError) {
+          console.error('Error fetching payments:', paymentError);
+        }
+      }
+      
+      // Set initial positions for boxes
+      const initialPositions: {[key: string]: {x: number, y: number}} = {};
+      
+      // Center invoice box
+      initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 200, y: 300 };
+      
+      // Position credit notes to the right of invoice
+      creditNotesForInvoice.forEach((cn, index) => {
+        initialPositions[`creditnote-${cn.id}`] = { 
+          x: 600, 
+          y: 200 + (index * 150) 
+        };
+      });
+      
+      // Position payment boxes to the left of invoice (visible within canvas)
+      paymentsForInvoice.forEach((payment, index) => {
+        initialPositions[`payment-${payment.id}`] = { 
+          x: Math.max(20, 200 - 350), // 20px margin from left edge, or left of invoice with spacing
+          y: 200 + (index * 150) 
+        };
+      });
+      
+      setSelectedInvoiceForMap(invoice);
+      setCreditNotesForMap(creditNotesForInvoice);
+      setPaymentsForMap(paymentsForInvoice);
+      setBoxPositions(initialPositions);
+      setIsMapModalOpen(true);
+    } catch (error) {
+      console.error('Error opening map:', error);
+    }
+  };
+
+  // Handle closing map modal
   const handleCloseMapModal = () => {
     setIsMapModalOpen(false);
     setSelectedInvoiceForMap(null);
     setCreditNotesForMap([]);
     setPaymentsForMap([]);
+    setBoxPositions({});
   };
-
-  const handleExportToExcel = () => {
-    try {
-      // Prepare data for export
-      const exportData = filteredCreditNotes.map((creditNote, index) => ({
-        [language === 'ar' ? 'الرقم' : 'No.']: index + 1,
-        [language === 'ar' ? 'رقم إشعار الخصم' : 'Credit Note Number']: creditNote.creditNoteNumber,
-        [language === 'ar' ? 'رقم الفاتورة' : 'Invoice Number']: creditNote.invoiceNumber,
-        [language === 'ar' ? 'اسم العميل' : 'Customer Name']: creditNote.customerName,
-        [language === 'ar' ? 'رقم الهاتف' : 'Phone Number']: creditNote.customerPhone,
-        [language === 'ar' ? 'تاريخ الإرسال' : 'Posting Date']: creditNote.postingDate ? new Date(creditNote.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US') : '',
-        [language === 'ar' ? 'المبلغ' : 'Amount']: creditNote.amount || 0,
-        [language === 'ar' ? 'الحالة' : 'Status']: creditNote.status || ''
-      }));
-
-      // Create workbook and worksheet
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(exportData);
-
-      // Set column widths for better readability
-      const colWidths = [
-        { wch: 8 },  // No.
-        { wch: 20 }, // Credit Note Number
-        { wch: 20 }, // Invoice Number
-        { wch: 25 }, // Customer Name
-        { wch: 15 }, // Phone Number
-        { wch: 15 }, // Posting Date
-        { wch: 15 }, // Amount
-        { wch: 15 }  // Status
-      ];
-      ws['!cols'] = colWidths;
-
-      // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(wb, ws, language === 'ar' ? 'إشعارات الخصم' : 'Credit Notes');
-
-      // Generate filename with current date
-      const currentDate = new Date().toISOString().split('T')[0];
-      const fileName = `${language === 'ar' ? 'إشعارات_الخصم' : 'Credit_Notes'}_${currentDate}.xlsx`;
-
-      // Generate and save file
-      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([wbout], { type: 'application/octet-stream' });
-      saveAs(blob, fileName);
-
-      console.log(`Exported ${filteredCreditNotes.length} credit notes to Excel`);
-    } catch (error) {
-      console.error('Failed to export to Excel:', error);
-    }
-  };
-
-  // Handle invoice search for credit note creation
-  const handleInvoiceSearch = async () => {
-    if (!invoiceNumber.trim()) return;
-    
-    setIsSearching(true);
-    try {
-      const response = await fetch(`/api/admin/generated-invoices/search?q=${encodeURIComponent(invoiceNumber)}`, {
-        headers: { Authorization: `Bearer ${adminToken}` }
-      });
-      if (response.ok) {
-        const results = await response.json();
-        setSearchResults(results);
-      }
-    } catch (error) {
-      console.error('Invoice search failed:', error);
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  // Handle selecting an invoice for credit note
-  const handleSelectInvoice = async (invoice: any) => {
-    setSelectedInvoice(invoice);
-    setSearchResults([]);
-    
-    // Load invoice items
-    setLoadingItems(true);
-    try {
-      const response = await fetch(`/api/admin/generated-invoices/${invoice.id}/items`, {
-        headers: { Authorization: `Bearer ${adminToken}` }
-      });
-      if (response.ok) {
-        const items = await response.json();
-        setInvoiceItems(items);
-      }
-    } catch (error) {
-      console.error('Failed to load invoice items:', error);
-    } finally {
-      setLoadingItems(false);
-    }
-  };
-
-  // Calculate credit note totals
-  const creditNoteTotals = useMemo(() => {
-    if (!invoiceItems.length) return { totalBeforeVatSum: 0, vatAmount: 0, finalTotal: 0 };
-    
-    let totalBeforeVatSum = 0;
-    
-    invoiceItems.forEach(item => {
-      if (!removedItems.has(item.id)) {
-        const quantity = editedQuantities[item.id] ?? item.quantity;
-        if (quantity > 0) {
-          const itemTotal = quantity * parseFloat(item.unitPrice);
-          totalBeforeVatSum += itemTotal;
-        }
-      }
-    });
-    
-    const vatAmount = totalBeforeVatSum * 0.15;
-    const finalTotal = totalBeforeVatSum + vatAmount;
-    
-    return { totalBeforeVatSum, vatAmount, finalTotal };
-  }, [invoiceItems, removedItems, editedQuantities]);
-
-  // Check if there are valid items for credit note
-  const hasValidItems = useMemo(() => {
-    return invoiceItems.some(item => {
-      if (removedItems.has(item.id)) return false;
-      const quantity = editedQuantities[item.id] ?? item.quantity;
-      return quantity > 0;
-    });
-  }, [invoiceItems, removedItems, editedQuantities]);
 
   // Handle creating credit note
   const handleCreateCreditNote = async () => {
-    if (!selectedInvoice || !hasValidItems) return;
-    
-    const creditNoteItems = invoiceItems
-      .filter(item => !removedItems.has(item.id))
-      .map(item => {
-        const quantity = editedQuantities[item.id] ?? item.quantity;
-        if (quantity <= 0) return null;
-        
-        const totalBeforeVat = quantity * parseFloat(item.unitPrice);
-        const vatAmount = totalBeforeVat * 0.15;
-        const totalAfterVat = totalBeforeVat + vatAmount;
-        
-        return {
-          itemId: item.id,
-          itemName: item.itemName,
-          quantity,
-          unitPrice: parseFloat(item.unitPrice),
-          totalBeforeVat,
-          vatAmount,
-          totalAfterVat
-        };
-      })
-      .filter(Boolean);
-
-    const creditNoteData = {
-      invoiceId: selectedInvoice.id,
-      invoiceNumber: selectedInvoice.invoiceNumber,
-      customerName: selectedInvoice.customerName,
-      customerPhone: selectedInvoice.customerPhone,
-      postingDate: new Date().toISOString(),
-      totalBeforeVat: creditNoteTotals.totalBeforeVatSum,
-      vatAmount: creditNoteTotals.vatAmount,
-      finalTotal: creditNoteTotals.finalTotal,
-      items: creditNoteItems
-    };
+    if (!selectedInvoice || invoiceItems.length === 0 || !currentCreditNoteNumber) {
+      console.error('No invoice selected, no items, or no credit note number generated');
+      return;
+    }
 
     try {
+      // Prepare credit note data
+      const activeItems = invoiceItems.filter(item => !removedItems.has(item.id));
+      const creditNoteItems = activeItems.map(item => ({
+        id: item.id,
+        description: item.description,
+        originalQuantity: item.quantity,
+        creditQuantity: editedQuantities[item.id] || item.quantity,
+        unitPrice: parseFloat(item.unitPrice),
+        totalBeforeVat: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice),
+        vatAmount: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice) * 0.15,
+        totalAfterVat: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice) * 1.15
+      }));
+
+      const creditNoteData = {
+        creditNoteNumber: currentCreditNoteNumber, // Use the pre-generated number
+        invoiceId: selectedInvoice.id,
+        invoiceNumber: selectedInvoice.invoiceNumber,
+        customerName: selectedInvoice.customerName,
+        appointmentDate: selectedInvoice.appointmentDate,
+        postingDate: new Date().toLocaleDateString('en-CA'), // YYYY-MM-DD format
+        items: creditNoteItems,
+        totalBeforeVat: creditNoteTotals.totalBeforeVatSum.toFixed(2),
+        vatAmount: creditNoteTotals.vatAmount.toFixed(2),
+        finalTotal: creditNoteTotals.finalTotal.toFixed(2),
+        createdBy: adminToken // Using admin token as created by identifier
+      };
+
+      // Save credit note via API
       const response = await fetch('/api/admin/credit-notes', {
         method: 'POST',
         headers: {
@@ -380,199 +743,839 @@ export default function FinancialCreditNote() {
   };
 
   return (
-    <>
-    <AdminLayout>
-      <div dir={getDirection(language)} className="p-8">
-        {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
-          {/* Left side - Lord Icon and Title */}
+    <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
+      {/* Full-width Header with logo and controls */}
+      <div className="bg-white shadow-md border-b border-gray-200">
+        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
+          {/* Logo */}
+          <div className="flex-shrink-0 -ml-6">
+            <img 
+              src={vetsVanLogo} 
+              alt="VETS VAN" 
+              className="h-14 w-auto object-contain"
+            />
+          </div>
+
+          {/* Header Controls */}
           <div className="flex items-center gap-4">
-            {/* Lord Icon */}
-            <div className="flex-shrink-0">
-              <div 
-                dangerouslySetInnerHTML={{
-                  __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="loop" delay="1500" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
-                }}
-              />
-            </div>
+            <LanguageSelector />
             
-            {/* Credit Note Title */}
-            <h1 className="text-2xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
-              {language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}
-            </h1>
-          </div>
+            {/* Audio notification toggle */}
+            <button
+              onClick={toggleAudio}
+              className={`p-2 rounded-full transition-colors duration-200 ${
+                audioEnabled 
+                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={audioEnabled 
+                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
+                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
+              }
+            >
+              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+            </button>
 
-          {/* Right side - Create New Credit Note Button */}
-          <button
-            ref={createButtonRef}
-            onClick={async () => {
-              if (isReadOnlyMode) return;
-              await fetchNextCreditNoteNumber();
-              setIsCreateCreditNoteModalOpen(true);
-            }}
-            disabled={isReadOnlyMode}
-            className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
-              isReadOnlyMode 
-                ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed' 
-                : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
-            }`}
-            title={isReadOnlyMode ? (language === 'ar' ? 'غير مسموح - صلاحية القراءة فقط' : 'Not allowed - Read-only permission') : ''}
-            data-testid="button-create-credit-note"
-          >
-            <FilePlus className="h-4 w-4" style={{ color: isReadOnlyMode ? '#9CA3AF' : '#852085' }} />
-            {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
-          </button>
-        </div>
-
-        {/* Search Field */}
-        <div className="mb-6">
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <Input
-                type="text"
-                placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الفاتورة، رقم مذكرة الائتمان، أو تاريخ النشر' : 'Search by customer name, phone number, invoice number, credit note number, or posting date'}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyPress={handleSearchKeyPress}
-                className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
-                data-testid="input-search-credit-notes"
-                dir={getDirection(language)}
-              />
-            </div>
-            <div className="flex gap-3" style={{ width: buttonContainerWidth ? `${buttonContainerWidth}px` : 'auto' }}>
-              <Button
-                onClick={handleSearchClick}
-                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                data-testid="button-search-credit-notes"
-              >
-                <Search className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'بحث' : 'Search'}
-              </Button>
-              <Button
-                onClick={canExport ? handleExportToExcel : undefined}
-                disabled={!canExport}
-                className={`flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
-                  !canExport 
-                    ? 'bg-gray-100 hover:bg-gray-100 cursor-not-allowed' 
-                    : 'bg-white hover:bg-purple-50'
-                }`}
-                style={{ 
-                  borderColor: !canExport ? '#D1D5DB' : '#852085', 
-                  color: !canExport ? '#9CA3AF' : '#852085'
-                }}
-                data-testid="button-export-credit-notes"
-                title={!canExport ? (language === 'ar' ? 'غير مسموح - لا توجد صلاحية تصدير' : 'Not allowed - No export permission') : ''}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'تصدير' : 'Export'}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Credit Notes Table */}
-        <div className="bg-white rounded-lg shadow">
-          {isLoadingCreditNotes ? (
-            <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-              <p className="mt-2 text-gray-600">{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
-            </div>
-          ) : filteredCreditNotes.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <div className="h-12 w-12 mx-auto mb-4 text-gray-400">📄</div>
-              {searchTerm.trim() ? (
-                <>
-                  <p>{language === 'ar' ? 'لا توجد نتائج مطابقة لبحثك' : 'No credit notes match your search'}</p>
-                  <p className="text-sm">{language === 'ar' ? 'جرب مصطلحات بحث مختلفة' : 'Try different search terms'}</p>
-                </>
-              ) : (
-                <>
-                  <p>{language === 'ar' ? 'لا توجد مذكرات ائتمان حتى الآن' : 'No credit notes found'}</p>
-                  <p className="text-sm">{language === 'ar' ? 'ابدأ بإنشاء مذكرة ائتمان جديدة' : 'Start by creating a new credit note'}</p>
-                </>
+            {/* Notifications counter */}
+            <div className="relative">
+              <Bell className="h-6 w-6 text-purple-600" />
+              {currentRequestCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
+                </span>
               )}
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {language === 'ar' ? 'رقم مذكرة الائتمان' : 'Credit Note No.'}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {language === 'ar' ? 'رقم الفاتورة' : 'Invoice No.'}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {language === 'ar' ? 'اسم العميل' : 'Customer Name'}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date'}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {language === 'ar' ? 'المبلغ النهائي' : 'Final Amount'}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {language === 'ar' ? 'الإجراءات' : 'Actions'}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {paginatedCreditNotes.map((creditNote) => (
-                    <tr key={creditNote.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        CRN{creditNote.creditNoteNumber}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {creditNote.invoiceNumber}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {creditNote.customerName}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(creditNote.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        -{parseFloat(creditNote.finalTotal).toFixed(2)} SAR
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center gap-2">
+            
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            >
+              <LogOut className="h-4 w-4 ml-2" />
+              {t('logout')}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu sheet */}
+      <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
+        <SheetTrigger asChild>
+          <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 fixed top-4 right-4 z-50">
+            <Menu className="h-6 w-6" />
+          </button>
+        </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0">
+                <div className="flex flex-col h-full bg-white">
+                  <div className="p-4 border-b">
+                    <div className="flex items-center gap-2">
+                      <img src={vetsVanLogo} alt="VetsVan Logo" className="h-8 w-8" />
+                      <span className="text-lg font-semibold text-purple-800">VetsVan</span>
+                    </div>
+                  </div>
+                  <nav className="flex-1 px-2 py-4 space-y-1">
+                    {/* Home Page */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-home');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Home className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+                    </button>
+
+                    {/* Administration Module */}
+                    <div className="mb-2">
+                      <button
+                        onClick={() => {
+                          const newState = !isAdministrationExpanded;
+                          setIsAdministrationExpanded(newState);
+                          localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                        }}
+                        className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      >
+                        <Users className="h-6 w-6 flex-shrink-0" />
+                        <span className="flex-1 text-left">
+                          {language === 'ar' ? 'الإدارة' : 'Administration'}
+                        </span>
+                        {isAdministrationExpanded ? (
+                          <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                        )}
+                      </button>
+
+                      {isAdministrationExpanded && (
+                        <div className="ml-6 mt-1 space-y-1">
                           <button
                             onClick={() => {
-                              setSelectedCreditNoteToView(creditNote);
-                              setIsViewCreditNoteModalOpen(true);
+                              setLocation('/administration/users');
+                              setIsMobileSidebarOpen(false);
                             }}
-                            className="text-purple-600 hover:text-purple-900 p-1 rounded-md hover:bg-purple-50"
-                            title={language === 'ar' ? 'عرض مذكرة الائتمان' : 'View Credit Note'}
-                            data-testid={`button-view-credit-note-${creditNote.id}`}
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                           >
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
+                            <User className="h-5 w-5 flex-shrink-0" />
+                            <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setLocation('/administration/authorization');
+                              setIsMobileSidebarOpen(false);
+                            }}
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                          >
+                            <Shield className="h-5 w-5 flex-shrink-0" />
+                            <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Financial Section */}
+                    <div className="mb-2">
+                      <button
+                        onClick={() => {
+                          const newState = !isFinancialExpanded;
+                          setIsFinancialExpanded(newState);
+                          localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
+                        }}
+                        className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      >
+                        <DollarSign className="h-6 w-6 flex-shrink-0" />
+                        <span className="flex-1 text-left">
+                          {language === 'ar' ? 'المالية' : 'Financial'}
+                        </span>
+                        {isFinancialExpanded ? (
+                          <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                        )}
+                      </button>
+
+                      {isFinancialExpanded && (
+                        <div className="ml-6 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setLocation('/sales-reports');
+                              setIsMobileSidebarOpen(false);
+                            }}
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                          >
+                            <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                            <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
+                          </button>
+                          <button
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
+                          >
+                            <Receipt className="h-5 w-5 flex-shrink-0 text-purple-600" />
+                            <span className="text-purple-600">{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setLocation('/financial/outgoing-payment');
+                              setIsMobileSidebarOpen(false);
+                            }}
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                          >
+                            <DollarSign className="h-5 w-5 flex-shrink-0" />
+                            <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setLocation('/financial/income-payment');
+                              setIsMobileSidebarOpen(false);
+                            }}
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                          >
+                            <DollarSign className="h-5 w-5 flex-shrink-0" />
+                            <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setLocation('/financial/ar-balance');
+                              setIsMobileSidebarOpen(false);
+                            }}
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                          >
+                            <DollarSign className="h-5 w-5 flex-shrink-0" />
+                            <span>{language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* VetsVan Management */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Car className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'Vets Van Management'}</span>
+                    </button>
+
+                    {/* Vets Van Shifts */}
+                    <button
+                      onClick={() => {
+                        setLocation('/vets-van-shifts');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Clock className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
+                    </button>
+
+                    {/* Reports */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard?tab=reports');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <BarChart3 className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+                    </button>
+
+                    {/* New Reports & Analytics Dropdown */}
+                    <div className="mb-2">
+                      <button
+                        onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                        className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      >
+                        <TrendingUp className="h-6 w-6 flex-shrink-0" />
+                        <span className="flex-1 text-left whitespace-nowrap">
+                          {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                        </span>
+                        {isNewReportsExpanded ? (
+                          <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                        )}
+                      </button>
+                      
+                      {/* Dropdown Items */}
+                      {isNewReportsExpanded && (
+                        <div className="ml-6 mt-1 space-y-1">
+                          <button
+                            onClick={() => {
+                              setLocation('/new-reports-analytics/sales-report');
+                              setIsMobileSidebarOpen(false);
+                            }}
+                            className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                          >
+                            <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                            <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* VetsVan Requests */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-vetsvan-requests');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 relative"
+                    >
+                      <FileText className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+                    </button>
+
+                    {/* Import */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard/import');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Upload className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
+                    </button>
+
+                    {/* Services */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard/services');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Stethoscope className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+                    </button>
+
+                    {/* Products */}
+                    <button
+                      onClick={() => {
+                        setLocation('/admin-dashboard/products');
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    >
+                      <Package className="h-6 w-6 flex-shrink-0" />
+                      <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
+                    </button>
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+      {/* Main Content with Sidebar */}
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-64 bg-white shadow-lg min-h-screen">
+          <nav className="mt-4 px-2">
+            {/* Home Page */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-home');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Home className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
+            </button>
+            
+            {/* Administration Module */}
+            <div className="mb-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isAdministrationExpanded;
+                  setIsAdministrationExpanded(newState);
+                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
+                }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <Users className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'الإدارة' : 'Administration'}
+                </span>
+                {isAdministrationExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+              
+              {/* Administration Submenu */}
+              {isAdministrationExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/administration/users');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <User className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/administration/authorization');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Shield className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Financial Section */}
+            <div className="mb-2">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isFinancialExpanded;
+                  setIsFinancialExpanded(newState);
+                  localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
+                }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <DollarSign className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'المالية' : 'Financial'}
+                </span>
+                {isFinancialExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+
+              {isFinancialExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/sales-reports');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
+                  </button>
+                  <button
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full bg-purple-50 border-l-4 border-purple-600"
+                  >
+                    <Receipt className="h-5 w-5 flex-shrink-0 text-purple-600" />
+                    <span className="text-purple-600">{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/financial/outgoing-payment');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/financial/income-payment');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/financial/ar-balance');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <DollarSign className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Business Partner Section */}
+            <div className="mb-2">
+              <button
+                data-testid="button-toggle-business-partner"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const newState = !isBusinessPartnerExpanded;
+                  setIsBusinessPartnerExpanded(newState);
+                  localStorage.setItem('isBusinessPartnerExpanded', JSON.stringify(newState));
+                }}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <Handshake className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left">
+                  {language === 'ar' ? 'شريك الأعمال' : 'Business Partner'}
+                </span>
+                {isBusinessPartnerExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+
+              {isBusinessPartnerExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    data-testid="button-business-partner-partner-management"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setLocation('/business-partner/partner-management');
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <Users className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'إدارة الشركاء' : 'Partner Management'}</span>
+                  </button>
+                  
+                  <button
+                    data-testid="button-business-partner-contracts"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // Placeholder for now
+                    }}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <FileText className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'عقود الشراكة' : 'Partnership Contracts'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+            
+            {/* VetsVan Management */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Car className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'Vets Van Management'}</span>
+            </button>
+
+            {/* Vets Van Shifts */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/vets-van-shifts');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Clock className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
+            </button>
+            
+            {/* Reports */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard?tab=reports');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <BarChart3 className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
+            </button>
+            
+            {/* New Reports & Analytics Dropdown */}
+            <div className="mb-2">
+              <button
+                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
+                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              >
+                <TrendingUp className="h-6 w-6 flex-shrink-0" />
+                <span className="flex-1 text-left whitespace-nowrap">
+                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
+                </span>
+                {isNewReportsExpanded ? (
+                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                )}
+              </button>
+              
+              {/* Dropdown Items */}
+              {isNewReportsExpanded && (
+                <div className="ml-6 mt-1 space-y-1">
+                  <button
+                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
+                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  >
+                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
+                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* VetsVan Requests */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-vetsvan-requests');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 relative"
+            >
+              <FileText className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+            </button>
+            
+            {/* Import */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/import');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Upload className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
+            </button>
+            
+            {/* Services */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/services');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Stethoscope className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
+            </button>
+            
+            {/* Products */}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setLocation('/admin-dashboard/products');
+              }}
+              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            >
+              <Package className="h-6 w-6 flex-shrink-0" />
+              <span>{language === 'ar' ? 'المنتجات' : 'Products'}</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 p-8">
+          <div className="flex items-center justify-between mb-8">
+            {/* Left side - Lord Icon and Title */}
+            <div className="flex items-center gap-4">
+              {/* Lord Icon */}
+              <div className="flex-shrink-0">
+                <div 
+                  dangerouslySetInnerHTML={{
+                    __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="loop" delay="1500" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                  }}
+                />
+              </div>
+              
+              {/* Credit Note Title */}
+              <h1 className="text-2xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+                {language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}
+              </h1>
+            </div>
+
+            {/* Right side - Create New Credit Note Button */}
+            <button
+              ref={createButtonRef}
+              onClick={async () => {
+                if (isReadOnlyMode) return; // Prevent action in read-only mode
+                await fetchNextCreditNoteNumber();
+                setIsCreateCreditNoteModalOpen(true);
+              }}
+              disabled={isReadOnlyMode}
+              className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+                isReadOnlyMode 
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed' 
+                  : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+              }`}
+              title={isReadOnlyMode ? (language === 'ar' ? 'غير مسموح - صلاحية القراءة فقط' : 'Not allowed - Read-only permission') : ''}
+            >
+              <FilePlus className="h-4 w-4" style={{ color: isReadOnlyMode ? '#9CA3AF' : '#852085' }} />
+              {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
+            </button>
+          </div>
+
+          {/* Search Field */}
+          <div className="mb-6">
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الفاتورة، رقم مذكرة الائتمان، أو تاريخ النشر' : 'Search by customer name, phone number, invoice number, credit note number, or posting date'}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
+                  data-testid="input-search-credit-notes"
+                  dir={getDirection(language)}
+                />
+              </div>
+              <div className="flex gap-3" style={{ width: buttonContainerWidth ? `${buttonContainerWidth}px` : 'auto' }}>
+                <Button
+                  onClick={handleSearchClick}
+                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                  data-testid="button-search-credit-notes"
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'بحث' : 'Search'}
+                </Button>
+                <Button
+                  onClick={canExport ? handleExportToExcel : undefined}
+                  disabled={!canExport}
+                  className={`flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
+                    !canExport 
+                      ? 'bg-gray-100 hover:bg-gray-100 cursor-not-allowed' 
+                      : 'bg-white hover:bg-purple-50'
+                  }`}
+                  style={{ 
+                    borderColor: !canExport ? '#D1D5DB' : '#852085', 
+                    color: !canExport ? '#9CA3AF' : '#852085'
+                  }}
+                  data-testid="button-export-credit-notes"
+                  title={!canExport ? (language === 'ar' ? 'غير مسموح - لا توجد صلاحية تصدير' : 'Not allowed - No export permission') : ''}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  {language === 'ar' ? 'تصدير' : 'Export'}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Credit Notes Table */}
+          <div className="bg-white rounded-lg shadow">
+            {isLoadingCreditNotes ? (
+              <div className="p-8 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                <p className="mt-2 text-gray-600">{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
+              </div>
+            ) : filteredCreditNotes.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                {searchTerm.trim() ? (
+                  <>
+                    <p>{language === 'ar' ? 'لا توجد نتائج مطابقة لبحثك' : 'No credit notes match your search'}</p>
+                    <p className="text-sm">{language === 'ar' ? 'جرب مصطلحات بحث مختلفة' : 'Try different search terms'}</p>
+                  </>
+                ) : (
+                  <>
+                    <p>{language === 'ar' ? 'لا توجد مذكرات ائتمان حتى الآن' : 'No credit notes found'}</p>
+                    <p className="text-sm">{language === 'ar' ? 'ابدأ بإنشاء مذكرة ائتمان جديدة' : 'Start by creating a new credit note'}</p>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'رقم مذكرة الائتمان' : 'Credit Note No.'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'رقم الفاتورة' : 'Invoice No.'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'اسم العميل' : 'Customer Name'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'المجموع النهائي' : 'Final Total'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'الإجراءات' : 'Actions'}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {paginatedCreditNotes.map((creditNote) => (
+                      <tr key={creditNote.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          CRN{creditNote.creditNoteNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {creditNote.invoiceNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {creditNote.customerName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(creditNote.postingDate).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          -{creditNote.finalTotal} SAR
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={() => handleViewCreditNote(creditNote.id)}
+                            className="text-purple-600 hover:text-purple-900 mr-4"
+                          >
+                            {language === 'ar' ? 'عرض' : 'View'}
+                          </button>
+                          <button
+                            onClick={() => console.log('Print credit note:', creditNote.id)}
+                            className="text-blue-600 hover:text-blue-900 mr-4"
+                          >
+                            {language === 'ar' ? 'طباعة' : 'Print'}
                           </button>
                           <button
                             onClick={() => handleMapClick(creditNote)}
-                            className="text-blue-600 hover:text-blue-900 p-1 rounded-md hover:bg-blue-50"
-                            title={language === 'ar' ? 'عرض الخريطة' : 'View Map'}
-                            data-testid={`button-map-credit-note-${creditNote.id}`}
+                            className="text-green-600 hover:text-green-900"
                           >
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                            </svg>
+                            {language === 'ar' ? 'خريطة' : 'Map'}
                           </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
 
-        {/* Enhanced Pagination */}
-        {totalPages > 1 && (
+          {/* Enhanced Pagination */}
           <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4 mt-6">
             {/* Results Info & Items Per Page */}
             <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -610,532 +1613,945 @@ export default function FinancialCreditNote() {
             </div>
             
             {/* Navigation Controls */}
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {language === 'ar' ? 'السابق' : 'Previous'}
-              </Button>
-              
-              <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
-                <span className="text-sm font-medium text-purple-700">
-                  {language === 'ar' 
-                    ? `صفحة ${currentPage} من ${totalPages}`
-                    : `Page ${currentPage} of ${totalPages}`
-                  }
-                </span>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {language === 'ar' ? 'السابق' : 'Previous'}
+                </Button>
+                
+                <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
+                  <span className="text-sm font-medium text-purple-700">
+                    {language === 'ar' 
+                      ? `صفحة ${currentPage} من ${totalPages}`
+                      : `Page ${currentPage} of ${totalPages}`
+                    }
+                  </span>
+                </div>
+                
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                  disabled={currentPage === totalPages}
+                  className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {language === 'ar' ? 'التالي' : 'Next'}
+                </Button>
               </div>
-              
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {language === 'ar' ? 'التالي' : 'Next'}
-              </Button>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Load lord-icon script */}
-      <script src="https://cdn.lordicon.com/lordicon.js"></script>
-    </AdminLayout>
-    
-    {/* Create New Credit Note Modal */}
-    <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={handleModalClose}>
-      <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
-        <DialogHeader>
-          <DialogTitle className="flex justify-between items-start text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
-            {/* Left side - Icon and Title */}
-            <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
-              <div 
-                dangerouslySetInnerHTML={{
-                  __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
-                }}
-              />
-              <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
-            </div>
-            
-            {/* Right side - Credit Note Details */}
-            <div className="flex flex-col gap-2">
-              {/* Credit Note Number */}
-              <div className="flex items-center w-80" style={{textAlign: getTextAlign(language)}}>
-                <label className="text-sm font-medium text-gray-700 w-28 text-left">
-                  {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
-                </label>
-                <div className="flex gap-2 ml-2">
-                  <Input
-                    value="CRN"
-                    disabled
-                    className="w-16 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
-                    readOnly
-                  />
-                  <Input
-                    value={currentCreditNoteNumber || "..."}
-                    disabled
-                    className="w-20 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
-                    readOnly
-                  />
-                </div>
+      {/* Create New Credit Note Modal */}
+      <Dialog open={isCreateCreditNoteModalOpen} onOpenChange={handleModalClose}>
+        <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
+          <DialogHeader>
+            <DialogTitle className="flex justify-between items-start text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+              {/* Left side - Icon and Title */}
+              <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
+                <div 
+                  dangerouslySetInnerHTML={{
+                    __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                  }}
+                />
+                <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
               </div>
               
-              {/* Posting Date */}
-              <div className="flex items-center w-80" style={{textAlign: getTextAlign(language)}}>
-                <label className="text-sm font-medium text-gray-700 w-28 text-left">
-                  {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
-                </label>
-                <div className="flex gap-2 ml-2">
+              {/* Right side - Credit Note Details */}
+              <div className="flex flex-col gap-2">
+                {/* Credit Note Number */}
+                <div className="flex items-center w-80" style={{textAlign: getTextAlign(language)}}>
+                  <label className="text-sm font-medium text-gray-700 w-28 text-left">
+                    {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
+                  </label>
+                  <div className="flex gap-2 ml-2">
+                    <Input
+                      value="CRN"
+                      disabled
+                      className="w-16 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
+                      readOnly
+                    />
+                    <Input
+                      value={currentCreditNoteNumber || "..."}
+                      disabled
+                      className="w-20 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
+                      readOnly
+                    />
+                  </div>
+                </div>
+                
+                {/* Posting Date */}
+                <div className="flex items-center w-80" style={{textAlign: getTextAlign(language)}}>
+                  <label className="text-sm font-medium text-gray-700 w-28 text-left">
+                    {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
+                  </label>
+                  <div className="flex gap-2 ml-2">
+                    <Input
+                      value={new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      disabled
+                      className="w-36 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
+                      readOnly
+                    />
+                  </div>
+                </div>
+              </div>
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {language === 'ar' ? 'نموذج لإنشاء مذكرة ائتمان جديدة للعملاء' : 'Form to create a new credit note for customers'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4" dir={getDirection(language)}>
+            <div className="space-y-2">
+              <label htmlFor="invoice-search" className="text-sm font-medium text-gray-700" style={{textAlign: getTextAlign(language)}}>
+                {language === 'ar' ? 'البحث برقم الفاتورة' : 'Search by Invoice Number'}
+              </label>
+              <div className="flex gap-3 items-center">
+                <div className="relative flex-1">
+                  <Search className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4`} />
                   <Input
-                    value={new Date().toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                    disabled
-                    className="w-36 text-center bg-gray-100 text-gray-500 cursor-not-allowed text-sm"
-                    readOnly
+                    id="invoice-search"
+                    type="text"
+                    value={invoiceNumber}
+                    onChange={(e) => setInvoiceNumber(e.target.value)}
+                    placeholder={language === 'ar' ? 'أدخل رقم الفاتورة...' : 'Enter invoice number...'}
+                    className={`${language === 'ar' ? 'pr-10' : 'pl-10'} w-full max-w-md`}
+                    style={{textAlign: getTextAlign(language)}}
+                    dir={getDirection(language)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleInvoiceSearch();
+                      }
+                    }}
                   />
                 </div>
+                
+                {/* Search Button */}
+                <Button
+                  onClick={handleInvoiceSearch}
+                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50 flex-shrink-0"
+                  disabled={!invoiceNumber.trim() || isSearching}
+                >
+                  {isSearching ? (language === 'ar' ? 'جاري البحث...' : 'Searching...') : (language === 'ar' ? 'بحث' : 'Search')}
+                </Button>
               </div>
             </div>
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {language === 'ar' ? 'نموذج لإنشاء مذكرة ائتمان جديدة للعملاء' : 'Form to create a new credit note for customers'}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="space-y-4 py-4" dir={getDirection(language)}>
-          <div className="space-y-2">
-            <label htmlFor="invoice-search" className="text-sm font-medium text-gray-700" style={{textAlign: getTextAlign(language)}}>
-              {language === 'ar' ? 'البحث برقم الفاتورة' : 'Search by Invoice Number'}
-            </label>
-            <div className="flex gap-3 items-center">
-              <div className="relative flex-1">
-                <Search className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4`} />
-                <Input
-                  id="invoice-search"
-                  type="text"
-                  value={invoiceNumber}
-                  onChange={(e) => setInvoiceNumber(e.target.value)}
-                  placeholder={language === 'ar' ? 'أدخل رقم الفاتورة...' : 'Enter invoice number...'}
-                  className={`${language === 'ar' ? 'pr-10' : 'pl-10'} focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2`}
-                  dir={getDirection(language)}
-                />
-              </div>
-              <Button
-                onClick={handleInvoiceSearch}
-                disabled={!invoiceNumber.trim() || isSearching}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white border-0"
-              >
-                {isSearching ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                ) : (
-                  language === 'ar' ? 'بحث' : 'Search'
-                )}
-              </Button>
-            </div>
-          </div>
 
-          {/* Search Results */}
-          {searchResults.length > 0 && (
-            <div className="mt-4">
-              <label className="text-sm font-medium text-gray-700 mb-2 block" style={{textAlign: getTextAlign(language)}}>
-                {language === 'ar' ? 'نتائج البحث' : 'Search Results'}
-              </label>
-              <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-md">
-                {searchResults.map((invoice) => (
-                  <div
-                    key={invoice.id}
-                    onClick={() => handleSelectInvoice(invoice)}
-                    className="p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
-                    style={{ direction: getDirection(language) }}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="font-medium text-gray-900">{invoice.invoiceNumber}</p>
-                        <p className="text-sm text-gray-600">{invoice.customerName}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">{parseFloat(invoice.finalTotal).toFixed(2)} SAR</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(invoice.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Selected Invoice Details */}
-          {selectedInvoice && (
-            <div className="mt-6 bg-gray-50 p-4 rounded-lg" dir={getDirection(language)}>
-              <h3 className="text-lg font-medium text-gray-900 mb-4" style={{textAlign: getTextAlign(language)}}>
-                {language === 'ar' ? 'تفاصيل الفاتورة المحددة' : 'Selected Invoice Details'}
-              </h3>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'رقم الفاتورة:' : 'Invoice Number:'}
-                  </label>
-                  <p className="text-gray-900">{selectedInvoice.invoiceNumber}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
-                  </label>
-                  <p className="text-gray-900">{selectedInvoice.customerName}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'تاريخ الموعد:' : 'Appointment Date:'}
-                  </label>
-                  <p className="text-gray-900">
-                    {new Date(selectedInvoice.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
-                  </label>
-                  <p className="text-gray-900">{parseFloat(selectedInvoice.finalTotal).toFixed(2)} SAR</p>
-                </div>
-              </div>
-
-              {/* Invoice Items */}
-              {loadingItems ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mx-auto"></div>
-                  <p className="mt-2 text-sm text-gray-600">{language === 'ar' ? 'جاري تحميل العناصر...' : 'Loading items...'}</p>
-                </div>
-              ) : invoiceItems.length > 0 ? (
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-3" style={{textAlign: getTextAlign(language)}}>
-                    {language === 'ar' ? 'عناصر الفاتورة' : 'Invoice Items'}
-                  </h4>
-                  <div className="space-y-2">
-                    {invoiceItems.map((item) => {
-                      const isRemoved = removedItems.has(item.id);
-                      const currentQuantity = editedQuantities[item.id] ?? item.quantity;
-                      const maxQuantity = item.quantity;
-                      
-                      return (
-                        <div 
-                          key={item.id} 
-                          className={`flex items-center justify-between p-3 border rounded-md transition-all ${
-                            isRemoved ? 'bg-red-50 border-red-200 opacity-50' : 'bg-white border-gray-200'
-                          }`}
-                          style={{ direction: getDirection(language) }}
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <span className={`font-medium ${isRemoved ? 'text-red-500 line-through' : 'text-gray-900'}`}>
-                                {item.itemName}
-                              </span>
-                              {isRemoved && (
-                                <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">
-                                  {language === 'ar' ? 'محذوف' : 'Removed'}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-sm text-gray-600 mt-1">
-                              {language === 'ar' ? 'السعر:' : 'Price:'} {parseFloat(item.unitPrice).toFixed(2)} SAR
-                            </div>
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="space-y-2" dir={getDirection(language)}>
+                <label className="text-sm font-medium text-gray-700" style={{textAlign: getTextAlign(language)}}>
+                  {language === 'ar' ? 'نتائج البحث' : 'Search Results'}
+                </label>
+                <div className="max-h-64 overflow-y-auto space-y-2 border rounded-md p-2 bg-gray-50">
+                  {searchResults.map((invoice: any) => (
+                    <div 
+                      key={invoice.id} 
+                      className="bg-white p-3 rounded border cursor-pointer hover:bg-purple-50 transition-colors"
+                      onClick={() => handleSelectInvoice(invoice)}
+                    >
+                      <div className="flex justify-between items-start mb-2" style={{textAlign: getTextAlign(language)}}>
+                        <div>
+                          <div className="font-semibold text-purple-600">
+                            {invoice.invoiceNumber}
                           </div>
-                          
-                          <div className="flex items-center gap-3">
-                            {!isRemoved && (
-                              <div className="flex items-center gap-2">
-                                <label className="text-sm text-gray-600">
-                                  {language === 'ar' ? 'الكمية:' : 'Qty:'}
-                                </label>
-                                <input
-                                  type="number"
-                                  min="0"
-                                  max={maxQuantity}
-                                  value={currentQuantity}
-                                  onChange={(e) => {
-                                    const newQty = parseInt(e.target.value) || 0;
-                                    if (newQty <= maxQuantity && newQty >= 0) {
-                                      setEditedQuantities(prev => ({
-                                        ...prev,
-                                        [item.id]: newQty
-                                      }));
-                                    }
-                                  }}
-                                  className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-sm"
-                                />
-                                <span className="text-xs text-gray-500">/{maxQuantity}</span>
-                              </div>
-                            )}
-                            
-                            <button
-                              onClick={() => {
-                                if (isRemoved) {
-                                  setRemovedItems(prev => {
-                                    const newSet = new Set(prev);
-                                    newSet.delete(item.id);
-                                    return newSet;
-                                  });
-                                } else {
-                                  setRemovedItems(prev => new Set(prev).add(item.id));
-                                }
-                              }}
-                              className={`p-1 rounded-md transition-colors ${
-                                isRemoved 
-                                  ? 'text-green-600 hover:bg-green-50' 
-                                  : 'text-red-600 hover:bg-red-50'
-                              }`}
-                              title={isRemoved 
-                                ? (language === 'ar' ? 'استعادة العنصر' : 'Restore item')
-                                : (language === 'ar' ? 'حذف العنصر' : 'Remove item')
-                              }
-                            >
-                              {isRemoved ? (
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                              ) : (
-                                <Minus className="h-4 w-4" />
-                              )}
-                            </button>
+                          <div className="text-sm text-gray-600">
+                            {invoice.customerName}
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Credit Note Summary */}
-                  <div className="mt-6 bg-white p-4 border border-gray-200 rounded-lg">
-                    <h5 className="text-md font-medium text-gray-900 mb-3" style={{textAlign: getTextAlign(language)}}>
-                      {language === 'ar' ? 'ملخص مذكرة الائتمان' : 'Credit Note Summary'}
-                    </h5>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Subtotal (Before VAT):'}
-                        </label>
-                        <p className="text-gray-900">{creditNoteTotals.totalBeforeVatSum.toFixed(2)} SAR</p>
+                        <div className="text-sm font-medium text-green-600">
+                          {invoice.finalTotal} SAR
+                        </div>
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'ضريبة القيمة المضافة (15%):' : 'VAT (15%):'}
-                        </label>
-                        <p className="text-gray-900">{creditNoteTotals.vatAmount.toFixed(2)} SAR</p>
-                      </div>
-                      <div className="col-span-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
-                        </label>
-                        <p className="text-lg font-bold text-purple-600">{creditNoteTotals.finalTotal.toFixed(2)} SAR</p>
+                      <div className="text-xs text-gray-500" style={{textAlign: getTextAlign(language)}}>
+                        {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                        {new Date(invoice.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                       </div>
                     </div>
-                  </div>
-
-                  {/* Create Credit Note Button */}
-                  <div className="mt-6 flex justify-end">
-                    <Button
-                      onClick={handleCreateCreditNote}
-                      disabled={!hasValidItems}
-                      className={`px-6 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
-                        hasValidItems
-                          ? 'border-purple-600 bg-purple-600 text-white hover:bg-purple-700'
-                          : 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      <FilePlus className="h-4 w-4 mr-2" />
-                      {language === 'ar' ? 'إنشاء مذكرة الائتمان' : 'Create Credit Note'}
-                    </Button>
-                  </div>
-                </div>
-              ) : selectedInvoice && !loadingItems ? (
-                <div className="text-center py-4 text-gray-500">
-                  <FileText className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                  <p>{language === 'ar' ? 'لا توجد عناصر في هذه الفاتورة' : 'No items found for this invoice'}</p>
-                </div>
-              ) : null}
-            </div>
-          )}
-          
-        </div>
-      </DialogContent>
-    </Dialog>
-
-    {/* View Credit Note Modal */}
-    <Dialog open={isViewCreditNoteModalOpen} onOpenChange={handleCloseViewModal}>
-      <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
-        <DialogHeader>
-          <DialogTitle className="flex justify-between items-start text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
-            {/* Left side - Icon and Title */}
-            <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
-              <div 
-                dangerouslySetInnerHTML={{
-                  __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:60px;height:60px"></lord-icon>'
-                }}
-              />
-              <span>{language === 'ar' ? 'تفاصيل مذكرة الائتمان' : 'Credit Note Details'}</span>
-            </div>
-            
-            {/* Right side - Credit Note Info */}
-            {selectedCreditNoteToView && (
-              <div className="flex flex-col gap-1 text-right">
-                <div className="text-sm text-gray-500">
-                  {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
-                </div>
-                <div className="text-lg font-bold text-purple-600">
-                  CRN{selectedCreditNoteToView.creditNoteNumber}
+                  ))}
                 </div>
               </div>
             )}
-          </DialogTitle>
-        </DialogHeader>
-        
-        {selectedCreditNoteToView && (
-          <div className="space-y-6 py-4" dir={getDirection(language)}>
-            {/* Credit Note Header Info */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'رقم الفاتورة الأصلية:' : 'Original Invoice No.:'}
-                  </label>
-                  <p className="text-gray-900">{selectedCreditNoteToView.invoiceNumber}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
-                  </label>
-                  <p className="text-gray-900">{selectedCreditNoteToView.customerName}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
-                  </label>
-                  <p className="text-gray-900">
-                    {new Date(selectedCreditNoteToView.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
-                  </label>
-                  <p className="text-lg font-bold text-purple-600">
-                    -{parseFloat(selectedCreditNoteToView.finalTotal).toFixed(2)} SAR
-                  </p>
+
+            {/* No Results Message */}
+            {!isSearching && searchResults.length === 0 && invoiceNumber.trim() && (
+              <div className="text-center py-4 text-gray-500" style={{textAlign: getTextAlign(language)}}>
+                {language === 'ar' ? 'لم يتم العثور على فواتير' : 'No invoices found'}
+              </div>
+            )}
+
+            {/* Selected Invoice Display */}
+            {selectedInvoice && (
+              <div className="space-y-4" dir={getDirection(language)}>
+
+                {/* Invoice Details */}
+                <div className="bg-white border rounded-lg p-6 shadow-sm">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 items-start">
+                    {/* Invoice Information */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
+                        {language === 'ar' ? 'معلومات الفاتورة' : 'Invoice Information'}
+                      </h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'رقم الفاتورة:' : 'Invoice Number:'}
+                          </span>
+                          <span className="text-purple-600 font-semibold">{selectedInvoice.invoiceNumber}</span>
+                        </div>
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'التاريخ:' : 'Date:'}
+                          </span>
+                          <span className="text-gray-600">
+                            {new Date(selectedInvoice.appointmentDate).toLocaleDateString(
+                              language === 'ar' ? 'ar-SA' : 'en-US'
+                            )}
+                          </span>
+                        </div>
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
+                          </span>
+                          <span className="text-green-600 font-bold">{selectedInvoice.finalTotal} SAR</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Customer Information */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
+                        {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
+                      </h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
+                          </span>
+                          <span className="text-gray-600">{selectedInvoice.customerName}</span>
+                        </div>
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'رقم الهاتف:' : 'Phone Number:'}
+                          </span>
+                          <span className="text-gray-600">{selectedInvoice.customerPhone}</span>
+                        </div>
+                        <div className="flex justify-between" style={{textAlign: getTextAlign(language)}}>
+                          <span className="font-medium text-gray-700">
+                            {language === 'ar' ? 'العنوان:' : 'Address:'}
+                          </span>
+                          <span className="text-gray-600">{selectedInvoice.customerAddress}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Divider Line */}
+                  <hr className="border-t border-gray-200 my-6" />
+
+                  {/* Items and Services */}
+                  <div className="space-y-4">
+                    {/* Loading Items */}
+                    {loadingItems && (
+                      <div className="text-center py-4">
+                        <div className="text-gray-600" style={{textAlign: getTextAlign(language)}}>
+                          {language === 'ar' ? 'جاري تحميل عناصر الفاتورة...' : 'Loading invoice items...'}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Items and Services Table */}
+                    {!loadingItems && invoiceItems.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
+                          {language === 'ar' ? 'المنتجات والخدمات' : 'Items and Services'}
+                        </h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full mb-4">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="text-left py-2 px-2" style={{textAlign: getTextAlign(language), width: '35%'}}>
+                                  {language === 'ar' ? 'الوصف' : 'Description'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-24">
+                                  {language === 'ar' ? 'الكمية' : 'Quantity'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-32">
+                                  {language === 'ar' ? 'سعر الوحدة (ر.س)' : 'Unit Price (SAR)'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-28">
+                                  {language === 'ar' ? 'الخصم' : 'Discount'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-24">
+                                  {language === 'ar' ? 'ضريبة القيمة المضافة (15%)' : 'VAT (15%)'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-32">
+                                  {language === 'ar' ? 'المجموع قبل الضريبة (ر.س)' : 'Total Before VAT (SAR)'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-32">
+                                  {language === 'ar' ? 'المجموع بعد الضريبة (ر.س)' : 'Total After VAT (SAR)'}
+                                </th>
+                                <th className="text-center py-2 px-2 w-16">
+                                  {language === 'ar' ? 'حذف' : 'Remove'}
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {invoiceItems.filter(item => !removedItems.has(item.id)).map((item: any, index: number) => {
+                                // Calculate remaining active items for delete protection
+                                const activeItemsCount = invoiceItems.filter(i => !removedItems.has(i.id)).length;
+                                const isLastItem = activeItemsCount <= 1;
+                                
+                                // Use the correct field names from the database  
+                                const unitPrice = parseFloat(item.unitPrice || 0);
+                                const originalQuantity = parseInt(item.quantity || 1);
+                                const currentQuantity = editedQuantities[item.id] ?? originalQuantity;
+                                const itemName = item.description || 'Unknown Item';
+                                
+                                // Get the discount from discountType field
+                                const discountType = item.discountType || 'none';
+                                
+                                // Real-time calculations for Credit Note screen
+                                // Step 1: Quantity × Unit Price = Total Before VAT (before discount)
+                                const totalBeforeDiscount = currentQuantity * unitPrice;
+                                
+                                // Step 2: Apply discount if any
+                                let discountAmount = 0;
+                                if (discountType !== 'none') {
+                                  if (discountType.includes('%')) {
+                                    const discountPercent = parseFloat(discountType.replace('%', '')) / 100;
+                                    discountAmount = totalBeforeDiscount * discountPercent;
+                                  }
+                                }
+                                
+                                // Step 3: Total Before VAT (after discount)
+                                const totalBeforeVat = totalBeforeDiscount - discountAmount;
+                                
+                                // Step 4: Calculate VAT (15%)
+                                const vatAmount = totalBeforeVat * 0.15;
+                                
+                                // Step 5: Total After VAT = Total Before VAT + VAT (negative for credit notes)
+                                const totalAfterVat = -(totalBeforeVat + vatAmount);
+                                
+                                return (
+                                  <tr key={index} className="border-b">
+                                    <td className="py-2 px-2" style={{width: '35%'}}>
+                                      <div className="bg-gray-100 p-2 rounded text-gray-700" style={{textAlign: getTextAlign(language)}}>
+                                        <span className={`inline-block px-2 py-1 rounded text-xs font-medium mr-2 ${
+                                          item.type === 'product' 
+                                            ? 'bg-blue-100 text-blue-800' 
+                                            : 'bg-green-100 text-green-800'
+                                        }`}>
+                                          {item.type === 'product' 
+                                            ? (language === 'ar' ? 'منتج' : 'Product')
+                                            : (language === 'ar' ? 'خدمة' : 'Service')
+                                          }
+                                        </span>
+                                        {itemName}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2">
+                                      <div className="flex items-center space-x-2 bg-white border rounded p-1">
+                                        <button
+                                          onClick={() => handleQuantityChange(item.id, originalQuantity, currentQuantity - 1)}
+                                          disabled={currentQuantity <= 0}
+                                          className="w-8 h-8 rounded bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white text-sm font-bold"
+                                        >
+                                          -
+                                        </button>
+                                        <input
+                                          type="number"
+                                          value={currentQuantity}
+                                          onChange={(e) => {
+                                            const newValue = parseInt(e.target.value) || 0;
+                                            handleQuantityChange(item.id, originalQuantity, newValue);
+                                          }}
+                                          className="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm"
+                                          min="0"
+                                          max={originalQuantity}
+                                        />
+                                        <button
+                                          onClick={() => handleQuantityChange(item.id, originalQuantity, currentQuantity + 1)}
+                                          disabled={currentQuantity >= originalQuantity}
+                                          className="w-8 h-8 rounded bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white text-sm font-bold"
+                                        >
+                                          +
+                                        </button>
+                                      </div>
+                                      <div className="text-xs text-gray-500 text-center mt-1">
+                                        {language === 'ar' ? `الأصلي: ${originalQuantity}` : `Original: ${originalQuantity}`}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2">
+                                      <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                        {unitPrice.toFixed(2)}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2">
+                                      <div className="bg-gray-100 p-2 rounded text-center text-gray-700">
+                                        {discountType === 'none' 
+                                          ? (language === 'ar' ? 'لا يوجد خصم' : 'No Discount')
+                                          : discountType
+                                        }
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-center">
+                                      <div className="bg-green-100 p-2 rounded text-green-700">
+                                        {vatAmount.toFixed(2)}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-center">
+                                      <div className="bg-gray-100 p-2 rounded text-gray-700">
+                                        {totalBeforeVat.toFixed(2)}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-center">
+                                      <div className="bg-gray-100 p-2 rounded text-gray-700 font-semibold">
+                                        {totalAfterVat.toFixed(2)}
+                                      </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-center">
+                                      <Button
+                                        onClick={() => !isLastItem && handleRemoveItem(item.id)}
+                                        disabled={isLastItem}
+                                        className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 w-8 p-0"
+                                        title={isLastItem ? (language === 'ar' ? 'لا يمكن حذف العنصر الأخير' : 'Cannot delete the last item') : ''}
+                                      >
+                                        <Minus className="h-4 w-4 text-gray-700 font-bold" />
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* No Items Message */}
+                    {!loadingItems && invoiceItems.length === 0 && selectedInvoice && (
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="text-lg mb-2">📋</div>
+                        <div style={{textAlign: getTextAlign(language)}}>
+                          {language === 'ar' ? 'لا توجد عناصر في هذه الفاتورة' : 'No items found for this invoice'}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Credit Note Totals and Action Buttons */}
+                  <div className="pt-6 border-t">
+                    {/* Credit Note Totals */}
+                    {invoiceItems.length > 0 && (
+                      <div className="flex justify-end mb-4">
+                        <div className="w-80">
+                          <div className="flex justify-between mb-2">
+                            <span>{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
+                            <span>-{creditNoteTotals.totalBeforeVatSum.toFixed(2)} SAR</span>
+                          </div>
+                          <div className="flex justify-between mb-2">
+                            <span>{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
+                            <span>-{creditNoteTotals.vatAmount.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
+                          </div>
+                          <div className="flex justify-between font-bold text-lg border-t pt-2">
+                            <span>{language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}</span>
+                            <span>-{creditNoteTotals.finalTotal.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons - Left Aligned Below Totals */}
+                    <div className="flex gap-3">
+                      <Button
+                        className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                        onClick={handleCreateCreditNote}
+                      >
+                        {language === 'ar' ? 'إنشاء مذكرة ائتمان' : 'Create Credit Note'}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleBackToSearch}
+                        className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                      >
+                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
+            
+          </div>
+        </DialogContent>
+      </Dialog>
 
-            {/* Credit Note Items */}
-            <div>
-              <h4 className="text-lg font-medium text-gray-900 mb-4" style={{textAlign: getTextAlign(language)}}>
-                {language === 'ar' ? 'عناصر مذكرة الائتمان' : 'Credit Note Items'}
-              </h4>
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'العنصر' : 'Item'}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'الكمية' : 'Quantity'}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'المجموع قبل الضريبة' : 'Subtotal'}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'الضريبة' : 'VAT'}
-                      </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total'}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {JSON.parse(selectedCreditNoteToView.items || '[]').map((item: any, index: number) => (
-                      <tr key={index}>
-                        <td className="px-4 py-3 text-sm text-gray-900">{item.itemName}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{item.quantity}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{parseFloat(item.unitPrice).toFixed(2)} SAR</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{parseFloat(item.totalBeforeVat).toFixed(2)} SAR</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{parseFloat(item.vatAmount).toFixed(2)} SAR</td>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{parseFloat(item.totalAfterVat).toFixed(2)} SAR</td>
+      {/* View Credit Note Modal */}
+      <Dialog open={isViewCreditNoteModalOpen} onOpenChange={handleCloseViewModal}>
+        <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
+          <DialogHeader>
+            <DialogTitle className="flex justify-between items-start text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+              {/* Left side - Icon and Title */}
+              <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
+                <div 
+                  dangerouslySetInnerHTML={{
+                    __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:60px;height:60px"></lord-icon>'
+                  }}
+                />
+                <span>{language === 'ar' ? 'تفاصيل مذكرة الائتمان' : 'Credit Note Details'}</span>
+              </div>
+              
+              {/* Right side - Credit Note Info */}
+              {selectedCreditNoteToView && (
+                <div className="flex flex-col gap-1 text-right">
+                  <div className="text-sm text-gray-500">
+                    {language === 'ar' ? 'رقم مذكرة الائتمان:' : 'Credit Note No.:'}
+                  </div>
+                  <div className="text-lg font-bold text-purple-600">
+                    CRN{selectedCreditNoteToView.creditNoteNumber}
+                  </div>
+                </div>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedCreditNoteToView && (
+            <div className="space-y-6 py-4" dir={getDirection(language)}>
+              {/* Credit Note Header Info */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'رقم الفاتورة الأصلية:' : 'Original Invoice No.:'}
+                    </label>
+                    <p className="text-gray-900">{selectedCreditNoteToView.invoiceNumber}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
+                    </label>
+                    <p className="text-gray-900">{selectedCreditNoteToView.customerName}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
+                    </label>
+                    <p className="text-gray-900">
+                      {new Date(selectedCreditNoteToView.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">
+                      {language === 'ar' ? 'تاريخ الموعد الأصلي:' : 'Original Appointment Date:'}
+                    </label>
+                    <p className="text-gray-900">
+                      {new Date(selectedCreditNoteToView.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Credit Note Items */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                  {language === 'ar' ? 'العناصر المعتمدة' : 'Credited Items'}
+                </h3>
+                <div className="bg-white border rounded-lg overflow-hidden">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'الوصف' : 'Description'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'الكمية المعتمدة' : 'Credit Quantity'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'المجموع قبل الضريبة' : 'Total Before VAT'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT Amount'}
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'المجموع بعد الضريبة' : 'Total After VAT'}
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Totals Summary */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'المجموع قبل الضريبة' : 'Subtotal (Before VAT)'}
-                  </label>
-                  <p className="text-lg font-bold text-gray-900">
-                    {parseFloat(selectedCreditNoteToView.totalBeforeVat).toFixed(2)} SAR
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT Amount'}
-                  </label>
-                  <p className="text-lg font-bold text-gray-900">
-                    {parseFloat(selectedCreditNoteToView.vatAmount).toFixed(2)} SAR
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    {language === 'ar' ? 'المجموع النهائي' : 'Final Total'}
-                  </label>
-                  <p className="text-lg font-bold text-purple-600">
-                    -{parseFloat(selectedCreditNoteToView.finalTotal).toFixed(2)} SAR
-                  </p>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {selectedCreditNoteToView.items && selectedCreditNoteToView.items.map((item: any, index: number) => (
+                        <tr key={index}>
+                          <td className="px-4 py-4 text-sm text-gray-900">{item.description}</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">{item.creditQuantity}</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">{item.unitPrice.toFixed(2)} SAR</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">-{item.totalBeforeVat.toFixed(2)} SAR</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">-{item.vatAmount.toFixed(2)} SAR</td>
+                          <td className="px-4 py-4 text-sm text-gray-900">-{item.totalAfterVat.toFixed(2)} SAR</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
+
+              {/* Credit Note Totals */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex justify-end">
+                  <div className="w-80">
+                    <div className="flex justify-between mb-2">
+                      <span className="font-medium">{language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}</span>
+                      <span className="font-semibold text-red-600">-{parseFloat(selectedCreditNoteToView.totalBeforeVat).toFixed(2)} SAR</span>
+                    </div>
+                    <div className="flex justify-between mb-2">
+                      <span className="font-medium">{language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}</span>
+                      <span className="font-semibold text-red-600">-{parseFloat(selectedCreditNoteToView.vatAmount).toFixed(2)} SAR</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg border-t pt-2">
+                      <span>{language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}</span>
+                      <span className="text-red-600">-{parseFloat(selectedCreditNoteToView.finalTotal).toFixed(2)} SAR</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3">
+                <Button
+                  onClick={() => console.log('Print credit note:', selectedCreditNoteToView.id)}
+                  className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-blue-600 bg-white text-blue-600 hover:bg-blue-50"
+                >
+                  {language === 'ar' ? 'طباعة' : 'Print'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleCloseViewModal}
+                  className="text-gray-600 border-gray-300 hover:bg-gray-50"
+                >
+                  {language === 'ar' ? 'إغلاق' : 'Close'}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Map Modal */}
+      <Dialog open={isMapModalOpen} onOpenChange={handleCloseMapModal}>
+        <DialogContent className="w-screen h-screen max-w-none p-0 m-0 border-0 rounded-none overflow-hidden" dir={getDirection(language)}>
+          <DialogHeader className="sr-only">
+            <DialogTitle>
+              {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
+            </DialogTitle>
+            <DialogDescription>
+              {language === 'ar' ? 'عرض مرئي للفاتورة والعناصر المرتبطة بها' : 'Visual representation of invoice and related items'}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="relative w-full h-full bg-gray-50" style={{ fontFamily: 'Arimo' }}>
+            {/* Header */}
+            <div className="absolute top-0 left-0 right-0 z-20 bg-white border-b px-6 py-4 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <lord-icon
+                  src="https://cdn.lordicon.com/wsvtrygf.json"
+                  trigger="loop"
+                  delay="1500"
+                  colors="primary:#852085,secondary:#545454"
+                  style={{ width: '80px', height: '80px' }}
+                ></lord-icon>
+                <h2 className="text-xl font-bold text-gray-800">
+                  {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
+                </h2>
+                {selectedInvoiceForMap && (
+                  <span className="text-sm text-gray-600">
+                    {selectedInvoiceForMap.invoiceNumber}
+                  </span>
+                )}
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleCloseMapModal}
+                className="text-gray-600 border-gray-300 hover:bg-gray-50"
+              >
+                {language === 'ar' ? 'إغلاق' : 'Close'}
+              </Button>
+            </div>
+
+            {/* Map Canvas */}
+            <div className="absolute inset-0 pt-20 overflow-hidden">
+              <svg 
+                className="absolute inset-0 w-full h-full pointer-events-none z-10"
+                style={{ zIndex: 10 }}
+              >
+                {/* Draw lines from invoice to each credit note */}
+                {selectedInvoiceForMap && creditNotesForMap.map((creditNote) => {
+                  const invoicePos = boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`];
+                  const creditNotePos = boxPositions[`creditnote-${creditNote.id}`];
+                  
+                  if (invoicePos && creditNotePos) {
+                    return (
+                      <line
+                        key={`line-${creditNote.id}`}
+                        x1={invoicePos.x + 150} // Invoice box center + half width
+                        y1={invoicePos.y + 85}  // Invoice box center + half height
+                        x2={creditNotePos.x}    // Credit note box left edge
+                        y2={creditNotePos.y + 80} // Credit note box center + half height
+                        stroke="#8B2F8B"
+                        strokeWidth="2"
+                        strokeDasharray="none"
+                      />
+                    );
+                  }
+                  return null;
+                })}
+                
+                {/* Draw lines from invoice to each payment */}
+                {selectedInvoiceForMap && paymentsForMap.map((payment) => {
+                  const invoicePos = boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`];
+                  const paymentPos = boxPositions[`payment-${payment.id}`];
+                  
+                  if (invoicePos && paymentPos) {
+                    return (
+                      <line
+                        key={`line-payment-${payment.id}`}
+                        x1={invoicePos.x} // Invoice box left edge
+                        y1={invoicePos.y + 85}  // Invoice box center + half height
+                        x2={paymentPos.x + 250}    // Payment box right edge
+                        y2={paymentPos.y + 80} // Payment box center + half height
+                        stroke="#4CAF50"
+                        strokeWidth="2"
+                        strokeDasharray="none"
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </svg>
+
+              {/* Invoice Box */}
+              {selectedInvoiceForMap && boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`] && (
+                <div
+                  className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
+                  style={{
+                    left: boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].x,
+                    top: boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].y,
+                    borderColor: '#8B2F8B',
+                    width: '300px',
+                    height: '170px'
+                  }}
+                  onMouseDown={(e) => {
+                    const startX = e.clientX - boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].x;
+                    const startY = e.clientY - boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].y;
+                    
+                    const handleMouseMove = (e: MouseEvent) => {
+                      const newX = e.clientX - startX;
+                      const newY = e.clientY - startY;
+                      
+                      setBoxPositions(prev => ({
+                        ...prev,
+                        [`invoice-${selectedInvoiceForMap.invoiceNumber}`]: { x: newX, y: newY }
+                      }));
+                    };
+                    
+                    const handleMouseUp = () => {
+                      document.removeEventListener('mousemove', handleMouseMove);
+                      document.removeEventListener('mouseup', handleMouseUp);
+                    };
+                    
+                    document.addEventListener('mousemove', handleMouseMove);
+                    document.addEventListener('mouseup', handleMouseUp);
+                  }}
+                >
+                  {/* Header Section */}
+                  <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center justify-center gap-2">
+                    <InvoiceIcon className="h-4 w-4 text-purple-600" />
+                    <span className="text-sm font-semibold text-gray-700">
+                      {language === 'ar' ? 'فاتورة' : 'Invoice'}
+                    </span>
+                  </div>
+                  
+                  {/* Content Section */}
+                  <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
+                    <div className="text-lg font-bold text-gray-800 mb-2">
+                      {selectedInvoiceForMap.invoiceNumber}
+                    </div>
+                    <div className="text-sm text-gray-600 mb-2">
+                      {selectedInvoiceForMap.customerName}
+                    </div>
+                    {selectedInvoiceForMap.finalTotal && (
+                      <div className="text-sm font-semibold text-green-600 mb-2">
+                        {parseFloat(selectedInvoiceForMap.finalTotal).toFixed(2)} SAR
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-500">
+                      {/* Find appointment date from credit notes data */}
+                      {creditNotesForMap.length > 0 && creditNotesForMap[0].appointmentDate && (
+                        <>
+                          {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                          {new Date(creditNotesForMap[0].appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Credit Note Boxes */}
+              {creditNotesForMap.map((creditNote) => {
+                const position = boxPositions[`creditnote-${creditNote.id}`];
+                if (!position) return null;
+
+                return (
+                  <div
+                    key={`box-${creditNote.id}`}
+                    className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
+                    style={{
+                      left: position.x,
+                      top: position.y,
+                      borderColor: '#8B2F8B',
+                      width: '250px',
+                      height: '160px'
+                    }}
+                    onMouseDown={(e) => {
+                      const startX = e.clientX - position.x;
+                      const startY = e.clientY - position.y;
+                      
+                      const handleMouseMove = (e: MouseEvent) => {
+                        const newX = e.clientX - startX;
+                        const newY = e.clientY - startY;
+                        
+                        setBoxPositions(prev => ({
+                          ...prev,
+                          [`creditnote-${creditNote.id}`]: { x: newX, y: newY }
+                        }));
+                      };
+                      
+                      const handleMouseUp = () => {
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                      };
+                      
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                    }}
+                  >
+                    {/* Header Section */}
+                    <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center justify-center gap-2">
+                      <CreditCard className="h-4 w-4 text-purple-600" />
+                      <span className="text-sm font-semibold text-gray-700">
+                        {language === 'ar' ? 'مذكرة ائتمان' : 'Credit Note'}
+                      </span>
+                    </div>
+                    
+                    {/* Content Section */}
+                    <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
+                      <div className="text-base font-bold text-gray-800 mb-1">
+                        CRN{creditNote.creditNoteNumber}
+                      </div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        {creditNote.customerName}
+                      </div>
+                      <div className="text-sm font-semibold text-red-600 mb-2">
+                        -{creditNote.finalTotal} SAR
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                        {new Date(creditNote.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Income Payment Boxes */}
+              {paymentsForMap.map((payment) => {
+                const position = boxPositions[`payment-${payment.id}`];
+                if (!position) return null;
+
+                return (
+                  <div
+                    key={`payment-box-${payment.id}`}
+                    className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
+                    style={{
+                      left: position.x,
+                      top: position.y,
+                      borderColor: '#4CAF50',
+                      width: '250px',
+                      height: '160px'
+                    }}
+                    onMouseDown={(e) => {
+                      const startX = e.clientX - position.x;
+                      const startY = e.clientY - position.y;
+                      
+                      const handleMouseMove = (e: MouseEvent) => {
+                        const newX = e.clientX - startX;
+                        const newY = e.clientY - startY;
+                        
+                        setBoxPositions(prev => ({
+                          ...prev,
+                          [`payment-${payment.id}`]: { x: newX, y: newY }
+                        }));
+                      };
+                      
+                      const handleMouseUp = () => {
+                        document.removeEventListener('mousemove', handleMouseMove);
+                        document.removeEventListener('mouseup', handleMouseUp);
+                      };
+                      
+                      document.addEventListener('mousemove', handleMouseMove);
+                      document.addEventListener('mouseup', handleMouseUp);
+                    }}
+                  >
+                    {/* Header Section */}
+                    <div className="bg-green-50 px-3 py-2 border-b border-green-200 rounded-t-lg flex items-center justify-center gap-2">
+                      <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                      </svg>
+                      <span className="text-sm font-semibold text-green-700">
+                        {language === 'ar' ? 'دفعة دخل' : 'Income Payment'}
+                      </span>
+                    </div>
+                    
+                    {/* Content Section */}
+                    <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
+                      <div className="text-base font-bold text-green-600 mb-1">
+                        +{parseFloat(payment.amount).toFixed(2)} SAR
+                      </div>
+                      <div className="text-sm text-gray-600 mb-1">
+                        {language === 'ar' ? 'طريقة الدفع: ' : 'Method: '}
+                        {payment.paymentType === 'cash' ? (language === 'ar' ? 'نقدي' : 'Cash') : 
+                         payment.paymentType === 'card' ? (language === 'ar' ? 'كارت' : 'Card') : 
+                         payment.paymentType === 'transfer' ? (language === 'ar' ? 'تحويل' : 'Transfer') : 
+                         payment.paymentType}
+                      </div>
+                      {payment.description && (
+                        <div className="text-xs text-gray-500 mb-2">
+                          {payment.description}
+                        </div>
+                      )}
+                      <div className="text-xs text-gray-500">
+                        {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                        {new Date(payment.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
 
-    {/* Map Modal for Credit Note Relations */}
-    <Dialog open={isMapModalOpen} onOpenChange={handleCloseMapModal}>
-      <DialogContent className="sm:max-w-6xl w-[95vw] max-h-[90vh] overflow-hidden" dir={getDirection(language)}>
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-xl font-bold text-gray-600" style={{fontFamily: 'Arimo', textAlign: getTextAlign(language)}}>
-            <div 
-              dangerouslySetInnerHTML={{
-                __html: '<lord-icon src="https://cdn.lordicon.com/wxnxiano.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:60px;height:60px"></lord-icon>'
-              }}
-            />
-            <span>
-              {language === 'ar' ? 'خريطة العلاقات المالية' : 'Financial Relations Map'}
-              {selectedInvoiceForMap && ` - ${selectedInvoiceForMap.invoiceNumber}`}
-            </span>
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="h-[70vh] w-full border border-gray-200 rounded-lg overflow-hidden relative bg-gray-50">
-          <div className="p-8 text-center">
-            <div className="h-12 w-12 mx-auto mb-4 text-gray-400">🗺️</div>
-            <p className="text-gray-500">
-              {language === 'ar' ? 'جاري تحميل خريطة العلاقات المالية...' : 'Loading financial relations map...'}
-            </p>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-    </>
+      {/* Load lord-icon script */}
+      <script src="https://cdn.lordicon.com/lordicon.js"></script>
+    </div>
   );
 }
