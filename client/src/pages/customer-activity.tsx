@@ -396,7 +396,7 @@ export default function CustomerActivity() {
                   
                   <div className="space-y-3">
                     {groupedBookings[date].map((booking) => (
-                      <Card key={booking.id} className="border-l-4 border-l-#852085 hover:shadow-md transition-shadow">
+                      <Card key={booking.id} className="border-l-4 border-[#852085] hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
                           <div className="space-y-3">
                             {/* Header with status and time */}
