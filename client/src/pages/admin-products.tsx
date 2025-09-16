@@ -4,17 +4,16 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Edit, Loader2, Plus, X, Search, Trash2, Bell, Volume2, LogOut, VolumeX, Car, Clock, BarChart3, TrendingUp, ChevronDown, ChevronUp, FileText, Upload, Stethoscope, Package, Users, User, Shield, Home, DollarSign, Receipt, Handshake } from "lucide-react";
+import { Edit, Loader2, Plus, X, Search, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
-import { LanguageSelector } from "@/components/language-selector";
-import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
+import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 
 // Products Management Component
-const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
+const ProductsManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'en'; isReadOnly: boolean }) => {
   const { toast } = useToast();
   const [editingProduct, setEditingProduct] = useState<{ id: number; price: string } | null>(null);
   const [editedProducts, setEditedProducts] = useState<{ [key: number]: string }>({});
@@ -124,30 +123,28 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     }
   });
 
-  // Delete Products Mutation
+  // Delete Products Mutation - Individual deletion calls
   const deleteProductsMutation = useMutation({
     mutationFn: async (productIds: number[]) => {
-      // Delete products one by one
-      for (const id of productIds) {
-        await apiRequest(`/api/admin/products/${id}`, {
-          method: 'DELETE',
-        });
-      }
-      return productIds;
+      // Delete each product individually since no bulk-delete endpoint exists
+      const deletePromises = productIds.map(id => 
+        apiRequest(`/api/admin/products/${id}`, {
+          method: 'DELETE'
+        })
+      );
+      return Promise.all(deletePromises);
     },
-    onSuccess: (deletedIds) => {
+    onSuccess: (result, productIds) => {
       // Remove deleted products from display array
-      setDisplayProducts(prev => prev.filter(product => !deletedIds.includes(product.id)));
+      setDisplayProducts(prev => prev.filter(product => !productIds.includes(product.id)));
       
-      // Invalidate cache
       queryClient.invalidateQueries({ queryKey: ['/api/admin/products'] });
-      
       toast({
         title: language === 'ar' ? "تم الحذف بنجاح" : "Deleted Successfully",
-        description: language === 'ar' ? `تم حذف ${deletedIds.length} منتج` : `${deletedIds.length} product(s) deleted`,
+        description: language === 'ar' 
+          ? `تم حذف ${productIds.length} منتج` 
+          : `${productIds.length} product(s) deleted`,
       });
-      
-      // Reset selection
       setSelectedProducts([]);
       setShowDeleteConfirm(false);
     },
@@ -161,7 +158,6 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     }
   });
 
-  // Helper functions
   const handleEditClick = (product: any) => {
     setEditingProduct({ id: product.id, price: product.price.toString() });
     setEditedProducts({ [product.id]: product.price.toString() });
@@ -169,9 +165,16 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
 
   const handleSaveClick = (productId: number) => {
     const newPrice = editedProducts[productId];
-    if (newPrice && !isNaN(parseFloat(newPrice))) {
-      updateProductMutation.mutate({ id: productId, price: newPrice });
+    if (!newPrice || isNaN(parseFloat(newPrice))) {
+      toast({
+        title: language === 'ar' ? "خطأ في السعر" : "Price Error",
+        description: language === 'ar' ? "يرجى إدخال سعر صحيح" : "Please enter a valid price",
+        variant: "destructive",
+      });
+      return;
     }
+
+    updateProductMutation.mutate({ id: productId, price: newPrice });
   };
 
   const handleCancelClick = () => {
@@ -179,29 +182,7 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     setEditedProducts({});
   };
 
-  const handlePriceChange = (productId: number, value: string) => {
-    setEditedProducts(prev => ({ ...prev, [productId]: value }));
-  };
-
-  // Filter products based on search text
-  const filteredProducts = displayProducts.filter(product => {
-    if (!filterText) return true;
-    const searchLower = filterText.toLowerCase();
-    return (
-      product.name?.toLowerCase().includes(searchLower) ||
-      product.nameAr?.toLowerCase().includes(searchLower) ||
-      product.price?.toString().includes(searchLower)
-    );
-  });
-
-  // Pagination
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
-
-  // Selection handlers
-  const toggleProductSelection = (productId: number) => {
+  const handleProductSelection = (productId: number) => {
     setSelectedProducts(prev => 
       prev.includes(productId) 
         ? prev.filter(id => id !== productId)
@@ -209,9 +190,34 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
     );
   };
 
+  const handleFilterChange = (value: string) => {
+    setFilterText(value);
+    setCurrentPage(1); // Reset to first page when filtering
+    setSelectedProducts([]); // Clear selections when filtering
+  };
+
+  // Filter products based on search text using display products to maintain order
+  const filteredProducts = displayProducts.filter(product => {
+    if (!filterText) return true;
+    const searchLower = filterText.toLowerCase();
+    return (
+      product.name.toLowerCase().includes(searchLower) ||
+      product.nameAr?.toLowerCase().includes(searchLower) ||
+      product.category.toLowerCase().includes(searchLower) ||
+      product.categoryAr?.toLowerCase().includes(searchLower) ||
+      product.price.toString().includes(searchLower)
+    );
+  });
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage, filteredProducts.length);
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  const currentProductIds = currentProducts.map((product: any) => product.id);
+
   const toggleSelectAll = () => {
-    const currentProductIds = currentProducts.map(p => p.id);
-    if (selectedProducts.length === currentProductIds.length) {
+    if (areAllVisibleSelected) {
       setSelectedProducts([]);
     } else {
       setSelectedProducts(currentProductIds);
@@ -251,8 +257,9 @@ const ProductsManagementTable = ({ language }: { language: 'ar' | 'en' }) => {
         
         <div className="flex flex-col gap-2 items-end">
           <Button
+            data-testid="button-add-product"
             onClick={() => setShowAddForm(true)}
-disabled={false}
+            disabled={isReadOnly}
             className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
             style={{ direction: 'ltr' }}
           >
@@ -261,8 +268,9 @@ disabled={false}
           </Button>
           
           <Button
+            data-testid="button-select-all"
             onClick={toggleSelectAll}
-disabled={false}
+            disabled={isReadOnly}
             variant="outline"
             className="border-purple-300 text-purple-700 hover:bg-purple-50"
             style={{ direction: 'ltr' }}
@@ -272,6 +280,7 @@ disabled={false}
           
           {selectedProducts.length > 0 && (
             <Button
+              data-testid="button-delete-selected"
               onClick={() => setShowDeleteConfirm(true)}
               variant="destructive"
               size="sm"
@@ -284,108 +293,17 @@ disabled={false}
         </div>
       </div>
 
-      {/* Add Product Form */}
-      {showAddForm && (
-        <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-200">
-          <h3 className="text-lg font-semibold mb-4" style={{ 
-            direction: getDirection(language), 
-            textAlign: getTextAlign(language) 
-          }}>
-            {language === 'ar' ? 'إضافة منتج جديد' : 'Add New Product'}
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ 
-                direction: getDirection(language), 
-                textAlign: getTextAlign(language) 
-              }}>
-                {language === 'ar' ? 'الاسم بالإنجليزية' : 'English Name'}
-              </label>
-              <Input
-                value={newProduct.name}
-                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                placeholder={language === 'ar' ? 'أدخل الاسم بالإنجليزية' : 'Enter English name'}
-                className="border-purple-300 focus:border-purple-500"
-                style={{ direction: 'ltr', textAlign: 'left' }}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ 
-                direction: getDirection(language), 
-                textAlign: getTextAlign(language) 
-              }}>
-                {language === 'ar' ? 'الاسم بالعربية' : 'Arabic Name'}
-              </label>
-              <Input
-                value={newProduct.nameAr}
-                onChange={(e) => setNewProduct({ ...newProduct, nameAr: e.target.value })}
-                placeholder={language === 'ar' ? 'أدخل الاسم بالعربية' : 'Enter Arabic name'}
-                className="border-purple-300 focus:border-purple-500"
-                style={{ direction: 'rtl', textAlign: 'right' }}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ 
-                direction: getDirection(language), 
-                textAlign: getTextAlign(language) 
-              }}>
-                {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
-              </label>
-              <Input
-                type="number"
-                value={newProduct.price}
-                onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-                placeholder={language === 'ar' ? 'أدخل السعر' : 'Enter price'}
-                className="border-purple-300 focus:border-purple-500"
-                style={{ direction: 'ltr', textAlign: 'left' }}
-              />
-            </div>
-          </div>
-          
-          <div className="flex gap-2 justify-end">
-            <Button
-              onClick={() => {
-                setShowAddForm(false);
-                setNewProduct({ name: '', nameAr: '', price: '' });
-              }}
-              variant="outline"
-              className="border-gray-300"
-            >
-              {language === 'ar' ? 'إلغاء' : 'Cancel'}
-            </Button>
-            <Button
-              onClick={() => {
-                if (newProduct.name && newProduct.nameAr && newProduct.price) {
-                  addProductMutation.mutate(newProduct);
-                }
-              }}
-              disabled={!newProduct.name || !newProduct.nameAr || !newProduct.price || addProductMutation.isPending}
-              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
-            >
-              {addProductMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <Plus className="h-4 w-4 mr-2" />
-              )}
-              {language === 'ar' ? 'حفظ' : 'Save'}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Search and Filters */}
+      {/* Search Filter */}
       <div className="bg-white p-4 rounded-lg shadow border border-gray-200">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
+            data-testid="input-search-products"
             type="text"
             placeholder={language === 'ar' ? 'البحث في المنتجات...' : 'Search products...'}
             value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            className="flex h-10 w-full rounded-md border bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-10 border-purple-300 focus:border-purple-500 focus:ring-purple-500"
+            onChange={(e) => handleFilterChange(e.target.value)}
+            className="pl-10 border-purple-300 focus:border-purple-500 focus:ring-purple-500"
             style={{ 
               direction: getDirection(language), 
               textAlign: getTextAlign(language),
@@ -411,55 +329,150 @@ disabled={false}
         )}
       </div>
 
+      {/* Add Product Form */}
+      {showAddForm && (
+        <div className="bg-white p-6 rounded-lg shadow-lg border border-purple-200">
+          <h3 className="text-lg font-semibold mb-4" style={{ 
+            direction: getDirection(language), 
+            textAlign: getTextAlign(language) 
+          }}>
+            {language === 'ar' ? 'إضافة منتج جديد' : 'Add New Product'}
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ 
+                direction: getDirection(language), 
+                textAlign: getTextAlign(language) 
+              }}>
+                {language === 'ar' ? 'الاسم بالإنجليزية' : 'English Name'}
+              </label>
+              <Input
+                data-testid="input-product-name-en"
+                value={newProduct.name}
+                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                placeholder={language === 'ar' ? 'أدخل الاسم بالإنجليزية' : 'Enter English name'}
+                className="border-purple-300 focus:border-purple-500"
+                style={{ direction: 'ltr', textAlign: 'left' }}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ 
+                direction: getDirection(language), 
+                textAlign: getTextAlign(language) 
+              }}>
+                {language === 'ar' ? 'الاسم بالعربية' : 'Arabic Name'}
+              </label>
+              <Input
+                data-testid="input-product-name-ar"
+                value={newProduct.nameAr}
+                onChange={(e) => setNewProduct({ ...newProduct, nameAr: e.target.value })}
+                placeholder={language === 'ar' ? 'أدخل الاسم بالعربية' : 'Enter Arabic name'}
+                className="border-purple-300 focus:border-purple-500"
+                style={{ direction: 'rtl', textAlign: 'right' }}
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ 
+                direction: getDirection(language), 
+                textAlign: getTextAlign(language) 
+              }}>
+                {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
+              </label>
+              <Input
+                data-testid="input-product-price"
+                type="number"
+                value={newProduct.price}
+                onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                placeholder={language === 'ar' ? 'أدخل السعر' : 'Enter price'}
+                className="border-purple-300 focus:border-purple-500"
+                style={{ direction: 'ltr', textAlign: 'left' }}
+              />
+            </div>
+          </div>
+          
+          <div className="flex gap-2 justify-end">
+            <Button
+              data-testid="button-cancel-product"
+              onClick={() => {
+                setShowAddForm(false);
+                setNewProduct({ name: '', nameAr: '', price: '' });
+              }}
+              variant="outline"
+              className="border-gray-300"
+            >
+              {language === 'ar' ? 'إلغاء' : 'Cancel'}
+            </Button>
+            <Button
+              data-testid="button-save-product"
+              onClick={() => {
+                if (newProduct.name && newProduct.nameAr && newProduct.price) {
+                  addProductMutation.mutate(newProduct);
+                }
+              }}
+              disabled={addProductMutation.isPending || !newProduct.name || !newProduct.nameAr || !newProduct.price}
+              className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white"
+            >
+              {addProductMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  {language === 'ar' ? 'جاري الحفظ...' : 'Saving...'}
+                </>
+              ) : (
+                language === 'ar' ? 'حفظ' : 'Save'
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Products Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gradient-to-r from-purple-50 to-purple-100">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left">
+                <th className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <Checkbox
-                    checked={selectedProducts.length === currentProducts.length && currentProducts.length > 0}
+                    checked={areAllVisibleSelected}
                     onCheckedChange={toggleSelectAll}
-                    className="border-gray-400"
+                    disabled={isReadOnly}
+                    className="border-purple-300 data-[state=checked]:bg-purple-600"
                   />
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
-                  {language === 'ar' ? 'المعرف' : 'ID'}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {language === 'ar' ? 'الاسم' : 'Name'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
-                  {language === 'ar' ? 'اسم المنتج' : 'Product Name'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
-                  {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {language === 'ar' ? 'الفئة' : 'Category'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {language === 'ar' ? 'الحالة' : 'Status'}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {language === 'ar' ? 'الإجراءات' : 'Actions'}
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentProducts.map((product) => (
+              {currentProducts.map((product: any) => (
                 <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Checkbox
                       checked={selectedProducts.includes(product.id)}
-                      onCheckedChange={() => toggleProductSelection(product.id)}
-                      className="border-gray-400"
+                      onCheckedChange={() => handleProductSelection(product.id)}
+                      disabled={isReadOnly}
+                      className="border-purple-300 data-[state=checked]:bg-purple-600"
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {product.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="space-y-1">
-                      <div className="font-medium">{product.name}</div>
+                      <div className="text-sm font-medium text-gray-900">{product.name}</div>
                       {product.nameAr && (
                         <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
                           {product.nameAr}
@@ -467,28 +480,50 @@ disabled={false}
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {editingProduct?.id === product.id ? (
-                      <Input
-                        type="number"
-                        value={editedProducts[product.id] || ''}
-                        onChange={(e) => handlePriceChange(product.id, e.target.value)}
-                        className="w-20 border-purple-300 focus:border-purple-500"
-                        style={{ direction: 'ltr' }}
-                      />
-                    ) : (
-                      <span className="font-medium">{parseFloat(product.price).toFixed(2)}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="space-y-1">
-                      <div>{product.category || (language === 'ar' ? 'غير محدد' : 'Uncategorized')}</div>
-                      {product.categoryAr && product.category !== product.categoryAr && (
+                      <div className="text-sm text-gray-900">{product.category}</div>
+                      {product.categoryAr && (
                         <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
                           {product.categoryAr}
                         </div>
                       )}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {editingProduct?.id === product.id ? (
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          value={editedProducts[product.id] || ''}
+                          onChange={(e) => setEditedProducts({ ...editedProducts, [product.id]: e.target.value })}
+                          className="w-20 h-8 text-sm border-purple-300 focus:border-purple-500 focus:ring-purple-500"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={() => handleSaveClick(product.id)}
+                          disabled={updateProductMutation.isPending}
+                          className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          {updateProductMutation.isPending ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            '✓'
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleCancelClick}
+                          className="h-8 px-2"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <span className="font-medium">{product.price}</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -503,34 +538,13 @@ disabled={false}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {editingProduct?.id === product.id ? (
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleSaveClick(product.id)}
-                          disabled={updateProductMutation.isPending}
-                          className="bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          {updateProductMutation.isPending ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            '✓'
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleCancelClick}
-                          className="border-gray-300"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ) : (
+                    {editingProduct?.id !== product.id && (
                       <Button
+                        data-testid={`button-edit-product-${product.id}`}
                         size="sm"
                         variant="outline"
                         onClick={() => handleEditClick(product)}
+                        disabled={isReadOnly}
                         className="h-8 px-3 border-purple-300 text-purple-600 hover:bg-purple-50"
                       >
                         <Edit className="h-3 w-3 mr-1" />
@@ -595,7 +609,7 @@ disabled={false}
                 {language === 'ar' ? 'السابق' : 'Previous'}
               </Button>
               
-              <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
+              <div className="flex items-center gap-1">
                 <span className="text-sm font-medium text-purple-700">
                   {language === 'ar' 
                     ? `صفحة ${currentPage} من ${totalPages}`
@@ -656,29 +670,6 @@ export default function AdminProducts() {
   const [, setLocation] = useLocation();
   const { language, t } = useTranslation();
   
-  // State for tracking notifications and audio - matches VetsVan Shifts and admin dashboard
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const lastRequestCountRef = useRef(0);
-  const [currentRequestCount, setCurrentRequestCount] = useState(0);
-  const [isNewReportsExpanded, setIsNewReportsExpanded] = useState(false);
-  const [isAdministrationExpanded, setIsAdministrationExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isAdministrationExpanded');
-    return savedState !== null ? JSON.parse(savedState) : false;
-  });
-  const [isFinancialExpanded, setIsFinancialExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isFinancialExpanded');
-    return savedState !== null ? JSON.parse(savedState) : false;
-  });
-  
-  // Business Partner menu state - persist across navigation
-  const [isBusinessPartnerExpanded, setIsBusinessPartnerExpanded] = useState(() => {
-    const savedState = localStorage.getItem('isBusinessPartnerExpanded');
-    if (savedState !== null) {
-      return JSON.parse(savedState);
-    }
-    return false; // Default collapsed
-  });
-
   // Fetch current user permissions
   const adminToken = localStorage.getItem("adminToken");
   const { data: currentUserPermissions, isLoading: permissionsLoading } = useQuery({
@@ -695,24 +686,6 @@ export default function AdminProducts() {
     enabled: !!adminToken,
   });
 
-  // Fetch current requests count for notification badge - matches VetsVan Shifts
-  const { data: allVetsVanRequests } = useQuery({
-    queryKey: ['/api/admin/vetsvan-requests'],
-    refetchInterval: 2000, // Poll every 2 seconds for real-time updates like admin dashboard
-    refetchIntervalInBackground: true,
-    staleTime: 0,
-  });
-
-  // Monitor for new requests and update notification count - exact same logic as VetsVan Shifts
-  useEffect(() => {
-    if (allVetsVanRequests && Array.isArray(allVetsVanRequests) && allVetsVanRequests.length > 0) {
-      const currentCount = allVetsVanRequests.length;
-      
-      lastRequestCountRef.current = currentCount;
-      setCurrentRequestCount(currentCount);
-    }
-  }, [allVetsVanRequests]);
-
   // Permission check - redirect users with "No Permission" for Products
   useEffect(() => {
     if (currentUserPermissions && currentUserPermissions.productsHidden === true) {
@@ -721,414 +694,18 @@ export default function AdminProducts() {
     }
   }, [currentUserPermissions, setLocation]);
 
+  // Check if user has read-only access (can view but not modify)
+  const isReadOnly = currentUserPermissions && 
+    currentUserPermissions.productsRead === true && 
+    currentUserPermissions.productsFullControl === false;
+
   return (
-    <div 
-      className="min-h-screen bg-gray-50"
-      dir={getDirection(language)}
-      style={{ textAlign: getTextAlign(language) }}
-    >
-      {/* Full-width Header with logo and controls - exact copy from VetsVan Shifts */}
-      <div className="bg-white shadow-md border-b border-gray-200">
-        <div className="flex justify-between items-center px-4 sm:px-6 lg:px-8 py-4">
-          {/* Logo */}
-          <div className="flex-shrink-0 -ml-6">
-            <img 
-              src={vetsVanLogo} 
-              alt="VETS VAN" 
-              className="h-14 w-auto object-contain"
-            />
-          </div>
-
-          {/* Header Controls */}
-          <div className="flex items-center gap-4">
-            <LanguageSelector />
-            
-            {/* Audio notification toggle */}
-            <button
-              onClick={() => setAudioEnabled(!audioEnabled)}
-              className={`p-2 rounded-full transition-colors duration-200 ${
-                audioEnabled 
-                  ? 'bg-green-100 text-green-600 hover:bg-green-200' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-              title={audioEnabled 
-                ? (language === 'ar' ? 'إيقاف الإشعارات الصوتية' : 'Disable audio notifications') 
-                : (language === 'ar' ? 'تفعيل الإشعارات الصوتية' : 'Enable audio notifications')
-              }
-            >
-              {audioEnabled ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
-            </button>
-
-            {/* Notifications counter - matches VetsVan Shifts and admin dashboard */}
-            <div className="relative">
-              <Bell className="h-6 w-6 text-purple-600" />
-              {currentRequestCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {currentRequestCount > 99 ? '99+' : currentRequestCount}
-                </span>
-              )}
-            </div>
-            
-            <button
-              onClick={() => {
-                localStorage.removeItem("adminToken");
-                setLocation("/admin-login");
-              }}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-            >
-              <LogOut className="h-4 w-4 ml-2" />
-              {t('logout')}
-            </button>
-          </div>
+    <AdminLayout>
+      <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
+        <div className="px-1 py-3 sm:px-0">
+          <ProductsManagementTable language={language} isReadOnly={isReadOnly} />
         </div>
       </div>
-
-      {/* Main Content with Sidebar - exact copy from VetsVan Shifts */}
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg min-h-screen">
-          <nav className="mt-4 px-2">
-            {/* Home Page */}
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setLocation('/admin-home');
-              }}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Home className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الصفحة الرئيسية' : 'Home Page'}</span>
-            </button>
-            
-            {/* Administration Module */}
-            <div className="mb-2">
-              <button
-                onClick={() => {
-                  const newState = !isAdministrationExpanded;
-                  setIsAdministrationExpanded(newState);
-                  localStorage.setItem('isAdministrationExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <Users className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'الإدارة' : 'Administration'}
-                </span>
-                {isAdministrationExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-              
-              {/* Administration Submenu */}
-              {isAdministrationExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (currentUserPermissions && currentUserPermissions.usersHidden === true) {
-                        setLocation('/admin-home');
-                      } else {
-                        setLocation('/administration/users');
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
-                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
-                  >
-                    <User className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'المستخدمين' : 'Users'}</span>
-                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      if (currentUserPermissions && (currentUserPermissions as any).authHidden === true) {
-                        setLocation('/admin-home');
-                      } else {
-                        setLocation('/administration/authorization');
-                      }
-                    }}
-                    disabled={permissionsLoading || !currentUserPermissions}
-                    className={`group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full ${
-                      permissionsLoading || !currentUserPermissions
-                        ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
-                    }`}
-                  >
-                    <Shield className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'التصريح' : 'Authorization'}</span>
-                    {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            {/* Financial Section */}
-            <div className="mb-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isFinancialExpanded;
-                  setIsFinancialExpanded(newState);
-                  localStorage.setItem('isFinancialExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <DollarSign className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'المالية' : 'Financial'}
-                </span>
-                {isFinancialExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-
-              {isFinancialExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/sales-reports');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'التقارير المالية' : 'Financial Reports'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/credit-note');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <Receipt className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'مذكرة الائتمان' : 'Credit Note'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/outgoing-payment');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/income-payment');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}</span>
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/financial/ar-balance');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <DollarSign className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Business Partner Section */}
-            <div className="mb-2">
-              <button
-                data-testid="button-toggle-business-partner"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const newState = !isBusinessPartnerExpanded;
-                  setIsBusinessPartnerExpanded(newState);
-                  localStorage.setItem('isBusinessPartnerExpanded', JSON.stringify(newState));
-                }}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <Handshake className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left">
-                  {language === 'ar' ? 'شريك الأعمال' : 'Business Partner'}
-                </span>
-                {isBusinessPartnerExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-
-              {isBusinessPartnerExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    data-testid="button-business-partner-partner-management"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setLocation('/business-partner/partner-management');
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <Users className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'إدارة الشركاء' : 'Partner Management'}</span>
-                  </button>
-                  <button
-                    data-testid="button-business-partner-contracts"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      // Placeholder for now
-                    }}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <FileText className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'عقود الشراكة' : 'Partnership Contracts'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (currentUserPermissions && currentUserPermissions.vetsVanHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  setLocation('/admin-dashboard');
-                }
-              }}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Car className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-            </button>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (currentUserPermissions && (currentUserPermissions as any).vetsVanShiftsHidden === true) {
-                  setLocation('/admin-home');
-                } else {
-                  setLocation('/vets-van-shifts');
-                }
-              }}
-              disabled={permissionsLoading || !currentUserPermissions}
-              className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 ${
-                permissionsLoading || !currentUserPermissions
-                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Clock className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
-              {permissionsLoading && <div className="ml-auto w-3 h-3 border-2 border-gray-300 border-t-purple-500 rounded-full animate-spin" />}
-            </button>
-            <button
-              onClick={() => setLocation('/admin-dashboard?tab=reports')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <BarChart3 className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'التقارير' : 'Reports'}</span>
-            </button>
-            
-            {/* New Reports & Analytics Dropdown - positioned after Reports */}
-            <div className="mt-2">
-              <button
-                onClick={() => setIsNewReportsExpanded(!isNewReportsExpanded)}
-                className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              >
-                <TrendingUp className="h-6 w-6 flex-shrink-0" />
-                <span className="flex-1 text-left whitespace-nowrap">
-                  {language === 'ar' ? 'تقارير وتحليلات جديدة' : 'New Reports & Analytics'}
-                </span>
-                {isNewReportsExpanded ? (
-                  <ChevronUp className="h-4 w-4 flex-shrink-0" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 flex-shrink-0" />
-                )}
-              </button>
-              
-              {/* Dropdown Items */}
-              {isNewReportsExpanded && (
-                <div className="ml-6 mt-1 space-y-1">
-                  <button
-                    onClick={() => setLocation('/new-reports-analytics/sales-report')}
-                    className="group flex items-center gap-3 px-2 py-2 text-sm font-medium rounded-md w-full text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-                  >
-                    <BarChart3 className="h-5 w-5 flex-shrink-0" />
-                    <span>{language === 'ar' ? 'تقرير المبيعات' : 'Sales Report'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-            
-            <button
-              onClick={() => setLocation('/admin-vetsvan-requests')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <FileText className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
-            </button>
-            <button
-              onClick={() => setLocation('/admin-dashboard/import')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Upload className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'استيراد البيانات' : 'Import'}</span>
-            </button>
-            <button
-              onClick={() => setLocation('/admin-dashboard/services')}
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-            >
-              <Stethoscope className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'الخدمات' : 'Services'}</span>
-            </button>
-            <button
-              className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mt-2 bg-purple-50 border-l-4 border-purple-600"
-            >
-              <Package className="h-6 w-6 flex-shrink-0 text-purple-600" />
-              <span className="text-purple-600">{language === 'ar' ? 'المنتجات' : 'Products'}</span>
-            </button>
-          </nav>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
-            <div className="px-1 py-3 sm:px-0">
-              <ProductsManagementTable language={language} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }
