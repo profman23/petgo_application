@@ -4,56 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes moving-border {
-  0% {
-    background-position: 0% 0%;
-  }
-  25% {
-    background-position: 100% 0%;
-  }
-  50% {
-    background-position: 100% 100%;
-  }
-  75% {
-    background-position: 0% 100%;
-  }
-  100% {
-    background-position: 0% 0%;
-  }
-}
-
-@keyframes border-glow {
-  0%, 100% {
-    box-shadow: 
-      0 0 5px #852085,
-      0 0 10px #852085,
-      0 0 15px #852085;
-  }
-  50% {
-    box-shadow: 
-      0 0 10px #852085,
-      0 0 20px #852085,
-      0 0 30px #852085;
-  }
-}
-
-.animate-moving-border {
-  position: relative;
-  background: 
-    linear-gradient(90deg, #852085 50%, transparent 50%),
-    linear-gradient(90deg, #852085 50%, transparent 50%),
-    linear-gradient(0deg, #852085 50%, transparent 50%),
-    linear-gradient(0deg, #852085 50%, transparent 50%);
-  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-  background-size: 15px 2px, 15px 2px, 2px 15px, 2px 15px;
-  background-position: 
-    0 0, 
-    0 100%, 
-    0 0, 
-    100% 0;
-  animation: moving-border 2s linear infinite, border-glow 2s ease-in-out infinite;
-}
-
 @layer utilities {
   .input-compact-20 {
     @apply h-[20px] py-0 leading-[20px] text-[12px] rounded-sm focus:outline-none focus:ring-1 focus:ring-purple-500 min-h-0;
