@@ -3367,6 +3367,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Search generated invoices by invoice number
+  app.get('/api/admin/generated-invoices/search', requireAdminAuth, async (req, res) => {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.json([]);
+      }
+      
+      const allInvoices = await storage.getAllGeneratedInvoices();
+      const filteredInvoices = allInvoices.filter(invoice => 
+        invoice.invoiceNumber.toLowerCase().includes(q.toLowerCase())
+      );
+      
+      res.json(filteredInvoices);
+    } catch (error) {
+      console.error('Error searching generated invoices:', error);
+      res.status(500).json({ message: 'Failed to search generated invoices' });
+    }
+  });
+
+  // Admin: Get items for a specific generated invoice
+  app.get('/api/admin/generated-invoices/:id/items', requireAdminAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const invoiceId = parseInt(id);
+      
+      if (isNaN(invoiceId)) {
+        return res.status(400).json({ message: 'Invalid invoice ID' });
+      }
+      
+      // Get the invoice first to get the booking ID
+      const allInvoices = await storage.getAllGeneratedInvoices();
+      const invoice = allInvoices.find(inv => inv.id === invoiceId);
+      
+      if (!invoice) {
+        return res.status(404).json({ message: 'Invoice not found' });
+      }
+      
+      // Get invoice items using the booking ID
+      const invoiceItems = await storage.getInvoiceItems(invoice.bookingId);
+      res.json(invoiceItems || []);
+    } catch (error) {
+      console.error('Error fetching invoice items:', error);
+      res.status(500).json({ message: 'Failed to fetch invoice items' });
+    }
+  });
+
   // Admin: Get detailed invoice items for specific booking
   app.get('/api/admin/invoice-details/:bookingId', requireAdminAuth, async (req, res) => {
     try {
