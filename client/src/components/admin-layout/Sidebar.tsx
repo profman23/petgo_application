@@ -17,7 +17,23 @@ const ACTIVE_ITEM_STYLES = {
 // Helper function to check if an item is active based on current route
 const isActiveItem = (itemRoute: string | undefined, currentLocation: string): boolean => {
   if (!itemRoute) return false;
-  return currentLocation === itemRoute;
+  
+  // Handle exact matches first
+  if (currentLocation === itemRoute) return true;
+  
+  // Handle query parameter routes (like /admin-dashboard?tab=reports)
+  if (itemRoute.includes('?')) {
+    const [baseRoute, queryString] = itemRoute.split('?');
+    const currentFullUrl = currentLocation + window.location.search;
+    
+    // Check if current URL matches the full route with query parameters
+    if (currentFullUrl === itemRoute) return true;
+    
+    // Check if we're on the base route and have the correct query parameters
+    if (currentLocation === baseRoute && window.location.search.includes(queryString)) return true;
+  }
+  
+  return false;
 };
 
 interface SidebarProps {
