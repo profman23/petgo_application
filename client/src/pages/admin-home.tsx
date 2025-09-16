@@ -18,26 +18,8 @@ export default function AdminHome() {
   const [, setLocation] = useLocation();
   const { language } = useTranslation();
 
-  // Lord-icon animation trigger state
-  const [triggerAnimation, setTriggerAnimation] = useState("hover");
-
-  // Effect to trigger lord-icon animation every 1.5 seconds
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout | null = null;
-    
-    const interval = setInterval(() => {
-      setTriggerAnimation("loop");
-      // Reset to hover after a brief moment
-      timeoutId = setTimeout(() => setTriggerAnimation("hover"), 1000);
-    }, 1500); // 1.5 seconds
-
-    return () => {
-      clearInterval(interval);
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, []);
+  // Lord-icon animation trigger state - continuous smooth animation
+  const [triggerAnimation] = useState("loop");
 
   // Check admin authentication
   useEffect(() => {
