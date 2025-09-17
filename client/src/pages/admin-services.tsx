@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 
 // Services Management Component
 const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'en'; isReadOnly: boolean }) => {
@@ -598,77 +599,18 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
         </div>
       </div>
 
-      {/* Enhanced Pagination */}
-      <div className="bg-white px-4 py-4 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 gap-4">
-          {/* Results Info & Items Per Page */}
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="text-sm text-gray-700" style={{ 
-              direction: getDirection(language), 
-              textAlign: getTextAlign(language) 
-            }}>
-              {language === 'ar' 
-                ? `عرض ${paginatedServices.length} من أصل ${filteredServices.length} خدمة (المجموع: ${Array.isArray(services) ? services.length : 0})`
-                : `Showing ${paginatedServices.length} of ${filteredServices.length} services (Total: ${Array.isArray(services) ? services.length : 0})`
-              }
-            </div>
-            
-            <div className="flex items-center gap-2" style={{ direction: getDirection(language) }}>
-              <span className="text-sm text-gray-600">
-                {language === 'ar' ? 'عرض:' : 'Show:'}
-              </span>
-              <select
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  handlePageChange(1);
-                }}
-                className="border border-purple-300 rounded px-3 py-1 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-200 bg-white"
-                style={{ direction: 'ltr' }}
-              >
-                <option value={10}>10</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <span className="text-sm text-gray-600">
-                {language === 'ar' ? 'لكل صفحة' : 'per page'}
-              </span>
-            </div>
-          </div>
-          
-          {/* Navigation Controls */}
-          {totalPages > 1 && (
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {language === 'ar' ? 'السابق' : 'Previous'}
-              </Button>
-              
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-medium text-purple-700">
-                  {language === 'ar' 
-                    ? `صفحة ${currentPage} من ${totalPages}`
-                    : `Page ${currentPage} of ${totalPages}`
-                  }
-                </span>
-              </div>
-              
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="border-purple-300 text-purple-600 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {language === 'ar' ? 'التالي' : 'Next'}
-              </Button>
-            </div>
-          )}
-        </div>
+      {/* Pagination Controls */}
+      <PaginationControls
+        currentCount={paginatedServices.length}
+        filteredCount={filteredServices.length}
+        totalCount={Array.isArray(services) ? services.length : 0}
+        itemType="services"
+        itemsPerPage={itemsPerPage}
+        onItemsPerPageChange={setItemsPerPage}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };
