@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 
 // Customer data type from backend API
 interface CustomerData {
@@ -33,6 +34,8 @@ export default function BusinessPartnerManagement() {
   const [triggerAnimation, setTriggerAnimation] = useState('hover');
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Animate icon every 1.5 seconds
   useEffect(() => {
@@ -95,6 +98,17 @@ export default function BusinessPartnerManagement() {
 
   const customers = customersData?.customers || [];
 
+  // Pagination calculations for customers
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCustomers = customers.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(customers.length / itemsPerPage);
+
+  // Handle page change
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+
   // Reset search when partner type changes
   useEffect(() => {
     if (selectedPartnerType === 'supplier') {
@@ -102,6 +116,11 @@ export default function BusinessPartnerManagement() {
       setSearchTerm('');
     }
   }, [selectedPartnerType]);
+
+  // Reset to first page when search results change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [customers.length]);
 
   return (
     <AdminLayout>
@@ -254,62 +273,77 @@ export default function BusinessPartnerManagement() {
               </div>
             ) : customers.length > 0 ? (
               // Customer data table matching Credit Note design
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'معرف المستخدم' : 'User ID'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'اسم المستخدم' : 'User Name'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'معرف المريض' : 'Patient ID'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'نوع المريض' : 'Patient Type'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'اسم المريض' : 'Patient Name'}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {customers.map((customer: CustomerData, index: number) => (
-                      <tr key={`${customer.userId}-${customer.patientId || index}`} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {customer.userId}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {customer.userName}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {customer.userPhone}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {customer.userEmail || (language === 'ar' ? 'غير متوفر' : 'N/A')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {customer.patientId || (language === 'ar' ? 'لا يوجد' : 'None')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {customer.patientType || (language === 'ar' ? 'لا يوجد' : 'None')}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {customer.patientName || (language === 'ar' ? 'لا يوجد' : 'None')}
-                        </td>
+              <>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'معرف المستخدم' : 'User ID'}
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'اسم المستخدم' : 'User Name'}
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'معرف المريض' : 'Patient ID'}
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'نوع المريض' : 'Patient Type'}
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'اسم المريض' : 'Patient Name'}
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {paginatedCustomers.map((customer: CustomerData, index: number) => (
+                        <tr key={`${customer.userId}-${customer.patientId || index}`} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {customer.userId}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {customer.userName}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {customer.userPhone}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {customer.userEmail || (language === 'ar' ? 'غير متوفر' : 'N/A')}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {customer.patientId || (language === 'ar' ? 'لا يوجد' : 'None')}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {customer.patientType || (language === 'ar' ? 'لا يوجد' : 'None')}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {customer.patientName || (language === 'ar' ? 'لا يوجد' : 'None')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                
+                {/* Pagination Controls for Customers */}
+                <PaginationControls
+                  currentCount={paginatedCustomers.length}
+                  filteredCount={customers.length}
+                  totalCount={customers.length}
+                  itemType="customers"
+                  itemsPerPage={itemsPerPage}
+                  onItemsPerPageChange={setItemsPerPage}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </>
             ) : (
               // No customers found
               <div className="text-center py-12">
