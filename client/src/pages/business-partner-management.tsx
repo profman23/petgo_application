@@ -122,6 +122,49 @@ export default function BusinessPartnerManagement() {
     setCurrentPage(1);
   }, [customers.length]);
 
+  // 🎯 DATATABLE CONFIGURATION - Customer columns in exact current order
+  const customerColumns: DataTableColumn<CustomerData>[] = [
+    {
+      key: 'userId',
+      label: { ar: 'معرف المستخدم', en: 'User ID' },
+      className: 'font-medium text-gray-900'
+    },
+    {
+      key: 'userName',
+      label: { ar: 'اسم المستخدم', en: 'User Name' },
+      className: 'text-gray-500'
+    },
+    {
+      key: 'userPhone',
+      label: { ar: 'رقم الهاتف', en: 'Phone Number' },
+      className: 'text-gray-500'
+    },
+    {
+      key: 'userEmail',
+      label: { ar: 'البريد الإلكتروني', en: 'Email' },
+      render: (customer) => customer.userEmail || (language === 'ar' ? 'غير متوفر' : 'N/A'),
+      className: 'text-gray-500'
+    },
+    {
+      key: 'patientId',
+      label: { ar: 'معرف المريض', en: 'Patient ID' },
+      render: (customer) => customer.patientId || (language === 'ar' ? 'لا يوجد' : 'None'),
+      className: 'text-gray-500'
+    },
+    {
+      key: 'patientType',
+      label: { ar: 'نوع المريض', en: 'Patient Type' },
+      render: (customer) => customer.patientType || (language === 'ar' ? 'لا يوجد' : 'None'),
+      className: 'text-gray-500'
+    },
+    {
+      key: 'patientName',
+      label: { ar: 'اسم المريض', en: 'Patient Name' },
+      render: (customer) => customer.patientName || (language === 'ar' ? 'لا يوجد' : 'None'),
+      className: 'text-gray-500'
+    }
+  ];
+
   return (
     <AdminLayout>
       <div className="flex-1 p-8" dir={getDirection(language)}>
