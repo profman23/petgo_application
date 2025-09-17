@@ -330,19 +330,6 @@ export default function BusinessPartnerManagement() {
                     </tbody>
                   </table>
                 </div>
-                
-                {/* Pagination Controls for Customers */}
-                <PaginationControls
-                  currentCount={paginatedCustomers.length}
-                  filteredCount={customers.length}
-                  totalCount={customers.length}
-                  itemType="customers"
-                  itemsPerPage={itemsPerPage}
-                  onItemsPerPageChange={setItemsPerPage}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
               </>
             ) : (
               // No customers found
@@ -385,6 +372,21 @@ export default function BusinessPartnerManagement() {
             </div>
           )}
         </div>
+
+        {/* Pagination Controls for Customers - Only show when customer data exists */}
+        {selectedPartnerType === 'customer' && customers.length > 0 && (
+          <PaginationControls
+            currentCount={paginatedCustomers.length}
+            filteredCount={customers.length}
+            totalCount={customers.length}
+            itemType="customers"
+            itemsPerPage={itemsPerPage}
+            onItemsPerPageChange={setItemsPerPage}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
     </AdminLayout>
   );
