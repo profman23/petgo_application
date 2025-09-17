@@ -1521,6 +1521,7 @@ export default function FinancialCreditNote() {
               en: searchTerm.trim() ? 'No credit notes match your search' : 'No credit notes found'
             }}
             emptySearchText={{ ar: 'جرب مصطلحات بحث مختلفة', en: 'Try different search terms' }}
+            verticalSeparators={true}
             showEmptySearch={searchTerm.trim().length > 0}
             hover={true}
             responsive={true}
