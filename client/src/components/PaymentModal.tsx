@@ -216,7 +216,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                 </div>
                 
                 {/* Row 2: Customer Name ↔ Posting Date */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ borderBottomWidth: '2px', paddingBottom: '10px' }}>
                   {/* Left: Customer Name */}
                   <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                     <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
@@ -260,7 +260,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
           {/* Payment Method Section */}
           <div style={{ marginTop: '200px' }}>
             <div dir={getDirection(language)}>
-              <label className="block text-sm font-medium text-gray-700 mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-4" style={{ borderTopWidth: '2px', paddingTop: '10px' }}>
                 {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
               </label>
               
