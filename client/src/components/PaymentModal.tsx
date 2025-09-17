@@ -265,6 +265,9 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Left: Transaction Type */}
               <div className="flex items-center gap-3 flex-row">
+                <label className="text-sm font-medium text-gray-700 min-w-[120px] text-left">
+                  {language === 'ar' ? 'نوع المعاملة:' : 'Transaction Type:'}
+                </label>
                 <select 
                   className="w-[170px] px-2 input-compact-20 border border-gray-300"
                   data-testid="select-transaction-type"
@@ -273,24 +276,19 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                   <option value="ar-credit-note">A/R Credit Note</option>
                   <option value="ar-invoice">A/R Invoice</option>
                 </select>
-                <span className="text-sm font-medium text-gray-700">:</span>
-                <label className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'نوع المعاملة' : 'Transaction Type'}
-                </label>
               </div>
               
               {/* Right: Document No */}
               <div className="flex items-center gap-3 flex-row">
+                <label className="text-sm font-medium text-gray-700 min-w-[120px] text-left">
+                  {language === 'ar' ? 'رقم الوثيقة:' : 'Document No:'}
+                </label>
                 <input 
                   type="text" 
                   className="w-[170px] px-2 input-compact-20 border border-gray-300"
                   placeholder={language === 'ar' ? 'بحث عن الوثيقة' : 'Search document'}
                   data-testid="input-document-no"
                 />
-                <span className="text-sm font-medium text-gray-700">:</span>
-                <label className="text-sm font-medium text-gray-700">
-                  {language === 'ar' ? 'رقم الوثيقة' : 'Document No'}
-                </label>
               </div>
             </div>
           </div>
