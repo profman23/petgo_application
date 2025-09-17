@@ -4,6 +4,19 @@ import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { FilePlus, Search, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+
+// Customer data type from backend API
+interface CustomerData {
+  userId: number;
+  userName: string;
+  userPhone: string;
+  userEmail: string;
+  patientId: number | null;
+  patientType: string;
+  patientName: string;
+}
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -19,6 +32,7 @@ export default function BusinessPartnerManagement() {
   const [selectedPartnerType, setSelectedPartnerType] = useState<'customer' | 'supplier'>('customer');
   const [triggerAnimation, setTriggerAnimation] = useState('hover');
   const [searchInput, setSearchInput] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Animate icon every 1.5 seconds
   useEffect(() => {
@@ -53,8 +67,8 @@ export default function BusinessPartnerManagement() {
   };
 
   const handleSearchClick = () => {
+    setSearchTerm(searchInput.trim());
     console.log('Search clicked:', searchInput, 'Type:', selectedPartnerType);
-    // Search functionality will be implemented later
   };
 
   const handleSearchKeyPress = (e: React.KeyboardEvent) => {
@@ -67,6 +81,27 @@ export default function BusinessPartnerManagement() {
     console.log('Export clicked for:', selectedPartnerType);
     // Export functionality will be implemented later
   };
+
+  // Fetch customer data from Users and Patients tables when Customer is selected
+  const { data: customersData, isLoading: isLoadingCustomers, error: customersError } = useQuery({
+    queryKey: ['/api/admin/customers', searchTerm],
+    queryFn: async () => {
+      const url = searchTerm ? `/api/admin/customers?search=${encodeURIComponent(searchTerm)}` : '/api/admin/customers';
+      const response = await apiRequest(url);
+      return response;
+    },
+    enabled: selectedPartnerType === 'customer' // Only fetch when Customer is selected
+  });
+
+  const customers = customersData?.customers || [];
+
+  // Reset search when partner type changes
+  useEffect(() => {
+    if (selectedPartnerType === 'supplier') {
+      setSearchInput('');
+      setSearchTerm('');
+    }
+  }, [selectedPartnerType]);
 
   return (
     <AdminLayout>
@@ -172,6 +207,7 @@ export default function BusinessPartnerManagement() {
                 onClick={handleSearchClick}
                 className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
                 data-testid="button-search-partners"
+                disabled={selectedPartnerType === 'supplier'}
               >
                 <Search className="h-4 w-4 mr-2" />
                 {language === 'ar' ? 'بحث' : 'Search'}
@@ -184,6 +220,7 @@ export default function BusinessPartnerManagement() {
                   color: '#852085'
                 }}
                 data-testid="button-export-partners"
+                disabled={selectedPartnerType === 'supplier'}
               >
                 <Download className="h-4 w-4 mr-2" />
                 {language === 'ar' ? 'تصدير' : 'Export'}
@@ -194,23 +231,125 @@ export default function BusinessPartnerManagement() {
 
         {/* Content Area */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <FilePlus className="h-16 w-16 mx-auto" />
+          {selectedPartnerType === 'customer' ? (
+            // Customer data display
+            isLoadingCustomers ? (
+              <div className="text-center py-12">
+                <div className="animate-spin h-8 w-8 border-2 border-purple-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-gray-600" style={{ fontFamily: 'Arimo' }}>
+                  {language === 'ar' ? 'جاري تحميل بيانات العملاء...' : 'Loading customer data...'}
+                </p>
+              </div>
+            ) : customersError ? (
+              <div className="text-center py-12">
+                <div className="text-red-400 mb-4">
+                  <FilePlus className="h-16 w-16 mx-auto" />
+                </div>
+                <h3 className="text-xl font-medium text-red-600 mb-2" style={{ fontFamily: 'Arimo' }}>
+                  {language === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}
+                </h3>
+                <p className="text-gray-500" style={{ fontFamily: 'Arimo' }}>
+                  {customersError.message || (language === 'ar' ? 'حدث خطأ أثناء تحميل بيانات العملاء' : 'An error occurred while loading customer data')}
+                </p>
+              </div>
+            ) : customers.length > 0 ? (
+              // Customer data table matching Credit Note design
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'معرف المستخدم' : 'User ID'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'اسم المستخدم' : 'User Name'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'معرف المريض' : 'Patient ID'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'نوع المريض' : 'Patient Type'}
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        {language === 'ar' ? 'اسم المريض' : 'Patient Name'}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {customers.map((customer, index) => (
+                      <tr key={`${customer.userId}-${customer.patientId || index}`} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {customer.userId}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.userName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.userPhone}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.userEmail || (language === 'ar' ? 'غير متوفر' : 'N/A')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.patientId || (language === 'ar' ? 'لا يوجد' : 'None')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.patientType || (language === 'ar' ? 'لا يوجد' : 'None')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {customer.patientName || (language === 'ar' ? 'لا يوجد' : 'None')}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              // No customers found
+              <div className="text-center py-12">
+                <div className="text-gray-400 mb-4">
+                  <FilePlus className="h-16 w-16 mx-auto" />
+                </div>
+                <h3 className="text-xl font-medium text-gray-900 mb-2" style={{ fontFamily: 'Arimo' }}>
+                  {searchTerm 
+                    ? (language === 'ar' ? 'لم يتم العثور على عملاء' : 'No customers found')
+                    : (language === 'ar' ? 'لا توجد بيانات عملاء حتى الآن' : 'No customer data yet')
+                  }
+                </h3>
+                <p className="text-gray-500" style={{ fontFamily: 'Arimo' }}>
+                  {searchTerm 
+                    ? (language === 'ar' ? 'جرب البحث بكلمات مختلفة' : 'Try searching with different terms')
+                    : (language === 'ar' ? 'لا توجد عملاء مسجلين في النظام' : 'No customers registered in the system')
+                  }
+                </p>
+              </div>
+            )
+          ) : (
+            // Supplier empty state (not implemented yet)
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <FilePlus className="h-16 w-16 mx-auto" />
+              </div>
+              <h3 className="text-xl font-medium text-gray-900 mb-2" style={{ fontFamily: 'Arimo' }}>
+                {language === 'ar' 
+                  ? 'لا توجد بيانات موردين حتى الآن' 
+                  : 'No supplier data yet'
+                }
+              </h3>
+              <p className="text-gray-500" style={{ fontFamily: 'Arimo' }}>
+                {language === 'ar'
+                  ? 'ابدأ بإنشاء البيانات الرئيسية للموردين باستخدام الزر أعلاه'
+                  : 'Start by creating supplier master data using the button above'
+                }
+              </p>
             </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2" style={{ fontFamily: 'Arimo' }}>
-              {language === 'ar' 
-                ? 'لا توجد بيانات شركاء تجاريين حتى الآن' 
-                : 'No business partner data yet'
-              }
-            </h3>
-            <p className="text-gray-500" style={{ fontFamily: 'Arimo' }}>
-              {language === 'ar'
-                ? 'ابدأ بإنشاء البيانات الرئيسية للعملاء أو الموردين باستخدام الزر أعلاه'
-                : 'Start by creating customer or supplier master data using the button above'
-              }
-            </p>
-          </div>
+          )}
         </div>
       </div>
     </AdminLayout>

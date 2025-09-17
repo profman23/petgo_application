@@ -5557,6 +5557,84 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
     }
   });
 
+  // Customer Business Partners API - Get customers from Users and Patients tables
+  app.get('/api/admin/customers', async (req, res) => {
+    try {
+      const { search } = req.query;
+      
+      console.log('📊 Fetching customer business partners data with search:', search);
+      
+      // Join Users and Patients tables to get complete customer data
+      let query = sql`
+        SELECT 
+          u.id as user_id,
+          u.name as user_name,
+          u.phone as user_phone,
+          u.email as user_email,
+          p.id as patient_id,
+          p.type as patient_type,
+          p.name as patient_name
+        FROM users u
+        LEFT JOIN patients p ON u.id = p.user_id
+        WHERE 1=1
+      `;
+      
+      // Add search filter if provided
+      if (search && typeof search === 'string' && search.trim()) {
+        const searchTerm = `%${search.trim().toLowerCase()}%`;
+        query = sql`
+          SELECT 
+            u.id as user_id,
+            u.name as user_name,
+            u.phone as user_phone,
+            u.email as user_email,
+            p.id as patient_id,
+            p.type as patient_type,
+            p.name as patient_name
+          FROM users u
+          LEFT JOIN patients p ON u.id = p.user_id
+          WHERE (
+            LOWER(u.name) LIKE ${searchTerm} OR
+            LOWER(u.phone) LIKE ${searchTerm} OR
+            LOWER(COALESCE(u.email, '')) LIKE ${searchTerm} OR
+            CAST(u.id AS TEXT) LIKE ${searchTerm} OR
+            LOWER(COALESCE(p.name, '')) LIKE ${searchTerm} OR
+            LOWER(COALESCE(p.type, '')) LIKE ${searchTerm} OR
+            CAST(COALESCE(p.id, 0) AS TEXT) LIKE ${searchTerm}
+          )
+        `;
+      }
+      
+      query = sql`${query} ORDER BY u.id, p.id`;
+      
+      const result = await db.execute(query);
+      const customers = result.rows.map((row: any) => ({
+        userId: row.user_id,
+        userName: row.user_name,
+        userPhone: row.user_phone,
+        userEmail: row.user_email || '',
+        patientId: row.patient_id,
+        patientType: row.patient_type || '',
+        patientName: row.patient_name || ''
+      }));
+      
+      console.log(`✅ Retrieved ${customers.length} customer records`);
+      
+      res.json({
+        success: true,
+        customers: customers
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Customer Business Partners fetch error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch customer business partners',
+        error: error.message
+      });
+    }
+  });
+
   // Register public payment routes
   addPublicPaymentRoutes(app);
 
