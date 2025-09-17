@@ -6,6 +6,7 @@ import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { DataTable, DataTableColumn } from "@/components/ui/data-table";
 
 // Customer data type from backend API
 interface CustomerData {
