@@ -314,6 +314,7 @@ export default function BusinessPartnerManagement() {
                 showEmptySearch={!!searchTerm}
                 hover={true}
                 responsive={true}
+                verticalSeparators={true}
                 className="bg-white"
                 rowTestId="customer-row"
               />
