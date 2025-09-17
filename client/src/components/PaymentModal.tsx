@@ -254,8 +254,11 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
             </div>
           </div>
           
+          {/* Spacer above Payment Method */}
+          <div className="h-[200px]" data-testid="spacer-above-payment-method" />
+          
           {/* Payment Method Section */}
-          <div className="mt-[200px]">
+          <div style={{ marginTop: '200px' }}>
             <div dir={getDirection(language)}>
               <label className="block text-sm font-medium text-gray-700 mb-4">
                 {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
