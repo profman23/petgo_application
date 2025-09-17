@@ -14,6 +14,7 @@ import { format } from "date-fns";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { playBookingNotification } from "@/utils/audio";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 
 export default function AdminVetsVanRequests() {
   const [, setLocation] = useLocation();
@@ -574,127 +575,19 @@ export default function AdminVetsVanRequests() {
                   </div>
                 )}
 
-                {/* Pagination Controls for VetsVan Requests - exact copy from admin dashboard */}
+                {/* Pagination Controls for VetsVan Requests */}
                 {vetsVanRequests && totalRequestsCount > 0 && (
-                  <div className="bg-white border-t px-4 py-3 flex items-center justify-between sm:px-6 mt-4">
-                    <div className="flex-1 flex justify-between sm:hidden">
-                      {/* Mobile Previous/Next */}
-                      <button
-                        onClick={() => handleRequestPageChange(requestCurrentPage - 1)}
-                        disabled={requestCurrentPage === 1}
-                        className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                          requestCurrentPage === 1
-                            ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                            : 'bg-white text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {language === 'ar' ? 'السابق' : 'Previous'}
-                      </button>
-                      <button
-                        onClick={() => handleRequestPageChange(requestCurrentPage + 1)}
-                        disabled={requestCurrentPage === totalRequestPages}
-                        className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                          requestCurrentPage === totalRequestPages
-                            ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                            : 'bg-white text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {language === 'ar' ? 'التالي' : 'Next'}
-                      </button>
-                    </div>
-
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between" style={{ direction: getDirection(language) }}>
-                      <div className="flex items-center gap-4">
-                        <div className="text-sm text-gray-700">
-                          {language === 'ar'
-                            ? `عرض ${requestStartIndex + 1} إلى ${Math.min(requestEndIndex, totalRequestsCount)} من ${totalRequestsCount} طلب`
-                            : `Showing ${requestStartIndex + 1} to ${Math.min(requestEndIndex, totalRequestsCount)} of ${totalRequestsCount} requests`
-                          }
-                        </div>
-                        
-                        {/* Items per page selector */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-700">
-                            {language === 'ar' ? 'عرض:' : 'Show:'}
-                          </span>
-                          <select
-                            value={requestItemsPerPage}
-                            onChange={(e) => handleRequestItemsPerPageChange(Number(e.target.value))}
-                            className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
-                          >
-                            <option value={10}>10</option>
-                            <option value={50}>50</option>
-                            <option value={100}>100</option>
-                          </select>
-                          <span className="text-sm text-gray-700">
-                            {language === 'ar' ? 'طلب في الصفحة' : 'per page'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {/* Previous Button */}
-                        <button
-                          onClick={() => handleRequestPageChange(requestCurrentPage - 1)}
-                          disabled={requestCurrentPage === 1}
-                          className={`relative inline-flex items-center px-3 py-2 rounded-md border text-sm font-medium ${
-                            requestCurrentPage === 1
-                              ? 'bg-gray-50 text-gray-400 border-gray-300 cursor-not-allowed'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-purple-600'
-                          }`}
-                        >
-                          <ChevronDown className={`h-4 w-4 ${language === 'ar' ? 'rotate-90' : '-rotate-90'}`} />
-                          <span className="ml-1">{language === 'ar' ? 'السابق' : 'Previous'}</span>
-                        </button>
-
-                        {/* Page Numbers */}
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: totalRequestPages }, (_, i) => i + 1)
-                            .filter(page => {
-                              // Show first page, last page, current page, and pages around current
-                              return page === 1 || 
-                                     page === totalRequestPages || 
-                                     Math.abs(page - requestCurrentPage) <= 1;
-                            })
-                            .map((page, index, array) => {
-                              // Add ellipsis if there's a gap
-                              const showEllipsis = index > 0 && page - array[index - 1] > 1;
-                              return (
-                                <div key={page} className="flex items-center">
-                                  {showEllipsis && (
-                                    <span className="px-2 py-1 text-gray-500">...</span>
-                                  )}
-                                  <button
-                                    onClick={() => handleRequestPageChange(page)}
-                                    className={`px-3 py-2 rounded-md text-sm font-medium ${
-                                      page === requestCurrentPage
-                                        ? 'bg-purple-600 text-white border border-purple-600'
-                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-purple-600'
-                                    }`}
-                                  >
-                                    {page}
-                                  </button>
-                                </div>
-                              );
-                            })}
-                        </div>
-
-                        {/* Next Button */}
-                        <button
-                          onClick={() => handleRequestPageChange(requestCurrentPage + 1)}
-                          disabled={requestCurrentPage === totalRequestPages}
-                          className={`relative inline-flex items-center px-3 py-2 rounded-md border text-sm font-medium ${
-                            requestCurrentPage === totalRequestPages
-                              ? 'bg-gray-50 text-gray-400 border-gray-300 cursor-not-allowed'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-purple-600'
-                          }`}
-                        >
-                          <span className="mr-1">{language === 'ar' ? 'التالي' : 'Next'}</span>
-                          <ChevronDown className={`h-4 w-4 ${language === 'ar' ? '-rotate-90' : 'rotate-90'}`} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <PaginationControls
+                    currentCount={Math.min(requestItemsPerPage, totalRequestsCount - requestStartIndex)}
+                    filteredCount={totalRequestsCount}
+                    totalCount={vetsVanRequests.length}
+                    itemType="customers"
+                    itemsPerPage={requestItemsPerPage}
+                    onItemsPerPageChange={handleRequestItemsPerPageChange}
+                    currentPage={requestCurrentPage}
+                    totalPages={totalRequestPages}
+                    onPageChange={handleRequestPageChange}
+                  />
                 )}
               </div>
         </div>
