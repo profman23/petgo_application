@@ -332,19 +332,17 @@ export default function BusinessPartnerManagement() {
                 </div>
                 
                 {/* Pagination Controls for Customers */}
-                <div className="mt-6">
-                  <PaginationControls
-                    currentCount={paginatedCustomers.length}
-                    filteredCount={customers.length}
-                    totalCount={customers.length}
-                    itemType="customers"
-                    itemsPerPage={itemsPerPage}
-                    onItemsPerPageChange={setItemsPerPage}
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
+                <PaginationControls
+                  currentCount={paginatedCustomers.length}
+                  filteredCount={customers.length}
+                  totalCount={customers.length}
+                  itemType="customers"
+                  itemsPerPage={itemsPerPage}
+                  onItemsPerPageChange={setItemsPerPage}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                />
               </>
             ) : (
               // No customers found
