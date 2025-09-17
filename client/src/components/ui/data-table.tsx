@@ -84,6 +84,24 @@ export function DataTable<T = any>({
 }: DataTableProps<T>) {
   const { language } = useTranslation();
 
+  // 🎯 Header formatting function - applies proper title case with ID special handling
+  const formatHeaderText = (text: string): string => {
+    if (!text) return text;
+    
+    return text
+      .toLowerCase()
+      .split(' ')
+      .map(word => {
+        // Special case: "id" should always be "ID"
+        if (word === 'id') {
+          return 'ID';
+        }
+        // Regular title case: first letter capitalized
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(' ');
+  };
+
   // Generate row className
   const getRowClassName = (item: T, index: number) => {
     let classes = 'transition-colors duration-200';
@@ -155,18 +173,18 @@ export function DataTable<T = any>({
             {columns.map((column, index) => (
               <th
                 key={column.key}
-                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.headerClassName || ''} ${
+                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ${column.headerClassName || ''} ${
                   verticalSeparators && index < columns.length - 1 ? 'border-r border-gray-200' : ''
                 }`}
               >
-                {language === 'ar' ? column.label.ar : column.label.en}
+                {formatHeaderText(language === 'ar' ? column.label.ar : column.label.en)}
               </th>
             ))}
             {showActions && (
-              <th className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+              <th className={`px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ${
                 verticalSeparators ? 'border-l border-gray-200' : ''
               }`}>
-                {language === 'ar' ? actionsLabel.ar : actionsLabel.en}
+                {formatHeaderText(language === 'ar' ? actionsLabel.ar : actionsLabel.en)}
               </th>
             )}
           </tr>
