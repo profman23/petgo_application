@@ -274,7 +274,7 @@ export default function BusinessPartnerManagement() {
             ) : customers.length > 0 ? (
               // Customer data table matching Credit Note design
               <>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto mb-6">
                   <table className="min-w-full">
                     <thead className="bg-gray-50">
                       <tr>
