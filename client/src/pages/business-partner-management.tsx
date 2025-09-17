@@ -17,12 +17,12 @@ export default function BusinessPartnerManagement() {
   const [selectedPartnerType, setSelectedPartnerType] = useState<'customer' | 'supplier'>('customer');
   const [triggerAnimation, setTriggerAnimation] = useState('hover');
 
-  // Animate icon every 1.5 minutes (90 seconds)
+  // Animate icon every 1.5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setTriggerAnimation('morph');
+      setTriggerAnimation('loop');
       setTimeout(() => setTriggerAnimation('hover'), 1000);
-    }, 90000); // 1.5 minutes = 90,000 milliseconds
+    }, 1500); // 1.5 seconds = 1,500 milliseconds
 
     return () => clearInterval(interval);
   }, []);
@@ -72,17 +72,50 @@ export default function BusinessPartnerManagement() {
                 }
               </p>
             </div>
+            
+            {/* Radio Buttons */}
+            <div className="flex items-center gap-6 ml-8">
+              <label className="flex items-center gap-2">
+                <input 
+                  type="radio" 
+                  name="businessPartnerType" 
+                  value="customer"
+                  checked={selectedPartnerType === 'customer'}
+                  onChange={() => setSelectedPartnerType('customer')}
+                  className="text-purple-600 focus:ring-purple-500"
+                  data-testid="radio-partner-customer"
+                />
+                <span className="text-sm text-gray-700">
+                  {language === 'ar' ? 'عميل' : 'Customer'}
+                </span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input 
+                  type="radio" 
+                  name="businessPartnerType" 
+                  value="supplier"
+                  checked={selectedPartnerType === 'supplier'}
+                  onChange={() => setSelectedPartnerType('supplier')}
+                  className="text-purple-600 focus:ring-purple-500"
+                  data-testid="radio-partner-supplier"
+                />
+                <span className="text-sm text-gray-700">
+                  {language === 'ar' ? 'مورد' : 'Supplier'}
+                </span>
+              </label>
+            </div>
           </div>
 
           {/* Create Button */}
           <div className="flex items-center gap-4">
             <button
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors duration-200"
+              className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
               onClick={() => {
                 console.log('Create new partner:', selectedPartnerType);
               }}
+              data-testid="button-create-partner"
             >
-              <FilePlus className="h-5 w-5" />
+              <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
               <span style={{ fontFamily: 'Arimo' }}>
                 {getButtonText()}
               </span>
@@ -90,40 +123,6 @@ export default function BusinessPartnerManagement() {
           </div>
         </div>
 
-        {/* Partner Type Selection */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <div className="flex items-center gap-4 mb-4">
-            <h3 className="text-lg font-medium text-gray-900" style={{ fontFamily: 'Arimo' }}>
-              {language === 'ar' ? 'نوع الشريك التجاري' : 'Business Partner Type'}
-            </h3>
-          </div>
-          
-          <div className="flex gap-4">
-            <button
-              onClick={() => setSelectedPartnerType('customer')}
-              className={`px-6 py-3 rounded-lg border transition-colors duration-200 ${
-                selectedPartnerType === 'customer'
-                  ? 'bg-purple-50 border-purple-500 text-purple-700'
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-              style={{ fontFamily: 'Arimo' }}
-            >
-              {language === 'ar' ? 'عميل' : 'Customer'}
-            </button>
-            
-            <button
-              onClick={() => setSelectedPartnerType('supplier')}
-              className={`px-6 py-3 rounded-lg border transition-colors duration-200 ${
-                selectedPartnerType === 'supplier'
-                  ? 'bg-purple-50 border-purple-500 text-purple-700'
-                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
-              style={{ fontFamily: 'Arivo' }}
-            >
-              {language === 'ar' ? 'مورد' : 'Supplier'}
-            </button>
-          </div>
-        </div>
 
         {/* Content Area */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
