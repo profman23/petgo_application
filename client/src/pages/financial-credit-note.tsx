@@ -6,7 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard, Download, FilePlus, Handshake } from "lucide-react";
+import { Shield, LogOut, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, ChevronDown, ChevronUp, TrendingUp, Volume2, VolumeX, Bell, Home, Menu, DollarSign, Receipt, Search, Minus, FileText as InvoiceIcon, CreditCard, FilePlus, Handshake } from "lucide-react";
+import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { LanguageSelector } from "@/components/language-selector";
 import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png";
@@ -1437,50 +1438,19 @@ export default function FinancialCreditNote() {
             </button>
           </div>
 
-          {/* Search Field */}
+          {/* Search Action Bar */}
           <div className="mb-6">
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <Input
-                  type="text"
-                  placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الفاتورة، رقم مذكرة الائتمان، أو تاريخ النشر' : 'Search by customer name, phone number, invoice number, credit note number, or posting date'}
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onKeyPress={handleSearchKeyPress}
-                  className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
-                  data-testid="input-search-credit-notes"
-                  dir={getDirection(language)}
-                />
-              </div>
-              <div className="flex gap-3" style={{ width: buttonContainerWidth ? `${buttonContainerWidth}px` : 'auto' }}>
-                <Button
-                  onClick={handleSearchClick}
-                  className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                  data-testid="button-search-credit-notes"
-                >
-                  <Search className="h-4 w-4 mr-2" />
-                  {language === 'ar' ? 'بحث' : 'Search'}
-                </Button>
-                <Button
-                  onClick={canExport ? handleExportToExcel : undefined}
-                  disabled={!canExport}
-                  className={`flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 ${
-                    !canExport 
-                      ? 'bg-gray-100 hover:bg-gray-100 cursor-not-allowed' 
-                      : 'bg-white hover:bg-purple-50'
-                  }`}
-                  style={{ 
-                    borderColor: !canExport ? '#D1D5DB' : '#852085', 
-                    color: !canExport ? '#9CA3AF' : '#852085'
-                  }}
-                  data-testid="button-export-credit-notes"
-                  title={!canExport ? (language === 'ar' ? 'غير مسموح - لا توجد صلاحية تصدير' : 'Not allowed - No export permission') : ''}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  {language === 'ar' ? 'تصدير' : 'Export'}
-                </Button>
-              </div>
-            </div>
+            <SearchActionBar
+              placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الفاتورة، رقم مذكرة الائتمان، أو تاريخ النشر' : 'Search by customer name, phone number, invoice number, credit note number, or posting date'}
+              searchValue={searchInput}
+              onSearchChange={setSearchInput}
+              onSearchClick={handleSearchClick}
+              onExportClick={handleExportToExcel}
+              exportDisabled={!canExport}
+              inputTestId="input-search-credit-notes"
+              searchButtonTestId="button-search-credit-notes"
+              exportButtonTestId="button-export-credit-notes"
+            />
           </div>
 
           {/* Credit Notes Table */}

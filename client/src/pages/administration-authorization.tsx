@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "@/lib/i18n";
-import { Shield, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, DollarSign, Receipt, FilePlus, Search, Download, X, Plus, Edit } from "lucide-react";
+import { Shield, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, DollarSign, Receipt, FilePlus, X, Plus, Edit } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 
 // Declare lord-icon custom element for TypeScript
@@ -40,11 +39,6 @@ export default function AdministrationAuthorization() {
     console.log('Search clicked with:', searchInput);
   };
   
-  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearchClick();
-    }
-  };
   
   const handleExportClick = () => {
     // Export functionality can be implemented here
@@ -532,40 +526,18 @@ export default function AdministrationAuthorization() {
           </button>
         </div>
 
-        {/* Search Field */}
+        {/* Search Action Bar */}
         <div className="px-8 mb-6">
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <Input
-                type="text"
-                placeholder={language === 'ar' ? 'البحث بحسب اسم التصريح أو المستخدم' : 'Search by authorization name or user'}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyPress={handleSearchKeyPress}
-                className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
-                data-testid="input-search-authorizations"
-              />
-            </div>
-            <div className="flex gap-3">
-              <Button
-                onClick={handleSearchClick}
-                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                data-testid="button-search-authorizations"
-              >
-                <Search className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'بحث' : 'Search'}
-              </Button>
-              <Button
-                onClick={handleExportClick}
-                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
-                data-testid="button-export-authorizations"
-                style={{ borderColor: '#852085', color: '#852085' }}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'تصدير' : 'Export'}
-              </Button>
-            </div>
-          </div>
+          <SearchActionBar
+            placeholder={language === 'ar' ? 'البحث بحسب اسم التصريح أو المستخدم' : 'Search by authorization name or user'}
+            searchValue={searchInput}
+            onSearchChange={setSearchInput}
+            onSearchClick={handleSearchClick}
+            onExportClick={handleExportClick}
+            inputTestId="input-search-authorizations"
+            searchButtonTestId="button-search-authorizations"
+            exportButtonTestId="button-export-authorizations"
+          />
         </div>
 
         {/* Authorization Content */}
