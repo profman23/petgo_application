@@ -140,9 +140,8 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                 </h1>
               </div>
               
-              {/* Business Partner Selection and Payment No. Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Left: Select Business Partner Master Data */}
+              {/* Business Partner Selection */}
+              <div className="mb-4">
                 <div className="flex items-center gap-4">
                   <label className="text-sm font-medium text-gray-700">
                     {language === 'ar' ? 'تحديد بيانات شريك العمل الرئيسية:' : 'Select Business Partner Master Data:'}
@@ -178,42 +177,45 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     </label>
                   </div>
                 </div>
-                
-                {/* Right: Payment No. */}
-                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                    {currentConfig.paymentNoLabel}
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-100 cursor-not-allowed"
-                    disabled
-                    value={currentConfig.paymentNo}
-                    data-testid="input-payment-no"
-                  />
-                </div>
               </div>
-              
-              {/* Customer/Supplier Details Section */}
+
+              {/* Customer/Supplier Details Section - New Layout */}
               <div className="space-y-4">
-                {/* Customer Phone - Horizontal Layout */}
-                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                    {businessPartnerType === 'supplier' 
-                      ? (language === 'ar' ? 'هاتف المورد:' : 'Supplier Phone:') 
-                      : (language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:')}
-                  </label>
-                  <input 
-                    type="text" 
-                    className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                    data-testid="input-partner-phone"
-                    placeholder={businessPartnerType === 'supplier' 
-                      ? (language === 'ar' ? 'أدخل هاتف المورد' : 'Enter supplier phone') 
-                      : (language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone')}
-                  />
+                {/* Row 1: Customer Phone ↔ Payment No */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Left: Customer Phone */}
+                  <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                      {businessPartnerType === 'supplier' 
+                        ? (language === 'ar' ? 'هاتف المورد:' : 'Supplier Phone:') 
+                        : (language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:')}
+                    </label>
+                    <input 
+                      type="text" 
+                      className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                      data-testid="input-partner-phone"
+                      placeholder={businessPartnerType === 'supplier' 
+                        ? (language === 'ar' ? 'أدخل هاتف المورد' : 'Enter supplier phone') 
+                        : (language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone')}
+                    />
+                  </div>
+                  
+                  {/* Right: Payment No */}
+                  <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                      {currentConfig.paymentNoLabel}
+                    </label>
+                    <input 
+                      type="text" 
+                      className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-100 cursor-not-allowed"
+                      disabled
+                      value={currentConfig.paymentNo}
+                      data-testid="input-payment-no"
+                    />
+                  </div>
                 </div>
                 
-                {/* Customer Name and Posting Date - Side by Side Layout */}
+                {/* Row 2: Customer Name ↔ Posting Date */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Left: Customer Name */}
                   <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
