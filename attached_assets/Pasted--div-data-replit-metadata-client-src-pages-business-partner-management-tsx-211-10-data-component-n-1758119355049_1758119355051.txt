@@ -1,0 +1,41 @@
+<div data-replit-metadata="client/src/pages/business-partner-management.tsx:211:10" data-component-name="div" class="flex items-center gap-3">
+  <div class="flex-1">
+    <input
+      type="text"
+      class="flex h-10 rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background 
+             file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground 
+             placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed 
+             disabled:opacity-50 md:text-sm w-full focus:border-[#852085] focus-visible:ring-2 
+             focus-visible:ring-[#852085] focus-visible:ring-offset-2"
+      placeholder="Search by customer name, phone number, customer ID, or creation date"
+      data-testid="input-search-partners"
+      dir="ltr"
+      value=""
+    />
+  </div>
+  <div class="flex gap-3" style="width: auto;">
+    <button
+      class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background 
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+             disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 
+             h-10 flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 
+             bg-white text-purple-600 hover:bg-purple-50"
+      data-testid="button-search-partners"
+    >
+      <svg class="lucide lucide-search h-4 w-4 mr-2" ...></svg>
+      Search
+    </button>
+    <button
+      class="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background 
+             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 
+             disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 
+             text-primary-foreground h-10 flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors 
+             duration-200 bg-white hover:bg-purple-50"
+      style="border-color: rgb(133, 32, 133); color: rgb(133, 32, 133);"
+      data-testid="button-export-partners"
+    >
+      <svg class="lucide lucide-download h-4 w-4 mr-2" ...></svg>
+      Export
+    </button>
+  </div>
+</div>

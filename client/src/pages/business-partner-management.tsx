@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
-import { FilePlus, Search, Download } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { FilePlus } from "lucide-react";
+import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { PaginationControls } from "@/components/ui/pagination-controls";
@@ -206,46 +205,20 @@ export default function BusinessPartnerManagement() {
           </div>
         </div>
 
-        {/* Search Field */}
+        {/* Search Action Bar */}
         <div className="mb-6">
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <Input
-                type="text"
-                placeholder={getSearchPlaceholder()}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyPress={handleSearchKeyPress}
-                className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
-                data-testid="input-search-partners"
-                dir={getDirection(language)}
-              />
-            </div>
-            <div className="flex gap-3" style={{ width: 'auto' }}>
-              <Button
-                onClick={handleSearchClick}
-                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-                data-testid="button-search-partners"
-                disabled={selectedPartnerType === 'supplier'}
-              >
-                <Search className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'بحث' : 'Search'}
-              </Button>
-              <Button
-                onClick={handleExportClick}
-                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
-                style={{ 
-                  borderColor: '#852085', 
-                  color: '#852085'
-                }}
-                data-testid="button-export-partners"
-                disabled={selectedPartnerType === 'supplier'}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                {language === 'ar' ? 'تصدير' : 'Export'}
-              </Button>
-            </div>
-          </div>
+          <SearchActionBar
+            placeholder={getSearchPlaceholder()}
+            searchValue={searchInput}
+            onSearchChange={setSearchInput}
+            onSearchClick={handleSearchClick}
+            onExportClick={handleExportClick}
+            searchDisabled={selectedPartnerType === 'supplier'}
+            exportDisabled={selectedPartnerType === 'supplier'}
+            inputTestId="input-search-partners"
+            searchButtonTestId="button-search-partners"
+            exportButtonTestId="button-export-partners"
+          />
         </div>
 
         {/* Content Area */}
