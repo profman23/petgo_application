@@ -256,6 +256,43 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
             </div>
           </div>
           
+          {/* Reference Information Document Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-700">
+              {language === 'ar' ? 'وثيقة المعلومات المرجعية:' : 'Reference Information Document:'}
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left: Transaction Type */}
+              <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                  {language === 'ar' ? 'نوع المعاملة:' : 'Transaction Type:'}
+                </label>
+                <select 
+                  className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                  data-testid="select-transaction-type"
+                >
+                  <option value="">{language === 'ar' ? 'اختر النوع' : 'Select Type'}</option>
+                  <option value="ar-credit-note">A/R Credit Note</option>
+                  <option value="ar-invoice">A/R Invoice</option>
+                </select>
+              </div>
+              
+              {/* Right: Document No */}
+              <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                  {language === 'ar' ? 'رقم الوثيقة:' : 'Document No:'}
+                </label>
+                <input 
+                  type="text" 
+                  className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                  placeholder={language === 'ar' ? 'بحث عن الوثيقة' : 'Search document'}
+                  data-testid="input-document-no"
+                />
+              </div>
+            </div>
+          </div>
+          
           {/* Spacer above Payment Method */}
           <div className="h-[200px]" data-testid="spacer-above-payment-method" />
           
