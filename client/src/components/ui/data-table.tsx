@@ -152,16 +152,20 @@ export function DataTable<T = any>({
       <table className={tableClassName} dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <thead className={headerClassName}>
           <tr>
-            {columns.map((column) => (
+            {columns.map((column, index) => (
               <th
                 key={column.key}
-                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.headerClassName || ''}`}
+                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.headerClassName || ''} ${
+                  verticalSeparators && index < columns.length - 1 ? 'border-r border-gray-200' : ''
+                }`}
               >
                 {language === 'ar' ? column.label.ar : column.label.en}
               </th>
             ))}
             {showActions && (
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                verticalSeparators ? 'border-l border-gray-200' : ''
+              }`}>
                 {language === 'ar' ? actionsLabel.ar : actionsLabel.en}
               </th>
             )}
@@ -175,16 +179,20 @@ export function DataTable<T = any>({
               onClick={onRowClick ? () => onRowClick(item) : undefined}
               data-testid={`${rowTestId}-${index}`}
             >
-              {columns.map((column) => (
+              {columns.map((column, index) => (
                 <td
                   key={column.key}
-                  className={`px-6 py-4 whitespace-nowrap text-sm ${column.className || 'text-gray-500'}`}
+                  className={`px-6 py-4 whitespace-nowrap text-sm ${column.className || 'text-gray-500'} ${
+                    verticalSeparators && index < columns.length - 1 ? 'border-r border-gray-200' : ''
+                  }`}
                 >
                   {column.render ? column.render(item) : (item as any)[column.key]}
                 </td>
               ))}
               {showActions && (
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
+                  verticalSeparators ? 'border-l border-gray-200' : ''
+                }`}>
                   <div className="flex space-x-2 rtl:space-x-reverse">
                     {actions.map((action, actionIndex) => {
                       // Check if action should be shown conditionally
