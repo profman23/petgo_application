@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
-import { FilePlus } from "lucide-react";
+import { FilePlus, Search, Download } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -16,6 +18,7 @@ export default function BusinessPartnerManagement() {
   const { language } = useTranslation();
   const [selectedPartnerType, setSelectedPartnerType] = useState<'customer' | 'supplier'>('customer');
   const [triggerAnimation, setTriggerAnimation] = useState('hover');
+  const [searchInput, setSearchInput] = useState('');
 
   // Animate icon every 1.5 seconds
   useEffect(() => {
@@ -37,6 +40,32 @@ export default function BusinessPartnerManagement() {
         ? 'إنشاء البيانات الرئيسية لمورد الأعمال' 
         : 'Create Supplier Business Master Data';
     }
+  };
+
+  const getSearchPlaceholder = () => {
+    const partnerType = selectedPartnerType === 'customer' 
+      ? (language === 'ar' ? 'العميل' : 'customer') 
+      : (language === 'ar' ? 'المورد' : 'supplier');
+    
+    return language === 'ar'
+      ? `البحث بحسب اسم ${partnerType}، رقم الهاتف، رقم ${partnerType}، أو تاريخ الإنشاء`
+      : `Search by ${partnerType} name, phone number, ${partnerType} ID, or creation date`;
+  };
+
+  const handleSearchClick = () => {
+    console.log('Search clicked:', searchInput, 'Type:', selectedPartnerType);
+    // Search functionality will be implemented later
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearchClick();
+    }
+  };
+
+  const handleExportClick = () => {
+    console.log('Export clicked for:', selectedPartnerType);
+    // Export functionality will be implemented later
   };
 
   return (
@@ -123,6 +152,45 @@ export default function BusinessPartnerManagement() {
           </div>
         </div>
 
+        {/* Search Field */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3">
+            <div className="flex-1">
+              <Input
+                type="text"
+                placeholder={getSearchPlaceholder()}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
+                className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
+                data-testid="input-search-partners"
+                dir={getDirection(language)}
+              />
+            </div>
+            <div className="flex gap-3" style={{ width: 'auto' }}>
+              <Button
+                onClick={handleSearchClick}
+                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                data-testid="button-search-partners"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'بحث' : 'Search'}
+              </Button>
+              <Button
+                onClick={handleExportClick}
+                className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
+                style={{ 
+                  borderColor: '#852085', 
+                  color: '#852085'
+                }}
+                data-testid="button-export-partners"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {language === 'ar' ? 'تصدير' : 'Export'}
+              </Button>
+            </div>
+          </div>
+        </div>
 
         {/* Content Area */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
