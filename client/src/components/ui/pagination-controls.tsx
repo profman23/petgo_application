@@ -140,8 +140,8 @@ export function PaginationControls({
             {language === 'ar' ? 'السابق' : 'Previous'}
           </Button>
           
-          <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md">
-            <span className="text-sm font-medium text-purple-700">
+          <div className="flex items-center gap-2 px-3 py-1 bg-purple-50 rounded-md opacity-30 pointer-events-none">
+            <span className="text-sm font-medium text-gray-400">
               {language === 'ar' 
                 ? `صفحة ${currentPage} من ${totalPages}`
                 : `Page ${currentPage} of ${totalPages}`
