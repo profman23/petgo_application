@@ -8,7 +8,7 @@ interface PaginationControlsProps {
   totalCount: number;          // Total items in dataset (e.g. 100)
   
   // Item type for display
-  itemType: 'customers' | 'credit-notes' | 'suppliers' | 'invoices' | 'payments' | 'services' | 'products';
+  itemType: 'customers' | 'credit-notes' | 'suppliers' | 'invoices' | 'payments' | 'services' | 'products' | 'requests';
   
   // Pagination settings
   itemsPerPage: number;
@@ -63,6 +63,10 @@ export function PaginationControls({
       'products': {
         ar: 'منتج',
         en: 'products'
+      },
+      'requests': {
+        ar: 'طلبات',
+        en: 'requests'
       }
     };
     

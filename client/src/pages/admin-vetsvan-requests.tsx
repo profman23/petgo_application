@@ -578,10 +578,10 @@ export default function AdminVetsVanRequests() {
                 {/* Pagination Controls for VetsVan Requests */}
                 {vetsVanRequests && totalRequestsCount > 0 && (
                   <PaginationControls
-                    currentCount={Math.min(requestItemsPerPage, totalRequestsCount - requestStartIndex)}
+                    currentCount={vetsVanRequests.length}
                     filteredCount={totalRequestsCount}
-                    totalCount={vetsVanRequests.length}
-                    itemType="customers"
+                    totalCount={allVetsVanRequests?.length || 0}
+                    itemType="requests"
                     itemsPerPage={requestItemsPerPage}
                     onItemsPerPageChange={handleRequestItemsPerPageChange}
                     currentPage={requestCurrentPage}
