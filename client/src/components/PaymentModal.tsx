@@ -211,6 +211,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       disabled
                       value={currentConfig.paymentNo}
                       data-testid="input-payment-no"
+                      style={variant === 'income' ? { marginLeft: '13px' } : undefined}
                     />
                   </div>
                 </div>
