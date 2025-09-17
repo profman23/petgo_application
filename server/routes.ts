@@ -5558,7 +5558,7 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
   });
 
   // Customer Business Partners API - Get customers from Users and Patients tables
-  app.get('/api/admin/customers', async (req, res) => {
+  app.get('/api/admin/customers', requireAuth, async (req, res) => {
     try {
       const { search } = req.query;
       

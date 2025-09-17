@@ -282,7 +282,7 @@ export default function BusinessPartnerManagement() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {customers.map((customer, index) => (
+                    {customers.map((customer: CustomerData, index: number) => (
                       <tr key={`${customer.userId}-${customer.patientId || index}`} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {customer.userId}
