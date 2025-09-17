@@ -14,6 +14,7 @@ import vetsVanLogo from "@assets/Screenshot 2025-07-10 182605_1753012202060.png"
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -97,6 +98,61 @@ export default function FinancialCreditNote() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedCreditNotes = filteredCreditNotes.slice(startIndex, endIndex);
   const totalPages = Math.ceil(filteredCreditNotes.length / itemsPerPage);
+
+  // 🎯 DATATABLE CONFIGURATION - Customize columns for this screen
+  const creditNoteColumns: DataTableColumn[] = [
+    {
+      key: 'creditNoteNumber',
+      label: { ar: 'رقم مذكرة الائتمان', en: 'Credit Note No.' },
+      render: (creditNote) => (
+        <span className="font-medium text-gray-900">
+          CRN{creditNote.creditNoteNumber}
+        </span>
+      ),
+      className: 'font-medium text-gray-900'
+    },
+    {
+      key: 'invoiceNumber',
+      label: { ar: 'رقم الفاتورة', en: 'Invoice No.' },
+      className: 'text-gray-500'
+    },
+    {
+      key: 'customerName',
+      label: { ar: 'اسم العميل', en: 'Customer Name' },
+      className: 'text-gray-500'
+    },
+    {
+      key: 'postingDate',
+      label: { ar: 'تاريخ الترحيل', en: 'Posting Date' },
+      render: (creditNote) => new Date(creditNote.postingDate).toLocaleDateString(),
+      className: 'text-gray-500'
+    },
+    {
+      key: 'finalTotal',
+      label: { ar: 'المجموع النهائي', en: 'Final Total' },
+      render: (creditNote) => `-${creditNote.finalTotal} SAR`,
+      className: 'text-gray-500'
+    }
+  ];
+
+  // 🎯 DATATABLE ACTIONS - Customize actions for this screen
+  const creditNoteActions: DataTableAction[] = [
+    {
+      label: { ar: 'عرض', en: 'View' },
+      onClick: (creditNote) => handleViewCreditNote(creditNote.id),
+      className: 'text-purple-600 hover:text-purple-900 transition-colors duration-200'
+    },
+    {
+      label: { ar: 'طباعة', en: 'Print' },
+      onClick: (creditNote) => console.log('Print credit note:', creditNote.id),
+      className: 'text-blue-600 hover:text-blue-900 transition-colors duration-200'
+    },
+    {
+      label: { ar: 'خريطة', en: 'Map' },
+      onClick: (creditNote) => handleMapClick(creditNote),
+      className: 'text-green-600 hover:text-green-900 transition-colors duration-200'
+    }
+  ];
 
   // Handle page change
   const handlePageChange = (newPage: number) => {
