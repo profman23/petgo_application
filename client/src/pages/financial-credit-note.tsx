@@ -1509,98 +1509,24 @@ export default function FinancialCreditNote() {
             />
           </div>
 
-          {/* Credit Notes Table */}
-          <div className="bg-white rounded-lg shadow">
-            {isLoadingCreditNotes ? (
-              <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
-                <p className="mt-2 text-gray-600">{language === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
-              </div>
-            ) : filteredCreditNotes.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                {searchTerm.trim() ? (
-                  <>
-                    <p>{language === 'ar' ? 'لا توجد نتائج مطابقة لبحثك' : 'No credit notes match your search'}</p>
-                    <p className="text-sm">{language === 'ar' ? 'جرب مصطلحات بحث مختلفة' : 'Try different search terms'}</p>
-                  </>
-                ) : (
-                  <>
-                    <p>{language === 'ar' ? 'لا توجد مذكرات ائتمان حتى الآن' : 'No credit notes found'}</p>
-                    <p className="text-sm">{language === 'ar' ? 'ابدأ بإنشاء مذكرة ائتمان جديدة' : 'Start by creating a new credit note'}</p>
-                  </>
-                )}
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'رقم مذكرة الائتمان' : 'Credit Note No.'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'رقم الفاتورة' : 'Invoice No.'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'اسم العميل' : 'Customer Name'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'المجموع النهائي' : 'Final Total'}
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {language === 'ar' ? 'الإجراءات' : 'Actions'}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {paginatedCreditNotes.map((creditNote) => (
-                      <tr key={creditNote.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          CRN{creditNote.creditNoteNumber}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {creditNote.invoiceNumber}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {creditNote.customerName}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(creditNote.postingDate).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          -{creditNote.finalTotal} SAR
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => handleViewCreditNote(creditNote.id)}
-                            className="text-purple-600 hover:text-purple-900 mr-4"
-                          >
-                            {language === 'ar' ? 'عرض' : 'View'}
-                          </button>
-                          <button
-                            onClick={() => console.log('Print credit note:', creditNote.id)}
-                            className="text-blue-600 hover:text-blue-900 mr-4"
-                          >
-                            {language === 'ar' ? 'طباعة' : 'Print'}
-                          </button>
-                          <button
-                            onClick={() => handleMapClick(creditNote)}
-                            className="text-green-600 hover:text-green-900"
-                          >
-                            {language === 'ar' ? 'خريطة' : 'Map'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          {/* Credit Notes Table - Now using unified DataTable component! 🎉 */}
+          <DataTable
+            data={paginatedCreditNotes}
+            columns={creditNoteColumns}
+            actions={creditNoteActions}
+            isLoading={isLoadingCreditNotes}
+            loadingText={{ ar: 'جاري التحميل...', en: 'Loading...' }}
+            emptyStateText={{ 
+              ar: searchTerm.trim() ? 'لا توجد نتائج مطابقة لبحثك' : 'لا توجد مذكرات ائتمان حتى الآن', 
+              en: searchTerm.trim() ? 'No credit notes match your search' : 'No credit notes found'
+            }}
+            emptySearchText={{ ar: 'جرب مصطلحات بحث مختلفة', en: 'Try different search terms' }}
+            showEmptySearch={searchTerm.trim().length > 0}
+            hover={true}
+            responsive={true}
+            className="bg-white rounded-lg shadow"
+            rowTestId="credit-note-row"
+          />
 
           {/* Pagination Controls */}
           <PaginationControls
