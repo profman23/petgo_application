@@ -52,6 +52,7 @@ export interface DataTableProps<T = any> {
   striped?: boolean;
   bordered?: boolean;
   responsive?: boolean;
+  verticalSeparators?: boolean;
   
   // Optional features
   onRowClick?: (item: T) => void;
@@ -77,6 +78,7 @@ export function DataTable<T = any>({
   striped = false,
   bordered = false,
   responsive = true,
+  verticalSeparators = false,
   onRowClick,
   rowTestId = 'table-row'
 }: DataTableProps<T>) {
