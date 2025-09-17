@@ -5,6 +5,7 @@ import { FilePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { PaymentModal } from "@/components/PaymentModal";
+import { SearchActionBar } from "@/components/ui/search-action-bar";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -22,6 +23,9 @@ export default function FinancialIncomePayment() {
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
+  // Search functionality state
+  const [searchInput, setSearchInput] = useState("");
+  
   // Lord-icon animation trigger state
   const [triggerAnimation, setTriggerAnimation] = useState("hover");
 
@@ -35,6 +39,23 @@ export default function FinancialIncomePayment() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Search functionality handlers (placeholder - to be implemented)
+  const handleSearchClick = () => {
+    console.log('Income Payment search clicked with:', searchInput);
+    toast({
+      title: language === 'ar' ? 'البحث' : 'Search',
+      description: language === 'ar' ? `البحث عن: ${searchInput}` : `Searching for: ${searchInput}`,
+    });
+  };
+
+  const handleExportClick = () => {
+    console.log('Income Payment export clicked');
+    toast({
+      title: language === 'ar' ? 'تصدير' : 'Export',
+      description: language === 'ar' ? 'سيتم تنفيذ وظيفة التصدير قريباً' : 'Export functionality will be implemented soon',
+    });
+  };
 
   // Check admin authentication
   useEffect(() => {
@@ -79,6 +100,27 @@ export default function FinancialIncomePayment() {
               {language === 'ar' ? 'إنشاء دفع وارد' : 'Create Income Payment'}
             </button>
           </div>
+
+        {/* Search Action Bar */}
+        <div className="mb-6">
+          <SearchActionBar
+            placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الدفع، أو تاريخ الدفع' : 'Search by customer name, phone number, payment number, or payment date'}
+            searchValue={searchInput}
+            onSearchChange={setSearchInput}
+            onSearchClick={handleSearchClick}
+            onExportClick={handleExportClick}
+            inputTestId="input-search-income-payments"
+            searchButtonTestId="button-search-income-payments"
+            exportButtonTestId="button-export-income-payments"
+          />
+        </div>
+
+        {/* Payments Table Placeholder */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <p className="text-gray-500">
+            {language === 'ar' ? 'سيتم عرض جدول المدفوعات الواردة هنا' : 'Income payments table will be displayed here'}
+          </p>
+        </div>
 
         </div>
 
