@@ -247,6 +247,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       onKeyDown={handlePostingDateKeyDown}
                       placeholder={language === 'ar' ? 'تاريخ أو +3، -2' : 'Date or +3, -2'}
                       data-testid="input-posting-date"
+                      style={{ marginLeft: '29px' }}
                     />
                   </div>
                 </div>
