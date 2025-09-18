@@ -46,7 +46,7 @@ interface InvoiceMapModalProps {
   invoice: Invoice | null;
   creditNotes: CreditNote[];
   payments: Payment[];
-  modalType?: 'income' | 'outgoing';
+  modalType?: 'income' | 'outgoing' | 'creditnote';
 }
 
 export function InvoiceMapModal({ 
@@ -129,12 +129,16 @@ export function InvoiceMapModal({
           <DialogTitle>
             {modalType === 'income' 
               ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
-              : (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')}
+              : modalType === 'outgoing'
+              ? (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')
+              : (language === 'ar' ? 'خريطة مذكرة الائتمان' : 'Credit Note Map')}
           </DialogTitle>
           <DialogDescription>
             {modalType === 'income'
               ? (language === 'ar' ? 'عرض مرئي للدفع الوارد والعناصر المرتبطة به' : 'Visual representation of income payment and related items')
-              : (language === 'ar' ? 'عرض مرئي للدفع الصادر والعناصر المرتبطة به' : 'Visual representation of outgoing payment and related items')}
+              : modalType === 'outgoing'
+              ? (language === 'ar' ? 'عرض مرئي للدفع الصادر والعناصر المرتبطة به' : 'Visual representation of outgoing payment and related items')
+              : (language === 'ar' ? 'عرض مرئي لمذكرة الائتمان والعناصر المرتبطة بها' : 'Visual representation of credit note and related items')}
           </DialogDescription>
         </DialogHeader>
         
@@ -152,9 +156,15 @@ export function InvoiceMapModal({
               <h2 className="text-xl font-bold text-gray-800">
                 {modalType === 'income' 
                   ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
-                  : (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')}
+                  : modalType === 'outgoing'
+                  ? (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')
+                  : (language === 'ar' ? 'خريطة مذكرة الائتمان' : 'Credit Note Map')}
               </h2>
-              {invoice && (
+              {modalType === 'creditnote' && creditNotes.length > 0 ? (
+                <span className="text-sm text-gray-600">
+                  CRN{creditNotes[0].creditNoteNumber}
+                </span>
+              ) : invoice && (
                 <span className="text-sm text-gray-600">
                   {invoice.invoiceNumber}
                 </span>
