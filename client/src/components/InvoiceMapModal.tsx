@@ -446,8 +446,8 @@ export function InvoiceMapModal({
                       {(modalType === 'creditnote' || isIncomePayment) ? '+' : '-'}{parseFloat((payment.amount ?? payment.totalAmount ?? '0').toString()).toFixed(2)} SAR
                     </div>
                     <div className="text-sm text-gray-600 mb-1">
-                      {language === 'ar' ? 'رقم المستند: ' : 'DocNum: '}
-                      {payment.docnum || payment.paymentType || '-'}
+                      {language === 'ar' ? 'طريقة الدفع: ' : 'Payment Method: '}
+                      {payment.paymentType || '-'}
                     </div>
                     {payment.description && (
                       <div className="text-xs text-gray-500 mb-2">
