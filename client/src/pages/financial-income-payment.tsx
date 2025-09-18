@@ -44,7 +44,7 @@ export default function FinancialIncomePayment() {
   const paymentColumns: DataTableColumn[] = [
     {
       key: 'incomePaymentId',
-      label: { ar: 'رقم الدفعة الواردة', en: 'Income Payment No.' },
+      label: { ar: 'رقم المستند', en: 'DocNum' },
       render: (payment) => (
         <span className="font-medium text-purple-600">
           {payment.incomePaymentId}

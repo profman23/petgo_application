@@ -44,7 +44,7 @@ export default function FinancialOutgoingPayment() {
   const paymentColumns: DataTableColumn[] = [
     {
       key: 'outgoingPaymentId',
-      label: { ar: 'رقم الدفعة الصادرة', en: 'Outgoing Payment No.' },
+      label: { ar: 'رقم المستند', en: 'DocNum' },
       render: (payment) => (
         <span className="font-medium text-purple-600">
           {payment.outgoingPaymentId}
