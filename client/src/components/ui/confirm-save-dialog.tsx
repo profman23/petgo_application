@@ -16,7 +16,7 @@ export function ConfirmSaveDialog({
 }: ConfirmSaveDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={() => onCancel()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-w-md" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <DialogHeader>
           <DialogTitle className={`flex items-center gap-2 text-amber-600 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
             <AlertTriangle className="h-5 w-5" />
@@ -24,7 +24,7 @@ export function ConfirmSaveDialog({
           </DialogTitle>
         </DialogHeader>
         
-        <div className={`space-y-4 ${language === 'ar' ? 'text-right' : 'text-left'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className={`space-y-4 ${language === 'ar' ? 'text-right' : 'text-left'}`}>
           <p className="text-sm text-gray-600">
             {language === 'ar' 
               ? 'هل أنت متأكد من أنك تريد حفظ هذه البيانات؟ لن تتمكن من تعديلها بعد الحفظ.'
