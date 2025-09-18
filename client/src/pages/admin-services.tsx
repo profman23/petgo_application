@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 
 // Services Management Component
 const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'en'; isReadOnly: boolean }) => {
@@ -263,6 +264,120 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
   const areAllVisibleSelected = paginatedServices.length > 0 && 
     paginatedServices.every((service: any) => selectedServices.includes(service.id));
 
+  // 🎯 DATATABLE CONFIGURATION - Customize columns for services screen
+  const serviceColumns: DataTableColumn[] = [
+    {
+      key: 'selection',
+      label: { ar: '', en: '' },
+      render: (service) => (
+        <Checkbox
+          checked={selectedServices.includes(service.id)}
+          onCheckedChange={() => handleServiceSelection(service.id)}
+          disabled={isReadOnly}
+          className="border-purple-300 data-[state=checked]:bg-purple-600"
+        />
+      ),
+      className: 'w-12',
+      headerClassName: 'w-12'
+    },
+    {
+      key: 'name',
+      label: { ar: 'الاسم', en: 'name' },
+      render: (service) => (
+        <div className="space-y-1">
+          <div className="text-sm font-medium text-gray-900">{service.name}</div>
+          {service.nameAr && (
+            <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
+              {service.nameAr}
+            </div>
+          )}
+        </div>
+      ),
+      className: 'text-gray-900'
+    },
+    {
+      key: 'price',
+      label: { ar: 'السعر', en: 'price' },
+      render: (service) => (
+        editingService?.id === service.id ? (
+          <div className="flex items-center space-x-2">
+            <Input
+              type="number"
+              step="0.01"
+              value={editedServices[service.id] || ''}
+              onChange={(e) => setEditedServices({ ...editedServices, [service.id]: e.target.value })}
+              className="w-20 h-8 text-sm border-purple-300 focus:border-purple-500 focus:ring-purple-500"
+            />
+            <Button
+              size="sm"
+              onClick={handlePriceUpdate}
+              disabled={updateServiceMutation.isPending}
+              className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              ✓
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setEditingService(null);
+                setEditedServices({});
+              }}
+              className="h-8 px-2"
+            >
+              ✕
+            </Button>
+          </div>
+        ) : (
+          <span className="font-medium">{service.price}</span>
+        )
+      ),
+      className: 'text-gray-900'
+    },
+    {
+      key: 'category',
+      label: { ar: 'الفئة', en: 'category' },
+      render: (service) => (
+        <div className="space-y-1">
+          <div>{service.category}</div>
+          {service.categoryAr && (
+            <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
+              {service.categoryAr}
+            </div>
+          )}
+        </div>
+      ),
+      className: 'text-gray-900'
+    },
+    {
+      key: 'status',
+      label: { ar: 'الحالة', en: 'status' },
+      render: (service) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+          service.isActive 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800'
+        }`}>
+          {service.isActive 
+            ? (language === 'ar' ? 'نشط' : 'Active')
+            : (language === 'ar' ? 'غير نشط' : 'Inactive')
+          }
+        </span>
+      )
+    }
+  ];
+
+  // 🎯 DATATABLE ACTIONS - Customize actions for services screen
+  const serviceActions: DataTableAction[] = [
+    {
+      label: { ar: 'تعديل', en: 'Edit' },
+      onClick: (service) => handlePriceEdit(service.id, service.price.toString()),
+      className: 'border-purple-300 text-purple-600 hover:bg-purple-50',
+      icon: <Edit className="h-3 w-3" />,
+      condition: (service) => editingService?.id !== service.id && !isReadOnly
+    }
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header with Add Service Button */}
@@ -469,135 +584,25 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
         </div>
       )}
 
-      {/* Services Table */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <Checkbox
-                    checked={areAllVisibleSelected}
-                    onCheckedChange={handleSelectAll}
-                    disabled={isReadOnly}
-                    className="border-purple-300 data-[state=checked]:bg-purple-600"
-                  />
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'الاسم' : 'Name'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'السعر' : 'Price'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'الفئة' : 'Category'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'الحالة' : 'Status'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'الإجراءات' : 'Actions'}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedServices.map((service: any) => (
-                <tr key={service.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Checkbox
-                      checked={selectedServices.includes(service.id)}
-                      onCheckedChange={() => handleServiceSelection(service.id)}
-                      disabled={isReadOnly}
-                      className="border-purple-300 data-[state=checked]:bg-purple-600"
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium text-gray-900">{service.name}</div>
-                      {service.nameAr && (
-                        <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
-                          {service.nameAr}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {editingService?.id === service.id ? (
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={editedServices[service.id] || ''}
-                          onChange={(e) => setEditedServices({ ...editedServices, [service.id]: e.target.value })}
-                          className="w-20 h-8 text-sm border-purple-300 focus:border-purple-500 focus:ring-purple-500"
-                        />
-                        <Button
-                          size="sm"
-                          onClick={handlePriceUpdate}
-                          disabled={updateServiceMutation.isPending}
-                          className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          ✓
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingService(null);
-                            setEditedServices({});
-                          }}
-                          className="h-8 px-2"
-                        >
-                          ✕
-                        </Button>
-                      </div>
-                    ) : (
-                      <span className="font-medium">{service.price}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="space-y-1">
-                      <div>{service.category}</div>
-                      {service.categoryAr && (
-                        <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
-                          {service.categoryAr}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      service.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {service.isActive 
-                        ? (language === 'ar' ? 'نشط' : 'Active')
-                        : (language === 'ar' ? 'غير نشط' : 'Inactive')
-                      }
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {editingService?.id !== service.id && (
-                      <Button
-                        data-testid={`button-edit-service-${service.id}`}
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handlePriceEdit(service.id, service.price.toString())}
-                        disabled={isReadOnly}
-                        className="h-8 px-3 border-purple-300 text-purple-600 hover:bg-purple-50"
-                      >
-                        <Edit className="h-3 w-3 mr-1" />
-                        {language === 'ar' ? 'تعديل' : 'Edit'}
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Services Table - Now using unified DataTable component! 🎉 */}
+      <DataTable
+        data={paginatedServices}
+        columns={serviceColumns}
+        actions={serviceActions}
+        isLoading={isLoading}
+        loadingText={{ ar: 'جاري التحميل...', en: 'Loading...' }}
+        emptyStateText={{ 
+          ar: filterText ? 'لا توجد خدمات مطابقة لبحثك' : 'لا توجد خدمات حتى الآن', 
+          en: filterText ? 'No services match your search' : 'No services found'
+        }}
+        emptySearchText={{ ar: 'جرب مصطلحات بحث مختلفة', en: 'Try different search terms' }}
+        showEmptySearch={!!filterText}
+        verticalSeparators={true}
+        hover={true}
+        responsive={true}
+        className="bg-white"
+        rowTestId="service-row"
+      />
 
       {/* Pagination Controls */}
       <PaginationControls
