@@ -893,7 +893,7 @@ export type InsertCreditNote = z.infer<typeof insertCreditNoteSchema>;
 // Outgoing Payments table (for expenses, supplier payments, etc.)
 export const outgoingPayments = pgTable("outgoing_payments", {
   id: serial("id").primaryKey(),
-  outgoingPaymentId: varchar("outgoing_payment_id", { length: 50 }).notNull(), // OPN9000001 format
+  docnum: varchar("docnum", { length: 50 }).notNull(), // OPN9000001 format
   businessPartnerType: varchar("business_partner_type", { length: 20 }).notNull(), // "customer" or "supplier"
   businessPartnerId: integer("business_partner_id"), // Reference to customer/supplier ID
   businessPartnerName: varchar("business_partner_name", { length: 255 }),
@@ -914,7 +914,7 @@ export const outgoingPayments = pgTable("outgoing_payments", {
 // Income Payments table (for revenue, customer payments, etc.)
 export const incomePayments = pgTable("income_payments", {
   id: serial("id").primaryKey(),
-  incomePaymentId: varchar("income_payment_id", { length: 50 }).notNull(), // IPN9000001 format
+  docnum: varchar("docnum", { length: 50 }).notNull(), // IPN9000001 format
   businessPartnerType: varchar("business_partner_type", { length: 20 }).notNull(), // "customer" or "supplier"
   businessPartnerId: integer("business_partner_id"), // Reference to customer/supplier ID
   businessPartnerName: varchar("business_partner_name", { length: 255 }),
@@ -933,7 +933,7 @@ export const incomePayments = pgTable("income_payments", {
 });
 
 export const insertOutgoingPaymentSchema = createInsertSchema(outgoingPayments).pick({
-  outgoingPaymentId: true,
+  docnum: true,
   businessPartnerType: true,
   businessPartnerId: true,
   businessPartnerName: true,
@@ -946,7 +946,7 @@ export const insertOutgoingPaymentSchema = createInsertSchema(outgoingPayments).
 });
 
 export const insertIncomePaymentSchema = createInsertSchema(incomePayments).pick({
-  incomePaymentId: true,
+  docnum: true,
   businessPartnerType: true,
   businessPartnerId: true,
   businessPartnerName: true,
