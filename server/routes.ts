@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, insertAdminUserSchema, adminUsers, redZones } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, insertAdminUserSchema, adminUsers, redZones, insertOutgoingPaymentSchema, insertIncomePaymentSchema } from "@shared/schema";
 import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
@@ -3425,6 +3425,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error creating credit note:', error);
       res.status(500).json({ message: 'Failed to create credit note' });
+    }
+  });
+
+  // Admin: Create a new outgoing payment
+  app.post('/api/admin/outgoing-payments', requireAdminAuth, async (req, res) => {
+    try {
+      const paymentData = insertOutgoingPaymentSchema.parse(req.body);
+      
+      // Calculate total amount from payment methods
+      const paymentMethods = paymentData.paymentMethods;
+      const totalAmount = 
+        (paymentMethods.cash.checked ? paymentMethods.cash.amount : 0) +
+        (paymentMethods.card.checked ? paymentMethods.card.amount : 0) +
+        (paymentMethods.bank.checked ? paymentMethods.bank.amount : 0);
+      
+      // Create the payment record
+      const newPayment = await storage.createOutgoingPayment({
+        ...paymentData,
+        totalAmount: totalAmount.toString()
+      });
+      
+      res.status(201).json(newPayment);
+    } catch (error) {
+      console.error('Error creating outgoing payment:', error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Failed to create outgoing payment' });
+    }
+  });
+
+  // Admin: Create a new income payment
+  app.post('/api/admin/income-payments', requireAdminAuth, async (req, res) => {
+    try {
+      const paymentData = insertIncomePaymentSchema.parse(req.body);
+      
+      // Calculate total amount from payment methods
+      const paymentMethods = paymentData.paymentMethods;
+      const totalAmount = 
+        (paymentMethods.cash.checked ? paymentMethods.cash.amount : 0) +
+        (paymentMethods.card.checked ? paymentMethods.card.amount : 0) +
+        (paymentMethods.bank.checked ? paymentMethods.bank.amount : 0);
+      
+      // Create the payment record
+      const newPayment = await storage.createIncomePayment({
+        ...paymentData,
+        totalAmount: totalAmount.toString()
+      });
+      
+      res.status(201).json(newPayment);
+    } catch (error) {
+      console.error('Error creating income payment:', error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({ message: 'Validation error', errors: error.errors });
+      }
+      res.status(500).json({ message: 'Failed to create income payment' });
     }
   });
 
