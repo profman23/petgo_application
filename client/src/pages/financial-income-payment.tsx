@@ -43,11 +43,11 @@ export default function FinancialIncomePayment() {
   // Define table columns for income payments
   const paymentColumns: DataTableColumn[] = [
     {
-      key: 'documentNo',
+      key: 'incomePaymentId',
       label: { ar: 'رقم الدفعة الواردة', en: 'Income Payment No.' },
       render: (payment) => (
         <span className="font-medium text-purple-600">
-          {payment.documentNo}
+          {payment.incomePaymentId}
         </span>
       ),
       className: 'font-medium text-purple-600'
@@ -96,6 +96,7 @@ export default function FinancialIncomePayment() {
     return (
       payment.businessPartnerName?.toLowerCase().includes(searchTerm) ||
       payment.businessPartnerPhone?.toLowerCase().includes(searchTerm) ||
+      payment.incomePaymentId?.toLowerCase().includes(searchTerm) ||
       payment.documentNo?.toLowerCase().includes(searchTerm) ||
       payment.postingDate?.toLowerCase().includes(searchTerm)
     );
