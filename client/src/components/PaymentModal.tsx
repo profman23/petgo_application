@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { format, addDays, subDays } from "date-fns";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, Search, User } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -72,6 +73,47 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     card: { checked: false, amount: 0 },
     bank: { checked: false, amount: 0 }
   });
+  
+  // Customer ID search state
+  const [customerSearchQuery, setCustomerSearchQuery] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [showCustomerResults, setShowCustomerResults] = useState(false);
+
+  // Search customers query - only search when we have a search query
+  const { data: searchResults = [], isLoading: isSearching } = useQuery({
+    queryKey: ['/api/admin/customers/search', customerSearchQuery],
+    queryFn: async () => {
+      if (!customerSearchQuery.trim()) return [];
+      const response = await fetch(`/api/admin/customers/search?q=${encodeURIComponent(customerSearchQuery)}`);
+      if (!response.ok) throw new Error('Failed to search customers');
+      return response.json();
+    },
+    enabled: customerSearchQuery.length >= 2, // Only search when we have at least 2 characters
+    staleTime: 30000, // Cache for 30 seconds
+  });
+
+  // Handle customer selection
+  const handleCustomerSelect = (customer: any) => {
+    setSelectedCustomer(customer);
+    setCustomerSearchQuery(`${customer.firstName} ${customer.lastName} (ID: ${customer.id})`);
+    setCustomerName(`${customer.firstName} ${customer.lastName}`);
+    setCustomerPhone(customer.phone || '');
+    setShowCustomerResults(false);
+  };
+
+  // Handle customer search input changes
+  const handleCustomerSearchChange = (value: string) => {
+    setCustomerSearchQuery(value);
+    setShowCustomerResults(value.length >= 2);
+    // Clear selection if user starts typing again
+    if (selectedCustomer && value !== `${selectedCustomer.firstName} ${selectedCustomer.lastName} (ID: ${selectedCustomer.id})`) {
+      setSelectedCustomer(null);
+      setCustomerName('');
+      setCustomerPhone('');
+    }
+  };
 
   const handlePaymentMethodChange = (method: string, field: 'checked' | 'amount', value: boolean | number) => {
     setPaymentMethods(prev => ({
@@ -181,6 +223,71 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
 
               {/* Customer/Supplier Details Section - New Layout */}
               <div className="space-y-4">
+                {/* Row 0: Customer ID Search Field */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Left: Customer ID Search */}
+                  <div className={`flex items-center gap-3 relative ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                      {businessPartnerType === 'supplier' 
+                        ? (language === 'ar' ? 'معرف المورد:' : 'Supplier ID:') 
+                        : (language === 'ar' ? 'معرف العميل:' : 'Customer ID:')}
+                    </label>
+                    <div className="relative w-[170px]">
+                      <input 
+                        type="text" 
+                        className="w-full px-2 input-compact-20 border border-gray-300 pr-8"
+                        value={customerSearchQuery}
+                        onChange={(e) => handleCustomerSearchChange(e.target.value)}
+                        placeholder={businessPartnerType === 'supplier' 
+                          ? (language === 'ar' ? 'ابحث عن مورد...' : 'Search supplier...') 
+                          : (language === 'ar' ? 'ابحث عن عميل...' : 'Search customer...')}
+                        data-testid="input-customer-search"
+                        onFocus={() => customerSearchQuery.length >= 2 && setShowCustomerResults(true)}
+                      />
+                      <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      
+                      {/* Search Results Dropdown */}
+                      {showCustomerResults && customerSearchQuery.length >= 2 && (
+                        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                          {isSearching ? (
+                            <div className="p-3 text-center text-gray-500">
+                              {language === 'ar' ? 'جاري البحث...' : 'Searching...'}
+                            </div>
+                          ) : searchResults.length > 0 ? (
+                            searchResults.map((customer: any) => (
+                              <div
+                                key={customer.id}
+                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                onClick={() => handleCustomerSelect(customer)}
+                                data-testid={`customer-result-${customer.id}`}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <User className="h-4 w-4 text-gray-500" />
+                                  <div>
+                                    <div className="text-sm font-medium text-gray-900">
+                                      {customer.firstName} {customer.lastName}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                      ID: {customer.id} • {customer.phone || 'No phone'}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-3 text-center text-gray-500">
+                              {language === 'ar' ? 'لا توجد نتائج' : 'No results found'}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Right: Empty space to maintain layout balance */}
+                  <div></div>
+                </div>
+                
                 {/* Row 1: Customer Phone ↔ Payment No */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Left: Customer Phone */}
@@ -193,6 +300,8 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     <input 
                       type="text" 
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                      value={customerPhone}
+                      onChange={(e) => setCustomerPhone(e.target.value)}
                       data-testid="input-partner-phone"
                       placeholder={businessPartnerType === 'supplier' 
                         ? (language === 'ar' ? 'أدخل هاتف المورد' : 'Enter supplier phone') 
@@ -228,6 +337,8 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     <input 
                       type="text" 
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                      value={customerName}
+                      onChange={(e) => setCustomerName(e.target.value)}
                       data-testid="input-partner-name"
                       placeholder={businessPartnerType === 'supplier' 
                         ? (language === 'ar' ? 'أدخل اسم المورد' : 'Enter supplier name') 

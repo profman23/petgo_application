@@ -5635,6 +5635,68 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
     }
   });
 
+  // Customer Search API - Optimized for PaymentModal component
+  app.get('/api/admin/customers/search', requireAuth, async (req, res) => {
+    try {
+      const { q } = req.query;
+      
+      if (!q || typeof q !== 'string' || q.trim().length < 2) {
+        return res.json([]);
+      }
+      
+      console.log('🔍 Searching customers for PaymentModal with query:', q);
+      
+      const searchTerm = `%${q.trim().toLowerCase()}%`;
+      
+      // Search in Users table with optimized query for PaymentModal
+      const query = sql`
+        SELECT DISTINCT
+          u.id,
+          u.name,
+          u.phone,
+          u.email
+        FROM users u
+        WHERE (
+          LOWER(u.name) LIKE ${searchTerm} OR
+          LOWER(COALESCE(u.phone, '')) LIKE ${searchTerm} OR
+          LOWER(COALESCE(u.email, '')) LIKE ${searchTerm} OR
+          CAST(u.id AS TEXT) LIKE ${searchTerm}
+        )
+        ORDER BY u.name ASC
+        LIMIT 10
+      `;
+      
+      const result = await db.execute(query);
+      const customers = result.rows.map((row: any) => {
+        // Parse name into first and last name for PaymentModal compatibility
+        const fullName = row.name || '';
+        const nameParts = fullName.trim().split(' ');
+        const firstName = nameParts[0] || '';
+        const lastName = nameParts.slice(1).join(' ') || '';
+        
+        return {
+          id: row.id,
+          firstName: firstName,
+          lastName: lastName,
+          phone: row.phone || '',
+          email: row.email || ''
+        };
+      });
+      
+      console.log(`✅ Found ${customers.length} customers matching search query`);
+      
+      res.json(customers);
+      
+    } catch (error: any) {
+      console.error('❌ Customer search error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to search customers',
+        error: error.message
+      });
+    }
+  });
+
   // Register public payment routes
   addPublicPaymentRoutes(app);
 
