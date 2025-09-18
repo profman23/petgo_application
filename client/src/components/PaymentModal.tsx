@@ -389,17 +389,26 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     // Normalize posting date one more time
     const normalizedDate = normalizePostingDate(postingDate);
     
+    // Calculate total amount from payment methods
+    const cashAmount = paymentMethods.cash.checked ? paymentMethods.cash.amount : 0;
+    const cardAmount = paymentMethods.card.checked ? paymentMethods.card.amount : 0;
+    const bankAmount = paymentMethods.bank.checked ? paymentMethods.bank.amount : 0;
+    const totalAmount = cashAmount + cardAmount + bankAmount;
+    
     // Prepare payment data for the API
     const paymentData = {
-      customerName: customerName || customerSearchQuery,
-      customerPhone,
+      businessPartnerType,
+      businessPartnerId: selectedCustomer?.id,
+      businessPartnerName: customerName || customerSearchQuery,
+      businessPartnerPhone: customerPhone,
       postingDate: normalizedDate,
-      documentNo,
-      transactionType,
+      transactionType: variant === 'outgoing' ? 'outgoing' : 'income',
+      documentNo: paymentNo || `${variant.toUpperCase()}-${Date.now()}`,
       paymentMethods,
-      paymentNumber: paymentNo || `${variant.toUpperCase()}-${Date.now()}`,
-      businessPartnerType
+      totalAmount: totalAmount.toFixed(2) // Convert to string with 2 decimal places
     };
+    
+    console.log('Payment data to send:', paymentData);
     
     // Call the appropriate mutation based on variant
     if (variant === 'outgoing') {
