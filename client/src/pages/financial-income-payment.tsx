@@ -6,6 +6,9 @@ import { useToast } from "@/hooks/use-toast";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { PaymentModal } from "@/components/PaymentModal";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
+import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -20,14 +23,84 @@ export default function FinancialIncomePayment() {
   const [location, setLocation] = useLocation();
   const { language } = useTranslation();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
-  // Search functionality state
+  // Search and pagination state
   const [searchInput, setSearchInput] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   // Lord-icon animation trigger state
   const [triggerAnimation, setTriggerAnimation] = useState("hover");
+
+  // Fetch income payments data
+  const { data: incomePayments = [], isLoading } = useQuery({
+    queryKey: ['/api/admin/income-payments'],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Define table columns for income payments
+  const paymentColumns: DataTableColumn[] = [
+    {
+      key: 'documentNo',
+      label: { ar: 'رقم الدفعة الواردة', en: 'Income Payment No.' },
+      render: (payment) => (
+        <span className="font-medium text-purple-600">
+          {payment.documentNo}
+        </span>
+      ),
+      className: 'font-medium text-purple-600'
+    },
+    {
+      key: 'businessPartnerId',
+      label: { ar: 'معرف العميل', en: 'Customer ID' },
+      render: (payment) => payment.businessPartnerId || '-',
+      className: 'text-gray-900'
+    },
+    {
+      key: 'businessPartnerName',
+      label: { ar: 'اسم العميل', en: 'Customer Name' },
+      render: (payment) => payment.businessPartnerName || '-',
+      className: 'text-gray-900'
+    },
+    {
+      key: 'businessPartnerPhone',
+      label: { ar: 'رقم الهاتف', en: 'Customer Phone' },
+      render: (payment) => payment.businessPartnerPhone || '-',
+      className: 'text-gray-500'
+    },
+    {
+      key: 'totalAmount',
+      label: { ar: 'المبلغ الإجمالي', en: 'Total Amount' },
+      render: (payment) => `${payment.totalAmount} SAR`,
+      className: 'text-gray-900 font-medium'
+    }
+  ];
+
+  // Define table actions (currently empty as requested)
+  const paymentActions: DataTableAction[] = [
+    // Empty for now as specified by user
+  ];
+
+  // Filter payments based on search input
+  const filteredPayments = incomePayments.filter((payment: any) => {
+    if (!searchInput.trim()) return true;
+    const searchTerm = searchInput.toLowerCase();
+    return (
+      payment.businessPartnerName?.toLowerCase().includes(searchTerm) ||
+      payment.businessPartnerPhone?.toLowerCase().includes(searchTerm) ||
+      payment.documentNo?.toLowerCase().includes(searchTerm) ||
+      payment.postingDate?.toLowerCase().includes(searchTerm)
+    );
+  });
+
+  // Pagination logic
+  const totalItems = filteredPayments.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedPayments = filteredPayments.slice(startIndex, startIndex + itemsPerPage);
 
   // Effect to trigger lord-icon animation every 1.5 minutes
   useEffect(() => {
@@ -115,11 +188,41 @@ export default function FinancialIncomePayment() {
           />
         </div>
 
-        {/* Payments Table Placeholder */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-gray-500">
-            {language === 'ar' ? 'سيتم عرض جدول المدفوعات الواردة هنا' : 'Income payments table will be displayed here'}
-          </p>
+        {/* Income Payments Data Table */}
+        <div className="bg-white rounded-lg shadow">
+          <DataTable
+            data={paginatedPayments}
+            columns={paymentColumns}
+            actions={paymentActions}
+            isLoading={isLoading}
+            loadingText={{ ar: 'جاري التحميل...', en: 'Loading...' }}
+            emptyStateText={{ 
+              ar: searchInput.trim() ? 'لا توجد نتائج مطابقة لبحثك' : 'لا توجد مدفوعات واردة حتى الآن', 
+              en: searchInput.trim() ? 'No income payments match your search' : 'No income payments found'
+            }}
+            emptySearchText={{ ar: 'جرب مصطلحات بحث مختلفة', en: 'Try different search terms' }}
+            verticalSeparators={true}
+            showEmptySearch={searchInput.trim().length > 0}
+            hover={true}
+            responsive={true}
+            className="bg-white rounded-lg shadow"
+            rowTestId="income-payment-row"
+          />
+          
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-200">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={totalPages}
+                itemsPerPage={itemsPerPage}
+                totalItems={totalItems}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+                language={language}
+              />
+            </div>
+          )}
         </div>
 
         </div>
