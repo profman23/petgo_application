@@ -31,10 +31,13 @@ interface CreditNote {
 
 interface Payment {
   id: number | string;
-  amount: string | number;
-  paymentType: string;
+  amount?: string | number;
+  totalAmount?: string | number;
+  paymentType?: string;
+  docnum?: string;
   description?: string;
-  createdAt: string;
+  createdAt?: string;
+  postingDate?: string;
 }
 
 interface InvoiceMapModalProps {
@@ -329,14 +332,11 @@ export function InvoiceMapModal({
                   {/* Content Section */}
                   <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
                     <div className="text-base font-bold text-green-600 mb-1">
-                      +{parseFloat(payment.amount.toString()).toFixed(2)} SAR
+                      +{parseFloat((payment.amount || payment.totalAmount || '0').toString()).toFixed(2)} SAR
                     </div>
                     <div className="text-sm text-gray-600 mb-1">
-                      {language === 'ar' ? 'طريقة الدفع: ' : 'Method: '}
-                      {payment.paymentType === 'cash' ? (language === 'ar' ? 'نقدي' : 'Cash') : 
-                       payment.paymentType === 'card' ? (language === 'ar' ? 'كارت' : 'Card') : 
-                       payment.paymentType === 'transfer' ? (language === 'ar' ? 'تحويل' : 'Transfer') : 
-                       payment.paymentType}
+                      {language === 'ar' ? 'رقم المستند: ' : 'DocNum: '}
+                      {payment.docnum || payment.paymentType || '-'}
                     </div>
                     {payment.description && (
                       <div className="text-xs text-gray-500 mb-2">
@@ -345,7 +345,7 @@ export function InvoiceMapModal({
                     )}
                     <div className="text-xs text-gray-500">
                       {language === 'ar' ? 'التاريخ: ' : 'Date: '}
-                      {new Date(payment.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                      {new Date(payment.createdAt || payment.postingDate || new Date()).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                     </div>
                   </div>
                 </div>

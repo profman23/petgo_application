@@ -1,0 +1,32 @@
+Uncaught TypeError: Cannot read properties of undefined (reading 'toString')
+    at InvoiceMapModal.tsx:332:51
+    at Array.map (<anonymous>)
+    at InvoiceMapModal (InvoiceMapModal.tsx:302:23)
+    at renderWithHooks (chunk-276SZO74.js?v=0180dd53:11548:26)
+    at updateFunctionComponent (chunk-276SZO74.js?v=0180dd53:14582:28)
+    at beginWork (chunk-276SZO74.js?v=0180dd53:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-276SZO74.js?v=0180dd53:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-276SZO74.js?v=0180dd53:3699:24)
+    at invokeGuardedCallback (chunk-276SZO74.js?v=0180dd53:3733:39)
+    at beginWork$1 (chunk-276SZO74.js?v=0180dd53:19765:15)Understand this error
+chunk-276SZO74.js?v=0180dd53:14032 The above error occurred in the <InvoiceMapModal> component:
+
+    at InvoiceMapModal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/InvoiceMapModal.tsx:24:3)
+    at div
+    at div
+    at div
+    at div
+    at AdminLayoutContent (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/AdminLayout.tsx:29:31)
+    at SidebarStateProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/sidebar-state.tsx:23:40)
+    at AdminLayout (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/AdminLayout.tsx:285:31)
+    at FinancialOutgoingPayment (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/financial-outgoing-payment.tsx:32:35)
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=0180dd53:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=0180dd53:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=A-pJ-kw6Yx8n2AnyKvhZm:222:22)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=0180dd53:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=A-pJ-kw6Yx8n2AnyKvhZm:548:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
