@@ -403,10 +403,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     
     // Prepare payment data for the API
     const paymentData = {
-      ...(variant === 'outgoing' 
-        ? { outgoingPaymentId: currentConfig.paymentNo } 
-        : { incomePaymentId: currentConfig.paymentNo }
-      ),
+      docnum: currentConfig.paymentNo,
       businessPartnerType,
       businessPartnerId: selectedCustomer?.id,
       businessPartnerName: customerName || customerSearchQuery,

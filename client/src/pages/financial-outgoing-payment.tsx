@@ -43,11 +43,11 @@ export default function FinancialOutgoingPayment() {
   // Define table columns for outgoing payments
   const paymentColumns: DataTableColumn[] = [
     {
-      key: 'outgoingPaymentId',
+      key: 'docnum',
       label: { ar: 'رقم المستند', en: 'DocNum' },
       render: (payment) => (
         <span className="font-medium text-purple-600">
-          {payment.outgoingPaymentId}
+          {payment.docnum}
         </span>
       ),
       className: 'font-medium text-purple-600'
@@ -96,7 +96,7 @@ export default function FinancialOutgoingPayment() {
     return (
       payment.businessPartnerName?.toLowerCase().includes(searchTerm) ||
       payment.businessPartnerPhone?.toLowerCase().includes(searchTerm) ||
-      payment.outgoingPaymentId?.toLowerCase().includes(searchTerm) ||
+      payment.docnum?.toLowerCase().includes(searchTerm) ||
       payment.documentNo?.toLowerCase().includes(searchTerm) ||
       payment.postingDate?.toLowerCase().includes(searchTerm)
     );
