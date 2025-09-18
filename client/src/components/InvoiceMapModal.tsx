@@ -131,7 +131,7 @@ export function InvoiceMapModal({
               ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
               : modalType === 'outgoing'
               ? (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')
-              : (language === 'ar' ? 'خريطة مذكرة الائتمان' : 'Credit Note Map')}
+              : (language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map')}
           </DialogTitle>
           <DialogDescription>
             {modalType === 'income'
@@ -158,13 +158,9 @@ export function InvoiceMapModal({
                   ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
                   : modalType === 'outgoing'
                   ? (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')
-                  : (language === 'ar' ? 'خريطة مذكرة الائتمان' : 'Credit Note Map')}
+                  : (language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map')}
               </h2>
-              {modalType === 'creditnote' && creditNotes.length > 0 ? (
-                <span className="text-sm text-gray-600">
-                  CRN{creditNotes[0].creditNoteNumber}
-                </span>
-              ) : invoice && (
+              {invoice && (
                 <span className="text-sm text-gray-600">
                   {invoice.invoiceNumber}
                 </span>
