@@ -35,6 +35,14 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
       const defaultDate = format(new Date(), 'yyyy-MM-dd');
       setPostingDate(defaultDate);
       
+      // Reset validation states when opening
+      setValidationErrors({
+        customerId: false,
+        postingDate: false,
+        paymentMethod: false
+      });
+      setShowValidationErrors(false);
+      
       // Set initial state with the default date to avoid race condition
       initialStateRef.current = {
         businessPartnerType,
@@ -54,8 +62,8 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     wasOpenRef.current = isOpen;
   }, [isOpen]);
   
-  // Handle posting date changes and shortcuts
-  const handlePostingDateChange = (value: string) => {
+  // Normalize posting date shortcuts to actual dates
+  const normalizePostingDate = useCallback((value: string) => {
     // Check for shortcut patterns like +3, -2, etc.
     const shortcutMatch = value.match(/^([+-])(\d+)$/);
     
@@ -66,10 +74,30 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
         ? addDays(today, parseInt(days))
         : subDays(today, parseInt(days));
       
-      setPostingDate(format(targetDate, 'yyyy-MM-dd'));
-    } else {
-      // Allow clearing and regular date input
-      setPostingDate(value);
+      return format(targetDate, 'yyyy-MM-dd');
+    }
+    
+    return value;
+  }, []);
+  
+  // Handle posting date changes and shortcuts
+  const handlePostingDateChange = (value: string) => {
+    setPostingDate(value);
+    
+    // Real-time validation when errors are being shown
+    if (showValidationErrors) {
+      setValidationErrors(prev => ({
+        ...prev,
+        postingDate: !value.trim()
+      }));
+    }
+  };
+  
+  // Handle posting date blur to normalize shortcuts
+  const handlePostingDateBlur = () => {
+    const normalizedDate = normalizePostingDate(postingDate);
+    if (normalizedDate !== postingDate) {
+      setPostingDate(normalizedDate);
     }
   };
   
@@ -114,6 +142,24 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   
   // Track modal open state to initialize only once per open
   const wasOpenRef = useRef(false);
+  
+  // Mandatory field validation states
+  const [validationErrors, setValidationErrors] = useState({
+    customerId: false,
+    postingDate: false,
+    paymentMethod: false
+  });
+  const [showValidationErrors, setShowValidationErrors] = useState(false);
+  
+  // Re-evaluate validation errors when businessPartnerType changes
+  useEffect(() => {
+    if (showValidationErrors) {
+      setValidationErrors(prev => ({
+        ...prev,
+        customerId: businessPartnerType === 'customer' ? !customerSearchQuery.trim() : false
+      }));
+    }
+  }, [businessPartnerType, customerSearchQuery, showValidationErrors]);
   
   // Capture initial state when modal opens
   const initialStateRef = useRef({
@@ -195,6 +241,95 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   }, [businessPartnerType, customerSearchQuery, customerPhone, customerName, postingDate, transactionType, documentNo, paymentMethods]);
 
   // Handle exit with unsaved changes check
+  
+  // Real-time validation for customer search
+  const handleCustomerSearchChangeWithValidation = (value: string) => {
+    handleCustomerSearchChange(value);
+    
+    // Real-time validation when errors are being shown
+    if (showValidationErrors && businessPartnerType === 'customer') {
+      setValidationErrors(prev => ({
+        ...prev,
+        customerId: !value.trim()
+      }));
+    }
+  };
+  
+  // Real-time validation for payment methods
+  const handlePaymentMethodChangeWithValidation = (method: 'cash' | 'card' | 'bank', field: 'checked' | 'amount', value: boolean | number) => {
+    handlePaymentMethodChange(method, field, value);
+    
+    // Real-time validation when errors are being shown
+    if (showValidationErrors) {
+      // Get updated payment methods state
+      const updatedMethods = {
+        ...paymentMethods,
+        [method]: {
+          ...paymentMethods[method],
+          [field]: value
+        }
+      };
+      
+      const hasValidPaymentMethod = 
+        (updatedMethods.cash.checked && updatedMethods.cash.amount > 0) ||
+        (updatedMethods.card.checked && updatedMethods.card.amount > 0) ||
+        (updatedMethods.bank.checked && updatedMethods.bank.amount > 0);
+      
+      setValidationErrors(prev => ({
+        ...prev,
+        paymentMethod: !hasValidPaymentMethod
+      }));
+    }
+  };
+  
+  // Handle Save button click
+  const handleSave = useCallback(() => {
+    // Normalize posting date before validation
+    const normalizedDate = normalizePostingDate(postingDate);
+    if (normalizedDate !== postingDate) {
+      setPostingDate(normalizedDate);
+    }
+    
+    setShowValidationErrors(true);
+    
+    // Update validation state to use normalized date and run validation
+    const tempValidationState = {
+      businessPartnerType,
+      customerSearchQuery,
+      postingDate: normalizedDate,
+      paymentMethods
+    };
+    
+    const errors = {
+      customerId: tempValidationState.businessPartnerType === 'customer' ? !tempValidationState.customerSearchQuery.trim() : false,
+      postingDate: !tempValidationState.postingDate.trim(),
+      paymentMethod: !(
+        (tempValidationState.paymentMethods.cash.checked && tempValidationState.paymentMethods.cash.amount > 0) ||
+        (tempValidationState.paymentMethods.card.checked && tempValidationState.paymentMethods.card.amount > 0) ||
+        (tempValidationState.paymentMethods.bank.checked && tempValidationState.paymentMethods.bank.amount > 0)
+      )
+    };
+    
+    setValidationErrors(errors);
+    
+    if (!Object.values(errors).some(hasError => hasError)) {
+      // TODO: Implement actual save logic here
+      console.log('Save payment:', {
+        businessPartnerType,
+        customerSearchQuery,
+        customerPhone,
+        customerName,
+        postingDate: normalizedDate,
+        transactionType,
+        documentNo,
+        paymentMethods
+      });
+      
+      // Close modal after successful save
+      onOpenChange(false);
+    }
+  }, [normalizePostingDate, postingDate, businessPartnerType, customerSearchQuery, customerPhone, customerName, transactionType, documentNo, paymentMethods, onOpenChange]);
+  
   const handleExit = useCallback((exitCallback: () => void) => {
     if (hasUnsavedChanges()) {
       setPendingExit(() => exitCallback);
@@ -403,9 +538,13 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     <div className="relative w-[170px]">
                       <input 
                         type="text" 
-                        className="w-full px-2 input-compact-20 border border-gray-300 pr-8"
+                        className={`w-full px-2 input-compact-20 border pr-8 ${
+                          showValidationErrors && validationErrors.customerId 
+                            ? 'border-red-500 bg-red-50' 
+                            : 'border-gray-300'
+                        }`}
                         value={customerSearchQuery}
-                        onChange={(e) => handleCustomerSearchChange(e.target.value)}
+                        onChange={(e) => handleCustomerSearchChangeWithValidation(e.target.value)}
                         placeholder={businessPartnerType === 'supplier' 
                           ? (language === 'ar' ? 'معرف المورد' : 'Supplier ID') 
                           : (language === 'ar' ? 'ابحث عن عميل...' : 'Search customer...')}
@@ -457,6 +596,16 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                               {language === 'ar' ? 'لا توجد نتائج' : 'No results found'}
                             </div>
                           )}
+                        </div>
+                      )}
+                      
+                      {/* Customer/Supplier ID Error Message */}
+                      {showValidationErrors && validationErrors.customerId && (
+                        <div className="absolute top-full left-0 mt-1 text-xs text-red-600" data-testid="error-customer-id">
+                          {businessPartnerType === 'supplier' 
+                            ? (language === 'ar' ? 'معرف المورد مطلوب' : 'Supplier ID is required')
+                            : (language === 'ar' ? 'معرف العميل مطلوب' : 'Customer ID is required')
+                          }
                         </div>
                       )}
                     </div>
@@ -535,16 +684,30 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                       {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
                     </label>
-                    <input 
-                      type="text" 
-                      className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                      value={postingDate}
-                      onChange={(e) => handlePostingDateChange(e.target.value)}
-                      onKeyDown={handlePostingDateKeyDown}
-                      placeholder={language === 'ar' ? 'تاريخ أو +3، -2' : 'Date or +3, -2'}
-                      data-testid="input-posting-date"
-                      style={{ marginLeft: '29px' }}
-                    />
+                    <div className="relative">
+                      <input 
+                        type="text" 
+                        className={`w-[170px] px-2 input-compact-20 border ${
+                          showValidationErrors && validationErrors.postingDate 
+                            ? 'border-red-500 bg-red-50' 
+                            : 'border-gray-300'
+                        }`}
+                        value={postingDate}
+                        onChange={(e) => handlePostingDateChange(e.target.value)}
+                        onBlur={handlePostingDateBlur}
+                        onKeyDown={handlePostingDateKeyDown}
+                        placeholder={language === 'ar' ? 'تاريخ أو +3، -2' : 'Date or +3, -2'}
+                        data-testid="input-posting-date"
+                        style={{ marginLeft: '29px' }}
+                      />
+                      
+                      {/* Posting Date Error Message */}
+                      {showValidationErrors && validationErrors.postingDate && (
+                        <div className="absolute top-full left-0 mt-1 text-xs text-red-600" data-testid="error-posting-date">
+                          {language === 'ar' ? 'تاريخ الترحيل مطلوب' : 'Posting Date is required'}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -598,11 +761,25 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
           {/* Payment Method Section */}
           <div style={{ marginTop: '200px' }}>
             <div dir={getDirection(language)}>
-              <label className="block text-sm font-medium text-gray-700 mb-4" style={{ borderTopWidth: '2px', paddingTop: '10px' }}>
+              <label className={`block text-sm font-medium mb-4 ${
+                showValidationErrors && validationErrors.paymentMethod 
+                  ? 'text-red-600' 
+                  : 'text-gray-700'
+              }`} style={{ borderTopWidth: '2px', paddingTop: '10px' }}>
                 {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
+                {showValidationErrors && validationErrors.paymentMethod && (
+                  <span className="text-red-600 text-xs ml-1">*</span>
+                )}
               </label>
               
               <div className="space-y-4">
+                {/* Payment Method Error Message */}
+                {showValidationErrors && validationErrors.paymentMethod && (
+                  <div className="text-xs text-red-600 mb-2" data-testid="error-payment-method">
+                    {language === 'ar' ? 'يجب تحديد طريقة دفع واحدة على الأقل بمبلغ أكبر من الصفر' : 'At least one payment method must be selected with amount greater than zero'}
+                  </div>
+                )}
+                
                 {/* Cash Option */}
                 <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className="flex items-center min-w-[120px]">
@@ -611,7 +788,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       name="paymentMethod" 
                       value="cash"
                       checked={paymentMethods.cash.checked}
-                      onChange={(e) => handlePaymentMethodChange('cash', 'checked', e.target.checked)}
+                      onChange={(e) => handlePaymentMethodChangeWithValidation('cash', 'checked', e.target.checked)}
                       className="mr-2 text-purple-600 focus:ring-purple-500"
                     />
                     <span className="text-sm text-gray-700">
@@ -630,7 +807,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.cash.amount || ''}
-                      onChange={(e) => handlePaymentMethodChange('cash', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onChange={(e) => handlePaymentMethodChangeWithValidation('cash', 'amount', parseFloat(e.currentTarget.value) || 0)}
                       onKeyDown={disallowNegativeKeys}
                       onInput={sanitizeNonNegative}
                       onPaste={preventNegativePaste}
@@ -647,7 +824,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       name="paymentMethod" 
                       value="card"
                       checked={paymentMethods.card.checked}
-                      onChange={(e) => handlePaymentMethodChange('card', 'checked', e.target.checked)}
+                      onChange={(e) => handlePaymentMethodChangeWithValidation('card', 'checked', e.target.checked)}
                       className="mr-2 text-purple-600 focus:ring-purple-500"
                     />
                     <span className="text-sm text-gray-700">
@@ -666,7 +843,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.card.amount || ''}
-                      onChange={(e) => handlePaymentMethodChange('card', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onChange={(e) => handlePaymentMethodChangeWithValidation('card', 'amount', parseFloat(e.currentTarget.value) || 0)}
                       onKeyDown={disallowNegativeKeys}
                       onInput={sanitizeNonNegative}
                       onPaste={preventNegativePaste}
@@ -683,7 +860,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       name="paymentMethod" 
                       value="bank"
                       checked={paymentMethods.bank.checked}
-                      onChange={(e) => handlePaymentMethodChange('bank', 'checked', e.target.checked)}
+                      onChange={(e) => handlePaymentMethodChangeWithValidation('bank', 'checked', e.target.checked)}
                       className="mr-2 text-purple-600 focus:ring-purple-500"
                     />
                     <span className="text-sm text-gray-700">
@@ -702,7 +879,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.bank.amount || ''}
-                      onChange={(e) => handlePaymentMethodChange('bank', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onChange={(e) => handlePaymentMethodChangeWithValidation('bank', 'amount', parseFloat(e.currentTarget.value) || 0)}
                       onKeyDown={disallowNegativeKeys}
                       onInput={sanitizeNonNegative}
                       onPaste={preventNegativePaste}
@@ -766,7 +943,9 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                 {language === 'ar' ? 'إلغاء' : 'Cancel'}
               </button>
               <button
+                onClick={handleSave}
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+                data-testid="button-save"
               >
                 {currentConfig.createButton}
               </button>
