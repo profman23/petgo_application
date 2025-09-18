@@ -5,7 +5,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ArrowUpRight, ArrowDownLeft, Search, User } from "lucide-react";
 import { ConfirmExitDialog } from "@/components/ui/confirm-exit-dialog";
 import { ConfirmSaveDialog } from "@/components/ui/confirm-save-dialog";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 // Customer interface for search results
 interface Customer {
@@ -32,6 +34,57 @@ interface PaymentModalProps {
 
 export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: PaymentModalProps) {
   const { language } = useTranslation();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
+  // Payment mutations
+  const outgoingPaymentMutation = useMutation({
+    mutationFn: async (paymentData: any) => {
+      return apiRequest('/api/admin/outgoing-payments', {
+        method: 'POST',
+        body: JSON.stringify(paymentData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: language === 'ar' ? "تم الحفظ بنجاح" : "Saved Successfully",
+        description: language === 'ar' ? "تم حفظ الدفعة الصادرة" : "Outgoing payment saved",
+      });
+      onOpenChange(false);
+    },
+    onError: (error: any) => {
+      console.error('Error saving outgoing payment:', error);
+      toast({
+        title: language === 'ar' ? "خطأ في الحفظ" : "Save Error",
+        description: language === 'ar' ? "فشل في حفظ الدفعة الصادرة" : "Failed to save outgoing payment",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const incomePaymentMutation = useMutation({
+    mutationFn: async (paymentData: any) => {
+      return apiRequest('/api/admin/income-payments', {
+        method: 'POST',
+        body: JSON.stringify(paymentData),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: language === 'ar' ? "تم الحفظ بنجاح" : "Saved Successfully",
+        description: language === 'ar' ? "تم حفظ الدفعة الواردة" : "Income payment saved",
+      });
+      onOpenChange(false);
+    },
+    onError: (error: any) => {
+      console.error('Error saving income payment:', error);
+      toast({
+        title: language === 'ar' ? "خطأ في الحفظ" : "Save Error",
+        description: language === 'ar' ? "فشل في حفظ الدفعة الواردة" : "Failed to save income payment",
+        variant: "destructive",
+      });
+    }
+  });
   
   // Posting Date state
   const [postingDate, setPostingDate] = useState('');
@@ -336,21 +389,25 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     // Normalize posting date one more time
     const normalizedDate = normalizePostingDate(postingDate);
     
-    // TODO: Implement actual save logic here
-    console.log('Save payment:', {
-      businessPartnerType,
-      customerSearchQuery,
+    // Prepare payment data for the API
+    const paymentData = {
+      customerName: customerName || customerSearchQuery,
       customerPhone,
-      customerName,
       postingDate: normalizedDate,
-      transactionType,
       documentNo,
-      paymentMethods
-    });
+      transactionType,
+      paymentMethods,
+      paymentNumber: paymentNo || `${variant.toUpperCase()}-${Date.now()}`,
+      businessPartnerType
+    };
     
-    // Close modal after successful save
-    onOpenChange(false);
-  }, [normalizePostingDate, postingDate, businessPartnerType, customerSearchQuery, customerPhone, customerName, transactionType, documentNo, paymentMethods, onOpenChange]);
+    // Call the appropriate mutation based on variant
+    if (variant === 'outgoing') {
+      outgoingPaymentMutation.mutate(paymentData);
+    } else {
+      incomePaymentMutation.mutate(paymentData);
+    }
+  }, [normalizePostingDate, postingDate, businessPartnerType, customerSearchQuery, customerPhone, customerName, transactionType, documentNo, paymentMethods, paymentNo, variant, outgoingPaymentMutation, incomePaymentMutation]);
   
   // Cancel save
   const cancelSave = useCallback(() => {
