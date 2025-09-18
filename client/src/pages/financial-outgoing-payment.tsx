@@ -9,6 +9,7 @@ import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 import { useQuery } from "@tanstack/react-query";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { InvoiceMapModal } from "@/components/InvoiceMapModal";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -30,6 +31,12 @@ export default function FinancialOutgoingPayment() {
   const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Map modal state
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [selectedPaymentForMap, setSelectedPaymentForMap] = useState<any>(null);
+  const [invoicesForMap, setInvoicesForMap] = useState<any[]>([]);
+  const [creditNotesForMap, setCreditNotesForMap] = useState<any[]>([]);
   
   // Lord-icon animation trigger state
   const [triggerAnimation, setTriggerAnimation] = useState("hover");
@@ -84,9 +91,13 @@ export default function FinancialOutgoingPayment() {
     }
   ];
 
-  // Define table actions (currently empty as requested)
+  // Define table actions
   const paymentActions: DataTableAction[] = [
-    // Empty for now as specified by user
+    {
+      label: { ar: 'خريطة', en: 'Map' },
+      onClick: (payment) => handleMapClick(payment),
+      className: 'text-green-600 hover:text-green-900 transition-colors duration-200'
+    }
   ];
 
   // Filter payments based on search input
@@ -143,6 +154,37 @@ export default function FinancialOutgoingPayment() {
       title: language === 'ar' ? 'تصدير' : 'Export',
       description: language === 'ar' ? 'سيتم تنفيذ وظيفة التصدير قريباً' : 'Export functionality will be implemented soon',
     });
+  };
+
+  // Handle opening map modal for outgoing payment
+  const handleMapClick = async (payment: any) => {
+    try {
+      const adminToken = localStorage.getItem("adminToken");
+      
+      // For now, create a mock invoice from payment data for the map display
+      const mockInvoice = {
+        invoiceNumber: payment.docnum || 'Outgoing Payment',
+        customerName: payment.businessPartnerName || 'Outgoing Payment',
+        finalTotal: payment.totalAmount,
+        appointmentDate: payment.postingDate
+      };
+      
+      // Set the payment as the main focus and show the map
+      setSelectedPaymentForMap(payment);
+      setInvoicesForMap([mockInvoice]);
+      setCreditNotesForMap([]);
+      setIsMapModalOpen(true);
+    } catch (error) {
+      console.error('Error opening outgoing payment map:', error);
+    }
+  };
+
+  // Handle closing map modal
+  const handleCloseMapModal = () => {
+    setIsMapModalOpen(false);
+    setSelectedPaymentForMap(null);
+    setInvoicesForMap([]);
+    setCreditNotesForMap([]);
   };
 
   // Check admin authentication
@@ -248,6 +290,15 @@ export default function FinancialOutgoingPayment() {
           variant="outgoing"
           isOpen={isCreateModalOpen}
           onOpenChange={setIsCreateModalOpen}
+        />
+
+        {/* Map Modal */}
+        <InvoiceMapModal
+          isOpen={isMapModalOpen}
+          onClose={handleCloseMapModal}
+          invoice={invoicesForMap[0] || null}
+          creditNotes={creditNotesForMap}
+          payments={selectedPaymentForMap ? [selectedPaymentForMap] : []}
         />
       </div>
     </AdminLayout>
