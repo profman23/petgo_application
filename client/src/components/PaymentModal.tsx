@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { format, addDays, subDays } from "date-fns";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -80,38 +80,75 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [showCustomerResults, setShowCustomerResults] = useState(false);
+  const [selectedResultIndex, setSelectedResultIndex] = useState(-1);
 
-  // Search customers query - only search when we have a search query
-  const { data: searchResults = [], isLoading: isSearching } = useQuery({
-    queryKey: ['/api/admin/customers/search', customerSearchQuery],
-    queryFn: async () => {
-      if (!customerSearchQuery.trim()) return [];
-      const response = await fetch(`/api/admin/customers/search?q=${encodeURIComponent(customerSearchQuery)}`);
-      if (!response.ok) throw new Error('Failed to search customers');
-      return response.json();
-    },
-    enabled: customerSearchQuery.length >= 2, // Only search when we have at least 2 characters
+  const [finalSearchQuery, setFinalSearchQuery] = useState('');
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setFinalSearchQuery(customerSearchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [customerSearchQuery]);
+
+  // Search customers query using default fetcher pattern
+  const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery({
+    queryKey: ['/api/admin/customers/search', { q: finalSearchQuery }],
+    enabled: finalSearchQuery.length >= 2, // Only search when we have at least 2 characters
     staleTime: 30000, // Cache for 30 seconds
   });
 
   // Handle customer selection
   const handleCustomerSelect = (customer: any) => {
     setSelectedCustomer(customer);
-    setCustomerSearchQuery(`${customer.firstName} ${customer.lastName} (ID: ${customer.id})`);
-    setCustomerName(`${customer.firstName} ${customer.lastName}`);
+    setCustomerSearchQuery(`${customer.name} (ID: ${customer.id})`);
+    setCustomerName(customer.name);
     setCustomerPhone(customer.phone || '');
     setShowCustomerResults(false);
+    setSelectedResultIndex(-1);
   };
 
   // Handle customer search input changes
   const handleCustomerSearchChange = (value: string) => {
     setCustomerSearchQuery(value);
     setShowCustomerResults(value.length >= 2);
+    setSelectedResultIndex(-1);
     // Clear selection if user starts typing again
-    if (selectedCustomer && value !== `${selectedCustomer.firstName} ${selectedCustomer.lastName} (ID: ${selectedCustomer.id})`) {
+    if (selectedCustomer && value !== `${selectedCustomer.name} (ID: ${selectedCustomer.id})`) {
       setSelectedCustomer(null);
       setCustomerName('');
       setCustomerPhone('');
+    }
+  };
+
+  // Handle keyboard navigation in search results
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (!showCustomerResults || !searchResults.length) return;
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedResultIndex(prev => 
+          prev < searchResults.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedResultIndex(prev => 
+          prev > 0 ? prev - 1 : searchResults.length - 1
+        );
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedResultIndex >= 0 && searchResults[selectedResultIndex]) {
+          handleCustomerSelect(searchResults[selectedResultIndex]);
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowCustomerResults(false);
+        setSelectedResultIndex(-1);
+        break;
     }
   };
 
@@ -243,6 +280,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                           : (language === 'ar' ? 'ابحث عن عميل...' : 'Search customer...')}
                         data-testid="input-customer-search"
                         onFocus={() => customerSearchQuery.length >= 2 && setShowCustomerResults(true)}
+                        onKeyDown={handleSearchKeyDown}
                       />
                       <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       
@@ -253,11 +291,19 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                             <div className="p-3 text-center text-gray-500">
                               {language === 'ar' ? 'جاري البحث...' : 'Searching...'}
                             </div>
+                          ) : searchError ? (
+                            <div className="p-3 text-center text-red-500">
+                              {language === 'ar' ? 'خطأ في البحث' : 'Search error'}
+                            </div>
                           ) : searchResults.length > 0 ? (
-                            searchResults.map((customer: any) => (
+                            searchResults.map((customer: any, index: number) => (
                               <div
                                 key={customer.id}
-                                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                className={`p-2 cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                                  index === selectedResultIndex 
+                                    ? 'bg-blue-50 border-blue-200' 
+                                    : 'hover:bg-gray-100'
+                                }`}
                                 onClick={() => handleCustomerSelect(customer)}
                                 data-testid={`customer-result-${customer.id}`}
                               >
@@ -265,7 +311,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                                   <User className="h-4 w-4 text-gray-500" />
                                   <div>
                                     <div className="text-sm font-medium text-gray-900">
-                                      {customer.firstName} {customer.lastName}
+                                      {customer.name}
                                     </div>
                                     <div className="text-xs text-gray-500">
                                       ID: {customer.id} • {customer.phone || 'No phone'}

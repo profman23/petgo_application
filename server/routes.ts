@@ -5668,16 +5668,9 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
       
       const result = await db.execute(query);
       const customers = result.rows.map((row: any) => {
-        // Parse name into first and last name for PaymentModal compatibility
-        const fullName = row.name || '';
-        const nameParts = fullName.trim().split(' ');
-        const firstName = nameParts[0] || '';
-        const lastName = nameParts.slice(1).join(' ') || '';
-        
         return {
           id: row.id,
-          firstName: firstName,
-          lastName: lastName,
+          name: row.name || '',
           phone: row.phone || '',
           email: row.email || ''
         };
