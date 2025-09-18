@@ -501,6 +501,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     </label>
                     <input 
                       type="number" 
+                      min="0"
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.cash.amount || ''}
@@ -531,6 +532,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     </label>
                     <input 
                       type="number" 
+                      min="0"
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.card.amount || ''}
@@ -561,6 +563,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     </label>
                     <input 
                       type="number" 
+                      min="0"
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.bank.amount || ''}
