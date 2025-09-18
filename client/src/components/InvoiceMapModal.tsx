@@ -39,6 +39,7 @@ interface Payment {
   createdAt?: string;
   postingDate?: string;
   payment_methods?: string | object;
+  paymentMethods?: string | object;
 }
 
 interface InvoiceMapModalProps {
@@ -455,11 +456,12 @@ export function InvoiceMapModal({
                         }
                         
                         // For Income/Outgoing modals, parse payment_methods JSON
-                        if (payment.payment_methods) {
+                        const paymentMethodsData = payment.paymentMethods || payment.payment_methods;
+                        if (paymentMethodsData) {
                           try {
-                            const methods = typeof payment.payment_methods === 'string' 
-                              ? JSON.parse(payment.payment_methods) 
-                              : payment.payment_methods;
+                            const methods = typeof paymentMethodsData === 'string' 
+                              ? JSON.parse(paymentMethodsData) 
+                              : paymentMethodsData;
                             
                             const activePayments = [];
                             if (methods.cash && methods.cash.checked && methods.cash.amount > 0) {
