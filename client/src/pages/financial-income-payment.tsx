@@ -295,6 +295,7 @@ export default function FinancialIncomePayment() {
           invoice={invoicesForMap[0] || null}
           creditNotes={creditNotesForMap}
           payments={selectedPaymentForMap ? [selectedPaymentForMap] : []}
+          modalType="income"
         />
       </div>
     </AdminLayout>
