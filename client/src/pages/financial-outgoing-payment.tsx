@@ -299,6 +299,7 @@ export default function FinancialOutgoingPayment() {
           invoice={invoicesForMap[0] || null}
           creditNotes={creditNotesForMap}
           payments={selectedPaymentForMap ? [selectedPaymentForMap] : []}
+          modalType="outgoing"
         />
       </div>
     </AdminLayout>
