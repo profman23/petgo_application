@@ -889,3 +889,72 @@ export const insertCreditNoteSchema = createInsertSchema(creditNotes).pick({
 
 export type CreditNote = typeof creditNotes.$inferSelect;
 export type InsertCreditNote = z.infer<typeof insertCreditNoteSchema>;
+
+// Outgoing Payments table (for expenses, supplier payments, etc.)
+export const outgoingPayments = pgTable("outgoing_payments", {
+  id: serial("id").primaryKey(),
+  businessPartnerType: varchar("business_partner_type", { length: 20 }).notNull(), // "customer" or "supplier"
+  businessPartnerId: integer("business_partner_id"), // Reference to customer/supplier ID
+  businessPartnerName: varchar("business_partner_name", { length: 255 }),
+  businessPartnerPhone: varchar("business_partner_phone", { length: 20 }),
+  postingDate: text("posting_date").notNull(), // YYYY-MM-DD format
+  transactionType: varchar("transaction_type", { length: 50 }).notNull(), // "outgoing" 
+  documentNo: varchar("document_no", { length: 50 }).notNull(), // OPN9000001 format
+  paymentMethods: jsonb("payment_methods").$type<{
+    cash: { checked: boolean; amount: number };
+    card: { checked: boolean; amount: number };
+    bank: { checked: boolean; amount: number };
+  }>().notNull(),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Income Payments table (for revenue, customer payments, etc.)
+export const incomePayments = pgTable("income_payments", {
+  id: serial("id").primaryKey(),
+  businessPartnerType: varchar("business_partner_type", { length: 20 }).notNull(), // "customer" or "supplier"
+  businessPartnerId: integer("business_partner_id"), // Reference to customer/supplier ID
+  businessPartnerName: varchar("business_partner_name", { length: 255 }),
+  businessPartnerPhone: varchar("business_partner_phone", { length: 20 }),
+  postingDate: text("posting_date").notNull(), // YYYY-MM-DD format
+  transactionType: varchar("transaction_type", { length: 50 }).notNull(), // "income"
+  documentNo: varchar("document_no", { length: 50 }).notNull(), // IPN9000001 format
+  paymentMethods: jsonb("payment_methods").$type<{
+    cash: { checked: boolean; amount: number };
+    card: { checked: boolean; amount: number };
+    bank: { checked: boolean; amount: number };
+  }>().notNull(),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertOutgoingPaymentSchema = createInsertSchema(outgoingPayments).pick({
+  businessPartnerType: true,
+  businessPartnerId: true,
+  businessPartnerName: true,
+  businessPartnerPhone: true,
+  postingDate: true,
+  transactionType: true,
+  documentNo: true,
+  paymentMethods: true,
+  totalAmount: true,
+});
+
+export const insertIncomePaymentSchema = createInsertSchema(incomePayments).pick({
+  businessPartnerType: true,
+  businessPartnerId: true,
+  businessPartnerName: true,
+  businessPartnerPhone: true,
+  postingDate: true,
+  transactionType: true,
+  documentNo: true,
+  paymentMethods: true,
+  totalAmount: true,
+});
+
+export type OutgoingPayment = typeof outgoingPayments.$inferSelect;
+export type IncomePayment = typeof incomePayments.$inferSelect;
+export type InsertOutgoingPayment = z.infer<typeof insertOutgoingPaymentSchema>;
+export type InsertIncomePayment = z.infer<typeof insertIncomePaymentSchema>;
