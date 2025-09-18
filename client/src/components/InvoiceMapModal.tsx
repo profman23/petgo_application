@@ -46,6 +46,7 @@ interface InvoiceMapModalProps {
   invoice: Invoice | null;
   creditNotes: CreditNote[];
   payments: Payment[];
+  modalType?: 'income' | 'outgoing';
 }
 
 export function InvoiceMapModal({ 
@@ -53,7 +54,8 @@ export function InvoiceMapModal({
   onClose, 
   invoice, 
   creditNotes, 
-  payments 
+  payments,
+  modalType = 'income'
 }: InvoiceMapModalProps) {
   const { t, language } = useTranslation();
   const [boxPositions, setBoxPositions] = useState<{[key: string]: {x: number, y: number}}>({});
@@ -123,10 +125,14 @@ export function InvoiceMapModal({
       <DialogContent className="w-screen h-screen max-w-none p-0 m-0 border-0 rounded-none overflow-hidden" dir={getDirection(language)}>
         <DialogHeader className="sr-only">
           <DialogTitle>
-            {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
+            {modalType === 'income' 
+              ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
+              : (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')}
           </DialogTitle>
           <DialogDescription>
-            {language === 'ar' ? 'عرض مرئي للفاتورة والعناصر المرتبطة بها' : 'Visual representation of invoice and related items'}
+            {modalType === 'income'
+              ? (language === 'ar' ? 'عرض مرئي للدفع الوارد والعناصر المرتبطة به' : 'Visual representation of income payment and related items')
+              : (language === 'ar' ? 'عرض مرئي للدفع الصادر والعناصر المرتبطة به' : 'Visual representation of outgoing payment and related items')}
           </DialogDescription>
         </DialogHeader>
         
@@ -142,7 +148,9 @@ export function InvoiceMapModal({
                 style={{ width: '80px', height: '80px' }}
               ></lord-icon>
               <h2 className="text-xl font-bold text-gray-800">
-                {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
+                {modalType === 'income' 
+                  ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
+                  : (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')}
               </h2>
               <span className="text-sm text-gray-600">
                 {invoice.invoiceNumber}
