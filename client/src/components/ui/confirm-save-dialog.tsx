@@ -18,11 +18,9 @@ export function ConfirmSaveDialog({
     <Dialog open={isOpen} onOpenChange={() => onCancel()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className={`flex items-center gap-2 justify-start ${language === 'ar' ? 'flex-row-reverse text-right' : 'flex-row text-left'}`}>
-            <AlertTriangle className="h-5 w-5 text-amber-500" />
-            <span className={language === 'ar' ? 'text-right' : 'text-left'}>
-              {language === 'ar' ? 'تأكيد الحفظ' : 'Confirm Save'}
-            </span>
+          <DialogTitle className={`flex items-center gap-2 text-amber-600 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+            <AlertTriangle className="h-5 w-5" />
+            {language === 'ar' ? 'تأكيد الحفظ' : 'Confirm Save'}
           </DialogTitle>
         </DialogHeader>
         
