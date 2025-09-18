@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, creditNotes, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction, type CreditNote, type InsertCreditNote } from "@shared/schema";
+import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, creditNotes, outgoingPayments, incomePayments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction, type CreditNote, type InsertCreditNote, type OutgoingPayment, type InsertOutgoingPayment, type IncomePayment, type InsertIncomePayment } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt, sql } from "drizzle-orm";
 
@@ -186,6 +186,18 @@ export interface IStorage {
   getCreditNoteByNumber(creditNoteNumber: string): Promise<CreditNote | undefined>;
   getNextCreditNoteNumber(): Promise<string>;
   getCreditedItemsForInvoice(invoiceNumber: string): Promise<any[]>;
+
+  // Outgoing Payment operations
+  createOutgoingPayment(payment: InsertOutgoingPayment): Promise<OutgoingPayment>;
+  getAllOutgoingPayments(): Promise<OutgoingPayment[]>;
+  getOutgoingPayment(id: number): Promise<OutgoingPayment | undefined>;
+  getNextOutgoingPaymentNumber(): Promise<string>;
+
+  // Income Payment operations
+  createIncomePayment(payment: InsertIncomePayment): Promise<IncomePayment>;
+  getAllIncomePayments(): Promise<IncomePayment[]>;
+  getIncomePayment(id: number): Promise<IncomePayment | undefined>;
+  getNextIncomePaymentNumber(): Promise<string>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1313,6 +1325,94 @@ export class DatabaseStorage implements IStorage {
     }
 
     return creditedItems;
+  }
+
+  // Outgoing Payment operations
+  async createOutgoingPayment(payment: InsertOutgoingPayment): Promise<OutgoingPayment> {
+    const [newPayment] = await db.insert(outgoingPayments)
+      .values(payment)
+      .returning();
+    return newPayment;
+  }
+
+  async getAllOutgoingPayments(): Promise<OutgoingPayment[]> {
+    return await db.select().from(outgoingPayments)
+      .orderBy(desc(outgoingPayments.createdAt));
+  }
+
+  async getOutgoingPayment(id: number): Promise<OutgoingPayment | undefined> {
+    const [payment] = await db.select().from(outgoingPayments)
+      .where(eq(outgoingPayments.id, id));
+    return payment;
+  }
+
+  async getNextOutgoingPaymentNumber(): Promise<string> {
+    // Get the latest outgoing payment to determine next number
+    const latestPayments = await db.select({ documentNo: outgoingPayments.documentNo })
+      .from(outgoingPayments)
+      .where(sql`document_no LIKE 'OPN%'`)
+      .orderBy(desc(outgoingPayments.id))
+      .limit(10);
+
+    let highestNumber = 9000000; // Start from 9000001
+    
+    for (const payment of latestPayments) {
+      if (payment.documentNo && payment.documentNo.startsWith('OPN')) {
+        const numberStr = payment.documentNo.replace('OPN', '');
+        const parsedNumber = parseInt(numberStr, 10);
+        // Only consider numbers >= 9000001 (our new range)
+        if (!isNaN(parsedNumber) && parsedNumber >= 9000001 && parsedNumber > highestNumber) {
+          highestNumber = parsedNumber;
+        }
+      }
+    }
+
+    const nextNumber = highestNumber + 1;
+    return `OPN${nextNumber.toString()}`;
+  }
+
+  // Income Payment operations
+  async createIncomePayment(payment: InsertIncomePayment): Promise<IncomePayment> {
+    const [newPayment] = await db.insert(incomePayments)
+      .values(payment)
+      .returning();
+    return newPayment;
+  }
+
+  async getAllIncomePayments(): Promise<IncomePayment[]> {
+    return await db.select().from(incomePayments)
+      .orderBy(desc(incomePayments.createdAt));
+  }
+
+  async getIncomePayment(id: number): Promise<IncomePayment | undefined> {
+    const [payment] = await db.select().from(incomePayments)
+      .where(eq(incomePayments.id, id));
+    return payment;
+  }
+
+  async getNextIncomePaymentNumber(): Promise<string> {
+    // Get the latest income payment to determine next number
+    const latestPayments = await db.select({ documentNo: incomePayments.documentNo })
+      .from(incomePayments)
+      .where(sql`document_no LIKE 'IPN%'`)
+      .orderBy(desc(incomePayments.id))
+      .limit(10);
+
+    let highestNumber = 9000000; // Start from 9000001
+    
+    for (const payment of latestPayments) {
+      if (payment.documentNo && payment.documentNo.startsWith('IPN')) {
+        const numberStr = payment.documentNo.replace('IPN', '');
+        const parsedNumber = parseInt(numberStr, 10);
+        // Only consider numbers >= 9000001 (our new range)
+        if (!isNaN(parsedNumber) && parsedNumber >= 9000001 && parsedNumber > highestNumber) {
+          highestNumber = parsedNumber;
+        }
+      }
+    }
+
+    const nextNumber = highestNumber + 1;
+    return `IPN${nextNumber.toString()}`;
   }
 }
 
