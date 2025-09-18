@@ -103,6 +103,29 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     }
   }, [businessPartnerType]);
 
+  // Handlers to prevent negative input in payment amount fields
+  const disallowNegativeKeys: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    const k = e.key;
+    if (k === '-' || k === '+' || k.toLowerCase() === 'e') e.preventDefault();
+  };
+
+  const sanitizeNonNegative: React.FormEventHandler<HTMLInputElement> = (e) => {
+    const el = e.currentTarget;
+    let v = el.value;
+    v = v.replace(/[^0-9.]/g, '');          // only digits and dot
+    v = v.replace(/(\.*?)\./g, '$1');     // single dot
+    if (v !== el.value) {
+      const pos = el.selectionStart ?? v.length;
+      el.value = v;
+      el.setSelectionRange(pos, pos);
+    }
+  };
+
+  const preventNegativePaste: React.ClipboardEventHandler<HTMLInputElement> = (e) => {
+    const t = e.clipboardData.getData('text');
+    if (/^-/.test(t) || /[^\d.]/.test(t) || (t.match(/\./g)?.length ?? 0) > 1) e.preventDefault();
+  };
+
   // Search customers query using default fetcher pattern - only for customers, not suppliers
   const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery({
     queryKey: [`/api/admin/customers/search?q=${encodeURIComponent(finalSearchQuery)}`],
@@ -502,10 +525,15 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     <input 
                       type="number" 
                       min="0"
+                      step="0.01"
+                      inputMode="decimal"
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.cash.amount || ''}
-                      onChange={(e) => handlePaymentMethodChange('cash', 'amount', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => handlePaymentMethodChange('cash', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onKeyDown={disallowNegativeKeys}
+                      onInput={sanitizeNonNegative}
+                      onPaste={preventNegativePaste}
                       disabled={!paymentMethods.cash.checked}
                     />
                   </div>
@@ -533,10 +561,15 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     <input 
                       type="number" 
                       min="0"
+                      step="0.01"
+                      inputMode="decimal"
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.card.amount || ''}
-                      onChange={(e) => handlePaymentMethodChange('card', 'amount', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => handlePaymentMethodChange('card', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onKeyDown={disallowNegativeKeys}
+                      onInput={sanitizeNonNegative}
+                      onPaste={preventNegativePaste}
                       disabled={!paymentMethods.card.checked}
                     />
                   </div>
@@ -564,10 +597,15 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     <input 
                       type="number" 
                       min="0"
+                      step="0.01"
+                      inputMode="decimal"
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.bank.amount || ''}
-                      onChange={(e) => handlePaymentMethodChange('bank', 'amount', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => handlePaymentMethodChange('bank', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onKeyDown={disallowNegativeKeys}
+                      onInput={sanitizeNonNegative}
+                      onPaste={preventNegativePaste}
                       disabled={!paymentMethods.bank.checked}
                     />
                   </div>
