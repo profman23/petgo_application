@@ -6,6 +6,13 @@ import { ArrowUpRight, ArrowDownLeft, Search, User } from "lucide-react";
 import { ConfirmExitDialog } from "@/components/ui/confirm-exit-dialog";
 import { useQuery } from "@tanstack/react-query";
 
+// Customer interface for search results
+interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+}
+
 // Declare lord-icon custom element for TypeScript
 declare global {
   namespace JSX {
@@ -353,7 +360,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   }, []);
 
   // Search customers query using default fetcher pattern - only for customers, not suppliers
-  const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery({
+  const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery<Customer[]>({
     queryKey: [`/api/admin/customers/search?q=${encodeURIComponent(finalSearchQuery)}`],
     enabled: finalSearchQuery.length >= 2 && businessPartnerType === 'customer', // Only search when we have at least 2 characters and it's for customers
     staleTime: 30000, // Cache for 30 seconds
@@ -567,7 +574,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                               {language === 'ar' ? 'خطأ في البحث' : 'Search error'}
                             </div>
                           ) : searchResults.length > 0 ? (
-                            searchResults.map((customer: any, index: number) => (
+                            searchResults.map((customer, index: number) => (
                               <div
                                 key={customer.id}
                                 className={`p-2 cursor-pointer border-b border-gray-100 last:border-b-0 ${
