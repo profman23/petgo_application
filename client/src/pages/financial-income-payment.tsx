@@ -7,7 +7,7 @@ import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { PaymentModal } from "@/components/PaymentModal";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 
 // Declare lord-icon custom element for TypeScript
@@ -23,7 +23,6 @@ export default function FinancialIncomePayment() {
   const [location, setLocation] = useLocation();
   const { language } = useTranslation();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   
@@ -76,6 +75,12 @@ export default function FinancialIncomePayment() {
       label: { ar: 'المبلغ الإجمالي', en: 'Total Amount' },
       render: (payment) => `${payment.totalAmount} SAR`,
       className: 'text-gray-900 font-medium'
+    },
+    {
+      key: 'actions',
+      label: { ar: 'الإجراء', en: 'Action' },
+      render: () => '-',
+      className: 'text-gray-400 text-center'
     }
   ];
 
@@ -101,6 +106,11 @@ export default function FinancialIncomePayment() {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedPayments = filteredPayments.slice(startIndex, startIndex + itemsPerPage);
+
+  // Reset pagination when search or items per page changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchInput, itemsPerPage]);
 
   // Effect to trigger lord-icon animation every 1.5 minutes
   useEffect(() => {
