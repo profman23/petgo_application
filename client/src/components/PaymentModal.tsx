@@ -93,7 +93,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
 
   // Search customers query using default fetcher pattern
   const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery({
-    queryKey: ['/api/admin/customers/search', { q: finalSearchQuery }],
+    queryKey: [`/api/admin/customers/search?q=${encodeURIComponent(finalSearchQuery)}`],
     enabled: finalSearchQuery.length >= 2, // Only search when we have at least 2 characters
     staleTime: 30000, // Cache for 30 seconds
   });
