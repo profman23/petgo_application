@@ -118,7 +118,7 @@ export function InvoiceMapModal({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  if (!invoice) return null;
+  if (!payments || payments.length === 0) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -199,6 +199,7 @@ export function InvoiceMapModal({
                 const paymentPos = boxPositions[`payment-${payment.id}`];
                 
                 if (invoicePos && paymentPos) {
+                  const lineColor = modalType === 'income' ? '#4CAF50' : '#F44336';
                   return (
                     <line
                       key={`line-payment-${payment.id}`}
@@ -206,7 +207,7 @@ export function InvoiceMapModal({
                       y1={invoicePos.y + 85}  // Invoice box center + half height
                       x2={paymentPos.x + 250}    // Payment box right edge
                       y2={paymentPos.y + 80} // Payment box center + half height
-                      stroke="#4CAF50"
+                      stroke={lineColor}
                       strokeWidth="2"
                       strokeDasharray="none"
                     />
@@ -309,10 +310,20 @@ export function InvoiceMapModal({
               );
             })}
 
-            {/* Income Payment Boxes */}
+            {/* Payment Boxes */}
             {payments.map((payment) => {
               const position = boxPositions[`payment-${payment.id}`];
               if (!position) return null;
+
+              const isIncomePayment = modalType === 'income';
+              const paymentColors = {
+                border: isIncomePayment ? '#4CAF50' : '#F44336',
+                headerBg: isIncomePayment ? 'bg-green-50' : 'bg-red-50',
+                headerBorder: isIncomePayment ? 'border-green-200' : 'border-red-200',
+                iconColor: isIncomePayment ? 'text-green-600' : 'text-red-600',
+                textColor: isIncomePayment ? 'text-green-700' : 'text-red-700',
+                amountColor: isIncomePayment ? 'text-green-600' : 'text-red-600'
+              };
 
               return (
                 <div
@@ -321,26 +332,28 @@ export function InvoiceMapModal({
                   style={{
                     left: position.x,
                     top: position.y,
-                    borderColor: '#4CAF50',
+                    borderColor: paymentColors.border,
                     width: '250px',
                     height: '160px'
                   }}
                   onMouseDown={createDragHandler(`payment-${payment.id}`)}
                 >
                   {/* Header Section */}
-                  <div className="bg-green-50 px-3 py-2 border-b border-green-200 rounded-t-lg flex items-center justify-center gap-2">
-                    <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className={`${paymentColors.headerBg} px-3 py-2 border-b ${paymentColors.headerBorder} rounded-t-lg flex items-center justify-center gap-2`}>
+                    <svg className={`h-4 w-4 ${paymentColors.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                     </svg>
-                    <span className="text-sm font-semibold text-green-700">
-                      {language === 'ar' ? 'دفعة دخل' : 'Income Payment'}
+                    <span className={`text-sm font-semibold ${paymentColors.textColor}`}>
+                      {isIncomePayment 
+                        ? (language === 'ar' ? 'دفعة دخل' : 'Income Payment')
+                        : (language === 'ar' ? 'دفعة صادرة' : 'Outgoing Payment')}
                     </span>
                   </div>
                   
                   {/* Content Section */}
                   <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
-                    <div className="text-base font-bold text-green-600 mb-1">
-                      +{parseFloat((payment.amount || payment.totalAmount || '0').toString()).toFixed(2)} SAR
+                    <div className={`text-base font-bold ${paymentColors.amountColor} mb-1`}>
+                      {isIncomePayment ? '+' : '-'}{parseFloat((payment.amount || payment.totalAmount || '0').toString()).toFixed(2)} SAR
                     </div>
                     <div className="text-sm text-gray-600 mb-1">
                       {language === 'ar' ? 'رقم المستند: ' : 'DocNum: '}
