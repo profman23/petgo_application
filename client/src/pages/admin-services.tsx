@@ -269,6 +269,14 @@ const ServicesManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
     {
       key: 'selection',
       label: { ar: '', en: '' },
+      headerRender: () => (
+        <Checkbox
+          checked={areAllVisibleSelected}
+          onCheckedChange={handleSelectAll}
+          disabled={isReadOnly}
+          className="border-purple-300 data-[state=checked]:bg-purple-600"
+        />
+      ),
       render: (service) => (
         <Checkbox
           checked={selectedServices.includes(service.id)}
