@@ -230,6 +230,121 @@ const ProductsManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
   const areAllVisibleSelected = currentProducts.length > 0 && 
     currentProducts.every((product: any) => selectedProducts.includes(product.id));
 
+  // 🎯 DATATABLE CONFIGURATION - Customize columns for products screen
+  const productColumns: DataTableColumn[] = [
+    {
+      key: 'selection',
+      label: { ar: '', en: '' },
+      render: (product) => (
+        <Checkbox
+          checked={selectedProducts.includes(product.id)}
+          onCheckedChange={() => handleProductSelection(product.id)}
+          disabled={isReadOnly}
+          className="border-purple-300 data-[state=checked]:bg-purple-600"
+        />
+      ),
+      className: 'w-12',
+      headerClassName: 'w-12'
+    },
+    {
+      key: 'name',
+      label: { ar: 'الاسم', en: 'name' },
+      render: (product) => (
+        <div className="space-y-1">
+          <div className="text-sm font-medium text-gray-900">{product.name}</div>
+          {product.nameAr && (
+            <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
+              {product.nameAr}
+            </div>
+          )}
+        </div>
+      ),
+      className: 'text-gray-900'
+    },
+    {
+      key: 'category',
+      label: { ar: 'الفئة', en: 'category' },
+      render: (product) => (
+        <div className="space-y-1">
+          <div className="text-sm text-gray-900">{product.category}</div>
+          {product.categoryAr && (
+            <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
+              {product.categoryAr}
+            </div>
+          )}
+        </div>
+      ),
+      className: 'text-gray-900'
+    },
+    {
+      key: 'price',
+      label: { ar: 'السعر (ريال)', en: 'price (sar)' },
+      render: (product) => (
+        editingProduct?.id === product.id ? (
+          <div className="flex items-center space-x-2">
+            <Input
+              type="number"
+              step="0.01"
+              value={editedProducts[product.id] || ''}
+              onChange={(e) => setEditedProducts({ ...editedProducts, [product.id]: e.target.value })}
+              className="w-20 h-8 text-sm border-purple-300 focus:border-purple-500 focus:ring-purple-500"
+            />
+            <Button
+              size="sm"
+              onClick={() => handleSaveClick(product.id)}
+              disabled={updateProductMutation.isPending}
+              className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
+            >
+              {updateProductMutation.isPending ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                '✓'
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCancelClick}
+              className="h-8 px-2"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
+        ) : (
+          <span className="font-medium">{product.price}</span>
+        )
+      ),
+      className: 'text-gray-900'
+    },
+    {
+      key: 'status',
+      label: { ar: 'الحالة', en: 'status' },
+      render: (product) => (
+        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+          product.isActive 
+            ? 'bg-green-100 text-green-800'
+            : 'bg-red-100 text-red-800'
+        }`}>
+          {product.isActive 
+            ? (language === 'ar' ? 'نشط' : 'Active')
+            : (language === 'ar' ? 'غير نشط' : 'Inactive')
+          }
+        </span>
+      )
+    }
+  ];
+
+  // 🎯 DATATABLE ACTIONS - Customize actions for products screen
+  const productActions: DataTableAction[] = [
+    {
+      label: { ar: 'تعديل', en: 'Edit' },
+      onClick: (product) => handleEditClick(product),
+      className: 'border-purple-300 text-purple-600 hover:bg-purple-50',
+      icon: <Edit className="h-3 w-3" />,
+      condition: (product) => editingProduct?.id !== product.id && !isReadOnly
+    }
+  ];
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -430,136 +545,25 @@ const ProductsManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
         </div>
       )}
 
-      {/* Products Table */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="w-12 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <Checkbox
-                    checked={areAllVisibleSelected}
-                    onCheckedChange={toggleSelectAll}
-                    disabled={isReadOnly}
-                    className="border-purple-300 data-[state=checked]:bg-purple-600"
-                  />
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'الاسم' : 'Name'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'الفئة' : 'Category'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'السعر (ريال)' : 'Price (SAR)'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'الحالة' : 'Status'}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {language === 'ar' ? 'الإجراءات' : 'Actions'}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {currentProducts.map((product: any) => (
-                <tr key={product.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Checkbox
-                      checked={selectedProducts.includes(product.id)}
-                      onCheckedChange={() => handleProductSelection(product.id)}
-                      disabled={isReadOnly}
-                      className="border-purple-300 data-[state=checked]:bg-purple-600"
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                      {product.nameAr && (
-                        <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
-                          {product.nameAr}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="space-y-1">
-                      <div className="text-sm text-gray-900">{product.category}</div>
-                      {product.categoryAr && (
-                        <div className="text-xs text-gray-500" style={{ direction: 'rtl' }}>
-                          {product.categoryAr}
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {editingProduct?.id === product.id ? (
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={editedProducts[product.id] || ''}
-                          onChange={(e) => setEditedProducts({ ...editedProducts, [product.id]: e.target.value })}
-                          className="w-20 h-8 text-sm border-purple-300 focus:border-purple-500 focus:ring-purple-500"
-                        />
-                        <Button
-                          size="sm"
-                          onClick={() => handleSaveClick(product.id)}
-                          disabled={updateProductMutation.isPending}
-                          className="h-8 px-2 bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          {updateProductMutation.isPending ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                          ) : (
-                            '✓'
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={handleCancelClick}
-                          className="h-8 px-2"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <span className="font-medium">{product.price}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      product.isActive 
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {product.isActive 
-                        ? (language === 'ar' ? 'نشط' : 'Active')
-                        : (language === 'ar' ? 'غير نشط' : 'Inactive')
-                      }
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {editingProduct?.id !== product.id && (
-                      <Button
-                        data-testid={`button-edit-product-${product.id}`}
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEditClick(product)}
-                        disabled={isReadOnly}
-                        className="h-8 px-3 border-purple-300 text-purple-600 hover:bg-purple-50"
-                      >
-                        <Edit className="h-3 w-3 mr-1" />
-                        {language === 'ar' ? 'تعديل' : 'Edit'}
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Products Table - Now using unified DataTable component! 🎉 */}
+      <DataTable
+        data={currentProducts}
+        columns={productColumns}
+        actions={productActions}
+        isLoading={isLoading}
+        loadingText={{ ar: 'جاري التحميل...', en: 'Loading...' }}
+        emptyStateText={{ 
+          ar: filterText ? 'لا توجد منتجات مطابقة لبحثك' : 'لا توجد منتجات حتى الآن', 
+          en: filterText ? 'No products match your search' : 'No products found'
+        }}
+        emptySearchText={{ ar: 'جرب مصطلحات بحث مختلفة', en: 'Try different search terms' }}
+        showEmptySearch={!!filterText}
+        verticalSeparators={true}
+        hover={true}
+        responsive={true}
+        className="bg-white"
+        rowTestId="product-row"
+      />
 
         {/* Pagination Controls */}
         <PaginationControls
