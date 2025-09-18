@@ -3484,6 +3484,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get all outgoing payments
+  app.get('/api/admin/outgoing-payments', requireAdminAuth, async (req, res) => {
+    try {
+      const outgoingPayments = await storage.getAllOutgoingPayments();
+      res.json(outgoingPayments);
+    } catch (error) {
+      console.error('Error fetching outgoing payments:', error);
+      res.status(500).json({ message: 'Failed to fetch outgoing payments' });
+    }
+  });
+
+  // Admin: Get all income payments
+  app.get('/api/admin/income-payments', requireAdminAuth, async (req, res) => {
+    try {
+      const incomePayments = await storage.getAllIncomePayments();
+      res.json(incomePayments);
+    } catch (error) {
+      console.error('Error fetching income payments:', error);
+      res.status(500).json({ message: 'Failed to fetch income payments' });
+    }
+  });
+
   // Admin: Get all credit notes
   app.get('/api/admin/credit-notes', requireAdminAuth, async (req, res) => {
     try {
