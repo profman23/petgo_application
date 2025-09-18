@@ -91,6 +91,18 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     return () => clearTimeout(timer);
   }, [customerSearchQuery]);
 
+  // Clear customer data when switching to Supplier
+  useEffect(() => {
+    if (businessPartnerType === 'supplier') {
+      setSelectedCustomer(null);
+      setCustomerSearchQuery('');
+      setCustomerName('');
+      setCustomerPhone('');
+      setShowCustomerResults(false);
+      setSelectedResultIndex(-1);
+    }
+  }, [businessPartnerType]);
+
   // Search customers query using default fetcher pattern - only for customers, not suppliers
   const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery({
     queryKey: [`/api/admin/customers/search?q=${encodeURIComponent(finalSearchQuery)}`],
@@ -346,9 +358,12 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     </label>
                     <input 
                       type="text" 
-                      className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                      className={`w-[170px] px-2 input-compact-20 border border-gray-300 ${
+                        selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                      }`}
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
+                      disabled={selectedCustomer !== null}
                       data-testid="input-partner-phone"
                       placeholder={businessPartnerType === 'supplier' 
                         ? (language === 'ar' ? 'أدخل هاتف المورد' : 'Enter supplier phone') 
@@ -383,9 +398,12 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                     </label>
                     <input 
                       type="text" 
-                      className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                      className={`w-[170px] px-2 input-compact-20 border border-gray-300 ${
+                        selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                      }`}
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
+                      disabled={selectedCustomer !== null}
                       data-testid="input-partner-name"
                       placeholder={businessPartnerType === 'supplier' 
                         ? (language === 'ar' ? 'أدخل اسم المورد' : 'Enter supplier name') 
