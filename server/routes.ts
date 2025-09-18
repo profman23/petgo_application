@@ -3506,6 +3506,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get next outgoing payment number
+  app.get('/api/admin/outgoing-payments/next-number', requireAdminAuth, async (req, res) => {
+    try {
+      const nextNumber = await storage.getNextOutgoingPaymentNumber();
+      res.json({ nextNumber });
+    } catch (error) {
+      console.error('Error fetching next outgoing payment number:', error);
+      res.status(500).json({ message: 'Failed to fetch next outgoing payment number' });
+    }
+  });
+
+  // Admin: Get next income payment number
+  app.get('/api/admin/income-payments/next-number', requireAdminAuth, async (req, res) => {
+    try {
+      const nextNumber = await storage.getNextIncomePaymentNumber();
+      res.json({ nextNumber });
+    } catch (error) {
+      console.error('Error fetching next income payment number:', error);
+      res.status(500).json({ message: 'Failed to fetch next income payment number' });
+    }
+  });
+
   // Admin: Get all credit notes
   app.get('/api/admin/credit-notes', requireAdminAuth, async (req, res) => {
     try {
