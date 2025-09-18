@@ -50,6 +50,9 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
         title: language === 'ar' ? "تم الحفظ بنجاح" : "Saved Successfully",
         description: language === 'ar' ? "تم حفظ الدفعة الصادرة" : "Outgoing payment saved",
       });
+      // Invalidate payment-related queries
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/outgoing-payments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/outgoing-payments/next-number'] });
       onOpenChange(false);
     },
     onError: (error: any) => {
@@ -74,6 +77,9 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
         title: language === 'ar' ? "تم الحفظ بنجاح" : "Saved Successfully",
         description: language === 'ar' ? "تم حفظ الدفعة الواردة" : "Income payment saved",
       });
+      // Invalidate payment-related queries
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/income-payments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/income-payments/next-number'] });
       onOpenChange(false);
     },
     onError: (error: any) => {
@@ -403,7 +409,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
       businessPartnerPhone: customerPhone,
       postingDate: normalizedDate,
       transactionType: variant === 'outgoing' ? 'outgoing' : 'income',
-      documentNo: paymentNo || `${variant.toUpperCase()}-${Date.now()}`,
+      documentNo: currentConfig.paymentNo, // Use the proper serial number from config
       paymentMethods,
       totalAmount: totalAmount.toFixed(2) // Convert to string with 2 decimal places
     };
@@ -444,6 +450,13 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     setShowConfirmExit(false);
     setPendingExit(() => {});
   }, []);
+
+  // Fetch next payment number based on variant
+  const { data: nextPaymentNumber } = useQuery({
+    queryKey: [`/api/admin/${variant}-payments/next-number`],
+    enabled: isOpen, // Only fetch when modal is open
+    staleTime: 0, // Always fetch fresh to avoid conflicts
+  });
 
   // Search customers query using default fetcher pattern - only for customers, not suppliers
   const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery<Customer[]>({
@@ -526,7 +539,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   const config = {
     income: {
       title: language === 'ar' ? 'الدفع الوارد' : 'Income Payment',
-      paymentNo: paymentNo || 'IPN9000001',
+      paymentNo: paymentNo || nextPaymentNumber?.nextNumber || 'IPN9000001',
       paymentNoLabel: language === 'ar' ? 'رقم الدفع الوارد:' : 'Income Payment No.:',
       createButton: language === 'ar' ? 'إنشاء دفع وارد' : 'Create Income Payment',
       footerLabel: language === 'ar' ? 'دفع وارد' : 'Income Payment',
@@ -535,7 +548,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     },
     outgoing: {
       title: language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment',
-      paymentNo: paymentNo || 'OPN9000001',
+      paymentNo: paymentNo || nextPaymentNumber?.nextNumber || 'OPN9000001',
       paymentNoLabel: language === 'ar' ? 'رقم الدفع الصادر:' : 'Outgoing Payment No.:',
       createButton: language === 'ar' ? 'إنشاء دفع صادر' : 'Create Outgoing Payment',
       footerLabel: language === 'ar' ? 'دفع صادر' : 'Outgoing Payment',
