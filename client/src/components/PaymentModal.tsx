@@ -91,17 +91,17 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     return () => clearTimeout(timer);
   }, [customerSearchQuery]);
 
-  // Search customers query using default fetcher pattern
+  // Search customers query using default fetcher pattern - only for customers, not suppliers
   const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery({
     queryKey: [`/api/admin/customers/search?q=${encodeURIComponent(finalSearchQuery)}`],
-    enabled: finalSearchQuery.length >= 2, // Only search when we have at least 2 characters
+    enabled: finalSearchQuery.length >= 2 && businessPartnerType === 'customer', // Only search when we have at least 2 characters and it's for customers
     staleTime: 30000, // Cache for 30 seconds
   });
 
   // Handle customer selection
   const handleCustomerSelect = (customer: any) => {
     setSelectedCustomer(customer);
-    setCustomerSearchQuery(`${customer.name} (ID: ${customer.id})`);
+    setCustomerSearchQuery(customer.id.toString()); // Only show the ID number
     setCustomerName(customer.name);
     setCustomerPhone(customer.phone || '');
     setShowCustomerResults(false);
@@ -111,10 +111,10 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   // Handle customer search input changes
   const handleCustomerSearchChange = (value: string) => {
     setCustomerSearchQuery(value);
-    setShowCustomerResults(value.length >= 2);
+    setShowCustomerResults(value.length >= 2 && businessPartnerType === 'customer'); // Only show results for customers
     setSelectedResultIndex(-1);
     // Clear selection if user starts typing again
-    if (selectedCustomer && value !== `${selectedCustomer.name} (ID: ${selectedCustomer.id})`) {
+    if (selectedCustomer && value !== selectedCustomer.id.toString()) {
       setSelectedCustomer(null);
       setCustomerName('');
       setCustomerPhone('');
@@ -276,16 +276,17 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                         value={customerSearchQuery}
                         onChange={(e) => handleCustomerSearchChange(e.target.value)}
                         placeholder={businessPartnerType === 'supplier' 
-                          ? (language === 'ar' ? 'ابحث عن مورد...' : 'Search supplier...') 
+                          ? (language === 'ar' ? 'معرف المورد' : 'Supplier ID') 
                           : (language === 'ar' ? 'ابحث عن عميل...' : 'Search customer...')}
                         data-testid="input-customer-search"
-                        onFocus={() => customerSearchQuery.length >= 2 && setShowCustomerResults(true)}
+                        disabled={businessPartnerType === 'supplier'}
+                        onFocus={() => customerSearchQuery.length >= 2 && businessPartnerType === 'customer' && setShowCustomerResults(true)}
                         onKeyDown={handleSearchKeyDown}
                       />
                       <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       
-                      {/* Search Results Dropdown */}
-                      {showCustomerResults && customerSearchQuery.length >= 2 && (
+                      {/* Search Results Dropdown - only show for customers */}
+                      {showCustomerResults && customerSearchQuery.length >= 2 && businessPartnerType === 'customer' && (
                         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
                           {isSearching ? (
                             <div className="p-3 text-center text-gray-500">
