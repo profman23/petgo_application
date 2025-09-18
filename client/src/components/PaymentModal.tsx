@@ -453,7 +453,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   }, []);
 
   // Fetch next payment number based on variant
-  const { data: nextPaymentNumber } = useQuery({
+  const { data: nextPaymentNumber } = useQuery<{ nextNumber: string }>({
     queryKey: [`/api/admin/${variant}-payments/next-number`],
     enabled: isOpen, // Only fetch when modal is open
     staleTime: 0, // Always fetch fresh to avoid conflicts

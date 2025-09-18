@@ -35,7 +35,7 @@ export default function FinancialIncomePayment() {
   const [triggerAnimation, setTriggerAnimation] = useState("hover");
 
   // Fetch income payments data
-  const { data: incomePayments = [], isLoading } = useQuery({
+  const { data: incomePayments = [], isLoading } = useQuery<{ docnum: string; businessPartnerName?: string; businessPartnerPhone?: string; totalAmount: string; businessPartnerId?: number; postingDate: string; }[]>({
     queryKey: ['/api/admin/income-payments'],
     staleTime: 5 * 60 * 1000,
   });
@@ -97,7 +97,6 @@ export default function FinancialIncomePayment() {
       payment.businessPartnerName?.toLowerCase().includes(searchTerm) ||
       payment.businessPartnerPhone?.toLowerCase().includes(searchTerm) ||
       payment.docnum?.toLowerCase().includes(searchTerm) ||
-      payment.documentNo?.toLowerCase().includes(searchTerm) ||
       payment.postingDate?.toLowerCase().includes(searchTerm)
     );
   });

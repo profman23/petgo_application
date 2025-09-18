@@ -35,7 +35,7 @@ export default function FinancialOutgoingPayment() {
   const [triggerAnimation, setTriggerAnimation] = useState("hover");
 
   // Fetch outgoing payments data
-  const { data: outgoingPayments = [], isLoading } = useQuery({
+  const { data: outgoingPayments = [], isLoading } = useQuery<{ docnum: string; businessPartnerName?: string; businessPartnerPhone?: string; totalAmount: string; businessPartnerId?: number; postingDate: string; }[]>({
     queryKey: ['/api/admin/outgoing-payments'],
     staleTime: 5 * 60 * 1000,
   });
@@ -97,7 +97,6 @@ export default function FinancialOutgoingPayment() {
       payment.businessPartnerName?.toLowerCase().includes(searchTerm) ||
       payment.businessPartnerPhone?.toLowerCase().includes(searchTerm) ||
       payment.docnum?.toLowerCase().includes(searchTerm) ||
-      payment.documentNo?.toLowerCase().includes(searchTerm) ||
       payment.postingDate?.toLowerCase().includes(searchTerm)
     );
   });
