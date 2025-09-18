@@ -90,7 +90,7 @@ export default function FinancialIncomePayment() {
   ];
 
   // Filter payments based on search input
-  const filteredPayments = incomePayments.filter((payment: any) => {
+  const filteredPayments = (incomePayments || []).filter((payment: any) => {
     if (!searchInput.trim()) return true;
     const searchTerm = searchInput.toLowerCase();
     return (
@@ -224,13 +224,15 @@ export default function FinancialIncomePayment() {
           {totalPages > 1 && (
             <div className="px-6 py-4 border-t border-gray-200">
               <PaginationControls
+                currentCount={paginatedPayments.length}
+                filteredCount={filteredPayments.length}
+                totalCount={incomePayments?.length || 0}
+                itemType="payments"
+                itemsPerPage={itemsPerPage}
+                onItemsPerPageChange={setItemsPerPage}
                 currentPage={currentPage}
                 totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
-                totalItems={totalItems}
                 onPageChange={setCurrentPage}
-                onItemsPerPageChange={setItemsPerPage}
-                language={language}
               />
             </div>
           )}

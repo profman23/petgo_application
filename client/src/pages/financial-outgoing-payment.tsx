@@ -90,7 +90,7 @@ export default function FinancialOutgoingPayment() {
   ];
 
   // Filter payments based on search input
-  const filteredPayments = outgoingPayments.filter((payment: any) => {
+  const filteredPayments = (outgoingPayments || []).filter((payment: any) => {
     if (!searchInput.trim()) return true;
     const searchTerm = searchInput.toLowerCase();
     return (
@@ -229,13 +229,15 @@ export default function FinancialOutgoingPayment() {
           {totalPages > 1 && (
             <div className="px-6 py-4 border-t border-gray-200">
               <PaginationControls
+                currentCount={paginatedPayments.length}
+                filteredCount={filteredPayments.length}
+                totalCount={outgoingPayments?.length || 0}
+                itemType="payments"
+                itemsPerPage={itemsPerPage}
+                onItemsPerPageChange={setItemsPerPage}
                 currentPage={currentPage}
                 totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
-                totalItems={totalItems}
                 onPageChange={setCurrentPage}
-                onItemsPerPageChange={setItemsPerPage}
-                language={language}
               />
             </div>
           )}
