@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { format, addDays, subDays } from "date-fns";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ArrowUpRight, ArrowDownLeft, Search, User } from "lucide-react";
+import { ConfirmExitDialog } from "@/components/ui/confirm-exit-dialog";
 import { useQuery } from "@tanstack/react-query";
 
 // Declare lord-icon custom element for TypeScript
@@ -27,11 +28,30 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   // Posting Date state
   const [postingDate, setPostingDate] = useState('');
   
-  // Initialize posting date when modal opens
+  // Initialize posting date and capture initial state only once per modal open
   useEffect(() => {
-    if (isOpen) {
-      setPostingDate(format(new Date(), 'yyyy-MM-dd'));
+    if (isOpen && !wasOpenRef.current) {
+      // Modal is opening for the first time
+      const defaultDate = format(new Date(), 'yyyy-MM-dd');
+      setPostingDate(defaultDate);
+      
+      // Set initial state with the default date to avoid race condition
+      initialStateRef.current = {
+        businessPartnerType,
+        customerSearchQuery,
+        customerPhone,
+        customerName,
+        postingDate: defaultDate,
+        transactionType,
+        documentNo,
+        paymentMethods: {
+          cash: { ...paymentMethods.cash },
+          card: { ...paymentMethods.card },
+          bank: { ...paymentMethods.bank }
+        }
+      };
     }
+    wasOpenRef.current = isOpen;
   }, [isOpen]);
   
   // Handle posting date changes and shortcuts
@@ -84,6 +104,34 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
 
   const [finalSearchQuery, setFinalSearchQuery] = useState('');
   
+  // Reference Information Document state
+  const [transactionType, setTransactionType] = useState('');
+  const [documentNo, setDocumentNo] = useState('');
+  
+  // Unsaved changes tracking
+  const [showConfirmExit, setShowConfirmExit] = useState(false);
+  const [pendingExit, setPendingExit] = useState<() => void>(() => {});
+  
+  // Track modal open state to initialize only once per open
+  const wasOpenRef = useRef(false);
+  
+  // Capture initial state when modal opens
+  const initialStateRef = useRef({
+    businessPartnerType: 'customer',
+    customerSearchQuery: '',
+    customerPhone: '',
+    customerName: '',
+    postingDate: '',
+    transactionType: '',
+    documentNo: '',
+    paymentMethods: {
+      cash: { checked: false, amount: 0 },
+      card: { checked: false, amount: 0 },
+      bank: { checked: false, amount: 0 }
+    }
+  });
+
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setFinalSearchQuery(customerSearchQuery);
@@ -125,6 +173,49 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     const t = e.clipboardData.getData('text');
     if (/^-/.test(t) || /[^\d.]/.test(t) || (t.match(/\./g)?.length ?? 0) > 1) e.preventDefault();
   };
+
+  // Check if there are unsaved changes by comparing with initial state
+  const hasUnsavedChanges = useCallback(() => {
+    const initial = initialStateRef.current;
+    return (
+      businessPartnerType !== initial.businessPartnerType ||
+      customerSearchQuery.trim() !== initial.customerSearchQuery.trim() ||
+      customerPhone.trim() !== initial.customerPhone.trim() ||
+      customerName.trim() !== initial.customerName.trim() ||
+      postingDate !== initial.postingDate ||
+      transactionType !== initial.transactionType ||
+      documentNo.trim() !== initial.documentNo.trim() ||
+      paymentMethods.cash.checked !== initial.paymentMethods.cash.checked ||
+      paymentMethods.card.checked !== initial.paymentMethods.card.checked ||
+      paymentMethods.bank.checked !== initial.paymentMethods.bank.checked ||
+      paymentMethods.cash.amount !== initial.paymentMethods.cash.amount ||
+      paymentMethods.card.amount !== initial.paymentMethods.card.amount ||
+      paymentMethods.bank.amount !== initial.paymentMethods.bank.amount
+    );
+  }, [businessPartnerType, customerSearchQuery, customerPhone, customerName, postingDate, transactionType, documentNo, paymentMethods]);
+
+  // Handle exit with unsaved changes check
+  const handleExit = useCallback((exitCallback: () => void) => {
+    if (hasUnsavedChanges()) {
+      setPendingExit(() => exitCallback);
+      setShowConfirmExit(true);
+    } else {
+      exitCallback();
+    }
+  }, [hasUnsavedChanges]);
+
+  // Confirm exit without saving
+  const confirmExit = useCallback(() => {
+    setShowConfirmExit(false);
+    pendingExit();
+    setPendingExit(() => {}); // Reset to prevent accidental reuse
+  }, [pendingExit]);
+
+  // Cancel exit
+  const cancelExit = useCallback(() => {
+    setShowConfirmExit(false);
+    setPendingExit(() => {});
+  }, []);
 
   // Search customers query using default fetcher pattern - only for customers, not suppliers
   const { data: searchResults = [], isLoading: isSearching, error: searchError } = useQuery({
@@ -229,7 +320,12 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   const FooterIcon = currentConfig.footerIcon;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open) {
+        handleExit(() => onOpenChange(false));
+      }
+    }}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="sr-only">
@@ -469,6 +565,8 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                 </label>
                 <select 
                   className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                  value={transactionType}
+                  onChange={(e) => setTransactionType(e.target.value)}
                   data-testid="select-transaction-type"
                 >
                   <option value="">{language === 'ar' ? 'اختر النوع' : 'Select Type'}</option>
@@ -485,6 +583,8 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                 <input 
                   type="text" 
                   className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                  value={documentNo}
+                  onChange={(e) => setDocumentNo(e.target.value)}
                   placeholder={language === 'ar' ? 'بحث عن الوثيقة' : 'Search document'}
                   data-testid="input-document-no"
                 />
@@ -659,8 +759,9 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
             
             <div className="flex gap-3">
               <button
-                onClick={() => onOpenChange(false)}
+                onClick={() => handleExit(() => onOpenChange(false))}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                data-testid="button-cancel"
               >
                 {language === 'ar' ? 'إلغاء' : 'Cancel'}
               </button>
@@ -674,5 +775,14 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
         </DialogHeader>
       </DialogContent>
     </Dialog>
+    
+    {/* Confirm Exit Dialog */}
+    <ConfirmExitDialog
+      isOpen={showConfirmExit}
+      onCancel={cancelExit}
+      onConfirm={confirmExit}
+      language={language}
+    />
+    </>
   );
 }
