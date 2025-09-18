@@ -38,6 +38,7 @@ interface Payment {
   description?: string;
   createdAt?: string;
   postingDate?: string;
+  payment_methods?: string | object;
 }
 
 interface InvoiceMapModalProps {
