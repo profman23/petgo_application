@@ -447,7 +447,38 @@ export function InvoiceMapModal({
                     </div>
                     <div className="text-sm text-gray-600 mb-1">
                       {language === 'ar' ? 'طريقة الدفع: ' : 'Payment Method: '}
-                      {payment.paymentType || '-'}
+                      {(() => {
+                        // For Credit Note modal, use paymentType directly
+                        if (modalType === 'creditnote') {
+                          return payment.paymentType || '-';
+                        }
+                        
+                        // For Income/Outgoing modals, parse payment_methods JSON
+                        if (payment.payment_methods) {
+                          try {
+                            const methods = typeof payment.payment_methods === 'string' 
+                              ? JSON.parse(payment.payment_methods) 
+                              : payment.payment_methods;
+                            
+                            const activePayments = [];
+                            if (methods.cash && methods.cash.checked && methods.cash.amount > 0) {
+                              activePayments.push(language === 'ar' ? 'نقدي' : 'Cash');
+                            }
+                            if (methods.card && methods.card.checked && methods.card.amount > 0) {
+                              activePayments.push(language === 'ar' ? 'بطاقة' : 'Card');
+                            }
+                            if (methods.bank && methods.bank.checked && methods.bank.amount > 0) {
+                              activePayments.push(language === 'ar' ? 'تحويل مصرفي' : 'Bank Transfer');
+                            }
+                            
+                            return activePayments.length > 0 ? activePayments.join(', ') : '-';
+                          } catch (e) {
+                            return '-';
+                          }
+                        }
+                        
+                        return payment.paymentType || '-';
+                      })()}
                     </div>
                     {payment.description && (
                       <div className="text-xs text-gray-500 mb-2">
