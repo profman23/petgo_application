@@ -443,7 +443,7 @@ export function InvoiceMapModal({
                   {/* Content Section */}
                   <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
                     <div className={`text-base font-bold ${paymentColors.amountColor} mb-1`}>
-                      {(modalType === 'creditnote' || isIncomePayment) ? '+' : '-'}{parseFloat((payment.amount || payment.totalAmount || '0').toString()).toFixed(2)} SAR
+                      {(modalType === 'creditnote' || isIncomePayment) ? '+' : '-'}{parseFloat((payment.amount ?? payment.totalAmount ?? '0').toString()).toFixed(2)} SAR
                     </div>
                     <div className="text-sm text-gray-600 mb-1">
                       {language === 'ar' ? 'رقم المستند: ' : 'DocNum: '}
