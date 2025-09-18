@@ -4,6 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ArrowUpRight, ArrowDownLeft, Search, User } from "lucide-react";
 import { ConfirmExitDialog } from "@/components/ui/confirm-exit-dialog";
+import { ConfirmSaveDialog } from "@/components/ui/confirm-save-dialog";
 import { useQuery } from "@tanstack/react-query";
 
 // Customer interface for search results
@@ -146,6 +147,9 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   // Unsaved changes tracking
   const [showConfirmExit, setShowConfirmExit] = useState(false);
   const [pendingExit, setPendingExit] = useState<() => void>(() => {});
+  
+  // Save confirmation tracking
+  const [showConfirmSave, setShowConfirmSave] = useState(false);
   
   // Track modal open state to initialize only once per open
   const wasOpenRef = useRef(false);
@@ -320,22 +324,38 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     setValidationErrors(errors);
     
     if (!Object.values(errors).some(hasError => hasError)) {
-      // TODO: Implement actual save logic here
-      console.log('Save payment:', {
-        businessPartnerType,
-        customerSearchQuery,
-        customerPhone,
-        customerName,
-        postingDate: normalizedDate,
-        transactionType,
-        documentNo,
-        paymentMethods
-      });
-      
-      // Close modal after successful save
-      onOpenChange(false);
+      // Validation passed - show save confirmation
+      setShowConfirmSave(true);
     }
+  }, [normalizePostingDate, postingDate, businessPartnerType, customerSearchQuery, customerPhone, customerName, transactionType, documentNo, paymentMethods]);
+  
+  // Confirm save after user accepts confirmation
+  const confirmSave = useCallback(() => {
+    setShowConfirmSave(false);
+    
+    // Normalize posting date one more time
+    const normalizedDate = normalizePostingDate(postingDate);
+    
+    // TODO: Implement actual save logic here
+    console.log('Save payment:', {
+      businessPartnerType,
+      customerSearchQuery,
+      customerPhone,
+      customerName,
+      postingDate: normalizedDate,
+      transactionType,
+      documentNo,
+      paymentMethods
+    });
+    
+    // Close modal after successful save
+    onOpenChange(false);
   }, [normalizePostingDate, postingDate, businessPartnerType, customerSearchQuery, customerPhone, customerName, transactionType, documentNo, paymentMethods, onOpenChange]);
+  
+  // Cancel save
+  const cancelSave = useCallback(() => {
+    setShowConfirmSave(false);
+  }, []);
   
   const handleExit = useCallback((exitCallback: () => void) => {
     if (hasUnsavedChanges()) {
@@ -967,6 +987,14 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
       isOpen={showConfirmExit}
       onCancel={cancelExit}
       onConfirm={confirmExit}
+      language={language}
+    />
+    
+    {/* Confirm Save Dialog */}
+    <ConfirmSaveDialog
+      isOpen={showConfirmSave}
+      onCancel={cancelSave}
+      onConfirm={confirmSave}
       language={language}
     />
     </>
