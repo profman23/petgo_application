@@ -62,25 +62,27 @@ export function InvoiceMapModal({
 
   // Initialize positions when modal opens or data changes
   useEffect(() => {
-    if (isOpen && invoice) {
+    if (isOpen && payments && payments.length > 0) {
       const initialPositions: {[key: string]: {x: number, y: number}} = {};
       
-      // Center invoice box
-      initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 200, y: 300 };
-      
-      // Position credit notes to the right of invoice
-      creditNotes.forEach((creditNote, index) => {
-        initialPositions[`creditnote-${creditNote.id}`] = { 
-          x: 600, 
-          y: 200 + (index * 150) 
+      // Center payment box (payment-centric layout)
+      payments.forEach((payment, index) => {
+        initialPositions[`payment-${payment.id}`] = { 
+          x: 400, // Center horizontally
+          y: 250 + (index * 170) // Center vertically with spacing for multiple payments
         };
       });
       
-      // Position payment boxes to the left of invoice (visible within canvas)
-      payments.forEach((payment, index) => {
-        initialPositions[`payment-${payment.id}`] = { 
-          x: Math.max(20, 200 - 350), // 20px margin from left edge, or left of invoice with spacing
-          y: 200 + (index * 150) 
+      // Position invoice box to the right of payment (if exists)
+      if (invoice) {
+        initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 750, y: 300 };
+      }
+      
+      // Position credit notes to the left of payment (if exist)
+      creditNotes.forEach((creditNote, index) => {
+        initialPositions[`creditnote-${creditNote.id}`] = { 
+          x: 50, 
+          y: 200 + (index * 170) 
         };
       });
       
@@ -152,9 +154,11 @@ export function InvoiceMapModal({
                   ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
                   : (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')}
               </h2>
-              <span className="text-sm text-gray-600">
-                {invoice.invoiceNumber}
-              </span>
+              {invoice && (
+                <span className="text-sm text-gray-600">
+                  {invoice.invoiceNumber}
+                </span>
+              )}
             </div>
             <Button
               variant="outline"
@@ -171,18 +175,18 @@ export function InvoiceMapModal({
               className="absolute inset-0 w-full h-full pointer-events-none z-10"
               style={{ zIndex: 10 }}
             >
-              {/* Draw lines from invoice to each credit note */}
-              {creditNotes.map((creditNote) => {
-                const invoicePos = boxPositions[`invoice-${invoice.invoiceNumber}`];
+              {/* Draw lines from payment to each credit note */}
+              {payments.length > 0 && creditNotes.map((creditNote) => {
+                const paymentPos = boxPositions[`payment-${payments[0].id}`]; // Use first payment as connection point
                 const creditNotePos = boxPositions[`creditnote-${creditNote.id}`];
                 
-                if (invoicePos && creditNotePos) {
+                if (paymentPos && creditNotePos) {
                   return (
                     <line
-                      key={`line-${creditNote.id}`}
-                      x1={invoicePos.x + 150} // Invoice box center + half width
-                      y1={invoicePos.y + 85}  // Invoice box center + half height
-                      x2={creditNotePos.x}    // Credit note box left edge
+                      key={`line-creditnote-${creditNote.id}`}
+                      x1={paymentPos.x} // Payment box left edge
+                      y1={paymentPos.y + 80}  // Payment box center + half height
+                      x2={creditNotePos.x + 250}    // Credit note box right edge
                       y2={creditNotePos.y + 80} // Credit note box center + half height
                       stroke="#8B2F8B"
                       strokeWidth="2"
@@ -193,20 +197,20 @@ export function InvoiceMapModal({
                 return null;
               })}
               
-              {/* Draw lines from invoice to each payment */}
-              {payments.map((payment) => {
+              {/* Draw lines from payment to invoice */}
+              {invoice && payments.length > 0 && (() => {
                 const invoicePos = boxPositions[`invoice-${invoice.invoiceNumber}`];
-                const paymentPos = boxPositions[`payment-${payment.id}`];
+                const paymentPos = boxPositions[`payment-${payments[0].id}`]; // Use first payment as connection point
                 
                 if (invoicePos && paymentPos) {
                   const lineColor = modalType === 'income' ? '#4CAF50' : '#F44336';
                   return (
                     <line
-                      key={`line-payment-${payment.id}`}
-                      x1={invoicePos.x} // Invoice box left edge
-                      y1={invoicePos.y + 85}  // Invoice box center + half height
-                      x2={paymentPos.x + 250}    // Payment box right edge
-                      y2={paymentPos.y + 80} // Payment box center + half height
+                      key={`line-payment-invoice`}
+                      x1={paymentPos.x + 250} // Payment box right edge
+                      y1={paymentPos.y + 80}  // Payment box center + half height
+                      x2={invoicePos.x}    // Invoice box left edge
+                      y2={invoicePos.y + 85} // Invoice box center + half height
                       stroke={lineColor}
                       strokeWidth="2"
                       strokeDasharray="none"
@@ -214,11 +218,11 @@ export function InvoiceMapModal({
                   );
                 }
                 return null;
-              })}
+              })()}
             </svg>
 
             {/* Invoice Box */}
-            {boxPositions[`invoice-${invoice.invoiceNumber}`] && (
+            {invoice && boxPositions[`invoice-${invoice.invoiceNumber}`] && (
               <div
                 className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
                 style={{
