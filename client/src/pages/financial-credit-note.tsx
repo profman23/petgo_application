@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
+import { InvoiceMapModal } from "@/components/InvoiceMapModal";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -67,7 +68,6 @@ export default function FinancialCreditNote() {
   const [selectedInvoiceForMap, setSelectedInvoiceForMap] = useState<any>(null);
   const [creditNotesForMap, setCreditNotesForMap] = useState<any[]>([]);
   const [paymentsForMap, setPaymentsForMap] = useState<any[]>([]);
-  const [boxPositions, setBoxPositions] = useState<{[key: string]: {x: number, y: number}}>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -697,32 +697,9 @@ export default function FinancialCreditNote() {
         }
       }
       
-      // Set initial positions for boxes
-      const initialPositions: {[key: string]: {x: number, y: number}} = {};
-      
-      // Center invoice box
-      initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 200, y: 300 };
-      
-      // Position credit notes to the right of invoice
-      creditNotesForInvoice.forEach((cn, index) => {
-        initialPositions[`creditnote-${cn.id}`] = { 
-          x: 600, 
-          y: 200 + (index * 150) 
-        };
-      });
-      
-      // Position payment boxes to the left of invoice (visible within canvas)
-      paymentsForInvoice.forEach((payment, index) => {
-        initialPositions[`payment-${payment.id}`] = { 
-          x: Math.max(20, 200 - 350), // 20px margin from left edge, or left of invoice with spacing
-          y: 200 + (index * 150) 
-        };
-      });
-      
       setSelectedInvoiceForMap(invoice);
       setCreditNotesForMap(creditNotesForInvoice);
       setPaymentsForMap(paymentsForInvoice);
-      setBoxPositions(initialPositions);
       setIsMapModalOpen(true);
     } catch (error) {
       console.error('Error opening map:', error);
@@ -735,7 +712,6 @@ export default function FinancialCreditNote() {
     setSelectedInvoiceForMap(null);
     setCreditNotesForMap([]);
     setPaymentsForMap([]);
-    setBoxPositions({});
   };
 
   // Handle creating credit note
@@ -2141,309 +2117,13 @@ export default function FinancialCreditNote() {
       </Dialog>
 
       {/* Map Modal */}
-      <Dialog open={isMapModalOpen} onOpenChange={handleCloseMapModal}>
-        <DialogContent className="w-screen h-screen max-w-none p-0 m-0 border-0 rounded-none overflow-hidden" dir={getDirection(language)}>
-          <DialogHeader className="sr-only">
-            <DialogTitle>
-              {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
-            </DialogTitle>
-            <DialogDescription>
-              {language === 'ar' ? 'عرض مرئي للفاتورة والعناصر المرتبطة بها' : 'Visual representation of invoice and related items'}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="relative w-full h-full bg-gray-50" style={{ fontFamily: 'Arimo' }}>
-            {/* Header */}
-            <div className="absolute top-0 left-0 right-0 z-20 bg-white border-b px-6 py-4 flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <lord-icon
-                  src="https://cdn.lordicon.com/wsvtrygf.json"
-                  trigger="loop"
-                  delay="1500"
-                  colors="primary:#852085,secondary:#545454"
-                  style={{ width: '80px', height: '80px' }}
-                ></lord-icon>
-                <h2 className="text-xl font-bold text-gray-800">
-                  {language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map'}
-                </h2>
-                {selectedInvoiceForMap && (
-                  <span className="text-sm text-gray-600">
-                    {selectedInvoiceForMap.invoiceNumber}
-                  </span>
-                )}
-              </div>
-              <Button
-                variant="outline"
-                onClick={handleCloseMapModal}
-                className="text-gray-600 border-gray-300 hover:bg-gray-50"
-              >
-                {language === 'ar' ? 'إغلاق' : 'Close'}
-              </Button>
-            </div>
-
-            {/* Map Canvas */}
-            <div className="absolute inset-0 pt-20 overflow-hidden">
-              <svg 
-                className="absolute inset-0 w-full h-full pointer-events-none z-10"
-                style={{ zIndex: 10 }}
-              >
-                {/* Draw lines from invoice to each credit note */}
-                {selectedInvoiceForMap && creditNotesForMap.map((creditNote) => {
-                  const invoicePos = boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`];
-                  const creditNotePos = boxPositions[`creditnote-${creditNote.id}`];
-                  
-                  if (invoicePos && creditNotePos) {
-                    return (
-                      <line
-                        key={`line-${creditNote.id}`}
-                        x1={invoicePos.x + 150} // Invoice box center + half width
-                        y1={invoicePos.y + 85}  // Invoice box center + half height
-                        x2={creditNotePos.x}    // Credit note box left edge
-                        y2={creditNotePos.y + 80} // Credit note box center + half height
-                        stroke="#8B2F8B"
-                        strokeWidth="2"
-                        strokeDasharray="none"
-                      />
-                    );
-                  }
-                  return null;
-                })}
-                
-                {/* Draw lines from invoice to each payment */}
-                {selectedInvoiceForMap && paymentsForMap.map((payment) => {
-                  const invoicePos = boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`];
-                  const paymentPos = boxPositions[`payment-${payment.id}`];
-                  
-                  if (invoicePos && paymentPos) {
-                    return (
-                      <line
-                        key={`line-payment-${payment.id}`}
-                        x1={invoicePos.x} // Invoice box left edge
-                        y1={invoicePos.y + 85}  // Invoice box center + half height
-                        x2={paymentPos.x + 250}    // Payment box right edge
-                        y2={paymentPos.y + 80} // Payment box center + half height
-                        stroke="#4CAF50"
-                        strokeWidth="2"
-                        strokeDasharray="none"
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </svg>
-
-              {/* Invoice Box */}
-              {selectedInvoiceForMap && boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`] && (
-                <div
-                  className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
-                  style={{
-                    left: boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].x,
-                    top: boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].y,
-                    borderColor: '#8B2F8B',
-                    width: '300px',
-                    height: '170px'
-                  }}
-                  onMouseDown={(e) => {
-                    const startX = e.clientX - boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].x;
-                    const startY = e.clientY - boxPositions[`invoice-${selectedInvoiceForMap.invoiceNumber}`].y;
-                    
-                    const handleMouseMove = (e: MouseEvent) => {
-                      const newX = e.clientX - startX;
-                      const newY = e.clientY - startY;
-                      
-                      setBoxPositions(prev => ({
-                        ...prev,
-                        [`invoice-${selectedInvoiceForMap.invoiceNumber}`]: { x: newX, y: newY }
-                      }));
-                    };
-                    
-                    const handleMouseUp = () => {
-                      document.removeEventListener('mousemove', handleMouseMove);
-                      document.removeEventListener('mouseup', handleMouseUp);
-                    };
-                    
-                    document.addEventListener('mousemove', handleMouseMove);
-                    document.addEventListener('mouseup', handleMouseUp);
-                  }}
-                >
-                  {/* Header Section */}
-                  <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center justify-center gap-2">
-                    <InvoiceIcon className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-semibold text-gray-700">
-                      {language === 'ar' ? 'فاتورة' : 'Invoice'}
-                    </span>
-                  </div>
-                  
-                  {/* Content Section */}
-                  <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
-                    <div className="text-lg font-bold text-gray-800 mb-2">
-                      {selectedInvoiceForMap.invoiceNumber}
-                    </div>
-                    <div className="text-sm text-gray-600 mb-2">
-                      {selectedInvoiceForMap.customerName}
-                    </div>
-                    {selectedInvoiceForMap.finalTotal && (
-                      <div className="text-sm font-semibold text-green-600 mb-2">
-                        {parseFloat(selectedInvoiceForMap.finalTotal).toFixed(2)} SAR
-                      </div>
-                    )}
-                    <div className="text-xs text-gray-500">
-                      {/* Find appointment date from credit notes data */}
-                      {creditNotesForMap.length > 0 && creditNotesForMap[0].appointmentDate && (
-                        <>
-                          {language === 'ar' ? 'التاريخ: ' : 'Date: '}
-                          {new Date(creditNotesForMap[0].appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Credit Note Boxes */}
-              {creditNotesForMap.map((creditNote) => {
-                const position = boxPositions[`creditnote-${creditNote.id}`];
-                if (!position) return null;
-
-                return (
-                  <div
-                    key={`box-${creditNote.id}`}
-                    className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
-                    style={{
-                      left: position.x,
-                      top: position.y,
-                      borderColor: '#8B2F8B',
-                      width: '250px',
-                      height: '160px'
-                    }}
-                    onMouseDown={(e) => {
-                      const startX = e.clientX - position.x;
-                      const startY = e.clientY - position.y;
-                      
-                      const handleMouseMove = (e: MouseEvent) => {
-                        const newX = e.clientX - startX;
-                        const newY = e.clientY - startY;
-                        
-                        setBoxPositions(prev => ({
-                          ...prev,
-                          [`creditnote-${creditNote.id}`]: { x: newX, y: newY }
-                        }));
-                      };
-                      
-                      const handleMouseUp = () => {
-                        document.removeEventListener('mousemove', handleMouseMove);
-                        document.removeEventListener('mouseup', handleMouseUp);
-                      };
-                      
-                      document.addEventListener('mousemove', handleMouseMove);
-                      document.addEventListener('mouseup', handleMouseUp);
-                    }}
-                  >
-                    {/* Header Section */}
-                    <div className="bg-gray-50 px-3 py-2 border-b border-gray-200 rounded-t-lg flex items-center justify-center gap-2">
-                      <CreditCard className="h-4 w-4 text-purple-600" />
-                      <span className="text-sm font-semibold text-gray-700">
-                        {language === 'ar' ? 'مذكرة ائتمان' : 'Credit Note'}
-                      </span>
-                    </div>
-                    
-                    {/* Content Section */}
-                    <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
-                      <div className="text-base font-bold text-gray-800 mb-1">
-                        CRN{creditNote.creditNoteNumber}
-                      </div>
-                      <div className="text-sm text-gray-600 mb-1">
-                        {creditNote.customerName}
-                      </div>
-                      <div className="text-sm font-semibold text-red-600 mb-2">
-                        -{creditNote.finalTotal} SAR
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {language === 'ar' ? 'التاريخ: ' : 'Date: '}
-                        {new Date(creditNote.postingDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* Income Payment Boxes */}
-              {paymentsForMap.map((payment) => {
-                const position = boxPositions[`payment-${payment.id}`];
-                if (!position) return null;
-
-                return (
-                  <div
-                    key={`payment-box-${payment.id}`}
-                    className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
-                    style={{
-                      left: position.x,
-                      top: position.y,
-                      borderColor: '#4CAF50',
-                      width: '250px',
-                      height: '160px'
-                    }}
-                    onMouseDown={(e) => {
-                      const startX = e.clientX - position.x;
-                      const startY = e.clientY - position.y;
-                      
-                      const handleMouseMove = (e: MouseEvent) => {
-                        const newX = e.clientX - startX;
-                        const newY = e.clientY - startY;
-                        
-                        setBoxPositions(prev => ({
-                          ...prev,
-                          [`payment-${payment.id}`]: { x: newX, y: newY }
-                        }));
-                      };
-                      
-                      const handleMouseUp = () => {
-                        document.removeEventListener('mousemove', handleMouseMove);
-                        document.removeEventListener('mouseup', handleMouseUp);
-                      };
-                      
-                      document.addEventListener('mousemove', handleMouseMove);
-                      document.addEventListener('mouseup', handleMouseUp);
-                    }}
-                  >
-                    {/* Header Section */}
-                    <div className="bg-green-50 px-3 py-2 border-b border-green-200 rounded-t-lg flex items-center justify-center gap-2">
-                      <svg className="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                      </svg>
-                      <span className="text-sm font-semibold text-green-700">
-                        {language === 'ar' ? 'دفعة دخل' : 'Income Payment'}
-                      </span>
-                    </div>
-                    
-                    {/* Content Section */}
-                    <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
-                      <div className="text-base font-bold text-green-600 mb-1">
-                        +{parseFloat(payment.amount).toFixed(2)} SAR
-                      </div>
-                      <div className="text-sm text-gray-600 mb-1">
-                        {language === 'ar' ? 'طريقة الدفع: ' : 'Method: '}
-                        {payment.paymentType === 'cash' ? (language === 'ar' ? 'نقدي' : 'Cash') : 
-                         payment.paymentType === 'card' ? (language === 'ar' ? 'كارت' : 'Card') : 
-                         payment.paymentType === 'transfer' ? (language === 'ar' ? 'تحويل' : 'Transfer') : 
-                         payment.paymentType}
-                      </div>
-                      {payment.description && (
-                        <div className="text-xs text-gray-500 mb-2">
-                          {payment.description}
-                        </div>
-                      )}
-                      <div className="text-xs text-gray-500">
-                        {language === 'ar' ? 'التاريخ: ' : 'Date: '}
-                        {new Date(payment.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <InvoiceMapModal
+        isOpen={isMapModalOpen}
+        onClose={handleCloseMapModal}
+        invoice={selectedInvoiceForMap}
+        creditNotes={creditNotesForMap}
+        payments={paymentsForMap}
+      />
 
       {/* Load lord-icon script */}
       <script src="https://cdn.lordicon.com/lordicon.js"></script>
