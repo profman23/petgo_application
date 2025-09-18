@@ -62,33 +62,60 @@ export function InvoiceMapModal({
 
   // Initialize positions when modal opens or data changes
   useEffect(() => {
-    if (isOpen && payments && payments.length > 0) {
+    if (isOpen) {
       const initialPositions: {[key: string]: {x: number, y: number}} = {};
       
-      // Center payment box (payment-centric layout)
-      payments.forEach((payment, index) => {
-        initialPositions[`payment-${payment.id}`] = { 
-          x: 400, // Center horizontally
-          y: 250 + (index * 170) // Center vertically with spacing for multiple payments
-        };
-      });
-      
-      // Position invoice box to the right of payment (if exists)
-      if (invoice) {
-        initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 750, y: 300 };
+      if (modalType === 'creditnote') {
+        // Invoice-centric layout for credit note modal
+        if (invoice) {
+          initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 400, y: 250 }; // Center the invoice
+        }
+        
+        // Position credit notes to the right of invoice
+        creditNotes.forEach((creditNote, index) => {
+          initialPositions[`creditnote-${creditNote.id}`] = { 
+            x: 750, 
+            y: 200 + (index * 170) 
+          };
+        });
+        
+        // Position payments to the left of invoice (if exist)
+        if (payments && payments.length > 0) {
+          payments.forEach((payment, index) => {
+            initialPositions[`payment-${payment.id}`] = { 
+              x: 50, 
+              y: 220 + (index * 170)
+            };
+          });
+        }
+      } else {
+        // Payment-centric layout for income/outgoing payment modals
+        if (payments && payments.length > 0) {
+          payments.forEach((payment, index) => {
+            initialPositions[`payment-${payment.id}`] = { 
+              x: 400, // Center horizontally
+              y: 250 + (index * 170) // Center vertically with spacing for multiple payments
+            };
+          });
+          
+          // Position invoice box to the right of payment (if exists)
+          if (invoice) {
+            initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 750, y: 300 };
+          }
+          
+          // Position credit notes to the left of payment (if exist)
+          creditNotes.forEach((creditNote, index) => {
+            initialPositions[`creditnote-${creditNote.id}`] = { 
+              x: 50, 
+              y: 200 + (index * 170) 
+            };
+          });
+        }
       }
-      
-      // Position credit notes to the left of payment (if exist)
-      creditNotes.forEach((creditNote, index) => {
-        initialPositions[`creditnote-${creditNote.id}`] = { 
-          x: 50, 
-          y: 200 + (index * 170) 
-        };
-      });
       
       setBoxPositions(initialPositions);
     }
-  }, [isOpen, invoice, creditNotes, payments]);
+  }, [isOpen, invoice, creditNotes, payments, modalType]);
 
   // Handle modal close
   const handleClose = () => {
@@ -120,7 +147,8 @@ export function InvoiceMapModal({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  if (!payments || payments.length === 0) return null;
+  // Only return null for non-credit note modals when no payments exist
+  if (modalType !== 'creditnote' && (!payments || payments.length === 0)) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -181,50 +209,100 @@ export function InvoiceMapModal({
               className="absolute inset-0 w-full h-full pointer-events-none z-10"
               style={{ zIndex: 10 }}
             >
-              {/* Draw lines from payment to each credit note */}
-              {payments.length > 0 && creditNotes.map((creditNote) => {
-                const paymentPos = boxPositions[`payment-${payments[0].id}`]; // Use first payment as connection point
-                const creditNotePos = boxPositions[`creditnote-${creditNote.id}`];
-                
-                if (paymentPos && creditNotePos) {
-                  return (
-                    <line
-                      key={`line-creditnote-${creditNote.id}`}
-                      x1={paymentPos.x} // Payment box left edge
-                      y1={paymentPos.y + 80}  // Payment box center + half height
-                      x2={creditNotePos.x + 250}    // Credit note box right edge
-                      y2={creditNotePos.y + 80} // Credit note box center + half height
-                      stroke="#8B2F8B"
-                      strokeWidth="2"
-                      strokeDasharray="none"
-                    />
-                  );
-                }
-                return null;
-              })}
-              
-              {/* Draw lines from payment to invoice */}
-              {invoice && payments.length > 0 && (() => {
-                const invoicePos = boxPositions[`invoice-${invoice.invoiceNumber}`];
-                const paymentPos = boxPositions[`payment-${payments[0].id}`]; // Use first payment as connection point
-                
-                if (invoicePos && paymentPos) {
-                  const lineColor = modalType === 'income' ? '#4CAF50' : '#F44336';
-                  return (
-                    <line
-                      key={`line-payment-invoice`}
-                      x1={paymentPos.x + 250} // Payment box right edge
-                      y1={paymentPos.y + 80}  // Payment box center + half height
-                      x2={invoicePos.x}    // Invoice box left edge
-                      y2={invoicePos.y + 85} // Invoice box center + half height
-                      stroke={lineColor}
-                      strokeWidth="2"
-                      strokeDasharray="none"
-                    />
-                  );
-                }
-                return null;
-              })()}
+              {modalType === 'creditnote' ? (
+                <>
+                  {/* Credit Note Modal: Draw lines from invoice to each credit note */}
+                  {invoice && creditNotes.map((creditNote) => {
+                    const invoicePos = boxPositions[`invoice-${invoice.invoiceNumber}`];
+                    const creditNotePos = boxPositions[`creditnote-${creditNote.id}`];
+                    
+                    if (invoicePos && creditNotePos) {
+                      return (
+                        <line
+                          key={`line-invoice-creditnote-${creditNote.id}`}
+                          x1={invoicePos.x + 300} // Invoice box right edge
+                          y1={invoicePos.y + 85}  // Invoice box center + half height
+                          x2={creditNotePos.x}    // Credit note box left edge
+                          y2={creditNotePos.y + 80} // Credit note box center + half height
+                          stroke="#8B2F8B"
+                          strokeWidth="2"
+                          strokeDasharray="none"
+                        />
+                      );
+                    }
+                    return null;
+                  })}
+                  
+                  {/* Credit Note Modal: Draw lines from payment to invoice */}
+                  {invoice && payments && payments.length > 0 && payments.map((payment) => {
+                    const invoicePos = boxPositions[`invoice-${invoice.invoiceNumber}`];
+                    const paymentPos = boxPositions[`payment-${payment.id}`];
+                    
+                    if (invoicePos && paymentPos) {
+                      return (
+                        <line
+                          key={`line-payment-invoice-${payment.id}`}
+                          x1={paymentPos.x + 250} // Payment box right edge
+                          y1={paymentPos.y + 80}  // Payment box center + half height
+                          x2={invoicePos.x}    // Invoice box left edge
+                          y2={invoicePos.y + 85} // Invoice box center + half height
+                          stroke="#4CAF50"
+                          strokeWidth="2"
+                          strokeDasharray="none"
+                        />
+                      );
+                    }
+                    return null;
+                  })}
+                </>
+              ) : (
+                <>
+                  {/* Payment Modal: Draw lines from payment to each credit note */}
+                  {payments.length > 0 && creditNotes.map((creditNote) => {
+                    const paymentPos = boxPositions[`payment-${payments[0].id}`]; // Use first payment as connection point
+                    const creditNotePos = boxPositions[`creditnote-${creditNote.id}`];
+                    
+                    if (paymentPos && creditNotePos) {
+                      return (
+                        <line
+                          key={`line-creditnote-${creditNote.id}`}
+                          x1={paymentPos.x} // Payment box left edge
+                          y1={paymentPos.y + 80}  // Payment box center + half height
+                          x2={creditNotePos.x + 250}    // Credit note box right edge
+                          y2={creditNotePos.y + 80} // Credit note box center + half height
+                          stroke="#8B2F8B"
+                          strokeWidth="2"
+                          strokeDasharray="none"
+                        />
+                      );
+                    }
+                    return null;
+                  })}
+                  
+                  {/* Payment Modal: Draw lines from payment to invoice */}
+                  {invoice && payments.length > 0 && (() => {
+                    const invoicePos = boxPositions[`invoice-${invoice.invoiceNumber}`];
+                    const paymentPos = boxPositions[`payment-${payments[0].id}`]; // Use first payment as connection point
+                    
+                    if (invoicePos && paymentPos) {
+                      const lineColor = modalType === 'income' ? '#4CAF50' : '#F44336';
+                      return (
+                        <line
+                          key={`line-payment-invoice`}
+                          x1={paymentPos.x + 250} // Payment box right edge
+                          y1={paymentPos.y + 80}  // Payment box center + half height
+                          x2={invoicePos.x}    // Invoice box left edge
+                          y2={invoicePos.y + 85} // Invoice box center + half height
+                          stroke={lineColor}
+                          strokeWidth="2"
+                          strokeDasharray="none"
+                        />
+                      );
+                    }
+                    return null;
+                  })()}
+                </>
+              )}
             </svg>
 
             {/* Invoice Box */}
@@ -325,7 +403,7 @@ export function InvoiceMapModal({
               const position = boxPositions[`payment-${payment.id}`];
               if (!position) return null;
 
-              const isIncomePayment = modalType === 'income';
+              const isIncomePayment = modalType === 'income' || modalType === 'creditnote';
               const paymentColors = {
                 border: isIncomePayment ? '#4CAF50' : '#F44336',
                 headerBg: isIncomePayment ? 'bg-green-50' : 'bg-red-50',
@@ -354,7 +432,9 @@ export function InvoiceMapModal({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                     </svg>
                     <span className={`text-sm font-semibold ${paymentColors.textColor}`}>
-                      {isIncomePayment 
+                      {modalType === 'creditnote'
+                        ? (language === 'ar' ? 'دفعة فاتورة دخل' : 'Income Invoice Payment')
+                        : isIncomePayment 
                         ? (language === 'ar' ? 'دفعة دخل' : 'Income Payment')
                         : (language === 'ar' ? 'دفعة صادرة' : 'Outgoing Payment')}
                     </span>
