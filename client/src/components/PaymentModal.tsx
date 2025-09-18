@@ -207,7 +207,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   const config = {
     income: {
       title: language === 'ar' ? 'الدفع الوارد' : 'Income Payment',
-      paymentNo: paymentNo || 'IPN001',
+      paymentNo: paymentNo || 'IPN9000001',
       paymentNoLabel: language === 'ar' ? 'رقم الدفع الوارد:' : 'Income Payment No.:',
       createButton: language === 'ar' ? 'إنشاء دفع وارد' : 'Create Income Payment',
       footerLabel: language === 'ar' ? 'دفع وارد' : 'Income Payment',
@@ -216,7 +216,7 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     },
     outgoing: {
       title: language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment',
-      paymentNo: paymentNo || 'OPN001',
+      paymentNo: paymentNo || 'OPN9000001',
       paymentNoLabel: language === 'ar' ? 'رقم الدفع الصادر:' : 'Outgoing Payment No.:',
       createButton: language === 'ar' ? 'إنشاء دفع صادر' : 'Create Outgoing Payment',
       footerLabel: language === 'ar' ? 'دفع صادر' : 'Outgoing Payment',
