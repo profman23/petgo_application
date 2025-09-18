@@ -2123,6 +2123,7 @@ export default function FinancialCreditNote() {
         invoice={selectedInvoiceForMap}
         creditNotes={creditNotesForMap}
         payments={paymentsForMap}
+        modalType="creditnote"
       />
 
       {/* Load lord-icon script */}
