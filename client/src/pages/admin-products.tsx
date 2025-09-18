@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
 
 // Products Management Component
 const ProductsManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'en'; isReadOnly: boolean }) => {
