@@ -41,6 +41,8 @@ import PaymentProcessing from "@/pages/payment-processing";
 import { PaymentTest } from "@/pages/payment-test";
 import PaymentSuccess from "@/pages/payment-success";
 import PaymentError from "@/pages/payment-error";
+import PrivacyPolicyEn from "@/pages/privacy-policy-en";
+import PrivacyPolicyAr from "@/pages/privacy-policy-ar";
 import { FixedFooter } from "@/components/fixed-footer";
 import { LoadingScreen } from "@/components/loading-screen";
 import { useEffect, useState } from "react";
@@ -266,6 +268,8 @@ function Router() {
           <Route path="/payment-test" component={() => <AuthCheck><PaymentTest /></AuthCheck>} />
           <Route path="/payment-success" component={PaymentSuccess} />
           <Route path="/payment-error" component={PaymentError} />
+          <Route path="/en/privacy-policy" component={PrivacyPolicyEn} />
+          <Route path="/ar/privacy-policy" component={PrivacyPolicyAr} />
           <Route path="/home" component={() => <AuthCheck><Home /></AuthCheck>} />
           <Route path="/" component={Login} />
           <Route component={NotFound} />
