@@ -8,20 +8,21 @@ export default function PrivacyPolicyAr() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8" dir="rtl">
       <style>{`
-        * {
+        .arabic-text :where(a, strong, em, code, mark) {
           color: inherit !important;
+          text-decoration-color: currentColor;
         }
-        .arabic-text, .arabic-text * {
+        .arabic-text.prose :where(a) {
           color: inherit !important;
         }
       `}</style>
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center" style={{ fontFamily: 'Cairo Play, sans-serif' }}>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center" style={{ fontFamily: 'Cairo, Tajawal, Noto Sans Arabic, system-ui, sans-serif' }}>
             سياسة الخصوصية – VetsVan
           </h1>
           
-          <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed arabic-text" style={{ fontFamily: 'Cairo Play, sans-serif' }}>
+          <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed arabic-text" style={{ fontFamily: 'Cairo, Tajawal, Noto Sans Arabic, system-ui, sans-serif' }}>
             <p className="mb-6">
               نحن في VetsVan نولي أهمية كبيرة لخصوصيتك. توضح هذه السياسة كيفية جمع واستخدام وحماية بياناتك عند استخدامك للتطبيق.
             </p>
@@ -48,7 +49,7 @@ export default function PrivacyPolicyAr() {
             
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-3">التواصل:</h2>
-              <p>للاستفسارات يمكنكم التواصل عبر <a href="mailto:support@vetsvan.com" className="text-purple-600 hover:text-purple-800 underline">support@vetsvan.com</a>.</p>
+              <p>للاستفسارات يمكنكم التواصل عبر <a href="mailto:support@vetsvan.com" className="underline">support@vetsvan.com</a>.</p>
             </div>
             
             <div className="mt-8 pt-6 border-t border-gray-200">
