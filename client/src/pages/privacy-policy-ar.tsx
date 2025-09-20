@@ -7,13 +7,21 @@ export default function PrivacyPolicyAr() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8" dir="rtl">
+      <style>{`
+        * {
+          color: inherit !important;
+        }
+        .arabic-text, .arabic-text * {
+          color: inherit !important;
+        }
+      `}</style>
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center" style={{ fontFamily: 'Cairo Play, sans-serif' }}>
             سياسة الخصوصية – VetsVan
           </h1>
           
-          <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed" style={{ fontFamily: 'Cairo Play, sans-serif' }}>
+          <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed arabic-text" style={{ fontFamily: 'Cairo Play, sans-serif' }}>
             <p className="mb-6">
               نحن في VetsVan نولي أهمية كبيرة لخصوصيتك. توضح هذه السياسة كيفية جمع واستخدام وحماية بياناتك عند استخدامك للتطبيق.
             </p>
