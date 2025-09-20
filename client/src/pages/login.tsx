@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { createLoginSchema, createRegisterSchema, type RegisterUser } from '@shared/schema';
 import { User, Phone, Lock, ArrowLeft, UserPlus, RefreshCw, Heart, Mail } from 'lucide-react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import logoImage from "@assets/Screenshot 2025-07-10 182605_1752161515777.png";
 import welcomeHandImage from "@assets/freepik__background__61417_1753095390676.png";
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
@@ -459,12 +459,21 @@ export default function Login() {
                     </div>
                   )}
 
-                  <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
                     <p className="text-sm text-gray-500 font-medium tracking-wide" style={{ 
                       fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                     }}>
-                      Powered By Ghazala Software
+                      Powered By DotVets Software
                     </p>
+                    <div className="text-center">
+                      <Link href="/en/privacy-policy">
+                        <span className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer underline" style={{ 
+                          fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                        }}>
+                          Privacy & Policy
+                        </span>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </form>
@@ -624,6 +633,23 @@ export default function Login() {
                 <ArrowLeft className={`w-5 h-5 ${language === 'ar' ? 'ml-3 rotate-180' : 'mr-3'}`} />
                 {language === 'ar' ? 'العودة إلى تسجيل الدخول' : 'Back to Login'}
               </Button>
+
+              <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
+                <p className="text-sm text-gray-500 font-medium tracking-wide text-center" style={{ 
+                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                }}>
+                  Powered By DotVets Software
+                </p>
+                <div className="text-center">
+                  <Link href="/en/privacy-policy">
+                    <span className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer underline" style={{ 
+                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                    }}>
+                      Privacy & Policy
+                    </span>
+                  </Link>
+                </div>
+              </div>
             </form>
           )}
         </CardContent>
