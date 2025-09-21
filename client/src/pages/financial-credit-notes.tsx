@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { FilePlus } from 'lucide-react';
 import { SearchActionBar } from '@/components/ui/search-action-bar';
+import { AdminLayout } from '@/components/admin-layout/AdminLayout';
 
 export default function FinancialCreditNotes() {
   const { language } = useTranslation();
@@ -38,8 +39,7 @@ export default function FinancialCreditNotes() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Main Content */}
+    <AdminLayout>
       <div className="p-8">
         <div className="flex items-center justify-between mb-8">
           {/* Left side - Lord Icon and Title */}
@@ -101,6 +101,6 @@ export default function FinancialCreditNotes() {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }
