@@ -1,4 +1,4 @@
-import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar, BanknoteArrowUp, BanknoteArrowDown, ArrowUpDown } from "lucide-react";
+import { Home, Users, DollarSign, Handshake, Car, Clock, BarChart3, TrendingUp, FileText, Upload, Package, Stethoscope, User, Receipt, ArrowDownLeft, ArrowUpRight, Calendar, BanknoteArrowUp, BanknoteArrowDown, ArrowUpDown, ReceiptText } from "lucide-react";
 
 export interface SidebarMenuItem {
   id: string;
@@ -60,6 +60,12 @@ export const adminSidebarConfig: SidebarSection[] = [
         i18nKey: { en: "Credit Note", ar: "إشعار دائن" },
         route: "/financial/credit-note",
         icon: Receipt
+      },
+      {
+        id: "credit-notes",
+        i18nKey: { en: "Credit Notes", ar: "إشعارات دائنة" },
+        route: "/financial/credit-notes",
+        icon: ReceiptText
       },
       {
         id: "outgoing-payment",
