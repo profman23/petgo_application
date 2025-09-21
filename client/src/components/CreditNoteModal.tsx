@@ -311,8 +311,8 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   return (
     <>
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0">
-        <DialogHeader className="p-6 pb-4" dir={getDirection(language)}>
+      <DialogContent className="max-w-6xl max-h-[85vh] p-0">
+        <DialogHeader className="p-3 pb-2" dir={getDirection(language)}>
           <div className="flex items-center gap-4">
             {/* Lord Icon */}
             <div className="flex-shrink-0">
@@ -330,19 +330,18 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
           </div>
         </DialogHeader>
 
-        <div className="px-6 pb-6" dir={getDirection(language)}>
+        <div className="px-3 pb-3 overflow-y-auto max-h-[75vh]" dir={getDirection(language)}>
           {/* Customer Information Section */}
-          <div className="p-4 mb-4 rounded-lg">
-            <div className="flex items-center gap-2 mb-4">
-              <User className="w-5 h-5 text-gray-600" />
+          <div className="p-2 mb-2 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
               <h2 className="text-lg font-medium text-gray-900">
                 {language === 'ar' ? 'معلومات العميل' : 'Customer Information'}
               </h2>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-1">
               {/* Row 1: Customer Search and Credit Note No */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'معرف العميل:' : 'Customer ID:'}
@@ -390,7 +389,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
               </div>
 
               {/* Row 2: Customer Name and Posting Date */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
@@ -439,7 +438,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
               </div>
 
               {/* Row 3: Customer Phone */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ borderBottomWidth: '2px', paddingBottom: '8px' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ borderBottomWidth: '2px', paddingBottom: '4px' }}>
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
@@ -461,12 +460,12 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
           </div>
 
           {/* Tabs Section */}
-          <div className="mb-4">
+          <div className="mb-2">
             <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8">
+              <nav className="-mb-px flex space-x-4">
                 <button
                   onClick={() => setActiveTab('content')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-1 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'content'
                       ? 'border-purple-500 text-purple-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -477,7 +476,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                 </button>
                 <button
                   onClick={() => setActiveTab('attachment')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  className={`py-1 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'attachment'
                       ? 'border-purple-500 text-purple-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -492,10 +491,10 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
 
           {/* Tab Content */}
           {activeTab === 'content' && (
-            <div className="space-y-4">
+            <div className="space-y-2">
               {/* Items Table */}
               <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                <div className="px-3 py-2 border-b border-gray-200 flex justify-between items-center">
                   <h3 className="text-lg font-medium text-gray-900">
                     {language === 'ar' ? 'عناصر مذكرة الائتمان' : 'Credit Note Items'}
                   </h3>
@@ -517,25 +516,25 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                   <table className="w-full">
                     <thead>
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'وصف العنصر/الخدمة' : 'Item/Service Description'}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'الكمية' : 'Quantity'}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'المجموع ق.ض.ق' : 'Total B.VAT'}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'ضريبة القيمة المضافة' : 'VAT'}
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'المجموع ب.ض.ق' : 'Total A.VAT'}
                         </th>
-                        <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'إجراءات' : 'Actions'}
                         </th>
                       </tr>
@@ -543,7 +542,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     <tbody className="bg-white divide-y divide-gray-200">
                       {items.map((item) => (
                         <tr key={item.id}>
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             <input
                               type="text"
                               value={item.description}
@@ -553,7 +552,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                               data-testid={`input-description-${item.id}`}
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             <input
                               type="number"
                               value={item.quantity}
@@ -563,7 +562,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                               data-testid={`input-quantity-${item.id}`}
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             <input
                               type="number"
                               value={item.unitPrice}
@@ -574,16 +573,16 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                               data-testid={`input-unit-price-${item.id}`}
                             />
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-900">
+                          <td className="px-3 py-2 text-sm text-gray-900">
                             {item.totalBeforeVAT.toFixed(2)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-900">
+                          <td className="px-3 py-2 text-sm text-gray-900">
                             {item.vat.toFixed(2)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-900">
+                          <td className="px-3 py-2 text-sm text-gray-900">
                             {item.totalAfterVAT.toFixed(2)}
                           </td>
-                          <td className="px-4 py-3 text-center">
+                          <td className="px-3 py-2 text-center">
                             {items.length > 1 && (
                               <button
                                 onClick={() => handleRemoveItem(item.id)}
@@ -599,16 +598,16 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     </tbody>
                     <tfoot>
                       <tr className="font-medium">
-                        <td colSpan={3} className="px-4 py-3 text-right text-sm font-medium text-gray-900">
+                        <td colSpan={3} className="px-3 py-2 text-right text-sm font-medium text-gray-900">
                           {language === 'ar' ? 'المجموع:' : 'Total:'}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                        <td className="px-3 py-2 text-sm text-gray-900">
                           {totals.totalBeforeVAT.toFixed(2)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                        <td className="px-3 py-2 text-sm text-gray-900">
                           {totals.vat.toFixed(2)}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                        <td className="px-3 py-2 text-sm text-gray-900">
                           {totals.totalAfterVAT.toFixed(2)}
                         </td>
                         <td></td>
@@ -619,13 +618,13 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
               </div>
               
               {/* Payment Methods Section */}
-              <div className="space-y-3 pt-4">
+              <div className="space-y-2 pt-2">
                 <div dir={getDirection(language)}>
-                  <label className="block text-sm font-medium mb-4 text-gray-700" style={{ borderTopWidth: '2px', paddingTop: '10px' }}>
+                  <label className="block text-sm font-medium mb-2 text-gray-700" style={{ borderTopWidth: '2px', paddingTop: '5px' }}>
                     {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
                   </label>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     {/* Cash Option */}
                     <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <label className="flex items-center min-w-[120px]">
@@ -741,7 +740,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     </div>
                     
                     {/* Total Amount */}
-                    <div className="mt-3 pt-2">
+                    <div className="mt-2 pt-1">
                       <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                         <label className="flex items-center min-w-[120px] font-semibold">
                           <span className="text-sm text-gray-800">
@@ -763,7 +762,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     </div>
                     
                     {/* Description Section */}
-                    <div className="mt-4 pt-3">
+                    <div className="mt-2 pt-1">
                       <div dir="ltr">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           {language === 'ar' ? 'الوصف' : 'Description'}
@@ -783,7 +782,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
           )}
 
           {activeTab === 'attachment' && (
-            <div className="rounded-lg p-8 text-center">
+            <div className="rounded-lg p-4 text-center">
               <p className="text-gray-500">
                 {language === 'ar' ? 'قسم المرفقات سيتم تطويره قريباً' : 'Attachment section will be developed soon'}
               </p>
@@ -791,9 +790,9 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center gap-3 mt-6 pt-4">
+          <div className="flex justify-between items-center gap-2 mt-3 pt-2">
             {/* Left side buttons */}
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <button
                 onClick={handleSave}
                 className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
