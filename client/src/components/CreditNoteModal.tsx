@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { User, Plus, Trash2, FilePlus } from "lucide-react";
@@ -39,6 +39,22 @@ interface CreditNoteModalProps {
 
 export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) {
   const { language } = useTranslation();
+  
+  // Helper function to handle relative date input
+  const parseRelativeDate = (input: string) => {
+    if (!input) return '';
+    
+    // Check if it's a relative value (+2, -3, etc.)
+    const relativeMatch = input.match(/^([+-]?\d+)$/);
+    if (relativeMatch) {
+      const days = parseInt(relativeMatch[1]);
+      const resultDate = addDays(new Date(), days);
+      return format(resultDate, 'yyyy-MM-dd');
+    }
+    
+    // Return as-is for regular date inputs
+    return input;
+  };
   
   // Auto-generate Credit Note Number
   const { data: nextCreditNoteNumber } = useQuery<string>({
@@ -249,7 +265,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
 
         <div className="px-6 pb-6" dir={getDirection(language)}>
           {/* Customer Information Section */}
-          <div className="p-6 mb-6 border border-gray-200 rounded-lg">
+          <div className="p-6 mb-6 rounded-lg">
             <div className="flex items-center gap-2 mb-4">
               <User className="w-5 h-5 text-gray-600" />
               <h2 className="text-lg font-medium text-gray-900">
@@ -301,7 +317,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     disabled
                     value={nextCreditNoteNumber || 'Loading...'}
                     data-testid="input-credit-note-no"
-                    style={{ marginLeft: '13px' }}
+                    style={{ marginLeft: '13px', marginRight: '10px' }}
                   />
                 </div>
               </div>
@@ -330,10 +346,25 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
                   </label>
                   <input 
-                    type="date" 
+                    type="text" 
                     className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                    placeholder={language === 'ar' ? '+2 أو -3' : '+2 or -3'}
                     value={postingDate}
-                    onChange={(e) => setPostingDate(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setPostingDate(value);
+                      // Parse relative dates on blur or when complete
+                      if (value.match(/^[+-]?\d+$/)) {
+                        const parsedDate = parseRelativeDate(value);
+                        if (parsedDate !== value) {
+                          setPostingDate(parsedDate);
+                        }
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const parsedDate = parseRelativeDate(e.target.value);
+                      setPostingDate(parsedDate);
+                    }}
                     data-testid="input-posting-date"
                     style={{ marginLeft: '29px' }}
                   />
@@ -555,7 +586,12 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                           className="w-[170px] px-2 input-compact-20 border border-gray-300"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                           value={paymentMethods.cash.amount || ''}
-                          onChange={(e) => handlePaymentMethodChange('cash', 'amount', parseFloat(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value) || 0;
+                            if (value >= 0) {
+                              handlePaymentMethodChange('cash', 'amount', value);
+                            }
+                          }}
                           disabled={!paymentMethods.cash.checked}
                         />
                       </div>
@@ -588,7 +624,12 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                           className="w-[170px] px-2 input-compact-20 border border-gray-300"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                           value={paymentMethods.card.amount || ''}
-                          onChange={(e) => handlePaymentMethodChange('card', 'amount', parseFloat(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value) || 0;
+                            if (value >= 0) {
+                              handlePaymentMethodChange('card', 'amount', value);
+                            }
+                          }}
                           disabled={!paymentMethods.card.checked}
                         />
                       </div>
@@ -621,7 +662,12 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                           className="w-[170px] px-2 input-compact-20 border border-gray-300"
                           placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                           value={paymentMethods.bank.amount || ''}
-                          onChange={(e) => handlePaymentMethodChange('bank', 'amount', parseFloat(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value) || 0;
+                            if (value >= 0) {
+                              handlePaymentMethodChange('bank', 'amount', value);
+                            }
+                          }}
                           disabled={!paymentMethods.bank.checked}
                         />
                       </div>
@@ -638,13 +684,29 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                         <div className="flex items-center gap-2">
                           <input 
                             type="number" 
-                            className="w-[170px] px-2 input-compact-20 border border-gray-300 font-semibold"
+                            className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-100 cursor-not-allowed font-semibold"
                             placeholder={language === 'ar' ? 'الإجمالي' : 'Total'}
                             value={calculatePaymentTotal()}
                             readOnly
+                            disabled
                             data-testid="input-total-payment-amount"
                           />
                         </div>
+                      </div>
+                    </div>
+                    
+                    {/* Description Section */}
+                    <div className="mt-4 pt-3">
+                      <div dir="ltr">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {language === 'ar' ? 'الوصف' : 'Description'}
+                        </label>
+                        <textarea 
+                          className="description-field border border-gray-300 w-full p-2 rounded-md resize-none"
+                          placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
+                          rows={3}
+                          data-testid="textarea-description"
+                        />
                       </div>
                     </div>
                   </div>
@@ -654,7 +716,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
           )}
 
           {activeTab === 'attachment' && (
-            <div className="rounded-lg p-8 text-center border border-gray-200">
+            <div className="rounded-lg p-8 text-center">
               <p className="text-gray-500">
                 {language === 'ar' ? 'قسم المرفقات سيتم تطويره قريباً' : 'Attachment section will be developed soon'}
               </p>
@@ -662,26 +724,48 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-start gap-3 mt-6 pt-4 border-t border-gray-200">
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
-              style={{ 
-                borderColor: '#852085', 
-                color: '#852085'
-              }}
-              data-testid="button-save"
-            >
-              <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
-              {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
-            </button>
-            <button
-              onClick={handleClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              data-testid="button-cancel"
-            >
-              {language === 'ar' ? 'إلغاء' : 'Cancel'}
-            </button>
+          <div className="flex justify-between items-center gap-3 mt-6 pt-4">
+            {/* Left side buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+                style={{ 
+                  borderColor: '#852085', 
+                  color: '#852085'
+                }}
+                data-testid="button-save"
+              >
+                <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+                {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
+              </button>
+              <button
+                onClick={handleClose}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                data-testid="button-cancel"
+              >
+                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+              </button>
+            </div>
+            
+            {/* Right side Copy From dropdown */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700">
+                {language === 'ar' ? 'نسخ من:' : 'Copy From:'}
+              </label>
+              <select
+                className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+                data-testid="select-copy-from"
+                defaultValue=""
+              >
+                <option value="" disabled>
+                  {language === 'ar' ? 'اختر...' : 'Select...'}
+                </option>
+                <option value="ar-invoice">
+                  {language === 'ar' ? 'فاتورة الذمم المدينة' : 'A/R Invoice'}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
       </DialogContent>
