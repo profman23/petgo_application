@@ -2,8 +2,17 @@ import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { User, Plus, Trash2 } from "lucide-react";
+import { User, Plus, Trash2, FilePlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+
+// Declare lord-icon custom element for TypeScript
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'lord-icon': any;
+    }
+  }
+}
 
 // Customer interface for search results
 interface Customer {
@@ -48,6 +57,13 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   // Tab state
   const [activeTab, setActiveTab] = useState<'content' | 'attachment'>('content');
   
+  // Payment Methods state
+  const [paymentMethods, setPaymentMethods] = useState({
+    cash: { checked: false, amount: 0 },
+    card: { checked: false, amount: 0 },
+    bank: { checked: false, amount: 0 }
+  });
+  
   // Credit Note Items state
   const [items, setItems] = useState<CreditNoteItem[]>([
     {
@@ -73,6 +89,13 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       const defaultDate = format(new Date(), 'yyyy-MM-dd');
       setPostingDate(defaultDate);
       
+      // Load lord-icon script (only if not already loaded)
+      if (!document.querySelector('script[src="https://cdn.lordicon.com/lordicon.js"]')) {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.lordicon.com/lordicon.js';
+        document.head.appendChild(script);
+      }
+      
       // Reset state when opening
       setCustomerSearchQuery('');
       setCustomerPhone('');
@@ -80,6 +103,11 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       setSelectedCustomer(null);
       setShowCustomerDropdown(false);
       setActiveTab('content');
+      setPaymentMethods({
+        cash: { checked: false, amount: 0 },
+        card: { checked: false, amount: 0 },
+        bank: { checked: false, amount: 0 }
+      });
       setItems([{
         id: '1',
         description: '',
@@ -162,6 +190,24 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
     totalAfterVAT: acc.totalAfterVAT + item.totalAfterVAT
   }), { totalBeforeVAT: 0, vat: 0, totalAfterVAT: 0 });
 
+  // Handle payment method changes
+  const handlePaymentMethodChange = (method: 'cash' | 'card' | 'bank', field: 'checked' | 'amount', value: boolean | number) => {
+    setPaymentMethods(prev => ({
+      ...prev,
+      [method]: {
+        ...prev[method],
+        [field]: value
+      }
+    }));
+  };
+
+  // Calculate payment total
+  const calculatePaymentTotal = () => {
+    return Object.values(paymentMethods).reduce((total, method) => {
+      return total + (method.checked ? method.amount : 0);
+    }, 0);
+  };
+
   const handleClose = () => {
     onOpenChange(false);
   };
@@ -185,23 +231,25 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0">
         <DialogHeader className="p-6 pb-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-              <User className="w-6 h-6 text-purple-600" />
+            {/* Lord Icon */}
+            <div className="flex-shrink-0">
+              <div 
+                dangerouslySetInnerHTML={{
+                  __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                }}
+              />
             </div>
-            <div>
-              <DialogTitle className="text-xl font-semibold text-gray-900">
-                {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
-              </DialogTitle>
-              <DialogDescription className="text-gray-600">
-                {language === 'ar' ? 'قم بإنشاء إشعار دائن جديد للعميل' : 'Create a new credit note for customer'}
-              </DialogDescription>
-            </div>
+            
+            {/* Title */}
+            <h1 className="text-2xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
+              {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
+            </h1>
           </div>
         </DialogHeader>
 
         <div className="px-6 pb-6" dir={getDirection(language)}>
           {/* Customer Information Section */}
-          <div className="bg-gray-50 rounded-lg p-6 mb-6">
+          <div className="p-6 mb-6 border border-gray-200 rounded-lg">
             <div className="flex items-center gap-2 mb-4">
               <User className="w-5 h-5 text-gray-600" />
               <h2 className="text-lg font-medium text-gray-900">
@@ -210,7 +258,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
             </div>
 
             <div className="space-y-4">
-              {/* Customer Search */}
+              {/* Row 1: Customer Search and Credit Note No */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
@@ -258,25 +306,8 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                 </div>
               </div>
 
-              {/* Customer Phone and Customer Name */}
+              {/* Row 2: Customer Name and Posting Date */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                    {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
-                  </label>
-                  <input 
-                    type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 ${
-                      selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
-                    }`}
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    disabled={selectedCustomer !== null}
-                    data-testid="input-customer-phone"
-                    placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
-                  />
-                </div>
-
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
@@ -293,10 +324,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
                   />
                 </div>
-              </div>
 
-              {/* Posting Date */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ borderBottomWidth: '2px', paddingBottom: '10px' }}>
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'تاريخ الترحيل:' : 'Posting Date:'}
@@ -308,6 +336,26 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     onChange={(e) => setPostingDate(e.target.value)}
                     data-testid="input-posting-date"
                     style={{ marginLeft: '29px' }}
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Customer Phone */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ borderBottomWidth: '2px', paddingBottom: '10px' }}>
+                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                    {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
+                  </label>
+                  <input 
+                    type="text" 
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 ${
+                      selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                    }`}
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    disabled={selectedCustomer !== null}
+                    data-testid="input-customer-phone"
+                    placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
                   />
                 </div>
               </div>
@@ -348,24 +396,28 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
           {activeTab === 'content' && (
             <div className="space-y-4">
               {/* Items Table */}
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
                   <h3 className="text-lg font-medium text-gray-900">
                     {language === 'ar' ? 'عناصر مذكرة الائتمان' : 'Credit Note Items'}
                   </h3>
                   <button
                     onClick={handleAddItem}
-                    className="px-3 py-1 bg-purple-600 text-white rounded-md hover:bg-purple-700 flex items-center gap-1 text-sm"
+                    className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+                    style={{ 
+                      borderColor: '#852085', 
+                      color: '#852085'
+                    }}
                     data-testid="button-add-item"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4" style={{ color: '#852085' }} />
                     {language === 'ar' ? 'إضافة عنصر' : 'Add Item'}
                   </button>
                 </div>
 
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50">
+                    <thead>
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'وصف العنصر/الخدمة' : 'Item/Service Description'}
@@ -447,7 +499,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                         </tr>
                       ))}
                     </tbody>
-                    <tfoot className="bg-gray-50">
+                    <tfoot>
                       <tr className="font-medium">
                         <td colSpan={3} className="px-4 py-3 text-right text-sm font-medium text-gray-900">
                           {language === 'ar' ? 'المجموع:' : 'Total:'}
@@ -467,11 +519,142 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                   </table>
                 </div>
               </div>
+              
+              {/* Payment Methods Section */}
+              <div className="space-y-4 pt-6 border-t border-gray-200">
+                <div dir={getDirection(language)}>
+                  <label className="block text-sm font-medium mb-4 text-gray-700" style={{ borderTopWidth: '2px', paddingTop: '10px' }}>
+                    {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
+                  </label>
+                  
+                  <div className="space-y-4">
+                    {/* Cash Option */}
+                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <label className="flex items-center min-w-[120px]">
+                        <input 
+                          type="checkbox" 
+                          name="paymentMethod" 
+                          value="cash"
+                          checked={paymentMethods.cash.checked}
+                          onChange={(e) => handlePaymentMethodChange('cash', 'checked', e.target.checked)}
+                          className="mr-2 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {language === 'ar' ? 'نقدي' : 'Cash'}
+                        </span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-700">
+                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
+                        </label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          step="0.01"
+                          inputMode="decimal"
+                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                          value={paymentMethods.cash.amount || ''}
+                          onChange={(e) => handlePaymentMethodChange('cash', 'amount', parseFloat(e.target.value) || 0)}
+                          disabled={!paymentMethods.cash.checked}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Card Option */}
+                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <label className="flex items-center min-w-[120px]">
+                        <input 
+                          type="checkbox" 
+                          name="paymentMethod" 
+                          value="card"
+                          checked={paymentMethods.card.checked}
+                          onChange={(e) => handlePaymentMethodChange('card', 'checked', e.target.checked)}
+                          className="mr-2 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {language === 'ar' ? 'بطاقة' : 'Card'}
+                        </span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-700">
+                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
+                        </label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          step="0.01"
+                          inputMode="decimal"
+                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                          value={paymentMethods.card.amount || ''}
+                          onChange={(e) => handlePaymentMethodChange('card', 'amount', parseFloat(e.target.value) || 0)}
+                          disabled={!paymentMethods.card.checked}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Bank Transfer Option */}
+                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <label className="flex items-center min-w-[120px]">
+                        <input 
+                          type="checkbox" 
+                          name="paymentMethod" 
+                          value="bank"
+                          checked={paymentMethods.bank.checked}
+                          onChange={(e) => handlePaymentMethodChange('bank', 'checked', e.target.checked)}
+                          className="mr-2 text-purple-600 focus:ring-purple-500"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {language === 'ar' ? 'تحويل مصرفي' : 'Bank Transfer'}
+                        </span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-gray-700">
+                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
+                        </label>
+                        <input 
+                          type="number" 
+                          min="0"
+                          step="0.01"
+                          inputMode="decimal"
+                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
+                          value={paymentMethods.bank.amount || ''}
+                          onChange={(e) => handlePaymentMethodChange('bank', 'amount', parseFloat(e.target.value) || 0)}
+                          disabled={!paymentMethods.bank.checked}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Total Amount */}
+                    <div className="mt-4 pt-3 border-t border-gray-200">
+                      <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                        <label className="flex items-center min-w-[120px] font-semibold">
+                          <span className="text-sm text-gray-800">
+                            {language === 'ar' ? 'المبلغ الإجمالي:' : 'Total Amount:'}
+                          </span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="number" 
+                            className="w-[170px] px-2 input-compact-20 border border-gray-300 font-semibold"
+                            placeholder={language === 'ar' ? 'الإجمالي' : 'Total'}
+                            value={calculatePaymentTotal()}
+                            readOnly
+                            data-testid="input-total-payment-amount"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
           {activeTab === 'attachment' && (
-            <div className="bg-gray-50 rounded-lg p-8 text-center">
+            <div className="rounded-lg p-8 text-center border border-gray-200">
               <p className="text-gray-500">
                 {language === 'ar' ? 'قسم المرفقات سيتم تطويره قريباً' : 'Attachment section will be developed soon'}
               </p>
@@ -479,20 +662,25 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+          <div className="flex justify-start gap-3 mt-6 pt-4 border-t border-gray-200">
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+              style={{ 
+                borderColor: '#852085', 
+                color: '#852085'
+              }}
+              data-testid="button-save"
+            >
+              <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+              {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
+            </button>
             <button
               onClick={handleClose}
               className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
               data-testid="button-cancel"
             >
               {language === 'ar' ? 'إلغاء' : 'Cancel'}
-            </button>
-            <button
-              onClick={handleSave}
-              className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-              data-testid="button-save"
-            >
-              {language === 'ar' ? 'حفظ' : 'Save'}
             </button>
           </div>
         </div>
