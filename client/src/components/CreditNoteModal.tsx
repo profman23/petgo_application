@@ -229,7 +229,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0">
-        <DialogHeader className="p-6 pb-4">
+        <DialogHeader className="p-6 pb-4" dir={getDirection(language)}>
           <div className="flex items-center gap-4">
             {/* Lord Icon */}
             <div className="flex-shrink-0">
