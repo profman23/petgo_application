@@ -37,6 +37,7 @@ export function InvoiceSelectionModal({
   const [allInvoices, setAllInvoices] = useState<Invoice[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
@@ -53,6 +54,7 @@ export function InvoiceSelectionModal({
     if (isOpen) {
       setSearchQuery('');
       setSearchResults([]);
+      setShowDropdown(false);
     }
   }, [isOpen]);
 
@@ -80,32 +82,44 @@ export function InvoiceSelectionModal({
     }
   };
 
-  const handleSearch = () => {
-    if (!searchQuery.trim()) {
+  // Handle search input change - search as user types
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    
+    if (!value.trim()) {
       setSearchResults([]);
+      setShowDropdown(false);
       return;
     }
 
-    setIsSearching(true);
-    
-    // Filter invoices by invoice number (partial match)
-    const results = allInvoices.filter((invoice: Invoice) => {
-      const invoiceNum = invoice.invoiceNumber || '';
-      const customerName = invoice.customerName || '';
-      const searchTerm = searchQuery.toLowerCase();
-      return (
-        invoiceNum.toLowerCase().includes(searchTerm) ||
-        customerName.toLowerCase().includes(searchTerm)
-      );
-    });
-    
-    setTimeout(() => {
-      setSearchResults(results);
-      setIsSearching(false);
-    }, 300);
+    if (value.length >= 2) {
+      setIsSearching(true);
+      setShowDropdown(true);
+      
+      // Filter invoices by invoice number or customer name (partial match)
+      const results = allInvoices.filter((invoice: Invoice) => {
+        const invoiceNum = invoice.invoiceNumber || '';
+        const customerName = invoice.customerName || '';
+        const searchTerm = value.toLowerCase();
+        return (
+          invoiceNum.toLowerCase().includes(searchTerm) ||
+          customerName.toLowerCase().includes(searchTerm)
+        );
+      });
+      
+      setTimeout(() => {
+        setSearchResults(results);
+        setIsSearching(false);
+      }, 300);
+    } else {
+      setSearchResults([]);
+      setShowDropdown(false);
+    }
   };
 
   const handleSelectInvoice = (invoice: Invoice) => {
+    setSearchQuery(invoice.invoiceNumber);
+    setShowDropdown(false);
     onSelect(invoice);
     onClose();
   };
@@ -152,23 +166,73 @@ export function InvoiceSelectionModal({
                 type="text"
                 placeholder={language === 'ar' ? 'ابحث برقم الفاتورة أو اسم العميل...' : 'Search by invoice number or customer name...'}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className={`${language === 'ar' ? 'pr-10' : 'pl-10'} credit-note-input`}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className={`${language === 'ar' ? 'pr-10' : 'pl-10'} credit-note-input focus-visible:ring-0 focus-visible:ring-offset-0`}
                 data-testid="input-invoice-search"
               />
+              
+              {/* Dropdown Results */}
+              {showDropdown && searchResults.length > 0 && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto mt-1">
+                  {searchResults.map((invoice) => (
+                    <div
+                      key={invoice.invoiceNumber}
+                      className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      onClick={() => handleSelectInvoice(invoice)}
+                      data-testid={`dropdown-invoice-${invoice.invoiceNumber}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-4 h-4 text-purple-600" />
+                          <div>
+                            <p className="font-semibold text-purple-600 text-sm">{invoice.invoiceNumber}</p>
+                            <p className="text-xs text-gray-600">{invoice.customerName}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-gray-800">{formatAmount(invoice.finalTotal)} SAR</p>
+                          <p className="text-xs text-gray-500">{formatDate(invoice.appointmentDate)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* No Results Dropdown */}
+              {showDropdown && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-50 mt-1">
+                  <div className="px-4 py-6 text-center text-gray-500">
+                    <FileText className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+                    <p className="text-sm font-medium">
+                      {language === 'ar' ? 'لم يتم العثور على فواتير' : 'No invoices found'}
+                    </p>
+                    <p className="text-xs">
+                      {language === 'ar' ? 'جرب كلمات بحث مختلفة' : 'Try different search terms'}
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Loading Dropdown */}
+              {showDropdown && isSearching && (
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-50 mt-1">
+                  <div className="px-4 py-6 text-center">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mx-auto mb-2"></div>
+                    <p className="text-sm text-gray-600">
+                      {language === 'ar' ? 'جاري البحث...' : 'Searching...'}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
             <Button
-              onClick={handleSearch}
-              disabled={isSearching || !searchQuery.trim()}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+              disabled={!searchQuery.trim()}
               data-testid="button-search-invoices"
             >
-              {isSearching ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              ) : (
-                language === 'ar' ? 'بحث' : 'Search'
-              )}
+              <Search className="h-4 w-4 mr-2" />
+              {language === 'ar' ? 'بحث' : 'Search'}
             </Button>
           </div>
 
@@ -179,83 +243,6 @@ export function InvoiceSelectionModal({
               <span className="ml-3 text-gray-600">
                 {language === 'ar' ? 'جاري تحميل الفواتير...' : 'Loading invoices...'}
               </span>
-            </div>
-          )}
-
-          {/* Search Results */}
-          {searchResults.length > 0 && (
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              <h3 className="text-lg font-medium text-gray-800 mb-3" style={{ textAlign: getTextAlign() }}>
-                {language === 'ar' ? 'نتائج البحث:' : 'Search Results:'}
-              </h3>
-              
-              {searchResults.map((invoice) => (
-                <div
-                  key={invoice.invoiceNumber}
-                  className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                  onClick={() => handleSelectInvoice(invoice)}
-                  data-testid={`invoice-result-${invoice.invoiceNumber}`}
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    {/* Invoice Number */}
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-purple-600" />
-                      <div>
-                        <p className="text-xs text-gray-500">
-                          {language === 'ar' ? 'رقم الفاتورة' : 'Invoice No.'}
-                        </p>
-                        <p className="font-semibold text-purple-600">{invoice.invoiceNumber}</p>
-                      </div>
-                    </div>
-
-                    {/* Customer Name */}
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-gray-600" />
-                      <div>
-                        <p className="text-xs text-gray-500">
-                          {language === 'ar' ? 'اسم العميل' : 'Customer'}
-                        </p>
-                        <p className="font-medium text-gray-800">{invoice.customerName}</p>
-                      </div>
-                    </div>
-
-                    {/* Date */}
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-600" />
-                      <div>
-                        <p className="text-xs text-gray-500">
-                          {language === 'ar' ? 'التاريخ' : 'Date'}
-                        </p>
-                        <p className="font-medium text-gray-800">{formatDate(invoice.appointmentDate)}</p>
-                      </div>
-                    </div>
-
-                    {/* Amount */}
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-green-600" />
-                      <div>
-                        <p className="text-xs text-gray-500">
-                          {language === 'ar' ? 'المبلغ' : 'Amount'}
-                        </p>
-                        <p className="font-bold text-green-600">{formatAmount(invoice.finalTotal)} SAR</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* No Results */}
-          {searchQuery && searchResults.length === 0 && !isSearching && !isLoading && (
-            <div className="text-center py-8 text-gray-500">
-              <FileText className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p className="text-lg font-medium">
-                {language === 'ar' ? 'لم يتم العثور على فواتير' : 'No invoices found'}
-              </p>
-              <p className="text-sm">
-                {language === 'ar' ? 'جرب كلمات بحث مختلفة' : 'Try different search terms'}
-              </p>
             </div>
           )}
 
