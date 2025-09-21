@@ -4,6 +4,7 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { User, Plus, Trash2, FilePlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { InvoiceSelectionModal } from "./InvoiceSelectionModal";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -73,6 +74,12 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   // Tab state
   const [activeTab, setActiveTab] = useState<'content' | 'attachment'>('content');
   
+  // Invoice Selection Modal state
+  const [showInvoiceSelectionModal, setShowInvoiceSelectionModal] = useState(false);
+  
+  // Admin token for API calls
+  const adminToken = localStorage.getItem('adminToken');
+  
   // Payment Methods state
   const [paymentMethods, setPaymentMethods] = useState({
     cash: { checked: false, amount: 0 },
@@ -119,6 +126,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       setSelectedCustomer(null);
       setShowCustomerDropdown(false);
       setActiveTab('content');
+      setShowInvoiceSelectionModal(false);
       setPaymentMethods({
         cash: { checked: false, amount: 0 },
         card: { checked: false, amount: 0 },
@@ -174,6 +182,64 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   const handleRemoveItem = (id: string) => {
     if (items.length > 1) {
       setItems(items.filter(item => item.id !== id));
+    }
+  };
+
+  // Handle Copy From dropdown change
+  const handleCopyFromChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    if (value === 'ar-invoice') {
+      setShowInvoiceSelectionModal(true);
+    }
+    // Reset the dropdown
+    event.target.value = '';
+  };
+
+  // Handle invoice selection from the modal
+  const handleInvoiceSelected = async (invoice: any) => {
+    try {
+      // Populate customer information
+      setSelectedCustomer({
+        id: invoice.bookingId || 0,
+        name: invoice.customerName || '',
+        phone: invoice.customerPhone || ''
+      });
+      setCustomerName(invoice.customerName || '');
+      setCustomerPhone(invoice.customerPhone || '');
+      setCustomerSearchQuery(invoice.customerName || '');
+
+      // If we have a bookingId, fetch the invoice items
+      if (invoice.bookingId && adminToken) {
+        const response = await fetch(`/api/invoice-items/${invoice.bookingId}`, {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        });
+        
+        if (response.ok) {
+          const invoiceItems = await response.json();
+          
+          // Transform invoice items to credit note items format
+          const creditNoteItems: CreditNoteItem[] = invoiceItems.map((item: any, index: number) => ({
+            id: (Date.now() + index).toString(),
+            description: item.description || '',
+            quantity: parseInt(item.quantity) || 1,
+            unitPrice: parseFloat(item.unitPrice) || 0,
+            totalBeforeVAT: parseFloat(item.totalBeforeVat) || 0,
+            vat: parseFloat(item.vatAmount) || 0,
+            totalAfterVAT: parseFloat(item.totalAfterVat) || 0
+          }));
+          
+          // If we have items, replace the current items, otherwise keep the default empty item
+          if (creditNoteItems.length > 0) {
+            setItems(creditNoteItems);
+          }
+        } else {
+          console.error('Failed to fetch invoice items:', response.statusText);
+        }
+      }
+    } catch (error) {
+      console.error('Error processing selected invoice:', error);
     }
   };
 
@@ -243,6 +309,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   };
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0">
         <DialogHeader className="p-6 pb-4" dir={getDirection(language)}>
@@ -757,6 +824,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                 className="px-3 py-2 border border-gray-300 rounded-md text-sm"
                 data-testid="select-copy-from"
                 defaultValue=""
+                onChange={handleCopyFromChange}
               >
                 <option value="" disabled>
                   {language === 'ar' ? 'اختر...' : 'Select...'}
@@ -770,5 +838,15 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Invoice Selection Modal */}
+    <InvoiceSelectionModal
+      isOpen={showInvoiceSelectionModal}
+      onClose={() => setShowInvoiceSelectionModal(false)}
+      onSelect={handleInvoiceSelected}
+      title={language === 'ar' ? 'اختيار فاتورة للنسخ منها' : 'Select Invoice to Copy From'}
+      adminToken={adminToken || undefined}
+    />
+  </>
   );
 }
