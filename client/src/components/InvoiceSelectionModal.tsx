@@ -158,7 +158,7 @@ export function InvoiceSelectionModal({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4" dir={getDirection()}>
+        <div className="space-y-4 h-full flex flex-col" dir={getDirection()}>
           {/* Search Section */}
           <div className="flex gap-3">
             <div className="relative flex-1">
@@ -238,11 +238,13 @@ export function InvoiceSelectionModal({
           </div>
 
           {/* Invoice Data Table */}
-          <InvoiceDataTable
-            invoices={searchQuery ? searchResults : allInvoices}
-            onSelectInvoice={handleSelectInvoice}
-            isLoading={isLoading}
-          />
+          <div className="flex-1 min-h-0">
+            <InvoiceDataTable
+              invoices={searchQuery ? searchResults : allInvoices}
+              onSelectInvoice={handleSelectInvoice}
+              isLoading={isLoading}
+            />
+          </div>
 
         </div>
 
