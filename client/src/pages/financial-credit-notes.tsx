@@ -3,10 +3,12 @@ import { useTranslation } from '@/lib/i18n';
 import { FilePlus } from 'lucide-react';
 import { SearchActionBar } from '@/components/ui/search-action-bar';
 import { AdminLayout } from '@/components/admin-layout/AdminLayout';
+import { CreditNoteModal } from '@/components/CreditNoteModal';
 
 export default function FinancialCreditNotes() {
   const { language } = useTranslation();
   const [searchInput, setSearchInput] = useState('');
+  const [isCreditNoteModalOpen, setIsCreditNoteModalOpen] = useState(false);
 
   // Add lord-icon script to head when component mounts
   useEffect(() => {
@@ -34,8 +36,7 @@ export default function FinancialCreditNotes() {
   };
 
   const handleCreateCreditNote = () => {
-    // TODO: Implement create credit note functionality
-    console.log('Create Credit Note clicked');
+    setIsCreditNoteModalOpen(true);
   };
 
   return (
@@ -101,6 +102,12 @@ export default function FinancialCreditNotes() {
           </div>
         </div>
       </div>
+
+      {/* Credit Note Modal */}
+      <CreditNoteModal
+        isOpen={isCreditNoteModalOpen}
+        onOpenChange={setIsCreditNoteModalOpen}
+      />
     </AdminLayout>
   );
 }

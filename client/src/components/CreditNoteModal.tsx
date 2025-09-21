@@ -32,7 +32,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   const { language } = useTranslation();
   
   // Auto-generate Credit Note Number
-  const { data: nextCreditNoteNumber } = useQuery({
+  const { data: nextCreditNoteNumber } = useQuery<string>({
     queryKey: ['/api/admin/credit-notes/next-number'],
     enabled: isOpen,
   });
@@ -62,7 +62,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   ]);
 
   // Customer search query
-  const { data: customerSearchResults = [] } = useQuery({
+  const { data: customerSearchResults = [] } = useQuery<Customer[]>({
     queryKey: ['/api/admin/customers/search', customerSearchQuery],
     enabled: customerSearchQuery.length >= 2 && !selectedCustomer,
   });
