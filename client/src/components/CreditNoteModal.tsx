@@ -265,7 +265,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
 
         <div className="px-6 pb-6" dir={getDirection(language)}>
           {/* Customer Information Section */}
-          <div className="p-6 mb-6 rounded-lg">
+          <div className="p-4 mb-4 rounded-lg">
             <div className="flex items-center gap-2 mb-4">
               <User className="w-5 h-5 text-gray-600" />
               <h2 className="text-lg font-medium text-gray-900">
@@ -273,17 +273,17 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
               </h2>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* Row 1: Customer Search and Credit Note No */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                    {language === 'ar' ? 'العميل:' : 'Customer:'}
+                    {language === 'ar' ? 'معرف العميل:' : 'Customer ID:'}
                   </label>
                   <div className="relative w-[170px]">
                     <input 
                       type="text" 
-                      className="w-full px-2 input-compact-20 border border-gray-300"
+                      className="w-full px-2 input-compact-20 border border-gray-300 credit-note-input"
                       value={customerSearchQuery}
                       onChange={(e) => handleCustomerSearchChange(e.target.value)}
                       placeholder={language === 'ar' ? 'بحث عن العميل' : 'Search customer'}
@@ -317,20 +317,20 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     disabled
                     value={nextCreditNoteNumber || 'Loading...'}
                     data-testid="input-credit-note-no"
-                    style={{ marginLeft: '13px', marginRight: '10px' }}
+                    style={{ marginLeft: '29px', marginRight: '10px' }}
                   />
                 </div>
               </div>
 
               {/* Row 2: Customer Name and Posting Date */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
                   </label>
                   <input 
                     type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 ${
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
                       selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                     }`}
                     value={customerName}
@@ -347,7 +347,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                   </label>
                   <input 
                     type="text" 
-                    className="w-[170px] px-2 input-compact-20 border border-gray-300"
+                    className="w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input"
                     placeholder={language === 'ar' ? '+2 أو -3' : '+2 or -3'}
                     value={postingDate}
                     onChange={(e) => {
@@ -372,14 +372,14 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
               </div>
 
               {/* Row 3: Customer Phone */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ borderBottomWidth: '2px', paddingBottom: '10px' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ borderBottomWidth: '2px', paddingBottom: '8px' }}>
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
                   </label>
                   <input 
                     type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 ${
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
                       selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                     }`}
                     value={customerPhone}
@@ -552,7 +552,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
               </div>
               
               {/* Payment Methods Section */}
-              <div className="space-y-4 pt-6 border-t border-gray-200">
+              <div className="space-y-3 pt-4">
                 <div dir={getDirection(language)}>
                   <label className="block text-sm font-medium mb-4 text-gray-700" style={{ borderTopWidth: '2px', paddingTop: '10px' }}>
                     {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
@@ -674,7 +674,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     </div>
                     
                     {/* Total Amount */}
-                    <div className="mt-4 pt-3 border-t border-gray-200">
+                    <div className="mt-3 pt-2">
                       <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                         <label className="flex items-center min-w-[120px] font-semibold">
                           <span className="text-sm text-gray-800">

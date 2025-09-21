@@ -6,13 +6,43 @@
 
 @layer utilities {
   .input-compact-20 {
-    @apply h-[20px] py-0 leading-[20px] text-[12px] rounded-sm focus:outline-none focus:ring-1 focus:ring-purple-500 min-h-0;
+    @apply h-[20px] py-0 leading-[20px] text-[12px] rounded-sm focus:outline-none focus:ring-1 min-h-0;
+    border-color: #d1d5db;
+    transition: border-color 0.2s ease;
+  }
+  .input-compact-20:hover {
+    border-color: #852085;
+  }
+  .input-compact-20:focus {
+    border-color: #852085;
+    ring-color: #852085;
   }
   .description-field {
-    @apply w-[200px] h-[50px] px-2 py-1 text-[12px] leading-[14px] rounded-sm focus:outline-none focus:ring-1 focus:ring-purple-500 resize-none;
+    @apply w-[200px] h-[50px] px-2 py-1 text-[12px] leading-[14px] rounded-sm focus:outline-none focus:ring-1 resize-none;
+    border-color: #d1d5db;
+    transition: border-color 0.2s ease;
+  }
+  .description-field:hover {
+    border-color: #852085;
+  }
+  .description-field:focus {
+    border-color: #852085;
+    ring-color: #852085;
   }
   .select-reset {
     @apply appearance-none min-h-0;
+  }
+  
+  /* Custom hover styles for all input fields */
+  .credit-note-input {
+    transition: border-color 0.2s ease;
+  }
+  .credit-note-input:hover:not(:disabled) {
+    border-color: #852085;
+  }
+  .credit-note-input:focus {
+    border-color: #852085;
+    box-shadow: 0 0 0 1px #852085;
   }
 }
 
