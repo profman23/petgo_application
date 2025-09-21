@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, FileText, Calendar, User, DollarSign } from 'lucide-react';
+import { Search, FileText } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
+import { InvoiceDataTable } from './InvoiceDataTable';
 
 interface Invoice {
   id?: number;
@@ -236,28 +237,13 @@ export function InvoiceSelectionModal({
             </Button>
           </div>
 
-          {/* Loading State */}
-          {isLoading && (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-              <span className="ml-3 text-gray-600">
-                {language === 'ar' ? 'جاري تحميل الفواتير...' : 'Loading invoices...'}
-              </span>
-            </div>
-          )}
+          {/* Invoice Data Table */}
+          <InvoiceDataTable
+            invoices={searchQuery ? searchResults : allInvoices}
+            onSelectInvoice={handleSelectInvoice}
+            isLoading={isLoading}
+          />
 
-          {/* Initial State */}
-          {!searchQuery && searchResults.length === 0 && !isLoading && (
-            <div className="text-center py-8 text-gray-500">
-              <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p className="text-lg font-medium">
-                {language === 'ar' ? 'ابحث عن فاتورة' : 'Search for an invoice'}
-              </p>
-              <p className="text-sm">
-                {language === 'ar' ? 'أدخل رقم الفاتورة أو اسم العميل للبحث' : 'Enter invoice number or customer name to search'}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Footer */}
