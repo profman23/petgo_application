@@ -59,14 +59,18 @@ export default function FinancialCreditNotes() {
             </h1>
           </div>
 
-          {/* Right side - Create New Credit Note Button */}
+          {/* Right side - Create Credit Note Button */}
           <button
             onClick={handleCreateCreditNote}
-            className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+            className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+            style={{ 
+              borderColor: '#852085', 
+              color: '#852085'
+            }}
             data-testid="button-create-credit-note"
           >
             <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
-            {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
+            {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
           </button>
         </div>
 
