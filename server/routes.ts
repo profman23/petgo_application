@@ -5664,18 +5664,14 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
       
       console.log('📊 Fetching customer business partners data with search:', search);
       
-      // Join Users and Patients tables to get complete customer data
+      // Get distinct users only to avoid duplicates when user has multiple pets
       let query = sql`
-        SELECT 
+        SELECT DISTINCT
           u.id as user_id,
           u.name as user_name,
           u.phone as user_phone,
-          u.email as user_email,
-          p.id as patient_id,
-          p.type as patient_type,
-          p.name as patient_name
+          u.email as user_email
         FROM users u
-        LEFT JOIN patients p ON u.id = p.user_id
         WHERE 1=1
       `;
       
@@ -5683,14 +5679,11 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
       if (search && typeof search === 'string' && search.trim()) {
         const searchTerm = `%${search.trim().toLowerCase()}%`;
         query = sql`
-          SELECT 
+          SELECT DISTINCT
             u.id as user_id,
             u.name as user_name,
             u.phone as user_phone,
-            u.email as user_email,
-            p.id as patient_id,
-            p.type as patient_type,
-            p.name as patient_name
+            u.email as user_email
           FROM users u
           LEFT JOIN patients p ON u.id = p.user_id
           WHERE (
@@ -5705,17 +5698,14 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
         `;
       }
       
-      query = sql`${query} ORDER BY u.id, p.id`;
+      query = sql`${query} ORDER BY u.id`;
       
       const result = await db.execute(query);
       const customers = result.rows.map((row: any) => ({
         userId: row.user_id,
         userName: row.user_name,
         userPhone: row.user_phone,
-        userEmail: row.user_email || '',
-        patientId: row.patient_id,
-        patientType: row.patient_type || '',
-        patientName: row.patient_name || ''
+        userEmail: row.user_email || ''
       }));
       
       console.log(`✅ Retrieved ${customers.length} customer records`);

@@ -54,15 +54,19 @@ export function InvoiceSelectionModal({
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
 
-  // Filter invoices by selected customer ID when in invoice mode
+  // Filter invoices by selected customer when in invoice mode
   const getFilteredInvoices = () => {
     if (mode === 'invoice' && selectedCustomerId) {
-      // Filter invoices by bookingId (which corresponds to customer/user ID)
-      return allInvoices.filter((invoice: Invoice) => 
-        invoice.bookingId === selectedCustomerId ||
-        invoice.userId === selectedCustomerId ||
-        invoice.customerId === selectedCustomerId
-      );
+      // Get the selected customer data to match by name and phone
+      const selectedCustomer = allCustomers.find(customer => customer.id === selectedCustomerId);
+      if (selectedCustomer) {
+        // Filter invoices by customer name and phone (more reliable than ID matching)
+        return allInvoices.filter((invoice: Invoice) => {
+          const nameMatch = invoice.customerName?.toLowerCase() === selectedCustomer.customerName?.toLowerCase();
+          const phoneMatch = invoice.customerPhone === selectedCustomer.customerPhone;
+          return nameMatch || phoneMatch;
+        });
+      }
     }
     return allInvoices;
   };
