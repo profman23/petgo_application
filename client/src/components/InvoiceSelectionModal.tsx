@@ -30,6 +30,7 @@ interface InvoiceSelectionModalProps {
   title?: string;
   adminToken?: string;
   mode?: 'invoice' | 'customer';
+  selectedCustomerId?: number;
 }
 
 export function InvoiceSelectionModal({
@@ -38,7 +39,8 @@ export function InvoiceSelectionModal({
   onSelect,
   title,
   adminToken,
-  mode = 'invoice'
+  mode = 'invoice',
+  selectedCustomerId
 }: InvoiceSelectionModalProps) {
   const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
@@ -51,6 +53,19 @@ export function InvoiceSelectionModal({
 
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
+
+  // Filter invoices by selected customer ID when in invoice mode
+  const getFilteredInvoices = () => {
+    if (mode === 'invoice' && selectedCustomerId) {
+      // Filter invoices by bookingId (which corresponds to customer/user ID)
+      return allInvoices.filter((invoice: Invoice) => 
+        invoice.bookingId === selectedCustomerId ||
+        invoice.userId === selectedCustomerId ||
+        invoice.customerId === selectedCustomerId
+      );
+    }
+    return allInvoices;
+  };
 
   // Fetch data when modal opens based on mode
   useEffect(() => {
@@ -344,7 +359,7 @@ export function InvoiceSelectionModal({
           <div className="flex-1 min-h-0">
             <InvoiceDataTable
               invoices={mode === 'invoice' 
-                ? (searchQuery ? searchResults as Invoice[] : allInvoices)
+                ? (searchQuery ? searchResults as Invoice[] : getFilteredInvoices())
                 : (searchQuery ? searchResults as Customer[] : allCustomers) as any}
               onSelectInvoice={handleSelectItem}
               isLoading={isLoading}

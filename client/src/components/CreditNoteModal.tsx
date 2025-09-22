@@ -192,7 +192,13 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   const handleCopyFromChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     if (value === 'ar-invoice') {
-      setShowInvoiceSelectionModal(true);
+      // Only open modal if customer is selected
+      if (selectedCustomer) {
+        setShowInvoiceSelectionModal(true);
+      } else {
+        // Show alert or toast that customer must be selected first
+        alert(language === 'ar' ? 'يجب تحديد العميل أولاً' : 'Please select a customer first');
+      }
     }
     // Reset the dropdown
     event.target.value = '';
@@ -365,6 +371,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'معرف العميل:' : 'Customer ID:'}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <div className="relative w-[170px]">
                     <input 
@@ -415,6 +422,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input 
                     type="text" 
@@ -819,14 +827,19 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
             <div className="flex gap-2">
               <button
                 onClick={handleSave}
-                className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+                disabled={!selectedCustomer}
+                className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+                  selectedCustomer 
+                    ? 'bg-white hover:bg-purple-50 cursor-pointer' 
+                    : 'bg-gray-100 cursor-not-allowed'
+                }`}
                 style={{ 
-                  borderColor: '#852085', 
-                  color: '#852085'
+                  borderColor: selectedCustomer ? '#852085' : '#9CA3AF',
+                  color: selectedCustomer ? '#852085' : '#9CA3AF'
                 }}
                 data-testid="button-save"
               >
-                <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+                <FilePlus className="h-4 w-4" style={{ color: selectedCustomer ? '#852085' : '#9CA3AF' }} />
                 {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
               </button>
               <button
@@ -870,6 +883,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       title={language === 'ar' ? 'اختيار فاتورة للنسخ منها' : 'Select Invoice to Copy From'}
       adminToken={adminToken || undefined}
       mode="invoice"
+      selectedCustomerId={selectedCustomer?.id}
     />
     
     {/* Customer Selection Modal */}
