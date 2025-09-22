@@ -127,7 +127,7 @@ export default function FinancialCreditNotes() {
       label: { ar: 'الحالة', en: 'Status' },
       render: (creditNote) => (
         <span className="text-blue-600 font-medium">
-          {creditNote.status || 'Open'}
+          {creditNote.status || 'Closed'}
         </span>
       ),
       className: 'text-blue-600 font-medium'

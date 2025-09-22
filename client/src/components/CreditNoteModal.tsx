@@ -90,8 +90,8 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
   // Selected invoice state (when copying from invoice)
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   
-  // Status state (starts as Open, changes to Closed after save)
-  const [status, setStatus] = useState<'Open' | 'Closed'>('Open');
+  // Status state (starts as Closed)
+  const [status, setStatus] = useState<'Open' | 'Closed'>('Closed');
   
   // Admin token for API calls
   const adminToken = localStorage.getItem('adminToken');
@@ -170,7 +170,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
         setCustomerName('');
         setSelectedCustomer(null);
         setSelectedInvoice(null);
-        setStatus('Open');
+        setStatus('Closed');
         setItems([{
           id: '1',
           description: '',
@@ -471,7 +471,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
           setCustomerName('');
           setCustomerPhone('');
           setCustomerSearchQuery('');
-          setStatus('Open');
+          setStatus('Closed');
           setItems([{
             id: '1',
             description: '',
@@ -581,10 +581,15 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                     style={{ marginLeft: '29px', marginRight: '10px' }}
                   />
                 </div>
+
               </div>
 
-              {/* Row 1.5: Status */}
+              {/* Row 1.5: Status positioned on the right */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {/* Empty space on left to align Status on right */}
+                <div></div>
+                
+                {/* Status - on right side */}
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'الحالة:' : 'Status:'}
@@ -596,10 +601,9 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                     readOnly
                     value={language === 'ar' ? (status === 'Open' ? 'مفتوح' : 'مغلق') : status}
                     data-testid="input-status"
+                    style={{ marginLeft: '29px' }}
                   />
                 </div>
-                {/* Empty space for alignment */}
-                <div></div>
               </div>
 
               {/* Row 2: Customer Name and Posting Date */}
@@ -656,6 +660,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                     }}
                     data-testid="input-posting-date"
                     disabled={viewMode}
+                    readOnly={viewMode}
                     style={{ marginLeft: '29px' }}
                   />
                 </div>
