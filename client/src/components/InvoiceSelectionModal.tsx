@@ -110,7 +110,16 @@ export function InvoiceSelectionModal({
       if (response.ok) {
         const data = await response.json();
         // Extract customers array from API response structure {success: true, customers: [...]}
-        const customers = data.customers || data || [];
+        const rawCustomers = data.customers || data || [];
+        
+        // Transform the data structure to match Customer interface
+        // API returns: {userId, userName, userPhone} but we need: {id, customerName, customerPhone}
+        const customers = rawCustomers.map((item: any) => ({
+          id: item.userId || item.id,
+          customerName: item.userName || item.customerName || item.name || '',
+          customerPhone: item.userPhone || item.customerPhone || item.phone || ''
+        }));
+        
         setAllCustomers(customers);
       } else {
         console.error('Failed to fetch customers:', response.statusText);
