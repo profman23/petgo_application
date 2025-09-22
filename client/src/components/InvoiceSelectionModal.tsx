@@ -26,7 +26,7 @@ interface Customer {
 interface InvoiceSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (item: Invoice | Customer) => void;
+  onSelect: (item: Invoice | Customer | any) => void;
   title?: string;
   adminToken?: string;
   mode?: 'invoice' | 'customer';
@@ -50,14 +50,66 @@ export function InvoiceSelectionModal({
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [fullyCreditedInvoices, setFullyCreditedInvoices] = useState<Set<string>>(new Set());
 
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
 
-  // Filter invoices by selected customer when in invoice mode
-  const getFilteredInvoices = () => {
-    console.log('🔍 getFilteredInvoices called:', { mode, selectedCustomerId, allInvoicesCount: allInvoices.length, allCustomersCount: allCustomers.length });
+  // Check if an invoice is fully credited
+  const checkIfInvoiceFullyCredited = async (invoice: Invoice): Promise<boolean> => {
+    if (!adminToken || !invoice.bookingId || !invoice.invoiceNumber) {
+      return false;
+    }
+
+    try {
+      // Fetch both invoice items and credited items in parallel
+      const [itemsResponse, creditedItemsResponse] = await Promise.all([
+        fetch(`/api/invoice-items/${invoice.bookingId}`, {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        }),
+        fetch(`/api/admin/credit-notes/credited-items/${invoice.invoiceNumber}`, {
+          headers: {
+            Authorization: `Bearer ${adminToken}`,
+          },
+        })
+      ]);
+      
+      if (itemsResponse.ok && creditedItemsResponse.ok) {
+        const items = await itemsResponse.json();
+        const creditedItems = await creditedItemsResponse.json();
+        
+        // Create a map of credited items for easy lookup
+        const creditedItemsMap = new Map();
+        creditedItems.forEach((creditedItem: any) => {
+          const existingCredited = creditedItemsMap.get(creditedItem.id) || 0;
+          creditedItemsMap.set(creditedItem.id, existingCredited + creditedItem.creditedQuantity);
+        });
+        
+        // Check if ALL items are fully credited
+        const allItemsFullyCredited = items.every((item: any) => {
+          const totalCredited = creditedItemsMap.get(item.id) || 0;
+          const originalQuantity = parseInt(item.quantity);
+          return totalCredited >= originalQuantity; // Item is fully credited
+        });
+        
+        return allItemsFullyCredited && items.length > 0; // Ensure there are items to credit
+      }
+    } catch (error) {
+      console.error('Error checking if invoice is fully credited:', error);
+    }
     
+    return false;
+  };
+
+  // Filter invoices by selected customer and exclude fully credited invoices
+  const getFilteredInvoices = () => {
+    console.log('🔍 getFilteredInvoices called:', { mode, selectedCustomerId, allInvoicesCount: allInvoices.length, allCustomersCount: allCustomers.length, fullyCreditedCount: fullyCreditedInvoices.size });
+    
+    let baseInvoices = allInvoices;
+    
+    // First filter by customer if in invoice mode and customer is selected
     if (mode === 'invoice' && selectedCustomerId) {
       // Get the selected customer data to match by name and phone
       const selectedCustomer = allCustomers.find(customer => customer.id === selectedCustomerId);
@@ -65,26 +117,26 @@ export function InvoiceSelectionModal({
       
       if (selectedCustomer) {
         // Filter invoices by customer name and phone (more reliable than ID matching)
-        const filteredInvoices = allInvoices.filter((invoice: Invoice) => {
+        baseInvoices = allInvoices.filter((invoice: Invoice) => {
           const nameMatch = invoice.customerName?.toLowerCase() === selectedCustomer.customerName?.toLowerCase();
           const phoneMatch = invoice.customerPhone === selectedCustomer.customerPhone;
-          console.log('🔍 Invoice check:', {
-            invoiceNumber: invoice.invoiceNumber,
-            invoiceCustomer: invoice.customerName,
-            invoicePhone: invoice.customerPhone,
-            selectedCustomer: selectedCustomer.customerName,
-            selectedPhone: selectedCustomer.customerPhone,
-            nameMatch,
-            phoneMatch
-          });
           return nameMatch || phoneMatch;
         });
-        console.log('✅ Filtered invoices result:', filteredInvoices.length, 'out of', allInvoices.length);
-        return filteredInvoices;
+        console.log('✅ Customer filtered invoices:', baseInvoices.length, 'out of', allInvoices.length);
       }
     }
-    console.log('📋 Returning all invoices:', allInvoices.length);
-    return allInvoices;
+    
+    // Then filter out fully credited invoices
+    const availableInvoices = baseInvoices.filter((invoice: Invoice) => {
+      const isFullyCredited = fullyCreditedInvoices.has(invoice.invoiceNumber);
+      if (isFullyCredited) {
+        console.log('🚫 Excluding fully credited invoice:', invoice.invoiceNumber);
+      }
+      return !isFullyCredited;
+    });
+    
+    console.log('✅ Final filtered invoices (excluding fully credited):', availableInvoices.length, 'out of', baseInvoices.length);
+    return availableInvoices;
   };
 
   // Fetch data when modal opens based on mode
@@ -125,6 +177,9 @@ export function InvoiceSelectionModal({
       if (response.ok) {
         const invoices = await response.json();
         setAllInvoices(invoices);
+        
+        // Check which invoices are fully credited
+        await checkFullyCreditedInvoices(invoices);
       } else {
         console.error('Failed to fetch invoices:', response.statusText);
       }
@@ -133,6 +188,24 @@ export function InvoiceSelectionModal({
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  // Check all invoices to see which ones are fully credited
+  const checkFullyCreditedInvoices = async (invoices: Invoice[]) => {
+    const fullyCredited = new Set<string>();
+    
+    // Check each invoice in parallel (but limit concurrency to avoid overwhelming the server)
+    const checkPromises = invoices.map(async (invoice) => {
+      const isFullyCredited = await checkIfInvoiceFullyCredited(invoice);
+      if (isFullyCredited) {
+        fullyCredited.add(invoice.invoiceNumber);
+      }
+    });
+    
+    await Promise.all(checkPromises);
+    
+    console.log('🔄 Fully credited invoices found:', Array.from(fullyCredited));
+    setFullyCreditedInvoices(fullyCredited);
   };
 
   const fetchCustomers = async () => {
@@ -188,7 +261,9 @@ export function InvoiceSelectionModal({
       
       if (mode === 'invoice') {
         // Filter invoices by invoice number or customer name (partial match)
-        results = allInvoices.filter((invoice: Invoice) => {
+        // and exclude fully credited invoices
+        const baseInvoices = getFilteredInvoices(); // This already excludes fully credited invoices
+        results = baseInvoices.filter((invoice: Invoice) => {
           const invoiceNum = invoice.invoiceNumber || '';
           const customerName = invoice.customerName || '';
           const searchTerm = value.toLowerCase();
