@@ -85,6 +85,12 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
   // Customer Selection Modal state
   const [showCustomerSelectionModal, setShowCustomerSelectionModal] = useState(false);
   
+  // Selected invoice state (when copying from invoice)
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  
+  // Status state (starts as Open, changes to Closed after save)
+  const [status, setStatus] = useState<'Open' | 'Closed'>('Open');
+  
   // Admin token for API calls
   const adminToken = localStorage.getItem('adminToken');
   
@@ -133,6 +139,8 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
       setCustomerPhone('');
       setCustomerName('');
       setSelectedCustomer(null);
+      setSelectedInvoice(null);
+      setStatus('Open');
       setShowCustomerDropdown(false);
       setActiveTab('content');
       setShowInvoiceSelectionModal(false);
@@ -215,6 +223,9 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
   // Handle invoice selection from the modal
   const handleInvoiceSelected = async (invoice: any) => {
     try {
+      // Store the selected invoice for later use when saving
+      setSelectedInvoice(invoice);
+      
       // Fix Issue 1: Preserve originally selected customer ID, only update name/phone from invoice
       if (selectedCustomer) {
         // If customer was already selected, preserve their ID but update name/phone if needed
@@ -374,17 +385,31 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
     }
 
     try {
+      // Prepare items in correct format for database
+      const filteredItems = items.filter(item => item.description.trim() !== '').map(item => ({
+        id: parseInt(item.id),
+        description: item.description,
+        originalQuantity: item.quantity,
+        creditQuantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalBeforeVat: item.totalBeforeVAT,
+        vatAmount: item.vat,
+        totalAfterVat: item.totalAfterVAT
+      }));
+
       const creditNoteData = {
         creditNoteNumber: nextCreditNoteResponse?.nextNumber,
-        customerId: selectedCustomer.id,
+        invoiceId: selectedInvoice?.bookingId || null,  // Add missing invoiceId
+        invoiceNumber: selectedInvoice?.invoiceNumber || null,  // Add missing invoiceNumber  
         customerName: selectedCustomer.name,
-        customerPhone: selectedCustomer.phone,
+        appointmentDate: selectedInvoice?.appointmentDate || postingDate,  // Add missing appointmentDate
         postingDate,
-        items: items.filter(item => item.description.trim() !== ''),
-        totalBeforeVAT: totals.totalBeforeVAT,
-        vatAmount: totals.vat,
-        totalAfterVAT: totals.totalAfterVAT,
-        status: 'Open'
+        items: filteredItems,
+        totalBeforeVat: totals.totalBeforeVAT.toFixed(2),  // Fix field name
+        vatAmount: totals.vat.toFixed(2),
+        finalTotal: totals.totalAfterVAT.toFixed(2),  // Fix field name
+        status: 'Open',
+        createdBy: adminToken
       };
 
       const response = await fetch('/api/admin/credit-notes', {
@@ -398,26 +423,34 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
 
       if (response.ok) {
         console.log('Credit Note created successfully');
-        onOpenChange(false);
-        // Call the callback to refresh the data
-        if (onCreditNoteCreated) {
-          onCreditNoteCreated();
-        }
-        // Reset form
-        setSelectedCustomer(null);
-        setCustomerName('');
-        setCustomerPhone('');
-        setCustomerSearchQuery('');
-        setItems([{
-          id: '1',
-          description: '',
-          quantity: 1,
-          unitPrice: 0,
-          discount: 0,
-          totalBeforeVAT: 0,
-          vat: 0,
-          totalAfterVAT: 0
-        }]);
+        // Change status to Closed after successful save
+        setStatus('Closed');
+        
+        // Short delay to show the status change, then close modal
+        setTimeout(() => {
+          onOpenChange(false);
+          // Call the callback to refresh the data
+          if (onCreditNoteCreated) {
+            onCreditNoteCreated();
+          }
+          // Reset form
+          setSelectedCustomer(null);
+          setSelectedInvoice(null);
+          setCustomerName('');
+          setCustomerPhone('');
+          setCustomerSearchQuery('');
+          setStatus('Open');
+          setItems([{
+            id: '1',
+            description: '',
+            quantity: 1,
+            unitPrice: 0,
+            discount: 0,
+            totalBeforeVAT: 0,
+            vat: 0,
+            totalAfterVAT: 0
+          }]);
+        }, 1500); // 1.5 second delay to show "Closed" status
       } else {
         const error = await response.json();
         console.error('Failed to create credit note:', error);
@@ -523,7 +556,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
                     className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-100 cursor-not-allowed text-gray-500"
                     disabled
                     readOnly
-                    value={language === 'ar' ? 'مفتوح' : 'Open'}
+                    value={language === 'ar' ? (status === 'Open' ? 'مفتوح' : 'مغلق') : status}
                     data-testid="input-status"
                   />
                 </div>
