@@ -215,45 +215,83 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
   // Handle invoice selection from the modal
   const handleInvoiceSelected = async (invoice: any) => {
     try {
-      // Populate customer information
-      setSelectedCustomer({
-        id: invoice.bookingId || 0,
-        name: invoice.customerName || '',
-        phone: invoice.customerPhone || ''
-      });
-      setCustomerName(invoice.customerName || '');
-      setCustomerPhone(invoice.customerPhone || '');
-      setCustomerSearchQuery(invoice.bookingId?.toString() || '');
-
-      // If we have a bookingId, fetch the invoice items
-      if (invoice.bookingId && adminToken) {
-        const response = await fetch(`/api/invoice-items/${invoice.bookingId}`, {
-          headers: {
-            Authorization: `Bearer ${adminToken}`,
-          },
+      // Fix Issue 1: Preserve originally selected customer ID, only update name/phone from invoice
+      if (selectedCustomer) {
+        // If customer was already selected, preserve their ID but update name/phone if needed
+        setCustomerName(invoice.customerName || selectedCustomer.name);
+        setCustomerPhone(invoice.customerPhone || selectedCustomer.phone);
+        // Keep the original customer ID in the search query
+        setCustomerSearchQuery(selectedCustomer.id.toString());
+      } else {
+        // If no customer was selected yet, use invoice customer data
+        setSelectedCustomer({
+          id: invoice.bookingId || 0,
+          name: invoice.customerName || '',
+          phone: invoice.customerPhone || ''
         });
+        setCustomerName(invoice.customerName || '');
+        setCustomerPhone(invoice.customerPhone || '');
+        setCustomerSearchQuery(invoice.bookingId?.toString() || '');
+      }
+
+      // Fix Issue 2: Implement item-level filtering like the old screen
+      if (invoice.bookingId && adminToken) {
+        // Fetch both invoice items and credited items in parallel
+        const [itemsResponse, creditedItemsResponse] = await Promise.all([
+          fetch(`/api/invoice-items/${invoice.bookingId}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          }),
+          fetch(`/api/admin/credit-notes/credited-items/${invoice.invoiceNumber}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          })
+        ]);
         
-        if (response.ok) {
-          const invoiceItems = await response.json();
+        if (itemsResponse.ok && creditedItemsResponse.ok) {
+          const invoiceItems = await itemsResponse.json();
+          const creditedItems = await creditedItemsResponse.json();
           
-          // Transform invoice items to credit note items format
-          const creditNoteItems: CreditNoteItem[] = invoiceItems.map((item: any, index: number) => ({
-            id: (Date.now() + index).toString(),
-            description: item.description || '',
-            quantity: parseInt(item.quantity) || 1,
-            unitPrice: parseFloat(item.unitPrice) || 0,
-            discount: parseFloat(item.discount) || 0,
-            totalBeforeVAT: parseFloat(item.totalBeforeVat) || 0,
-            vat: parseFloat(item.vatAmount) || 0,
-            totalAfterVAT: parseFloat(item.totalAfterVat) || 0
-          }));
+          // Create a map of credited items for easy lookup
+          const creditedItemsMap = new Map();
+          creditedItems.forEach((creditedItem: any) => {
+            const existingCredited = creditedItemsMap.get(creditedItem.id) || 0;
+            creditedItemsMap.set(creditedItem.id, existingCredited + creditedItem.creditedQuantity);
+          });
           
-          // If we have items, replace the current items, otherwise keep the default empty item
+          // Filter items to exclude those that are fully credited
+          const availableItems = invoiceItems.filter((item: any) => {
+            const totalCredited = creditedItemsMap.get(item.id) || 0;
+            const originalQuantity = parseInt(item.quantity);
+            return totalCredited < originalQuantity; // Only show items that haven't been fully credited
+          });
+          
+          // Transform available invoice items to credit note items format
+          const creditNoteItems: CreditNoteItem[] = availableItems.map((item: any, index: number) => {
+            const totalCredited = creditedItemsMap.get(item.id) || 0;
+            const originalQuantity = parseInt(item.quantity);
+            const availableQuantity = originalQuantity - totalCredited;
+            
+            return {
+              id: (Date.now() + index).toString(),
+              description: item.description || '',
+              quantity: availableQuantity, // Use available quantity (original - credited)
+              unitPrice: parseFloat(item.unitPrice) || 0,
+              discount: parseFloat(item.discount) || 0,
+              totalBeforeVAT: parseFloat(item.totalBeforeVat) || 0,
+              vat: parseFloat(item.vatAmount) || 0,
+              totalAfterVAT: parseFloat(item.totalAfterVat) || 0
+            };
+          });
+          
+          // If we have available items, replace the current items, otherwise keep the default empty item
           if (creditNoteItems.length > 0) {
             setItems(creditNoteItems);
           }
         } else {
-          console.error('Failed to fetch invoice items:', response.statusText);
+          console.error('Failed to fetch invoice items or credited items');
         }
       }
     } catch (error) {
