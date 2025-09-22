@@ -113,7 +113,7 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
             </tr>
           </thead>
           <tbody className="bg-white divide-y-2 divide-gray-400">
-            {invoices.map((item) => {
+            {(invoices || []).map((item) => {
               if (mode === 'invoice') {
                 const invoice = item as Invoice;
                 return (

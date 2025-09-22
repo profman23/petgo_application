@@ -1,0 +1,50 @@
+chunk-276SZO74.js?v=0180dd53:14032 The above error occurred in the <InvoiceDataTable> component:
+
+    at InvoiceDataTable (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/InvoiceDataTable.tsx:20:36)
+    at div
+    at div
+    at div
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=0180dd53:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…runner/workspace/node_modules/.vite/deps/chunk-3P6BQVAP.js?v=0180dd53:59:7
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=0180dd53:79:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=0180dd53:56:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=0180dd53:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…runner/workspace/node_modules/.vite/deps/chunk-XCXRIG6V.js?v=0180dd53:42:5
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…nner/workspace/node_modules/.vite/deps/chunk-MTOWP2PE.js?v=0180dd53:229:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…nner/workspace/node_modules/.vite/deps/chunk-MTOWP2PE.js?v=0180dd53:152:58
+    at Presence (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-RMPI7RXF.js?v=0180dd53:24:11)
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…nner/workspace/node_modules/.vite/deps/chunk-MTOWP2PE.js?v=0180dd53:143:64
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=0180dd53:79:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=0180dd53:56:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=0180dd53:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…nner/workspace/node_modules/.vite/deps/chunk-3P6BQVAP.js?v=0180dd53:258:22
+    at Presence (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-RMPI7RXF.js?v=0180dd53:24:11)
+    at Provider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-P6HMMFCN.js?v=0180dd53:48:15)
+    at DialogPortal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…nner/workspace/node_modules/.vite/deps/chunk-MTOWP2PE.js?v=0180dd53:105:11)
+    at _c3 (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/ui/dialog.tsx:52:12)
+    at Provider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…unner/workspace/node_modules/.vite/deps/chunk-P6HMMFCN.js?v=0180dd53:48:15)
+    at Dialog (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…runner/workspace/node_modules/.vite/deps/chunk-MTOWP2PE.js?v=0180dd53:46:5)
+    at InvoiceSelectionModal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/InvoiceSelectionModal.tsx:26:3)
+    at CreditNoteModal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/CreditNoteModal.tsx:25:35)
+    at div
+    at div
+    at div
+    at AdminLayoutContent (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/AdminLayout.tsx:29:31)
+    at SidebarStateProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/sidebar-state.tsx:23:40)
+    at AdminLayout (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/AdminLayout.tsx:285:31)
+    at FinancialCreditNotes (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/financial-credit-notes.tsx:26:24)
+    at CreditNotePermissionGate (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=1HRn7JF8V28CflM-uI07B:107:37)
+    at component
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=0180dd53:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=0180dd53:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=1HRn7JF8V28CflM-uI07B:225:22)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=0180dd53:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=1HRn7JF8V28CflM-uI07B:574:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+chunk-276SZO74.js?v=0180dd53:19413 Uncaught TypeError: invoices.map is not a function
+    at InvoiceDataTable (InvoiceDataTable.tsx:116:23)

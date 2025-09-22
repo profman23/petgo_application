@@ -108,7 +108,9 @@ export function InvoiceSelectionModal({
       });
       
       if (response.ok) {
-        const customers = await response.json();
+        const data = await response.json();
+        // Extract customers array from API response structure {success: true, customers: [...]}
+        const customers = data.customers || data || [];
         setAllCustomers(customers);
       } else {
         console.error('Failed to fetch customers:', response.statusText);
@@ -149,7 +151,7 @@ export function InvoiceSelectionModal({
         });
       } else if (mode === 'customer') {
         // Filter customers by customer name, phone or ID
-        results = allCustomers.filter((customer: Customer) => {
+        results = (allCustomers || []).filter((customer: Customer) => {
           const customerName = customer.customerName || '';
           const customerPhone = customer.customerPhone || '';
           const customerId = customer.id?.toString() || '';
