@@ -722,18 +722,20 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   <h3 className="text-lg font-medium text-gray-900">
                     {language === 'ar' ? 'عناصر مذكرة الائتمان' : 'Credit Note Items'}
                   </h3>
-                  <button
-                    onClick={handleAddItem}
-                    className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
-                    style={{ 
-                      borderColor: '#852085', 
-                      color: '#852085'
-                    }}
-                    data-testid="button-add-item"
-                  >
-                    <Plus className="w-4 h-4" style={{ color: '#852085' }} />
-                    {language === 'ar' ? 'إضافة عنصر' : 'Add Item'}
-                  </button>
+                  {!viewMode && (
+                    <button
+                      onClick={handleAddItem}
+                      className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+                      style={{ 
+                        borderColor: '#852085', 
+                        color: '#852085'
+                      }}
+                      data-testid="button-add-item"
+                    >
+                      <Plus className="w-4 h-4" style={{ color: '#852085' }} />
+                      {language === 'ar' ? 'إضافة عنصر' : 'Add Item'}
+                    </button>
+                  )}
                 </div>
 
                 <div className="overflow-x-auto">
@@ -773,9 +775,12 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="text"
                               value={item.description}
-                              onChange={(e) => handleItemChange(item.id, 'description', e.target.value)}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                              onChange={(e) => viewMode ? null : handleItemChange(item.id, 'description', e.target.value)}
+                              className={`w-full px-2 py-1 border border-gray-300 rounded text-sm ${
+                                viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                              }`}
                               placeholder={language === 'ar' ? 'وصف العنصر' : 'Item description'}
+                              disabled={viewMode}
                               data-testid={`input-description-${item.id}`}
                             />
                           </td>
@@ -783,9 +788,12 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="number"
                               value={item.quantity}
-                              onChange={(e) => handleItemChange(item.id, 'quantity', Number(e.target.value))}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                              onChange={(e) => viewMode ? null : handleItemChange(item.id, 'quantity', Number(e.target.value))}
+                              className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm ${
+                                viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                              }`}
                               min="1"
+                              disabled={viewMode}
                               data-testid={`input-quantity-${item.id}`}
                             />
                           </td>
@@ -819,7 +827,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             {item.totalAfterVAT.toFixed(2)}
                           </td>
                           <td className="px-2 py-1 text-center">
-                            {items.length > 1 && (
+                            {items.length > 1 && !viewMode && (
                               <button
                                 onClick={() => handleRemoveItem(item.id)}
                                 className="text-red-600 hover:text-red-800"
@@ -1029,51 +1037,55 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
           <div className="flex justify-between items-center gap-2 mt-3 pt-2">
             {/* Left side buttons */}
             <div className="flex gap-2">
-              <button
-                onClick={handleSave}
-                disabled={!selectedCustomer}
-                className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
-                  selectedCustomer 
-                    ? 'bg-white hover:bg-purple-50 cursor-pointer' 
-                    : 'bg-gray-100 cursor-not-allowed'
-                }`}
-                style={{ 
-                  borderColor: selectedCustomer ? '#852085' : '#9CA3AF',
-                  color: selectedCustomer ? '#852085' : '#9CA3AF'
-                }}
-                data-testid="button-save"
-              >
-                <FilePlus className="h-4 w-4" style={{ color: selectedCustomer ? '#852085' : '#9CA3AF' }} />
-                {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
-              </button>
+              {!viewMode && (
+                <button
+                  onClick={handleSave}
+                  disabled={!selectedCustomer}
+                  className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+                    selectedCustomer 
+                      ? 'bg-white hover:bg-purple-50 cursor-pointer' 
+                      : 'bg-gray-100 cursor-not-allowed'
+                  }`}
+                  style={{ 
+                    borderColor: selectedCustomer ? '#852085' : '#9CA3AF',
+                    color: selectedCustomer ? '#852085' : '#9CA3AF'
+                  }}
+                  data-testid="button-save"
+                >
+                  <FilePlus className="h-4 w-4" style={{ color: selectedCustomer ? '#852085' : '#9CA3AF' }} />
+                  {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
+                </button>
+              )}
               <button
                 onClick={handleClose}
                 className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                data-testid="button-cancel"
+                data-testid={viewMode ? "button-close" : "button-cancel"}
               >
-                {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                {viewMode ? (language === 'ar' ? 'إغلاق' : 'Close') : (language === 'ar' ? 'إلغاء' : 'Cancel')}
               </button>
             </div>
             
-            {/* Right side Copy From dropdown */}
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">
-                {language === 'ar' ? 'نسخ من:' : 'Copy From:'}
-              </label>
-              <select
-                className="px-2 py-1 border border-gray-300 rounded-md text-sm"
-                data-testid="select-copy-from"
-                defaultValue=""
-                onChange={handleCopyFromChange}
-              >
-                <option value="" disabled>
-                  {language === 'ar' ? 'اختر...' : 'Select...'}
-                </option>
-                <option value="ar-invoice">
-                  {language === 'ar' ? 'فاتورة الذمم المدينة' : 'A/R Invoice'}
-                </option>
-              </select>
-            </div>
+            {/* Right side Copy From dropdown - hidden in view mode */}
+            {!viewMode && (
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  {language === 'ar' ? 'نسخ من:' : 'Copy From:'}
+                </label>
+                <select
+                  className="px-2 py-1 border border-gray-300 rounded-md text-sm"
+                  data-testid="select-copy-from"
+                  defaultValue=""
+                  onChange={handleCopyFromChange}
+                >
+                  <option value="" disabled>
+                    {language === 'ar' ? 'اختر...' : 'Select...'}
+                  </option>
+                  <option value="ar-invoice">
+                    {language === 'ar' ? 'فاتورة الذمم المدينة' : 'A/R Invoice'}
+                  </option>
+                </select>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

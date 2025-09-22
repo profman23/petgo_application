@@ -11,6 +11,8 @@ export default function FinancialCreditNotes() {
   const { language } = useTranslation();
   const [searchInput, setSearchInput] = useState('');
   const [isCreditNoteModalOpen, setIsCreditNoteModalOpen] = useState(false);
+  const [viewCreditNote, setViewCreditNote] = useState<any>(null);
+  const [isViewMode, setIsViewMode] = useState(false);
   
   // Fetch credit notes data
   const { data: creditNotes = [], isLoading, refetch } = useQuery<any[]>({
@@ -44,6 +46,8 @@ export default function FinancialCreditNotes() {
   };
 
   const handleCreateCreditNote = () => {
+    setViewCreditNote(null);
+    setIsViewMode(false);
     setIsCreditNoteModalOpen(true);
   };
   
@@ -58,7 +62,9 @@ export default function FinancialCreditNotes() {
   };
   
   const handleViewCreditNote = (creditNote: any) => {
-    console.log('View credit note:', creditNote);
+    setViewCreditNote(creditNote);
+    setIsViewMode(true);
+    setIsCreditNoteModalOpen(true);
   };
   
   const handlePrintCreditNote = (creditNote: any) => {
@@ -221,8 +227,16 @@ export default function FinancialCreditNotes() {
       {/* Credit Note Modal */}
       <CreditNoteModal
         isOpen={isCreditNoteModalOpen}
-        onOpenChange={setIsCreditNoteModalOpen}
+        onOpenChange={(open) => {
+          setIsCreditNoteModalOpen(open);
+          if (!open) {
+            setViewCreditNote(null);
+            setIsViewMode(false);
+          }
+        }}
         onCreditNoteCreated={handleCreditNoteCreated}
+        viewMode={isViewMode}
+        creditNoteData={viewCreditNote}
       />
     </AdminLayout>
   );
