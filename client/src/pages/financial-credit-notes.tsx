@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/i18n';
-import { FilePlus } from 'lucide-react';
+import { FilePlus, Eye, FileText, MapPin } from 'lucide-react';
 import { SearchActionBar } from '@/components/ui/search-action-bar';
 import { AdminLayout } from '@/components/admin-layout/AdminLayout';
 import { CreditNoteModal } from '@/components/CreditNoteModal';
 import { useQuery } from '@tanstack/react-query';
-import { InvoiceDataTable } from '@/components/InvoiceDataTable';
+import { DataTable, DataTableColumn, DataTableAction } from '@/components/ui/data-table';
 
 export default function FinancialCreditNotes() {
   const { language } = useTranslation();
@@ -13,7 +13,7 @@ export default function FinancialCreditNotes() {
   const [isCreditNoteModalOpen, setIsCreditNoteModalOpen] = useState(false);
   
   // Fetch credit notes data
-  const { data: creditNotes = [], isLoading, refetch } = useQuery({
+  const { data: creditNotes = [], isLoading, refetch } = useQuery<any[]>({
     queryKey: ['/api/admin/credit-notes'],
     retry: false,
   });
@@ -56,6 +56,99 @@ export default function FinancialCreditNotes() {
     // Handle credit note selection if needed
     console.log('Selected credit note:', creditNote);
   };
+  
+  const handleViewCreditNote = (creditNote: any) => {
+    console.log('View credit note:', creditNote);
+  };
+  
+  const handlePrintCreditNote = (creditNote: any) => {
+    console.log('Print credit note:', creditNote);
+  };
+  
+  const handleMapCreditNote = (creditNote: any) => {
+    console.log('Map credit note:', creditNote);
+  };
+  
+  // Define table columns for credit notes
+  const creditNoteColumns: DataTableColumn[] = [
+    {
+      key: 'creditNoteNumber',
+      label: { ar: 'رقم إشعار دائن', en: 'Credit Note No' },
+      render: (creditNote) => (
+        <span className="font-semibold text-purple-600">
+          CRN{creditNote.creditNoteNumber}
+        </span>
+      ),
+      className: 'font-semibold text-purple-600'
+    },
+    {
+      key: 'customerName',
+      label: { ar: 'اسم العميل', en: 'Customer Name' },
+      render: (creditNote) => creditNote.customerName || '-',
+      className: 'text-gray-900'
+    },
+    {
+      key: 'customerPhone',
+      label: { ar: 'رقم الهاتف', en: 'Phone Number' },
+      render: (creditNote) => creditNote.customerPhone || '-',
+      className: 'text-gray-600'
+    },
+    {
+      key: 'postingDate',
+      label: { ar: 'تاريخ الترحيل', en: 'Posting Date' },
+      render: (creditNote) => {
+        const date = new Date(creditNote.postingDate);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+      },
+      className: 'text-gray-600'
+    },
+    {
+      key: 'totalAfterVAT',
+      label: { ar: 'المبلغ', en: 'Amount' },
+      render: (creditNote) => {
+        const amount = typeof creditNote.totalAfterVAT === 'string' 
+          ? parseFloat(creditNote.totalAfterVAT) 
+          : creditNote.totalAfterVAT;
+        return `${(isNaN(amount) ? 0 : amount).toFixed(2)} SAR`;
+      },
+      className: 'text-green-600 font-medium'
+    },
+    {
+      key: 'status',
+      label: { ar: 'الحالة', en: 'Status' },
+      render: (creditNote) => (
+        <span className="text-blue-600 font-medium">
+          {creditNote.status || 'Open'}
+        </span>
+      ),
+      className: 'text-blue-600 font-medium'
+    }
+  ];
+  
+  // Define table actions for credit notes
+  const creditNoteActions: DataTableAction[] = [
+    {
+      label: { ar: 'عرض', en: 'View' },
+      onClick: handleViewCreditNote,
+      className: 'text-purple-600 hover:text-purple-900 transition-colors duration-200',
+      icon: <Eye className="h-4 w-4" />
+    },
+    {
+      label: { ar: 'طباعة', en: 'Print' },
+      onClick: handlePrintCreditNote,
+      className: 'text-blue-600 hover:text-blue-900 transition-colors duration-200',
+      icon: <FileText className="h-4 w-4" />
+    },
+    {
+      label: { ar: 'خريطة', en: 'Map' },
+      onClick: handleMapCreditNote,
+      className: 'text-green-600 hover:text-green-900 transition-colors duration-200',
+      icon: <MapPin className="h-4 w-4" />
+    }
+  ];
 
   return (
     <AdminLayout>
@@ -109,14 +202,20 @@ export default function FinancialCreditNotes() {
         </div>
 
         {/* Credit Notes DataTable */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <InvoiceDataTable
-            invoices={creditNotes}
-            onSelectInvoice={handleSelectCreditNote}
-            isLoading={isLoading}
-            mode="creditNote"
-          />
-        </div>
+        <DataTable
+          data={creditNotes}
+          columns={creditNoteColumns}
+          actions={creditNoteActions}
+          isLoading={isLoading}
+          loadingText={{ ar: 'جاري التحميل...', en: 'Loading...' }}
+          emptyStateText={{ ar: 'لا توجد إشعارات دائنة', en: 'No credit notes available' }}
+          verticalSeparators={true}
+          hover={true}
+          responsive={true}
+          className="bg-white rounded-lg shadow"
+          rowTestId="credit-note-row"
+          keyField="creditNoteNumber"
+        />
       </div>
 
       {/* Credit Note Modal */}
