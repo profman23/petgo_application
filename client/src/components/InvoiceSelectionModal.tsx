@@ -56,18 +56,34 @@ export function InvoiceSelectionModal({
 
   // Filter invoices by selected customer when in invoice mode
   const getFilteredInvoices = () => {
+    console.log('🔍 getFilteredInvoices called:', { mode, selectedCustomerId, allInvoicesCount: allInvoices.length, allCustomersCount: allCustomers.length });
+    
     if (mode === 'invoice' && selectedCustomerId) {
       // Get the selected customer data to match by name and phone
       const selectedCustomer = allCustomers.find(customer => customer.id === selectedCustomerId);
+      console.log('🎯 Selected customer found:', selectedCustomer);
+      
       if (selectedCustomer) {
         // Filter invoices by customer name and phone (more reliable than ID matching)
-        return allInvoices.filter((invoice: Invoice) => {
+        const filteredInvoices = allInvoices.filter((invoice: Invoice) => {
           const nameMatch = invoice.customerName?.toLowerCase() === selectedCustomer.customerName?.toLowerCase();
           const phoneMatch = invoice.customerPhone === selectedCustomer.customerPhone;
+          console.log('🔍 Invoice check:', {
+            invoiceNumber: invoice.invoiceNumber,
+            invoiceCustomer: invoice.customerName,
+            invoicePhone: invoice.customerPhone,
+            selectedCustomer: selectedCustomer.customerName,
+            selectedPhone: selectedCustomer.customerPhone,
+            nameMatch,
+            phoneMatch
+          });
           return nameMatch || phoneMatch;
         });
+        console.log('✅ Filtered invoices result:', filteredInvoices.length, 'out of', allInvoices.length);
+        return filteredInvoices;
       }
     }
+    console.log('📋 Returning all invoices:', allInvoices.length);
     return allInvoices;
   };
 
@@ -76,11 +92,15 @@ export function InvoiceSelectionModal({
     if (isOpen && adminToken) {
       if (mode === 'invoice') {
         fetchInvoices();
+        // If we have a selectedCustomerId, also fetch customers for filtering
+        if (selectedCustomerId) {
+          fetchCustomers();
+        }
       } else if (mode === 'customer') {
         fetchCustomers();
       }
     }
-  }, [isOpen, adminToken, mode]);
+  }, [isOpen, adminToken, mode, selectedCustomerId]);
 
   // Reset search when modal opens/closes
   useEffect(() => {
