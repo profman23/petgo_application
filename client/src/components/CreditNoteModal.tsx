@@ -77,6 +77,9 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   // Invoice Selection Modal state
   const [showInvoiceSelectionModal, setShowInvoiceSelectionModal] = useState(false);
   
+  // Customer Selection Modal state
+  const [showCustomerSelectionModal, setShowCustomerSelectionModal] = useState(false);
+  
   // Admin token for API calls
   const adminToken = localStorage.getItem('adminToken');
   
@@ -243,6 +246,23 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
     }
   };
 
+  // Handle customer selection from customer modal
+  const handleCustomerSelected = (customer: any) => {
+    try {
+      // Populate customer information
+      setSelectedCustomer({
+        id: customer.id || 0,
+        name: customer.customerName || '',
+        phone: customer.customerPhone || ''
+      });
+      setCustomerName(customer.customerName || '');
+      setCustomerPhone(customer.customerPhone || '');
+      setCustomerSearchQuery(customer.id?.toString() || '');
+    } catch (error) {
+      console.error('Error processing selected customer:', error);
+    }
+  };
+
   // Update item
   const handleItemChange = (id: string, field: keyof CreditNoteItem, value: string | number) => {
     setItems(items.map(item => {
@@ -349,11 +369,13 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                   <div className="relative w-[170px]">
                     <input 
                       type="text" 
-                      className="w-full px-2 input-compact-20 border border-gray-300 credit-note-input"
+                      className="w-full px-2 input-compact-20 border border-gray-300 credit-note-input cursor-pointer"
                       value={customerSearchQuery}
                       onChange={(e) => handleCustomerSearchChange(e.target.value)}
+                      onClick={() => setShowCustomerSelectionModal(true)}
                       placeholder={language === 'ar' ? 'بحث عن العميل' : 'Search customer'}
                       data-testid="input-customer-search"
+                      readOnly
                     />
                     {showCustomerDropdown && customerSearchResults.length > 0 && (
                       <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
@@ -396,14 +418,16 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                   </label>
                   <input 
                     type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input cursor-pointer ${
                       selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                     }`}
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
+                    onClick={() => setShowCustomerSelectionModal(true)}
                     disabled={selectedCustomer !== null}
                     data-testid="input-customer-name"
                     placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
+                    readOnly
                   />
                 </div>
 
@@ -845,6 +869,17 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       onSelect={handleInvoiceSelected}
       title={language === 'ar' ? 'اختيار فاتورة للنسخ منها' : 'Select Invoice to Copy From'}
       adminToken={adminToken || undefined}
+      mode="invoice"
+    />
+    
+    {/* Customer Selection Modal */}
+    <InvoiceSelectionModal
+      isOpen={showCustomerSelectionModal}
+      onClose={() => setShowCustomerSelectionModal(false)}
+      onSelect={handleCustomerSelected}
+      title={language === 'ar' ? 'قائمة شركاء الأعمال' : 'List Of Business Partner'}
+      adminToken={adminToken || undefined}
+      mode="customer"
     />
   </>
   );
