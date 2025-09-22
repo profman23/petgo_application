@@ -58,10 +58,13 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   };
   
   // Auto-generate Credit Note Number
-  const { data: nextCreditNoteNumber } = useQuery<string>({
+  const { data: nextCreditNoteResponse } = useQuery<{nextNumber: string}>({
     queryKey: ['/api/admin/credit-notes/next-number'],
     enabled: isOpen,
   });
+  
+  // Extract and format the credit note number
+  const nextCreditNoteNumber = nextCreditNoteResponse?.nextNumber ? `CRN${nextCreditNoteResponse.nextNumber}` : 'Loading...';
 
   // State for customer information
   const [customerSearchQuery, setCustomerSearchQuery] = useState('');
@@ -323,7 +326,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
   const handleSave = () => {
     // TODO: Implement save functionality
     console.log('Save Credit Note:', {
-      creditNoteNo: nextCreditNoteNumber,
+      creditNoteNo: nextCreditNoteResponse?.nextNumber,
       customer: selectedCustomer,
       customerPhone,
       customerName,
