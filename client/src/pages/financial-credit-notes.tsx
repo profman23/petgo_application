@@ -4,11 +4,19 @@ import { FilePlus } from 'lucide-react';
 import { SearchActionBar } from '@/components/ui/search-action-bar';
 import { AdminLayout } from '@/components/admin-layout/AdminLayout';
 import { CreditNoteModal } from '@/components/CreditNoteModal';
+import { useQuery } from '@tanstack/react-query';
+import { InvoiceDataTable } from '@/components/InvoiceDataTable';
 
 export default function FinancialCreditNotes() {
   const { language } = useTranslation();
   const [searchInput, setSearchInput] = useState('');
   const [isCreditNoteModalOpen, setIsCreditNoteModalOpen] = useState(false);
+  
+  // Fetch credit notes data
+  const { data: creditNotes = [], isLoading, refetch } = useQuery({
+    queryKey: ['/api/admin/credit-notes'],
+    retry: false,
+  });
 
   // Add lord-icon script to head when component mounts
   useEffect(() => {
@@ -37,6 +45,16 @@ export default function FinancialCreditNotes() {
 
   const handleCreateCreditNote = () => {
     setIsCreditNoteModalOpen(true);
+  };
+  
+  const handleCreditNoteCreated = () => {
+    // Refresh the data when a new credit note is created
+    refetch();
+  };
+  
+  const handleSelectCreditNote = (creditNote: any) => {
+    // Handle credit note selection if needed
+    console.log('Selected credit note:', creditNote);
   };
 
   return (
@@ -90,16 +108,14 @@ export default function FinancialCreditNotes() {
           />
         </div>
 
-        {/* Placeholder for future content */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-          <div className="text-center text-gray-500">
-            <p className="text-lg font-medium mb-2">
-              {language === 'ar' ? 'محتوى إضافي سيتم إضافته هنا' : 'Additional content will be added here'}
-            </p>
-            <p className="text-sm">
-              {language === 'ar' ? 'يتم العمل على تطوير هذه الصفحة' : 'This page is under development'}
-            </p>
-          </div>
+        {/* Credit Notes DataTable */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <InvoiceDataTable
+            invoices={creditNotes}
+            onSelectInvoice={handleSelectCreditNote}
+            isLoading={isLoading}
+            mode="creditNote"
+          />
         </div>
       </div>
 
@@ -107,6 +123,7 @@ export default function FinancialCreditNotes() {
       <CreditNoteModal
         isOpen={isCreditNoteModalOpen}
         onOpenChange={setIsCreditNoteModalOpen}
+        onCreditNoteCreated={handleCreditNoteCreated}
       />
     </AdminLayout>
   );

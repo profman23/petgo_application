@@ -18,11 +18,21 @@ interface Customer {
   customerPhone?: string;
 }
 
+interface CreditNote {
+  id?: number;
+  creditNoteNumber: string;
+  customerName: string;
+  customerPhone?: string;
+  postingDate: string;
+  totalAfterVAT: string | number;
+  status: string;
+}
+
 interface InvoiceDataTableProps {
-  invoices: (Invoice | Customer)[];
-  onSelectInvoice: (item: Invoice | Customer) => void;
+  invoices: (Invoice | Customer | CreditNote)[];
+  onSelectInvoice: (item: Invoice | Customer | CreditNote) => void;
   isLoading?: boolean;
-  mode?: 'invoice' | 'customer';
+  mode?: 'invoice' | 'customer' | 'creditNote';
 }
 
 export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 'invoice' }: InvoiceDataTableProps) {
@@ -51,7 +61,9 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
         <span className="ml-3 text-gray-600">
           {mode === 'invoice' 
             ? (language === 'ar' ? 'جاري تحميل الفواتير...' : 'Loading invoices...')
-            : (language === 'ar' ? 'جاري تحميل العملاء...' : 'Loading customers...')}
+            : mode === 'customer'
+            ? (language === 'ar' ? 'جاري تحميل العملاء...' : 'Loading customers...')
+            : (language === 'ar' ? 'جاري تحميل إشعارات دائنة...' : 'Loading credit notes...')}
         </span>
       </div>
     );
@@ -64,7 +76,9 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
         <p className="text-lg font-medium">
           {mode === 'invoice'
             ? (language === 'ar' ? 'لا توجد فواتير' : 'No invoices available')
-            : (language === 'ar' ? 'لا يوجد عملاء' : 'No customers available')}
+            : mode === 'customer'
+            ? (language === 'ar' ? 'لا يوجد عملاء' : 'No customers available')
+            : (language === 'ar' ? 'لا توجد إشعارات دائنة' : 'No credit notes available')}
         </p>
       </div>
     );
@@ -97,7 +111,7 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
                     {/* Empty column header */}
                   </th>
                 </>
-              ) : (
+              ) : mode === 'customer' ? (
                 <>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
                     {language === 'ar' ? 'معرف العميل' : 'Customer ID'}
@@ -107,6 +121,24 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
                     {language === 'ar' ? 'رقم الهاتف' : 'Customer Phone'}
+                  </th>
+                </>
+              ) : (
+                <>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                    {language === 'ar' ? 'رقم إشعار دائن' : 'Credit Note No'}
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                    {language === 'ar' ? 'اسم العميل' : 'Customer Name'}
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                    {language === 'ar' ? 'تاريخ الترحيل' : 'Posting Date'}
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                    {language === 'ar' ? 'المبلغ' : 'Amount'}
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                    {language === 'ar' ? 'الحالة' : 'Status'}
                   </th>
                 </>
               )}
@@ -164,7 +196,7 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
                     </td>
                   </tr>
                 );
-              } else {
+              } else if (mode === 'customer') {
                 const customer = item as Customer;
                 return (
                   <tr 
@@ -191,6 +223,51 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
                     <td className="px-4 py-3 border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
                       <span className="text-sm text-gray-600">
                         {customer.customerPhone || '-'}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              } else {
+                const creditNote = item as CreditNote;
+                return (
+                  <tr 
+                    key={creditNote.creditNoteNumber}
+                    className="hover:bg-gray-50 cursor-pointer transition-colors"
+                    onClick={() => onSelectInvoice(creditNote)}
+                    data-testid={`table-credit-note-row-${creditNote.creditNoteNumber}`}
+                  >
+                    {/* Credit Note Number */}
+                    <td className="px-4 py-3 border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                      <span className="font-semibold text-purple-600 text-sm">
+                        {creditNote.creditNoteNumber}
+                      </span>
+                    </td>
+                    
+                    {/* Customer Name */}
+                    <td className="px-4 py-3 border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                      <span className="text-sm font-medium text-gray-800">
+                        {creditNote.customerName}
+                      </span>
+                    </td>
+                    
+                    {/* Posting Date */}
+                    <td className="px-4 py-3 border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                      <span className="text-sm text-gray-800">
+                        {formatDate(creditNote.postingDate)}
+                      </span>
+                    </td>
+                    
+                    {/* Amount */}
+                    <td className="px-4 py-3 border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                      <span className="text-sm font-bold text-green-600">
+                        {formatAmount(creditNote.totalAfterVAT)} SAR
+                      </span>
+                    </td>
+                    
+                    {/* Status */}
+                    <td className="px-4 py-3 border-r-2 border-gray-400" style={{ textAlign: getTextAlign() }}>
+                      <span className="text-sm font-medium text-blue-600">
+                        {creditNote.status}
                       </span>
                     </td>
                   </tr>

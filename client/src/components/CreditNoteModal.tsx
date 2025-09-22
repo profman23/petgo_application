@@ -28,6 +28,7 @@ interface CreditNoteItem {
   description: string;
   quantity: number;
   unitPrice: number;
+  discount: number;
   totalBeforeVAT: number;
   vat: number;
   totalAfterVAT: number;
@@ -36,9 +37,10 @@ interface CreditNoteItem {
 interface CreditNoteModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  onCreditNoteCreated?: () => void;
 }
 
-export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) {
+export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: CreditNoteModalProps) {
   const { language } = useTranslation();
   
   // Helper function to handle relative date input
@@ -100,6 +102,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       description: '',
       quantity: 1,
       unitPrice: 0,
+      discount: 0,
       totalBeforeVAT: 0,
       vat: 0,
       totalAfterVAT: 0
@@ -143,6 +146,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
         description: '',
         quantity: 1,
         unitPrice: 0,
+        discount: 0,
         totalBeforeVAT: 0,
         vat: 0,
         totalAfterVAT: 0
@@ -177,6 +181,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       description: '',
       quantity: 1,
       unitPrice: 0,
+      discount: 0,
       totalBeforeVAT: 0,
       vat: 0,
       totalAfterVAT: 0
@@ -218,7 +223,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
       });
       setCustomerName(invoice.customerName || '');
       setCustomerPhone(invoice.customerPhone || '');
-      setCustomerSearchQuery(invoice.customerName || '');
+      setCustomerSearchQuery(invoice.bookingId?.toString() || '');
 
       // If we have a bookingId, fetch the invoice items
       if (invoice.bookingId && adminToken) {
@@ -237,6 +242,7 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
             description: item.description || '',
             quantity: parseInt(item.quantity) || 1,
             unitPrice: parseFloat(item.unitPrice) || 0,
+            discount: parseFloat(item.discount) || 0,
             totalBeforeVAT: parseFloat(item.totalBeforeVat) || 0,
             vat: parseFloat(item.vatAmount) || 0,
             totalAfterVAT: parseFloat(item.totalAfterVat) || 0
@@ -323,18 +329,66 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
     onOpenChange(false);
   };
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log('Save Credit Note:', {
-      creditNoteNo: nextCreditNoteResponse?.nextNumber,
-      customer: selectedCustomer,
-      customerPhone,
-      customerName,
-      postingDate,
-      items,
-      totals
-    });
-    onOpenChange(false);
+  const handleSave = async () => {
+    if (!selectedCustomer || !adminToken) {
+      alert(language === 'ar' ? 'يرجى تحديد عميل أولاً' : 'Please select a customer first');
+      return;
+    }
+
+    try {
+      const creditNoteData = {
+        creditNoteNumber: nextCreditNoteResponse?.nextNumber,
+        customerId: selectedCustomer.id,
+        customerName: selectedCustomer.name,
+        customerPhone: selectedCustomer.phone,
+        postingDate,
+        items: items.filter(item => item.description.trim() !== ''),
+        totalBeforeVAT: totals.totalBeforeVAT,
+        vatAmount: totals.vat,
+        totalAfterVAT: totals.totalAfterVAT,
+        status: 'Open'
+      };
+
+      const response = await fetch('/api/admin/credit-notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminToken}`,
+        },
+        body: JSON.stringify(creditNoteData),
+      });
+
+      if (response.ok) {
+        console.log('Credit Note created successfully');
+        onOpenChange(false);
+        // Call the callback to refresh the data
+        if (onCreditNoteCreated) {
+          onCreditNoteCreated();
+        }
+        // Reset form
+        setSelectedCustomer(null);
+        setCustomerName('');
+        setCustomerPhone('');
+        setCustomerSearchQuery('');
+        setItems([{
+          id: '1',
+          description: '',
+          quantity: 1,
+          unitPrice: 0,
+          discount: 0,
+          totalBeforeVAT: 0,
+          vat: 0,
+          totalAfterVAT: 0
+        }]);
+      } else {
+        const error = await response.json();
+        console.error('Failed to create credit note:', error);
+        alert(language === 'ar' ? 'فشل في إنشاء إشعار دائن' : 'Failed to create credit note');
+      }
+    } catch (error) {
+      console.error('Error creating credit note:', error);
+      alert(language === 'ar' ? 'حدث خطأ أثناء إنشاء إشعار دائن' : 'An error occurred while creating the credit note');
+    }
   };
 
   return (
@@ -418,6 +472,25 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                     style={{ marginLeft: '29px', marginRight: '10px' }}
                   />
                 </div>
+              </div>
+
+              {/* Row 1.5: Status */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                    {language === 'ar' ? 'الحالة:' : 'Status:'}
+                  </label>
+                  <input 
+                    type="text" 
+                    className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-100 cursor-not-allowed text-gray-500"
+                    disabled
+                    readOnly
+                    value={language === 'ar' ? 'مفتوح' : 'Open'}
+                    data-testid="input-status"
+                  />
+                </div>
+                {/* Empty space for alignment */}
+                <div></div>
               </div>
 
               {/* Row 2: Customer Name and Posting Date */}
@@ -561,6 +634,9 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                           {language === 'ar' ? 'سعر الوحدة' : 'Unit Price'}
                         </th>
                         <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          {language === 'ar' ? 'الخصم' : 'Discount'}
+                        </th>
+                        <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           {language === 'ar' ? 'المجموع ق.ض.ق' : 'Total B.VAT'}
                         </th>
                         <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -601,11 +677,20 @@ export function CreditNoteModal({ isOpen, onOpenChange }: CreditNoteModalProps) 
                             <input
                               type="number"
                               value={item.unitPrice}
-                              onChange={(e) => handleItemChange(item.id, 'unitPrice', Number(e.target.value))}
-                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
-                              min="0"
-                              step="0.01"
+                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                              disabled
+                              readOnly
                               data-testid={`input-unit-price-${item.id}`}
+                            />
+                          </td>
+                          <td className="px-2 py-1">
+                            <input
+                              type="number"
+                              value={item.discount}
+                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                              disabled
+                              readOnly
+                              data-testid={`input-discount-${item.id}`}
                             />
                           </td>
                           <td className="px-2 py-1 text-sm text-gray-900">
