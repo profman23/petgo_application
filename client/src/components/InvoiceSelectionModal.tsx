@@ -17,12 +17,19 @@ interface Invoice {
   bookingId?: number;
 }
 
+interface Customer {
+  id: number;
+  customerName: string;
+  customerPhone?: string;
+}
+
 interface InvoiceSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (invoice: Invoice) => void;
+  onSelect: (item: Invoice | Customer) => void;
   title?: string;
   adminToken?: string;
+  mode?: 'invoice' | 'customer';
 }
 
 export function InvoiceSelectionModal({
@@ -30,12 +37,14 @@ export function InvoiceSelectionModal({
   onClose,
   onSelect,
   title,
-  adminToken
+  adminToken,
+  mode = 'invoice'
 }: InvoiceSelectionModalProps) {
   const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Invoice[]>([]);
+  const [searchResults, setSearchResults] = useState<(Invoice | Customer)[]>([]);
   const [allInvoices, setAllInvoices] = useState<Invoice[]>([]);
+  const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -43,12 +52,16 @@ export function InvoiceSelectionModal({
   const getDirection = () => language === 'ar' ? 'rtl' : 'ltr';
   const getTextAlign = () => language === 'ar' ? 'right' : 'left';
 
-  // Fetch all invoices when modal opens
+  // Fetch data when modal opens based on mode
   useEffect(() => {
     if (isOpen && adminToken) {
-      fetchInvoices();
+      if (mode === 'invoice') {
+        fetchInvoices();
+      } else if (mode === 'customer') {
+        fetchCustomers();
+      }
     }
-  }, [isOpen, adminToken]);
+  }, [isOpen, adminToken, mode]);
 
   // Reset search when modal opens/closes
   useEffect(() => {
@@ -83,6 +96,30 @@ export function InvoiceSelectionModal({
     }
   };
 
+  const fetchCustomers = async () => {
+    if (!adminToken) return;
+    
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/admin/customers', {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      
+      if (response.ok) {
+        const customers = await response.json();
+        setAllCustomers(customers);
+      } else {
+        console.error('Failed to fetch customers:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Handle search input change - search as user types
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
@@ -97,16 +134,33 @@ export function InvoiceSelectionModal({
       setIsSearching(true);
       setShowDropdown(true);
       
-      // Filter invoices by invoice number or customer name (partial match)
-      const results = allInvoices.filter((invoice: Invoice) => {
-        const invoiceNum = invoice.invoiceNumber || '';
-        const customerName = invoice.customerName || '';
-        const searchTerm = value.toLowerCase();
-        return (
-          invoiceNum.toLowerCase().includes(searchTerm) ||
-          customerName.toLowerCase().includes(searchTerm)
-        );
-      });
+      let results: (Invoice | Customer)[] = [];
+      
+      if (mode === 'invoice') {
+        // Filter invoices by invoice number or customer name (partial match)
+        results = allInvoices.filter((invoice: Invoice) => {
+          const invoiceNum = invoice.invoiceNumber || '';
+          const customerName = invoice.customerName || '';
+          const searchTerm = value.toLowerCase();
+          return (
+            invoiceNum.toLowerCase().includes(searchTerm) ||
+            customerName.toLowerCase().includes(searchTerm)
+          );
+        });
+      } else if (mode === 'customer') {
+        // Filter customers by customer name, phone or ID
+        results = allCustomers.filter((customer: Customer) => {
+          const customerName = customer.customerName || '';
+          const customerPhone = customer.customerPhone || '';
+          const customerId = customer.id?.toString() || '';
+          const searchTerm = value.toLowerCase();
+          return (
+            customerName.toLowerCase().includes(searchTerm) ||
+            customerPhone.includes(searchTerm) ||
+            customerId.includes(searchTerm)
+          );
+        });
+      }
       
       setTimeout(() => {
         setSearchResults(results);
@@ -118,10 +172,14 @@ export function InvoiceSelectionModal({
     }
   };
 
-  const handleSelectInvoice = (invoice: Invoice) => {
-    setSearchQuery(invoice.invoiceNumber);
+  const handleSelectItem = (item: Invoice | Customer) => {
+    if (mode === 'invoice') {
+      setSearchQuery((item as Invoice).invoiceNumber);
+    } else {
+      setSearchQuery((item as Customer).customerName);
+    }
     setShowDropdown(false);
-    onSelect(invoice);
+    onSelect(item);
     onClose();
   };
 
@@ -153,7 +211,9 @@ export function InvoiceSelectionModal({
               }}
             />
             <span style={{ textAlign: getTextAlign() }}>
-              {title || (language === 'ar' ? 'اختيار فاتورة' : 'Select Invoice')}
+              {title || (mode === 'invoice' 
+                ? (language === 'ar' ? 'اختيار فاتورة' : 'Select Invoice')
+                : (language === 'ar' ? 'قائمة شركاء الأعمال' : 'List Of Business Partner'))}
             </span>
           </DialogTitle>
         </DialogHeader>
@@ -165,38 +225,68 @@ export function InvoiceSelectionModal({
               <Search className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4`} />
               <Input
                 type="text"
-                placeholder={language === 'ar' ? 'ابحث برقم الفاتورة أو اسم العميل...' : 'Search by invoice number or customer name...'}
+                placeholder={mode === 'invoice' 
+                  ? (language === 'ar' ? 'ابحث برقم الفاتورة أو اسم العميل...' : 'Search by invoice number or customer name...')
+                  : (language === 'ar' ? 'ابحث بمعرف العميل أو الاسم أو رقم الهاتف...' : 'Search by customer ID, name or phone...')}
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 className={`${language === 'ar' ? 'pr-10' : 'pl-10'} credit-note-input focus-visible:ring-0 focus-visible:ring-offset-0`}
-                data-testid="input-invoice-search"
+                data-testid={mode === 'invoice' ? 'input-invoice-search' : 'input-customer-search'}
               />
               
               {/* Dropdown Results */}
               {showDropdown && searchResults.length > 0 && (
                 <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto mt-1">
-                  {searchResults.map((invoice) => (
-                    <div
-                      key={invoice.invoiceNumber}
-                      className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                      onClick={() => handleSelectInvoice(invoice)}
-                      data-testid={`dropdown-invoice-${invoice.invoiceNumber}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <FileText className="w-4 h-4 text-purple-600" />
-                          <div>
-                            <p className="font-semibold text-purple-600 text-sm">{invoice.invoiceNumber}</p>
-                            <p className="text-xs text-gray-600">{invoice.customerName}</p>
+                  {searchResults.map((item) => {
+                    if (mode === 'invoice') {
+                      const invoice = item as Invoice;
+                      return (
+                        <div
+                          key={invoice.invoiceNumber}
+                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                          onClick={() => handleSelectItem(invoice)}
+                          data-testid={`dropdown-invoice-${invoice.invoiceNumber}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <FileText className="w-4 h-4 text-purple-600" />
+                              <div>
+                                <p className="font-semibold text-purple-600 text-sm">{invoice.invoiceNumber}</p>
+                                <p className="text-xs text-gray-600">{invoice.customerName}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-medium text-gray-800">{formatAmount(invoice.finalTotal)} SAR</p>
+                              <p className="text-xs text-gray-500">{formatDate(invoice.appointmentDate)}</p>
+                            </div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-gray-800">{formatAmount(invoice.finalTotal)} SAR</p>
-                          <p className="text-xs text-gray-500">{formatDate(invoice.appointmentDate)}</p>
+                      );
+                    } else {
+                      const customer = item as Customer;
+                      return (
+                        <div
+                          key={customer.id}
+                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                          onClick={() => handleSelectItem(customer)}
+                          data-testid={`dropdown-customer-${customer.id}`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <FileText className="w-4 h-4 text-purple-600" />
+                              <div>
+                                <p className="font-semibold text-purple-600 text-sm">{customer.id}</p>
+                                <p className="text-xs text-gray-600">{customer.customerName}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-medium text-gray-800">{customer.customerPhone || 'N/A'}</p>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
+                      );
+                    }
+                  })}
                 </div>
               )}
               
@@ -206,7 +296,9 @@ export function InvoiceSelectionModal({
                   <div className="px-4 py-6 text-center text-gray-500">
                     <FileText className="w-8 h-8 mx-auto mb-2 text-gray-300" />
                     <p className="text-sm font-medium">
-                      {language === 'ar' ? 'لم يتم العثور على فواتير' : 'No invoices found'}
+                      {mode === 'invoice'
+                        ? (language === 'ar' ? 'لم يتم العثور على فواتير' : 'No invoices found')
+                        : (language === 'ar' ? 'لم يتم العثور على عملاء' : 'No customers found')}
                     </p>
                     <p className="text-xs">
                       {language === 'ar' ? 'جرب كلمات بحث مختلفة' : 'Try different search terms'}
@@ -230,19 +322,22 @@ export function InvoiceSelectionModal({
             <Button
               className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
               disabled={!searchQuery.trim()}
-              data-testid="button-search-invoices"
+              data-testid={mode === 'invoice' ? 'button-search-invoices' : 'button-search-customers'}
             >
               <Search className="h-4 w-4 mr-2" />
               {language === 'ar' ? 'بحث' : 'Search'}
             </Button>
           </div>
 
-          {/* Invoice Data Table */}
+          {/* Data Table */}
           <div className="flex-1 min-h-0">
             <InvoiceDataTable
-              invoices={searchQuery ? searchResults : allInvoices}
-              onSelectInvoice={handleSelectInvoice}
+              invoices={mode === 'invoice' 
+                ? (searchQuery ? searchResults as Invoice[] : allInvoices)
+                : (searchQuery ? searchResults as Customer[] : allCustomers) as any}
+              onSelectInvoice={handleSelectItem}
               isLoading={isLoading}
+              mode={mode}
             />
           </div>
 
@@ -254,7 +349,7 @@ export function InvoiceSelectionModal({
             onClick={onClose}
             variant="outline"
             className="px-6"
-            data-testid="button-cancel-invoice-selection"
+            data-testid={mode === 'invoice' ? 'button-cancel-invoice-selection' : 'button-cancel-customer-selection'}
           >
             {language === 'ar' ? 'إلغاء' : 'Cancel'}
           </Button>
