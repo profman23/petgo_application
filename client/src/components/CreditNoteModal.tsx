@@ -38,9 +38,11 @@ interface CreditNoteModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onCreditNoteCreated?: () => void;
+  viewMode?: boolean;  // New prop for view-only mode
+  creditNoteData?: any;  // Existing credit note data for viewing
 }
 
-export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: CreditNoteModalProps) {
+export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, viewMode = false, creditNoteData }: CreditNoteModalProps) {
   const { language } = useTranslation();
   
   // Helper function to handle relative date input
@@ -134,13 +136,53 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
         document.head.appendChild(script);
       }
       
-      // Reset state when opening
-      setCustomerSearchQuery('');
-      setCustomerPhone('');
-      setCustomerName('');
-      setSelectedCustomer(null);
-      setSelectedInvoice(null);
-      setStatus('Open');
+      if (viewMode && creditNoteData) {
+        // Load existing data when in view mode
+        setCustomerName(creditNoteData.customerName || '');
+        setCustomerPhone(creditNoteData.customerPhone || '');
+        setCustomerSearchQuery(creditNoteData.customerName || '');
+        setSelectedCustomer({
+          id: creditNoteData.customerId || 0,
+          name: creditNoteData.customerName || '',
+          phone: creditNoteData.customerPhone || ''
+        });
+        setPostingDate(creditNoteData.postingDate || defaultDate);
+        setStatus(creditNoteData.status || 'Closed');
+        
+        // Load existing items
+        if (creditNoteData.items && Array.isArray(creditNoteData.items)) {
+          const loadedItems = creditNoteData.items.map((item: any, index: number) => ({
+            id: (index + 1).toString(),
+            description: item.description || '',
+            quantity: item.creditQuantity || item.originalQuantity || 1,
+            unitPrice: item.unitPrice || 0,
+            discount: item.discount || 0,
+            totalBeforeVAT: item.totalBeforeVat || 0,
+            vat: item.vatAmount || 0,
+            totalAfterVAT: item.totalAfterVat || 0
+          }));
+          setItems(loadedItems);
+        }
+      } else {
+        // Reset state when opening in create mode
+        setCustomerSearchQuery('');
+        setCustomerPhone('');
+        setCustomerName('');
+        setSelectedCustomer(null);
+        setSelectedInvoice(null);
+        setStatus('Open');
+        setItems([{
+          id: '1',
+          description: '',
+          quantity: 1,
+          unitPrice: 0,
+          discount: 0,
+          totalBeforeVAT: 0,
+          vat: 0,
+          totalAfterVAT: 0
+        }]);
+      }
+      
       setShowCustomerDropdown(false);
       setActiveTab('content');
       setShowInvoiceSelectionModal(false);
@@ -149,18 +191,8 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
         card: { checked: false, amount: 0 },
         bank: { checked: false, amount: 0 }
       });
-      setItems([{
-        id: '1',
-        description: '',
-        quantity: 1,
-        unitPrice: 0,
-        discount: 0,
-        totalBeforeVAT: 0,
-        vat: 0,
-        totalAfterVAT: 0
-      }]);
     }
-  }, [isOpen]);
+  }, [isOpen, viewMode, creditNoteData]);
 
   // Handle customer selection
   const handleCustomerSelect = (customer: Customer) => {
@@ -408,7 +440,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
         totalBeforeVat: totals.totalBeforeVAT.toFixed(2),  // Fix field name
         vatAmount: totals.vat.toFixed(2),
         finalTotal: totals.totalAfterVAT.toFixed(2),  // Fix field name
-        status: 'Open',
+        status: 'Closed',  // Save as Closed instead of Open
         createdBy: adminToken
       };
 
@@ -479,7 +511,10 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
             
             {/* Title */}
             <h1 className="text-2xl font-bold text-gray-600" style={{fontFamily: 'Arimo'}}>
-              {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
+              {viewMode 
+                ? (language === 'ar' ? 'عرض إشعار دائن' : 'View Credit Note')
+                : (language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note')
+              }
             </h1>
           </div>
         </DialogHeader>
@@ -504,12 +539,15 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
                   <div className="relative w-[170px]">
                     <input 
                       type="text" 
-                      className="w-full px-2 input-compact-20 border border-gray-300 credit-note-input cursor-pointer"
+                      className={`w-full px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                        viewMode ? 'bg-gray-100 cursor-not-allowed text-gray-500' : 'cursor-pointer'
+                      }`}
                       value={customerSearchQuery}
-                      onChange={(e) => handleCustomerSearchChange(e.target.value)}
-                      onClick={() => setShowCustomerSelectionModal(true)}
+                      onChange={(e) => viewMode ? null : handleCustomerSearchChange(e.target.value)}
+                      onClick={() => viewMode ? null : setShowCustomerSelectionModal(true)}
                       placeholder={language === 'ar' ? 'بحث عن العميل' : 'Search customer'}
                       data-testid="input-customer-search"
+                      disabled={viewMode}
                       readOnly
                     />
                     {showCustomerDropdown && customerSearchResults.length > 0 && (
@@ -573,13 +611,13 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
                   </label>
                   <input 
                     type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input cursor-pointer ${
-                      selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                      viewMode || selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'cursor-pointer'
                     }`}
                     value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    onClick={() => setShowCustomerSelectionModal(true)}
-                    disabled={selectedCustomer !== null}
+                    onChange={(e) => viewMode ? null : setCustomerName(e.target.value)}
+                    onClick={() => viewMode ? null : setShowCustomerSelectionModal(true)}
+                    disabled={viewMode || selectedCustomer !== null}
                     data-testid="input-customer-name"
                     placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
                     readOnly
@@ -592,25 +630,32 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
                   </label>
                   <input 
                     type="text" 
-                    className="w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input"
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                      viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                    }`}
                     placeholder={language === 'ar' ? '+2 أو -3' : '+2 or -3'}
                     value={postingDate}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      setPostingDate(value);
-                      // Parse relative dates on blur or when complete
-                      if (value.match(/^[+-]?\d+$/)) {
-                        const parsedDate = parseRelativeDate(value);
-                        if (parsedDate !== value) {
-                          setPostingDate(parsedDate);
+                      if (!viewMode) {
+                        const value = e.target.value;
+                        setPostingDate(value);
+                        // Parse relative dates on blur or when complete
+                        if (value.match(/^[+-]?\d+$/)) {
+                          const parsedDate = parseRelativeDate(value);
+                          if (parsedDate !== value) {
+                            setPostingDate(parsedDate);
+                          }
                         }
                       }
                     }}
                     onBlur={(e) => {
-                      const parsedDate = parseRelativeDate(e.target.value);
-                      setPostingDate(parsedDate);
+                      if (!viewMode) {
+                        const parsedDate = parseRelativeDate(e.target.value);
+                        setPostingDate(parsedDate);
+                      }
                     }}
                     data-testid="input-posting-date"
+                    disabled={viewMode}
                     style={{ marginLeft: '29px' }}
                   />
                 </div>
@@ -625,11 +670,11 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated }: C
                   <input 
                     type="text" 
                     className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
-                      selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                      viewMode || selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                     }`}
                     value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value)}
-                    disabled={selectedCustomer !== null}
+                    onChange={(e) => viewMode ? null : setCustomerPhone(e.target.value)}
+                    disabled={viewMode || selectedCustomer !== null}
                     data-testid="input-customer-phone"
                     placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
                   />
