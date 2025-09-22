@@ -869,6 +869,7 @@ export const creditNotes = pgTable("credit_notes", {
   totalBeforeVat: decimal("total_before_vat", { precision: 10, scale: 2 }).notNull(),
   vatAmount: decimal("vat_amount", { precision: 10, scale: 2 }).notNull(),
   finalTotal: decimal("final_total", { precision: 10, scale: 2 }).notNull(),
+  status: varchar("status", { length: 50 }).notNull().default('Open'),
   createdBy: varchar("created_by", { length: 100 }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -884,6 +885,7 @@ export const insertCreditNoteSchema = createInsertSchema(creditNotes).pick({
   totalBeforeVat: true,
   vatAmount: true,
   finalTotal: true,
+  status: true,
   createdBy: true,
 });
 
