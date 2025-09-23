@@ -287,26 +287,18 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
           const invoiceItems = await itemsResponse.json();
           const creditedItems = await creditedItemsResponse.json();
           
-          console.log('🔍 DEBUGGING - Invoice Items:', invoiceItems);
-          console.log('🔍 DEBUGGING - Credited Items:', creditedItems);
-          
           // Create a map of credited items for easy lookup
           const creditedItemsMap = new Map();
           creditedItems.forEach((creditedItem: any) => {
             const existingCredited = creditedItemsMap.get(creditedItem.id) || 0;
             creditedItemsMap.set(creditedItem.id, existingCredited + creditedItem.creditedQuantity);
-            console.log(`🔍 DEBUGGING - Added to map: ID ${creditedItem.id} -> ${existingCredited + creditedItem.creditedQuantity}`);
           });
-          
-          console.log('🔍 DEBUGGING - Credited Items Map:', Array.from(creditedItemsMap.entries()));
           
           // Filter items to exclude those that are fully credited
           const availableItems = invoiceItems.filter((item: any) => {
             const totalCredited = creditedItemsMap.get(item.id) || 0;
             const originalQuantity = parseInt(item.quantity);
-            const isAvailable = totalCredited < originalQuantity;
-            console.log(`🔍 DEBUGGING - Item ${item.id}: credited=${totalCredited}, original=${originalQuantity}, available=${isAvailable}`);
-            return isAvailable; // Only show items that haven't been fully credited
+            return totalCredited < originalQuantity; // Only show items that haven't been fully credited
           });
           
           // Transform available invoice items to credit note items format
@@ -410,6 +402,20 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
     }
 
     try {
+      // Fetch a fresh credit note number for each save attempt
+      const freshCreditNoteResponse = await fetch('/api/admin/credit-notes/next-number', {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      
+      if (!freshCreditNoteResponse.ok) {
+        alert('Failed to generate credit note number');
+        return;
+      }
+      
+      const freshCreditNoteData = await freshCreditNoteResponse.json();
+      
       // Prepare items in correct format for database
       const filteredItems = items.filter(item => item.description.trim() !== '').map(item => ({
         id: parseInt(item.id),
@@ -422,10 +428,9 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
         totalAfterVat: item.totalAfterVAT
       }));
 
-      console.log('🔍 DEBUGGING - Filtered items being sent to backend:', filteredItems);
 
       const creditNoteData = {
-        creditNoteNumber: nextCreditNoteResponse?.nextNumber,
+        creditNoteNumber: freshCreditNoteData.nextNumber,  // Use fresh credit note number
         invoiceId: selectedInvoice?.bookingId || null,  // Add missing invoiceId
         invoiceNumber: selectedInvoice?.invoiceNumber || null,  // Add missing invoiceNumber  
         customerName: selectedCustomer.name,
