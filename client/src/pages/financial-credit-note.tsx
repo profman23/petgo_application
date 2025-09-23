@@ -542,6 +542,11 @@ export default function FinancialCreditNote() {
             });
           }
           
+          console.log('🔴 INVOICE SELECTION DEBUG:');
+          console.log('Available items count:', availableItems.length);
+          console.log('Final padded items count:', paddedItems.length);
+          console.log('Final padded items:', paddedItems);
+          
           setInvoiceItems(paddedItems);
         } else {
           console.error('Failed to fetch invoice items or credited items');
@@ -1816,6 +1821,14 @@ export default function FinancialCreditNote() {
                     )}
 
                     {/* Items and Services Table */}
+                    {(() => {
+                      console.log('🔵 RENDER DEBUG:');
+                      console.log('loadingItems:', loadingItems);
+                      console.log('invoiceItems.length:', invoiceItems.length);
+                      console.log('invoiceItems:', invoiceItems);
+                      console.log('Should show table:', !loadingItems && invoiceItems.length > 0);
+                      return null;
+                    })()}
                     {!loadingItems && invoiceItems.length > 0 && (
                       <div>
                         <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
