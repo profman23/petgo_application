@@ -761,13 +761,14 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="text"
                               value={item.description}
-                              onChange={(e) => viewMode ? null : handleItemChange(item.id, 'description', e.target.value)}
+                              onChange={(e) => (viewMode || item.originalQuantity) ? null : handleItemChange(item.id, 'description', e.target.value)}
                               className={`w-full px-2 border border-gray-600 rounded text-sm h-6 ${
-                                viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
+                                (viewMode || item.originalQuantity) ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                               }`}
                               placeholder={language === 'ar' ? 'وصف العنصر' : 'Item description'}
-                              disabled={viewMode}
+                              disabled={viewMode || item.originalQuantity}
                               data-testid={`input-description-${item.id}`}
+                              readOnly={item.originalQuantity ? true : false}
                             />
                           </td>
                           <td className="px-2 py-1">
