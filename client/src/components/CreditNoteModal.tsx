@@ -499,6 +499,18 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl max-h-[95vh] p-0">
         <DialogHeader className="p-3 pb-2" dir={getDirection(language)}>
+          <DialogTitle className="sr-only">
+            {viewMode 
+              ? (language === 'ar' ? 'عرض إشعار دائن' : 'View Credit Note')
+              : (language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note')
+            }
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {viewMode 
+              ? (language === 'ar' ? 'عرض تفاصيل إشعار دائن موجود' : 'View details of an existing credit note')
+              : (language === 'ar' ? 'إنشاء إشعار دائن جديد للعميل' : 'Create a new credit note for a customer')
+            }
+          </DialogDescription>
           <div className="flex items-center gap-4">
             {/* Lord Icon */}
             <div className="flex-shrink-0">
