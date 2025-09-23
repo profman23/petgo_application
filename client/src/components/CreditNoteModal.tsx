@@ -180,11 +180,6 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
       setShowCustomerDropdown(false);
       setActiveTab('content');
       setShowInvoiceSelectionModal(false);
-      setPaymentMethods({
-        cash: { checked: false, amount: 0 },
-        card: { checked: false, amount: 0 },
-        bank: { checked: false, amount: 0 }
-      });
     }
   }, [isOpen, viewMode, creditNoteData]);
 
@@ -759,7 +754,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                               type="text"
                               value={item.description}
                               onChange={(e) => viewMode ? null : handleItemChange(item.id, 'description', e.target.value)}
-                              className={`w-full px-2 py-1 border border-gray-300 rounded text-sm ${
+                              className={`w-full px-2 border border-gray-300 rounded text-sm h-3 ${
                                 viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                               }`}
                               placeholder={language === 'ar' ? 'وصف العنصر' : 'Item description'}
@@ -772,7 +767,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                               type="number"
                               value={item.quantity}
                               onChange={(e) => viewMode ? null : handleItemChange(item.id, 'quantity', Number(e.target.value))}
-                              className={`w-20 px-2 py-1 border border-gray-300 rounded text-sm ${
+                              className={`w-20 px-2 border border-gray-300 rounded text-sm h-3 ${
                                 viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                               }`}
                               min="1"
@@ -784,7 +779,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="number"
                               value={item.unitPrice}
-                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                              className="w-24 px-2 border border-gray-300 rounded text-sm h-3 bg-gray-100 text-gray-500 cursor-not-allowed"
                               disabled
                               readOnly
                               data-testid={`input-unit-price-${item.id}`}
@@ -794,7 +789,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="number"
                               value={item.discount}
-                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm bg-gray-100 text-gray-500 cursor-not-allowed"
+                              className="w-24 px-2 border border-gray-300 rounded text-sm h-3 bg-gray-100 text-gray-500 cursor-not-allowed"
                               disabled
                               readOnly
                               data-testid={`input-discount-${item.id}`}
