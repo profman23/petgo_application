@@ -55,19 +55,41 @@ export default function FinancialCreditNote() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
-  // Initialize with 6 empty default rows
-  const defaultEmptyRows = Array.from({ length: 6 }, (_, index) => ({
-    id: `default-${index + 1}`,
+  // Default 6-row template
+  const DEFAULT_ROWS = Array.from({ length: 6 }, (_, i) => ({
+    id: `default-${i + 1}`,
     description: '',
     quantity: '1',
     unitPrice: '0',
     discountType: 'none',
-    type: 'product', // Required for badge rendering
+    type: 'product',
     originalQuantity: 1,
     creditedQuantity: 0
   }));
+
+  // Merge invoice items with default template
+  const mergeInvoiceItems = (invoiceItems: any[]) => {
+    const filledRows = invoiceItems.map((item, i) => ({
+      id: item.id || `invoice-${i + 1}`,
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      discountType: item.discountType || 'none',
+      type: item.type,
+      originalQuantity: item.originalQuantity,
+      creditedQuantity: item.creditedQuantity
+    }));
+
+    if (filledRows.length < 6) {
+      // Fill first N positions with invoice data, keep remaining as defaults
+      return [...filledRows, ...DEFAULT_ROWS.slice(filledRows.length)];
+    }
+
+    // If more than 6 items, show all of them
+    return filledRows;
+  };
   
-  const [invoiceItems, setInvoiceItems] = useState<any[]>(defaultEmptyRows);
+  const [invoiceItems, setInvoiceItems] = useState<any[]>(DEFAULT_ROWS);
   const [loadingItems, setLoadingItems] = useState(false);
   const [editedQuantities, setEditedQuantities] = useState<{[key: string]: number}>({});
   const [removedItems, setRemovedItems] = useState<Set<string>>(new Set());
@@ -525,60 +547,18 @@ export default function FinancialCreditNote() {
             };
           });
           
-          // Simple approach: Always pad to exactly 6 rows
-          const paddedItems = [...availableItems];
-          
-          // Add empty default rows to make exactly 6 total
-          while (paddedItems.length < 6) {
-            paddedItems.push({
-              id: `default-${paddedItems.length + 1}`,
-              description: '',
-              quantity: '1',
-              unitPrice: '0',
-              discountType: 'none',
-              type: 'product',
-              originalQuantity: 1,
-              creditedQuantity: 0
-            });
-          }
-          
-          console.log('🔴 INVOICE SELECTION DEBUG:');
-          console.log('Available items count:', availableItems.length);
-          console.log('Final padded items count:', paddedItems.length);
-          console.log('Final padded items:', paddedItems);
-          
-          setInvoiceItems(paddedItems);
+          // Use merge logic to combine invoice items with default template
+          const mergedItems = mergeInvoiceItems(availableItems);
+          setInvoiceItems(mergedItems);
         } else {
           console.error('Failed to fetch invoice items or credited items');
-          // Set 6 empty default rows when no items
-          const defaultRows = Array.from({ length: 6 }, (_, index) => ({
-            id: `default-${index + 1}`,
-            description: '',
-            quantity: '1',
-            unitPrice: '0',
-            discountType: 'none',
-            type: 'product',
-            originalQuantity: 1,
-            creditedQuantity: 0
-          }));
-          
-          setInvoiceItems(defaultRows);
+          // Set default template when no items
+          setInvoiceItems(DEFAULT_ROWS);
         }
       } catch (error) {
         console.error('Failed to fetch invoice items:', error);
-        // Set 6 empty default rows when error occurs
-        const defaultRows = Array.from({ length: 6 }, (_, index) => ({
-          id: `default-${index + 1}`,
-          description: '',
-          quantity: '1',
-          unitPrice: '0',
-          discountType: 'none',
-          type: 'product',
-          originalQuantity: 1,
-          creditedQuantity: 0
-        }));
-        
-        setInvoiceItems(defaultRows);
+        // Set default template when error occurs
+        setInvoiceItems(DEFAULT_ROWS);
       } finally {
         setLoadingItems(false);
       }
@@ -590,19 +570,8 @@ export default function FinancialCreditNote() {
     setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
-    // Reset to 6 empty default rows when going back to search
-    const defaultRows = Array.from({ length: 6 }, (_, index) => ({
-      id: `default-${index + 1}`,
-      description: '',
-      quantity: '1',
-      unitPrice: '0',
-      discountType: 'none',
-      type: 'product',
-      originalQuantity: 1,
-      creditedQuantity: 0
-    }));
-    
-    setInvoiceItems(defaultRows);
+    // Reset to default template when going back to search
+    setInvoiceItems(DEFAULT_ROWS);
     // Reset credit note editing states when returning to search
     setEditedQuantities({});
     setRemovedItems(new Set());
@@ -614,19 +583,8 @@ export default function FinancialCreditNote() {
     setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
-    // Reset to 6 empty default rows when closing modal
-    const defaultRows = Array.from({ length: 6 }, (_, index) => ({
-      id: `default-${index + 1}`,
-      description: '',
-      quantity: '1',
-      unitPrice: '0',
-      discountType: 'none',
-      type: 'product',
-      originalQuantity: 1,
-      creditedQuantity: 0
-    }));
-    
-    setInvoiceItems(defaultRows);
+    // Reset to default template when closing modal
+    setInvoiceItems(DEFAULT_ROWS);
     // Reset credit note editing states when closing modal
     setEditedQuantities({});
     setRemovedItems(new Set());
@@ -1821,14 +1779,6 @@ export default function FinancialCreditNote() {
                     )}
 
                     {/* Items and Services Table */}
-                    {(() => {
-                      console.log('🔵 RENDER DEBUG:');
-                      console.log('loadingItems:', loadingItems);
-                      console.log('invoiceItems.length:', invoiceItems.length);
-                      console.log('invoiceItems:', invoiceItems);
-                      console.log('Should show table:', !loadingItems && invoiceItems.length > 0);
-                      return null;
-                    })()}
                     {!loadingItems && invoiceItems.length > 0 && (
                       <div>
                         <h3 className="text-lg font-semibold text-purple-800 mb-3" style={{textAlign: getTextAlign(language)}}>
