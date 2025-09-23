@@ -557,10 +557,28 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
 
               </div>
 
-              {/* Row 1.5: Status positioned on the right */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 -mt-1 -mb-1">
-                {/* Empty space on left to align Status on right */}
-                <div></div>
+              {/* Row 2: Customer Name and Status */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {/* Customer Name on left side */}
+                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
+                    {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                      viewMode || selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'cursor-pointer'
+                    }`}
+                    value={customerName}
+                    onChange={(e) => viewMode ? null : setCustomerName(e.target.value)}
+                    onClick={() => viewMode ? null : setShowCustomerSelectionModal(true)}
+                    disabled={viewMode || selectedCustomer !== null}
+                    data-testid="input-customer-name"
+                    placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
+                    readOnly
+                  />
+                </div>
                 
                 {/* Status - on right side */}
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -579,25 +597,22 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                 </div>
               </div>
 
-              {/* Row 2: Customer Name and Posting Date */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {/* Row 3: Customer Phone and Posting Date */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ borderBottomWidth: '2px', paddingBottom: '4px' }}>
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                    {language === 'ar' ? 'اسم العميل:' : 'Customer Name:'}
-                    <span className="text-red-500 ml-1">*</span>
+                    {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
                   </label>
                   <input 
                     type="text" 
                     className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
-                      viewMode || selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'cursor-pointer'
+                      viewMode || selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                     }`}
-                    value={customerName}
-                    onChange={(e) => viewMode ? null : setCustomerName(e.target.value)}
-                    onClick={() => viewMode ? null : setShowCustomerSelectionModal(true)}
+                    value={customerPhone}
+                    onChange={(e) => viewMode ? null : setCustomerPhone(e.target.value)}
                     disabled={viewMode || selectedCustomer !== null}
-                    data-testid="input-customer-name"
-                    placeholder={language === 'ar' ? 'أدخل اسم العميل' : 'Enter customer name'}
-                    readOnly
+                    data-testid="input-customer-phone"
+                    placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
                   />
                 </div>
 
@@ -635,26 +650,6 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                     disabled={viewMode}
                     readOnly={viewMode}
                     style={{ marginLeft: '29px' }}
-                  />
-                </div>
-              </div>
-
-              {/* Row 3: Customer Phone */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ borderBottomWidth: '2px', paddingBottom: '4px' }}>
-                <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
-                    {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
-                  </label>
-                  <input 
-                    type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
-                      viewMode || selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
-                    }`}
-                    value={customerPhone}
-                    onChange={(e) => viewMode ? null : setCustomerPhone(e.target.value)}
-                    disabled={viewMode || selectedCustomer !== null}
-                    data-testid="input-customer-phone"
-                    placeholder={language === 'ar' ? 'أدخل هاتف العميل' : 'Enter customer phone'}
                   />
                 </div>
               </div>
