@@ -308,7 +308,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
             const availableQuantity = originalQuantity - totalCredited;
             
             return {
-              id: (Date.now() + index).toString(),
+              id: item.id.toString(), // PRESERVE ORIGINAL ITEM ID for filtering to work
               description: item.description || '',
               quantity: availableQuantity, // Use available quantity (original - credited)
               unitPrice: parseFloat(item.unitPrice) || 0,
@@ -766,9 +766,9 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                                 (viewMode || item.originalQuantity) ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                               }`}
                               placeholder={language === 'ar' ? 'وصف العنصر' : 'Item description'}
-                              disabled={viewMode || item.originalQuantity}
+                              disabled={viewMode || !!item.originalQuantity}
                               data-testid={`input-description-${item.id}`}
-                              readOnly={item.originalQuantity ? true : false}
+                              readOnly={!!item.originalQuantity}
                             />
                           </td>
                           <td className="px-2 py-1">
