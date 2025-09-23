@@ -55,7 +55,18 @@ export default function FinancialCreditNote() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
-  const [invoiceItems, setInvoiceItems] = useState<any[]>([]);
+  // Initialize with 6 empty default rows
+  const defaultEmptyRows = Array.from({ length: 6 }, (_, index) => ({
+    id: `default-${index + 1}`,
+    description: '',
+    quantity: '1',
+    unitPrice: '0',
+    discountType: 'none',
+    originalQuantity: 1,
+    creditedQuantity: 0
+  }));
+  
+  const [invoiceItems, setInvoiceItems] = useState<any[]>(defaultEmptyRows);
   const [loadingItems, setLoadingItems] = useState(false);
   const [editedQuantities, setEditedQuantities] = useState<{[key: number]: number}>({});
   const [removedItems, setRemovedItems] = useState<Set<number>>(new Set());
@@ -513,14 +524,78 @@ export default function FinancialCreditNote() {
             };
           });
           
-          setInvoiceItems(availableItems);
+          // Create 6 default empty rows as template
+          const emptyRowTemplate = {
+            id: null,
+            description: '',
+            quantity: '1',
+            unitPrice: '0',
+            discountType: 'none',
+            originalQuantity: 1,
+            creditedQuantity: 0
+          };
+          
+          const defaultRows = Array.from({ length: 6 }, (_, index) => ({
+            ...emptyRowTemplate,
+            id: `default-${index + 1}` // Use string IDs for default rows
+          }));
+          
+          // Fill first N rows with invoice items, keep remaining as defaults
+          const combinedItems = defaultRows.map((defaultRow, index) => {
+            if (index < availableItems.length) {
+              // Replace this default row with actual invoice item
+              return availableItems[index];
+            }
+            // Keep this row as default empty row
+            return defaultRow;
+          });
+          
+          // If invoice has more items than available rows, add additional rows
+          if (availableItems.length > 6) {
+            const additionalItems = availableItems.slice(6);
+            combinedItems.push(...additionalItems);
+          }
+          
+          setInvoiceItems(combinedItems);
         } else {
           console.error('Failed to fetch invoice items or credited items');
-          setInvoiceItems([]);
+          // Set 6 empty default rows when no items
+          const emptyRowTemplate = {
+            id: null,
+            description: '',
+            quantity: '1',
+            unitPrice: '0',
+            discountType: 'none',
+            originalQuantity: 1,
+            creditedQuantity: 0
+          };
+          
+          const defaultRows = Array.from({ length: 6 }, (_, index) => ({
+            ...emptyRowTemplate,
+            id: `default-${index + 1}`
+          }));
+          
+          setInvoiceItems(defaultRows);
         }
       } catch (error) {
         console.error('Failed to fetch invoice items:', error);
-        setInvoiceItems([]);
+        // Set 6 empty default rows when error occurs
+        const emptyRowTemplate = {
+          id: null,
+          description: '',
+          quantity: '1',
+          unitPrice: '0',
+          discountType: 'none',
+          originalQuantity: 1,
+          creditedQuantity: 0
+        };
+        
+        const defaultRows = Array.from({ length: 6 }, (_, index) => ({
+          ...emptyRowTemplate,
+          id: `default-${index + 1}`
+        }));
+        
+        setInvoiceItems(defaultRows);
       } finally {
         setLoadingItems(false);
       }
@@ -532,7 +607,23 @@ export default function FinancialCreditNote() {
     setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
-    setInvoiceItems([]);
+    // Reset to 6 empty default rows when going back to search
+    const emptyRowTemplate = {
+      id: null,
+      description: '',
+      quantity: '1',
+      unitPrice: '0',
+      discountType: 'none',
+      originalQuantity: 1,
+      creditedQuantity: 0
+    };
+    
+    const defaultRows = Array.from({ length: 6 }, (_, index) => ({
+      ...emptyRowTemplate,
+      id: `default-${index + 1}`
+    }));
+    
+    setInvoiceItems(defaultRows);
     // Reset credit note editing states when returning to search
     setEditedQuantities({});
     setRemovedItems(new Set());
@@ -544,7 +635,23 @@ export default function FinancialCreditNote() {
     setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
-    setInvoiceItems([]);
+    // Reset to 6 empty default rows when closing modal
+    const emptyRowTemplate = {
+      id: null,
+      description: '',
+      quantity: '1',
+      unitPrice: '0',
+      discountType: 'none',
+      originalQuantity: 1,
+      creditedQuantity: 0
+    };
+    
+    const defaultRows = Array.from({ length: 6 }, (_, index) => ({
+      ...emptyRowTemplate,
+      id: `default-${index + 1}`
+    }));
+    
+    setInvoiceItems(defaultRows);
     // Reset credit note editing states when closing modal
     setEditedQuantities({});
     setRemovedItems(new Set());
