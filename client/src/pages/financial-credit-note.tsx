@@ -1888,13 +1888,7 @@ export default function FinancialCreditNote() {
                               </tr>
                             </thead>
                             <tbody>
-                              {(() => {
-                                console.log('DEBUG invoiceItems:', invoiceItems);
-                                console.log('DEBUG removedItems:', removedItems);
-                                const filteredItems = invoiceItems.filter(item => !removedItems.has(item.id));
-                                console.log('DEBUG filtered items:', filteredItems);
-                                return filteredItems;
-                              })().map((item: any, index: number) => {
+                              {invoiceItems.filter(item => !removedItems.has(item.id)).map((item: any, index: number) => {
                                 // Calculate remaining active items for delete protection
                                 const activeItemsCount = invoiceItems.filter(i => !removedItems.has(i.id)).length;
                                 const isLastItem = activeItemsCount <= 1;
@@ -1945,6 +1939,8 @@ export default function FinancialCreditNote() {
                                           }
                                         </span>
                                         {itemName}
+                                        {/* DEBUG: Show item ID */}
+                                        <span className="ml-2 text-xs text-red-500">[ID: {item.id}]</span>
                                       </div>
                                     </td>
                                     <td className="py-2 px-2">
