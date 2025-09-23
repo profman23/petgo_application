@@ -6,6 +6,7 @@ import { AdminLayout } from '@/components/admin-layout/AdminLayout';
 import { CreditNoteModal } from '@/components/CreditNoteModal';
 import { useQuery } from '@tanstack/react-query';
 import { DataTable, DataTableColumn, DataTableAction } from '@/components/ui/data-table';
+import { InvoiceMapModal } from '@/components/InvoiceMapModal';
 
 export default function FinancialCreditNotes() {
   const { language } = useTranslation();
@@ -13,10 +14,23 @@ export default function FinancialCreditNotes() {
   const [isCreditNoteModalOpen, setIsCreditNoteModalOpen] = useState(false);
   const [viewCreditNote, setViewCreditNote] = useState<any>(null);
   const [isViewMode, setIsViewMode] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [selectedInvoiceForMap, setSelectedInvoiceForMap] = useState<any>(null);
+  const [creditNotesForMap, setCreditNotesForMap] = useState<any[]>([]);
+  const [paymentsForMap, setPaymentsForMap] = useState<any[]>([]);
+  
+  // Get admin token
+  const adminToken = localStorage.getItem('adminToken');
   
   // Fetch credit notes data
   const { data: creditNotes = [], isLoading, refetch } = useQuery<any[]>({
     queryKey: ['/api/admin/credit-notes'],
+    retry: false,
+  });
+  
+  // Fetch all invoices data for Map functionality
+  const { data: allInvoices = [] } = useQuery<any[]>({
+    queryKey: ['/api/admin/generated-invoices'],
     retry: false,
   });
 
@@ -71,8 +85,57 @@ export default function FinancialCreditNotes() {
     console.log('Print credit note:', creditNote);
   };
   
-  const handleMapCreditNote = (creditNote: any) => {
-    console.log('Map credit note:', creditNote);
+  const handleMapCreditNote = async (creditNote: any) => {
+    console.log('🗺️ Map credit note clicked:', creditNote);
+    try {
+      // Find the full invoice details for this credit note
+      const fullInvoice = allInvoices?.find((inv: any) => inv.invoiceNumber === creditNote.invoiceNumber);
+      console.log('🗺️ Found invoice:', fullInvoice);
+      
+      const invoice = {
+        invoiceNumber: creditNote.invoiceNumber,
+        customerName: creditNote.customerName,
+        finalTotal: fullInvoice?.finalTotal,
+        appointmentDate: fullInvoice?.appointmentDate
+      };
+      
+      // Fetch all credit notes for this invoice
+      const creditNotesForInvoice = creditNotes.filter(cn => cn.invoiceNumber === creditNote.invoiceNumber);
+      
+      // Fetch payments for this invoice's booking
+      let paymentsForInvoice: any[] = [];
+      if (fullInvoice?.bookingId) {
+        try {
+          const paymentsResponse = await fetch(`/api/invoice-payments/${fullInvoice.bookingId}`, {
+            headers: {
+              Authorization: `Bearer ${adminToken}`,
+            },
+          });
+          if (paymentsResponse.ok) {
+            paymentsForInvoice = await paymentsResponse.json();
+            console.log('🗺️ Fetched payments:', paymentsForInvoice);
+          }
+        } catch (paymentError) {
+          console.error('Error fetching payments:', paymentError);
+        }
+      }
+      
+      setSelectedInvoiceForMap(invoice);
+      setCreditNotesForMap(creditNotesForInvoice);
+      setPaymentsForMap(paymentsForInvoice);
+      console.log('🗺️ Opening map modal...');
+      setIsMapModalOpen(true);
+    } catch (error) {
+      console.error('Error opening map:', error);
+    }
+  };
+  
+  // Handle closing map modal
+  const handleCloseMapModal = () => {
+    setIsMapModalOpen(false);
+    setSelectedInvoiceForMap(null);
+    setCreditNotesForMap([]);
+    setPaymentsForMap([]);
   };
   
   // Define table columns for credit notes
@@ -237,6 +300,16 @@ export default function FinancialCreditNotes() {
         onCreditNoteCreated={handleCreditNoteCreated}
         viewMode={isViewMode}
         creditNoteData={viewCreditNote}
+      />
+      
+      {/* Map Modal */}
+      <InvoiceMapModal
+        isOpen={isMapModalOpen}
+        onClose={handleCloseMapModal}
+        invoice={selectedInvoiceForMap}
+        creditNotes={creditNotesForMap}
+        payments={paymentsForMap}
+        modalType="creditnote"
       />
     </AdminLayout>
   );

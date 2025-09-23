@@ -667,63 +667,42 @@ export default function FinancialCreditNote() {
 
   // Handle opening map modal
   const handleMapClick = async (creditNote: any) => {
-    console.log('🗺️ DEBUG: Map button clicked!', creditNote);
-    console.log('🗺️ DEBUG: allInvoices data:', allInvoices);
-    console.log('🗺️ DEBUG: creditNotes data:', creditNotes);
-    console.log('🗺️ DEBUG: adminToken:', adminToken);
-    
     try {
       // Find the full invoice details for this credit note
       const fullInvoice = allInvoices?.find((inv: any) => inv.invoiceNumber === creditNote.invoiceNumber);
-      console.log('🗺️ DEBUG: fullInvoice found:', fullInvoice);
-      
       const invoice = {
         invoiceNumber: creditNote.invoiceNumber,
         customerName: creditNote.customerName,
         finalTotal: fullInvoice?.finalTotal,
         appointmentDate: fullInvoice?.appointmentDate
       };
-      console.log('🗺️ DEBUG: invoice object created:', invoice);
       
       // Fetch all credit notes for this invoice
       const creditNotesForInvoice = creditNotes.filter(cn => cn.invoiceNumber === creditNote.invoiceNumber);
-      console.log('🗺️ DEBUG: creditNotesForInvoice:', creditNotesForInvoice);
       
       // Fetch payments for this invoice's booking
       let paymentsForInvoice: any[] = [];
-      console.log('🗺️ DEBUG: fullInvoice.bookingId:', fullInvoice?.bookingId);
-      
       if (fullInvoice?.bookingId) {
-        console.log('🗺️ DEBUG: Fetching payments for booking:', fullInvoice.bookingId);
         try {
           const paymentsResponse = await fetch(`/api/invoice-payments/${fullInvoice.bookingId}`, {
             headers: {
               Authorization: `Bearer ${adminToken}`,
             },
           });
-          console.log('🗺️ DEBUG: paymentsResponse status:', paymentsResponse.status);
           if (paymentsResponse.ok) {
             paymentsForInvoice = await paymentsResponse.json();
-            console.log('🗺️ DEBUG: paymentsForInvoice fetched:', paymentsForInvoice);
-          } else {
-            console.log('🗺️ DEBUG: payments fetch failed:', paymentsResponse.statusText);
           }
         } catch (paymentError) {
-          console.error('🗺️ DEBUG: Error fetching payments:', paymentError);
+          console.error('Error fetching payments:', paymentError);
         }
-      } else {
-        console.log('🗺️ DEBUG: No bookingId found, skipping payment fetch');
       }
       
-      console.log('🗺️ DEBUG: About to set modal state...');
       setSelectedInvoiceForMap(invoice);
       setCreditNotesForMap(creditNotesForInvoice);
       setPaymentsForMap(paymentsForInvoice);
-      console.log('🗺️ DEBUG: Setting isMapModalOpen to true');
       setIsMapModalOpen(true);
-      console.log('🗺️ DEBUG: Modal state should be set now');
     } catch (error) {
-      console.error('🗺️ DEBUG: Error opening map:', error);
+      console.error('Error opening map:', error);
     }
   };
 
