@@ -558,7 +558,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
               </div>
 
               {/* Row 1.5: Status positioned on the right */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 -mt-1 -mb-1">
                 {/* Empty space on left to align Status on right */}
                 <div></div>
                 
@@ -703,10 +703,11 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   {!viewMode && (
                     <button
                       onClick={handleAddItem}
-                      className="px-4 h-2.5 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+                      className="px-4 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
                       style={{ 
                         borderColor: '#852085', 
-                        color: '#852085'
+                        color: '#852085',
+                        height: '25px'
                       }}
                       data-testid="button-add-item"
                     >
@@ -754,7 +755,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                               type="text"
                               value={item.description}
                               onChange={(e) => viewMode ? null : handleItemChange(item.id, 'description', e.target.value)}
-                              className={`w-full px-2 border border-gray-300 rounded text-sm h-3 ${
+                              className={`w-full px-2 border border-gray-300 rounded text-sm h-6 ${
                                 viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                               }`}
                               placeholder={language === 'ar' ? 'وصف العنصر' : 'Item description'}
@@ -767,7 +768,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                               type="number"
                               value={item.quantity}
                               onChange={(e) => viewMode ? null : handleItemChange(item.id, 'quantity', Number(e.target.value))}
-                              className={`w-20 px-2 border border-gray-300 rounded text-sm h-3 ${
+                              className={`w-20 px-2 border border-gray-300 rounded text-sm h-6 ${
                                 viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                               }`}
                               min="1"
@@ -779,7 +780,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="number"
                               value={item.unitPrice}
-                              className="w-24 px-2 border border-gray-300 rounded text-sm h-3 bg-gray-100 text-gray-500 cursor-not-allowed"
+                              className="w-24 px-2 border border-gray-300 rounded text-sm h-6 bg-gray-100 text-gray-500 cursor-not-allowed"
                               disabled
                               readOnly
                               data-testid={`input-unit-price-${item.id}`}
@@ -789,7 +790,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="number"
                               value={item.discount}
-                              className="w-24 px-2 border border-gray-300 rounded text-sm h-3 bg-gray-100 text-gray-500 cursor-not-allowed"
+                              className="w-24 px-2 border border-gray-300 rounded text-sm h-6 bg-gray-100 text-gray-500 cursor-not-allowed"
                               disabled
                               readOnly
                               data-testid={`input-discount-${item.id}`}
