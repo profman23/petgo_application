@@ -225,7 +225,6 @@ export function DataTable<T = any>({
                           className={action.className || 'text-purple-600 hover:text-purple-900 transition-colors duration-200'}
                           data-testid={`action-${actionIndex}-${index}`}
                         >
-                          {action.icon && <span className="mr-1">{action.icon}</span>}
                           {language === 'ar' ? action.label.ar : action.label.en}
                         </button>
                       );

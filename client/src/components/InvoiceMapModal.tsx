@@ -161,7 +161,7 @@ export function InvoiceMapModal({
               ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
               : modalType === 'outgoing'
               ? (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')
-              : (language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map')}
+              : (language === 'ar' ? 'خريطة مذكرات الائتمان' : 'Credit Notes Map')}
           </DialogTitle>
           <DialogDescription>
             {modalType === 'income'
@@ -188,7 +188,7 @@ export function InvoiceMapModal({
                   ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
                   : modalType === 'outgoing'
                   ? (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')
-                  : (language === 'ar' ? 'خريطة الفواتير' : 'Invoice Map')}
+                  : (language === 'ar' ? 'خريطة مذكرات الائتمان' : 'Credit Notes Map')}
               </h2>
               {invoice && (
                 <span className="text-sm text-gray-600">
@@ -435,7 +435,7 @@ export function InvoiceMapModal({
                     </svg>
                     <span className={`text-sm font-semibold ${paymentColors.textColor}`}>
                       {modalType === 'creditnote'
-                        ? (language === 'ar' ? 'دفعة فاتورة دخل' : 'Income Invoice Payment')
+                        ? (language === 'ar' ? 'دفعة دخل من الفاتورة' : 'Income Payment From Invoice')
                         : isIncomePayment 
                         ? (language === 'ar' ? 'دفعة دخل' : 'Income Payment')
                         : (language === 'ar' ? 'دفعة صادرة' : 'Outgoing Payment')}
