@@ -610,7 +610,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
               </div>
 
               {/* Row 3: Customer Phone and Posting Date */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ borderBottomWidth: '2px', paddingBottom: '4px' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2" style={{ borderBottomWidth: '0px', paddingBottom: '4px' }}>
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
                   <label className={`text-sm font-medium text-gray-700 ${language === 'ar' ? 'min-w-[120px] text-right' : 'min-w-[120px] text-left'}`}>
                     {language === 'ar' ? 'هاتف العميل:' : 'Customer Phone:'}
