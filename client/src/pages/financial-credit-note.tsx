@@ -1888,7 +1888,13 @@ export default function FinancialCreditNote() {
                               </tr>
                             </thead>
                             <tbody>
-                              {invoiceItems.filter(item => !removedItems.has(item.id)).map((item: any, index: number) => {
+                              {(() => {
+                                console.log('DEBUG invoiceItems:', invoiceItems);
+                                console.log('DEBUG removedItems:', removedItems);
+                                const filteredItems = invoiceItems.filter(item => !removedItems.has(item.id));
+                                console.log('DEBUG filtered items:', filteredItems);
+                                return filteredItems;
+                              })().map((item: any, index: number) => {
                                 // Calculate remaining active items for delete protection
                                 const activeItemsCount = invoiceItems.filter(i => !removedItems.has(i.id)).length;
                                 const isLastItem = activeItemsCount <= 1;
