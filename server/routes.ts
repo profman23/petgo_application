@@ -3418,8 +3418,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const creditNoteData = req.body;
       
+      console.log('🔍 DEBUGGING - Credit note data received in backend:', JSON.stringify(creditNoteData, null, 2));
+      console.log('🔍 DEBUGGING - Items in credit note data:', creditNoteData.items);
+      
       // Create credit note with provided data (including creditNoteNumber)
       const newCreditNote = await storage.createCreditNote(creditNoteData);
+      
+      console.log('🔍 DEBUGGING - Credit note saved to database:', JSON.stringify(newCreditNote, null, 2));
       
       res.status(201).json(newCreditNote);
     } catch (error) {

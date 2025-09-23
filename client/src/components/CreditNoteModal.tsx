@@ -422,6 +422,8 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
         totalAfterVat: item.totalAfterVAT
       }));
 
+      console.log('🔍 DEBUGGING - Filtered items being sent to backend:', filteredItems);
+
       const creditNoteData = {
         creditNoteNumber: nextCreditNoteResponse?.nextNumber,
         invoiceId: selectedInvoice?.bookingId || null,  // Add missing invoiceId
