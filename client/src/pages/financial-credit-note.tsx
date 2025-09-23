@@ -55,44 +55,10 @@ export default function FinancialCreditNote() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
-  // Default 6-row template
-  const DEFAULT_ROWS = Array.from({ length: 6 }, (_, i) => ({
-    id: `default-${i + 1}`,
-    description: '',
-    quantity: '1',
-    unitPrice: '0',
-    discountType: 'none',
-    type: 'product',
-    originalQuantity: 1,
-    creditedQuantity: 0
-  }));
-
-  // Merge invoice items with default template
-  const mergeInvoiceItems = (invoiceItems: any[]) => {
-    const filledRows = invoiceItems.map((item, i) => ({
-      id: item.id || `invoice-${i + 1}`,
-      description: item.description,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-      discountType: item.discountType || 'none',
-      type: item.type,
-      originalQuantity: item.originalQuantity,
-      creditedQuantity: item.creditedQuantity
-    }));
-
-    if (filledRows.length < 6) {
-      // Fill first N positions with invoice data, keep remaining as defaults
-      return [...filledRows, ...DEFAULT_ROWS.slice(filledRows.length)];
-    }
-
-    // If more than 6 items, show all of them
-    return filledRows;
-  };
-  
-  const [invoiceItems, setInvoiceItems] = useState<any[]>(DEFAULT_ROWS);
+  const [invoiceItems, setInvoiceItems] = useState<any[]>([]);
   const [loadingItems, setLoadingItems] = useState(false);
-  const [editedQuantities, setEditedQuantities] = useState<{[key: string]: number}>({});
-  const [removedItems, setRemovedItems] = useState<Set<string>>(new Set());
+  const [editedQuantities, setEditedQuantities] = useState<{[key: number]: number}>({});
+  const [removedItems, setRemovedItems] = useState<Set<number>>(new Set());
   const [creditNotes, setCreditNotes] = useState<any[]>([]);
   const [isLoadingCreditNotes, setIsLoadingCreditNotes] = useState(false);
   const [currentCreditNoteNumber, setCurrentCreditNoteNumber] = useState<string>("");
@@ -344,7 +310,7 @@ export default function FinancialCreditNote() {
   }, []);
 
   // Handle quantity changes (decrease only for credit notes)
-  const handleQuantityChange = (itemId: string, originalQuantity: number, newQuantity: number) => {
+  const handleQuantityChange = (itemId: number, originalQuantity: number, newQuantity: number) => {
     if (newQuantity <= originalQuantity && newQuantity >= 0) {
       setEditedQuantities(prev => ({
         ...prev,
@@ -354,7 +320,7 @@ export default function FinancialCreditNote() {
   };
 
   // Handle item removal
-  const handleRemoveItem = (itemId: string) => {
+  const handleRemoveItem = (itemId: number) => {
     setRemovedItems(prev => new Set(prev).add(itemId));
   };
 
@@ -547,19 +513,14 @@ export default function FinancialCreditNote() {
             };
           });
           
-          // Use merge logic to combine invoice items with default template
-          const mergedItems = mergeInvoiceItems(availableItems);
-          console.log('✅ MERGED ROWS:', mergedItems);
-          setInvoiceItems(mergedItems);
+          setInvoiceItems(availableItems);
         } else {
           console.error('Failed to fetch invoice items or credited items');
-          // Set default template when no items
-          setInvoiceItems(DEFAULT_ROWS);
+          setInvoiceItems([]);
         }
       } catch (error) {
         console.error('Failed to fetch invoice items:', error);
-        // Set default template when error occurs
-        setInvoiceItems(DEFAULT_ROWS);
+        setInvoiceItems([]);
       } finally {
         setLoadingItems(false);
       }
@@ -571,8 +532,7 @@ export default function FinancialCreditNote() {
     setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
-    // Reset to default template when going back to search
-    setInvoiceItems(DEFAULT_ROWS);
+    setInvoiceItems([]);
     // Reset credit note editing states when returning to search
     setEditedQuantities({});
     setRemovedItems(new Set());
@@ -584,8 +544,7 @@ export default function FinancialCreditNote() {
     setSelectedInvoice(null);
     setInvoiceNumber("");
     setSearchResults([]);
-    // Reset to default template when closing modal
-    setInvoiceItems(DEFAULT_ROWS);
+    setInvoiceItems([]);
     // Reset credit note editing states when closing modal
     setEditedQuantities({});
     setRemovedItems(new Set());
@@ -595,14 +554,14 @@ export default function FinancialCreditNote() {
 
   // Calculate credit note totals (negative values)
   const creditNoteTotals = useMemo(() => {
-    const activeItems = invoiceItems.filter(item => !removedItems.has(String(item.id)));
+    const activeItems = invoiceItems.filter(item => !removedItems.has(item.id));
     
     let totalBeforeVatSum = 0;
     
     activeItems.forEach(item => {
       const unitPrice = parseFloat(item.unitPrice || 0);
       const originalQuantity = parseInt(item.quantity || 1);
-      const currentQuantity = editedQuantities[String(item.id)] ?? originalQuantity;
+      const currentQuantity = editedQuantities[item.id] ?? originalQuantity;
       const discountType = item.discountType || 'none';
       
       // Same calculation as individual items
@@ -764,16 +723,16 @@ export default function FinancialCreditNote() {
 
     try {
       // Prepare credit note data
-      const activeItems = invoiceItems.filter(item => !removedItems.has(String(item.id)));
+      const activeItems = invoiceItems.filter(item => !removedItems.has(item.id));
       const creditNoteItems = activeItems.map(item => ({
         id: item.id,
         description: item.description,
         originalQuantity: item.quantity,
-        creditQuantity: editedQuantities[String(item.id)] || item.quantity,
+        creditQuantity: editedQuantities[item.id] || item.quantity,
         unitPrice: parseFloat(item.unitPrice),
-        totalBeforeVat: (editedQuantities[String(item.id)] || item.quantity) * parseFloat(item.unitPrice),
-        vatAmount: (editedQuantities[String(item.id)] || item.quantity) * parseFloat(item.unitPrice) * 0.15,
-        totalAfterVat: (editedQuantities[String(item.id)] || item.quantity) * parseFloat(item.unitPrice) * 1.15
+        totalBeforeVat: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice),
+        vatAmount: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice) * 0.15,
+        totalAfterVat: (editedQuantities[item.id] || item.quantity) * parseFloat(item.unitPrice) * 1.15
       }));
 
       const creditNoteData = {
@@ -1495,7 +1454,6 @@ export default function FinancialCreditNote() {
               ref={createButtonRef}
               onClick={async () => {
                 if (isReadOnlyMode) return; // Prevent action in read-only mode
-                console.log("✅ CREDIT NOTE MODAL OPENED");
                 await fetchNextCreditNoteNumber();
                 setIsCreateCreditNoteModalOpen(true);
               }}
@@ -1817,20 +1775,15 @@ export default function FinancialCreditNote() {
                               </tr>
                             </thead>
                             <tbody>
-                              {(() => {
-                                console.log('✅ RENDER ROWS COUNT:', invoiceItems.length, invoiceItems);
-                                console.log('✅ REMOVED ITEMS:', removedItems);
-                                return null;
-                              })()}
-                              {invoiceItems.map((item: any, index: number) => {
+                              {invoiceItems.filter(item => !removedItems.has(item.id)).map((item: any, index: number) => {
                                 // Calculate remaining active items for delete protection
-                                const activeItemsCount = invoiceItems.filter(i => !removedItems.has(String(i.id))).length;
+                                const activeItemsCount = invoiceItems.filter(i => !removedItems.has(i.id)).length;
                                 const isLastItem = activeItemsCount <= 1;
                                 
                                 // Use the correct field names from the database  
                                 const unitPrice = parseFloat(item.unitPrice || 0);
                                 const originalQuantity = parseInt(item.quantity || 1);
-                                const currentQuantity = editedQuantities[String(item.id)] ?? originalQuantity;
+                                const currentQuantity = editedQuantities[item.id] ?? originalQuantity;
                                 const itemName = item.description || 'Unknown Item';
                                 
                                 // Get the discount from discountType field
@@ -1878,7 +1831,7 @@ export default function FinancialCreditNote() {
                                     <td className="py-2 px-2">
                                       <div className="flex items-center space-x-2 bg-white border rounded p-1">
                                         <button
-                                          onClick={() => handleQuantityChange(String(item.id), originalQuantity, currentQuantity - 1)}
+                                          onClick={() => handleQuantityChange(item.id, originalQuantity, currentQuantity - 1)}
                                           disabled={currentQuantity <= 0}
                                           className="w-8 h-8 rounded bg-red-500 hover:bg-red-600 disabled:bg-gray-300 text-white text-sm font-bold"
                                         >
@@ -1889,14 +1842,14 @@ export default function FinancialCreditNote() {
                                           value={currentQuantity}
                                           onChange={(e) => {
                                             const newValue = parseInt(e.target.value) || 0;
-                                            handleQuantityChange(String(item.id), originalQuantity, newValue);
+                                            handleQuantityChange(item.id, originalQuantity, newValue);
                                           }}
                                           className="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm"
                                           min="0"
                                           max={originalQuantity}
                                         />
                                         <button
-                                          onClick={() => handleQuantityChange(String(item.id), originalQuantity, currentQuantity + 1)}
+                                          onClick={() => handleQuantityChange(item.id, originalQuantity, currentQuantity + 1)}
                                           disabled={currentQuantity >= originalQuantity}
                                           className="w-8 h-8 rounded bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white text-sm font-bold"
                                         >
@@ -1937,7 +1890,7 @@ export default function FinancialCreditNote() {
                                     </td>
                                     <td className="py-2 px-2 text-center">
                                       <Button
-                                        onClick={() => !isLastItem && handleRemoveItem(String(item.id))}
+                                        onClick={() => !isLastItem && handleRemoveItem(item.id)}
                                         disabled={isLastItem}
                                         className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md h-8 w-8 p-0"
                                         title={isLastItem ? (language === 'ar' ? 'لا يمكن حذف العنصر الأخير' : 'Cannot delete the last item') : ''}
