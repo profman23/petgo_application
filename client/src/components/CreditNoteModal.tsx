@@ -703,7 +703,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   {!viewMode && (
                     <button
                       onClick={handleAddItem}
-                      className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+                      className="px-4 h-2.5 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
                       style={{ 
                         borderColor: '#852085', 
                         color: '#852085'
