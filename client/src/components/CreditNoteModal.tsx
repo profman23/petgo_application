@@ -501,7 +501,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
               </h2>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {/* Row 1: Customer Search and Credit Note No */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div className={`flex items-center gap-3 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
