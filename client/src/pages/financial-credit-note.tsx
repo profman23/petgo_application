@@ -549,6 +549,10 @@ export default function FinancialCreditNote() {
           
           // Use merge logic to combine invoice items with default template
           const mergedItems = mergeInvoiceItems(availableItems);
+          console.log('🔴 MERGE DEBUG:');
+          console.log('Available items:', availableItems.length);
+          console.log('Merged items:', mergedItems.length);
+          console.log('Merged items details:', mergedItems);
           setInvoiceItems(mergedItems);
         } else {
           console.error('Failed to fetch invoice items or credited items');
@@ -1815,6 +1819,10 @@ export default function FinancialCreditNote() {
                               </tr>
                             </thead>
                             <tbody>
+                              {(() => {
+                                console.log('🔵 RENDER DEBUG - removedItems:', removedItems, 'invoiceItems:', invoiceItems.length);
+                                return null;
+                              })()}
                               {invoiceItems.filter(item => !removedItems.has(String(item.id))).map((item: any, index: number) => {
                                 // Calculate remaining active items for delete protection
                                 const activeItemsCount = invoiceItems.filter(i => !removedItems.has(String(i.id))).length;
