@@ -62,6 +62,7 @@ export default function FinancialCreditNote() {
     quantity: '1',
     unitPrice: '0',
     discountType: 'none',
+    type: 'product', // Required for badge rendering
     originalQuantity: 1,
     creditedQuantity: 0
   }));
@@ -531,6 +532,7 @@ export default function FinancialCreditNote() {
             quantity: '1',
             unitPrice: '0',
             discountType: 'none',
+            type: 'product', // Required for badge rendering
             originalQuantity: 1,
             creditedQuantity: 0
           };
@@ -566,6 +568,7 @@ export default function FinancialCreditNote() {
             quantity: '1',
             unitPrice: '0',
             discountType: 'none',
+            type: 'product', // Required for badge rendering
             originalQuantity: 1,
             creditedQuantity: 0
           };
@@ -586,6 +589,7 @@ export default function FinancialCreditNote() {
           quantity: '1',
           unitPrice: '0',
           discountType: 'none',
+          type: 'product', // Required for badge rendering
           originalQuantity: 1,
           creditedQuantity: 0
         };
@@ -614,6 +618,7 @@ export default function FinancialCreditNote() {
       quantity: '1',
       unitPrice: '0',
       discountType: 'none',
+      type: 'product', // Required for badge rendering
       originalQuantity: 1,
       creditedQuantity: 0
     };
@@ -642,6 +647,7 @@ export default function FinancialCreditNote() {
       quantity: '1',
       unitPrice: '0',
       discountType: 'none',
+      type: 'product', // Required for badge rendering
       originalQuantity: 1,
       creditedQuantity: 0
     };
