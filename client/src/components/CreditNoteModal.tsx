@@ -96,12 +96,6 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
   // Admin token for API calls
   const adminToken = localStorage.getItem('adminToken');
   
-  // Payment Methods state
-  const [paymentMethods, setPaymentMethods] = useState({
-    cash: { checked: false, amount: 0 },
-    card: { checked: false, amount: 0 },
-    bank: { checked: false, amount: 0 }
-  });
   
   // Credit Note Items state
   const [items, setItems] = useState<CreditNoteItem[]>([
@@ -385,26 +379,10 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
   const totals = items.reduce((acc, item) => ({
     totalBeforeVAT: acc.totalBeforeVAT + item.totalBeforeVAT,
     vat: acc.vat + item.vat,
-    totalAfterVAT: acc.totalAfterVAT + item.totalAfterVAT
-  }), { totalBeforeVAT: 0, vat: 0, totalAfterVAT: 0 });
+    totalAfterVAT: acc.totalAfterVAT + item.totalAfterVAT,
+    discount: acc.discount + (item.discount || 0)
+  }), { totalBeforeVAT: 0, vat: 0, totalAfterVAT: 0, discount: 0 });
 
-  // Handle payment method changes
-  const handlePaymentMethodChange = (method: 'cash' | 'card' | 'bank', field: 'checked' | 'amount', value: boolean | number) => {
-    setPaymentMethods(prev => ({
-      ...prev,
-      [method]: {
-        ...prev[method],
-        [field]: value
-      }
-    }));
-  };
-
-  // Calculate payment total
-  const calculatePaymentTotal = () => {
-    return Object.values(paymentMethods).reduce((total, method) => {
-      return total + (method.checked ? method.amount : 0);
-    }, 0);
-  };
 
   const handleClose = () => {
     onOpenChange(false);
@@ -866,163 +844,51 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                 </div>
               </div>
               
-              {/* Payment Methods Section */}
+              {/* Customer Transaction Details Section */}
               <div className="space-y-2 pt-2">
-                <div dir={getDirection(language)}>
-                  <label className="block text-sm font-medium mb-2 text-gray-700" style={{ borderTopWidth: '2px', paddingTop: '5px' }}>
-                    {language === 'ar' ? 'طريقة الدفع' : 'Payment Method'}
-                  </label>
-                  
+                <div className={`ml-auto max-w-xs ${language === 'ar' ? 'mr-auto ml-0' : ''}`}>
                   <div className="space-y-2">
-                    {/* Cash Option */}
-                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <label className="flex items-center min-w-[120px]">
-                        <input 
-                          type="checkbox" 
-                          name="paymentMethod" 
-                          value="cash"
-                          checked={paymentMethods.cash.checked}
-                          onChange={(e) => handlePaymentMethodChange('cash', 'checked', e.target.checked)}
-                          className="mr-2 text-purple-600 focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {language === 'ar' ? 'نقدي' : 'Cash'}
-                        </span>
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
-                        </label>
-                        <input 
-                          type="number" 
-                          min="0"
-                          step="0.01"
-                          inputMode="decimal"
-                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
-                          value={paymentMethods.cash.amount || ''}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0;
-                            if (value >= 0) {
-                              handlePaymentMethodChange('cash', 'amount', value);
-                            }
-                          }}
-                          disabled={!paymentMethods.cash.checked}
-                        />
-                      </div>
+                    {/* Total Before VAT */}
+                    <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                      <span className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'المجموع قبل الضريبة:' : 'Total Before VAT:'}
+                      </span>
+                      <span className="text-sm text-gray-900 font-medium">
+                        {totals.totalBeforeVAT.toFixed(2)}
+                      </span>
                     </div>
                     
-                    {/* Card Option */}
-                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <label className="flex items-center min-w-[120px]">
-                        <input 
-                          type="checkbox" 
-                          name="paymentMethod" 
-                          value="card"
-                          checked={paymentMethods.card.checked}
-                          onChange={(e) => handlePaymentMethodChange('card', 'checked', e.target.checked)}
-                          className="mr-2 text-purple-600 focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {language === 'ar' ? 'بطاقة' : 'Card'}
-                        </span>
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
-                        </label>
-                        <input 
-                          type="number" 
-                          min="0"
-                          step="0.01"
-                          inputMode="decimal"
-                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
-                          value={paymentMethods.card.amount || ''}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0;
-                            if (value >= 0) {
-                              handlePaymentMethodChange('card', 'amount', value);
-                            }
-                          }}
-                          disabled={!paymentMethods.card.checked}
-                        />
-                      </div>
+                    {/* Discount */}
+                    <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                      <span className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'الخصم:' : 'Discount:'}
+                      </span>
+                      <span className="text-sm text-gray-900 font-medium">
+                        {totals.discount.toFixed(2)}
+                      </span>
                     </div>
                     
-                    {/* Bank Transfer Option */}
-                    <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                      <label className="flex items-center min-w-[120px]">
-                        <input 
-                          type="checkbox" 
-                          name="paymentMethod" 
-                          value="bank"
-                          checked={paymentMethods.bank.checked}
-                          onChange={(e) => handlePaymentMethodChange('bank', 'checked', e.target.checked)}
-                          className="mr-2 text-purple-600 focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {language === 'ar' ? 'تحويل مصرفي' : 'Bank Transfer'}
-                        </span>
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <label className="text-sm font-medium text-gray-700">
-                          {language === 'ar' ? 'المبلغ:' : 'Amount:'}
-                        </label>
-                        <input 
-                          type="number" 
-                          min="0"
-                          step="0.01"
-                          inputMode="decimal"
-                          className="w-[170px] px-2 input-compact-20 border border-gray-300"
-                          placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
-                          value={paymentMethods.bank.amount || ''}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0;
-                            if (value >= 0) {
-                              handlePaymentMethodChange('bank', 'amount', value);
-                            }
-                          }}
-                          disabled={!paymentMethods.bank.checked}
-                        />
-                      </div>
+                    {/* VAT 15% */}
+                    <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                      <span className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'ضريبة القيمة المضافة 15%:' : 'VAT 15%:'}
+                      </span>
+                      <span className="text-sm text-gray-900 font-medium">
+                        {totals.vat.toFixed(2)}
+                      </span>
                     </div>
                     
-                    {/* Total Amount */}
-                    <div className="mt-2 pt-1">
-                      <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : 'flex-row'}`}>
-                        <label className="flex items-center min-w-[120px] font-semibold">
-                          <span className="text-sm text-gray-800">
-                            {language === 'ar' ? 'المبلغ الإجمالي:' : 'Total Amount:'}
-                          </span>
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input 
-                            type="number" 
-                            className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-100 cursor-not-allowed font-semibold"
-                            placeholder={language === 'ar' ? 'الإجمالي' : 'Total'}
-                            value={calculatePaymentTotal()}
-                            readOnly
-                            disabled
-                            data-testid="input-total-payment-amount"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                    {/* Line separator */}
+                    <div className="border-t border-gray-300 my-2"></div>
                     
-                    {/* Description Section */}
-                    <div className="mt-2 pt-1">
-                      <div dir="ltr">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {language === 'ar' ? 'الوصف' : 'Description'}
-                        </label>
-                        <textarea 
-                          className="description-field border border-gray-300 w-full p-2 rounded-md resize-none"
-                          placeholder={language === 'ar' ? 'أدخل الوصف' : 'Enter description'}
-                          rows={3}
-                          data-testid="textarea-description"
-                        />
-                      </div>
+                    {/* Final Total */}
+                    <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                      <span className="text-sm font-semibold text-gray-800">
+                        {language === 'ar' ? 'المجموع النهائي:' : 'Final Total:'}
+                      </span>
+                      <span className="text-sm text-gray-900 font-semibold">
+                        {totals.totalAfterVAT.toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 </div>
