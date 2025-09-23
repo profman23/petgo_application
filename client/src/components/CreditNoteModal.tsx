@@ -28,7 +28,8 @@ interface CreditNoteItem {
   description: string;
   quantity: number;
   unitPrice: number;
-  discount: number;
+  discount: string | number; // Support percentage format like "10%"
+  originalQuantity?: number; // Store original invoice quantity for validation
   totalBeforeVAT: number;
   vat: number;
   totalAfterVAT: number;
@@ -311,7 +312,8 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
               description: item.description || '',
               quantity: availableQuantity, // Use available quantity (original - credited)
               unitPrice: parseFloat(item.unitPrice) || 0,
-              discount: parseFloat(item.discount) || 0,
+              discount: item.discountType && item.discountType !== 'none' ? item.discountType : '0%', // Show percentage format
+              originalQuantity: originalQuantity, // Store original quantity for validation
               totalBeforeVAT: parseFloat(item.totalBeforeVat) || 0,
               vat: parseFloat(item.vatAmount) || 0,
               totalAfterVAT: parseFloat(item.totalAfterVat) || 0
@@ -374,9 +376,8 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
   const totals = items.reduce((acc, item) => ({
     totalBeforeVAT: acc.totalBeforeVAT + item.totalBeforeVAT,
     vat: acc.vat + item.vat,
-    totalAfterVAT: acc.totalAfterVAT + item.totalAfterVAT,
-    discount: acc.discount + (item.discount || 0)
-  }), { totalBeforeVAT: 0, vat: 0, totalAfterVAT: 0, discount: 0 });
+    totalAfterVAT: acc.totalAfterVAT + item.totalAfterVAT
+  }), { totalBeforeVAT: 0, vat: 0, totalAfterVAT: 0 });
 
 
   const handleClose = () => {
@@ -512,7 +513,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   <div className="relative w-[170px]">
                     <input 
                       type="text" 
-                      className={`w-full px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                      className={`w-full px-2 input-compact-20 border border-gray-600 credit-note-input ${
                         viewMode ? 'bg-gray-100 cursor-not-allowed text-gray-500' : 'cursor-pointer'
                       }`}
                       value={customerSearchQuery}
@@ -524,7 +525,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                       readOnly
                     />
                     {showCustomerDropdown && customerSearchResults.length > 0 && (
-                      <div className="absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 bg-white border border-gray-600 rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
                         {customerSearchResults.map((customer: Customer) => (
                           <div
                             key={customer.id}
@@ -547,7 +548,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   </label>
                   <input 
                     type="text" 
-                    className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-100 cursor-not-allowed"
+                    className="w-[170px] px-2 input-compact-20 border border-gray-600 bg-gray-100 cursor-not-allowed"
                     disabled
                     value={nextCreditNoteNumber || 'Loading...'}
                     data-testid="input-credit-note-no"
@@ -567,7 +568,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   </label>
                   <input 
                     type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-600 credit-note-input ${
                       viewMode || selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'cursor-pointer'
                     }`}
                     value={customerName}
@@ -587,7 +588,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   </label>
                   <input 
                     type="text" 
-                    className="w-[170px] px-2 input-compact-20 border border-gray-300 bg-gray-100 cursor-not-allowed text-gray-500"
+                    className="w-[170px] px-2 input-compact-20 border border-gray-600 bg-gray-100 cursor-not-allowed text-gray-500"
                     disabled
                     readOnly
                     value={language === 'ar' ? (status === 'Open' ? 'مفتوح' : 'مغلق') : status}
@@ -605,7 +606,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   </label>
                   <input 
                     type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-600 credit-note-input ${
                       viewMode || selectedCustomer ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                     }`}
                     value={customerPhone}
@@ -622,7 +623,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   </label>
                   <input 
                     type="text" 
-                    className={`w-[170px] px-2 input-compact-20 border border-gray-300 credit-note-input ${
+                    className={`w-[170px] px-2 input-compact-20 border border-gray-600 credit-note-input ${
                       viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                     }`}
                     placeholder={language === 'ar' ? '+2 أو -3' : '+2 or -3'}
@@ -658,14 +659,14 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
 
           {/* Tabs Section */}
           <div className="mb-2">
-            <div className="border-b border-gray-200">
+            <div className="border-b border-gray-600">
               <nav className="-mb-px flex space-x-4">
                 <button
                   onClick={() => setActiveTab('content')}
                   className={`py-1 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'content'
                       ? 'border-purple-500 text-purple-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-600'
                   }`}
                   data-testid="tab-content"
                 >
@@ -676,7 +677,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   className={`py-1 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'attachment'
                       ? 'border-purple-500 text-purple-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-600'
                   }`}
                   data-testid="tab-attachment"
                 >
@@ -690,8 +691,8 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
           {activeTab === 'content' && (
             <div className="space-y-2">
               {/* Items Table */}
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <div className="px-2 py-1 border-b border-gray-200 flex justify-between items-center">
+              <div className="border border-gray-600 rounded-lg overflow-hidden">
+                <div className="px-2 py-1 border-b border-gray-600 flex justify-between items-center">
                   <h3 className="text-lg font-medium text-gray-900">
                     {language === 'ar' ? 'عناصر مذكرة الائتمان' : 'Credit Note Items'}
                   </h3>
@@ -750,7 +751,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                               type="text"
                               value={item.description}
                               onChange={(e) => viewMode ? null : handleItemChange(item.id, 'description', e.target.value)}
-                              className={`w-full px-2 border border-gray-300 rounded text-sm h-6 ${
+                              className={`w-full px-2 border border-gray-600 rounded text-sm h-6 ${
                                 viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                               }`}
                               placeholder={language === 'ar' ? 'وصف العنصر' : 'Item description'}
@@ -762,11 +763,19 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="number"
                               value={item.quantity}
-                              onChange={(e) => viewMode ? null : handleItemChange(item.id, 'quantity', Number(e.target.value))}
-                              className={`w-20 px-2 border border-gray-300 rounded text-sm h-6 ${
+                              onChange={(e) => {
+                                if (viewMode) return;
+                                const newValue = Number(e.target.value);
+                                // Prevent values > original invoice quantity or = 0
+                                if (newValue > 0 && newValue <= (item.originalQuantity || item.quantity)) {
+                                  handleItemChange(item.id, 'quantity', newValue);
+                                }
+                              }}
+                              className={`w-20 px-2 border border-gray-600 rounded text-sm h-6 ${
                                 viewMode ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''
                               }`}
                               min="1"
+                              max={item.originalQuantity || item.quantity}
                               disabled={viewMode}
                               data-testid={`input-quantity-${item.id}`}
                             />
@@ -775,7 +784,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                             <input
                               type="number"
                               value={item.unitPrice}
-                              className="w-24 px-2 border border-gray-300 rounded text-sm h-6 bg-gray-100 text-gray-500 cursor-not-allowed"
+                              className="w-24 px-2 border border-gray-600 rounded text-sm h-6 bg-gray-100 text-gray-500 cursor-not-allowed"
                               disabled
                               readOnly
                               data-testid={`input-unit-price-${item.id}`}
@@ -783,9 +792,9 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                           </td>
                           <td className="px-2 py-1">
                             <input
-                              type="number"
+                              type="text"
                               value={item.discount}
-                              className="w-24 px-2 border border-gray-300 rounded text-sm h-6 bg-gray-100 text-gray-500 cursor-not-allowed"
+                              className="w-24 px-2 border border-gray-600 rounded text-sm h-6 bg-gray-100 text-gray-500 cursor-not-allowed"
                               disabled
                               readOnly
                               data-testid={`input-discount-${item.id}`}
@@ -849,15 +858,6 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                       </span>
                     </div>
                     
-                    {/* Discount */}
-                    <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-                      <span className="text-sm font-medium text-gray-700">
-                        {language === 'ar' ? 'الخصم:' : 'Discount:'}
-                      </span>
-                      <span className="text-sm text-gray-900 font-medium">
-                        {totals.discount.toFixed(2)}
-                      </span>
-                    </div>
                     
                     {/* VAT 15% */}
                     <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
@@ -870,7 +870,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                     </div>
                     
                     {/* Line separator */}
-                    <div className="border-t border-gray-300 my-2"></div>
+                    <div className="border-t border-gray-600 my-2"></div>
                     
                     {/* Final Total */}
                     <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
@@ -920,7 +920,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
               )}
               <button
                 onClick={handleClose}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-600 rounded-md text-gray-700 hover:bg-gray-50"
                 data-testid={viewMode ? "button-close" : "button-cancel"}
               >
                 {viewMode ? (language === 'ar' ? 'إغلاق' : 'Close') : (language === 'ar' ? 'إلغاء' : 'Cancel')}
@@ -934,7 +934,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                   {language === 'ar' ? 'نسخ من:' : 'Copy From:'}
                 </label>
                 <select
-                  className="px-2 py-1 border border-gray-300 rounded-md text-sm"
+                  className="px-2 py-1 border border-gray-600 rounded-md text-sm"
                   data-testid="select-copy-from"
                   defaultValue=""
                   onChange={handleCopyFromChange}
