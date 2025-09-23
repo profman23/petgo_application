@@ -1,0 +1,26 @@
+<div data-replit-metadata="client/src/components/CreditNoteModal.tsx:859:14" data-component-name="div" class="space-y-2 pt-2" style="
+    border-bottom-width: 2px;
+    padding-bottom: 10px;
+">
+  <div data-replit-metadata="client/src/components/CreditNoteModal.tsx:860:16" data-component-name="div" class="ml-auto max-w-xs ">
+    <div data-replit-metadata="client/src/components/CreditNoteModal.tsx:861:18" data-component-name="div" class="space-y-2">
+      <div data-replit-metadata="client/src/components/CreditNoteModal.tsx:863:20" data-component-name="div" class="flex justify-between items-center ">
+        <span data-replit-metadata="client/src/components/CreditNoteModal.tsx:864:22" data-component-name="span" class="text-sm font-medium text-gray-700">Total Before VAT:</span>
+        <span data-replit-metadata="client/src/components/CreditNoteModal.tsx:867:22" data-component-name="span" class="text-sm text-gray-900 font-medium">0.00</span>
+      </div>
+      <div data-replit-metadata="client/src/components/CreditNoteModal.tsx:873:20" data-component-name="div" class="flex justify-between items-center ">
+        <span data-replit-metadata="client/src/components/CreditNoteModal.tsx:874:22" data-component-name="span" class="text-sm font-medium text-gray-700">Discount:</span>
+        <span data-replit-metadata="client/src/components/CreditNoteModal.tsx:877:22" data-component-name="span" class="text-sm text-gray-900 font-medium">0.00</span>
+      </div>
+      <div data-replit-metadata="client/src/components/CreditNoteModal.tsx:883:20" data-component-name="div" class="flex justify-between items-center ">
+        <span data-replit-metadata="client/src/components/CreditNoteModal.tsx:884:22" data-component-name="span" class="text-sm font-medium text-gray-700">VAT 15%:</span>
+        <span data-replit-metadata="client/src/components/CreditNoteModal.tsx:887:22" data-component-name="span" class="text-sm text-gray-900 font-medium">0.00</span>
+      </div>
+      <div data-replit-metadata="client/src/components/CreditNoteModal.tsx:893:20" data-component-name="div" class="border-t border-gray-600 my-2"></div>
+      <div data-replit-metadata="client/src/components/CreditNoteModal.tsx:896:20" data-component-name="div" class="flex justify-between items-center ">
+        <span data-replit-metadata="client/src/components/CreditNoteModal.tsx:897:22" data-component-name="span" class="text-sm font-semibold text-gray-800">Final Total:</span>
+        <span data-replit-metadata="client/src/components/CreditNoteModal.tsx:900:22" data-component-name="span" class="text-sm text-gray-900 font-semibold">0.00</span>
+      </div>
+    </div>
+  </div>
+</div>
