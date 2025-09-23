@@ -373,11 +373,22 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
   };
 
   // Calculate totals
-  const totals = items.reduce((acc, item) => ({
-    totalBeforeVAT: acc.totalBeforeVAT + item.totalBeforeVAT,
-    vat: acc.vat + item.vat,
-    totalAfterVAT: acc.totalAfterVAT + item.totalAfterVAT
-  }), { totalBeforeVAT: 0, vat: 0, totalAfterVAT: 0 });
+  const totals = items.reduce((acc, item) => {
+    // Calculate discount amount from percentage
+    let discountAmount = 0;
+    if (item.discount && typeof item.discount === 'string' && item.discount.includes('%')) {
+      const discountPercent = parseFloat(item.discount.replace('%', '')) / 100;
+      const itemTotal = item.quantity * item.unitPrice;
+      discountAmount = itemTotal * discountPercent;
+    }
+    
+    return {
+      totalBeforeVAT: acc.totalBeforeVAT + item.totalBeforeVAT,
+      vat: acc.vat + item.vat,
+      totalAfterVAT: acc.totalAfterVAT + item.totalAfterVAT,
+      discount: acc.discount + discountAmount
+    };
+  }, { totalBeforeVAT: 0, vat: 0, totalAfterVAT: 0, discount: 0 });
 
 
   const handleClose = () => {
@@ -858,6 +869,15 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                       </span>
                     </div>
                     
+                    {/* Discount */}
+                    <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                      <span className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'الخصم:' : 'Discount:'}
+                      </span>
+                      <span className="text-sm text-gray-900 font-medium">
+                        {totals.discount.toFixed(2)}
+                      </span>
+                    </div>
                     
                     {/* VAT 15% */}
                     <div className={`flex justify-between items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
