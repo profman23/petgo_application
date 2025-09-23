@@ -109,6 +109,56 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
       totalBeforeVAT: 0,
       vat: 0,
       totalAfterVAT: 0
+    },
+    {
+      id: '2',
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+      discount: 0,
+      totalBeforeVAT: 0,
+      vat: 0,
+      totalAfterVAT: 0
+    },
+    {
+      id: '3',
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+      discount: 0,
+      totalBeforeVAT: 0,
+      vat: 0,
+      totalAfterVAT: 0
+    },
+    {
+      id: '4',
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+      discount: 0,
+      totalBeforeVAT: 0,
+      vat: 0,
+      totalAfterVAT: 0
+    },
+    {
+      id: '5',
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+      discount: 0,
+      totalBeforeVAT: 0,
+      vat: 0,
+      totalAfterVAT: 0
+    },
+    {
+      id: '6',
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+      discount: 0,
+      totalBeforeVAT: 0,
+      vat: 0,
+      totalAfterVAT: 0
     }
   ]);
 
@@ -166,16 +216,68 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
         setSelectedCustomer(null);
         setSelectedInvoice(null);
         setStatus('Closed');
-        setItems([{
-          id: '1',
-          description: '',
-          quantity: 1,
-          unitPrice: 0,
-          discount: 0,
-          totalBeforeVAT: 0,
-          vat: 0,
-          totalAfterVAT: 0
-        }]);
+        setItems([
+          {
+            id: '1',
+            description: '',
+            quantity: 1,
+            unitPrice: 0,
+            discount: 0,
+            totalBeforeVAT: 0,
+            vat: 0,
+            totalAfterVAT: 0
+          },
+          {
+            id: '2',
+            description: '',
+            quantity: 1,
+            unitPrice: 0,
+            discount: 0,
+            totalBeforeVAT: 0,
+            vat: 0,
+            totalAfterVAT: 0
+          },
+          {
+            id: '3',
+            description: '',
+            quantity: 1,
+            unitPrice: 0,
+            discount: 0,
+            totalBeforeVAT: 0,
+            vat: 0,
+            totalAfterVAT: 0
+          },
+          {
+            id: '4',
+            description: '',
+            quantity: 1,
+            unitPrice: 0,
+            discount: 0,
+            totalBeforeVAT: 0,
+            vat: 0,
+            totalAfterVAT: 0
+          },
+          {
+            id: '5',
+            description: '',
+            quantity: 1,
+            unitPrice: 0,
+            discount: 0,
+            totalBeforeVAT: 0,
+            vat: 0,
+            totalAfterVAT: 0
+          },
+          {
+            id: '6',
+            description: '',
+            quantity: 1,
+            unitPrice: 0,
+            discount: 0,
+            totalBeforeVAT: 0,
+            vat: 0,
+            totalAfterVAT: 0
+          }
+        ]);
       }
       
       setShowCustomerDropdown(false);
@@ -919,10 +1021,57 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
           )}
 
           {activeTab === 'attachment' && (
-            <div className="rounded-lg p-4 text-center">
-              <p className="text-gray-500">
-                {language === 'ar' ? 'قسم المرفقات سيتم تطويره قريباً' : 'Attachment section will be developed soon'}
-              </p>
+            <div className="space-y-4 p-4" style={{ minHeight: '400px', maxHeight: '65vh', overflowY: 'auto' }}>
+              {/* Attachment Header */}
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-lg font-medium text-gray-900">
+                  {language === 'ar' ? 'المرفقات' : 'Attachments'}
+                </h2>
+              </div>
+              
+              {/* Attachment Content - Full Width */}
+              <div className="w-full">
+                {/* Upload Section */}
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
+                  <div className="space-y-4">
+                    <div className="text-gray-400">
+                      <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-lg font-medium text-gray-700">
+                        {language === 'ar' ? 'رفع المرفقات' : 'Upload Attachments'}
+                      </p>
+                      <p className="text-sm text-gray-500 mt-2">
+                        {language === 'ar' ? 'اسحب الملفات هنا أو انقر لتحديد الملفات' : 'Drag files here or click to select files'}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {language === 'ar' ? 'الحد الأقصى لحجم الملف: 10 ميجابايت' : 'Maximum file size: 10MB'}
+                      </p>
+                    </div>
+                    <button 
+                      type="button"
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      disabled={viewMode}
+                    >
+                      {language === 'ar' ? 'اختر الملفات' : 'Select Files'}
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Existing Attachments List */}
+                <div className="mt-6">
+                  <h3 className="text-md font-medium text-gray-800 mb-3">
+                    {language === 'ar' ? 'المرفقات الموجودة' : 'Existing Attachments'}
+                  </h3>
+                  <div className="bg-gray-50 rounded-lg p-4 text-center">
+                    <p className="text-gray-500 text-sm">
+                      {language === 'ar' ? 'لا توجد مرفقات' : 'No attachments found'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
