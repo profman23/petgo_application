@@ -667,9 +667,12 @@ export default function FinancialCreditNote() {
 
   // Handle opening map modal
   const handleMapClick = async (creditNote: any) => {
+    console.log('🗺️ DEBUG: Map button clicked!', creditNote);
+    console.log('🗺️ DEBUG: allInvoices data:', allInvoices);
     try {
       // Find the full invoice details for this credit note
       const fullInvoice = allInvoices?.find((inv: any) => inv.invoiceNumber === creditNote.invoiceNumber);
+      console.log('🗺️ DEBUG: fullInvoice found:', fullInvoice);
       const invoice = {
         invoiceNumber: creditNote.invoiceNumber,
         customerName: creditNote.customerName,
