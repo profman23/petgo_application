@@ -3,7 +3,8 @@ import { format, addDays } from "date-fns";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { User, Plus, Trash2, FilePlus } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React from "react";
 import { InvoiceSelectionModal } from "./InvoiceSelectionModal";
 
 // Declare lord-icon custom element for TypeScript
@@ -46,6 +47,7 @@ interface CreditNoteModalProps {
 
 export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, viewMode = false, creditNoteData }: CreditNoteModalProps) {
   const { language } = useTranslation();
+  const queryClient = useQueryClient();
   
   // Helper function to handle relative date input
   const parseRelativeDate = (input: string) => {
@@ -64,11 +66,19 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
   };
   
   // Auto-generate Credit Note Number
-  const { data: nextCreditNoteResponse } = useQuery<{nextNumber: string}>({
+  const { data: nextCreditNoteResponse, refetch } = useQuery<{nextNumber: string}>({
     queryKey: ['/api/admin/credit-notes/next-number'],
     enabled: isOpen,
-    refetchOnMount: 'always', // Force fresh fetch every time modal opens
+    staleTime: 0, // Always consider data stale to force fresh fetches
   });
+
+  // Force fresh fetch when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/credit-notes/next-number'] });
+      refetch();
+    }
+  }, [isOpen, queryClient, refetch]);
   
   // Extract and format the credit note number
   const nextCreditNoteNumber = nextCreditNoteResponse?.nextNumber ? `CRN${nextCreditNoteResponse.nextNumber}` : 'Loading...';
