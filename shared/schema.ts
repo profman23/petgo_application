@@ -15,6 +15,7 @@ export const users = pgTable("users", {
   address: text("address"),
   birthdate: text("birthdate"),
   membershipType: text("membership_type").notNull().default("bronze"),
+  active: boolean("active").notNull().default(true), // For soft delete - all existing users remain active
 });
 
 export const drivers = pgTable("drivers", {
