@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp, Mail, Calendar } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp, Mail, Calendar, Trash2 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import logoPath from '@assets/Screenshot 2025-07-21 115341_1753088187495.png';
 
 import { LanguageSelector } from '@/components/language-selector';
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
 
 export default function Account() {
   const { t, language } = useTranslation();
@@ -26,6 +27,9 @@ export default function Account() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // Delete account modal state
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   
   // UI states
   const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState(false);
@@ -81,6 +85,27 @@ export default function Account() {
     },
     onError: (error: any) => {
       showToast(error.message || 'حدث خطأ', 'error');
+    },
+  });
+
+  // Delete account mutation
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest('/api/user/delete-account', {
+        method: 'DELETE',
+      });
+    },
+    onSuccess: () => {
+      setShowDeleteDialog(false);
+      showToast(language === 'ar' ? 'تم حذف الحساب بنجاح' : 'Account deleted successfully', 'success');
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        localStorage.removeItem('userToken');
+        setLocation('/login');
+      }, 2000);
+    },
+    onError: (error: any) => {
+      showToast(error.message || (language === 'ar' ? 'فشل في حذف الحساب' : 'Failed to delete account'), 'error');
     },
   });
 
@@ -148,6 +173,18 @@ export default function Account() {
 
   const handlePatientsClick = () => {
     setLocation('/patients');
+  };
+
+  const handleDeleteAccount = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    deleteAccountMutation.mutate();
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
   };
 
   const ArrowIcon = direction === 'rtl' ? ArrowRight : ArrowLeft;
@@ -281,6 +318,21 @@ export default function Account() {
             Patients
           </span>
           <ArrowIcon className="text-purple-600" size={20} />
+        </button>
+
+        {/* Delete Account Button */}
+        <button
+          onClick={handleDeleteAccount}
+          className="w-full bg-white rounded-xl shadow-lg p-4 mb-6 flex items-center justify-between hover:bg-red-50 transition-colors border border-red-200"
+          data-testid="button-delete-account"
+        >
+          <span className="text-lg font-semibold text-red-600" style={{ 
+            textAlign,
+            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+          }}>
+            {language === 'ar' ? 'حذف الحساب' : 'Delete Account'}
+          </span>
+          <Trash2 className="text-red-600" size={20} />
         </button>
 
         {/* Collapsible Account Details Form */}
@@ -498,6 +550,15 @@ export default function Account() {
           </div>
         </div>
       )}
+
+      {/* Delete Account Dialog */}
+      <ConfirmDeleteDialog
+        isOpen={showDeleteDialog}
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        language={language}
+        isLoading={deleteAccountMutation.isPending}
+      />
       </div>
     </div>
   );
