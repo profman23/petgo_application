@@ -25,6 +25,7 @@ interface Customer {
 // Credit Note Item interface
 interface CreditNoteItem {
   id: string;
+  invoiceItemId?: number; // Link to original invoice_items.id for proper filtering
   description: string;
   quantity: number;
   unitPrice: number;
@@ -389,16 +390,18 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
           const invoiceItems = await itemsResponse.json();
           const creditedItems = await creditedItemsResponse.json();
           
-          // Create a map of credited items for easy lookup
+          // Create a map of credited items by invoiceItemId for proper matching
           const creditedItemsMap = new Map();
           creditedItems.forEach((creditedItem: any) => {
-            const existingCredited = creditedItemsMap.get(creditedItem.id) || 0;
-            creditedItemsMap.set(creditedItem.id, existingCredited + creditedItem.creditedQuantity);
+            // Backend now returns invoiceItemId and creditedQuantity
+            const itemId = creditedItem.invoiceItemId;
+            const existingCredited = creditedItemsMap.get(itemId) || 0;
+            creditedItemsMap.set(itemId, existingCredited + creditedItem.creditedQuantity);
           });
           
           // Filter items to exclude those that are fully credited
           const availableItems = invoiceItems.filter((item: any) => {
-            const totalCredited = creditedItemsMap.get(item.id) || 0;
+            const totalCredited = creditedItemsMap.get(item.id) || 0; // item.id is the invoice item DB id
             const originalQuantity = parseInt(item.quantity);
             return totalCredited < originalQuantity; // Only show items that haven't been fully credited
           });
@@ -410,7 +413,8 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
             const availableQuantity = originalQuantity - totalCredited;
             
             return {
-              id: item.id.toString(), // PRESERVE ORIGINAL ITEM ID for filtering to work
+              id: Date.now().toString() + index, // UI-only ID for React keys
+              invoiceItemId: item.id, // CRITICAL: Link back to original invoice item for filtering
               description: item.description || '',
               quantity: availableQuantity, // Use available quantity (original - credited)
               unitPrice: parseFloat(item.unitPrice) || 0,
