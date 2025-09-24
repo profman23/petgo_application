@@ -154,7 +154,7 @@ export const createRegisterSchema = (language: string = 'en') => {
     firstName: z.string().min(2, msg.firstNameRequired),
     lastName: z.string().min(2, msg.lastNameRequired),
     email: z.string().email(msg.emailInvalid),
-    phone: z.string().regex(/^05\d{8}$/, msg.phoneInvalid),
+    phone: z.string().regex(/^05\d{8}$/, msg.phoneInvalid).optional().or(z.literal('')),
     password: z.string().min(6, msg.passwordTooShort),
     captcha: z.string().min(1, msg.captchaRequired),
   });

@@ -532,17 +532,16 @@ export default function Login() {
 
               <div>
                 <label htmlFor="reg-phone-input" className="block text-sm font-medium mb-3" style={{ textAlign: getTextAlign(language) }}>
-                  {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
+                  {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} {language === 'ar' ? '(اختياري)' : '(optional)'}
                 </label>
                 <div className="relative">
                   <Input
                     id="reg-phone-input"
                     type="tel"
-                    placeholder={language === 'ar' ? 'أدخل رقم الهاتف' : 'Enter your phone number'}
+                    placeholder={language === 'ar' ? 'أدخل رقم الهاتف (اختياري)' : 'Enter your phone number (optional)'}
                     className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                     value={formData.phone}
                     onChange={(e) => updateFormData('phone', e.target.value)}
-                    required
                   />
                   <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 </div>
