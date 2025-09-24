@@ -1320,21 +1320,29 @@ export class DatabaseStorage implements IStorage {
       .from(creditNotes)
       .where(eq(creditNotes.invoiceNumber, invoiceNumber));
 
-    const creditedItems: any[] = [];
+    // Aggregate credited quantities by invoiceItemId
+    const creditedItemsMap = new Map<number, number>();
     
-    // Extract items from each credit note
+    // Extract items from each credit note and aggregate by invoiceItemId
     for (const creditNote of creditNotesForInvoice) {
       if (creditNote.items && Array.isArray(creditNote.items)) {
-        // Add each credited item with its credited quantity
         creditNote.items.forEach((item: any) => {
-          creditedItems.push({
-            id: item.id,
-            description: item.description,
-            creditedQuantity: item.creditQuantity || 0
-          });
+          // Use invoiceItemId if available (new format), fallback to id for legacy data
+          const itemKey = item.invoiceItemId || item.id;
+          const existingCredited = creditedItemsMap.get(itemKey) || 0;
+          creditedItemsMap.set(itemKey, existingCredited + (item.creditQuantity || 0));
         });
       }
     }
+
+    // Convert map to array format expected by frontend
+    const creditedItems: any[] = [];
+    creditedItemsMap.forEach((creditedQuantity, invoiceItemId) => {
+      creditedItems.push({
+        invoiceItemId: invoiceItemId,
+        creditedQuantity: creditedQuantity
+      });
+    });
 
     return creditedItems;
   }
