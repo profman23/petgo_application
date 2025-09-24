@@ -525,6 +525,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
       // Prepare items in correct format for database
       const filteredItems = items.filter(item => item.description.trim() !== '').map(item => ({
         id: parseInt(item.id),
+        invoiceItemId: item.invoiceItemId, // CRITICAL: Include invoiceItemId for proper filtering
         description: item.description,
         originalQuantity: item.quantity,
         creditQuantity: item.quantity,
