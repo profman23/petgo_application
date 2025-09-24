@@ -67,6 +67,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
   const { data: nextCreditNoteResponse } = useQuery<{nextNumber: string}>({
     queryKey: ['/api/admin/credit-notes/next-number'],
     enabled: isOpen,
+    refetchOnMount: 'always', // Force fresh fetch every time modal opens
   });
   
   // Extract and format the credit note number
