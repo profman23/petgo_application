@@ -11,6 +11,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<User>): Promise<User | undefined>;
   updateUserPassword(id: number, newPassword: string): Promise<User | undefined>;
+  deactivateUser(id: number): Promise<User | undefined>;
   
   // Driver operations
   getAllDrivers(): Promise<Driver[]>;
@@ -314,13 +315,13 @@ export class DatabaseStorage implements IStorage {
     return updatedUser;
   }
 
-  async updateUserPassword(id: number, newPassword: string): Promise<User | undefined> {
-    const [updatedUser] = await db
+  async deactivateUser(id: number): Promise<User | undefined> {
+    const [deactivatedUser] = await db
       .update(users)
-      .set({ password: newPassword })
+      .set({ active: false })
       .where(eq(users.id, id))
       .returning();
-    return updatedUser;
+    return deactivatedUser;
   }
 
   // Driver operations

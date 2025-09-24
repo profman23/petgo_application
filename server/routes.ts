@@ -206,6 +206,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
       }
       
+      // Check if user account is active (soft delete check)
+      if (user.active === false) {
+        return res.status(401).json({ message: 'هذا الحساب غير نشط' });
+      }
+      
       // Check password - handle both plain text (legacy) and bcrypt hashed passwords
       let isPasswordValid = false;
       
@@ -1435,6 +1440,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error resetting password:', error);
       res.status(500).json({ message: 'Error resetting password' });
+    }
+  });
+
+  // Delete (deactivate) user account
+  app.delete('/api/user/delete-account', requireAuth, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      
+      // Deactivate user instead of deleting to preserve data
+      const deactivatedUser = await storage.deactivateUser(userId);
+      
+      if (!deactivatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      res.json({ message: 'Account deactivated successfully' });
+    } catch (error) {
+      console.error('Error deactivating account:', error);
+      res.status(500).json({ message: 'Error deactivating account' });
     }
   });
 
