@@ -859,6 +859,7 @@ export const creditNotes = pgTable("credit_notes", {
   postingDate: text("posting_date").notNull(),
   items: jsonb("items").$type<Array<{
     id: number;
+    invoiceItemId?: number; // Link to original invoice_items.id for proper filtering
     description: string;
     originalQuantity: number;
     creditQuantity: number;
