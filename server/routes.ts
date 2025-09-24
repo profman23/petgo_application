@@ -3442,10 +3442,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const creditNoteData = req.body;
       
-      // Create credit note with provided data (including creditNoteNumber)
-      const newCreditNote = await storage.createCreditNote(creditNoteData);
+      // CONCURRENCY PROTECTION: Generate number during creation with retry logic
+      let retryCount = 0;
+      const maxRetries = 5;
       
-      res.status(201).json(newCreditNote);
+      while (retryCount < maxRetries) {
+        try {
+          // Generate fresh number each attempt
+          const creditNoteNumber = await storage.getNextCreditNoteNumber();
+          
+          // Create credit note with fresh number
+          const creditNoteWithNumber = {
+            ...creditNoteData,
+            creditNoteNumber
+          };
+          
+          const newCreditNote = await storage.createCreditNote(creditNoteWithNumber);
+          return res.status(201).json(newCreditNote);
+          
+        } catch (createError: any) {
+          // Check if it's a unique constraint violation
+          if (createError.code === '23505' && createError.constraint?.includes('credit_note_number')) {
+            retryCount++;
+            console.log(`Credit Note number collision, retrying... (${retryCount}/${maxRetries})`);
+            if (retryCount >= maxRetries) {
+              throw new Error('Failed to generate unique credit note number after multiple attempts');
+            }
+            // Small delay before retry
+            await new Promise(resolve => setTimeout(resolve, 50));
+          } else {
+            throw createError;
+          }
+        }
+      }
     } catch (error) {
       console.error('Error creating credit note:', error);
       res.status(500).json({ message: 'Failed to create credit note' });

@@ -1278,6 +1278,8 @@ export class DatabaseStorage implements IStorage {
       .from(creditNotes)
       .orderBy(desc(creditNotes.id));
 
+    // Create a set of existing numbers for gap detection
+    const existingNumbers = new Set<number>();
     let highestNumber = 90000; // Start from 90000 so next will be 90001
 
     for (const creditNote of allCreditNotes) {
@@ -1294,11 +1296,20 @@ export class DatabaseStorage implements IStorage {
       }
       
       // Only consider numbers >= 90001 (our new range)
-      if (!isNaN(parsedNumber) && parsedNumber >= 90001 && parsedNumber > highestNumber) {
-        highestNumber = parsedNumber;
+      if (!isNaN(parsedNumber) && parsedNumber >= 90001) {
+        existingNumbers.add(parsedNumber);
+        if (parsedNumber > highestNumber) {
+          highestNumber = parsedNumber;
+        }
       }
     }
 
+    // ONE-TIME FIX: Check if 90008 is missing (gap-filling for deleted CRN90008)
+    if (!existingNumbers.has(90008) && highestNumber >= 90008) {
+      return "90008";
+    }
+
+    // Normal sequence: next number after highest
     const nextNumber = highestNumber + 1;
     return nextNumber.toString();
   }
