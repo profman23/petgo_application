@@ -5,8 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { DataTable, DataTableColumn } from "@/components/ui/data-table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { TransactionDetailsModal } from "@/components/TransactionDetailsModal";
 
 // AR Balance data interface
 interface ARBalanceData {
@@ -48,11 +47,11 @@ export default function FinancialARBalance() {
     enabled: true
   });
 
-  // Fetch transaction details for selected customer
-  const { data: transactionDetails = [], isLoading: isLoadingDetails } = useQuery<TransactionDetail[]>({
-    queryKey: ['/api/admin/ar-balance/details', selectedCustomer?.customerId],
-    enabled: !!selectedCustomer?.customerId
-  });
+  // Handle modal close
+  const handleCloseModal = () => {
+    setShowTransactionModal(false);
+    setSelectedCustomer(null);
+  };
 
   // Filter data based on search input
   const filteredData = arBalanceData.filter((customer: ARBalanceData) => {
@@ -182,89 +181,12 @@ export default function FinancialARBalance() {
         />
 
         {/* Transaction Details Modal */}
-        <Dialog open={showTransactionModal} onOpenChange={setShowTransactionModal}>
-          <DialogContent className="max-w-4xl max-h-[80vh]" data-testid="modal-transaction-details">
-            <DialogHeader>
-              <DialogTitle className="text-left">
-                <div className="flex flex-col gap-1">
-                  <span className="text-lg font-semibold">
-                    {language === 'ar' ? 'تفاصيل المعاملات' : 'Transaction Details'}
-                  </span>
-                  {selectedCustomer && (
-                    <span className="text-sm text-gray-600">
-                      {language === 'ar' ? 'العميل:' : 'Customer:'} {selectedCustomer.customerName} ({selectedCustomer.phone})
-                    </span>
-                  )}
-                </div>
-              </DialogTitle>
-            </DialogHeader>
-            
-            <ScrollArea className="max-h-[60vh]">
-              <div className="space-y-4">
-                {isLoadingDetails ? (
-                  <div className="flex items-center justify-center py-8">
-                    <span className="text-gray-500">
-                      {language === 'ar' ? 'جاري تحميل التفاصيل...' : 'Loading details...'}
-                    </span>
-                  </div>
-                ) : transactionDetails.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full border border-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-2 text-left border-b text-sm font-medium text-gray-700">
-                            {language === 'ar' ? 'النوع' : 'Type'}
-                          </th>
-                          <th className="px-4 py-2 text-left border-b text-sm font-medium text-gray-700">
-                            {language === 'ar' ? 'الوصف' : 'Description'}
-                          </th>
-                          <th className="px-4 py-2 text-left border-b text-sm font-medium text-gray-700">
-                            {language === 'ar' ? 'التاريخ' : 'Date'}
-                          </th>
-                          <th className="px-4 py-2 text-right border-b text-sm font-medium text-gray-700">
-                            {language === 'ar' ? 'المبلغ' : 'Amount'}
-                          </th>
-                          <th className="px-4 py-2 text-right border-b text-sm font-medium text-gray-700">
-                            {language === 'ar' ? 'الرصيد الجاري' : 'Running Balance'}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {transactionDetails.map((transaction: TransactionDetail, index: number) => (
-                          <tr key={index} className="hover:bg-gray-50">
-                            <td className="px-4 py-2 border-b text-sm text-gray-900">
-                              {transaction.type}
-                            </td>
-                            <td className="px-4 py-2 border-b text-sm text-gray-600">
-                              {transaction.description}
-                            </td>
-                            <td className="px-4 py-2 border-b text-sm text-gray-600">
-                              {transaction.date ? new Date(transaction.date).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US') : '-'}
-                            </td>
-                            <td className={`px-4 py-2 border-b text-sm text-right font-medium ${
-                              transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {transaction.amount >= 0 ? '+' : ''}{transaction.amount.toFixed(2)}
-                            </td>
-                            <td className="px-4 py-2 border-b text-sm text-right font-semibold text-gray-900">
-                              {transaction.runningBalance}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <span className="text-gray-500">
-                      {language === 'ar' ? 'لا توجد معاملات' : 'No transactions found'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+        <TransactionDetailsModal
+          customerId={selectedCustomer?.customerId ?? null}
+          customerName={selectedCustomer?.customerName ?? ''}
+          isOpen={showTransactionModal}
+          onClose={handleCloseModal}
+        />
       </div>
     </AdminLayout>
   );
