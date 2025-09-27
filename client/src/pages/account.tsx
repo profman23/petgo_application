@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
-import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp, Mail, Calendar, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Camera, User, Phone, Lock, ChevronDown, ChevronUp, Mail, Calendar, Trash2, CircleUserRound } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -251,28 +251,13 @@ export default function Account() {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center gap-4" style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row' }}>
             {/* Profile Picture */}
-            <div className="relative">
-              <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center">
-                <User size={32} className="text-purple-600" />
-              </div>
-              
-              {/* Camera Button */}
-              <button 
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-purple-600 hover:bg-purple-600 text-white border-2 border-white flex items-center justify-center transition-colors"
-              >
-                <Camera size={14} />
-              </button>
-              
-              {/* Hidden File Input */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoUpload}
-                className="hidden"
-              />
-            </div>
+            <CircleUserRound 
+              size={80} 
+              style={{ 
+                color: '#852085',
+                strokeWidth: '1px'
+              }}
+            />
 
             {/* User Name */}
             <div className="flex-1" style={{ textAlign }}>
