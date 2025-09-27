@@ -4,10 +4,9 @@ import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
-import { DataTable, DataTableColumn, DataTableAction } from "@/components/ui/data-table";
+import { DataTable, DataTableColumn } from "@/components/ui/data-table";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { TransactionDetailsModal } from "@/components/TransactionDetailsModal";
-import { InvoiceMapModal } from "@/components/InvoiceMapModal";
 
 // AR Balance data interface
 interface ARBalanceData {
@@ -42,11 +41,6 @@ export default function FinancialARBalance() {
   // Modal state
   const [selectedCustomer, setSelectedCustomer] = useState<ARBalanceData | null>(null);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
-  
-  // Map modal state
-  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
-  const [selectedCustomerForMap, setSelectedCustomerForMap] = useState<ARBalanceData | null>(null);
-  const [transactionsForMap, setTransactionsForMap] = useState<TransactionDetail[]>([]);
 
   useEffect(() => {
     setLordIconKey(prev => prev + 1);
@@ -114,51 +108,6 @@ export default function FinancialARBalance() {
     setSelectedCustomer(customer);
     setShowTransactionModal(true);
   };
-
-  // Handle opening map modal for AR Balance
-  const handleMapClick = async (customer: ARBalanceData) => {
-    try {
-      const adminToken = localStorage.getItem("adminToken");
-      
-      // Fetch transaction details for this customer
-      const response = await fetch(`/api/admin/ar-balance/details/${customer.customerId}`, {
-        headers: {
-          'Authorization': `Bearer ${adminToken}`,
-        }
-      });
-      
-      if (!response.ok) throw new Error('Failed to fetch transaction details');
-      const transactions = await response.json();
-      
-      // Set the customer and transactions for the map
-      setSelectedCustomerForMap(customer);
-      setTransactionsForMap(transactions);
-      setIsMapModalOpen(true);
-    } catch (error) {
-      console.error('Error opening AR Balance map:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ' : 'Error',
-        description: language === 'ar' ? 'فشل في تحميل بيانات المعاملات' : 'Failed to load transaction data',
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Handle closing map modal
-  const handleCloseMapModal = () => {
-    setIsMapModalOpen(false);
-    setSelectedCustomerForMap(null);
-    setTransactionsForMap([]);
-  };
-
-  // Define actions for the AR Balance table
-  const actions: DataTableAction<ARBalanceData>[] = [
-    {
-      label: { ar: 'خريطة', en: 'Map' },
-      onClick: (customer) => handleMapClick(customer),
-      className: 'text-green-600 hover:text-green-900 transition-colors duration-200'
-    }
-  ];
 
   // Define columns for the AR Balance table
   const columns: DataTableColumn<ARBalanceData>[] = [
@@ -249,7 +198,6 @@ export default function FinancialARBalance() {
         <DataTable
           data={paginatedData}
           columns={columns}
-          actions={actions}
           keyField="customerId"
           isLoading={isLoading}
           loadingText={{ ar: 'جاري تحميل بيانات الحسابات المدينة...', en: 'Loading AR Balance data...' }}
@@ -281,18 +229,6 @@ export default function FinancialARBalance() {
           customerName={selectedCustomer?.customerName ?? ''}
           isOpen={showTransactionModal}
           onClose={handleCloseModal}
-        />
-
-        {/* Map Modal for AR Balance */}
-        <InvoiceMapModal
-          isOpen={isMapModalOpen}
-          onClose={handleCloseMapModal}
-          invoice={null}
-          creditNotes={[]}
-          payments={[]}
-          modalType="ar-balance"
-          transactions={transactionsForMap}
-          customerName={selectedCustomerForMap?.customerName || ''}
         />
       </div>
     </AdminLayout>
