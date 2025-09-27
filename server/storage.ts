@@ -1482,13 +1482,13 @@ export class DatabaseStorage implements IStorage {
       }
 
       // Subtract Income Payments (payments ON invoices)
-      const invoicePayments = await db.select({
+      const invoicePaymentsList = await db.select({
         amount: invoicePayments.amount
       }).from(invoicePayments)
         .innerJoin(bookings, eq(invoicePayments.bookingId, bookings.id))
         .where(eq(bookings.userId, customerId));
 
-      for (const payment of invoicePayments) {
+      for (const payment of invoicePaymentsList) {
         balance -= Number(payment.amount);
       }
 
