@@ -1457,8 +1457,8 @@ export class DatabaseStorage implements IStorage {
         })
       );
 
-      // Filter out customers with zero balance
-      return arBalanceData.filter(customer => parseFloat(customer.balance) !== 0);
+      // Return all customers including those with zero balance
+      return arBalanceData;
     } catch (error) {
       console.error('Error fetching AR balance data:', error);
       throw error;
