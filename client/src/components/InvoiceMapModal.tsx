@@ -42,13 +42,23 @@ interface Payment {
   paymentMethods?: string | object;
 }
 
+interface Transaction {
+  type: string;
+  description: string;
+  amount: number;
+  date: string | null;
+  documentNumber: string | null;
+}
+
 interface InvoiceMapModalProps {
   isOpen: boolean;
   onClose: () => void;
   invoice: Invoice | null;
   creditNotes: CreditNote[];
   payments: Payment[];
-  modalType?: 'income' | 'outgoing' | 'creditnote';
+  modalType?: 'income' | 'outgoing' | 'creditnote' | 'ar-balance';
+  transactions?: Transaction[];
+  customerName?: string;
 }
 
 export function InvoiceMapModal({ 
@@ -57,7 +67,9 @@ export function InvoiceMapModal({
   invoice, 
   creditNotes, 
   payments,
-  modalType = 'income'
+  modalType = 'income',
+  transactions = [],
+  customerName = ''
 }: InvoiceMapModalProps) {
   const { t, language } = useTranslation();
   const [boxPositions, setBoxPositions] = useState<{[key: string]: {x: number, y: number}}>({});
@@ -67,7 +79,15 @@ export function InvoiceMapModal({
     if (isOpen) {
       const initialPositions: {[key: string]: {x: number, y: number}} = {};
       
-      if (modalType === 'creditnote') {
+      if (modalType === 'ar-balance') {
+        // Transaction-centric layout for AR Balance modal
+        transactions.forEach((transaction, index) => {
+          initialPositions[`transaction-${index}`] = { 
+            x: 50 + (index % 3) * 300, // 3 columns
+            y: 150 + Math.floor(index / 3) * 200 // Multiple rows
+          };
+        });
+      } else if (modalType === 'creditnote') {
         // Invoice-centric layout for credit note modal
         if (invoice) {
           initialPositions[`invoice-${invoice.invoiceNumber}`] = { x: 400, y: 250 }; // Center the invoice
@@ -117,7 +137,7 @@ export function InvoiceMapModal({
       
       setBoxPositions(initialPositions);
     }
-  }, [isOpen, invoice, creditNotes, payments, modalType]);
+  }, [isOpen, invoice, creditNotes, payments, modalType, transactions]);
 
   // Handle modal close
   const handleClose = () => {
@@ -149,8 +169,8 @@ export function InvoiceMapModal({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  // Only return null for non-credit note modals when no payments exist
-  if (modalType !== 'creditnote' && (!payments || payments.length === 0)) return null;
+  // Only return null for non-credit note and non-ar-balance modals when no payments exist
+  if (modalType !== 'creditnote' && modalType !== 'ar-balance' && (!payments || payments.length === 0)) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -161,6 +181,8 @@ export function InvoiceMapModal({
               ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
               : modalType === 'outgoing'
               ? (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')
+              : modalType === 'ar-balance'
+              ? (language === 'ar' ? 'خريطة رصيد الحسابات المدينة' : 'A/R Balance Map')
               : (language === 'ar' ? 'خريطة مذكرات الائتمان' : 'Credit Notes Map')}
           </DialogTitle>
           <DialogDescription>
@@ -188,9 +210,15 @@ export function InvoiceMapModal({
                   ? (language === 'ar' ? 'خريطة الدفع الوارد' : 'Income Payment Map')
                   : modalType === 'outgoing'
                   ? (language === 'ar' ? 'خريطة الدفع الصادر' : 'Outgoing Payment Map')
+                  : modalType === 'ar-balance'
+                  ? (language === 'ar' ? 'خريطة رصيد الحسابات المدينة' : 'A/R Balance Map')
                   : (language === 'ar' ? 'خريطة مذكرات الائتمان' : 'Credit Notes Map')}
               </h2>
-              {invoice && (
+              {modalType === 'ar-balance' ? (
+                <span className="text-sm text-gray-600">
+                  {customerName}
+                </span>
+              ) : invoice && (
                 <span className="text-sm text-gray-600">
                   {invoice.invoiceNumber}
                 </span>
@@ -491,6 +519,140 @@ export function InvoiceMapModal({
                     <div className="text-xs text-gray-500">
                       {language === 'ar' ? 'التاريخ: ' : 'Date: '}
                       {new Date(payment.createdAt || payment.postingDate || new Date()).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Transaction Boxes for AR Balance */}
+            {modalType === 'ar-balance' && transactions.map((transaction, index) => {
+              const position = boxPositions[`transaction-${index}`];
+              if (!position) return null;
+
+              // Format amount with currency
+              const formatAmount = (amount: number) => {
+                const absAmount = Math.abs(amount);
+                const currency = language === 'ar' ? 'ر.س' : 'SAR';
+                return `${absAmount.toFixed(2)} ${currency}`;
+              };
+
+              // Format date
+              const formatDate = (dateString: string | null) => {
+                if (!dateString) return language === 'ar' ? 'غير محدد' : 'N/A';
+                const date = new Date(dateString);
+                return date.toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US');
+              };
+
+              // Get transaction type color and icon
+              const getTransactionStyle = (type: string) => {
+                switch (type.toLowerCase()) {
+                  case 'opening balance':
+                    return {
+                      borderColor: '#6366f1',
+                      headerBg: 'bg-indigo-50',
+                      headerBorder: 'border-indigo-200',
+                      iconColor: 'text-indigo-600',
+                      textColor: 'text-indigo-700',
+                      amountColor: transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
+                    };
+                  case 'invoice':
+                    return {
+                      borderColor: '#8B2F8B',
+                      headerBg: 'bg-purple-50',
+                      headerBorder: 'border-purple-200',
+                      iconColor: 'text-purple-600',
+                      textColor: 'text-purple-700',
+                      amountColor: 'text-purple-600'
+                    };
+                  case 'income payment':
+                    return {
+                      borderColor: '#4CAF50',
+                      headerBg: 'bg-green-50',
+                      headerBorder: 'border-green-200',
+                      iconColor: 'text-green-600',
+                      textColor: 'text-green-700',
+                      amountColor: 'text-green-600'
+                    };
+                  case 'credit note':
+                    return {
+                      borderColor: '#f59e0b',
+                      headerBg: 'bg-yellow-50',
+                      headerBorder: 'border-yellow-200',
+                      iconColor: 'text-yellow-600',
+                      textColor: 'text-yellow-700',
+                      amountColor: 'text-red-600'
+                    };
+                  case 'outgoing payment':
+                    return {
+                      borderColor: '#F44336',
+                      headerBg: 'bg-red-50',
+                      headerBorder: 'border-red-200',
+                      iconColor: 'text-red-600',
+                      textColor: 'text-red-700',
+                      amountColor: 'text-red-600'
+                    };
+                  default:
+                    return {
+                      borderColor: '#6b7280',
+                      headerBg: 'bg-gray-50',
+                      headerBorder: 'border-gray-200',
+                      iconColor: 'text-gray-600',
+                      textColor: 'text-gray-700',
+                      amountColor: transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'
+                    };
+                }
+              };
+
+              const style = getTransactionStyle(transaction.type);
+
+              return (
+                <div
+                  key={`transaction-box-${index}`}
+                  className="absolute bg-white border-2 shadow-lg rounded-lg cursor-move z-20"
+                  style={{
+                    left: position.x,
+                    top: position.y,
+                    borderColor: style.borderColor,
+                    width: '280px',
+                    height: '180px'
+                  }}
+                  onMouseDown={createDragHandler(`transaction-${index}`)}
+                >
+                  {/* Header Section */}
+                  <div className={`${style.headerBg} px-3 py-2 border-b ${style.headerBorder} rounded-t-lg flex items-center justify-center gap-2`}>
+                    <svg className={`h-4 w-4 ${style.iconColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span className={`text-sm font-semibold ${style.textColor}`}>
+                      {language === 'ar' 
+                        ? transaction.type === 'Opening Balance' ? 'رصيد افتتاحي' 
+                        : transaction.type === 'Invoice' ? 'فاتورة'
+                        : transaction.type === 'Income Payment' ? 'دفعة واردة'
+                        : transaction.type === 'Credit Note' ? 'مذكرة ائتمان'
+                        : transaction.type === 'Outgoing Payment' ? 'دفعة صادرة'
+                        : transaction.type
+                        : transaction.type}
+                    </span>
+                  </div>
+                  
+                  {/* Content Section */}
+                  <div className="p-3 flex-1 flex flex-col justify-center" style={{ direction: language === 'ar' ? 'rtl' : 'ltr', textAlign: language === 'en' ? 'left' : 'right' }}>
+                    <div className={`text-base font-bold ${style.amountColor} mb-2`}>
+                      {transaction.amount >= 0 ? '+' : ''}{formatAmount(transaction.amount)}
+                    </div>
+                    <div className="text-sm text-gray-600 mb-2">
+                      {transaction.description}
+                    </div>
+                    {transaction.documentNumber && (
+                      <div className="text-sm text-gray-600 mb-2">
+                        {language === 'ar' ? 'رقم المستند: ' : 'Doc No: '}
+                        {transaction.documentNumber}
+                      </div>
+                    )}
+                    <div className="text-xs text-gray-500">
+                      {language === 'ar' ? 'التاريخ: ' : 'Date: '}
+                      {formatDate(transaction.date)}
                     </div>
                   </div>
                 </div>
