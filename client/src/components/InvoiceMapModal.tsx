@@ -80,12 +80,95 @@ export function InvoiceMapModal({
       const initialPositions: {[key: string]: {x: number, y: number}} = {};
       
       if (modalType === 'ar-balance') {
-        // Transaction-centric layout for AR Balance modal
+        // Group related transactions together in rows
+        const groups: number[][] = [];
+        const usedIndices = new Set<number>();
+        
         transactions.forEach((transaction, index) => {
-          initialPositions[`transaction-${index}`] = { 
-            x: 50 + (index % 3) * 300, // 3 columns
-            y: 150 + Math.floor(index / 3) * 200 // Multiple rows
-          };
+          if (usedIndices.has(index)) return;
+          
+          const group = [index];
+          usedIndices.add(index);
+          
+          // Find all related transactions for this transaction
+          transactions.forEach((relatedTransaction, relatedIndex) => {
+            if (index === relatedIndex || usedIndices.has(relatedIndex)) return;
+            
+            let isRelated = false;
+            
+            // Check for relationships between transactions
+            if (transaction.type === 'Invoice' && relatedTransaction.type === 'Income Payment') {
+              if (relatedTransaction.description?.includes(transaction.documentNumber || '') ||
+                  relatedTransaction.documentNumber === transaction.documentNumber) {
+                isRelated = true;
+              }
+            }
+            
+            if (transaction.type === 'Invoice' && relatedTransaction.type === 'Credit Note') {
+              if (relatedTransaction.description?.includes(transaction.documentNumber || '') ||
+                  (transaction.documentNumber && relatedTransaction.description?.includes(transaction.documentNumber))) {
+                isRelated = true;
+              }
+            }
+            
+            if (transaction.type === 'Income Payment' && relatedTransaction.type === 'Invoice') {
+              if (transaction.description?.includes(relatedTransaction.documentNumber || '') ||
+                  transaction.documentNumber === relatedTransaction.documentNumber) {
+                isRelated = true;
+              }
+            }
+            
+            if (transaction.type === 'Credit Note' && relatedTransaction.type === 'Invoice') {
+              if (transaction.description?.includes(relatedTransaction.documentNumber || '') ||
+                  (relatedTransaction.documentNumber && transaction.description?.includes(relatedTransaction.documentNumber))) {
+                isRelated = true;
+              }
+            }
+            
+            // Also check reverse relationships within the same group
+            for (const groupIndex of group) {
+              const groupTransaction = transactions[groupIndex];
+              
+              if (groupTransaction.type === 'Invoice' && relatedTransaction.type === 'Income Payment') {
+                if (relatedTransaction.description?.includes(groupTransaction.documentNumber || '') ||
+                    relatedTransaction.documentNumber === groupTransaction.documentNumber) {
+                  isRelated = true;
+                  break;
+                }
+              }
+              
+              if (groupTransaction.type === 'Invoice' && relatedTransaction.type === 'Credit Note') {
+                if (relatedTransaction.description?.includes(groupTransaction.documentNumber || '') ||
+                    (groupTransaction.documentNumber && relatedTransaction.description?.includes(groupTransaction.documentNumber))) {
+                  isRelated = true;
+                  break;
+                }
+              }
+            }
+            
+            if (isRelated) {
+              group.push(relatedIndex);
+              usedIndices.add(relatedIndex);
+            }
+          });
+          
+          groups.push(group);
+        });
+        
+        // Position transactions in groups (rows)
+        const boxWidth = 280;
+        const boxHeight = 180;
+        const horizontalMargin = 30;
+        const verticalMargin = 40;
+        const startY = 150;
+        
+        groups.forEach((group, groupIndex) => {
+          group.forEach((transactionIndex, positionInGroup) => {
+            initialPositions[`transaction-${transactionIndex}`] = {
+              x: 50 + positionInGroup * (boxWidth + horizontalMargin),
+              y: startY + groupIndex * (boxHeight + verticalMargin)
+            };
+          });
         });
       } else if (modalType === 'creditnote') {
         // Invoice-centric layout for credit note modal
@@ -287,74 +370,113 @@ export function InvoiceMapModal({
                 </>
               ) : modalType === 'ar-balance' ? (
                 <>
-                  {/* AR Balance Modal: Draw lines between related transactions */}
-                  {transactions.map((transaction, index) => {
-                    const transactionPos = boxPositions[`transaction-${index}`];
-                    if (!transactionPos) return null;
-
-                    const lines: JSX.Element[] = [];
-
-                    // Find related transactions based on document numbers and relationships
-                    transactions.forEach((relatedTransaction, relatedIndex) => {
-                      if (index === relatedIndex) return; // Skip self
+                  {/* AR Balance Modal: Draw lines between related transactions in the same row */}
+                  {(() => {
+                    // Re-create groups to draw lines between transactions in the same group
+                    const groups: number[][] = [];
+                    const usedIndices = new Set<number>();
+                    
+                    transactions.forEach((transaction, index) => {
+                      if (usedIndices.has(index)) return;
                       
-                      const relatedPos = boxPositions[`transaction-${relatedIndex}`];
-                      if (!relatedPos) return;
-
-                      let shouldConnect = false;
-
-                      // Connect invoices to their related income payments
-                      if (transaction.type === 'Invoice' && relatedTransaction.type === 'Income Payment') {
-                        // Check if payment references this invoice
-                        if (relatedTransaction.description?.includes(transaction.documentNumber || '') ||
-                            relatedTransaction.documentNumber === transaction.documentNumber) {
-                          shouldConnect = true;
+                      const group = [index];
+                      usedIndices.add(index);
+                      
+                      // Find all related transactions for this transaction
+                      transactions.forEach((relatedTransaction, relatedIndex) => {
+                        if (index === relatedIndex || usedIndices.has(relatedIndex)) return;
+                        
+                        let isRelated = false;
+                        
+                        // Check for relationships between transactions (same logic as positioning)
+                        if (transaction.type === 'Invoice' && relatedTransaction.type === 'Income Payment') {
+                          if (relatedTransaction.description?.includes(transaction.documentNumber || '') ||
+                              relatedTransaction.documentNumber === transaction.documentNumber) {
+                            isRelated = true;
+                          }
                         }
-                      }
-
-                      // Connect invoices to their related credit notes
-                      if (transaction.type === 'Invoice' && relatedTransaction.type === 'Credit Note') {
-                        // Check if credit note references this invoice
-                        if (relatedTransaction.description?.includes(transaction.documentNumber || '') ||
-                            (transaction.documentNumber && relatedTransaction.description?.includes(transaction.documentNumber))) {
-                          shouldConnect = true;
+                        
+                        if (transaction.type === 'Invoice' && relatedTransaction.type === 'Credit Note') {
+                          if (relatedTransaction.description?.includes(transaction.documentNumber || '') ||
+                              (transaction.documentNumber && relatedTransaction.description?.includes(transaction.documentNumber))) {
+                            isRelated = true;
+                          }
                         }
-                      }
-
-                      // Connect income payments to invoices (reverse relationship)
-                      if (transaction.type === 'Income Payment' && relatedTransaction.type === 'Invoice') {
-                        if (transaction.description?.includes(relatedTransaction.documentNumber || '') ||
-                            transaction.documentNumber === relatedTransaction.documentNumber) {
-                          shouldConnect = true;
+                        
+                        if (transaction.type === 'Income Payment' && relatedTransaction.type === 'Invoice') {
+                          if (transaction.description?.includes(relatedTransaction.documentNumber || '') ||
+                              transaction.documentNumber === relatedTransaction.documentNumber) {
+                            isRelated = true;
+                          }
                         }
-                      }
-
-                      // Connect credit notes to invoices (reverse relationship)
-                      if (transaction.type === 'Credit Note' && relatedTransaction.type === 'Invoice') {
-                        if (transaction.description?.includes(relatedTransaction.documentNumber || '') ||
-                            (relatedTransaction.documentNumber && transaction.description?.includes(relatedTransaction.documentNumber))) {
-                          shouldConnect = true;
+                        
+                        if (transaction.type === 'Credit Note' && relatedTransaction.type === 'Invoice') {
+                          if (transaction.description?.includes(relatedTransaction.documentNumber || '') ||
+                              (relatedTransaction.documentNumber && transaction.description?.includes(relatedTransaction.documentNumber))) {
+                            isRelated = true;
+                          }
                         }
-                      }
-
-                      if (shouldConnect) {
-                        lines.push(
-                          <line
-                            key={`line-transaction-${index}-${relatedIndex}`}
-                            x1={transactionPos.x + 140} // Transaction box center
-                            y1={transactionPos.y + 90}  // Transaction box center
-                            x2={relatedPos.x + 140}     // Related transaction box center
-                            y2={relatedPos.y + 90}      // Related transaction box center
-                            stroke="#4CAF50"            // Green color as requested
-                            strokeWidth="2"
-                            strokeDasharray="none"
-                          />
-                        );
-                      }
+                        
+                        // Also check reverse relationships within the same group
+                        for (const groupIndex of group) {
+                          const groupTransaction = transactions[groupIndex];
+                          
+                          if (groupTransaction.type === 'Invoice' && relatedTransaction.type === 'Income Payment') {
+                            if (relatedTransaction.description?.includes(groupTransaction.documentNumber || '') ||
+                                relatedTransaction.documentNumber === groupTransaction.documentNumber) {
+                              isRelated = true;
+                              break;
+                            }
+                          }
+                          
+                          if (groupTransaction.type === 'Invoice' && relatedTransaction.type === 'Credit Note') {
+                            if (relatedTransaction.description?.includes(groupTransaction.documentNumber || '') ||
+                                (groupTransaction.documentNumber && relatedTransaction.description?.includes(groupTransaction.documentNumber))) {
+                              isRelated = true;
+                              break;
+                            }
+                          }
+                        }
+                        
+                        if (isRelated) {
+                          group.push(relatedIndex);
+                          usedIndices.add(relatedIndex);
+                        }
+                      });
+                      
+                      groups.push(group);
                     });
 
+                    // Draw lines between adjacent transactions in the same group
+                    const lines: JSX.Element[] = [];
+                    
+                    groups.forEach((group, groupIndex) => {
+                      for (let i = 0; i < group.length - 1; i++) {
+                        const currentTransactionIndex = group[i];
+                        const nextTransactionIndex = group[i + 1];
+                        
+                        const currentPos = boxPositions[`transaction-${currentTransactionIndex}`];
+                        const nextPos = boxPositions[`transaction-${nextTransactionIndex}`];
+                        
+                        if (currentPos && nextPos) {
+                          lines.push(
+                            <line
+                              key={`group-${groupIndex}-line-${i}`}
+                              x1={currentPos.x + 280} // Right edge of current box
+                              y1={currentPos.y + 90}  // Center height of current box
+                              x2={nextPos.x}          // Left edge of next box
+                              y2={nextPos.y + 90}     // Center height of next box
+                              stroke="#4CAF50"        // Green color as requested
+                              strokeWidth="3"
+                              strokeDasharray="none"
+                            />
+                          );
+                        }
+                      }
+                    });
+                    
                     return lines;
-                  })}
+                  })()}
                 </>
               ) : (
                 <>
