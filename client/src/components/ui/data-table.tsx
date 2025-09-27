@@ -246,14 +246,11 @@ export function DataTable<T = any>({
               >
                 <div className="flex items-center gap-1">
                   <span>{formatHeaderText(language === 'ar' ? column.label.ar : column.label.en)}</span>
-                  <span className={`font-bold ${
-                    sortColumn === column.key ? 'text-purple-600' : 'text-gray-300'
-                  }`}>
-                    {sortColumn === column.key 
-                      ? (sortDirection === 'asc' ? '↑' : '↓')
-                      : '↕'
-                    }
-                  </span>
+                  {sortColumn === column.key && (
+                    <span className="text-purple-600 font-bold">
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
                 </div>
               </th>
             ))}
