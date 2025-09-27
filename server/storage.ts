@@ -1434,6 +1434,238 @@ export class DatabaseStorage implements IStorage {
     const nextNumber = highestNumber + 1;
     return `IPN${nextNumber.toString()}`;
   }
+
+  // AR Balance calculation methods
+  async getARBalanceData(): Promise<any[]> {
+    try {
+      // Get all customers from users table
+      const customers = await db.select({
+        id: users.id,
+        name: users.name,
+        phone: users.phone
+      }).from(users);
+
+      const arBalanceData = await Promise.all(
+        customers.map(async (customer) => {
+          const balance = await this.calculateCustomerBalance(customer.id);
+          return {
+            customerId: customer.id,
+            customerName: customer.name,
+            phone: customer.phone,
+            balance: balance.toFixed(2)
+          };
+        })
+      );
+
+      // Filter out customers with zero balance
+      return arBalanceData.filter(customer => parseFloat(customer.balance) !== 0);
+    } catch (error) {
+      console.error('Error fetching AR balance data:', error);
+      throw error;
+    }
+  }
+
+  async calculateCustomerBalance(customerId: number): Promise<number> {
+    try {
+      // Opening Balance (start with 0 for now)
+      let balance = 0;
+
+      // Add Invoice Values (from generated invoices)
+      const invoices = await db.select({
+        finalTotal: generatedInvoices.finalTotal
+      }).from(generatedInvoices)
+        .innerJoin(bookings, eq(generatedInvoices.bookingId, bookings.id))
+        .where(eq(bookings.userId, customerId));
+
+      for (const invoice of invoices) {
+        balance += Number(invoice.finalTotal);
+      }
+
+      // Subtract Income Payments (payments ON invoices)
+      const invoicePayments = await db.select({
+        amount: invoicePayments.amount
+      }).from(invoicePayments)
+        .innerJoin(bookings, eq(invoicePayments.bookingId, bookings.id))
+        .where(eq(bookings.userId, customerId));
+
+      for (const payment of invoicePayments) {
+        balance -= Number(payment.amount);
+      }
+
+      // Subtract Income Payments (separate income payments for this customer)
+      const separateIncomePayments = await db.select({
+        totalAmount: incomePayments.totalAmount
+      }).from(incomePayments)
+        .where(eq(incomePayments.businessPartnerId, customerId));
+
+      for (const payment of separateIncomePayments) {
+        balance -= Number(payment.totalAmount);
+      }
+
+      // Subtract Credit Notes
+      const creditNoteAmounts = await db.select({
+        finalTotal: creditNotes.finalTotal
+      }).from(creditNotes)
+        .innerJoin(generatedInvoices, eq(creditNotes.invoiceId, generatedInvoices.bookingId))
+        .innerJoin(bookings, eq(generatedInvoices.bookingId, bookings.id))
+        .where(eq(bookings.userId, customerId));
+
+      for (const creditNote of creditNoteAmounts) {
+        balance -= Number(creditNote.finalTotal);
+      }
+
+      // Add Outgoing Payments (payments TO this customer)
+      const outgoingPaymentsToCustomer = await db.select({
+        totalAmount: outgoingPayments.totalAmount
+      }).from(outgoingPayments)
+        .where(eq(outgoingPayments.businessPartnerId, customerId));
+
+      for (const payment of outgoingPaymentsToCustomer) {
+        balance += Number(payment.totalAmount);
+      }
+
+      return balance;
+    } catch (error) {
+      console.error(`Error calculating balance for customer ${customerId}:`, error);
+      return 0;
+    }
+  }
+
+  async getCustomerTransactionDetails(customerId: number): Promise<any[]> {
+    try {
+      const transactions = [];
+
+      // Opening Balance
+      transactions.push({
+        type: 'Opening Balance',
+        description: 'Opening Balance',
+        amount: 0,
+        date: null,
+        documentNumber: null
+      });
+
+      // Get all invoices for this customer
+      const invoices = await db.select({
+        invoiceNumber: generatedInvoices.invoiceNumber,
+        finalTotal: generatedInvoices.finalTotal,
+        generatedAt: generatedInvoices.generatedAt
+      }).from(generatedInvoices)
+        .innerJoin(bookings, eq(generatedInvoices.bookingId, bookings.id))
+        .where(eq(bookings.userId, customerId))
+        .orderBy(generatedInvoices.generatedAt);
+
+      for (const invoice of invoices) {
+        transactions.push({
+          type: 'Invoice',
+          description: `Invoice ${invoice.invoiceNumber}`,
+          amount: Number(invoice.finalTotal),
+          date: invoice.generatedAt,
+          documentNumber: invoice.invoiceNumber
+        });
+      }
+
+      // Get invoice payments
+      const invoicePaymentsList = await db.select({
+        amount: invoicePayments.amount,
+        createdAt: invoicePayments.createdAt,
+        paymentType: invoicePayments.paymentType
+      }).from(invoicePayments)
+        .innerJoin(bookings, eq(invoicePayments.bookingId, bookings.id))
+        .where(eq(bookings.userId, customerId))
+        .orderBy(invoicePayments.createdAt);
+
+      for (const payment of invoicePaymentsList) {
+        transactions.push({
+          type: 'Income Payment',
+          description: `Income Payment (${payment.paymentType})`,
+          amount: -Number(payment.amount),
+          date: payment.createdAt,
+          documentNumber: null
+        });
+      }
+
+      // Get separate income payments
+      const separateIncomePaymentsList = await db.select({
+        documentNo: incomePayments.documentNo,
+        totalAmount: incomePayments.totalAmount,
+        createdAt: incomePayments.createdAt
+      }).from(incomePayments)
+        .where(eq(incomePayments.businessPartnerId, customerId))
+        .orderBy(incomePayments.createdAt);
+
+      for (const payment of separateIncomePaymentsList) {
+        transactions.push({
+          type: 'Income Payment',
+          description: `Income Payment`,
+          amount: -Number(payment.totalAmount),
+          date: payment.createdAt,
+          documentNumber: payment.documentNo
+        });
+      }
+
+      // Get credit notes
+      const creditNotesList = await db.select({
+        creditNoteNumber: creditNotes.creditNoteNumber,
+        finalTotal: creditNotes.finalTotal,
+        createdAt: creditNotes.createdAt
+      }).from(creditNotes)
+        .innerJoin(generatedInvoices, eq(creditNotes.invoiceId, generatedInvoices.bookingId))
+        .innerJoin(bookings, eq(generatedInvoices.bookingId, bookings.id))
+        .where(eq(bookings.userId, customerId))
+        .orderBy(creditNotes.createdAt);
+
+      for (const creditNote of creditNotesList) {
+        transactions.push({
+          type: 'Credit Note',
+          description: `Credit Note ${creditNote.creditNoteNumber}`,
+          amount: -Number(creditNote.finalTotal),
+          date: creditNote.createdAt,
+          documentNumber: creditNote.creditNoteNumber
+        });
+      }
+
+      // Get outgoing payments to this customer
+      const outgoingPaymentsList = await db.select({
+        documentNo: outgoingPayments.documentNo,
+        totalAmount: outgoingPayments.totalAmount,
+        createdAt: outgoingPayments.createdAt
+      }).from(outgoingPayments)
+        .where(eq(outgoingPayments.businessPartnerId, customerId))
+        .orderBy(outgoingPayments.createdAt);
+
+      for (const payment of outgoingPaymentsList) {
+        transactions.push({
+          type: 'Outgoing Payment',
+          description: `Outgoing Payment`,
+          amount: Number(payment.totalAmount),
+          date: payment.createdAt,
+          documentNumber: payment.documentNo
+        });
+      }
+
+      // Sort all transactions by date
+      transactions.sort((a, b) => {
+        if (!a.date) return -1;
+        if (!b.date) return 1;
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      });
+
+      // Calculate running balance
+      let runningBalance = 0;
+      const transactionsWithBalance = transactions.map((transaction) => {
+        runningBalance += transaction.amount;
+        return {
+          ...transaction,
+          runningBalance: runningBalance.toFixed(2)
+        };
+      });
+
+      return transactionsWithBalance;
+    } catch (error) {
+      console.error(`Error getting transaction details for customer ${customerId}:`, error);
+      return [];
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();
