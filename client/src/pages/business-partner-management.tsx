@@ -31,21 +31,11 @@ declare global {
 export default function BusinessPartnerManagement() {
   const { language } = useTranslation();
   const [selectedPartnerType, setSelectedPartnerType] = useState<'customer' | 'supplier'>('customer');
-  const [triggerAnimation, setTriggerAnimation] = useState('hover');
+  const [triggerAnimation, setTriggerAnimation] = useState('loop');
   const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  // Animate icon every 1.5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTriggerAnimation('loop');
-      setTimeout(() => setTriggerAnimation('hover'), 1000);
-    }, 1500); // 1.5 seconds = 1,500 milliseconds
-
-    return () => clearInterval(interval);
-  }, []);
 
   const getButtonText = () => {
     if (selectedPartnerType === 'customer') {
@@ -184,6 +174,7 @@ export default function BusinessPartnerManagement() {
             <lord-icon
               src="https://cdn.lordicon.com/rcuovkuy.json"
               trigger={triggerAnimation}
+              delay="1500"
               colors="primary:#852085,secondary:#545454"
               style={{width:'80px',height:'80px'}}
             />
