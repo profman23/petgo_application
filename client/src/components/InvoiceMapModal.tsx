@@ -285,6 +285,77 @@ export function InvoiceMapModal({
                     return null;
                   })}
                 </>
+              ) : modalType === 'ar-balance' ? (
+                <>
+                  {/* AR Balance Modal: Draw lines between related transactions */}
+                  {transactions.map((transaction, index) => {
+                    const transactionPos = boxPositions[`transaction-${index}`];
+                    if (!transactionPos) return null;
+
+                    const lines: JSX.Element[] = [];
+
+                    // Find related transactions based on document numbers and relationships
+                    transactions.forEach((relatedTransaction, relatedIndex) => {
+                      if (index === relatedIndex) return; // Skip self
+                      
+                      const relatedPos = boxPositions[`transaction-${relatedIndex}`];
+                      if (!relatedPos) return;
+
+                      let shouldConnect = false;
+
+                      // Connect invoices to their related income payments
+                      if (transaction.type === 'Invoice' && relatedTransaction.type === 'Income Payment') {
+                        // Check if payment references this invoice
+                        if (relatedTransaction.description?.includes(transaction.documentNumber || '') ||
+                            relatedTransaction.documentNumber === transaction.documentNumber) {
+                          shouldConnect = true;
+                        }
+                      }
+
+                      // Connect invoices to their related credit notes
+                      if (transaction.type === 'Invoice' && relatedTransaction.type === 'Credit Note') {
+                        // Check if credit note references this invoice
+                        if (relatedTransaction.description?.includes(transaction.documentNumber || '') ||
+                            (transaction.documentNumber && relatedTransaction.description?.includes(transaction.documentNumber))) {
+                          shouldConnect = true;
+                        }
+                      }
+
+                      // Connect income payments to invoices (reverse relationship)
+                      if (transaction.type === 'Income Payment' && relatedTransaction.type === 'Invoice') {
+                        if (transaction.description?.includes(relatedTransaction.documentNumber || '') ||
+                            transaction.documentNumber === relatedTransaction.documentNumber) {
+                          shouldConnect = true;
+                        }
+                      }
+
+                      // Connect credit notes to invoices (reverse relationship)
+                      if (transaction.type === 'Credit Note' && relatedTransaction.type === 'Invoice') {
+                        if (transaction.description?.includes(relatedTransaction.documentNumber || '') ||
+                            (relatedTransaction.documentNumber && transaction.description?.includes(relatedTransaction.documentNumber))) {
+                          shouldConnect = true;
+                        }
+                      }
+
+                      if (shouldConnect) {
+                        lines.push(
+                          <line
+                            key={`line-transaction-${index}-${relatedIndex}`}
+                            x1={transactionPos.x + 140} // Transaction box center
+                            y1={transactionPos.y + 90}  // Transaction box center
+                            x2={relatedPos.x + 140}     // Related transaction box center
+                            y2={relatedPos.y + 90}      // Related transaction box center
+                            stroke="#4CAF50"            // Green color as requested
+                            strokeWidth="2"
+                            strokeDasharray="none"
+                          />
+                        );
+                      }
+                    });
+
+                    return lines;
+                  })}
+                </>
               ) : (
                 <>
                   {/* Payment Modal: Draw lines from payment to each credit note */}
