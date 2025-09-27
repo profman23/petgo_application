@@ -3592,6 +3592,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: Get AR Balance data
+  app.get('/api/admin/ar-balance', requireAdminAuth, async (req, res) => {
+    try {
+      const arBalanceData = await storage.getARBalanceData();
+      res.json(arBalanceData);
+    } catch (error) {
+      console.error('Error fetching AR balance data:', error);
+      res.status(500).json({ message: 'Failed to fetch AR balance data' });
+    }
+  });
+
+  // Admin: Get customer transaction details for AR Balance
+  app.get('/api/admin/ar-balance/details/:customerId', requireAdminAuth, async (req, res) => {
+    try {
+      const { customerId } = req.params;
+      const customerIdNum = parseInt(customerId);
+      
+      if (isNaN(customerIdNum)) {
+        return res.status(400).json({ message: 'Invalid customer ID' });
+      }
+      
+      const transactionDetails = await storage.getCustomerTransactionDetails(customerIdNum);
+      res.json(transactionDetails);
+    } catch (error) {
+      console.error('Error fetching customer transaction details:', error);
+      res.status(500).json({ message: 'Failed to fetch customer transaction details' });
+    }
+  });
+
   // Admin: Get next credit note number
   app.get('/api/admin/credit-notes/next-number', requireAdminAuth, async (req, res) => {
     try {
