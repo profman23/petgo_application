@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { DataTable, DataTableColumn } from "@/components/ui/data-table";
+import { PaginationControls } from "@/components/ui/pagination-controls";
 import { TransactionDetailsModal } from "@/components/TransactionDetailsModal";
 
 // AR Balance data interface
@@ -33,6 +34,10 @@ export default function FinancialARBalance() {
   // Search functionality state
   const [searchInput, setSearchInput] = useState("");
   
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  
   // Modal state
   const [selectedCustomer, setSelectedCustomer] = useState<ARBalanceData | null>(null);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
@@ -58,11 +63,28 @@ export default function FinancialARBalance() {
     if (!searchInput) return true;
     const searchLower = searchInput.toLowerCase();
     return (
+      customer.customerId?.toString().includes(searchLower) ||
       customer.customerName?.toLowerCase().includes(searchLower) ||
       customer.phone?.toLowerCase().includes(searchLower) ||
       customer.balance?.toString().includes(searchLower)
     );
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchInput]);
 
   // Search functionality handlers
   const handleSearchClick = () => {
@@ -89,6 +111,13 @@ export default function FinancialARBalance() {
 
   // Define columns for the AR Balance table
   const columns: DataTableColumn<ARBalanceData>[] = [
+    {
+      key: 'customerId',
+      label: { ar: 'معرف العميل', en: 'Customer ID' },
+      render: (customer) => (
+        <span className="font-mono text-sm text-gray-600">{customer.customerId || 'N/A'}</span>
+      )
+    },
     {
       key: 'customerName',
       label: { ar: 'اسم العميل', en: 'Customer Name' },
@@ -153,7 +182,7 @@ export default function FinancialARBalance() {
         {/* Search Action Bar */}
         <div className="mb-6">
           <SearchActionBar
-            placeholder={language === 'ar' ? 'البحث بحسب اسم العميل، رقم الهاتف، رقم الحساب، أو الرصيد' : 'Search by customer name, phone number, account number, or balance amount'}
+            placeholder={language === 'ar' ? 'البحث بحسب معرف العميل، اسم العميل، رقم الهاتف، أو الرصيد' : 'Search by customer ID, customer name, phone number, or balance amount'}
             searchValue={searchInput}
             onSearchChange={setSearchInput}
             onSearchClick={handleSearchClick}
@@ -166,7 +195,7 @@ export default function FinancialARBalance() {
 
         {/* A/R Balance Table */}
         <DataTable
-          data={filteredData}
+          data={paginatedData}
           columns={columns}
           keyField="customerId"
           isLoading={isLoading}
@@ -178,6 +207,19 @@ export default function FinancialARBalance() {
           rowTestId="row-ar-balance"
           hover={true}
           className="bg-white rounded-lg shadow"
+        />
+
+        {/* Pagination Controls */}
+        <PaginationControls
+          currentCount={paginatedData.length}
+          filteredCount={filteredData.length}
+          totalCount={arBalanceData.length}
+          itemType="customers"
+          itemsPerPage={itemsPerPage}
+          onItemsPerPageChange={setItemsPerPage}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
         />
 
         {/* Transaction Details Modal */}
