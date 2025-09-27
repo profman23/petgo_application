@@ -281,7 +281,14 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
     if (v !== el.value) {
       const pos = el.selectionStart ?? v.length;
       el.value = v;
-      el.setSelectionRange(pos, pos);
+      // Only set selection range if the input type supports it
+      try {
+        if (el.type === 'text' || el.type === 'search' || el.type === 'url' || el.type === 'tel' || el.type === 'password') {
+          el.setSelectionRange(pos, pos);
+        }
+      } catch (error) {
+        // Ignore error for input types that don't support selection range
+      }
     }
   };
 
