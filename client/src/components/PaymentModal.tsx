@@ -592,7 +592,8 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
               <div className="flex items-center gap-4">
                 <lord-icon 
                   src="https://cdn.lordicon.com/uemybdyy.json" 
-                  trigger="hover" 
+                  trigger="loop" 
+                  delay="1500"
                   colors="primary:#852085,secondary:#848484" 
                   style={{ width: '80px', height: '80px' }}>
                 </lord-icon>

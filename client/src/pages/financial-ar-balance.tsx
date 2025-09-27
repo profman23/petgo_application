@@ -162,7 +162,8 @@ export default function FinancialARBalance() {
             <lord-icon
               key={lordIconKey}
               src="https://cdn.lordicon.com/mrniyolg.json"
-              trigger="hover"
+              trigger="loop"
+              delay="1500"
               colors="primary:#852085,secondary:#848484"
               style={{width:'80px',height:'80px'}}
             />

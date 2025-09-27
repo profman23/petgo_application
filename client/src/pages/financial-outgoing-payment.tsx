@@ -39,7 +39,7 @@ export default function FinancialOutgoingPayment() {
   const [creditNotesForMap, setCreditNotesForMap] = useState<any[]>([]);
   
   // Lord-icon animation trigger state
-  const [triggerAnimation, setTriggerAnimation] = useState("hover");
+  const [triggerAnimation, setTriggerAnimation] = useState("loop");
 
   // Fetch outgoing payments data
   const { data: outgoingPayments = [], isLoading } = useQuery<{ docnum: string; businessPartnerName?: string; businessPartnerPhone?: string; totalAmount: string; businessPartnerId?: number; postingDate: string; }[]>({
@@ -209,6 +209,7 @@ export default function FinancialOutgoingPayment() {
               <lord-icon 
                 src="https://cdn.lordicon.com/uemybdyy.json" 
                 trigger={triggerAnimation}
+                delay="1500"
                 colors="primary:#852085,secondary:#848484" 
                 style={{ width: '80px', height: '80px' }}
               />
