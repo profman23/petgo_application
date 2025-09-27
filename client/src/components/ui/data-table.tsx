@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { FileText, Loader2 } from 'lucide-react';
 
@@ -84,6 +84,72 @@ export function DataTable<T = any>({
 }: DataTableProps<T>) {
   const { language } = useTranslation();
 
+  // Sorting state
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Find the default ID column and set it as default sort
+  useEffect(() => {
+    const idColumn = columns.find(col => 
+      col.key.toLowerCase().includes('id') || 
+      col.key === keyField
+    );
+    if (idColumn && !sortColumn) {
+      setSortColumn(idColumn.key);
+      setSortDirection('asc');
+    }
+  }, [columns, keyField, sortColumn]);
+
+  // Sorting function
+  const sortData = (data: T[], column: string, direction: 'asc' | 'desc'): T[] => {
+    return [...data].sort((a, b) => {
+      const aValue = (a as any)[column];
+      const bValue = (b as any)[column];
+      
+      // Handle null/undefined values
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return direction === 'asc' ? 1 : -1;
+      if (bValue == null) return direction === 'asc' ? -1 : 1;
+      
+      // Handle numbers
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return direction === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+      
+      // Handle dates
+      const aDate = new Date(aValue);
+      const bDate = new Date(bValue);
+      if (!isNaN(aDate.getTime()) && !isNaN(bDate.getTime())) {
+        return direction === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
+      }
+      
+      // Handle strings (convert to string and compare)
+      const aStr = String(aValue).toLowerCase();
+      const bStr = String(bValue).toLowerCase();
+      
+      if (direction === 'asc') {
+        return aStr.localeCompare(bStr);
+      } else {
+        return bStr.localeCompare(aStr);
+      }
+    });
+  };
+
+  // Handle column header click
+  const handleColumnClick = (columnKey: string) => {
+    if (sortColumn === columnKey) {
+      // Toggle direction: asc → desc → asc
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // New column, start with ascending
+      setSortColumn(columnKey);
+      setSortDirection('asc');
+    }
+  };
+
+  // Apply sorting to data
+  const sortedData = sortColumn ? sortData(data, sortColumn, sortDirection) : data;
+
   // 🎯 Header formatting function - applies proper title case with ID special handling
   const formatHeaderText = (text: string): string => {
     if (!text) return text;
@@ -132,7 +198,7 @@ export function DataTable<T = any>({
   }
 
   // Render empty state
-  if (data.length === 0) {
+  if (sortedData.length === 0) {
     return (
       <div className={className}>
         <div className="p-8 text-center text-gray-500">
@@ -173,11 +239,19 @@ export function DataTable<T = any>({
             {columns.map((column, index) => (
               <th
                 key={column.key}
-                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider ${column.headerClassName || ''} ${
+                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider cursor-pointer hover:bg-gray-100 transition-colors duration-200 ${column.headerClassName || ''} ${
                   verticalSeparators && index < columns.length - 1 ? 'border-r border-gray-200' : ''
                 }`}
+                onClick={() => handleColumnClick(column.key)}
               >
-                {formatHeaderText(language === 'ar' ? column.label.ar : column.label.en)}
+                <div className="flex items-center gap-1">
+                  <span>{formatHeaderText(language === 'ar' ? column.label.ar : column.label.en)}</span>
+                  {sortColumn === column.key && (
+                    <span className="text-purple-600 font-bold">
+                      {sortDirection === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
               </th>
             ))}
             {showActions && (
@@ -190,7 +264,7 @@ export function DataTable<T = any>({
           </tr>
         </thead>
         <tbody className={`bg-white divide-y divide-gray-200 ${bordered ? 'border border-gray-200' : ''}`}>
-          {data.map((item, index) => (
+          {sortedData.map((item, index) => (
             <tr
               key={(item as any)[keyField] || index}
               className={getRowClassName(item, index)}
