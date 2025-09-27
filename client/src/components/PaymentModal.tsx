@@ -538,9 +538,11 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
   };
 
   const calculateTotal = () => {
-    return Object.values(paymentMethods).reduce((total, method) => {
+    const total = Object.values(paymentMethods).reduce((total, method) => {
       return total + (method.checked ? method.amount : 0);
     }, 0);
+    // Round to 2 decimal places to avoid floating point precision issues
+    return Math.round(total * 100) / 100;
   };
 
   // Variant configuration
@@ -921,9 +923,20 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.cash.amount || ''}
-                      onChange={(e) => handlePaymentMethodChangeWithValidation('cash', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onChange={(e) => {
+                        const value = e.currentTarget.value;
+                        // Allow empty string for better user experience while typing
+                        if (value === '') {
+                          handlePaymentMethodChangeWithValidation('cash', 'amount', 0);
+                        } else {
+                          const numValue = parseFloat(value);
+                          // Only update if it's a valid positive number
+                          if (!isNaN(numValue) && numValue >= 0) {
+                            handlePaymentMethodChangeWithValidation('cash', 'amount', numValue);
+                          }
+                        }
+                      }}
                       onKeyDown={disallowNegativeKeys}
-                      onInput={sanitizeNonNegative}
                       onPaste={preventNegativePaste}
                       disabled={!paymentMethods.cash.checked}
                     />
@@ -957,9 +970,20 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.card.amount || ''}
-                      onChange={(e) => handlePaymentMethodChangeWithValidation('card', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onChange={(e) => {
+                        const value = e.currentTarget.value;
+                        // Allow empty string for better user experience while typing
+                        if (value === '') {
+                          handlePaymentMethodChangeWithValidation('card', 'amount', 0);
+                        } else {
+                          const numValue = parseFloat(value);
+                          // Only update if it's a valid positive number
+                          if (!isNaN(numValue) && numValue >= 0) {
+                            handlePaymentMethodChangeWithValidation('card', 'amount', numValue);
+                          }
+                        }
+                      }}
                       onKeyDown={disallowNegativeKeys}
-                      onInput={sanitizeNonNegative}
                       onPaste={preventNegativePaste}
                       disabled={!paymentMethods.card.checked}
                     />
@@ -993,9 +1017,20 @@ export function PaymentModal({ variant, isOpen, onOpenChange, paymentNo }: Payme
                       className="w-[170px] px-2 input-compact-20 border border-gray-300"
                       placeholder={language === 'ar' ? 'المبلغ' : 'Amount'}
                       value={paymentMethods.bank.amount || ''}
-                      onChange={(e) => handlePaymentMethodChangeWithValidation('bank', 'amount', parseFloat(e.currentTarget.value) || 0)}
+                      onChange={(e) => {
+                        const value = e.currentTarget.value;
+                        // Allow empty string for better user experience while typing
+                        if (value === '') {
+                          handlePaymentMethodChangeWithValidation('bank', 'amount', 0);
+                        } else {
+                          const numValue = parseFloat(value);
+                          // Only update if it's a valid positive number
+                          if (!isNaN(numValue) && numValue >= 0) {
+                            handlePaymentMethodChangeWithValidation('bank', 'amount', numValue);
+                          }
+                        }
+                      }}
                       onKeyDown={disallowNegativeKeys}
-                      onInput={sanitizeNonNegative}
                       onPaste={preventNegativePaste}
                       disabled={!paymentMethods.bank.checked}
                     />
