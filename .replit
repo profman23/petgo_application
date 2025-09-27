@@ -88,9 +88,5 @@ externalPort = 6800
 localPort = 45545
 externalPort = 8000
 
-[[ports]]
-localPort = 46637
-externalPort = 8099
-
 [agent]
 integrations = ["javascript_database==1.0.0"]
