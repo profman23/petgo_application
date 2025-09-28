@@ -341,12 +341,12 @@ export default function AdministrationAuthorization() {
     setProductsHiddenChecked(auth.productsHidden || false);
     setProductsReadChecked(auth.productsRead || false);
     setProductsFullControlChecked(auth.productsFullControl || false);
-    console.log("🐛 [DEBUG] Loading auth.creditNotesNoPermission:", auth.creditNotesNoPermission);
-    setCreditNotesNoPermissionChecked(auth.creditNotesNoPermission || false);
-    console.log("🐛 [DEBUG] Set creditNotesNoPermissionChecked to:", auth.creditNotesNoPermission || false);
-    setCreditNotesReadChecked(auth.creditNotesRead || false);
-    setCreditNotesFullControlChecked(auth.creditNotesFullControl || false);
-    setCreditNotesExportChecked(auth.creditNotesExport || false);
+    console.log("🐛 [DEBUG] Loading auth.creditNoteNoPermission:", auth.creditNoteNoPermission);
+    setCreditNotesNoPermissionChecked(auth.creditNoteNoPermission || false);
+    console.log("🐛 [DEBUG] Set creditNotesNoPermissionChecked to:", auth.creditNoteNoPermission || false);
+    setCreditNotesReadChecked(auth.creditNoteRead || false);
+    setCreditNotesFullControlChecked(auth.creditNoteFullControl || false);
+    setCreditNotesExportChecked(auth.creditNoteExport || false);
     setOutgoingPaymentNoPermissionChecked(auth.outgoingPaymentNoPermission || false);
     setOutgoingPaymentReadChecked(auth.outgoingPaymentRead || false);
     setOutgoingPaymentFullControlChecked(auth.outgoingPaymentFullControl || false);
