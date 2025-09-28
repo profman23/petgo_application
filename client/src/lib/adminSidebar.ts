@@ -15,8 +15,6 @@ export interface SidebarSection {
   icon: any;
   items?: SidebarMenuItem[];
   route?: string;
-  requiresPermission?: string;
-  permissionRedirect?: string;
 }
 
 export const adminSidebarConfig: SidebarSection[] = [
@@ -161,9 +159,7 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "import",
     i18nKey: { en: "Import", ar: "استيراد" },
     icon: Upload,
-    route: "/admin-dashboard/import",
-    requiresPermission: "importHidden",
-    permissionRedirect: "/admin-home"
+    route: "/admin-dashboard/import"
   },
   
   // Services
@@ -171,9 +167,7 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "services",
     i18nKey: { en: "Services", ar: "الخدمات" },
     icon: Stethoscope,
-    route: "/admin-dashboard/services",
-    requiresPermission: "servicesHidden",
-    permissionRedirect: "/admin-home"
+    route: "/admin-dashboard/services"
   },
   
   // Products

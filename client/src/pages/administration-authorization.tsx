@@ -802,7 +802,19 @@ export default function AdministrationAuthorization() {
                       </p>
                     </div>
                     <div className="ml-4">
-                      {/* Edit button temporarily disabled */}
+                      <button
+                        data-testid={`button-edit-${auth.id}`}
+                        onClick={isReadOnly ? undefined : () => handleEditAuthorization(auth)}
+                        disabled={!!isReadOnly}
+                        className={`p-2 rounded-full transition-colors ${
+                          isReadOnly 
+                            ? 'text-gray-300 cursor-not-allowed opacity-50'
+                            : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
+                        }`}
+                        title={language === 'ar' ? 'تعديل' : 'Edit'}
+                      >
+                        <Edit className="h-5 w-5" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -813,6 +825,48 @@ export default function AdministrationAuthorization() {
         </div>
       </div>
 
+      {/* Add New Authorization Popup */}
+      {showAddAuthorizationPopup && !isReadOnly && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[85vh]">
+            {/* Popup Header */}
+            <div className="flex justify-between items-center p-4 border-b">
+              {editingAuthorization ? (
+                <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                  <lord-icon 
+                    src="https://cdn.lordicon.com/exymduqj.json" 
+                    trigger="loop" 
+                    delay="1500" 
+                    state="hover-line" 
+                    colors="primary:#852085,secondary:#545454" 
+                    style={{ width: '80px', height: '80px' }}
+                  />
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {language === 'ar' ? 'تعديل التصريح' : 'Edit Authorization'}
+                  </h2>
+                </div>
+              ) : (
+                <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+                  <lord-icon 
+                    src="https://cdn.lordicon.com/avbhqgrw.json" 
+                    trigger="loop" 
+                    delay="1500" 
+                    colors="primary:#852085,secondary:#545454" 
+                    style={{ width: '80px', height: '80px' }}
+                  />
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
+                  </h2>
+                </div>
+              )}
+              <button
+                data-testid="button-close-popup"
+                onClick={handleClosePopup}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
             
             {/* Popup Content with Custom Scrollbar */}
             <div className="relative flex-1 overflow-hidden">
@@ -990,28 +1044,61 @@ export default function AdministrationAuthorization() {
                         {language === 'ar' ? 'إشعارات الخصم' : 'Credit Notes'}
                       </h5>
                       <div className="ml-4 flex flex-row gap-6">
-                        <NoPermissionToggle 
-                          groupKey="creditNote" 
-                          data-testid="checkbox-credit-notes-no-permission"
-                        />
-                        <PermissionToggle 
-                          groupKey="creditNote" 
-                          permissionType="read" 
-                          label="Read"
-                          data-testid="checkbox-credit-notes-read"
-                        />
-                        <PermissionToggle 
-                          groupKey="creditNote" 
-                          permissionType="fullControl" 
-                          label="Full Control"
-                          data-testid="checkbox-credit-notes-full-control"
-                        />
-                        <PermissionToggle 
-                          groupKey="creditNote" 
-                          permissionType="export" 
-                          label="Export"
-                          data-testid="checkbox-credit-notes-export"
-                        />
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="creditNotesNoPermission"
+                            data-testid="checkbox-credit-notes-no-permission"
+                            checked={creditNotesNoPermissionChecked}
+                            onChange={(e) => handleCreditNotesNoPermissionChange(e.target.checked)}
+                            className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          />
+                          <label htmlFor="creditNotesNoPermission" className="ml-2 text-sm text-gray-600">
+                            No Permission
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="creditNotesRead"
+                            data-testid="checkbox-credit-notes-read"
+                            checked={creditNotesReadChecked}
+                            disabled={creditNotesNoPermissionChecked}
+                            onChange={(e) => handleCreditNotesReadChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="creditNotesRead" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Read
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="creditNotesFullControl"
+                            data-testid="checkbox-credit-notes-full-control"
+                            checked={creditNotesFullControlChecked}
+                            disabled={creditNotesNoPermissionChecked}
+                            onChange={(e) => handleCreditNotesFullControlChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="creditNotesFullControl" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Full Control
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="creditNotesExport"
+                            data-testid="checkbox-credit-notes-export"
+                            checked={creditNotesExportChecked}
+                            disabled={creditNotesNoPermissionChecked}
+                            onChange={(e) => handleCreditNotesExportChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="creditNotesExport" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Export
+                          </label>
+                        </div>
                       </div>
                     </div>
 
@@ -1452,7 +1539,7 @@ export default function AdministrationAuthorization() {
                           className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                         <label htmlFor="servicesFullControl" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Full Control
+                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                         </label>
                       </div>
                       </div>
@@ -1520,9 +1607,8 @@ export default function AdministrationAuthorization() {
                           className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${productsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                         <label htmlFor="productsFullControl" className={`ml-2 text-sm ${productsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Full Control
+                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                         </label>
-                      </div>
                       </div>
                       
                       {/* Purple divider line */}
@@ -1634,6 +1720,56 @@ export default function AdministrationAuthorization() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* No Permission Popup */}
+      {showNoPermissionPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            {/* Popup Header */}
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {language === 'ar' ? 'ليس لديك صلاحية' : 'No permission'}
+              </h2>
+              <button
+                data-testid="button-close-no-permission"
+                onClick={() => {
+                  setShowNoPermissionPopup(false);
+                  setIsNoPermissionDialogOpen(false);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            {/* Popup Body */}
+            <div className="p-4">
+              <p className="text-sm text-gray-600">
+                {language === 'ar' 
+                  ? 'ليس لديك صلاحية للوصول إلى هذا القسم. يُرجى التواصل مع المشرف.' 
+                  : "You don't have access to this section. Please contact the administrator."
+                }
+              </p>
+            </div>
+            
+            {/* Popup Footer */}
+            <div className="flex justify-end p-4 border-t">
+              <button
+                data-testid="button-ok"
+                onClick={() => {
+                  setShowNoPermissionPopup(false);
+                  setIsNoPermissionDialogOpen(false);
+                }}
+                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
+              >
+                {language === 'ar' ? 'موافق' : 'OK'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
