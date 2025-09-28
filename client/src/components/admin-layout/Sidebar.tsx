@@ -74,6 +74,10 @@ export function Sidebar({ className = "" }: SidebarProps) {
   const renderSection = (section: SidebarSection, isMobile: boolean = false) => {
     const Icon = section.icon;
     const isExpanded = Boolean(expandedSections[section.id]);
+    const permissions = currentUserPermissions as any;
+    const isDisabled = Boolean(section.requiresPermission && 
+      currentUserPermissions && 
+      permissions[section.requiresPermission] === true);
 
     if (section.items) {
       // Collapsible section with subitems
@@ -81,20 +85,25 @@ export function Sidebar({ className = "" }: SidebarProps) {
         <div key={section.id} className="mb-2">
           <button
             onClick={() => handleSectionClick(section, isMobile)}
-            className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            disabled={isDisabled}
+            className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
+              isDisabled
+                ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
           >
             <Icon className="h-6 w-6 flex-shrink-0" />
             <span className="flex-1 text-left whitespace-nowrap">
               {section.i18nKey[language] || section.i18nKey.en}
             </span>
-            {isExpanded ? (
+            {!isDisabled && (isExpanded ? (
               <ChevronUp className="h-4 w-4 flex-shrink-0" />
             ) : (
               <ChevronDown className="h-4 w-4 flex-shrink-0" />
-            )}
+            ))}
           </button>
           
-          {isExpanded && (
+          {isExpanded && !isDisabled && (
             <div className="ml-6 mt-1 space-y-1">
               {section.items.map(item => renderMenuItem(item, isMobile))}
             </div>
@@ -102,12 +111,17 @@ export function Sidebar({ className = "" }: SidebarProps) {
         </div>
       );
     } else {
-      // Simple navigation item
+      // Simple navigation item - now with permission checking
       return (
         <button
           key={section.id}
           onClick={() => handleSectionClick(section, isMobile)}
-          className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          disabled={isDisabled}
+          className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 ${
+            isDisabled
+              ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          }`}
         >
           <Icon className="h-6 w-6 flex-shrink-0" />
           <span>{section.i18nKey[language] || section.i18nKey.en}</span>
@@ -154,6 +168,16 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
   };
 
   const handleSectionClick = (section: SidebarSection) => {
+    // Check permissions if required
+    if (section.requiresPermission && currentUserPermissions) {
+      const permissions = currentUserPermissions as any;
+      if (permissions[section.requiresPermission] === true) {
+        setLocation(section.permissionRedirect || '/admin-home');
+        setIsMobileSidebarOpen(false);
+        return;
+      }
+    }
+
     if (section.route) {
       setLocation(section.route);
       setIsMobileSidebarOpen(false);
@@ -189,6 +213,10 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
   const renderSection = (section: SidebarSection) => {
     const Icon = section.icon;
     const isExpanded = Boolean(expandedSections[section.id]);
+    const permissions = currentUserPermissions as any;
+    const isDisabled = Boolean(section.requiresPermission && 
+      currentUserPermissions && 
+      permissions[section.requiresPermission] === true);
 
     if (section.items) {
       // Collapsible section with subitems
@@ -196,20 +224,25 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
         <div key={section.id} className="mb-2">
           <button
             onClick={() => handleSectionClick(section)}
-            className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            disabled={isDisabled}
+            className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full ${
+              isDisabled
+                ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+            }`}
           >
             <Icon className="h-6 w-6 flex-shrink-0" />
             <span className="flex-1 text-left whitespace-nowrap">
               {section.i18nKey[language] || section.i18nKey.en}
             </span>
-            {isExpanded ? (
+            {!isDisabled && (isExpanded ? (
               <ChevronUp className="h-4 w-4 flex-shrink-0" />
             ) : (
               <ChevronDown className="h-4 w-4 flex-shrink-0" />
-            )}
+            ))}
           </button>
           
-          {isExpanded && (
+          {isExpanded && !isDisabled && (
             <div className="ml-6 mt-1 space-y-1">
               {section.items.map(item => renderMenuItem(item))}
             </div>
@@ -217,12 +250,17 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
         </div>
       );
     } else {
-      // Simple navigation item
+      // Simple navigation item - now with permission checking
       return (
         <button
           key={section.id}
           onClick={() => handleSectionClick(section)}
-          className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+          disabled={isDisabled}
+          className={`group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 ${
+            isDisabled
+              ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          }`}
         >
           <Icon className="h-6 w-6 flex-shrink-0" />
           <span>{section.i18nKey[language] || section.i18nKey.en}</span>
