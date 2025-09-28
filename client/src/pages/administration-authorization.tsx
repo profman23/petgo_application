@@ -341,7 +341,9 @@ export default function AdministrationAuthorization() {
     setProductsHiddenChecked(auth.productsHidden || false);
     setProductsReadChecked(auth.productsRead || false);
     setProductsFullControlChecked(auth.productsFullControl || false);
+    console.log("🐛 [DEBUG] Loading auth.creditNotesNoPermission:", auth.creditNotesNoPermission);
     setCreditNotesNoPermissionChecked(auth.creditNotesNoPermission || false);
+    console.log("🐛 [DEBUG] Set creditNotesNoPermissionChecked to:", auth.creditNotesNoPermission || false);
     setCreditNotesReadChecked(auth.creditNotesRead || false);
     setCreditNotesFullControlChecked(auth.creditNotesFullControl || false);
     setCreditNotesExportChecked(auth.creditNotesExport || false);
