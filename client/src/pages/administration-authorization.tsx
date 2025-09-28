@@ -79,11 +79,29 @@ export default function AdministrationAuthorization() {
   const [productsReadChecked, setProductsReadChecked] = useState(false);
   const [productsFullControlChecked, setProductsFullControlChecked] = useState(false);
   
-  // State for checkboxes - Financial Credit Note section
-  const [creditNoteNoPermissionChecked, setCreditNoteNoPermissionChecked] = useState(false);
-  const [creditNoteReadChecked, setCreditNoteReadChecked] = useState(false);
-  const [creditNoteFullControlChecked, setCreditNoteFullControlChecked] = useState(false);
-  const [creditNoteExportChecked, setCreditNoteExportChecked] = useState(false);
+  // State for checkboxes - Financial Credit Notes section
+  const [creditNotesNoPermissionChecked, setCreditNotesNoPermissionChecked] = useState(false);
+  const [creditNotesReadChecked, setCreditNotesReadChecked] = useState(false);
+  const [creditNotesFullControlChecked, setCreditNotesFullControlChecked] = useState(false);
+  const [creditNotesExportChecked, setCreditNotesExportChecked] = useState(false);
+
+  // State for checkboxes - Financial Outgoing Payment section
+  const [outgoingPaymentNoPermissionChecked, setOutgoingPaymentNoPermissionChecked] = useState(false);
+  const [outgoingPaymentReadChecked, setOutgoingPaymentReadChecked] = useState(false);
+  const [outgoingPaymentFullControlChecked, setOutgoingPaymentFullControlChecked] = useState(false);
+  const [outgoingPaymentExportChecked, setOutgoingPaymentExportChecked] = useState(false);
+
+  // State for checkboxes - Financial Income Payment section
+  const [incomePaymentNoPermissionChecked, setIncomePaymentNoPermissionChecked] = useState(false);
+  const [incomePaymentReadChecked, setIncomePaymentReadChecked] = useState(false);
+  const [incomePaymentFullControlChecked, setIncomePaymentFullControlChecked] = useState(false);
+  const [incomePaymentExportChecked, setIncomePaymentExportChecked] = useState(false);
+
+  // State for checkboxes - Financial A/R Invoice section
+  const [arInvoiceNoPermissionChecked, setArInvoiceNoPermissionChecked] = useState(false);
+  const [arInvoiceReadChecked, setArInvoiceReadChecked] = useState(false);
+  const [arInvoiceFullControlChecked, setArInvoiceFullControlChecked] = useState(false);
+  const [arInvoiceExportChecked, setArInvoiceExportChecked] = useState(false);
   
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
@@ -195,10 +213,22 @@ export default function AdministrationAuthorization() {
     setProductsHiddenChecked(false);
     setProductsReadChecked(false);
     setProductsFullControlChecked(false);
-    setCreditNoteNoPermissionChecked(false);
-    setCreditNoteReadChecked(false);
-    setCreditNoteFullControlChecked(false);
-    setCreditNoteExportChecked(false);
+    setCreditNotesNoPermissionChecked(false);
+    setCreditNotesReadChecked(false);
+    setCreditNotesFullControlChecked(false);
+    setCreditNotesExportChecked(false);
+    setOutgoingPaymentNoPermissionChecked(false);
+    setOutgoingPaymentReadChecked(false);
+    setOutgoingPaymentFullControlChecked(false);
+    setOutgoingPaymentExportChecked(false);
+    setIncomePaymentNoPermissionChecked(false);
+    setIncomePaymentReadChecked(false);
+    setIncomePaymentFullControlChecked(false);
+    setIncomePaymentExportChecked(false);
+    setArInvoiceNoPermissionChecked(false);
+    setArInvoiceReadChecked(false);
+    setArInvoiceFullControlChecked(false);
+    setArInvoiceExportChecked(false);
   };
 
   // Handle save authorization
@@ -234,10 +264,22 @@ export default function AdministrationAuthorization() {
       productsHidden: productsHiddenChecked,
       productsRead: productsReadChecked,
       productsFullControl: productsFullControlChecked,
-      creditNoteNoPermission: creditNoteNoPermissionChecked,
-      creditNoteRead: creditNoteReadChecked,
-      creditNoteFullControl: creditNoteFullControlChecked,
-      creditNoteExport: creditNoteExportChecked,
+      creditNotesNoPermission: creditNotesNoPermissionChecked,
+      creditNotesRead: creditNotesReadChecked,
+      creditNotesFullControl: creditNotesFullControlChecked,
+      creditNotesExport: creditNotesExportChecked,
+      outgoingPaymentNoPermission: outgoingPaymentNoPermissionChecked,
+      outgoingPaymentRead: outgoingPaymentReadChecked,
+      outgoingPaymentFullControl: outgoingPaymentFullControlChecked,
+      outgoingPaymentExport: outgoingPaymentExportChecked,
+      incomePaymentNoPermission: incomePaymentNoPermissionChecked,
+      incomePaymentRead: incomePaymentReadChecked,
+      incomePaymentFullControl: incomePaymentFullControlChecked,
+      incomePaymentExport: incomePaymentExportChecked,
+      arInvoiceNoPermission: arInvoiceNoPermissionChecked,
+      arInvoiceRead: arInvoiceReadChecked,
+      arInvoiceFullControl: arInvoiceFullControlChecked,
+      arInvoiceExport: arInvoiceExportChecked,
     };
 
     if (editingAuthorization) {
@@ -271,10 +313,22 @@ export default function AdministrationAuthorization() {
     setProductsHiddenChecked(auth.productsHidden || false);
     setProductsReadChecked(auth.productsRead || false);
     setProductsFullControlChecked(auth.productsFullControl || false);
-    setCreditNoteNoPermissionChecked(auth.creditNoteNoPermission || false);
-    setCreditNoteReadChecked(auth.creditNoteRead || false);
-    setCreditNoteFullControlChecked(auth.creditNoteFullControl || false);
-    setCreditNoteExportChecked(auth.creditNoteExport || false);
+    setCreditNotesNoPermissionChecked(auth.creditNotesNoPermission || false);
+    setCreditNotesReadChecked(auth.creditNotesRead || false);
+    setCreditNotesFullControlChecked(auth.creditNotesFullControl || false);
+    setCreditNotesExportChecked(auth.creditNotesExport || false);
+    setOutgoingPaymentNoPermissionChecked(auth.outgoingPaymentNoPermission || false);
+    setOutgoingPaymentReadChecked(auth.outgoingPaymentRead || false);
+    setOutgoingPaymentFullControlChecked(auth.outgoingPaymentFullControl || false);
+    setOutgoingPaymentExportChecked(auth.outgoingPaymentExport || false);
+    setIncomePaymentNoPermissionChecked(auth.incomePaymentNoPermission || false);
+    setIncomePaymentReadChecked(auth.incomePaymentRead || false);
+    setIncomePaymentFullControlChecked(auth.incomePaymentFullControl || false);
+    setIncomePaymentExportChecked(auth.incomePaymentExport || false);
+    setArInvoiceNoPermissionChecked(auth.arInvoiceNoPermission || false);
+    setArInvoiceReadChecked(auth.arInvoiceRead || false);
+    setArInvoiceFullControlChecked(auth.arInvoiceFullControl || false);
+    setArInvoiceExportChecked(auth.arInvoiceExport || false);
     setShowAddAuthorizationPopup(true);
   };
 
@@ -435,35 +489,131 @@ export default function AdministrationAuthorization() {
     }
   };
 
-  // Handlers for Credit Note section
-  const handleCreditNoteNoPermissionChange = (checked: boolean) => {
-    setCreditNoteNoPermissionChecked(checked);
+  // Handlers for Credit Notes section
+  const handleCreditNotesNoPermissionChange = (checked: boolean) => {
+    setCreditNotesNoPermissionChecked(checked);
     if (checked) {
-      setCreditNoteReadChecked(false);
-      setCreditNoteFullControlChecked(false);
-      setCreditNoteExportChecked(false);
+      setCreditNotesReadChecked(false);
+      setCreditNotesFullControlChecked(false);
+      setCreditNotesExportChecked(false);
     }
   };
 
-  const handleCreditNoteReadChange = (checked: boolean) => {
-    setCreditNoteReadChecked(checked);
+  const handleCreditNotesReadChange = (checked: boolean) => {
+    setCreditNotesReadChecked(checked);
     if (!checked) {
-      setCreditNoteFullControlChecked(false);
-      setCreditNoteExportChecked(false);
+      setCreditNotesFullControlChecked(false);
+      setCreditNotesExportChecked(false);
     }
   };
 
-  const handleCreditNoteFullControlChange = (checked: boolean) => {
-    setCreditNoteFullControlChecked(checked);
+  const handleCreditNotesFullControlChange = (checked: boolean) => {
+    setCreditNotesFullControlChecked(checked);
     if (checked) {
-      setCreditNoteReadChecked(true);
+      setCreditNotesReadChecked(true);
     }
   };
 
-  const handleCreditNoteExportChange = (checked: boolean) => {
-    setCreditNoteExportChecked(checked);
+  const handleCreditNotesExportChange = (checked: boolean) => {
+    setCreditNotesExportChecked(checked);
     if (checked) {
-      setCreditNoteReadChecked(true);
+      setCreditNotesReadChecked(true);
+    }
+  };
+
+  // Handlers for Outgoing Payment section
+  const handleOutgoingPaymentNoPermissionChange = (checked: boolean) => {
+    setOutgoingPaymentNoPermissionChecked(checked);
+    if (checked) {
+      setOutgoingPaymentReadChecked(false);
+      setOutgoingPaymentFullControlChecked(false);
+      setOutgoingPaymentExportChecked(false);
+    }
+  };
+
+  const handleOutgoingPaymentReadChange = (checked: boolean) => {
+    setOutgoingPaymentReadChecked(checked);
+    if (!checked) {
+      setOutgoingPaymentFullControlChecked(false);
+      setOutgoingPaymentExportChecked(false);
+    }
+  };
+
+  const handleOutgoingPaymentFullControlChange = (checked: boolean) => {
+    setOutgoingPaymentFullControlChecked(checked);
+    if (checked) {
+      setOutgoingPaymentReadChecked(true);
+    }
+  };
+
+  const handleOutgoingPaymentExportChange = (checked: boolean) => {
+    setOutgoingPaymentExportChecked(checked);
+    if (checked) {
+      setOutgoingPaymentReadChecked(true);
+    }
+  };
+
+  // Handlers for Income Payment section
+  const handleIncomePaymentNoPermissionChange = (checked: boolean) => {
+    setIncomePaymentNoPermissionChecked(checked);
+    if (checked) {
+      setIncomePaymentReadChecked(false);
+      setIncomePaymentFullControlChecked(false);
+      setIncomePaymentExportChecked(false);
+    }
+  };
+
+  const handleIncomePaymentReadChange = (checked: boolean) => {
+    setIncomePaymentReadChecked(checked);
+    if (!checked) {
+      setIncomePaymentFullControlChecked(false);
+      setIncomePaymentExportChecked(false);
+    }
+  };
+
+  const handleIncomePaymentFullControlChange = (checked: boolean) => {
+    setIncomePaymentFullControlChecked(checked);
+    if (checked) {
+      setIncomePaymentReadChecked(true);
+    }
+  };
+
+  const handleIncomePaymentExportChange = (checked: boolean) => {
+    setIncomePaymentExportChecked(checked);
+    if (checked) {
+      setIncomePaymentReadChecked(true);
+    }
+  };
+
+  // Handlers for A/R Invoice section
+  const handleArInvoiceNoPermissionChange = (checked: boolean) => {
+    setArInvoiceNoPermissionChecked(checked);
+    if (checked) {
+      setArInvoiceReadChecked(false);
+      setArInvoiceFullControlChecked(false);
+      setArInvoiceExportChecked(false);
+    }
+  };
+
+  const handleArInvoiceReadChange = (checked: boolean) => {
+    setArInvoiceReadChecked(checked);
+    if (!checked) {
+      setArInvoiceFullControlChecked(false);
+      setArInvoiceExportChecked(false);
+    }
+  };
+
+  const handleArInvoiceFullControlChange = (checked: boolean) => {
+    setArInvoiceFullControlChecked(checked);
+    if (checked) {
+      setArInvoiceReadChecked(true);
+    }
+  };
+
+  const handleArInvoiceExportChange = (checked: boolean) => {
+    setArInvoiceExportChecked(checked);
+    if (checked) {
+      setArInvoiceReadChecked(true);
     }
   };
 
@@ -791,75 +941,265 @@ export default function AdministrationAuthorization() {
                     {language === 'ar' ? 'المالية' : 'Financial'}
                   </h3>
                   
-                  {/* Credit Note Section */}
+                  {/* Credit Note Section with Sub-tabs */}
                   <div className="ml-8">
                     <h4 className="text-sm font-medium text-gray-700 mb-3">
                       {language === 'ar' ? 'إشعار الخصم' : 'Credit Note'}
                     </h4>
                     
-                    {/* Permission Items */}
-                    <div className="ml-4 flex flex-row gap-6">
-                      {/* No Permission */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="creditNoteNoPermission"
-                          data-testid="checkbox-credit-note-no-permission"
-                          checked={creditNoteNoPermissionChecked}
-                          onChange={(e) => handleCreditNoteNoPermissionChange(e.target.checked)}
-                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                        />
-                        <label htmlFor="creditNoteNoPermission" className="ml-2 text-sm text-gray-600">
-                          No Permission
-                        </label>
+                    {/* Credit Notes Sub-tab */}
+                    <div className="ml-4 mb-4">
+                      <h5 className="text-xs font-medium text-gray-600 mb-2">
+                        {language === 'ar' ? 'إشعارات الخصم' : 'Credit Notes'}
+                      </h5>
+                      <div className="ml-4 flex flex-row gap-6">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="creditNotesNoPermission"
+                            data-testid="checkbox-credit-notes-no-permission"
+                            checked={creditNotesNoPermissionChecked}
+                            onChange={(e) => handleCreditNotesNoPermissionChange(e.target.checked)}
+                            className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          />
+                          <label htmlFor="creditNotesNoPermission" className="ml-2 text-sm text-gray-600">
+                            No Permission
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="creditNotesRead"
+                            data-testid="checkbox-credit-notes-read"
+                            checked={creditNotesReadChecked}
+                            disabled={creditNotesNoPermissionChecked}
+                            onChange={(e) => handleCreditNotesReadChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="creditNotesRead" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Read
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="creditNotesFullControl"
+                            data-testid="checkbox-credit-notes-full-control"
+                            checked={creditNotesFullControlChecked}
+                            disabled={creditNotesNoPermissionChecked}
+                            onChange={(e) => handleCreditNotesFullControlChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="creditNotesFullControl" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Full Control
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="creditNotesExport"
+                            data-testid="checkbox-credit-notes-export"
+                            checked={creditNotesExportChecked}
+                            disabled={creditNotesNoPermissionChecked}
+                            onChange={(e) => handleCreditNotesExportChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="creditNotesExport" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Export
+                          </label>
+                        </div>
                       </div>
-                      
-                      {/* Read */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="creditNoteRead"
-                          data-testid="checkbox-credit-note-read"
-                          checked={creditNoteReadChecked}
-                          disabled={creditNoteNoPermissionChecked}
-                          onChange={(e) => handleCreditNoteReadChange(e.target.checked)}
-                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        />
-                        <label htmlFor="creditNoteRead" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Read
-                        </label>
+                    </div>
+
+                    {/* Outgoing Payment Sub-tab */}
+                    <div className="ml-4 mb-4">
+                      <h5 className="text-xs font-medium text-gray-600 mb-2">
+                        {language === 'ar' ? 'الدفع الصادر' : 'Outgoing Payment'}
+                      </h5>
+                      <div className="ml-4 flex flex-row gap-6">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="outgoingPaymentNoPermission"
+                            data-testid="checkbox-outgoing-payment-no-permission"
+                            checked={outgoingPaymentNoPermissionChecked}
+                            onChange={(e) => handleOutgoingPaymentNoPermissionChange(e.target.checked)}
+                            className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          />
+                          <label htmlFor="outgoingPaymentNoPermission" className="ml-2 text-sm text-gray-600">
+                            No Permission
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="outgoingPaymentRead"
+                            data-testid="checkbox-outgoing-payment-read"
+                            checked={outgoingPaymentReadChecked}
+                            disabled={outgoingPaymentNoPermissionChecked}
+                            onChange={(e) => handleOutgoingPaymentReadChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${outgoingPaymentNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="outgoingPaymentRead" className={`ml-2 text-sm ${outgoingPaymentNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Read
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="outgoingPaymentFullControl"
+                            data-testid="checkbox-outgoing-payment-full-control"
+                            checked={outgoingPaymentFullControlChecked}
+                            disabled={outgoingPaymentNoPermissionChecked}
+                            onChange={(e) => handleOutgoingPaymentFullControlChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${outgoingPaymentNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="outgoingPaymentFullControl" className={`ml-2 text-sm ${outgoingPaymentNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Full Control
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="outgoingPaymentExport"
+                            data-testid="checkbox-outgoing-payment-export"
+                            checked={outgoingPaymentExportChecked}
+                            disabled={outgoingPaymentNoPermissionChecked}
+                            onChange={(e) => handleOutgoingPaymentExportChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${outgoingPaymentNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="outgoingPaymentExport" className={`ml-2 text-sm ${outgoingPaymentNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Export
+                          </label>
+                        </div>
                       </div>
-                      
-                      {/* Full Control */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="creditNoteFullControl"
-                          data-testid="checkbox-credit-note-full-control"
-                          checked={creditNoteFullControlChecked}
-                          disabled={creditNoteNoPermissionChecked}
-                          onChange={(e) => handleCreditNoteFullControlChange(e.target.checked)}
-                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        />
-                        <label htmlFor="creditNoteFullControl" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                        </label>
+                    </div>
+
+                    {/* Income Payment Sub-tab */}
+                    <div className="ml-4 mb-4">
+                      <h5 className="text-xs font-medium text-gray-600 mb-2">
+                        {language === 'ar' ? 'الدفع الوارد' : 'Income Payment'}
+                      </h5>
+                      <div className="ml-4 flex flex-row gap-6">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="incomePaymentNoPermission"
+                            data-testid="checkbox-income-payment-no-permission"
+                            checked={incomePaymentNoPermissionChecked}
+                            onChange={(e) => handleIncomePaymentNoPermissionChange(e.target.checked)}
+                            className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          />
+                          <label htmlFor="incomePaymentNoPermission" className="ml-2 text-sm text-gray-600">
+                            No Permission
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="incomePaymentRead"
+                            data-testid="checkbox-income-payment-read"
+                            checked={incomePaymentReadChecked}
+                            disabled={incomePaymentNoPermissionChecked}
+                            onChange={(e) => handleIncomePaymentReadChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${incomePaymentNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="incomePaymentRead" className={`ml-2 text-sm ${incomePaymentNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Read
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="incomePaymentFullControl"
+                            data-testid="checkbox-income-payment-full-control"
+                            checked={incomePaymentFullControlChecked}
+                            disabled={incomePaymentNoPermissionChecked}
+                            onChange={(e) => handleIncomePaymentFullControlChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${incomePaymentNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="incomePaymentFullControl" className={`ml-2 text-sm ${incomePaymentNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Full Control
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="incomePaymentExport"
+                            data-testid="checkbox-income-payment-export"
+                            checked={incomePaymentExportChecked}
+                            disabled={incomePaymentNoPermissionChecked}
+                            onChange={(e) => handleIncomePaymentExportChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${incomePaymentNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="incomePaymentExport" className={`ml-2 text-sm ${incomePaymentNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Export
+                          </label>
+                        </div>
                       </div>
-                      
-                      {/* Export */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="creditNoteExport"
-                          data-testid="checkbox-credit-note-export"
-                          checked={creditNoteExportChecked}
-                          disabled={creditNoteNoPermissionChecked}
-                          onChange={(e) => handleCreditNoteExportChange(e.target.checked)}
-                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNoteNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        />
-                        <label htmlFor="creditNoteExport" className={`ml-2 text-sm ${creditNoteNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          {language === 'ar' ? 'تصدير' : 'Export'}
-                        </label>
+                    </div>
+
+                    {/* A/R Invoice Sub-tab */}
+                    <div className="ml-4 mb-4">
+                      <h5 className="text-xs font-medium text-gray-600 mb-2">
+                        {language === 'ar' ? 'فاتورة الحسابات المدينة' : 'A/R Invoice'}
+                      </h5>
+                      <div className="ml-4 flex flex-row gap-6">
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="arInvoiceNoPermission"
+                            data-testid="checkbox-ar-invoice-no-permission"
+                            checked={arInvoiceNoPermissionChecked}
+                            onChange={(e) => handleArInvoiceNoPermissionChange(e.target.checked)}
+                            className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          />
+                          <label htmlFor="arInvoiceNoPermission" className="ml-2 text-sm text-gray-600">
+                            No Permission
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="arInvoiceRead"
+                            data-testid="checkbox-ar-invoice-read"
+                            checked={arInvoiceReadChecked}
+                            disabled={arInvoiceNoPermissionChecked}
+                            onChange={(e) => handleArInvoiceReadChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${arInvoiceNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="arInvoiceRead" className={`ml-2 text-sm ${arInvoiceNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Read
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="arInvoiceFullControl"
+                            data-testid="checkbox-ar-invoice-full-control"
+                            checked={arInvoiceFullControlChecked}
+                            disabled={arInvoiceNoPermissionChecked}
+                            onChange={(e) => handleArInvoiceFullControlChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${arInvoiceNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="arInvoiceFullControl" className={`ml-2 text-sm ${arInvoiceNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Full Control
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="arInvoiceExport"
+                            data-testid="checkbox-ar-invoice-export"
+                            checked={arInvoiceExportChecked}
+                            disabled={arInvoiceNoPermissionChecked}
+                            onChange={(e) => handleArInvoiceExportChange(e.target.checked)}
+                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${arInvoiceNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          />
+                          <label htmlFor="arInvoiceExport" className={`ml-2 text-sm ${arInvoiceNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Export
+                          </label>
+                        </div>
                       </div>
                     </div>
                     
