@@ -825,8 +825,7 @@ export default function AdministrationAuthorization() {
         </div>
       </div>
 
-      {/* Add New Authorization Popup - TEMPORARILY DISABLED */}
-      {false && showAddAuthorizationPopup && (
+      {/* Modal temporarily removed for testing */}
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[85vh]">
             {/* Popup Header */}
@@ -1688,9 +1687,6 @@ export default function AdministrationAuthorization() {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
     </AdminLayout>
   );
 }
