@@ -1332,8 +1332,6 @@ export default function AdministrationAuthorization() {
                         </div>
                       </div>
                     </div>
-                    
-                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
                 </div>
                 
