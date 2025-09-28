@@ -1044,61 +1044,28 @@ export default function AdministrationAuthorization() {
                         {language === 'ar' ? 'إشعارات الخصم' : 'Credit Notes'}
                       </h5>
                       <div className="ml-4 flex flex-row gap-6">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="creditNotesNoPermission"
-                            data-testid="checkbox-credit-notes-no-permission"
-                            checked={creditNotesNoPermissionChecked}
-                            onChange={(e) => handleCreditNotesNoPermissionChange(e.target.checked)}
-                            className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                          />
-                          <label htmlFor="creditNotesNoPermission" className="ml-2 text-sm text-gray-600">
-                            No Permission
-                          </label>
-                        </div>
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="creditNotesRead"
-                            data-testid="checkbox-credit-notes-read"
-                            checked={creditNotesReadChecked}
-                            disabled={creditNotesNoPermissionChecked}
-                            onChange={(e) => handleCreditNotesReadChange(e.target.checked)}
-                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          />
-                          <label htmlFor="creditNotesRead" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Read
-                          </label>
-                        </div>
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="creditNotesFullControl"
-                            data-testid="checkbox-credit-notes-full-control"
-                            checked={creditNotesFullControlChecked}
-                            disabled={creditNotesNoPermissionChecked}
-                            onChange={(e) => handleCreditNotesFullControlChange(e.target.checked)}
-                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          />
-                          <label htmlFor="creditNotesFullControl" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Full Control
-                          </label>
-                        </div>
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="creditNotesExport"
-                            data-testid="checkbox-credit-notes-export"
-                            checked={creditNotesExportChecked}
-                            disabled={creditNotesNoPermissionChecked}
-                            onChange={(e) => handleCreditNotesExportChange(e.target.checked)}
-                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          />
-                          <label htmlFor="creditNotesExport" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Export
-                          </label>
-                        </div>
+                        <NoPermissionToggle 
+                          groupKey="creditNote" 
+                          data-testid="checkbox-credit-notes-no-permission"
+                        />
+                        <PermissionToggle 
+                          groupKey="creditNote" 
+                          permissionType="read" 
+                          label="Read"
+                          data-testid="checkbox-credit-notes-read"
+                        />
+                        <PermissionToggle 
+                          groupKey="creditNote" 
+                          permissionType="fullControl" 
+                          label="Full Control"
+                          data-testid="checkbox-credit-notes-full-control"
+                        />
+                        <PermissionToggle 
+                          groupKey="creditNote" 
+                          permissionType="export" 
+                          label="Export"
+                          data-testid="checkbox-credit-notes-export"
+                        />
                       </div>
                     </div>
 
@@ -1539,7 +1506,7 @@ export default function AdministrationAuthorization() {
                           className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                         <label htmlFor="servicesFullControl" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                          Full Control
                         </label>
                       </div>
                       </div>
@@ -1607,8 +1574,9 @@ export default function AdministrationAuthorization() {
                           className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${productsHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                         <label htmlFor="productsFullControl" className={`ml-2 text-sm ${productsHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
+                          Full Control
                         </label>
+                      </div>
                       </div>
                       
                       {/* Purple divider line */}
@@ -1723,8 +1691,8 @@ export default function AdministrationAuthorization() {
         </div>
       )}
 
-      {/* No Permission Popup */}
-      {showNoPermissionPopup && (
+      {/* No Permission Popup - DISABLED FOR TESTING */}
+      {/*{showNoPermissionPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
             {/* Popup Header */}
