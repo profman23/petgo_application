@@ -7,6 +7,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
+import { usePermissionsStore, fromAuthData, toAuthData } from "@/hooks/usePermissionsStore";
+import { NoPermissionToggle, PermissionToggle, PermissionGroup } from "@/components/NoPermissionToggle";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -24,6 +26,7 @@ export default function AdministrationAuthorization() {
   const [location, setLocation] = useLocation();
   const { t, language } = useTranslation();
   const { toast } = useToast();
+  const { state: permissionsState, loadAuthorization, resetAll } = usePermissionsStore();
   
   // State for popup
   const [showAddAuthorizationPopup, setShowAddAuthorizationPopup] = useState(false);
@@ -255,7 +258,7 @@ export default function AdministrationAuthorization() {
     setPartnerMgmtExportChecked(false);
   };
 
-  // Handle save authorization
+  // Handle save authorization - Get data from permission store
   const handleSaveAuthorization = () => {
     if (!authorizationName.trim()) {
       toast({
@@ -266,8 +269,13 @@ export default function AdministrationAuthorization() {
       return;
     }
 
+    // Get permission data from the store
+    const permissionData = toAuthData(permissionsState);
+    console.log("🐛 [DEBUG] Permission data from store:", permissionData);
+
     const authData = {
       name: authorizationName.trim(),
+      // Legacy fields (not yet migrated)
       usersHidden: hiddenUsersChecked,
       usersRead: readUsersChecked,
       usersFullControl: fullControlChecked,
@@ -282,33 +290,12 @@ export default function AdministrationAuthorization() {
       vetsVanShiftsFullControl: vetsVanShiftsFullControlChecked,
       importHidden: importHiddenChecked,
       importFullControl: importFullControlChecked,
-      servicesHidden: servicesHiddenChecked,
-      servicesRead: servicesReadChecked,
-      servicesFullControl: servicesFullControlChecked,
-      productsHidden: productsHiddenChecked,
-      productsRead: productsReadChecked,
-      productsFullControl: productsFullControlChecked,
-      creditNoteNoPermission: creditNotesNoPermissionChecked,
-      creditNoteRead: creditNotesReadChecked,
-      creditNoteFullControl: creditNotesFullControlChecked,
-      creditNoteExport: creditNotesExportChecked,
-      outgoingPaymentNoPermission: outgoingPaymentNoPermissionChecked,
-      outgoingPaymentRead: outgoingPaymentReadChecked,
-      outgoingPaymentFullControl: outgoingPaymentFullControlChecked,
-      outgoingPaymentExport: outgoingPaymentExportChecked,
-      incomePaymentNoPermission: incomePaymentNoPermissionChecked,
-      incomePaymentRead: incomePaymentReadChecked,
-      incomePaymentFullControl: incomePaymentFullControlChecked,
-      incomePaymentExport: incomePaymentExportChecked,
-      arInvoiceNoPermission: arInvoiceNoPermissionChecked,
-      arInvoiceRead: arInvoiceReadChecked,
-      arInvoiceFullControl: arInvoiceFullControlChecked,
-      arInvoiceExport: arInvoiceExportChecked,
+      usersExport: usersExportChecked,
+      // Permission store data
+      ...permissionData,
     };
 
     console.log("🐛 [DEBUG] Saving authData:", authData);
-    console.log("🐛 [DEBUG] creditNotesNoPermissionChecked state:", creditNotesNoPermissionChecked);
-    console.log("🐛 [DEBUG] authData.creditNoteNoPermission value:", authData.creditNoteNoPermission);
 
     if (editingAuthorization) {
       updateAuthorizationMutation.mutate({ id: editingAuthorization.id, authData });
@@ -317,10 +304,17 @@ export default function AdministrationAuthorization() {
     }
   };
 
-  // Handle edit authorization
+  // Handle edit authorization - Load data into permission store
   const handleEditAuthorization = (auth: any) => {
     setEditingAuthorization(auth);
     setAuthorizationName(auth.name);
+    
+    // Load authorization data into the permission store
+    const permissionsData = fromAuthData(auth);
+    loadAuthorization(permissionsData);
+    console.log("🐛 [DEBUG] Loaded authorization into permission store:", permissionsData);
+    
+    // Continue with legacy state for non-permission fields
     setHiddenUsersChecked(auth.usersHidden);
     setReadUsersChecked(auth.usersRead);
     setFullControlChecked(auth.usersFullControl);
@@ -335,39 +329,8 @@ export default function AdministrationAuthorization() {
     setVetsVanShiftsFullControlChecked(auth.vetsVanShiftsFullControl || false);
     setImportHiddenChecked(auth.importHidden || false);
     setImportFullControlChecked(auth.importFullControl || false);
-    setServicesHiddenChecked(auth.servicesHidden || false);
-    setServicesReadChecked(auth.servicesRead || false);
-    setServicesFullControlChecked(auth.servicesFullControl || false);
-    setProductsHiddenChecked(auth.productsHidden || false);
-    setProductsReadChecked(auth.productsRead || false);
-    setProductsFullControlChecked(auth.productsFullControl || false);
-    console.log("🐛 [DEBUG] Loading auth.creditNoteNoPermission:", auth.creditNoteNoPermission);
-    setCreditNotesNoPermissionChecked(auth.creditNoteNoPermission || false);
-    console.log("🐛 [DEBUG] Set creditNotesNoPermissionChecked to:", auth.creditNoteNoPermission || false);
-    setCreditNotesReadChecked(auth.creditNoteRead || false);
-    setCreditNotesFullControlChecked(auth.creditNoteFullControl || false);
-    setCreditNotesExportChecked(auth.creditNoteExport || false);
-    setOutgoingPaymentNoPermissionChecked(auth.outgoingPaymentNoPermission || false);
-    setOutgoingPaymentReadChecked(auth.outgoingPaymentRead || false);
-    setOutgoingPaymentFullControlChecked(auth.outgoingPaymentFullControl || false);
-    setOutgoingPaymentExportChecked(auth.outgoingPaymentExport || false);
-    setIncomePaymentNoPermissionChecked(auth.incomePaymentNoPermission || false);
-    setIncomePaymentReadChecked(auth.incomePaymentRead || false);
-    setIncomePaymentFullControlChecked(auth.incomePaymentFullControl || false);
-    setIncomePaymentExportChecked(auth.incomePaymentExport || false);
-    setArInvoiceNoPermissionChecked(auth.arInvoiceNoPermission || false);
-    setArInvoiceReadChecked(auth.arInvoiceRead || false);
-    setArInvoiceFullControlChecked(auth.arInvoiceFullControl || false);
-    setArInvoiceExportChecked(auth.arInvoiceExport || false);
     setUsersExportChecked(auth.usersExport || false);
-    setAuthorizationMgmtNoPermissionChecked(auth.authorizationMgmtNoPermission || false);
-    setAuthorizationMgmtReadChecked(auth.authorizationMgmtRead || false);
-    setAuthorizationMgmtFullControlChecked(auth.authorizationMgmtFullControl || false);
-    setAuthorizationMgmtExportChecked(auth.authorizationMgmtExport || false);
-    setPartnerMgmtNoPermissionChecked(auth.partnerMgmtNoPermission || false);
-    setPartnerMgmtReadChecked(auth.partnerMgmtRead || false);
-    setPartnerMgmtFullControlChecked(auth.partnerMgmtFullControl || false);
-    setPartnerMgmtExportChecked(auth.partnerMgmtExport || false);
+    
     setShowAddAuthorizationPopup(true);
   };
 
