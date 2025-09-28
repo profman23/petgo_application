@@ -825,8 +825,8 @@ export default function AdministrationAuthorization() {
         </div>
       </div>
 
-      {/* Add New Authorization Popup */}
-      {showAddAuthorizationPopup && !isReadOnly && (
+      {/* Add New Authorization Popup - TEMPORARILY DISABLED */}
+      {false && showAddAuthorizationPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[85vh]">
             {/* Popup Header */}
@@ -1691,53 +1691,6 @@ export default function AdministrationAuthorization() {
         </div>
       )}
 
-      {/* No Permission Popup - DISABLED FOR TESTING */}
-      {/*{showNoPermissionPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            {/* Popup Header */}
-            <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {language === 'ar' ? 'ليس لديك صلاحية' : 'No permission'}
-              </h2>
-              <button
-                data-testid="button-close-no-permission"
-                onClick={() => {
-                  setShowNoPermissionPopup(false);
-                  setIsNoPermissionDialogOpen(false);
-                }}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            {/* Popup Body */}
-            <div className="p-4">
-              <p className="text-sm text-gray-600">
-                {language === 'ar' 
-                  ? 'ليس لديك صلاحية للوصول إلى هذا القسم. يُرجى التواصل مع المشرف.' 
-                  : "You don't have access to this section. Please contact the administrator."
-                }
-              </p>
-            </div>
-            
-            {/* Popup Footer */}
-            <div className="flex justify-end p-4 border-t">
-              <button
-                data-testid="button-ok"
-                onClick={() => {
-                  setShowNoPermissionPopup(false);
-                  setIsNoPermissionDialogOpen(false);
-                }}
-                className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
-              >
-                {language === 'ar' ? 'موافق' : 'OK'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </AdminLayout>
   );
 }
