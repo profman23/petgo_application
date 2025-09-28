@@ -308,6 +308,7 @@ export default function AdministrationAuthorization() {
 
     console.log("🐛 [DEBUG] Saving authData:", authData);
     console.log("🐛 [DEBUG] creditNotesNoPermissionChecked state:", creditNotesNoPermissionChecked);
+    console.log("🐛 [DEBUG] authData.creditNoteNoPermission value:", authData.creditNoteNoPermission);
 
     if (editingAuthorization) {
       updateAuthorizationMutation.mutate({ id: editingAuthorization.id, authData });
