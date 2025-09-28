@@ -312,7 +312,6 @@ export default function AdministrationAuthorization() {
     // Load authorization data into the permission store
     const permissionsData = fromAuthData(auth);
     loadAuthorization(permissionsData);
-    console.log("🐛 [DEBUG] Loaded authorization into permission store:", permissionsData);
     
     // Continue with legacy state for non-permission fields
     setHiddenUsersChecked(auth.usersHidden);
