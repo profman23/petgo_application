@@ -649,40 +649,18 @@ export default function AdminServices() {
     enabled: !!adminToken,
   });
 
-  // Check if user has no permission for Services (make screen gray)
-  const hasNoPermission = currentUserPermissions && currentUserPermissions.servicesHidden === true;
-  
+  // Permission check - redirect users with "No Permission" for Services
+  useEffect(() => {
+    if (currentUserPermissions && currentUserPermissions.servicesHidden === true) {
+      console.log('🚫 User has no permission for Services - redirecting to admin home');
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, setLocation]);
+
   // Check if user has read-only access (can view but not modify)
   const isReadOnly = currentUserPermissions && 
     currentUserPermissions.servicesRead === true && 
     currentUserPermissions.servicesFullControl === false;
-
-  if (hasNoPermission) {
-    return (
-      <AdminLayout>
-        <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
-          <div className="px-1 py-3 sm:px-0">
-            <div className="min-h-screen bg-gray-300 opacity-50 pointer-events-none">
-              <div className="flex items-center justify-center h-96">
-                <div className="text-center">
-                  <h2 className="text-2xl font-semibold text-gray-600 mb-4">
-                    {language === 'ar' ? 'لا توجد صلاحية' : 'No Permission'}
-                  </h2>
-                  <p className="text-gray-500">
-                    {language === 'ar' ? 'ليس لديك صلاحية للوصول إلى إدارة الخدمات' : 'You do not have permission to access Services Management'}
-                  </p>
-                </div>
-              </div>
-              {/* Gray overlay of the normal content */}
-              <div className="opacity-30">
-                <ServicesManagementTable language={language} isReadOnly={true} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </AdminLayout>
-    );
-  }
 
   return (
     <AdminLayout>
