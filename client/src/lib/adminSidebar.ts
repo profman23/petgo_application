@@ -59,13 +59,17 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "credit-note",
         i18nKey: { en: "Credit Note", ar: "إشعار دائن" },
         route: "/financial/credit-note",
-        icon: Receipt
+        icon: Receipt,
+        requiresPermission: "creditNoteNoPermission",
+        permissionRedirect: "/admin-home"
       },
       {
         id: "credit-notes",
         i18nKey: { en: "Credit Notes", ar: "إشعارات دائنة" },
         route: "/financial/credit-notes",
-        icon: ReceiptText
+        icon: ReceiptText,
+        requiresPermission: "creditNoteNoPermission",
+        permissionRedirect: "/admin-home"
       },
       {
         id: "outgoing-payment",
