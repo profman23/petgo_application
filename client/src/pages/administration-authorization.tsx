@@ -795,7 +795,7 @@ export default function AdministrationAuthorization() {
             
             {/* Popup Content with Custom Scrollbar */}
             <div className="relative flex-1 overflow-hidden">
-              <div className="p-4 h-full overflow-y-auto custom-scrollbar" style={{ maxHeight: 'calc(85vh - 120px)' }}>
+              <div className="p-4 pb-6 h-full overflow-y-auto custom-scrollbar" style={{ maxHeight: 'calc(85vh - 200px)' }}>
                 {/* Authorization Name */}
                 <div className="mb-6">
                   <label htmlFor="authorizationName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -1518,7 +1518,7 @@ export default function AdministrationAuthorization() {
                       </div>
                       
                       {/* Purple divider line */}
-                      <div className="border-b border-purple-600 mt-3 mb-4"></div>
+                      <div className="border-b border-purple-600 mt-3 mb-8"></div>
                     </div>
                   </div>
                 </div>
