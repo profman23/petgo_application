@@ -802,19 +802,7 @@ export default function AdministrationAuthorization() {
                       </p>
                     </div>
                     <div className="ml-4">
-                      <button
-                        data-testid={`button-edit-${auth.id}`}
-                        onClick={isReadOnly ? undefined : () => handleEditAuthorization(auth)}
-                        disabled={!!isReadOnly}
-                        className={`p-2 rounded-full transition-colors ${
-                          isReadOnly 
-                            ? 'text-gray-300 cursor-not-allowed opacity-50'
-                            : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
-                        }`}
-                        title={language === 'ar' ? 'تعديل' : 'Edit'}
-                      >
-                        <Edit className="h-5 w-5" />
-                      </button>
+                      {/* Edit button temporarily disabled */}
                     </div>
                   </div>
                 </div>
@@ -825,47 +813,6 @@ export default function AdministrationAuthorization() {
         </div>
       </div>
 
-      {/* Modal temporarily removed for testing */}
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[85vh]">
-            {/* Popup Header */}
-            <div className="flex justify-between items-center p-4 border-b">
-              {editingAuthorization ? (
-                <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-                  <lord-icon 
-                    src="https://cdn.lordicon.com/exymduqj.json" 
-                    trigger="loop" 
-                    delay="1500" 
-                    state="hover-line" 
-                    colors="primary:#852085,secondary:#545454" 
-                    style={{ width: '80px', height: '80px' }}
-                  />
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {language === 'ar' ? 'تعديل التصريح' : 'Edit Authorization'}
-                  </h2>
-                </div>
-              ) : (
-                <div className={`flex items-center gap-4 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-                  <lord-icon 
-                    src="https://cdn.lordicon.com/avbhqgrw.json" 
-                    trigger="loop" 
-                    delay="1500" 
-                    colors="primary:#852085,secondary:#545454" 
-                    style={{ width: '80px', height: '80px' }}
-                  />
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    {language === 'ar' ? 'إضافة تصريح جديد' : 'Add New Authorization'}
-                  </h2>
-                </div>
-              )}
-              <button
-                data-testid="button-close-popup"
-                onClick={handleClosePopup}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
             
             {/* Popup Content with Custom Scrollbar */}
             <div className="relative flex-1 overflow-hidden">
