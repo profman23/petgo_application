@@ -201,6 +201,92 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Services Permission Gate
+function ServicesPermissionGate({ children }: { children: React.ReactNode }) {
+  const [, setLocation] = useLocation();
+  const adminToken = localStorage.getItem("adminToken");
+
+  const { data: currentUserPermissions, isLoading, error } = useQuery({
+    queryKey: ["/api/admin/current-user-permissions"],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/current-user-permissions?_t=${Date.now()}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+        },
+        cache: 'no-store',
+      });
+      if (!response.ok) throw new Error("Failed to fetch permissions");
+      return response.json();
+    },
+    enabled: !!adminToken,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: 'always',
+  });
+
+  // DEFAULT-DENY LOGIC: Only allow access if user has explicit read or full control permission  
+  useEffect(() => {
+    if (currentUserPermissions) {
+      // Check for explicit "No Permission" flag (Services uses servicesHidden)
+      if (currentUserPermissions.servicesHidden === true) {
+        console.log('🚫 [PERMS_GATE] REDIRECTING: User has explicit no permission for Services');
+        setLocation('/admin-home');
+        return;
+      }
+
+      // Check if user has any valid Services permissions
+      const hasValidPermission = currentUserPermissions.servicesRead === true || 
+                                 currentUserPermissions.servicesFullControl === true;
+      
+      if (!hasValidPermission) {
+        console.log('🚫 [PERMS_GATE] REDIRECTING: User lacks valid Services permissions');
+        setLocation('/admin-home');
+        return;
+      }
+
+      console.log('✅ [PERMS_GATE] ALLOWING: User has valid Services permissions');
+    }
+  }, [currentUserPermissions, setLocation]);
+
+  // Show loading while fetching permissions
+  if (isLoading || !adminToken) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">Loading permissions...</div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    console.error('[PERMS_GATE] Permission fetch failed:', error);
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-red-600">Error loading permissions</div>
+      </div>
+    );
+  }
+
+  // DEFAULT-DENY: Only render children if user has explicit permissions
+  const hasValidPermission = currentUserPermissions && (
+    currentUserPermissions.servicesRead === true || 
+    currentUserPermissions.servicesFullControl === true
+  ) && currentUserPermissions.servicesHidden !== true;
+
+  if (!hasValidPermission) {
+    // Don't render anything while redirect is happening
+    return null;
+  }
+
+  return <>{children}</>;
+}
+
 function AuthCheck({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -253,7 +339,7 @@ function Router() {
           <Route path="/login-admin" component={AdminLogin} />
           <Route path="/admin-home" component={AdminHome} />
           <Route path="/admin-dashboard" component={AdminDashboard} />
-          <Route path="/admin-dashboard/services" component={AdminServices} />
+          <Route path="/admin-dashboard/services" component={() => <ServicesPermissionGate><AdminServices /></ServicesPermissionGate>} />
           <Route path="/admin-dashboard/products" component={AdminProducts} />
           <Route path="/admin-dashboard/import" component={AdminImport} />
           <Route path="/admin-vetsvan-requests" component={AdminVetsVanRequests} />
