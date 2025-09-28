@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "@/lib/i18n";
-import { Shield, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, DollarSign, Receipt, FilePlus, X, Plus, Edit } from "lucide-react";
+import { Shield, Car, Clock, BarChart3, FileText, User, Users, Upload, Package, Stethoscope, DollarSign, Receipt, FilePlus, X, Plus, Edit, Settings, Building } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -102,6 +102,21 @@ export default function AdministrationAuthorization() {
   const [arInvoiceReadChecked, setArInvoiceReadChecked] = useState(false);
   const [arInvoiceFullControlChecked, setArInvoiceFullControlChecked] = useState(false);
   const [arInvoiceExportChecked, setArInvoiceExportChecked] = useState(false);
+
+  // State for checkboxes - Administration Users Management Export
+  const [usersExportChecked, setUsersExportChecked] = useState(false);
+
+  // State for checkboxes - Administration Authorization Management section
+  const [authorizationMgmtNoPermissionChecked, setAuthorizationMgmtNoPermissionChecked] = useState(false);
+  const [authorizationMgmtReadChecked, setAuthorizationMgmtReadChecked] = useState(false);
+  const [authorizationMgmtFullControlChecked, setAuthorizationMgmtFullControlChecked] = useState(false);
+  const [authorizationMgmtExportChecked, setAuthorizationMgmtExportChecked] = useState(false);
+
+  // State for checkboxes - Business Partner Management section
+  const [partnerMgmtNoPermissionChecked, setPartnerMgmtNoPermissionChecked] = useState(false);
+  const [partnerMgmtReadChecked, setPartnerMgmtReadChecked] = useState(false);
+  const [partnerMgmtFullControlChecked, setPartnerMgmtFullControlChecked] = useState(false);
+  const [partnerMgmtExportChecked, setPartnerMgmtExportChecked] = useState(false);
   
   // State for authorization name field
   const [authorizationName, setAuthorizationName] = useState('');
@@ -229,6 +244,15 @@ export default function AdministrationAuthorization() {
     setArInvoiceReadChecked(false);
     setArInvoiceFullControlChecked(false);
     setArInvoiceExportChecked(false);
+    setUsersExportChecked(false);
+    setAuthorizationMgmtNoPermissionChecked(false);
+    setAuthorizationMgmtReadChecked(false);
+    setAuthorizationMgmtFullControlChecked(false);
+    setAuthorizationMgmtExportChecked(false);
+    setPartnerMgmtNoPermissionChecked(false);
+    setPartnerMgmtReadChecked(false);
+    setPartnerMgmtFullControlChecked(false);
+    setPartnerMgmtExportChecked(false);
   };
 
   // Handle save authorization
@@ -329,6 +353,15 @@ export default function AdministrationAuthorization() {
     setArInvoiceReadChecked(auth.arInvoiceRead || false);
     setArInvoiceFullControlChecked(auth.arInvoiceFullControl || false);
     setArInvoiceExportChecked(auth.arInvoiceExport || false);
+    setUsersExportChecked(auth.usersExport || false);
+    setAuthorizationMgmtNoPermissionChecked(auth.authorizationMgmtNoPermission || false);
+    setAuthorizationMgmtReadChecked(auth.authorizationMgmtRead || false);
+    setAuthorizationMgmtFullControlChecked(auth.authorizationMgmtFullControl || false);
+    setAuthorizationMgmtExportChecked(auth.authorizationMgmtExport || false);
+    setPartnerMgmtNoPermissionChecked(auth.partnerMgmtNoPermission || false);
+    setPartnerMgmtReadChecked(auth.partnerMgmtRead || false);
+    setPartnerMgmtFullControlChecked(auth.partnerMgmtFullControl || false);
+    setPartnerMgmtExportChecked(auth.partnerMgmtExport || false);
     setShowAddAuthorizationPopup(true);
   };
 
@@ -617,6 +650,78 @@ export default function AdministrationAuthorization() {
     }
   };
 
+  // Handler for Users Export permission
+  const handleUsersExportChange = (checked: boolean) => {
+    setUsersExportChecked(checked);
+    if (checked) {
+      setReadUsersChecked(true);
+    }
+  };
+
+  // Handlers for Authorization Management section
+  const handleAuthorizationMgmtNoPermissionChange = (checked: boolean) => {
+    setAuthorizationMgmtNoPermissionChecked(checked);
+    if (checked) {
+      setAuthorizationMgmtReadChecked(false);
+      setAuthorizationMgmtFullControlChecked(false);
+      setAuthorizationMgmtExportChecked(false);
+    }
+  };
+
+  const handleAuthorizationMgmtReadChange = (checked: boolean) => {
+    setAuthorizationMgmtReadChecked(checked);
+    if (!checked) {
+      setAuthorizationMgmtFullControlChecked(false);
+      setAuthorizationMgmtExportChecked(false);
+    }
+  };
+
+  const handleAuthorizationMgmtFullControlChange = (checked: boolean) => {
+    setAuthorizationMgmtFullControlChecked(checked);
+    if (checked) {
+      setAuthorizationMgmtReadChecked(true);
+    }
+  };
+
+  const handleAuthorizationMgmtExportChange = (checked: boolean) => {
+    setAuthorizationMgmtExportChecked(checked);
+    if (checked) {
+      setAuthorizationMgmtReadChecked(true);
+    }
+  };
+
+  // Handlers for Partner Management section
+  const handlePartnerMgmtNoPermissionChange = (checked: boolean) => {
+    setPartnerMgmtNoPermissionChecked(checked);
+    if (checked) {
+      setPartnerMgmtReadChecked(false);
+      setPartnerMgmtFullControlChecked(false);
+      setPartnerMgmtExportChecked(false);
+    }
+  };
+
+  const handlePartnerMgmtReadChange = (checked: boolean) => {
+    setPartnerMgmtReadChecked(checked);
+    if (!checked) {
+      setPartnerMgmtFullControlChecked(false);
+      setPartnerMgmtExportChecked(false);
+    }
+  };
+
+  const handlePartnerMgmtFullControlChange = (checked: boolean) => {
+    setPartnerMgmtFullControlChecked(checked);
+    if (checked) {
+      setPartnerMgmtReadChecked(true);
+    }
+  };
+
+  const handlePartnerMgmtExportChange = (checked: boolean) => {
+    setPartnerMgmtExportChecked(checked);
+    if (checked) {
+      setPartnerMgmtReadChecked(true);
+    }
+  };
+
   // Check admin authentication
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
@@ -812,121 +917,140 @@ export default function AdministrationAuthorization() {
                   />
                 </div>
 
-                {/* Users Tab */}
+                {/* Administration Tab */}
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
+                    <Settings className="h-4 w-4 text-gray-500" />
+                    {language === 'ar' ? 'الإدارة' : 'Administration'}
                   </h3>
                   
-                  {/* Permission Items */}
-                  <div className="ml-8 flex flex-row gap-6">
-                    {/* Hidden Users */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="hiddenUsers"
-                        data-testid="checkbox-users-hidden"
-                        checked={hiddenUsersChecked}
-                        onChange={(e) => handleHiddenUsersChange(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="hiddenUsers" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
-                    </div>
-                    
-                    {/* Read Users */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="readUsers"
-                        data-testid="checkbox-users-read"
-                        checked={readUsersChecked}
-                        disabled={hiddenUsersChecked}
-                        onChange={(e) => handleReadUsersChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${hiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="readUsers" className={`ml-2 text-sm ${hiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Read
-                      </label>
-                    </div>
-                    
-                    {/* Full Control Users */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="fullControl"
-                        data-testid="checkbox-users-full-control"
-                        checked={fullControlChecked}
-                        disabled={hiddenUsersChecked}
-                        onChange={(e) => handleFullControlChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${hiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="fullControl" className={`ml-2 text-sm ${hiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
+                  {/* Users Management Sub-tab */}
+                  <div className="ml-8 mb-4">
+                    <h4 className="text-xs font-medium text-gray-600 mb-2 flex items-center gap-2">
+                      <Users className="h-3 w-3 text-gray-500" />
+                      {language === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
+                    </h4>
+                    <div className="ml-4 flex flex-row gap-6">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="hiddenUsers"
+                          data-testid="checkbox-users-hidden"
+                          checked={hiddenUsersChecked}
+                          onChange={(e) => handleHiddenUsersChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="hiddenUsers" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="readUsers"
+                          data-testid="checkbox-users-read"
+                          checked={readUsersChecked}
+                          disabled={hiddenUsersChecked}
+                          onChange={(e) => handleReadUsersChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${hiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="readUsers" className={`ml-2 text-sm ${hiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Read
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="fullControl"
+                          data-testid="checkbox-users-full-control"
+                          checked={fullControlChecked}
+                          disabled={hiddenUsersChecked}
+                          onChange={(e) => handleFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${hiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="fullControl" className={`ml-2 text-sm ${hiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Full Control
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="usersExport"
+                          data-testid="checkbox-users-export"
+                          checked={usersExportChecked}
+                          disabled={hiddenUsersChecked}
+                          onChange={(e) => handleUsersExportChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${hiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="usersExport" className={`ml-2 text-sm ${hiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Export
+                        </label>
+                      </div>
                     </div>
                   </div>
-                  
-                  {/* Purple divider line */}
-                  <div className="border-b border-purple-600 mt-3 mb-4"></div>
-                </div>
 
-                {/* Authorization Tab */}
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-gray-500" />
-                    {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
-                  </h3>
-                  
-                  {/* Permission Items */}
-                  <div className="ml-8 flex flex-row gap-6">
-                    {/* Hidden Authorization */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="authHiddenUsers"
-                        data-testid="checkbox-auth-hidden"
-                        checked={authHiddenUsersChecked}
-                        onChange={(e) => handleAuthHiddenUsersChange(e.target.checked)}
-                        className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                      />
-                      <label htmlFor="authHiddenUsers" className="ml-2 text-sm text-gray-600">
-                        No Permission
-                      </label>
-                    </div>
-                    
-                    {/* Read Authorization */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="authReadUsers"
-                        data-testid="checkbox-auth-read"
-                        checked={authReadUsersChecked}
-                        disabled={authHiddenUsersChecked}
-                        onChange={(e) => handleAuthReadUsersChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authHiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="authReadUsers" className={`ml-2 text-sm ${authHiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Read
-                      </label>
-                    </div>
-                    
-                    {/* Full Control Authorization */}
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="authFullControl"
-                        data-testid="checkbox-auth-full-control"
-                        checked={authFullControlChecked}
-                        disabled={authHiddenUsersChecked}
-                        onChange={(e) => handleAuthFullControlChange(e.target.checked)}
-                        className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authHiddenUsersChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      />
-                      <label htmlFor="authFullControl" className={`ml-2 text-sm ${authHiddenUsersChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                      </label>
+                  {/* Authorization Management Sub-tab */}
+                  <div className="ml-8 mb-4">
+                    <h4 className="text-xs font-medium text-gray-600 mb-2 flex items-center gap-2">
+                      <Shield className="h-3 w-3 text-gray-500" />
+                      {language === 'ar' ? 'إدارة التصريحات' : 'Authorization Management'}
+                    </h4>
+                    <div className="ml-4 flex flex-row gap-6">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="authorizationMgmtNoPermission"
+                          data-testid="checkbox-authorization-mgmt-no-permission"
+                          checked={authorizationMgmtNoPermissionChecked}
+                          onChange={(e) => handleAuthorizationMgmtNoPermissionChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="authorizationMgmtNoPermission" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="authorizationMgmtRead"
+                          data-testid="checkbox-authorization-mgmt-read"
+                          checked={authorizationMgmtReadChecked}
+                          disabled={authorizationMgmtNoPermissionChecked}
+                          onChange={(e) => handleAuthorizationMgmtReadChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authorizationMgmtNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="authorizationMgmtRead" className={`ml-2 text-sm ${authorizationMgmtNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Read
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="authorizationMgmtFullControl"
+                          data-testid="checkbox-authorization-mgmt-full-control"
+                          checked={authorizationMgmtFullControlChecked}
+                          disabled={authorizationMgmtNoPermissionChecked}
+                          onChange={(e) => handleAuthorizationMgmtFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authorizationMgmtNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="authorizationMgmtFullControl" className={`ml-2 text-sm ${authorizationMgmtNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Full Control
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="authorizationMgmtExport"
+                          data-testid="checkbox-authorization-mgmt-export"
+                          checked={authorizationMgmtExportChecked}
+                          disabled={authorizationMgmtNoPermissionChecked}
+                          onChange={(e) => handleAuthorizationMgmtExportChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${authorizationMgmtNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="authorizationMgmtExport" className={`ml-2 text-sm ${authorizationMgmtNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Export
+                        </label>
+                      </div>
                     </div>
                   </div>
                   
@@ -1518,8 +1642,83 @@ export default function AdministrationAuthorization() {
                       </div>
                       
                       {/* Purple divider line */}
-                      <div className="border-b border-purple-600 mt-3 mb-8"></div>
+                      <div className="border-b border-purple-600 mt-3 mb-4"></div>
                     </div>
+                  </div>
+                </div>
+
+                {/* Business Partner Tab */}
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+                    <Building className="h-4 w-4 text-gray-500" />
+                    {language === 'ar' ? 'شريك الأعمال' : 'Business Partner'}
+                  </h3>
+                  
+                  {/* Partner Management Sub-tab */}
+                  <div className="ml-8 mb-4">
+                    <h4 className="text-xs font-medium text-gray-600 mb-2">
+                      {language === 'ar' ? 'إدارة الشركاء' : 'Partner Management'}
+                    </h4>
+                    <div className="ml-4 flex flex-row gap-6">
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="partnerMgmtNoPermission"
+                          data-testid="checkbox-partner-mgmt-no-permission"
+                          checked={partnerMgmtNoPermissionChecked}
+                          onChange={(e) => handlePartnerMgmtNoPermissionChange(e.target.checked)}
+                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                        />
+                        <label htmlFor="partnerMgmtNoPermission" className="ml-2 text-sm text-gray-600">
+                          No Permission
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="partnerMgmtRead"
+                          data-testid="checkbox-partner-mgmt-read"
+                          checked={partnerMgmtReadChecked}
+                          disabled={partnerMgmtNoPermissionChecked}
+                          onChange={(e) => handlePartnerMgmtReadChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${partnerMgmtNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="partnerMgmtRead" className={`ml-2 text-sm ${partnerMgmtNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Read
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="partnerMgmtFullControl"
+                          data-testid="checkbox-partner-mgmt-full-control"
+                          checked={partnerMgmtFullControlChecked}
+                          disabled={partnerMgmtNoPermissionChecked}
+                          onChange={(e) => handlePartnerMgmtFullControlChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${partnerMgmtNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="partnerMgmtFullControl" className={`ml-2 text-sm ${partnerMgmtNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Full Control
+                        </label>
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id="partnerMgmtExport"
+                          data-testid="checkbox-partner-mgmt-export"
+                          checked={partnerMgmtExportChecked}
+                          disabled={partnerMgmtNoPermissionChecked}
+                          onChange={(e) => handlePartnerMgmtExportChange(e.target.checked)}
+                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${partnerMgmtNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        />
+                        <label htmlFor="partnerMgmtExport" className={`ml-2 text-sm ${partnerMgmtNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Export
+                        </label>
+                      </div>
+                    </div>
+                    
+                    {/* Purple divider line */}
+                    <div className="border-b border-purple-600 mt-3 mb-8"></div>
                   </div>
                 </div>
                 </div>
