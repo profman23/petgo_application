@@ -97,7 +97,7 @@ export default function AdministrationAuthorization() {
   const [incomePaymentFullControlChecked, setIncomePaymentFullControlChecked] = useState(false);
   const [incomePaymentExportChecked, setIncomePaymentExportChecked] = useState(false);
 
-  // State for checkboxes - Financial A/R Invoice section
+  // State for checkboxes - Financial A/R Balance section
   const [arInvoiceNoPermissionChecked, setArInvoiceNoPermissionChecked] = useState(false);
   const [arInvoiceReadChecked, setArInvoiceReadChecked] = useState(false);
   const [arInvoiceFullControlChecked, setArInvoiceFullControlChecked] = useState(false);
@@ -618,7 +618,7 @@ export default function AdministrationAuthorization() {
     }
   };
 
-  // Handlers for A/R Invoice section
+  // Handlers for A/R Balance section
   const handleArInvoiceNoPermissionChange = (checked: boolean) => {
     setArInvoiceNoPermissionChecked(checked);
     if (checked) {
@@ -1260,10 +1260,10 @@ export default function AdministrationAuthorization() {
                       </div>
                     </div>
 
-                    {/* A/R Invoice Sub-tab */}
+                    {/* A/R Balance Sub-tab */
                     <div className="ml-4 mb-4">
                       <h5 className="text-xs font-medium text-gray-600 mb-2">
-                        {language === 'ar' ? 'فاتورة الحسابات المدينة' : 'A/R Invoice'}
+                        {language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}
                       </h5>
                       <div className="ml-4 flex flex-row gap-6">
                         <div className="flex items-center">
