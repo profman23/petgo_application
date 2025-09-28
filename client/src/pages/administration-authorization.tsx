@@ -288,10 +288,10 @@ export default function AdministrationAuthorization() {
       productsHidden: productsHiddenChecked,
       productsRead: productsReadChecked,
       productsFullControl: productsFullControlChecked,
-      creditNotesNoPermission: creditNotesNoPermissionChecked,
-      creditNotesRead: creditNotesReadChecked,
-      creditNotesFullControl: creditNotesFullControlChecked,
-      creditNotesExport: creditNotesExportChecked,
+      creditNoteNoPermission: creditNotesNoPermissionChecked,
+      creditNoteRead: creditNotesReadChecked,
+      creditNoteFullControl: creditNotesFullControlChecked,
+      creditNoteExport: creditNotesExportChecked,
       outgoingPaymentNoPermission: outgoingPaymentNoPermissionChecked,
       outgoingPaymentRead: outgoingPaymentReadChecked,
       outgoingPaymentFullControl: outgoingPaymentFullControlChecked,
@@ -305,6 +305,9 @@ export default function AdministrationAuthorization() {
       arInvoiceFullControl: arInvoiceFullControlChecked,
       arInvoiceExport: arInvoiceExportChecked,
     };
+
+    console.log("🐛 [DEBUG] Saving authData:", authData);
+    console.log("🐛 [DEBUG] creditNotesNoPermissionChecked state:", creditNotesNoPermissionChecked);
 
     if (editingAuthorization) {
       updateAuthorizationMutation.mutate({ id: editingAuthorization.id, authData });
@@ -524,7 +527,9 @@ export default function AdministrationAuthorization() {
 
   // Handlers for Credit Notes section
   const handleCreditNotesNoPermissionChange = (checked: boolean) => {
+    console.log("🐛 [DEBUG] Credit Notes No Permission checkbox clicked:", checked);
     setCreditNotesNoPermissionChecked(checked);
+    console.log("🐛 [DEBUG] After setting state, creditNotesNoPermissionChecked should be:", checked);
     if (checked) {
       setCreditNotesReadChecked(false);
       setCreditNotesFullControlChecked(false);
