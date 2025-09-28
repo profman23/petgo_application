@@ -753,7 +753,7 @@ export default function AdministrationAuthorization() {
       {/* Add New Authorization Popup */}
       {showAddAuthorizationPopup && !isReadOnly && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[90vh]">
+          <div className="bg-white rounded-lg shadow-xl w-[1000px] max-w-6xl mx-4 flex flex-col max-h-[85vh]">
             {/* Popup Header */}
             <div className="flex justify-between items-center p-4 border-b">
               {editingAuthorization ? (
@@ -795,7 +795,7 @@ export default function AdministrationAuthorization() {
             
             {/* Popup Content with Custom Scrollbar */}
             <div className="relative flex-1 overflow-hidden">
-              <div className="p-4 h-full overflow-y-auto custom-scrollbar">
+              <div className="p-4 h-full overflow-y-auto custom-scrollbar" style={{ maxHeight: 'calc(85vh - 120px)' }}>
                 {/* Authorization Name */}
                 <div className="mb-6">
                   <label htmlFor="authorizationName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -943,9 +943,6 @@ export default function AdministrationAuthorization() {
                   
                   {/* Credit Note Section with Sub-tabs */}
                   <div className="ml-8">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">
-                      {language === 'ar' ? 'إشعار الخصم' : 'Credit Note'}
-                    </h4>
                     
                     {/* Credit Notes Sub-tab */}
                     <div className="ml-4 mb-4">
