@@ -3058,28 +3058,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         creditNoteNoPermission: authorizations.creditNoteNoPermission,
         creditNoteRead: authorizations.creditNoteRead,
         creditNoteFullControl: authorizations.creditNoteFullControl,
-        creditNoteExport: authorizations.creditNoteExport,
-        usersExport: authorizations.usersExport,
-        authorizationMgmtNoPermission: authorizations.authorizationMgmtNoPermission,
-        authorizationMgmtRead: authorizations.authorizationMgmtRead,
-        authorizationMgmtFullControl: authorizations.authorizationMgmtFullControl,
-        authorizationMgmtExport: authorizations.authorizationMgmtExport,
-        outgoingPaymentNoPermission: authorizations.outgoingPaymentNoPermission,
-        outgoingPaymentRead: authorizations.outgoingPaymentRead,
-        outgoingPaymentFullControl: authorizations.outgoingPaymentFullControl,
-        outgoingPaymentExport: authorizations.outgoingPaymentExport,
-        incomePaymentNoPermission: authorizations.incomePaymentNoPermission,
-        incomePaymentRead: authorizations.incomePaymentRead,
-        incomePaymentFullControl: authorizations.incomePaymentFullControl,
-        incomePaymentExport: authorizations.incomePaymentExport,
-        arBalanceNoPermission: authorizations.arBalanceNoPermission,
-        arBalanceRead: authorizations.arBalanceRead,
-        arBalanceFullControl: authorizations.arBalanceFullControl,
-        arBalanceExport: authorizations.arBalanceExport,
-        partnerMgmtNoPermission: authorizations.partnerMgmtNoPermission,
-        partnerMgmtRead: authorizations.partnerMgmtRead,
-        partnerMgmtFullControl: authorizations.partnerMgmtFullControl,
-        partnerMgmtExport: authorizations.partnerMgmtExport
+        creditNoteExport: authorizations.creditNoteExport
       })
       .from(adminUsers)
       .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
@@ -3120,28 +3099,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           creditNoteNoPermission: false,
           creditNoteRead: true,
           creditNoteFullControl: true,
-          creditNoteExport: true,
-          usersExport: true,
-          authorizationMgmtNoPermission: false,
-          authorizationMgmtRead: true,
-          authorizationMgmtFullControl: true,
-          authorizationMgmtExport: true,
-          outgoingPaymentNoPermission: false,
-          outgoingPaymentRead: true,
-          outgoingPaymentFullControl: true,
-          outgoingPaymentExport: true,
-          incomePaymentNoPermission: false,
-          incomePaymentRead: true,
-          incomePaymentFullControl: true,
-          incomePaymentExport: true,
-          arBalanceNoPermission: false,
-          arBalanceRead: true,
-          arBalanceFullControl: true,
-          arBalanceExport: true,
-          partnerMgmtNoPermission: false,
-          partnerMgmtRead: true,
-          partnerMgmtFullControl: true,
-          partnerMgmtExport: true
+          creditNoteExport: true
         };
       }
       

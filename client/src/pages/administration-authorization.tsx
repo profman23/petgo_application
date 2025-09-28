@@ -97,7 +97,7 @@ export default function AdministrationAuthorization() {
   const [incomePaymentFullControlChecked, setIncomePaymentFullControlChecked] = useState(false);
   const [incomePaymentExportChecked, setIncomePaymentExportChecked] = useState(false);
 
-  // State for checkboxes - Financial A/R Balance section
+  // State for checkboxes - Financial A/R Invoice section
   const [arInvoiceNoPermissionChecked, setArInvoiceNoPermissionChecked] = useState(false);
   const [arInvoiceReadChecked, setArInvoiceReadChecked] = useState(false);
   const [arInvoiceFullControlChecked, setArInvoiceFullControlChecked] = useState(false);
@@ -300,19 +300,10 @@ export default function AdministrationAuthorization() {
       incomePaymentRead: incomePaymentReadChecked,
       incomePaymentFullControl: incomePaymentFullControlChecked,
       incomePaymentExport: incomePaymentExportChecked,
-      arBalanceNoPermission: arInvoiceNoPermissionChecked,
-      arBalanceRead: arInvoiceReadChecked,
-      arBalanceFullControl: arInvoiceFullControlChecked,
-      arBalanceExport: arInvoiceExportChecked,
-      usersExport: usersExportChecked,
-      authorizationMgmtNoPermission: authorizationMgmtNoPermissionChecked,
-      authorizationMgmtRead: authorizationMgmtReadChecked,
-      authorizationMgmtFullControl: authorizationMgmtFullControlChecked,
-      authorizationMgmtExport: authorizationMgmtExportChecked,
-      partnerMgmtNoPermission: partnerMgmtNoPermissionChecked,
-      partnerMgmtRead: partnerMgmtReadChecked,
-      partnerMgmtFullControl: partnerMgmtFullControlChecked,
-      partnerMgmtExport: partnerMgmtExportChecked,
+      arInvoiceNoPermission: arInvoiceNoPermissionChecked,
+      arInvoiceRead: arInvoiceReadChecked,
+      arInvoiceFullControl: arInvoiceFullControlChecked,
+      arInvoiceExport: arInvoiceExportChecked,
     };
 
     if (editingAuthorization) {
@@ -358,10 +349,10 @@ export default function AdministrationAuthorization() {
     setIncomePaymentReadChecked(auth.incomePaymentRead || false);
     setIncomePaymentFullControlChecked(auth.incomePaymentFullControl || false);
     setIncomePaymentExportChecked(auth.incomePaymentExport || false);
-    setArInvoiceNoPermissionChecked(auth.arBalanceNoPermission || false);
-    setArInvoiceReadChecked(auth.arBalanceRead || false);
-    setArInvoiceFullControlChecked(auth.arBalanceFullControl || false);
-    setArInvoiceExportChecked(auth.arBalanceExport || false);
+    setArInvoiceNoPermissionChecked(auth.arInvoiceNoPermission || false);
+    setArInvoiceReadChecked(auth.arInvoiceRead || false);
+    setArInvoiceFullControlChecked(auth.arInvoiceFullControl || false);
+    setArInvoiceExportChecked(auth.arInvoiceExport || false);
     setUsersExportChecked(auth.usersExport || false);
     setAuthorizationMgmtNoPermissionChecked(auth.authorizationMgmtNoPermission || false);
     setAuthorizationMgmtReadChecked(auth.authorizationMgmtRead || false);
@@ -627,7 +618,7 @@ export default function AdministrationAuthorization() {
     }
   };
 
-  // Handlers for A/R Balance section
+  // Handlers for A/R Invoice section
   const handleArInvoiceNoPermissionChange = (checked: boolean) => {
     setArInvoiceNoPermissionChecked(checked);
     if (checked) {
@@ -1269,10 +1260,10 @@ export default function AdministrationAuthorization() {
                       </div>
                     </div>
 
-                    {/* A/R Balance Sub-tab */
+                    {/* A/R Invoice Sub-tab */}
                     <div className="ml-4 mb-4">
                       <h5 className="text-xs font-medium text-gray-600 mb-2">
-                        {language === 'ar' ? 'رصيد الحسابات المدينة' : 'A/R Balance'}
+                        {language === 'ar' ? 'فاتورة الحسابات المدينة' : 'A/R Invoice'}
                       </h5>
                       <div className="ml-4 flex flex-row gap-6">
                         <div className="flex items-center">
@@ -1332,6 +1323,9 @@ export default function AdministrationAuthorization() {
                         </div>
                       </div>
                     </div>
+                    
+                    {/* Purple divider line */}
+                    <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
                 </div>
                 
