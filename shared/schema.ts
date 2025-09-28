@@ -761,6 +761,39 @@ export const authorizations = pgTable("authorizations", {
   creditNoteFullControl: boolean("credit_note_full_control").notNull().default(false),
   creditNoteExport: boolean("credit_note_export").notNull().default(false),
   
+  // Users Export permission
+  usersExport: boolean("users_export").notNull().default(false),
+  
+  // Authorization Management permissions
+  authorizationMgmtNoPermission: boolean("authorization_mgmt_no_permission").notNull().default(false),
+  authorizationMgmtRead: boolean("authorization_mgmt_read").notNull().default(false),
+  authorizationMgmtFullControl: boolean("authorization_mgmt_full_control").notNull().default(false),
+  authorizationMgmtExport: boolean("authorization_mgmt_export").notNull().default(false),
+  
+  // Outgoing Payment permissions
+  outgoingPaymentNoPermission: boolean("outgoing_payment_no_permission").notNull().default(false),
+  outgoingPaymentRead: boolean("outgoing_payment_read").notNull().default(false),
+  outgoingPaymentFullControl: boolean("outgoing_payment_full_control").notNull().default(false),
+  outgoingPaymentExport: boolean("outgoing_payment_export").notNull().default(false),
+  
+  // Income Payment permissions
+  incomePaymentNoPermission: boolean("income_payment_no_permission").notNull().default(false),
+  incomePaymentRead: boolean("income_payment_read").notNull().default(false),
+  incomePaymentFullControl: boolean("income_payment_full_control").notNull().default(false),
+  incomePaymentExport: boolean("income_payment_export").notNull().default(false),
+  
+  // A/R Balance permissions
+  arBalanceNoPermission: boolean("ar_balance_no_permission").notNull().default(false),
+  arBalanceRead: boolean("ar_balance_read").notNull().default(false),
+  arBalanceFullControl: boolean("ar_balance_full_control").notNull().default(false),
+  arBalanceExport: boolean("ar_balance_export").notNull().default(false),
+  
+  // Partner Management permissions
+  partnerMgmtNoPermission: boolean("partner_mgmt_no_permission").notNull().default(false),
+  partnerMgmtRead: boolean("partner_mgmt_read").notNull().default(false),
+  partnerMgmtFullControl: boolean("partner_mgmt_full_control").notNull().default(false),
+  partnerMgmtExport: boolean("partner_mgmt_export").notNull().default(false),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -784,9 +817,14 @@ export const insertAuthorizationSchema = createInsertSchema(authorizations).pick
   usersHidden: true,
   usersRead: true,
   usersFullControl: true,
+  usersExport: true,
   authHidden: true,
   authRead: true,
   authFullControl: true,
+  authorizationMgmtNoPermission: true,
+  authorizationMgmtRead: true,
+  authorizationMgmtFullControl: true,
+  authorizationMgmtExport: true,
   vetsVanHidden: true,
   vetsVanRead: true,
   vetsVanFullControl: true,
@@ -805,6 +843,22 @@ export const insertAuthorizationSchema = createInsertSchema(authorizations).pick
   creditNoteRead: true,
   creditNoteFullControl: true,
   creditNoteExport: true,
+  outgoingPaymentNoPermission: true,
+  outgoingPaymentRead: true,
+  outgoingPaymentFullControl: true,
+  outgoingPaymentExport: true,
+  incomePaymentNoPermission: true,
+  incomePaymentRead: true,
+  incomePaymentFullControl: true,
+  incomePaymentExport: true,
+  arBalanceNoPermission: true,
+  arBalanceRead: true,
+  arBalanceFullControl: true,
+  arBalanceExport: true,
+  partnerMgmtNoPermission: true,
+  partnerMgmtRead: true,
+  partnerMgmtFullControl: true,
+  partnerMgmtExport: true,
 });
 
 export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
