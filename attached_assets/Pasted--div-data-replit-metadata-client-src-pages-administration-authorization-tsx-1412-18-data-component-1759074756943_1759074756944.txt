@@ -1,0 +1,26 @@
+<div data-replit-metadata="client/src/pages/administration-authorization.tsx:1412:18" data-component-name="div" class="mb-4">
+  <h3 data-replit-metadata="client/src/pages/administration-authorization.tsx:1413:20" data-component-name="h3" class="text-sm font-medium text-gray-900 mb-2 flex items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-stethoscope h-4 w-4 text-gray-500" aria-hidden="true" data-replit-metadata="client/src/pages/administration-authorization.tsx:1414:22" data-component-name="Stethoscope">
+      <path d="M11 2v2"></path><path d="M5 2v2"></path><path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1"></path><path d="M8 15a6 6 0 0 0 12 0v-3"></path><circle cx="20" cy="10" r="2"></circle>
+    </svg>
+    Services
+  </h3>
+  <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1419:20" data-component-name="div" class="ml-8">
+    <h4 data-replit-metadata="client/src/pages/administration-authorization.tsx:1420:22" data-component-name="h4" class="text-sm font-medium text-gray-700 mb-3">Services</h4>
+    <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1425:22" data-component-name="div" class="ml-4 flex flex-row gap-6">
+      <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1427:22" data-component-name="div" class="flex items-center">
+        <input data-replit-metadata="client/src/pages/administration-authorization.tsx:1428:24" data-component-name="input" type="checkbox" id="servicesHidden" data-testid="checkbox-services-hidden" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+        <label data-replit-metadata="client/src/pages/administration-authorization.tsx:1436:24" data-component-name="label" for="servicesHidden" class="ml-2 text-sm text-gray-600">No Permission</label>
+      </div>
+      <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1442:22" data-component-name="div" class="flex items-center">
+        <input data-replit-metadata="client/src/pages/administration-authorization.tsx:1443:24" data-component-name="input" type="checkbox" id="servicesRead" data-testid="checkbox-services-read" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ">
+        <label data-replit-metadata="client/src/pages/administration-authorization.tsx:1452:24" data-component-name="label" for="servicesRead" class="ml-2 text-sm text-gray-600">Read</label>
+      </div>
+      <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1458:22" data-component-name="div" class="flex items-center">
+        <input data-replit-metadata="client/src/pages/administration-authorization.tsx:1459:24" data-component-name="input" type="checkbox" id="servicesFullControl" data-testid="checkbox-services-full-control" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ">
+        <label data-replit-metadata="client/src/pages/administration-authorization.tsx:1468:24" data-component-name="label" for="servicesFullControl" class="ml-2 text-sm text-gray-600">Full Control</label>
+      </div>
+    </div>
+    <div data-replit-metadata="client/src/pages/administration-authorization.tsx:1475:22" data-component-name="div" class="border-b border-purple-600 mt-3 mb-4"></div>
+  </div>
+</div>

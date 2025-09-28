@@ -72,10 +72,7 @@ export default function AdministrationAuthorization() {
   const [importHiddenChecked, setImportHiddenChecked] = useState(false);
   const [importFullControlChecked, setImportFullControlChecked] = useState(false);
   
-  // State for checkboxes - Services section
-  const [servicesHiddenChecked, setServicesHiddenChecked] = useState(false);
-  const [servicesReadChecked, setServicesReadChecked] = useState(false);
-  const [servicesFullControlChecked, setServicesFullControlChecked] = useState(false);
+  // Services now use permission store - no local state needed
   
   // State for checkboxes - Products section
   const [productsHiddenChecked, setProductsHiddenChecked] = useState(false);
@@ -221,9 +218,7 @@ export default function AdministrationAuthorization() {
     setVetsVanShiftsFullControlChecked(false);
     setImportHiddenChecked(false);
     setImportFullControlChecked(false);
-    setServicesHiddenChecked(false);
-    setServicesReadChecked(false);
-    setServicesFullControlChecked(false);
+    // Services state reset handled by permission store
     setProductsHiddenChecked(false);
     setProductsReadChecked(false);
     setProductsFullControlChecked(false);
@@ -436,28 +431,7 @@ export default function AdministrationAuthorization() {
     setImportFullControlChecked(checked);
   };
 
-  // Handlers for Services section
-  const handleServicesHiddenChange = (checked: boolean) => {
-    setServicesHiddenChecked(checked);
-    if (checked) {
-      setServicesReadChecked(false);
-      setServicesFullControlChecked(false);
-    }
-  };
-
-  const handleServicesReadChange = (checked: boolean) => {
-    setServicesReadChecked(checked);
-    if (!checked) {
-      setServicesFullControlChecked(false);
-    }
-  };
-
-  const handleServicesFullControlChange = (checked: boolean) => {
-    setServicesFullControlChecked(checked);
-    if (checked) {
-      setServicesReadChecked(true);
-    }
-  };
+  // Services handlers removed - now using permission store
 
   // Handlers for Products section
   const handleProductsHiddenChange = (checked: boolean) => {
@@ -1423,52 +1397,22 @@ export default function AdministrationAuthorization() {
                       
                       {/* Permission Items */}
                       <div className="ml-4 flex flex-row gap-6">
-                      {/* No Permission Services */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="servicesHidden"
+                        <NoPermissionToggle 
+                          groupKey="services"
                           data-testid="checkbox-services-hidden"
-                          checked={servicesHiddenChecked}
-                          onChange={(e) => handleServicesHiddenChange(e.target.checked)}
-                          className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                         />
-                        <label htmlFor="servicesHidden" className="ml-2 text-sm text-gray-600">
-                          No Permission
-                        </label>
-                      </div>
-                      
-                      {/* Read Services */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="servicesRead"
+                        <PermissionToggle 
+                          groupKey="services"
+                          permissionType="read"
+                          label="Read"
                           data-testid="checkbox-services-read"
-                          checked={servicesReadChecked}
-                          disabled={servicesHiddenChecked}
-                          onChange={(e) => handleServicesReadChange(e.target.checked)}
-                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
-                        <label htmlFor="servicesRead" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          Read
-                        </label>
-                      </div>
-                      
-                      {/* Full Control Services */}
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id="servicesFullControl"
+                        <PermissionToggle 
+                          groupKey="services"
+                          permissionType="fullControl"
+                          label={language === 'ar' ? 'تحكم كامل' : 'Full Control'}
                           data-testid="checkbox-services-full-control"
-                          checked={servicesFullControlChecked}
-                          disabled={servicesHiddenChecked}
-                          onChange={(e) => handleServicesFullControlChange(e.target.checked)}
-                          className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${servicesHiddenChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
-                        <label htmlFor="servicesFullControl" className={`ml-2 text-sm ${servicesHiddenChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                          {language === 'ar' ? 'تحكم كامل' : 'Full Control'}
-                        </label>
-                      </div>
                       </div>
                       
                       {/* Purple divider line */}
