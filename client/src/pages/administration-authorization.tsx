@@ -300,10 +300,19 @@ export default function AdministrationAuthorization() {
       incomePaymentRead: incomePaymentReadChecked,
       incomePaymentFullControl: incomePaymentFullControlChecked,
       incomePaymentExport: incomePaymentExportChecked,
-      arInvoiceNoPermission: arInvoiceNoPermissionChecked,
-      arInvoiceRead: arInvoiceReadChecked,
-      arInvoiceFullControl: arInvoiceFullControlChecked,
-      arInvoiceExport: arInvoiceExportChecked,
+      arBalanceNoPermission: arInvoiceNoPermissionChecked,
+      arBalanceRead: arInvoiceReadChecked,
+      arBalanceFullControl: arInvoiceFullControlChecked,
+      arBalanceExport: arInvoiceExportChecked,
+      usersExport: usersExportChecked,
+      authorizationMgmtNoPermission: authorizationMgmtNoPermissionChecked,
+      authorizationMgmtRead: authorizationMgmtReadChecked,
+      authorizationMgmtFullControl: authorizationMgmtFullControlChecked,
+      authorizationMgmtExport: authorizationMgmtExportChecked,
+      partnerMgmtNoPermission: partnerMgmtNoPermissionChecked,
+      partnerMgmtRead: partnerMgmtReadChecked,
+      partnerMgmtFullControl: partnerMgmtFullControlChecked,
+      partnerMgmtExport: partnerMgmtExportChecked,
     };
 
     if (editingAuthorization) {
@@ -349,10 +358,10 @@ export default function AdministrationAuthorization() {
     setIncomePaymentReadChecked(auth.incomePaymentRead || false);
     setIncomePaymentFullControlChecked(auth.incomePaymentFullControl || false);
     setIncomePaymentExportChecked(auth.incomePaymentExport || false);
-    setArInvoiceNoPermissionChecked(auth.arInvoiceNoPermission || false);
-    setArInvoiceReadChecked(auth.arInvoiceRead || false);
-    setArInvoiceFullControlChecked(auth.arInvoiceFullControl || false);
-    setArInvoiceExportChecked(auth.arInvoiceExport || false);
+    setArInvoiceNoPermissionChecked(auth.arBalanceNoPermission || false);
+    setArInvoiceReadChecked(auth.arBalanceRead || false);
+    setArInvoiceFullControlChecked(auth.arBalanceFullControl || false);
+    setArInvoiceExportChecked(auth.arBalanceExport || false);
     setUsersExportChecked(auth.usersExport || false);
     setAuthorizationMgmtNoPermissionChecked(auth.authorizationMgmtNoPermission || false);
     setAuthorizationMgmtReadChecked(auth.authorizationMgmtRead || false);
@@ -1324,7 +1333,6 @@ export default function AdministrationAuthorization() {
                       </div>
                     </div>
                     
-                    {/* Purple divider line */}
                     <div className="border-b border-purple-600 mt-3 mb-4"></div>
                   </div>
                 </div>
