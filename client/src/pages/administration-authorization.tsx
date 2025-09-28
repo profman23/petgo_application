@@ -82,11 +82,7 @@ export default function AdministrationAuthorization() {
   const [productsReadChecked, setProductsReadChecked] = useState(false);
   const [productsFullControlChecked, setProductsFullControlChecked] = useState(false);
   
-  // State for checkboxes - Financial Credit Notes section
-  const [creditNotesNoPermissionChecked, setCreditNotesNoPermissionChecked] = useState(false);
-  const [creditNotesReadChecked, setCreditNotesReadChecked] = useState(false);
-  const [creditNotesFullControlChecked, setCreditNotesFullControlChecked] = useState(false);
-  const [creditNotesExportChecked, setCreditNotesExportChecked] = useState(false);
+  // Credit Notes now use permission store - no local state needed
 
   // State for checkboxes - Financial Outgoing Payment section
   const [outgoingPaymentNoPermissionChecked, setOutgoingPaymentNoPermissionChecked] = useState(false);
@@ -231,10 +227,8 @@ export default function AdministrationAuthorization() {
     setProductsHiddenChecked(false);
     setProductsReadChecked(false);
     setProductsFullControlChecked(false);
-    setCreditNotesNoPermissionChecked(false);
-    setCreditNotesReadChecked(false);
-    setCreditNotesFullControlChecked(false);
-    setCreditNotesExportChecked(false);
+    // Credit Notes state reset handled by permission store
+    resetAll(); // Reset all permission store state
     setOutgoingPaymentNoPermissionChecked(false);
     setOutgoingPaymentReadChecked(false);
     setOutgoingPaymentFullControlChecked(false);
@@ -271,7 +265,6 @@ export default function AdministrationAuthorization() {
 
     // Get permission data from the store
     const permissionData = toAuthData(permissionsState);
-    console.log("🐛 [DEBUG] Permission data from store:", permissionData);
 
     const authData = {
       name: authorizationName.trim(),
@@ -295,7 +288,6 @@ export default function AdministrationAuthorization() {
       ...permissionData,
     };
 
-    console.log("🐛 [DEBUG] Saving authData:", authData);
 
     if (editingAuthorization) {
       updateAuthorizationMutation.mutate({ id: editingAuthorization.id, authData });
@@ -490,39 +482,7 @@ export default function AdministrationAuthorization() {
     }
   };
 
-  // Handlers for Credit Notes section
-  const handleCreditNotesNoPermissionChange = (checked: boolean) => {
-    console.log("🐛 [DEBUG] Credit Notes No Permission checkbox clicked:", checked);
-    setCreditNotesNoPermissionChecked(checked);
-    console.log("🐛 [DEBUG] After setting state, creditNotesNoPermissionChecked should be:", checked);
-    if (checked) {
-      setCreditNotesReadChecked(false);
-      setCreditNotesFullControlChecked(false);
-      setCreditNotesExportChecked(false);
-    }
-  };
-
-  const handleCreditNotesReadChange = (checked: boolean) => {
-    setCreditNotesReadChecked(checked);
-    if (!checked) {
-      setCreditNotesFullControlChecked(false);
-      setCreditNotesExportChecked(false);
-    }
-  };
-
-  const handleCreditNotesFullControlChange = (checked: boolean) => {
-    setCreditNotesFullControlChecked(checked);
-    if (checked) {
-      setCreditNotesReadChecked(true);
-    }
-  };
-
-  const handleCreditNotesExportChange = (checked: boolean) => {
-    setCreditNotesExportChecked(checked);
-    if (checked) {
-      setCreditNotesReadChecked(true);
-    }
-  };
+  // Credit Notes handlers removed - now using permission store
 
   // Handlers for Outgoing Payment section
   const handleOutgoingPaymentNoPermissionChange = (checked: boolean) => {
@@ -1044,61 +1004,28 @@ export default function AdministrationAuthorization() {
                         {language === 'ar' ? 'إشعارات الخصم' : 'Credit Notes'}
                       </h5>
                       <div className="ml-4 flex flex-row gap-6">
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="creditNotesNoPermission"
-                            data-testid="checkbox-credit-notes-no-permission"
-                            checked={creditNotesNoPermissionChecked}
-                            onChange={(e) => handleCreditNotesNoPermissionChange(e.target.checked)}
-                            className="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                          />
-                          <label htmlFor="creditNotesNoPermission" className="ml-2 text-sm text-gray-600">
-                            No Permission
-                          </label>
-                        </div>
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="creditNotesRead"
-                            data-testid="checkbox-credit-notes-read"
-                            checked={creditNotesReadChecked}
-                            disabled={creditNotesNoPermissionChecked}
-                            onChange={(e) => handleCreditNotesReadChange(e.target.checked)}
-                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          />
-                          <label htmlFor="creditNotesRead" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Read
-                          </label>
-                        </div>
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="creditNotesFullControl"
-                            data-testid="checkbox-credit-notes-full-control"
-                            checked={creditNotesFullControlChecked}
-                            disabled={creditNotesNoPermissionChecked}
-                            onChange={(e) => handleCreditNotesFullControlChange(e.target.checked)}
-                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          />
-                          <label htmlFor="creditNotesFullControl" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Full Control
-                          </label>
-                        </div>
-                        <div className="flex items-center">
-                          <input
-                            type="checkbox"
-                            id="creditNotesExport"
-                            data-testid="checkbox-credit-notes-export"
-                            checked={creditNotesExportChecked}
-                            disabled={creditNotesNoPermissionChecked}
-                            onChange={(e) => handleCreditNotesExportChange(e.target.checked)}
-                            className={`h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 ${creditNotesNoPermissionChecked ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          />
-                          <label htmlFor="creditNotesExport" className={`ml-2 text-sm ${creditNotesNoPermissionChecked ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Export
-                          </label>
-                        </div>
+                        <NoPermissionToggle 
+                          groupKey="creditNote"
+                          data-testid="checkbox-credit-notes-no-permission"
+                        />
+                        <PermissionToggle 
+                          groupKey="creditNote"
+                          permissionType="read"
+                          label="Read"
+                          data-testid="checkbox-credit-notes-read"
+                        />
+                        <PermissionToggle 
+                          groupKey="creditNote"
+                          permissionType="fullControl"
+                          label="Full Control"
+                          data-testid="checkbox-credit-notes-full-control"
+                        />
+                        <PermissionToggle 
+                          groupKey="creditNote"
+                          permissionType="export"
+                          label="Export"
+                          data-testid="checkbox-credit-notes-export"
+                        />
                       </div>
                     </div>
 
