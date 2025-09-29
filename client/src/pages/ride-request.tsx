@@ -135,8 +135,22 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   const petCount = selectedPets.length;
   let total = 0;
 
-  // Special pricing for First Visit, Home Consultation, and General Check-up
-  if (['first-visit', 'home-consultation', 'general-checkup'].includes(serviceType)) {
+  // National Day 95 Offer pricing for Home Consultation
+  if (serviceType === 'national-day-home-consultation') {
+    if (petCount <= 2) {
+      total = 195; // 1-2 pets: 195 SAR
+    } else if (petCount === 3) {
+      total = 290; // 3 pets: 290 SAR (195 + 95)
+    } else {
+      total = 290 + ((petCount - 3) * 95); // 4+ pets: 290 + 95 per additional pet
+    }
+  }
+  // National Day 95 Offer pricing for Vaccination & Deworming
+  else if (serviceType === 'national-day-vaccination') {
+    total = petCount * 95; // 95 SAR per pet
+  }
+  // Special pricing for First Visit and General Check-up (unchanged)
+  else if (['first-visit', 'general-checkup'].includes(serviceType)) {
     if (petCount <= 2) {
       total = 575; // 1-2 pets: 575 SAR
     } else if (petCount <= 4) {
@@ -1317,10 +1331,17 @@ export default function RideRequest() {
               </SelectTrigger>
               <SelectContent className="max-h-[240px] overflow-y-auto">
 
-                <SelectItem value="home-consultation" className="select-item-custom">
+                <SelectItem value="national-day-vaccination" className="select-item-custom">
+                  <div className="flex items-center gap-2">
+                    <Pill className="w-4 h-4 text-blue-600" />
+                    <span>{language === 'ar' ? 'عرض اليوم الوطني 95 تطعيم ومكافحة الديدان' : 'National Day 95 Offer Vaccination & Deworming'}</span>
+                  </div>
+                </SelectItem>
+
+                <SelectItem value="national-day-home-consultation" className="select-item-custom">
                   <div className="flex items-center gap-2">
                     <Home className="w-4 h-4 text-green-700" />
-                    <span>{language === 'ar' ? 'استشارة منزلية' : 'Home Consultation'}</span>
+                    <span>{language === 'ar' ? 'عرض اليوم الوطني 95 استشارة منزلية' : 'National Day 95 Offer Home Consultation'}</span>
                   </div>
                 </SelectItem>
 
@@ -1367,7 +1388,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'national-day-home-consultation', 'national-day-vaccination', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 {(() => {
                   const costData = getEstimatedCost(selectedPatients, patients, serviceType);
@@ -1395,6 +1416,8 @@ export default function RideRequest() {
                               {serviceType === 'vaccination' && (language === 'ar' ? 'التطعيم:' : 'Vaccination:')}
                               {serviceType === 'deworming' && (language === 'ar' ? 'مكافحة الديدان:' : 'Deworming:')}
                               {serviceType === 'fleas-ticks-prevention' && (language === 'ar' ? 'مكافحة البراغيث والقراد:' : 'Fleas & Ticks Prevention:')}
+                              {serviceType === 'national-day-vaccination' && (language === 'ar' ? 'عرض اليوم الوطني 95 تطعيم ومكافحة الديدان:' : 'National Day 95 Offer Vaccination & Deworming:')}
+                              {serviceType === 'national-day-home-consultation' && (language === 'ar' ? 'عرض اليوم الوطني 95 استشارة منزلية:' : 'National Day 95 Offer Home Consultation:')}
                             </span>
                             <span className="text-sm font-bold text-purple-900" style={{ 
                               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
