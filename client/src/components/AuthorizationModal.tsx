@@ -1,6 +1,6 @@
 import { useTranslation } from "@/lib/i18n";
 import { X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface AuthorizationModalProps {
   isOpen: boolean;
@@ -9,6 +9,13 @@ interface AuthorizationModalProps {
   editMode?: boolean;
   authorizationName?: string;
   onNameChange?: (name: string) => void;
+}
+
+interface ScreenPermissions {
+  noPermission: boolean;
+  read: boolean;
+  export: boolean;
+  fullControl: boolean;
 }
 
 export function AuthorizationModal({
@@ -20,6 +27,9 @@ export function AuthorizationModal({
   onNameChange
 }: AuthorizationModalProps) {
   const { language } = useTranslation();
+  
+  // State to track permissions for each screen
+  const [permissions, setPermissions] = useState<Record<string, ScreenPermissions>>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -72,12 +82,120 @@ export function AuthorizationModal({
     { id: 'products', title: { ar: 'المنتجات', en: 'Products' } }
   ];
 
-  const permissions = [
+  const permissionTypes = [
     { id: 'noPermission', label: { ar: 'لا صلاحية', en: 'No Permission' } },
     { id: 'read', label: { ar: 'قراءة', en: 'Read' } },
     { id: 'export', label: { ar: 'تصدير', en: 'Export' } },
     { id: 'fullControl', label: { ar: 'تحكم كامل', en: 'Full Control' } }
   ];
+
+  // Get current permissions for a screen (default to all false)
+  const getScreenPermissions = (screenId: string): ScreenPermissions => {
+    return permissions[screenId] || {
+      noPermission: false,
+      read: false,
+      export: false,
+      fullControl: false
+    };
+  };
+
+  // Handle permission toggle
+  const handlePermissionToggle = (screenId: string, permissionType: string) => {
+    const currentPerms = getScreenPermissions(screenId);
+    
+    if (permissionType === 'noPermission') {
+      // Toggle No Permission - if checked, disable all others
+      setPermissions({
+        ...permissions,
+        [screenId]: {
+          noPermission: !currentPerms.noPermission,
+          read: false,
+          export: false,
+          fullControl: false
+        }
+      });
+    } else if (permissionType === 'fullControl') {
+      // Toggle Full Control - auto-check Read and Export
+      const newFullControl = !currentPerms.fullControl;
+      setPermissions({
+        ...permissions,
+        [screenId]: {
+          noPermission: false,
+          read: newFullControl ? true : currentPerms.read,
+          export: newFullControl ? true : currentPerms.export,
+          fullControl: newFullControl
+        }
+      });
+    } else if (permissionType === 'read') {
+      // Can only toggle Read if Full Control is not active
+      if (!currentPerms.fullControl) {
+        setPermissions({
+          ...permissions,
+          [screenId]: {
+            ...currentPerms,
+            noPermission: false,
+            read: !currentPerms.read
+          }
+        });
+      }
+    } else if (permissionType === 'export') {
+      // Export can always be toggled
+      setPermissions({
+        ...permissions,
+        [screenId]: {
+          ...currentPerms,
+          noPermission: false,
+          export: !currentPerms.export
+        }
+      });
+    }
+  };
+
+  // Check if a permission is disabled
+  const isPermissionDisabled = (screenId: string, permissionType: string): boolean => {
+    const currentPerms = getScreenPermissions(screenId);
+    
+    if (permissionType === 'noPermission') {
+      // No Permission is disabled when Full Control is active
+      return currentPerms.fullControl;
+    } else if (permissionType === 'read') {
+      // Read is disabled when No Permission or Full Control is active
+      return currentPerms.noPermission || currentPerms.fullControl;
+    } else if (permissionType === 'export') {
+      // Export is disabled when No Permission is active
+      return currentPerms.noPermission;
+    } else if (permissionType === 'fullControl') {
+      // Full Control is disabled when No Permission is active
+      return currentPerms.noPermission;
+    }
+    
+    return false;
+  };
+
+  const renderPermissionCheckbox = (screenId: string, permissionType: string, label: { ar: string; en: string }) => {
+    const currentPerms = getScreenPermissions(screenId);
+    const isChecked = currentPerms[permissionType as keyof ScreenPermissions];
+    const isDisabled = isPermissionDisabled(screenId, permissionType);
+
+    return (
+      <label className={`flex items-center gap-2 ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+        <input
+          type="checkbox"
+          checked={isChecked}
+          disabled={isDisabled}
+          onChange={() => handlePermissionToggle(screenId, permissionType)}
+          className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 checked:border-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            accentColor: isDisabled ? '#d1d5db' : '#852085'
+          }}
+          data-testid={`checkbox-${screenId}-${permissionType}`}
+        />
+        <span className={`text-sm ${isDisabled ? 'text-gray-400' : 'text-gray-600'}`} dir={getDirection(language)}>
+          {label[language]}
+        </span>
+      </label>
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -157,20 +275,10 @@ export function AuthorizationModal({
                         {screen.title[language]}
                       </span>
                       <div className="flex items-center gap-6">
-                        {permissions.map((permission) => (
-                          <label key={permission.id} className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 checked:border-purple-600"
-                              style={{
-                                accentColor: '#852085'
-                              }}
-                              data-testid={`checkbox-${screen.id}-${permission.id}`}
-                            />
-                            <span className="text-sm text-gray-600" dir={getDirection(language)}>
-                              {permission.label[language]}
-                            </span>
-                          </label>
+                        {permissionTypes.map((permission) => (
+                          <div key={permission.id}>
+                            {renderPermissionCheckbox(screen.id, permission.id, permission.label)}
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -189,20 +297,10 @@ export function AuthorizationModal({
                       {screen.title[language]}
                     </span>
                     <div className="flex items-center gap-6">
-                      {permissions.map((permission) => (
-                        <label key={permission.id} className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 checked:border-purple-600"
-                            style={{
-                              accentColor: '#852085'
-                            }}
-                            data-testid={`checkbox-${screen.id}-${permission.id}`}
-                          />
-                          <span className="text-sm text-gray-600" dir={getDirection(language)}>
-                            {permission.label[language]}
-                          </span>
-                        </label>
+                      {permissionTypes.map((permission) => (
+                        <div key={permission.id}>
+                          {renderPermissionCheckbox(screen.id, permission.id, permission.label)}
+                        </div>
                       ))}
                     </div>
                   </div>
