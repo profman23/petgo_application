@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, authorizationRoles, insertAdminUserSchema, adminUsers, redZones, insertOutgoingPaymentSchema, insertIncomePaymentSchema } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, insertAdminUserSchema, adminUsers, redZones, insertOutgoingPaymentSchema, insertIncomePaymentSchema } from "@shared/schema";
 import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
@@ -3025,29 +3025,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Helper function to automatically clear blocking flags when access is granted
-  // Works with nested JSON structure: { "users": { "read": true, "fullControl": false, "noPermission": false } }
-  function normalizePermissions(permissions: any): any {
-    const normalized = JSON.parse(JSON.stringify(permissions)); // Deep clone
-    
-    // For each screen in the permissions object
-    for (const screen in normalized) {
-      if (typeof normalized[screen] === 'object' && normalized[screen] !== null) {
-        const screenPerms = normalized[screen];
-        
-        // If read or fullControl is granted, automatically clear noPermission flag
-        const hasRead = screenPerms.read === true;
-        const hasFullControl = screenPerms.fullControl === true;
-        
-        if (hasRead || hasFullControl) {
-          screenPerms.noPermission = false;
-        }
-      }
-    }
-    
-    return normalized;
-  }
-
   // Authorization Roles management routes (JSON-based)
   app.post('/api/admin/authorization-roles', requireAdminAuth, async (req, res) => {
     try {
@@ -3057,12 +3034,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Name and permissions are required' });
       }
       
-      // Normalize permissions to ensure blocking flags are cleared when access is granted
-      const normalizedPermissions = normalizePermissions(permissions);
-      
       const newRole = await storage.createAuthorizationRole({
         name,
-        permissions: normalizedPermissions
+        permissions
       });
       
       res.json(newRole);
@@ -3091,12 +3065,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Name and permissions are required' });
       }
       
-      // Normalize permissions to ensure blocking flags are cleared when access is granted
-      const normalizedPermissions = normalizePermissions(permissions);
-      
       const updatedRole = await storage.updateAuthorizationRole(id, {
         name,
-        permissions: normalizedPermissions
+        permissions
       });
       
       if (!updatedRole) {
@@ -3220,10 +3191,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         authorizationId: adminUsers.authorizationId,
         isActive: adminUsers.isActive,
         createdAt: adminUsers.createdAt,
-        authorizationName: authorizationRoles.name
+        authorizationName: authorizations.name
       })
       .from(adminUsers)
-      .leftJoin(authorizationRoles, eq(adminUsers.authorizationId, authorizationRoles.id))
+      .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
       .orderBy(adminUsers.createdAt);
       
       res.json(adminUsersList);
@@ -3246,17 +3217,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const [newUser] = await db.insert(adminUsers).values(userDataWithHashedPassword).returning();
       res.json(newUser);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating admin user:', error);
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
       // Handle database unique constraint violations
-      if (error?.code === '23505') { // PostgreSQL unique constraint violation
-        if (error?.constraint === 'admin_users_email_key') {
+      if (error.code === '23505') { // PostgreSQL unique constraint violation
+        if (error.constraint === 'admin_users_email_unique') {
           return res.status(400).json({ message: 'Email address is already in use' });
         }
-        if (error?.constraint === 'admin_users_username_key') {
+        if (error.constraint === 'admin_users_username_unique') {
           return res.status(400).json({ message: 'Username is already taken' });
         }
       }

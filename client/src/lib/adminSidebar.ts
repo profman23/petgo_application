@@ -7,7 +7,6 @@ export interface SidebarMenuItem {
   icon: any;
   requiresPermission?: string;
   permissionRedirect?: string;
-  screenId?: string; // Maps to screen ID in permissionMapping
 }
 
 export interface SidebarSection {
@@ -18,7 +17,6 @@ export interface SidebarSection {
   route?: string;
   requiresPermission?: string;
   permissionRedirect?: string;
-  screenId?: string; // Maps to screen ID in permissionMapping
 }
 
 export const adminSidebarConfig: SidebarSection[] = [
@@ -41,14 +39,14 @@ export const adminSidebarConfig: SidebarSection[] = [
         i18nKey: { en: "Users", ar: "المستخدمين" },
         route: "/administration/users",
         icon: User,
-        screenId: "users"
+        requiresPermission: "usersHidden",
+        permissionRedirect: "/admin-home"
       },
       {
         id: "authorization",
         i18nKey: { en: "Authorization", ar: "الصلاحيات" },
         route: "/administration/authorization",
-        icon: User,
-        screenId: "authorization"
+        icon: User
       }
     ]
   },
@@ -64,35 +62,34 @@ export const adminSidebarConfig: SidebarSection[] = [
         i18nKey: { en: "Credit Note", ar: "إشعار دائن" },
         route: "/financial/credit-note",
         icon: Receipt,
-        screenId: "creditNotes"
+        requiresPermission: "creditNoteNoPermission",
+        permissionRedirect: "/admin-home"
       },
       {
         id: "credit-notes",
         i18nKey: { en: "Credit Notes", ar: "إشعارات دائنة" },
         route: "/financial/credit-notes",
         icon: ReceiptText,
-        screenId: "creditNotes"
+        requiresPermission: "creditNoteNoPermission",
+        permissionRedirect: "/admin-home"
       },
       {
         id: "outgoing-payment",
         i18nKey: { en: "Outgoing Payment", ar: "الدفع الصادر" },
         route: "/financial/outgoing-payment",
-        icon: BanknoteArrowDown,
-        screenId: "outgoingPayment"
+        icon: BanknoteArrowDown
       },
       {
         id: "income-payment",
         i18nKey: { en: "Income Payment", ar: "الدفع الوارد" },
         route: "/financial/income-payment",
-        icon: BanknoteArrowUp,
-        screenId: "incomePayment"
+        icon: BanknoteArrowUp
       },
       {
         id: "ar-balance",
         i18nKey: { en: "A/R Balance", ar: "رصيد الحسابات المدينة" },
         route: "/financial/ar-balance",
-        icon: ArrowUpDown,
-        screenId: "arBalance"
+        icon: ArrowUpDown
       },
     ]
   },
@@ -107,8 +104,7 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "partner-management",
         i18nKey: { en: "Partner Management", ar: "إدارة الشركاء" },
         route: "/business-partner/partner-management",
-        icon: Users,
-        screenId: "partnerManagement"
+        icon: Users
       },
     ]
   },
@@ -118,8 +114,7 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "vetsvan-management",
     i18nKey: { en: "VetsVan Management", ar: "إدارة VETS VAN" },
     icon: Car,
-    route: "/admin-dashboard",
-    screenId: "vetsvanManagement"
+    route: "/admin-dashboard"
   },
   
   // Vets Van Shifts
@@ -127,8 +122,7 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "vets-van-shifts",
     i18nKey: { en: "Vets Van Shifts", ar: "نوبات VETS VAN" },
     icon: Clock,
-    route: "/vets-van-shifts",
-    screenId: "vetsvanShifts"
+    route: "/vets-van-shifts"
   },
   
   // Reports
@@ -159,8 +153,7 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "vets-van-requests",
     i18nKey: { en: "Vets Van Requests", ar: "طلبات VETS VAN" },
     icon: FileText,
-    route: "/admin-vetsvan-requests",
-    screenId: "vetsvanRequests"
+    route: "/admin-vetsvan-requests"
   },
   
   // Import
@@ -168,8 +161,7 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "import",
     i18nKey: { en: "Import", ar: "استيراد" },
     icon: Upload,
-    route: "/admin-dashboard/import",
-    screenId: "import"
+    route: "/admin-dashboard/import"
   },
   
   // Services
@@ -178,7 +170,8 @@ export const adminSidebarConfig: SidebarSection[] = [
     i18nKey: { en: "Services", ar: "الخدمات" },
     icon: Stethoscope,
     route: "/admin-dashboard/services",
-    screenId: "services"
+    requiresPermission: "servicesHidden",
+    permissionRedirect: "/admin-home"
   },
   
   // Products
@@ -186,8 +179,7 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "products",
     i18nKey: { en: "Products", ar: "المنتجات" },
     icon: Package,
-    route: "/admin-dashboard/products",
-    screenId: "products"
+    route: "/admin-dashboard/products"
   }
 ];
 
