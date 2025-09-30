@@ -765,6 +765,15 @@ export const authorizations = pgTable("authorizations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Authorization Roles table - JSON-based flexible permission storage
+export const authorizationRoles = pgTable("authorization_roles", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  permissions: jsonb("permissions").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Admin users table for user management
 export const adminUsers = pgTable("admin_users", {
   id: serial("id").primaryKey(),
@@ -817,10 +826,17 @@ export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
   isActive: true,
 });
 
+export const insertAuthorizationRoleSchema = createInsertSchema(authorizationRoles).pick({
+  name: true,
+  permissions: true,
+});
+
 export type Authorization = typeof authorizations.$inferSelect;
 export type InsertAuthorization = z.infer<typeof insertAuthorizationSchema>;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
+export type AuthorizationRole = typeof authorizationRoles.$inferSelect;
+export type InsertAuthorizationRole = z.infer<typeof insertAuthorizationRoleSchema>;
 
 // Red zones table - circular areas where ride requests are restricted
 export const redZones = pgTable("red_zones", {

@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, creditNotes, outgoingPayments, incomePayments, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction, type CreditNote, type InsertCreditNote, type OutgoingPayment, type InsertOutgoingPayment, type IncomePayment, type InsertIncomePayment } from "@shared/schema";
+import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, creditNotes, outgoingPayments, incomePayments, authorizationRoles, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction, type CreditNote, type InsertCreditNote, type OutgoingPayment, type InsertOutgoingPayment, type IncomePayment, type InsertIncomePayment, type AuthorizationRole, type InsertAuthorizationRole } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt, sql } from "drizzle-orm";
 
@@ -42,6 +42,11 @@ export interface IStorage {
   getAdminByUsername(username: string): Promise<Admin | undefined>;
   createDriver(driver: InsertDriver): Promise<Driver>;
   deleteDriver(id: number): Promise<void>;
+
+  // Authorization Roles operations
+  createAuthorizationRole(role: InsertAuthorizationRole): Promise<AuthorizationRole>;
+  getAllAuthorizationRoles(): Promise<AuthorizationRole[]>;
+  getAuthorizationRole(id: number): Promise<AuthorizationRole | undefined>;
 
   // Shifts operations
   getAllShifts(): Promise<Shift[]>;
@@ -461,6 +466,21 @@ export class DatabaseStorage implements IStorage {
 
   async deleteDriver(id: number): Promise<void> {
     await db.delete(drivers).where(eq(drivers.id, id));
+  }
+
+  // Authorization Roles operations
+  async createAuthorizationRole(role: InsertAuthorizationRole): Promise<AuthorizationRole> {
+    const [newRole] = await db.insert(authorizationRoles).values(role).returning();
+    return newRole;
+  }
+
+  async getAllAuthorizationRoles(): Promise<AuthorizationRole[]> {
+    return await db.select().from(authorizationRoles).orderBy(desc(authorizationRoles.createdAt));
+  }
+
+  async getAuthorizationRole(id: number): Promise<AuthorizationRole | undefined> {
+    const [role] = await db.select().from(authorizationRoles).where(eq(authorizationRoles.id, id)).limit(1);
+    return role;
   }
 
   // Shifts operations

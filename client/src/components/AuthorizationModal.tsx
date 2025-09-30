@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 interface AuthorizationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (name: string, permissions: Record<string, ScreenPermissions>) => void;
   editMode?: boolean;
   authorizationName?: string;
   onNameChange?: (name: string) => void;
@@ -249,7 +249,7 @@ export function AuthorizationModal({
                 {language === 'ar' ? 'إلغاء' : 'Cancel'}
               </button>
               <button
-                onClick={onSave}
+                onClick={() => onSave(authorizationName || '', permissions)}
                 className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
                 style={{ backgroundColor: '#852085' }}
                 data-testid="button-save-authorization"

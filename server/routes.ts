@@ -3025,6 +3025,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Authorization Roles management routes (JSON-based)
+  app.post('/api/admin/authorization-roles', requireAdminAuth, async (req, res) => {
+    try {
+      const { name, permissions } = req.body;
+      
+      if (!name || !permissions) {
+        return res.status(400).json({ message: 'Name and permissions are required' });
+      }
+      
+      const newRole = await storage.createAuthorizationRole({
+        name,
+        permissions
+      });
+      
+      res.json(newRole);
+    } catch (error) {
+      console.error('Error creating authorization role:', error);
+      res.status(500).json({ message: 'Error creating authorization role' });
+    }
+  });
+
+  app.get('/api/admin/authorization-roles', requireAdminAuth, async (req, res) => {
+    try {
+      const roles = await storage.getAllAuthorizationRoles();
+      res.json(roles);
+    } catch (error) {
+      console.error('Error fetching authorization roles:', error);
+      res.status(500).json({ message: 'Error fetching authorization roles' });
+    }
+  });
+
   // Get current user's authorization permissions
   app.get('/api/admin/current-user-permissions', requireAdminAuth, async (req, res) => {
     try {

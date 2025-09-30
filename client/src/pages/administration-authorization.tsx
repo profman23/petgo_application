@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "@/lib/i18n";
 import { Shield, User, FilePlus } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { AuthorizationModal } from "@/components/AuthorizationModal";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -22,6 +24,7 @@ const getDirection = (lang: string) => lang === 'ar' ? 'rtl' : 'ltr';
 export default function AdministrationAuthorization() {
   const [location, setLocation] = useLocation();
   const { t, language } = useTranslation();
+  const { toast } = useToast();
   
   // Search state
   const [searchInput, setSearchInput] = useState("");
@@ -29,6 +32,32 @@ export default function AdministrationAuthorization() {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [authorizationName, setAuthorizationName] = useState("");
+  
+  // Create authorization role mutation
+  const createRoleMutation = useMutation({
+    mutationFn: async (data: { name: string; permissions: any }) => {
+      return await apiRequest('/api/admin/authorization-roles', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/authorization-roles'] });
+      toast({
+        title: language === 'ar' ? 'تم الحفظ' : 'Saved',
+        description: language === 'ar' ? 'تم حفظ الصلاحية بنجاح' : 'Authorization saved successfully',
+      });
+      handleCloseModal();
+    },
+    onError: (error) => {
+      console.error('Error saving authorization:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في حفظ الصلاحية' : 'Failed to save authorization',
+        variant: 'destructive',
+      });
+    }
+  });
   
   // Search handlers
   const handleSearchClick = () => {
@@ -49,10 +78,19 @@ export default function AdministrationAuthorization() {
     setAuthorizationName("");
   };
 
-  const handleSaveAuthorization = () => {
-    console.log('Saving authorization:', authorizationName);
-    // Save logic will be implemented later
-    handleCloseModal();
+  const handleSaveAuthorization = (name: string, permissions: Record<string, any>) => {
+    console.log('Saving authorization:', name, permissions);
+    
+    if (!name.trim()) {
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'الرجاء إدخال اسم الصلاحية' : 'Please enter authorization name',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    createRoleMutation.mutate({ name, permissions });
   };
 
   // Add lord-icon script to head when component mounts
