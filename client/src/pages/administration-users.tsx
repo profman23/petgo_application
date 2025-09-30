@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
+import { useScreenPermissions } from "@/hooks/useScreenPermissions";
 
 export default function AdministrationUsers() {
   const [, setLocation] = useLocation();
@@ -35,28 +36,16 @@ export default function AdministrationUsers() {
     }
   }, [setLocation]);
 
-  // Fetch current user's authorization permissions with proper cache management
-  const {
-    data: currentUserPermissions,
-    isLoading: permissionsLoading,
-    error: permissionsError
-  } = useQuery({
-    queryKey: ['/api/admin/current-user-permissions'],
-    retry: false,
-    staleTime: 0, // Always fetch fresh permissions
-    gcTime: 0, // Don't cache to avoid stale data (updated for TanStack Query v5)
-    refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: false, // Don't refetch on window focus
-  });
+  // Use centralized permission hook
+  const { hasAccess, canEdit, canExport, isLoading: permissionsLoading } = useScreenPermissions('users');
 
   // Route guard - redirect silently if user doesn't have permission to access Users page
   useEffect(() => {
-    if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
-      // User should not reach this page with hidden permission, redirect immediately
+    if (!permissionsLoading && !hasAccess) {
       console.log('User has no users permission, redirecting to admin home');
       setLocation('/admin-home');
     }
-  }, [currentUserPermissions, permissionsLoading, setLocation]);
+  }, [hasAccess, permissionsLoading, setLocation]);
 
   const adminToken = localStorage.getItem("adminToken");
 
@@ -197,7 +186,7 @@ export default function AdministrationUsers() {
   };
 
   // Determine if page is in read-only mode
-  const isReadOnly = currentUserPermissions && currentUserPermissions.usersRead === true && !currentUserPermissions.usersFullControl;
+  const isReadOnly = !canEdit;
 
   return (
     <AdminLayout>

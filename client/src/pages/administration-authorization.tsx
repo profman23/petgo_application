@@ -8,6 +8,7 @@ import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { AuthorizationModal } from "@/components/AuthorizationModal";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useScreenPermissions } from "@/hooks/useScreenPermissions";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -164,40 +165,19 @@ export default function AdministrationAuthorization() {
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 
-  // Fetch current user's authorization permissions with proper cache management
-  const {
-    data: currentUserPermissions,
-    isLoading: permissionsLoading,
-    error: permissionsError
-  } = useQuery({
-    queryKey: ['/api/admin/current-user-permissions'],
-    retry: false,
-    staleTime: 0, // Always fetch fresh permissions
-    gcTime: 0, // Don't cache to avoid stale data (replaces cacheTime)
-    refetchOnMount: true, // Always refetch when component mounts
-    refetchOnWindowFocus: false, // Don't refetch on window focus to avoid unnecessary calls
-  });
+  // Use centralized permission hook
+  const { hasAccess, canEdit, canExport, isLoading: permissionsLoading } = useScreenPermissions('authorization');
 
-  // Check authorization permissions on page load
+  // Check permissions on page load and redirect if no access
   useEffect(() => {
-    if (!permissionsLoading && currentUserPermissions) {
-      const permissions = currentUserPermissions as any;
-      
-      // Check if user has any authorization permissions
-      const hasAuthRead = permissions.authRead === true;
-      const hasAuthFullControl = permissions.authFullControl === true;
-      const hasAuthHidden = permissions.authHidden === true;
-      
-      if (hasAuthHidden || (!hasAuthRead && !hasAuthFullControl)) {
-        console.log('User does not have authorization permissions, redirecting to admin home');
-        setLocation('/admin-home');
-        return;
-      }
+    if (!permissionsLoading && !hasAccess) {
+      console.log('User does not have authorization permissions, redirecting to admin home');
+      setLocation('/admin-home');
     }
-  }, [currentUserPermissions, permissionsLoading, setLocation]);
+  }, [hasAccess, permissionsLoading, setLocation]);
 
   // Determine if page is in read-only mode
-  const isReadOnly = currentUserPermissions && (currentUserPermissions as any).authRead === true && !(currentUserPermissions as any).authFullControl;
+  const isReadOnly = !canEdit;
 
   return (
     <AdminLayout>
@@ -221,18 +201,20 @@ export default function AdministrationAuthorization() {
           </div>
 
           {/* Right side - Create Authorization Button */}
-          <button
-            onClick={handleCreateAuthorization}
-            className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
-            style={{ 
-              borderColor: '#852085', 
-              color: '#852085'
-            }}
-            data-testid="button-create-authorization"
-          >
-            <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
-            {language === 'ar' ? 'إنشاء صلاحية' : 'Create Authorization'}
-          </button>
+          {canEdit && (
+            <button
+              onClick={handleCreateAuthorization}
+              className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
+              style={{ 
+                borderColor: '#852085', 
+                color: '#852085'
+              }}
+              data-testid="button-create-authorization"
+            >
+              <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+              {language === 'ar' ? 'إنشاء صلاحية' : 'Create Authorization'}
+            </button>
+          )}
         </div>
 
         {/* Search Action Bar */}
@@ -243,7 +225,7 @@ export default function AdministrationAuthorization() {
             onSearchChange={setSearchInput}
             onSearchClick={handleSearchClick}
             onExportClick={handleExportClick}
-            exportDisabled={false}
+            exportDisabled={!canExport}
             inputTestId="input-search-authorizations"
             searchButtonTestId="button-search-authorizations"
             exportButtonTestId="button-export-authorizations"
@@ -289,14 +271,16 @@ export default function AdministrationAuthorization() {
                       </p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleEditAuthorization(role)}
-                    className="p-2 hover:bg-purple-100 rounded-lg transition-colors"
-                    data-testid={`button-edit-authorization-${role.id}`}
-                    title={language === 'ar' ? 'تعديل' : 'Edit'}
-                  >
-                    <Pencil className="h-5 w-5" style={{ color: '#852085' }} />
-                  </button>
+                  {canEdit && (
+                    <button
+                      onClick={() => handleEditAuthorization(role)}
+                      className="p-2 hover:bg-purple-100 rounded-lg transition-colors"
+                      data-testid={`button-edit-authorization-${role.id}`}
+                      title={language === 'ar' ? 'تعديل' : 'Edit'}
+                    >
+                      <Pencil className="h-5 w-5" style={{ color: '#852085' }} />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
