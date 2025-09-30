@@ -46,6 +46,7 @@ export interface IStorage {
   // Authorization Roles operations
   createAuthorizationRole(role: InsertAuthorizationRole): Promise<AuthorizationRole>;
   getAllAuthorizationRoles(): Promise<AuthorizationRole[]>;
+  updateAuthorizationRole(id: number, role: Partial<InsertAuthorizationRole>): Promise<AuthorizationRole | null>;
   getAuthorizationRole(id: number): Promise<AuthorizationRole | undefined>;
 
   // Shifts operations
@@ -481,6 +482,15 @@ export class DatabaseStorage implements IStorage {
   async getAuthorizationRole(id: number): Promise<AuthorizationRole | undefined> {
     const [role] = await db.select().from(authorizationRoles).where(eq(authorizationRoles.id, id)).limit(1);
     return role;
+  }
+
+  async updateAuthorizationRole(id: number, role: Partial<InsertAuthorizationRole>): Promise<AuthorizationRole | null> {
+    const [updatedRole] = await db
+      .update(authorizationRoles)
+      .set({ ...role, updatedAt: new Date() })
+      .where(eq(authorizationRoles.id, id))
+      .returning();
+    return updatedRole || null;
   }
 
   // Shifts operations

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useTranslation } from "@/lib/i18n";
-import { Shield, User, FilePlus } from "lucide-react";
+import { Shield, User, FilePlus, Pencil } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
@@ -32,6 +32,8 @@ export default function AdministrationAuthorization() {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [authorizationName, setAuthorizationName] = useState("");
+  const [editingRole, setEditingRole] = useState<any>(null);
+  const [initialPermissions, setInitialPermissions] = useState<Record<string, any>>({});
   
   // Create authorization role mutation
   const createRoleMutation = useMutation({
@@ -58,6 +60,32 @@ export default function AdministrationAuthorization() {
       });
     }
   });
+
+  // Update authorization role mutation
+  const updateRoleMutation = useMutation({
+    mutationFn: async (data: { id: number; name: string; permissions: any }) => {
+      return await apiRequest(`/api/admin/authorization-roles/${data.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ name: data.name, permissions: data.permissions })
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/authorization-roles'] });
+      toast({
+        title: language === 'ar' ? 'تم التحديث' : 'Updated',
+        description: language === 'ar' ? 'تم تحديث الصلاحية بنجاح' : 'Authorization updated successfully',
+      });
+      handleCloseModal();
+    },
+    onError: (error) => {
+      console.error('Error updating authorization:', error);
+      toast({
+        title: language === 'ar' ? 'خطأ' : 'Error',
+        description: language === 'ar' ? 'فشل في تحديث الصلاحية' : 'Failed to update authorization',
+        variant: 'destructive',
+      });
+    }
+  });
   
   // Search handlers
   const handleSearchClick = () => {
@@ -69,13 +97,24 @@ export default function AdministrationAuthorization() {
   };
 
   const handleCreateAuthorization = () => {
-    setIsModalOpen(true);
+    setEditingRole(null);
     setAuthorizationName("");
+    setInitialPermissions({});
+    setIsModalOpen(true);
+  };
+
+  const handleEditAuthorization = (role: any) => {
+    setEditingRole(role);
+    setAuthorizationName(role.name);
+    setInitialPermissions(role.permissions || {});
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setAuthorizationName("");
+    setEditingRole(null);
+    setInitialPermissions({});
   };
 
   const handleSaveAuthorization = (name: string, permissions: Record<string, any>) => {
@@ -90,7 +129,13 @@ export default function AdministrationAuthorization() {
       return;
     }
     
-    createRoleMutation.mutate({ name, permissions });
+    if (editingRole) {
+      // Update existing authorization
+      updateRoleMutation.mutate({ id: editingRole.id, name, permissions });
+    } else {
+      // Create new authorization
+      createRoleMutation.mutate({ name, permissions });
+    }
   };
 
   // Add lord-icon script to head when component mounts
@@ -108,13 +153,13 @@ export default function AdministrationAuthorization() {
     };
   }, []);
 
-  // Fetch authorizations from API
+  // Fetch authorization roles from API (JSON-based)
   const {
-    data: authorizations = [],
+    data: authorizationRoles = [],
     isLoading: authorizationsLoading,
     error: authorizationsError
   } = useQuery({
-    queryKey: ['/api/admin/authorizations'],
+    queryKey: ['/api/admin/authorization-roles'],
     retry: false,
     refetchInterval: 30000, // Refetch every 30 seconds
   });
@@ -213,7 +258,7 @@ export default function AdministrationAuthorization() {
               {language === 'ar' ? 'جاري التحميل...' : 'Loading authorizations...'}
             </p>
           </div>
-        ) : (authorizations as any[]).length === 0 ? (
+        ) : (authorizationRoles as any[]).length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <Shield className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900" dir={getDirection(language)}>
@@ -225,28 +270,33 @@ export default function AdministrationAuthorization() {
           </div>
         ) : (
           <div className="space-y-4 bg-white rounded-lg shadow p-4">
-            {(authorizations as any[]).map((auth: any) => (
+            {(authorizationRoles as any[]).map((role: any) => (
               <div
-                key={auth.id}
+                key={role.id}
                 className="bg-gray-50 rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 rounded-lg">
-                      <User className="h-5 w-5 text-purple-600" />
+                      <Shield className="h-5 w-5" style={{ color: '#852085' }} />
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900" dir={getDirection(language)}>
-                        {auth.name}
+                        {role.name}
                       </h3>
                       <p className="text-sm text-gray-500" dir={getDirection(language)}>
-                        {language === 'ar' ? `المعرف: ${auth.id}` : `ID: ${auth.id}`}
+                        {language === 'ar' ? `المعرف: ${role.id}` : `ID: ${role.id}`}
                       </p>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500" dir={getDirection(language)}>
-                    {language === 'ar' ? 'صلاحية محفوظة' : 'Saved Authorization'}
-                  </div>
+                  <button
+                    onClick={() => handleEditAuthorization(role)}
+                    className="p-2 hover:bg-purple-100 rounded-lg transition-colors"
+                    data-testid={`button-edit-authorization-${role.id}`}
+                    title={language === 'ar' ? 'تعديل' : 'Edit'}
+                  >
+                    <Pencil className="h-5 w-5" style={{ color: '#852085' }} />
+                  </button>
                 </div>
               </div>
             ))}
@@ -259,8 +309,10 @@ export default function AdministrationAuthorization() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onSave={handleSaveAuthorization}
+        editMode={!!editingRole}
         authorizationName={authorizationName}
         onNameChange={setAuthorizationName}
+        initialPermissions={initialPermissions}
       />
     </AdminLayout>
   );

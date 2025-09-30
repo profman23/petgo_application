@@ -3056,6 +3056,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put('/api/admin/authorization-roles/:id', requireAdminAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { name, permissions } = req.body;
+      
+      if (!name || !permissions) {
+        return res.status(400).json({ message: 'Name and permissions are required' });
+      }
+      
+      const updatedRole = await storage.updateAuthorizationRole(id, {
+        name,
+        permissions
+      });
+      
+      if (!updatedRole) {
+        return res.status(404).json({ message: 'Authorization role not found' });
+      }
+      
+      res.json(updatedRole);
+    } catch (error) {
+      console.error('Error updating authorization role:', error);
+      res.status(500).json({ message: 'Error updating authorization role' });
+    }
+  });
+
   // Get current user's authorization permissions
   app.get('/api/admin/current-user-permissions', requireAdminAuth, async (req, res) => {
     try {

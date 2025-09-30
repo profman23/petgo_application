@@ -9,6 +9,7 @@ interface AuthorizationModalProps {
   editMode?: boolean;
   authorizationName?: string;
   onNameChange?: (name: string) => void;
+  initialPermissions?: Record<string, ScreenPermissions>;
 }
 
 interface ScreenPermissions {
@@ -24,12 +25,23 @@ export function AuthorizationModal({
   onSave,
   editMode = false,
   authorizationName = '',
-  onNameChange
+  onNameChange,
+  initialPermissions = {}
 }: AuthorizationModalProps) {
   const { language } = useTranslation();
   
   // State to track permissions for each screen
   const [permissions, setPermissions] = useState<Record<string, ScreenPermissions>>({});
+
+  // Initialize permissions when modal opens in edit mode
+  useEffect(() => {
+    if (isOpen && editMode && initialPermissions) {
+      setPermissions(initialPermissions);
+    } else if (isOpen && !editMode) {
+      // Clear permissions when creating new authorization
+      setPermissions({});
+    }
+  }, [isOpen, editMode, initialPermissions]);
 
   useEffect(() => {
     if (isOpen) {
