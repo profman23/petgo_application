@@ -3217,17 +3217,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const [newUser] = await db.insert(adminUsers).values(userDataWithHashedPassword).returning();
       res.json(newUser);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating admin user:', error);
       if (error instanceof ZodError) {
         return res.status(400).json({ message: error.errors[0].message });
       }
       // Handle database unique constraint violations
-      if (error.code === '23505') { // PostgreSQL unique constraint violation
-        if (error.constraint === 'admin_users_email_unique') {
+      if (error?.code === '23505') { // PostgreSQL unique constraint violation
+        if (error?.constraint === 'admin_users_email_key') {
           return res.status(400).json({ message: 'Email address is already in use' });
         }
-        if (error.constraint === 'admin_users_username_unique') {
+        if (error?.constraint === 'admin_users_username_key') {
           return res.status(400).json({ message: 'Username is already taken' });
         }
       }
