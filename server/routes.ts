@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, insertAdminUserSchema, adminUsers, redZones, insertOutgoingPaymentSchema, insertIncomePaymentSchema } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, authorizationRoles, insertAdminUserSchema, adminUsers, redZones, insertOutgoingPaymentSchema, insertIncomePaymentSchema } from "@shared/schema";
 import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
@@ -3191,10 +3191,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         authorizationId: adminUsers.authorizationId,
         isActive: adminUsers.isActive,
         createdAt: adminUsers.createdAt,
-        authorizationName: authorizations.name
+        authorizationName: authorizationRoles.name
       })
       .from(adminUsers)
-      .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
+      .leftJoin(authorizationRoles, eq(adminUsers.authorizationId, authorizationRoles.id))
       .orderBy(adminUsers.createdAt);
       
       res.json(adminUsersList);
