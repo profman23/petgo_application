@@ -43,20 +43,34 @@ export function useScreenPermissions(screenId: string): ScreenPermissions {
 
   const permissions = currentUserPermissions as any;
 
-  // Check if screen is hidden (No Permission)
-  const isHidden = permissions[permissionFields.hidden] === true;
+  // Check if screen is hidden or has no permission
+  // Note: Some screens use "hidden" field, others use "noPermission" field
+  let isBlocked = false;
+  if (permissionFields.hidden && permissions[permissionFields.hidden] === true) {
+    isBlocked = true;
+  }
+  if (permissionFields.noPermission && permissions[permissionFields.noPermission] === true) {
+    isBlocked = true;
+  }
   
-  // Check if user has Read permission
-  const hasRead = permissions[permissionFields.read] === true;
+  // Check if user has Read permission (if field exists)
+  const hasRead = permissionFields.read 
+    ? permissions[permissionFields.read] === true 
+    : false;
   
   // Check if user has Full Control
   const hasFullControl = permissions[permissionFields.fullControl] === true;
 
+  // Check if user has Export permission (if field exists, otherwise use fullControl)
+  const hasExport = permissionFields.export
+    ? permissions[permissionFields.export] === true
+    : hasFullControl;
+
   // Determine access levels
-  const hasAccess = !isHidden && (hasRead || hasFullControl);
+  const hasAccess = !isBlocked && (hasRead || hasFullControl);
   const canRead = hasRead || hasFullControl;
   const canEdit = hasFullControl;
-  const canExport = hasFullControl; // Export is included in Full Control
+  const canExport = hasExport;
 
   return {
     hasAccess,
