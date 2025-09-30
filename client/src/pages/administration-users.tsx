@@ -49,13 +49,13 @@ export default function AdministrationUsers() {
 
   const adminToken = localStorage.getItem("adminToken");
 
-  // Fetch authorizations for dropdown
+  // Fetch authorization roles for dropdown from the new authorization_roles table
   const {
     data: authorizations = [],
     isLoading: authorizationsLoading,
     error: authorizationsError
   } = useQuery({
-    queryKey: ['/api/admin/authorizations'],
+    queryKey: ['/api/admin/authorization-roles'],
     retry: false,
     refetchInterval: 30000, // Refetch every 30 seconds
     enabled: !!adminToken,
