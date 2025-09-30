@@ -5,6 +5,7 @@ import { Shield, User, FilePlus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
+import { AuthorizationModal } from "@/components/AuthorizationModal";
 
 // Declare lord-icon custom element for TypeScript
 declare global {
@@ -25,6 +26,10 @@ export default function AdministrationAuthorization() {
   // Search state
   const [searchInput, setSearchInput] = useState("");
   
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [authorizationName, setAuthorizationName] = useState("");
+  
   // Search handlers
   const handleSearchClick = () => {
     console.log('Search clicked with:', searchInput);
@@ -35,7 +40,19 @@ export default function AdministrationAuthorization() {
   };
 
   const handleCreateAuthorization = () => {
-    console.log('Create authorization clicked');
+    setIsModalOpen(true);
+    setAuthorizationName("");
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setAuthorizationName("");
+  };
+
+  const handleSaveAuthorization = () => {
+    console.log('Saving authorization:', authorizationName);
+    // Save logic will be implemented later
+    handleCloseModal();
   };
 
   // Add lord-icon script to head when component mounts
@@ -198,6 +215,15 @@ export default function AdministrationAuthorization() {
           </div>
         )}
       </div>
+
+      {/* Authorization Modal */}
+      <AuthorizationModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSave={handleSaveAuthorization}
+        authorizationName={authorizationName}
+        onNameChange={setAuthorizationName}
+      />
     </AdminLayout>
   );
 }
