@@ -3025,6 +3025,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to automatically clear blocking flags when access is granted
+  // Works with nested JSON structure: { "users": { "read": true, "fullControl": false, "noPermission": false } }
+  function normalizePermissions(permissions: any): any {
+    const normalized = JSON.parse(JSON.stringify(permissions)); // Deep clone
+    
+    // For each screen in the permissions object
+    for (const screen in normalized) {
+      if (typeof normalized[screen] === 'object' && normalized[screen] !== null) {
+        const screenPerms = normalized[screen];
+        
+        // If read or fullControl is granted, automatically clear noPermission flag
+        const hasRead = screenPerms.read === true;
+        const hasFullControl = screenPerms.fullControl === true;
+        
+        if (hasRead || hasFullControl) {
+          screenPerms.noPermission = false;
+        }
+      }
+    }
+    
+    return normalized;
+  }
+
   // Authorization Roles management routes (JSON-based)
   app.post('/api/admin/authorization-roles', requireAdminAuth, async (req, res) => {
     try {
@@ -3034,9 +3057,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Name and permissions are required' });
       }
       
+      // Normalize permissions to ensure blocking flags are cleared when access is granted
+      const normalizedPermissions = normalizePermissions(permissions);
+      
       const newRole = await storage.createAuthorizationRole({
         name,
-        permissions
+        permissions: normalizedPermissions
       });
       
       res.json(newRole);
@@ -3065,9 +3091,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Name and permissions are required' });
       }
       
+      // Normalize permissions to ensure blocking flags are cleared when access is granted
+      const normalizedPermissions = normalizePermissions(permissions);
+      
       const updatedRole = await storage.updateAuthorizationRole(id, {
         name,
-        permissions
+        permissions: normalizedPermissions
       });
       
       if (!updatedRole) {
