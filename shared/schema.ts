@@ -782,7 +782,7 @@ export const adminUsers = pgTable("admin_users", {
   email: text("email").notNull().unique(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  authorizationId: integer("authorization_id").notNull().references(() => authorizations.id),
+  authorizationId: integer("authorization_id").references(() => authorizations.id),
   authorizationRoleId: integer("authorization_role_id").references(() => authorizationRoles.id, { onDelete: 'set null' }),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
