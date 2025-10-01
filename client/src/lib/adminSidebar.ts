@@ -46,7 +46,9 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "authorization",
         i18nKey: { en: "Authorization", ar: "الصلاحيات" },
         route: "/administration/authorization",
-        icon: User
+        icon: User,
+        requiresPermission: "Authorization",
+        permissionRedirect: "/admin-home"
       }
     ]
   },
