@@ -134,51 +134,20 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
     refetchOnReconnect: 'always',
   });
 
-  // DEFAULT-DENY LOGIC: Only allow access if user has explicit read or full control permission  
-  // Redirect in useEffect to avoid state updates during render - MUST be called before conditional returns
+  // Permission check - redirect users without access
   useEffect(() => {
-    if (currentUserPermissions) {
-      // Check new JSON-based permissions first
-      if (currentUserPermissions.rolePermissions?.CreditNote) {
-        const creditNotePerms = currentUserPermissions.rolePermissions.CreditNote;
-        
-        // Check for explicit "No Permission" flag
-        if (creditNotePerms.noPermission === true) {
-          console.log('🚫 [PERMS_GATE] REDIRECTING: User has explicit no permission for Credit Note (rolePermissions)');
-          setLocation('/admin-home');
-          return;
-        }
-
-        // Check if user has any valid Credit Note permissions
-        const hasValidPermission = creditNotePerms.read === true || creditNotePerms.fullControl === true;
-        
-        if (!hasValidPermission) {
-          console.log('🚫 [PERMS_GATE] REDIRECTING: User lacks valid Credit Note permissions (rolePermissions)');
-          setLocation('/admin-home');
-          return;
-        }
-
-        console.log('✅ [PERMS_GATE] ALLOWING: User has valid Credit Note permissions (rolePermissions)');
-        return;
-      }
+    if (currentUserPermissions?.rolePermissions?.CreditNote) {
+      const creditNotePerms = currentUserPermissions.rolePermissions.CreditNote;
       
-      // Fallback to legacy permissions
-      if (currentUserPermissions.creditNoteNoPermission === true) {
-        console.log('🚫 [PERMS_GATE] REDIRECTING: User has explicit no permission for Credit Note (legacy)');
+      if (creditNotePerms.noPermission === true) {
         setLocation('/admin-home');
         return;
       }
 
-      const hasValidPermission = currentUserPermissions.creditNoteRead === true || 
-                                 currentUserPermissions.creditNoteFullControl === true;
-      
+      const hasValidPermission = creditNotePerms.read === true || creditNotePerms.fullControl === true;
       if (!hasValidPermission) {
-        console.log('🚫 [PERMS_GATE] REDIRECTING: User lacks valid Credit Note permissions (legacy)');
         setLocation('/admin-home');
-        return;
       }
-
-      console.log('✅ [PERMS_GATE] ALLOWING: User has valid Credit Note permissions (legacy)');
     }
   }, [currentUserPermissions, setLocation]);
 
@@ -201,33 +170,13 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Debug: Log received permissions
-  console.log('[PERMS_GATE] Credit Note - User permissions received:', {
-    username: currentUserPermissions?.username,
-    rolePermissions: currentUserPermissions?.rolePermissions,
-    creditNoteNoPermission: currentUserPermissions?.creditNoteNoPermission,
-    creditNoteRead: currentUserPermissions?.creditNoteRead,
-    creditNoteFullControl: currentUserPermissions?.creditNoteFullControl
-  });
-
-  // DEFAULT-DENY: Only render children if user has explicit permissions
-  let hasValidPermission = false;
-  
-  // Check new JSON-based permissions first
-  if (currentUserPermissions?.rolePermissions?.CreditNote) {
-    const creditNotePerms = currentUserPermissions.rolePermissions.CreditNote;
-    hasValidPermission = (creditNotePerms.read === true || creditNotePerms.fullControl === true) && 
-                         creditNotePerms.noPermission !== true;
-  } else {
-    // Fallback to legacy permissions
-    hasValidPermission = currentUserPermissions && (
-      currentUserPermissions.creditNoteRead === true || 
-      currentUserPermissions.creditNoteFullControl === true
-    ) && currentUserPermissions.creditNoteNoPermission !== true;
-  }
+  // Only render if user has valid permissions
+  const creditNotePerms = currentUserPermissions?.rolePermissions?.CreditNote;
+  const hasValidPermission = creditNotePerms && 
+    (creditNotePerms.read === true || creditNotePerms.fullControl === true) && 
+    creditNotePerms.noPermission !== true;
 
   if (!hasValidPermission) {
-    // Don't render anything while redirect is happening
     return null;
   }
 
@@ -263,50 +212,20 @@ function ServicesPermissionGate({ children }: { children: React.ReactNode }) {
     refetchOnReconnect: 'always',
   });
 
-  // DEFAULT-DENY LOGIC: Only allow access if user has explicit read or full control permission  
+  // Permission check - redirect users without access
   useEffect(() => {
-    if (currentUserPermissions) {
-      // Check new JSON-based permissions first
-      if (currentUserPermissions.rolePermissions?.Services) {
-        const servicesPerms = currentUserPermissions.rolePermissions.Services;
-        
-        // Check for explicit "No Permission" flag
-        if (servicesPerms.noPermission === true) {
-          console.log('🚫 [PERMS_GATE] REDIRECTING: User has explicit no permission for Services (rolePermissions)');
-          setLocation('/admin-home');
-          return;
-        }
-
-        // Check if user has any valid Services permissions
-        const hasValidPermission = servicesPerms.read === true || servicesPerms.fullControl === true;
-        
-        if (!hasValidPermission) {
-          console.log('🚫 [PERMS_GATE] REDIRECTING: User lacks valid Services permissions (rolePermissions)');
-          setLocation('/admin-home');
-          return;
-        }
-
-        console.log('✅ [PERMS_GATE] ALLOWING: User has valid Services permissions (rolePermissions)');
-        return;
-      }
+    if (currentUserPermissions?.rolePermissions?.Services) {
+      const servicesPerms = currentUserPermissions.rolePermissions.Services;
       
-      // Fallback to legacy permissions (Services uses servicesHidden)
-      if (currentUserPermissions.servicesHidden === true) {
-        console.log('🚫 [PERMS_GATE] REDIRECTING: User has explicit no permission for Services (legacy)');
+      if (servicesPerms.noPermission === true) {
         setLocation('/admin-home');
         return;
       }
 
-      const hasValidPermission = currentUserPermissions.servicesRead === true || 
-                                 currentUserPermissions.servicesFullControl === true;
-      
+      const hasValidPermission = servicesPerms.read === true || servicesPerms.fullControl === true;
       if (!hasValidPermission) {
-        console.log('🚫 [PERMS_GATE] REDIRECTING: User lacks valid Services permissions (legacy)');
         setLocation('/admin-home');
-        return;
       }
-
-      console.log('✅ [PERMS_GATE] ALLOWING: User has valid Services permissions (legacy)');
     }
   }, [currentUserPermissions, setLocation]);
 
@@ -329,33 +248,13 @@ function ServicesPermissionGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Debug: Log received permissions
-  console.log('[PERMS_GATE] Services - User permissions received:', {
-    username: currentUserPermissions?.username,
-    rolePermissions: currentUserPermissions?.rolePermissions,
-    servicesHidden: currentUserPermissions?.servicesHidden,
-    servicesRead: currentUserPermissions?.servicesRead,
-    servicesFullControl: currentUserPermissions?.servicesFullControl
-  });
-
-  // DEFAULT-DENY: Only render children if user has explicit permissions
-  let hasValidPermission = false;
-  
-  // Check new JSON-based permissions first
-  if (currentUserPermissions?.rolePermissions?.Services) {
-    const servicesPerms = currentUserPermissions.rolePermissions.Services;
-    hasValidPermission = (servicesPerms.read === true || servicesPerms.fullControl === true) && 
-                         servicesPerms.noPermission !== true;
-  } else {
-    // Fallback to legacy permissions
-    hasValidPermission = currentUserPermissions && (
-      currentUserPermissions.servicesRead === true || 
-      currentUserPermissions.servicesFullControl === true
-    ) && currentUserPermissions.servicesHidden !== true;
-  }
+  // Only render if user has valid permissions
+  const servicesPerms = currentUserPermissions?.rolePermissions?.Services;
+  const hasValidPermission = servicesPerms && 
+    (servicesPerms.read === true || servicesPerms.fullControl === true) && 
+    servicesPerms.noPermission !== true;
 
   if (!hasValidPermission) {
-    // Don't render anything while redirect is happening
     return null;
   }
 
