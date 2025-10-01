@@ -181,7 +181,6 @@ export default function AdministrationUsers() {
       email: email.trim(),
       username: username.trim(),
       password: password,
-      authorizationId: parseInt(selectedAuthorization), // Keep for backwards compatibility
       authorizationRoleId: parseInt(selectedAuthorization), // Use new JSON-based authorization roles
       isActive: true
     };
