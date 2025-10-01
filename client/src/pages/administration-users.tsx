@@ -10,32 +10,7 @@ import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 interface UserPermissions {
   id: number;
   username: string;
-  authorizationId?: number | null;
   authorizationRoleId?: number | null;
-  usersHidden?: boolean;
-  usersRead?: boolean;
-  usersFullControl?: boolean;
-  authHidden?: boolean;
-  authRead?: boolean;
-  authFullControl?: boolean;
-  vetsVanHidden?: boolean;
-  vetsVanRead?: boolean;
-  vetsVanFullControl?: boolean;
-  vetsVanShiftsHidden?: boolean;
-  vetsVanShiftsRead?: boolean;
-  vetsVanShiftsFullControl?: boolean;
-  importHidden?: boolean;
-  importFullControl?: boolean;
-  servicesHidden?: boolean;
-  servicesRead?: boolean;
-  servicesFullControl?: boolean;
-  productsHidden?: boolean;
-  productsRead?: boolean;
-  productsFullControl?: boolean;
-  creditNoteNoPermission?: boolean;
-  creditNoteRead?: boolean;
-  creditNoteFullControl?: boolean;
-  creditNoteExport?: boolean;
   rolePermissions?: {
     Users?: {
       noPermission?: boolean;
@@ -97,21 +72,10 @@ export default function AdministrationUsers() {
     refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 
-  // Route guard - redirect silently if user doesn't have permission to access Users page
+  // Route guard - redirect if user doesn't have permission to access Users page
   useEffect(() => {
-    if (!permissionsLoading && currentUserPermissions) {
-      // Check new JSON-based permissions first
-      if (currentUserPermissions.rolePermissions?.Users?.noPermission === true) {
-        console.log('User has no permission for Users screen (JSON-based), redirecting to admin home');
-        setLocation('/admin-home');
-        return;
-      }
-      
-      // Fallback to legacy permissions
-      if (currentUserPermissions.usersHidden) {
-        console.log('User has no users permission (legacy), redirecting to admin home');
-        setLocation('/admin-home');
-      }
+    if (!permissionsLoading && currentUserPermissions?.rolePermissions?.Users?.noPermission === true) {
+      setLocation('/admin-home');
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
@@ -254,7 +218,8 @@ export default function AdministrationUsers() {
   };
 
   // Determine if page is in read-only mode
-  const isReadOnly = currentUserPermissions && currentUserPermissions.usersRead === true && !currentUserPermissions.usersFullControl;
+  const isReadOnly = currentUserPermissions?.rolePermissions?.Users?.read === true && 
+                      currentUserPermissions?.rolePermissions?.Users?.fullControl !== true;
 
   return (
     <AdminLayout>

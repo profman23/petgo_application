@@ -651,36 +651,14 @@ export default function AdminServices() {
 
   // Permission check - redirect users with "No Permission" for Services
   useEffect(() => {
-    if (currentUserPermissions) {
-      // Check new JSON-based permissions first
-      if (currentUserPermissions.rolePermissions?.Services) {
-        const servicesPerms = currentUserPermissions.rolePermissions.Services;
-        if (servicesPerms.noPermission === true) {
-          setLocation('/admin-home');
-        }
-      } else {
-        // Fallback to legacy permissions
-        if (currentUserPermissions.servicesHidden === true) {
-          setLocation('/admin-home');
-        }
-      }
+    if (currentUserPermissions?.rolePermissions?.Services?.noPermission === true) {
+      setLocation('/admin-home');
     }
   }, [currentUserPermissions, setLocation]);
 
   // Check if user has read-only access (can view but not modify)
-  const isReadOnly = (() => {
-    if (!currentUserPermissions) return false;
-    
-    // Check new JSON-based permissions first
-    if (currentUserPermissions.rolePermissions?.Services) {
-      const servicesPerms = currentUserPermissions.rolePermissions.Services;
-      return servicesPerms.read === true && servicesPerms.fullControl !== true;
-    }
-    
-    // Fallback to legacy permissions
-    return currentUserPermissions.servicesRead === true && 
-           currentUserPermissions.servicesFullControl === false;
-  })();
+  const isReadOnly = currentUserPermissions?.rolePermissions?.Services?.read === true && 
+                      currentUserPermissions?.rolePermissions?.Services?.fullControl !== true;
 
   return (
     <AdminLayout>

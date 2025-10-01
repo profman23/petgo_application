@@ -9,34 +9,10 @@ interface SidebarProps {
   className?: string;
 }
 
-// Helper function to check if user has no permission for a given permission key
-const checkNoPermission = (permissionKey: string | undefined, permissions: any): boolean => {
-  if (!permissionKey || !permissions) return false;
-  
-  // Map legacy permission keys to new JSON-based module names
-  const permissionKeyToModule: Record<string, string> = {
-    'usersHidden': 'Users',
-    'servicesHidden': 'Services',
-    'productsHidden': 'Products',
-    'creditNoteNoPermission': 'CreditNote',
-    'authHidden': 'Authorization',
-    'vetsVanHidden': 'VetsVan',
-    'vetsVanShiftsHidden': 'VetsVanShifts',
-    'importHidden': 'Import'
-  };
-  
-  // Check new JSON-based permissions first (priority)
-  const moduleName = permissionKeyToModule[permissionKey];
-  if (moduleName && permissions.rolePermissions?.[moduleName]?.noPermission === true) {
-    return true;
-  }
-  
-  // Fallback to legacy permissions
-  if (permissions[permissionKey] === true) {
-    return true;
-  }
-  
-  return false;
+// Helper function to check if user has no permission for a given module
+const checkNoPermission = (moduleName: string | undefined, permissions: any): boolean => {
+  if (!moduleName || !permissions) return false;
+  return permissions.rolePermissions?.[moduleName]?.noPermission === true;
 };
 
 export function Sidebar({ className = "" }: SidebarProps) {

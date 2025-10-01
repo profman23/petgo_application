@@ -39,7 +39,7 @@ export const adminSidebarConfig: SidebarSection[] = [
         i18nKey: { en: "Users", ar: "المستخدمين" },
         route: "/administration/users",
         icon: User,
-        requiresPermission: "usersHidden",
+        requiresPermission: "Users",
         permissionRedirect: "/admin-home"
       },
       {
@@ -62,7 +62,7 @@ export const adminSidebarConfig: SidebarSection[] = [
         i18nKey: { en: "Credit Note", ar: "إشعار دائن" },
         route: "/financial/credit-note",
         icon: Receipt,
-        requiresPermission: "creditNoteNoPermission",
+        requiresPermission: "CreditNote",
         permissionRedirect: "/admin-home"
       },
       {
@@ -70,7 +70,7 @@ export const adminSidebarConfig: SidebarSection[] = [
         i18nKey: { en: "Credit Notes", ar: "إشعارات دائنة" },
         route: "/financial/credit-notes",
         icon: ReceiptText,
-        requiresPermission: "creditNoteNoPermission",
+        requiresPermission: "CreditNote",
         permissionRedirect: "/admin-home"
       },
       {
@@ -170,7 +170,7 @@ export const adminSidebarConfig: SidebarSection[] = [
     i18nKey: { en: "Services", ar: "الخدمات" },
     icon: Stethoscope,
     route: "/admin-dashboard/services",
-    requiresPermission: "servicesHidden",
+    requiresPermission: "Services",
     permissionRedirect: "/admin-home"
   },
   

@@ -642,16 +642,14 @@ export default function AdminProducts() {
 
   // Permission check - redirect users with "No Permission" for Products
   useEffect(() => {
-    if (currentUserPermissions && currentUserPermissions.productsHidden === true) {
-      console.log('🚫 User has no permission for Products - redirecting to admin home');
+    if (currentUserPermissions?.rolePermissions?.Products?.noPermission === true) {
       setLocation('/admin-home');
     }
   }, [currentUserPermissions, setLocation]);
 
   // Check if user has read-only access (can view but not modify)
-  const isReadOnly = currentUserPermissions && 
-    currentUserPermissions.productsRead === true && 
-    currentUserPermissions.productsFullControl === false;
+  const isReadOnly = currentUserPermissions?.rolePermissions?.Products?.read === true && 
+                      currentUserPermissions?.rolePermissions?.Products?.fullControl !== true;
 
   return (
     <AdminLayout>

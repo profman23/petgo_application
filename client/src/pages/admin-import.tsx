@@ -35,8 +35,7 @@ export default function AdminImport() {
 
   // Permission check - redirect users with "No Permission" for Import
   useEffect(() => {
-    if (currentUserPermissions && currentUserPermissions.importHidden === true) {
-      console.log('🚫 User has no permission for Import - redirecting to admin home');
+    if (currentUserPermissions?.rolePermissions?.Import?.noPermission === true) {
       toast({
         title: language === 'ar' ? 'غير مسموح' : 'Access Denied',
         description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى استيراد البيانات' : 'You do not have permission to access data import',

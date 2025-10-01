@@ -85,39 +85,18 @@ export default function VetsVanShifts() {
 
   // Check if user has access to VetsVan Shifts
   useEffect(() => {
-    if (userPermissions) {
-      // Check new JSON-based permissions first
-      if (userPermissions.rolePermissions?.VetsVanShifts?.noPermission === true) {
-        toast({
-          title: language === 'ar' ? 'غير مسموح' : 'Access Denied',
-          description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى إدارة المناوبات' : 'You do not have permission to access shift management',
-          variant: 'destructive',
-        });
-        setLocation('/admin-home');
-      } else if (userPermissions.vetsVanShiftsHidden) {
-        // Fallback to legacy permissions
-        toast({
-          title: language === 'ar' ? 'غير مسموح' : 'Access Denied',
-          description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى إدارة المناوبات' : 'You do not have permission to access shift management',
-          variant: 'destructive',
-        });
-        setLocation('/admin-home');
-      }
+    if (userPermissions?.rolePermissions?.VetsVanShifts?.noPermission === true) {
+      toast({
+        title: language === 'ar' ? 'غير مسموح' : 'Access Denied',
+        description: language === 'ar' ? 'ليس لديك صلاحية للوصول إلى إدارة المناوبات' : 'You do not have permission to access shift management',
+        variant: 'destructive',
+      });
+      setLocation('/admin-home');
     }
   }, [userPermissions, setLocation, toast, language]);
   
   // Determine read-only mode from permissions
-  const isReadOnly = (() => {
-    if (!userPermissions) return true;
-    
-    // Check new JSON-based permissions first
-    if (userPermissions.rolePermissions?.VetsVanShifts) {
-      return !userPermissions.rolePermissions.VetsVanShifts.fullControl;
-    }
-    
-    // Fallback to legacy permissions
-    return !userPermissions.vetsVanShiftsFullControl;
-  })();
+  const isReadOnly = !userPermissions?.rolePermissions?.VetsVanShifts?.fullControl;
 
   // Week navigation state
   const [currentWeekStart, setCurrentWeekStart] = useState(() => {

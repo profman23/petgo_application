@@ -812,7 +812,7 @@ export default function AdminDashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (currentUserPermissions && (currentUserPermissions as any).vetsVanShiftsHidden === true) {
+                if (currentUserPermissions?.rolePermissions?.VetsVanShifts?.noPermission === true) {
                   setLocation('/admin-home');
                 } else {
                   setLocation('/vets-van-shifts');
