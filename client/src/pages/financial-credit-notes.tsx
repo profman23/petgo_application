@@ -27,6 +27,16 @@ export default function FinancialCreditNotes() {
   // Fetch current user permissions
   const { data: currentUserPermissions } = useQuery({
     queryKey: ['/api/admin/current-user-permissions'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/current-user-permissions', {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch permissions');
+      return response.json();
+    },
+    enabled: !!adminToken,
     retry: false,
   });
   
