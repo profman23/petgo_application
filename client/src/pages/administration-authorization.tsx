@@ -185,21 +185,43 @@ export default function AdministrationAuthorization() {
     if (!permissionsLoading && currentUserPermissions) {
       const permissions = currentUserPermissions as any;
       
-      // Check if user has any authorization permissions
-      const hasAuthRead = permissions.authRead === true;
-      const hasAuthFullControl = permissions.authFullControl === true;
-      const hasAuthHidden = permissions.authHidden === true;
-      
-      if (hasAuthHidden || (!hasAuthRead && !hasAuthFullControl)) {
-        console.log('User does not have authorization permissions, redirecting to admin home');
-        setLocation('/admin-home');
-        return;
+      // Check new JSON-based permissions first
+      if (permissions.rolePermissions?.Authorization) {
+        const authPerms = permissions.rolePermissions.Authorization;
+        if (authPerms.noPermission === true) {
+          console.log('User does not have authorization permissions (rolePermissions), redirecting to admin home');
+          setLocation('/admin-home');
+          return;
+        }
+      } else {
+        // Fallback to legacy permissions
+        const hasAuthRead = permissions.authRead === true;
+        const hasAuthFullControl = permissions.authFullControl === true;
+        const hasAuthHidden = permissions.authHidden === true;
+        
+        if (hasAuthHidden || (!hasAuthRead && !hasAuthFullControl)) {
+          console.log('User does not have authorization permissions (legacy), redirecting to admin home');
+          setLocation('/admin-home');
+          return;
+        }
       }
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   // Determine if page is in read-only mode
-  const isReadOnly = currentUserPermissions && (currentUserPermissions as any).authRead === true && !(currentUserPermissions as any).authFullControl;
+  const isReadOnly = (() => {
+    if (!currentUserPermissions) return false;
+    const permissions = currentUserPermissions as any;
+    
+    // Check new JSON-based permissions first
+    if (permissions.rolePermissions?.Authorization) {
+      const authPerms = permissions.rolePermissions.Authorization;
+      return authPerms.read === true && authPerms.fullControl !== true;
+    }
+    
+    // Fallback to legacy permissions
+    return permissions.authRead === true && !permissions.authFullControl;
+  })();
 
   return (
     <AdminLayout>

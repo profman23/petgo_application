@@ -357,22 +357,54 @@ export default function FinancialCreditNote() {
   useEffect(() => {
     if (currentUserPermissions) {
       console.log('🔍 Current user permissions:', currentUserPermissions);
-      console.log('🔍 Credit Note No Permission status:', currentUserPermissions.creditNoteNoPermission);
       
-      if (currentUserPermissions.creditNoteNoPermission === true) {
-        console.log('🚫 User has no permission for Credit Note - redirecting to admin home');
-        setLocation('/admin-home');
+      // Check new JSON-based permissions first
+      if (currentUserPermissions.rolePermissions?.CreditNote) {
+        const creditNotePerms = currentUserPermissions.rolePermissions.CreditNote;
+        console.log('🔍 Credit Note rolePermissions:', creditNotePerms);
+        
+        if (creditNotePerms.noPermission === true) {
+          console.log('🚫 User has no permission for Credit Note (rolePermissions) - redirecting to admin home');
+          setLocation('/admin-home');
+        }
+      } else {
+        // Fallback to legacy permissions
+        console.log('🔍 Credit Note No Permission status (legacy):', currentUserPermissions.creditNoteNoPermission);
+        if (currentUserPermissions.creditNoteNoPermission === true) {
+          console.log('🚫 User has no permission for Credit Note (legacy) - redirecting to admin home');
+          setLocation('/admin-home');
+        }
       }
     }
   }, [currentUserPermissions, setLocation]);
 
   // Determine if user is in READ-ONLY mode (has read access but not full control)
-  const isReadOnlyMode = currentUserPermissions && 
-    currentUserPermissions.creditNoteRead === true && 
-    currentUserPermissions.creditNoteFullControl !== true;
+  const isReadOnlyMode = (() => {
+    if (!currentUserPermissions) return false;
+    
+    // Check new JSON-based permissions first
+    if (currentUserPermissions.rolePermissions?.CreditNote) {
+      const creditNotePerms = currentUserPermissions.rolePermissions.CreditNote;
+      return creditNotePerms.read === true && creditNotePerms.fullControl !== true;
+    }
+    
+    // Fallback to legacy permissions
+    return currentUserPermissions.creditNoteRead === true && 
+           currentUserPermissions.creditNoteFullControl !== true;
+  })();
 
   // Determine if user can export (requires separate export permission)
-  const canExport = currentUserPermissions && currentUserPermissions.creditNoteExport === true;
+  const canExport = (() => {
+    if (!currentUserPermissions) return false;
+    
+    // Check new JSON-based permissions first
+    if (currentUserPermissions.rolePermissions?.CreditNote) {
+      return currentUserPermissions.rolePermissions.CreditNote.export === true;
+    }
+    
+    // Fallback to legacy permissions
+    return currentUserPermissions.creditNoteExport === true;
+  })();
 
   // Fetch all VetsVan requests for notification counter
   const { data: allVetsVanRequests } = useQuery({
