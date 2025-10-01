@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAuthorizationSchema, authorizations, insertAdminUserSchema, adminUsers, authorizationRoles, redZones, insertOutgoingPaymentSchema, insertIncomePaymentSchema } from "@shared/schema";
+import { loginSchema, insertUserSchema, rideRequestSchema, registerSchema, otpVerificationSchema, insertOtpVerificationSchema, insertAdminUserSchema, adminUsers, authorizationRoles, redZones, insertOutgoingPaymentSchema, insertIncomePaymentSchema } from "@shared/schema";
 import { MyFatoorahService } from "./services/myfatoorah";
 import { ZodError } from "zod";
 import { emailService } from "./emailService";
@@ -2977,54 +2977,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Authorization management routes
-  app.get('/api/admin/authorizations', requireAdminAuth, async (req, res) => {
-    try {
-      const authorizationsList = await db.select().from(authorizations).orderBy(authorizations.createdAt);
-      res.json(authorizationsList);
-    } catch (error) {
-      console.error('Error fetching authorizations:', error);
-      res.status(500).json({ message: 'Error fetching authorizations' });
-    }
-  });
-
-  app.post('/api/admin/authorizations', requireAdminAuth, async (req, res) => {
-    try {
-      const authData = insertAuthorizationSchema.parse(req.body);
-      const [newAuth] = await db.insert(authorizations).values(authData).returning();
-      res.json(newAuth);
-    } catch (error) {
-      console.error('Error creating authorization:', error);
-      if (error instanceof ZodError) {
-        return res.status(400).json({ message: error.errors[0].message });
-      }
-      res.status(500).json({ message: 'Error creating authorization' });
-    }
-  });
-
-  app.put('/api/admin/authorizations/:id', requireAdminAuth, async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const authData = insertAuthorizationSchema.parse(req.body);
-      const [updatedAuth] = await db.update(authorizations)
-        .set({ ...authData, updatedAt: new Date() })
-        .where(eq(authorizations.id, id))
-        .returning();
-      
-      if (!updatedAuth) {
-        return res.status(404).json({ message: 'Authorization not found' });
-      }
-      
-      res.json(updatedAuth);
-    } catch (error) {
-      console.error('Error updating authorization:', error);
-      if (error instanceof ZodError) {
-        return res.status(400).json({ message: error.errors[0].message });
-      }
-      res.status(500).json({ message: 'Error updating authorization' });
-    }
-  });
-
   // Authorization Roles management routes (JSON-based)
   app.post('/api/admin/authorization-roles', requireAdminAuth, async (req, res) => {
     try {
@@ -3086,40 +3038,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const adminId = req.admin.id;
       
-      // Get the admin user with their authorization and username
+      // Get the admin user with their authorization role
       const adminUserWithAuth = await db.select({
         id: adminUsers.id,
         username: adminUsers.username,
-        authorizationId: adminUsers.authorizationId,
         authorizationRoleId: adminUsers.authorizationRoleId,
-        usersHidden: authorizations.usersHidden,
-        usersRead: authorizations.usersRead,
-        usersFullControl: authorizations.usersFullControl,
-        authHidden: authorizations.authHidden,
-        authRead: authorizations.authRead,
-        authFullControl: authorizations.authFullControl,
-        vetsVanHidden: authorizations.vetsVanHidden,
-        vetsVanRead: authorizations.vetsVanRead,
-        vetsVanFullControl: authorizations.vetsVanFullControl,
-        vetsVanShiftsHidden: authorizations.vetsVanShiftsHidden,
-        vetsVanShiftsRead: authorizations.vetsVanShiftsRead,
-        vetsVanShiftsFullControl: authorizations.vetsVanShiftsFullControl,
-        importHidden: authorizations.importHidden,
-        importFullControl: authorizations.importFullControl,
-        servicesHidden: authorizations.servicesHidden,
-        servicesRead: authorizations.servicesRead,
-        servicesFullControl: authorizations.servicesFullControl,
-        productsHidden: authorizations.productsHidden,
-        productsRead: authorizations.productsRead,
-        productsFullControl: authorizations.productsFullControl,
-        creditNoteNoPermission: authorizations.creditNoteNoPermission,
-        creditNoteRead: authorizations.creditNoteRead,
-        creditNoteFullControl: authorizations.creditNoteFullControl,
-        creditNoteExport: authorizations.creditNoteExport,
         rolePermissions: authorizationRoles.permissions
       })
       .from(adminUsers)
-      .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
       .leftJoin(authorizationRoles, eq(adminUsers.authorizationRoleId, authorizationRoles.id))
       .where(eq(adminUsers.id, adminId))
       .limit(1);
@@ -3130,35 +3056,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let permissions = adminUserWithAuth[0];
       
-      // Super Admin Exception: If username is "admin", grant full permissions regardless of authorization settings
+      // Super Admin Exception: If username is "admin", grant full permissions
       if (permissions.username === 'admin') {
         console.log('🔑 Super Admin detected - granting full permissions to admin user');
+        // Create full permissions object for super admin
         permissions = {
           ...permissions,
-          usersHidden: false,
-          usersRead: true,
-          usersFullControl: true,
-          authHidden: false,
-          authRead: true,
-          authFullControl: true,
-          vetsVanHidden: false,
-          vetsVanRead: true,
-          vetsVanFullControl: true,
-          vetsVanShiftsHidden: false,
-          vetsVanShiftsRead: true,
-          vetsVanShiftsFullControl: true,
-          importHidden: false,
-          importFullControl: true,
-          servicesHidden: false,
-          servicesRead: true,
-          servicesFullControl: true,
-          productsHidden: false,
-          productsRead: true,
-          productsFullControl: true,
-          creditNoteNoPermission: false,
-          creditNoteRead: true,
-          creditNoteFullControl: true,
-          creditNoteExport: true
+          rolePermissions: {
+            Users: { noPermission: false, read: true, fullControl: true, export: true },
+            Authorization: { noPermission: false, read: true, fullControl: true, export: true },
+            VetsVanManagement: { noPermission: false, read: true, fullControl: true, export: true },
+            VetsVanShifts: { noPermission: false, read: true, fullControl: true, export: true },
+            Import: { noPermission: false, read: true, fullControl: true, export: true },
+            Services: { noPermission: false, read: true, fullControl: true, export: true },
+            Products: { noPermission: false, read: true, fullControl: true, export: true },
+            CreditNote: { noPermission: false, read: true, fullControl: true, export: true }
+          }
         };
       }
       
@@ -3166,14 +3079,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       res.set('Pragma', 'no-cache');
       res.set('Expires', '0');
-      
-      // Debug: Log Credit Note permissions for troubleshooting
-      console.log('🔍 [BACKEND] Permissions for user:', permissions.username, 'Credit Note:', {
-        creditNoteNoPermission: permissions.creditNoteNoPermission,
-        creditNoteRead: permissions.creditNoteRead,
-        creditNoteFullControl: permissions.creditNoteFullControl,
-        creditNoteExport: permissions.creditNoteExport
-      });
       
       res.json(permissions);
     } catch (error) {
@@ -3191,14 +3096,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName: adminUsers.lastName,
         email: adminUsers.email,
         username: adminUsers.username,
-        authorizationId: adminUsers.authorizationId,
         authorizationRoleId: adminUsers.authorizationRoleId,
         isActive: adminUsers.isActive,
         createdAt: adminUsers.createdAt,
-        authorizationName: sql<string>`COALESCE(${authorizationRoles.name}, ${authorizations.name})`.as('authorizationName')
+        authorizationName: authorizationRoles.name
       })
       .from(adminUsers)
-      .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
       .leftJoin(authorizationRoles, eq(adminUsers.authorizationRoleId, authorizationRoles.id))
       .orderBy(adminUsers.createdAt);
       
