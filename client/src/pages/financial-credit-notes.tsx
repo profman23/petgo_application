@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useTranslation } from '@/lib/i18n';
 import { FilePlus, Eye, FileText, MapPin } from 'lucide-react';
 import { SearchActionBar } from '@/components/ui/search-action-bar';
@@ -9,6 +10,7 @@ import { DataTable, DataTableColumn, DataTableAction } from '@/components/ui/dat
 import { InvoiceMapModal } from '@/components/InvoiceMapModal';
 
 export default function FinancialCreditNotes() {
+  const [, setLocation] = useLocation();
   const { language } = useTranslation();
   const [searchInput, setSearchInput] = useState('');
   const [isCreditNoteModalOpen, setIsCreditNoteModalOpen] = useState(false);
@@ -21,6 +23,32 @@ export default function FinancialCreditNotes() {
   
   // Get admin token
   const adminToken = localStorage.getItem('adminToken');
+  
+  // Fetch current user permissions
+  const { data: currentUserPermissions } = useQuery({
+    queryKey: ['/api/admin/current-user-permissions'],
+    retry: false,
+  });
+  
+  // Permission check - redirect users with "No Permission" for Credit Notes
+  useEffect(() => {
+    if (currentUserPermissions) {
+      // Check new JSON-based permissions first
+      if (currentUserPermissions.rolePermissions?.CreditNote) {
+        const creditNotePerms = currentUserPermissions.rolePermissions.CreditNote;
+        if (creditNotePerms.noPermission === true) {
+          console.log('🚫 User has no permission for Credit Notes (rolePermissions) - redirecting to admin home');
+          setLocation('/admin-home');
+        }
+      } else {
+        // Fallback to legacy permissions
+        if (currentUserPermissions.creditNoteNoPermission === true) {
+          console.log('🚫 User has no permission for Credit Notes (legacy) - redirecting to admin home');
+          setLocation('/admin-home');
+        }
+      }
+    }
+  }, [currentUserPermissions, setLocation]);
   
   // Fetch credit notes data
   const { data: creditNotes = [], isLoading, refetch } = useQuery<any[]>({
