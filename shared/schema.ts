@@ -716,55 +716,6 @@ export type GeneratedInvoice = typeof generatedInvoices.$inferSelect & {
 };
 export type InsertGeneratedInvoice = z.infer<typeof insertGeneratedInvoiceSchema>;
 
-// Authorizations table for permission management
-export const authorizations = pgTable("authorizations", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  
-  // Users permissions
-  usersHidden: boolean("users_hidden").notNull().default(false),
-  usersRead: boolean("users_read").notNull().default(false),
-  usersFullControl: boolean("users_full_control").notNull().default(false),
-  
-  // Authorization permissions
-  authHidden: boolean("auth_hidden").notNull().default(false),
-  authRead: boolean("auth_read").notNull().default(false),
-  authFullControl: boolean("auth_full_control").notNull().default(false),
-  
-  // Vets Van Management permissions
-  vetsVanHidden: boolean("vets_van_hidden").notNull().default(false),
-  vetsVanRead: boolean("vets_van_read").notNull().default(false),
-  vetsVanFullControl: boolean("vets_van_full_control").notNull().default(false),
-  
-  // Vets Van Shifts permissions
-  vetsVanShiftsHidden: boolean("vets_van_shifts_hidden").notNull().default(true),
-  vetsVanShiftsRead: boolean("vets_van_shifts_read").notNull().default(false),
-  vetsVanShiftsFullControl: boolean("vets_van_shifts_full_control").notNull().default(false),
-  
-  // Import permissions
-  importHidden: boolean("import_hidden").notNull().default(false),
-  importFullControl: boolean("import_full_control").notNull().default(false),
-  
-  // Services permissions
-  servicesHidden: boolean("services_hidden").notNull().default(false),
-  servicesRead: boolean("services_read").notNull().default(false),
-  servicesFullControl: boolean("services_full_control").notNull().default(false),
-  
-  // Products permissions
-  productsHidden: boolean("products_hidden").notNull().default(false),
-  productsRead: boolean("products_read").notNull().default(false),
-  productsFullControl: boolean("products_full_control").notNull().default(false),
-  
-  // Credit Note permissions
-  creditNoteNoPermission: boolean("credit_note_no_permission").notNull().default(false),
-  creditNoteRead: boolean("credit_note_read").notNull().default(false),
-  creditNoteFullControl: boolean("credit_note_full_control").notNull().default(false),
-  creditNoteExport: boolean("credit_note_export").notNull().default(false),
-  
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
 // Authorization Roles table - JSON-based flexible permission storage
 export const authorizationRoles = pgTable("authorization_roles", {
   id: serial("id").primaryKey(),
@@ -782,39 +733,10 @@ export const adminUsers = pgTable("admin_users", {
   email: text("email").notNull().unique(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  authorizationId: integer("authorization_id").references(() => authorizations.id),
   authorizationRoleId: integer("authorization_role_id").references(() => authorizationRoles.id, { onDelete: 'set null' }),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-export const insertAuthorizationSchema = createInsertSchema(authorizations).pick({
-  name: true,
-  usersHidden: true,
-  usersRead: true,
-  usersFullControl: true,
-  authHidden: true,
-  authRead: true,
-  authFullControl: true,
-  vetsVanHidden: true,
-  vetsVanRead: true,
-  vetsVanFullControl: true,
-  vetsVanShiftsHidden: true,
-  vetsVanShiftsRead: true,
-  vetsVanShiftsFullControl: true,
-  importHidden: true,
-  importFullControl: true,
-  servicesHidden: true,
-  servicesRead: true,
-  servicesFullControl: true,
-  productsHidden: true,
-  productsRead: true,
-  productsFullControl: true,
-  creditNoteNoPermission: true,
-  creditNoteRead: true,
-  creditNoteFullControl: true,
-  creditNoteExport: true,
 });
 
 export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
@@ -823,11 +745,8 @@ export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
   email: true,
   username: true,
   password: true,
-  authorizationId: true,
   authorizationRoleId: true,
   isActive: true,
-}).extend({
-  authorizationId: z.number().optional(),
 });
 
 export const insertAuthorizationRoleSchema = createInsertSchema(authorizationRoles).pick({
@@ -835,8 +754,6 @@ export const insertAuthorizationRoleSchema = createInsertSchema(authorizationRol
   permissions: true,
 });
 
-export type Authorization = typeof authorizations.$inferSelect;
-export type InsertAuthorization = z.infer<typeof insertAuthorizationSchema>;
 export type AdminUser = typeof adminUsers.$inferSelect;
 export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
 export type AuthorizationRole = typeof authorizationRoles.$inferSelect;
