@@ -43,26 +43,15 @@ export default function FinancialCreditNotes() {
   // Permission check - redirect users with "No Permission" for Credit Notes
   useEffect(() => {
     if (currentUserPermissions) {
-      console.log('🔍 Credit Notes page - Current user permissions:', currentUserPermissions);
-      console.log('🔍 Credit Notes page - rolePermissions:', currentUserPermissions.rolePermissions);
-      console.log('🔍 Credit Notes page - rolePermissions.CreditNote:', currentUserPermissions.rolePermissions?.CreditNote);
-      
       // Check new JSON-based permissions first
       if (currentUserPermissions.rolePermissions?.CreditNote) {
         const creditNotePerms = currentUserPermissions.rolePermissions.CreditNote;
-        console.log('🔍 Credit Notes page - creditNotePerms.noPermission:', creditNotePerms.noPermission);
-        
         if (creditNotePerms.noPermission === true) {
-          console.log('🚫 User has no permission for Credit Notes (rolePermissions) - redirecting to admin home');
           setLocation('/admin-home');
-        } else {
-          console.log('✅ User has access to Credit Notes page');
         }
       } else {
         // Fallback to legacy permissions
-        console.log('🔍 Credit Notes page - Using legacy permissions check');
         if (currentUserPermissions.creditNoteNoPermission === true) {
-          console.log('🚫 User has no permission for Credit Notes (legacy) - redirecting to admin home');
           setLocation('/admin-home');
         }
       }

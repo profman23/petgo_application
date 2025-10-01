@@ -652,26 +652,15 @@ export default function AdminServices() {
   // Permission check - redirect users with "No Permission" for Services
   useEffect(() => {
     if (currentUserPermissions) {
-      console.log('🔍 Services page - Current user permissions:', currentUserPermissions);
-      console.log('🔍 Services page - rolePermissions:', currentUserPermissions.rolePermissions);
-      console.log('🔍 Services page - rolePermissions.Services:', currentUserPermissions.rolePermissions?.Services);
-      
       // Check new JSON-based permissions first
       if (currentUserPermissions.rolePermissions?.Services) {
         const servicesPerms = currentUserPermissions.rolePermissions.Services;
-        console.log('🔍 Services page - servicesPerms.noPermission:', servicesPerms.noPermission);
-        
         if (servicesPerms.noPermission === true) {
-          console.log('🚫 User has no permission for Services (rolePermissions) - redirecting to admin home');
           setLocation('/admin-home');
-        } else {
-          console.log('✅ User has access to Services page');
         }
       } else {
         // Fallback to legacy permissions
-        console.log('🔍 Services page - Using legacy permissions check');
         if (currentUserPermissions.servicesHidden === true) {
-          console.log('🚫 User has no permission for Services (legacy) - redirecting to admin home');
           setLocation('/admin-home');
         }
       }
