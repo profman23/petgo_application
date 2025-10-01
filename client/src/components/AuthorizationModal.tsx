@@ -62,36 +62,36 @@ export function AuthorizationModal({
       id: 'administration',
       title: { ar: 'الإدارة', en: 'Administration' },
       screens: [
-        { id: 'users', title: { ar: 'المستخدمين', en: 'Users' } },
-        { id: 'authorization', title: { ar: 'الصلاحيات', en: 'Authorization' } }
+        { id: 'Users', title: { ar: 'المستخدمين', en: 'Users' } },
+        { id: 'Authorization', title: { ar: 'الصلاحيات', en: 'Authorization' } }
       ]
     },
     {
       id: 'financial',
       title: { ar: 'المالية', en: 'Financial' },
       screens: [
-        { id: 'creditNotes', title: { ar: 'إشعارات دائنة', en: 'Credit Notes' } },
-        { id: 'outgoingPayment', title: { ar: 'المدفوعات الصادرة', en: 'Outgoing Payment' } },
-        { id: 'incomePayment', title: { ar: 'المدفوعات الواردة', en: 'Income Payment' } },
-        { id: 'arBalance', title: { ar: 'رصيد الحسابات المدينة', en: 'A/R Balance' } }
+        { id: 'CreditNote', title: { ar: 'إشعارات دائنة', en: 'Credit Notes' } },
+        { id: 'OutgoingPayment', title: { ar: 'المدفوعات الصادرة', en: 'Outgoing Payment' } },
+        { id: 'IncomePayment', title: { ar: 'المدفوعات الواردة', en: 'Income Payment' } },
+        { id: 'ARBalance', title: { ar: 'رصيد الحسابات المدينة', en: 'A/R Balance' } }
       ]
     },
     {
       id: 'businessPartner',
       title: { ar: 'شريك الأعمال', en: 'Business Partner' },
       screens: [
-        { id: 'partnerManagement', title: { ar: 'إدارة الشركاء', en: 'Partner Management' } }
+        { id: 'PartnerManagement', title: { ar: 'إدارة الشركاء', en: 'Partner Management' } }
       ]
     }
   ];
 
   const individualScreens = [
-    { id: 'vetsvanManagement', title: { ar: 'إدارة فيتسفان', en: 'Vetsvan Management' } },
-    { id: 'vetsvanShifts', title: { ar: 'نوبات فيتسفان', en: 'Vetsvan Shifts' } },
-    { id: 'vetsvanRequests', title: { ar: 'طلبات فيتسفان', en: 'Vetsvan Requests' } },
-    { id: 'import', title: { ar: 'استيراد', en: 'Import' } },
-    { id: 'services', title: { ar: 'الخدمات', en: 'Services' } },
-    { id: 'products', title: { ar: 'المنتجات', en: 'Products' } }
+    { id: 'VetsVanManagement', title: { ar: 'إدارة فيتسفان', en: 'Vetsvan Management' } },
+    { id: 'VetsVanShifts', title: { ar: 'نوبات فيتسفان', en: 'Vetsvan Shifts' } },
+    { id: 'VetsVanRequests', title: { ar: 'طلبات فيتسفان', en: 'Vetsvan Requests' } },
+    { id: 'Import', title: { ar: 'استيراد', en: 'Import' } },
+    { id: 'Services', title: { ar: 'الخدمات', en: 'Services' } },
+    { id: 'Products', title: { ar: 'المنتجات', en: 'Products' } }
   ];
 
   const permissionTypes = [
