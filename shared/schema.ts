@@ -783,6 +783,7 @@ export const adminUsers = pgTable("admin_users", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   authorizationId: integer("authorization_id").notNull().references(() => authorizations.id),
+  authorizationRoleId: integer("authorization_role_id").references(() => authorizationRoles.id, { onDelete: 'set null' }),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -823,6 +824,7 @@ export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
   username: true,
   password: true,
   authorizationId: true,
+  authorizationRoleId: true,
   isActive: true,
 });
 
