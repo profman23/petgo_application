@@ -9,6 +9,36 @@ interface SidebarProps {
   className?: string;
 }
 
+// Helper function to check if user has no permission for a given permission key
+const checkNoPermission = (permissionKey: string | undefined, permissions: any): boolean => {
+  if (!permissionKey || !permissions) return false;
+  
+  // Map legacy permission keys to new JSON-based module names
+  const permissionKeyToModule: Record<string, string> = {
+    'usersHidden': 'Users',
+    'servicesHidden': 'Services',
+    'productsHidden': 'Products',
+    'creditNoteNoPermission': 'CreditNote',
+    'authHidden': 'Authorization',
+    'vetsVanHidden': 'VetsVan',
+    'vetsVanShiftsHidden': 'VetsVanShifts',
+    'importHidden': 'Import'
+  };
+  
+  // Check new JSON-based permissions first (priority)
+  const moduleName = permissionKeyToModule[permissionKey];
+  if (moduleName && permissions.rolePermissions?.[moduleName]?.noPermission === true) {
+    return true;
+  }
+  
+  // Fallback to legacy permissions
+  if (permissions[permissionKey] === true) {
+    return true;
+  }
+  
+  return false;
+};
+
 export function Sidebar({ className = "" }: SidebarProps) {
   const [, setLocation] = useLocation();
   const { language } = useTranslation();
@@ -26,8 +56,7 @@ export function Sidebar({ className = "" }: SidebarProps) {
   const handleItemClick = (item: SidebarMenuItem, isMobile: boolean = false) => {
     // Check permissions if required
     if (item.requiresPermission && currentUserPermissions) {
-      const permissions = currentUserPermissions as any;
-      if (permissions[item.requiresPermission] === true) {
+      if (checkNoPermission(item.requiresPermission, currentUserPermissions)) {
         setLocation(item.permissionRedirect || '/admin-home');
         if (isMobile) setIsMobileSidebarOpen(false);
         return;
@@ -49,10 +78,7 @@ export function Sidebar({ className = "" }: SidebarProps) {
 
   const renderMenuItem = (item: SidebarMenuItem, isMobile: boolean = false) => {
     const Icon = item.icon;
-    const permissions = currentUserPermissions as any;
-    const isDisabled = Boolean(item.requiresPermission && 
-      currentUserPermissions && 
-      permissions[item.requiresPermission] === true);
+    const isDisabled = checkNoPermission(item.requiresPermission, currentUserPermissions);
 
     return (
       <button
@@ -74,10 +100,7 @@ export function Sidebar({ className = "" }: SidebarProps) {
   const renderSection = (section: SidebarSection, isMobile: boolean = false) => {
     const Icon = section.icon;
     const isExpanded = Boolean(expandedSections[section.id]);
-    const permissions = currentUserPermissions as any;
-    const isDisabled = Boolean(section.requiresPermission && 
-      currentUserPermissions && 
-      permissions[section.requiresPermission] === true);
+    const isDisabled = checkNoPermission(section.requiresPermission, currentUserPermissions);
 
     if (section.items) {
       // Collapsible section with subitems
@@ -155,8 +178,7 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
   const handleItemClick = (item: SidebarMenuItem) => {
     // Check permissions if required
     if (item.requiresPermission && currentUserPermissions) {
-      const permissions = currentUserPermissions as any;
-      if (permissions[item.requiresPermission] === true) {
+      if (checkNoPermission(item.requiresPermission, currentUserPermissions)) {
         setLocation(item.permissionRedirect || '/admin-home');
         setIsMobileSidebarOpen(false);
         return;
@@ -170,8 +192,7 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
   const handleSectionClick = (section: SidebarSection) => {
     // Check permissions if required
     if (section.requiresPermission && currentUserPermissions) {
-      const permissions = currentUserPermissions as any;
-      if (permissions[section.requiresPermission] === true) {
+      if (checkNoPermission(section.requiresPermission, currentUserPermissions)) {
         setLocation(section.permissionRedirect || '/admin-home');
         setIsMobileSidebarOpen(false);
         return;
@@ -188,10 +209,7 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
 
   const renderMenuItem = (item: SidebarMenuItem) => {
     const Icon = item.icon;
-    const permissions = currentUserPermissions as any;
-    const isDisabled = Boolean(item.requiresPermission && 
-      currentUserPermissions && 
-      permissions[item.requiresPermission] === true);
+    const isDisabled = checkNoPermission(item.requiresPermission, currentUserPermissions);
 
     return (
       <button
@@ -213,10 +231,7 @@ export function MobileSidebar({ className = "" }: SidebarProps) {
   const renderSection = (section: SidebarSection) => {
     const Icon = section.icon;
     const isExpanded = Boolean(expandedSections[section.id]);
-    const permissions = currentUserPermissions as any;
-    const isDisabled = Boolean(section.requiresPermission && 
-      currentUserPermissions && 
-      permissions[section.requiresPermission] === true);
+    const isDisabled = checkNoPermission(section.requiresPermission, currentUserPermissions);
 
     if (section.items) {
       // Collapsible section with subitems

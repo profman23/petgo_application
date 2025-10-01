@@ -45,6 +45,7 @@ export default function AdministrationAuthorization() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/authorization-roles'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/current-user-permissions'] });
       toast({
         title: language === 'ar' ? 'تم الحفظ' : 'Saved',
         description: language === 'ar' ? 'تم حفظ الصلاحية بنجاح' : 'Authorization saved successfully',
@@ -71,6 +72,7 @@ export default function AdministrationAuthorization() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/authorization-roles'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/current-user-permissions'] });
       toast({
         title: language === 'ar' ? 'تم التحديث' : 'Updated',
         description: language === 'ar' ? 'تم تحديث الصلاحية بنجاح' : 'Authorization updated successfully',
