@@ -3189,12 +3189,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: adminUsers.email,
         username: adminUsers.username,
         authorizationId: adminUsers.authorizationId,
+        authorizationRoleId: adminUsers.authorizationRoleId,
         isActive: adminUsers.isActive,
         createdAt: adminUsers.createdAt,
-        authorizationName: authorizations.name
+        authorizationName: sql<string>`COALESCE(${authorizationRoles.name}, ${authorizations.name})`.as('authorizationName')
       })
       .from(adminUsers)
       .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
+      .leftJoin(authorizationRoles, eq(adminUsers.authorizationRoleId, authorizationRoles.id))
       .orderBy(adminUsers.createdAt);
       
       res.json(adminUsersList);
