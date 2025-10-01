@@ -60,13 +60,13 @@ export default function AdministrationUsers() {
 
   const adminToken = localStorage.getItem("adminToken");
 
-  // Fetch authorizations for dropdown
+  // Fetch authorization roles for dropdown (JSON-based system)
   const {
-    data: authorizations = [],
+    data: authorizationRoles = [],
     isLoading: authorizationsLoading,
     error: authorizationsError
   } = useQuery({
-    queryKey: ['/api/admin/authorizations'],
+    queryKey: ['/api/admin/authorization-roles'],
     retry: false,
     refetchInterval: 30000, // Refetch every 30 seconds
     enabled: !!adminToken,
@@ -181,7 +181,8 @@ export default function AdministrationUsers() {
       email: email.trim(),
       username: username.trim(),
       password: password,
-      authorizationId: parseInt(selectedAuthorization),
+      authorizationId: parseInt(selectedAuthorization), // Keep for backwards compatibility
+      authorizationRoleId: parseInt(selectedAuthorization), // Use new JSON-based authorization roles
       isActive: true
     };
 
@@ -493,9 +494,9 @@ export default function AdministrationUsers() {
                         : (language === 'ar' ? 'اختر التصريح' : 'Select Authorization')
                       }
                     </option>
-                    {authorizations && authorizations.map((authorization: any) => (
-                      <option key={authorization.id} value={authorization.id}>
-                        {authorization.name}
+                    {authorizationRoles && authorizationRoles.map((role: any) => (
+                      <option key={role.id} value={role.id}>
+                        {role.name}
                       </option>
                     ))}
                   </select>
