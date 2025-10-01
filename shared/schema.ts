@@ -826,6 +826,8 @@ export const insertAdminUserSchema = createInsertSchema(adminUsers).pick({
   authorizationId: true,
   authorizationRoleId: true,
   isActive: true,
+}).extend({
+  authorizationId: z.number().optional(),
 });
 
 export const insertAuthorizationRoleSchema = createInsertSchema(authorizationRoles).pick({
