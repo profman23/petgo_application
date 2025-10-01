@@ -7,6 +7,54 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 
+interface UserPermissions {
+  id: number;
+  username: string;
+  authorizationId?: number | null;
+  authorizationRoleId?: number | null;
+  usersHidden?: boolean;
+  usersRead?: boolean;
+  usersFullControl?: boolean;
+  authHidden?: boolean;
+  authRead?: boolean;
+  authFullControl?: boolean;
+  vetsVanHidden?: boolean;
+  vetsVanRead?: boolean;
+  vetsVanFullControl?: boolean;
+  vetsVanShiftsHidden?: boolean;
+  vetsVanShiftsRead?: boolean;
+  vetsVanShiftsFullControl?: boolean;
+  importHidden?: boolean;
+  importFullControl?: boolean;
+  servicesHidden?: boolean;
+  servicesRead?: boolean;
+  servicesFullControl?: boolean;
+  productsHidden?: boolean;
+  productsRead?: boolean;
+  productsFullControl?: boolean;
+  creditNoteNoPermission?: boolean;
+  creditNoteRead?: boolean;
+  creditNoteFullControl?: boolean;
+  creditNoteExport?: boolean;
+  rolePermissions?: {
+    Users?: {
+      noPermission?: boolean;
+      read?: boolean;
+      fullControl?: boolean;
+      export?: boolean;
+    };
+    [key: string]: any;
+  };
+}
+
+interface AuthorizationRole {
+  id: number;
+  name: string;
+  permissions: Record<string, any>;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export default function AdministrationUsers() {
   const [, setLocation] = useLocation();
   const { t, language } = useTranslation();
@@ -40,7 +88,7 @@ export default function AdministrationUsers() {
     data: currentUserPermissions,
     isLoading: permissionsLoading,
     error: permissionsError
-  } = useQuery({
+  } = useQuery<UserPermissions>({
     queryKey: ['/api/admin/current-user-permissions'],
     retry: false,
     staleTime: 0, // Always fetch fresh permissions
@@ -51,10 +99,19 @@ export default function AdministrationUsers() {
 
   // Route guard - redirect silently if user doesn't have permission to access Users page
   useEffect(() => {
-    if (!permissionsLoading && currentUserPermissions && currentUserPermissions.usersHidden) {
-      // User should not reach this page with hidden permission, redirect immediately
-      console.log('User has no users permission, redirecting to admin home');
-      setLocation('/admin-home');
+    if (!permissionsLoading && currentUserPermissions) {
+      // Check new JSON-based permissions first
+      if (currentUserPermissions.rolePermissions?.Users?.noPermission === true) {
+        console.log('User has no permission for Users screen (JSON-based), redirecting to admin home');
+        setLocation('/admin-home');
+        return;
+      }
+      
+      // Fallback to legacy permissions
+      if (currentUserPermissions.usersHidden) {
+        console.log('User has no users permission (legacy), redirecting to admin home');
+        setLocation('/admin-home');
+      }
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
@@ -65,7 +122,7 @@ export default function AdministrationUsers() {
     data: authorizationRoles = [],
     isLoading: authorizationsLoading,
     error: authorizationsError
-  } = useQuery({
+  } = useQuery<AuthorizationRole[]>({
     queryKey: ['/api/admin/authorization-roles'],
     retry: false,
     refetchInterval: 30000, // Refetch every 30 seconds

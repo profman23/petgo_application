@@ -3091,6 +3091,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: adminUsers.id,
         username: adminUsers.username,
         authorizationId: adminUsers.authorizationId,
+        authorizationRoleId: adminUsers.authorizationRoleId,
         usersHidden: authorizations.usersHidden,
         usersRead: authorizations.usersRead,
         usersFullControl: authorizations.usersFullControl,
@@ -3114,10 +3115,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         creditNoteNoPermission: authorizations.creditNoteNoPermission,
         creditNoteRead: authorizations.creditNoteRead,
         creditNoteFullControl: authorizations.creditNoteFullControl,
-        creditNoteExport: authorizations.creditNoteExport
+        creditNoteExport: authorizations.creditNoteExport,
+        rolePermissions: authorizationRoles.permissions
       })
       .from(adminUsers)
       .leftJoin(authorizations, eq(adminUsers.authorizationId, authorizations.id))
+      .leftJoin(authorizationRoles, eq(adminUsers.authorizationRoleId, authorizationRoles.id))
       .where(eq(adminUsers.id, adminId))
       .limit(1);
       
