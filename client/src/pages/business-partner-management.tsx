@@ -58,6 +58,10 @@ export default function BusinessPartnerManagement() {
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
+  // Determine if page is in read-only mode
+  const isReadOnly = currentUserPermissions?.rolePermissions?.PartnerManagement?.read === true && 
+                      currentUserPermissions?.rolePermissions?.PartnerManagement?.fullControl !== true;
+
   const getButtonText = () => {
     if (selectedPartnerType === 'customer') {
       return language === 'ar' 
@@ -255,13 +259,18 @@ export default function BusinessPartnerManagement() {
           {/* Create Button */}
           <div className="flex items-center gap-4">
             <button
-              className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
-              onClick={() => {
+              onClick={isReadOnly ? undefined : () => {
                 console.log('Create new partner:', selectedPartnerType);
               }}
+              disabled={isReadOnly}
+              className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+                isReadOnly
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                  : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+              }`}
               data-testid="button-create-partner"
             >
-              <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+              <FilePlus className="h-4 w-4" style={{ color: isReadOnly ? '#9ca3af' : '#852085' }} />
               <span style={{ fontFamily: 'Arimo' }}>
                 {getButtonText()}
               </span>
@@ -278,7 +287,7 @@ export default function BusinessPartnerManagement() {
             onSearchClick={handleSearchClick}
             onExportClick={handleExportClick}
             searchDisabled={selectedPartnerType === 'supplier'}
-            exportDisabled={selectedPartnerType === 'supplier'}
+            exportDisabled={selectedPartnerType === 'supplier' || isReadOnly}
             inputTestId="input-search-partners"
             searchButtonTestId="button-search-partners"
             exportButtonTestId="button-export-partners"

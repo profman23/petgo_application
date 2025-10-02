@@ -831,6 +831,10 @@ export default function AdminDashboard() {
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
+  // Determine if page is in read-only mode
+  const isReadOnly = currentUserPermissions?.rolePermissions?.VetsVanManagement?.read === true && 
+                      currentUserPermissions?.rolePermissions?.VetsVanManagement?.fullControl !== true;
+
   // Excel Export Function
   const handleExportToExcel = async () => {
     setIsExporting(true);
@@ -1839,11 +1843,11 @@ export default function AdminDashboard() {
                         </div>
                         <button
                           data-testid="button-add-new-vets-van"
-                          onClick={() => setShowAddForm(!showAddForm)}
-                          disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                          onClick={isReadOnly ? undefined : () => setShowAddForm(!showAddForm)}
+                          disabled={isReadOnly}
                           className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md ${
-                            currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
-                              ? 'text-gray-400 bg-gray-300 cursor-not-allowed'
+                            isReadOnly
+                              ? 'text-gray-400 bg-gray-300 cursor-not-allowed opacity-50'
                               : 'text-white bg-purple-600 hover:bg-purple-700'
                           }`}
                         >
@@ -1963,16 +1967,16 @@ export default function AdminDashboard() {
                               </span>
                               <button
                                 data-testid="button-change-status"
-                                onClick={() =>
+                                onClick={isReadOnly ? undefined : () =>
                                   toggleAvailabilityMutation.mutate({
                                     driverId: driver.id,
                                     isAvailable: !driver.isAvailable,
                                   })
                                 }
-                                disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                disabled={isReadOnly}
                                 className={`text-sm ${
-                                  currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
-                                    ? 'text-gray-400 cursor-not-allowed'
+                                  isReadOnly
+                                    ? 'text-gray-400 cursor-not-allowed opacity-50'
                                     : 'text-purple-600 hover:text-purple-700'
                                 }`}
                               >
@@ -1980,11 +1984,11 @@ export default function AdminDashboard() {
                               </button>
                               <button
                                 data-testid="button-set-location"
-                                onClick={() => handleLocationClick(driver)}
-                                disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                onClick={isReadOnly ? undefined : () => handleLocationClick(driver)}
+                                disabled={isReadOnly}
                                 className={`text-sm inline-flex items-center gap-1 ${
-                                  currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
-                                    ? 'text-gray-400 cursor-not-allowed'
+                                  isReadOnly
+                                    ? 'text-gray-400 cursor-not-allowed opacity-50'
                                     : 'text-blue-600 hover:text-blue-900'
                                 }`}
                               >
@@ -1992,11 +1996,11 @@ export default function AdminDashboard() {
                                 {language === 'ar' ? 'تحديد الموقع' : 'Set Location'}
                               </button>
                               <button
-                                onClick={() => handleRedZonesClick(driver)}
-                                disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                onClick={isReadOnly ? undefined : () => handleRedZonesClick(driver)}
+                                disabled={isReadOnly}
                                 className={`text-sm inline-flex items-center gap-1 ${
-                                  currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
-                                    ? 'text-gray-400 cursor-not-allowed'
+                                  isReadOnly
+                                    ? 'text-gray-400 cursor-not-allowed opacity-50'
                                     : 'text-red-600 hover:text-red-900'
                                 }`}
                               >
@@ -2005,11 +2009,11 @@ export default function AdminDashboard() {
                               </button>
                               <button
                                 data-testid="button-edit"
-                                onClick={() => handleEditClick(driver)}
-                                disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                onClick={isReadOnly ? undefined : () => handleEditClick(driver)}
+                                disabled={isReadOnly}
                                 className={`text-sm inline-flex items-center gap-1 ${
-                                  currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
-                                    ? 'text-gray-400 cursor-not-allowed'
+                                  isReadOnly
+                                    ? 'text-gray-400 cursor-not-allowed opacity-50'
                                     : 'text-green-600 hover:text-green-900'
                                 }`}
                               >
@@ -2019,10 +2023,10 @@ export default function AdminDashboard() {
                               <AlertDialog>
                                 <AlertDialogTrigger asChild>
                                   <button 
-                                    disabled={currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl}
+                                    disabled={isReadOnly}
                                     className={`text-sm inline-flex items-center gap-1 ${
-                                      currentUserPermissions && currentUserPermissions.vetsVanRead === true && !currentUserPermissions.vetsVanFullControl
-                                        ? 'text-gray-400 cursor-not-allowed'
+                                      isReadOnly
+                                        ? 'text-gray-400 cursor-not-allowed opacity-50'
                                         : 'text-red-600 hover:text-red-900'
                                     }`}
                                   >

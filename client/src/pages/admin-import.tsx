@@ -45,6 +45,10 @@ export default function AdminImport() {
     }
   }, [currentUserPermissions, setLocation, toast, language]);
 
+  // Determine if page is in read-only mode
+  const isReadOnly = currentUserPermissions?.rolePermissions?.Import?.read === true && 
+                      currentUserPermissions?.rolePermissions?.Import?.fullControl !== true;
+
   // Download template function - exact copy from admin dashboard
   const downloadTemplate = async (type: 'products' | 'services') => {
     try {
@@ -301,15 +305,15 @@ export default function AdminImport() {
                       id="import-file"
                       data-testid="input-import-file"
                       onChange={handleFileUpload}
-                      disabled={uploadingFile}
+                      disabled={uploadingFile || isReadOnly}
                     />
                     <label
-                      htmlFor="import-file"
+                      htmlFor={isReadOnly ? undefined : "import-file"}
                       data-testid="button-choose-file"
-                      className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white cursor-pointer transition-colors ${
-                        uploadingFile 
+                      className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white transition-colors ${
+                        uploadingFile || isReadOnly
                           ? 'bg-gray-400 cursor-not-allowed' 
-                          : 'bg-purple-600 hover:bg-purple-600'
+                          : 'bg-purple-600 hover:bg-purple-600 cursor-pointer'
                       }`}
                     >
                       {uploadingFile ? (
@@ -361,8 +365,13 @@ export default function AdminImport() {
                     </p>
                     <button 
                       data-testid="button-download-template"
-                      onClick={() => downloadTemplate(importSubTab)}
-                      className="inline-flex items-center text-sm text-purple-600 hover:text-purple-600 hover:underline"
+                      onClick={isReadOnly ? undefined : () => downloadTemplate(importSubTab)}
+                      disabled={isReadOnly}
+                      className={`inline-flex items-center text-sm ${
+                        isReadOnly
+                          ? 'text-gray-400 cursor-not-allowed opacity-50'
+                          : 'text-purple-600 hover:text-purple-600 hover:underline'
+                      }`}
                     >
                       <FileText className="h-4 w-4 mr-1" />
                       {language === 'ar' 
