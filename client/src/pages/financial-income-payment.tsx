@@ -60,6 +60,10 @@ export default function FinancialIncomePayment() {
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
+  // Determine if page is in read-only mode
+  const isReadOnly = currentUserPermissions?.rolePermissions?.IncomePayment?.read === true && 
+                      currentUserPermissions?.rolePermissions?.IncomePayment?.fullControl !== true;
+
   // Fetch income payments data
   const { data: incomePayments = [], isLoading } = useQuery<{ docnum: string; businessPartnerName?: string; businessPartnerPhone?: string; totalAmount: string; businessPartnerId?: number; postingDate: string; }[]>({
     queryKey: ['/api/admin/income-payments'],
@@ -111,7 +115,7 @@ export default function FinancialIncomePayment() {
   ];
 
   // Define table actions
-  const paymentActions: DataTableAction[] = [
+  const paymentActions: DataTableAction[] = isReadOnly ? [] : [
     {
       label: { ar: 'خريطة', en: 'Map' },
       onClick: (payment) => handleMapClick(payment),
@@ -237,11 +241,16 @@ export default function FinancialIncomePayment() {
 
             {/* Create Income Payment Button */}
             <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 border-purple-600 bg-white text-purple-600 hover:bg-purple-50"
+              onClick={isReadOnly ? undefined : () => setIsCreateModalOpen(true)}
+              disabled={isReadOnly}
+              className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+                isReadOnly
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                  : 'border-purple-600 bg-white text-purple-600 hover:bg-purple-50'
+              }`}
               data-testid="button-create-income-payment"
             >
-              <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+              <FilePlus className="h-4 w-4" style={{ color: isReadOnly ? '#9ca3af' : '#852085' }} />
               {language === 'ar' ? 'إنشاء دفع وارد' : 'Create Income Payment'}
             </button>
           </div>
@@ -254,6 +263,7 @@ export default function FinancialIncomePayment() {
             onSearchChange={setSearchInput}
             onSearchClick={handleSearchClick}
             onExportClick={handleExportClick}
+            exportDisabled={isReadOnly}
             inputTestId="input-search-income-payments"
             searchButtonTestId="button-search-income-payments"
             exportButtonTestId="button-export-income-payments"

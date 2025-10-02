@@ -47,6 +47,10 @@ export default function FinancialCreditNotes() {
     }
   }, [currentUserPermissions, setLocation]);
   
+  // Determine if page is in read-only mode
+  const isReadOnly = currentUserPermissions?.rolePermissions?.CreditNote?.read === true && 
+                      currentUserPermissions?.rolePermissions?.CreditNote?.fullControl !== true;
+  
   // Fetch credit notes data
   const { data: creditNotes = [], isLoading, refetch } = useQuery<any[]>({
     queryKey: ['/api/admin/credit-notes'],
@@ -223,7 +227,7 @@ export default function FinancialCreditNotes() {
   ];
   
   // Define table actions for credit notes
-  const creditNoteActions: DataTableAction[] = [
+  const creditNoteActions: DataTableAction[] = isReadOnly ? [] : [
     {
       label: { ar: 'عرض', en: 'View' },
       onClick: handleViewCreditNote,
@@ -267,15 +271,20 @@ export default function FinancialCreditNotes() {
 
           {/* Right side - Create Credit Note Button */}
           <button
-            onClick={handleCreateCreditNote}
-            className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
-            style={{ 
+            onClick={isReadOnly ? undefined : handleCreateCreditNote}
+            disabled={isReadOnly}
+            className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+              isReadOnly
+                ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                : 'bg-white hover:bg-purple-50'
+            }`}
+            style={isReadOnly ? {} : { 
               borderColor: '#852085', 
               color: '#852085'
             }}
             data-testid="button-create-credit-note"
           >
-            <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+            <FilePlus className="h-4 w-4" style={isReadOnly ? { color: '#9ca3af' } : { color: '#852085' }} />
             {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
           </button>
         </div>
@@ -288,7 +297,7 @@ export default function FinancialCreditNotes() {
             onSearchChange={setSearchInput}
             onSearchClick={handleSearchClick}
             onExportClick={handleExportToExcel}
-            exportDisabled={false}
+            exportDisabled={isReadOnly}
             inputTestId="input-search-credit-notes"
             searchButtonTestId="button-search-credit-notes"
             exportButtonTestId="button-export-credit-notes"

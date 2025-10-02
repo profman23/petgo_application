@@ -67,6 +67,10 @@ export default function FinancialARBalance() {
     }
   }, [currentUserPermissions, permissionsLoading, setLocation]);
 
+  // Determine if page is in read-only mode
+  const isReadOnly = currentUserPermissions?.rolePermissions?.ARBalance?.read === true && 
+                      currentUserPermissions?.rolePermissions?.ARBalance?.fullControl !== true;
+
   // Fetch AR Balance data
   const { data: arBalanceData = [], isLoading } = useQuery<ARBalanceData[]>({
     queryKey: ['/api/admin/ar-balance'],
@@ -126,8 +130,10 @@ export default function FinancialARBalance() {
 
   // Handle row click to show transaction details
   const handleRowClick = (customer: ARBalanceData) => {
-    setSelectedCustomer(customer);
-    setShowTransactionModal(true);
+    if (!isReadOnly) {
+      setSelectedCustomer(customer);
+      setShowTransactionModal(true);
+    }
   };
 
   // Define columns for the AR Balance table
@@ -209,6 +215,7 @@ export default function FinancialARBalance() {
             onSearchChange={setSearchInput}
             onSearchClick={handleSearchClick}
             onExportClick={handleExportClick}
+            exportDisabled={isReadOnly}
             inputTestId="input-search-ar-balance"
             searchButtonTestId="button-search-ar-balance"
             exportButtonTestId="button-export-ar-balance"
