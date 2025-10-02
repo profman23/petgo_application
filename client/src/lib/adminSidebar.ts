@@ -167,7 +167,9 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "vets-van-requests",
     i18nKey: { en: "Vets Van Requests", ar: "طلبات VETS VAN" },
     icon: FileText,
-    route: "/admin-vetsvan-requests"
+    route: "/admin-vetsvan-requests",
+    requiresPermission: "VetsVanRequests",
+    permissionRedirect: "/admin-home"
   },
   
   // Import
@@ -175,7 +177,9 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "import",
     i18nKey: { en: "Import", ar: "استيراد" },
     icon: Upload,
-    route: "/admin-dashboard/import"
+    route: "/admin-dashboard/import",
+    requiresPermission: "Import",
+    permissionRedirect: "/admin-home"
   },
   
   // Services
@@ -193,7 +197,9 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "products",
     i18nKey: { en: "Products", ar: "المنتجات" },
     icon: Package,
-    route: "/admin-dashboard/products"
+    route: "/admin-dashboard/products",
+    requiresPermission: "Products",
+    permissionRedirect: "/admin-home"
   }
 ];
 

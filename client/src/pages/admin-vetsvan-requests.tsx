@@ -85,6 +85,13 @@ export default function AdminVetsVanRequests() {
     }
   }, [setLocation, toast, language]);
 
+  // Route guard - redirect if user doesn't have permission to access VetsVan Requests page
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions?.rolePermissions?.VetsVanRequests?.noPermission === true) {
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
+
   // Fetch VetsVan Requests - exact copy from admin dashboard
   const { data: allVetsVanRequests, isLoading: isLoadingRequests } = useQuery({
     queryKey: ["/api/admin/vetsvan-requests"],
