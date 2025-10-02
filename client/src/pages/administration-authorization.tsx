@@ -217,15 +217,20 @@ export default function AdministrationAuthorization() {
 
           {/* Right side - Create Authorization Button */}
           <button
-            onClick={handleCreateAuthorization}
-            className="px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
-            style={{ 
+            onClick={isReadOnly ? undefined : handleCreateAuthorization}
+            disabled={isReadOnly}
+            className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
+              isReadOnly
+                ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                : 'bg-white hover:bg-purple-50'
+            }`}
+            style={isReadOnly ? {} : { 
               borderColor: '#852085', 
               color: '#852085'
             }}
             data-testid="button-create-authorization"
           >
-            <FilePlus className="h-4 w-4" style={{ color: '#852085' }} />
+            <FilePlus className="h-4 w-4" style={isReadOnly ? { color: '#9ca3af' } : { color: '#852085' }} />
             {language === 'ar' ? 'إنشاء صلاحية' : 'Create Authorization'}
           </button>
         </div>
@@ -238,7 +243,7 @@ export default function AdministrationAuthorization() {
             onSearchChange={setSearchInput}
             onSearchClick={handleSearchClick}
             onExportClick={handleExportClick}
-            exportDisabled={false}
+            exportDisabled={isReadOnly}
             inputTestId="input-search-authorizations"
             searchButtonTestId="button-search-authorizations"
             exportButtonTestId="button-export-authorizations"
@@ -285,12 +290,17 @@ export default function AdministrationAuthorization() {
                     </div>
                   </div>
                   <button
-                    onClick={() => handleEditAuthorization(role)}
-                    className="p-2 hover:bg-purple-100 rounded-lg transition-colors"
+                    onClick={isReadOnly ? undefined : () => handleEditAuthorization(role)}
+                    disabled={isReadOnly}
+                    className={`p-2 rounded-lg transition-colors ${
+                      isReadOnly
+                        ? 'cursor-not-allowed opacity-50'
+                        : 'hover:bg-purple-100'
+                    }`}
                     data-testid={`button-edit-authorization-${role.id}`}
                     title={language === 'ar' ? 'تعديل' : 'Edit'}
                   >
-                    <Pencil className="h-5 w-5" style={{ color: '#852085' }} />
+                    <Pencil className="h-5 w-5" style={{ color: isReadOnly ? '#9ca3af' : '#852085' }} />
                   </button>
                 </div>
               </div>
