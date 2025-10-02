@@ -87,13 +87,17 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "income-payment",
         i18nKey: { en: "Income Payment", ar: "الدفع الوارد" },
         route: "/financial/income-payment",
-        icon: BanknoteArrowUp
+        icon: BanknoteArrowUp,
+        requiresPermission: "IncomePayment",
+        permissionRedirect: "/admin-home"
       },
       {
         id: "ar-balance",
         i18nKey: { en: "A/R Balance", ar: "رصيد الحسابات المدينة" },
         route: "/financial/ar-balance",
-        icon: ArrowUpDown
+        icon: ArrowUpDown,
+        requiresPermission: "ARBalance",
+        permissionRedirect: "/admin-home"
       },
     ]
   },

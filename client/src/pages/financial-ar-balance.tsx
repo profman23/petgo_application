@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from "@/lib/i18n";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +31,7 @@ export default function FinancialARBalance() {
   const { language } = useTranslation();
   const { toast } = useToast();
   const [lordIconKey, setLordIconKey] = useState(0);
+  const [, setLocation] = useLocation();
   
   // Search functionality state
   const [searchInput, setSearchInput] = useState("");
@@ -45,6 +47,25 @@ export default function FinancialARBalance() {
   useEffect(() => {
     setLordIconKey(prev => prev + 1);
   }, []);
+
+  // Fetch current user's permissions
+  const {
+    data: currentUserPermissions,
+    isLoading: permissionsLoading
+  } = useQuery({
+    queryKey: ['/api/admin/current-user-permissions'],
+    retry: false,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
+
+  // Route guard - redirect if user doesn't have permission to access A/R Balance page
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions?.rolePermissions?.ARBalance?.noPermission === true) {
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   // Fetch AR Balance data
   const { data: arBalanceData = [], isLoading } = useQuery<ARBalanceData[]>({
