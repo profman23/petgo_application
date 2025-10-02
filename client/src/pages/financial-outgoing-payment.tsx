@@ -41,6 +41,25 @@ export default function FinancialOutgoingPayment() {
   // Lord-icon animation trigger state
   const [triggerAnimation, setTriggerAnimation] = useState("loop");
 
+  // Fetch current user's permissions
+  const {
+    data: currentUserPermissions,
+    isLoading: permissionsLoading
+  } = useQuery({
+    queryKey: ['/api/admin/current-user-permissions'],
+    retry: false,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
+
+  // Route guard - redirect if user doesn't have permission to access Outgoing Payment page
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions?.rolePermissions?.OutgoingPayment?.noPermission === true) {
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
+
   // Fetch outgoing payments data
   const { data: outgoingPayments = [], isLoading } = useQuery<{ docnum: string; businessPartnerName?: string; businessPartnerPhone?: string; totalAmount: string; businessPartnerId?: number; postingDate: string; }[]>({
     queryKey: ['/api/admin/outgoing-payments'],

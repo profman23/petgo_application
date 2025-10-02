@@ -79,7 +79,9 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "outgoing-payment",
         i18nKey: { en: "Outgoing Payment", ar: "الدفع الصادر" },
         route: "/financial/outgoing-payment",
-        icon: BanknoteArrowDown
+        icon: BanknoteArrowDown,
+        requiresPermission: "OutgoingPayment",
+        permissionRedirect: "/admin-home"
       },
       {
         id: "income-payment",
