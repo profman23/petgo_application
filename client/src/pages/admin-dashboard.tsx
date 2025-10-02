@@ -812,6 +812,25 @@ export default function AdminDashboard() {
     setRequestCurrentPage(1); // Reset to first page when clearing filters
   };
 
+  // Fetch current user's permissions
+  const {
+    data: currentUserPermissions,
+    isLoading: permissionsLoading
+  } = useQuery({
+    queryKey: ['/api/admin/current-user-permissions'],
+    retry: false,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
+
+  // Route guard - redirect if user doesn't have permission to access VetsVan Management page
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions?.rolePermissions?.VetsVanManagement?.noPermission === true) {
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
+
   // Excel Export Function
   const handleExportToExcel = async () => {
     setIsExporting(true);
@@ -1127,21 +1146,6 @@ export default function AdminDashboard() {
     localStorage.removeItem("admin");
     localStorage.removeItem("adminToken");
   }
-
-  // Fetch current user permissions
-  const { data: currentUserPermissions, isLoading: permissionsLoading } = useQuery({
-    queryKey: ["/api/admin/current-user-permissions"],
-    queryFn: async () => {
-      const response = await fetch("/api/admin/current-user-permissions", {
-        headers: {
-          Authorization: `Bearer ${adminToken}`,
-        },
-      });
-      if (!response.ok) throw new Error("Failed to fetch permissions");
-      return response.json();
-    },
-    enabled: !!adminToken,
-  });
 
   // Fetch drivers
   const { data: drivers, isLoading, refetch: refetchDrivers } = useQuery({

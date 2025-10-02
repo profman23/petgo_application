@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { FilePlus } from "lucide-react";
@@ -29,6 +30,7 @@ declare global {
 }
 
 export default function BusinessPartnerManagement() {
+  const [, setLocation] = useLocation();
   const { language } = useTranslation();
   const [selectedPartnerType, setSelectedPartnerType] = useState<'customer' | 'supplier'>('customer');
   const [triggerAnimation, setTriggerAnimation] = useState('loop');
@@ -36,6 +38,25 @@ export default function BusinessPartnerManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Fetch current user's permissions
+  const {
+    data: currentUserPermissions,
+    isLoading: permissionsLoading
+  } = useQuery({
+    queryKey: ['/api/admin/current-user-permissions'],
+    retry: false,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
+
+  // Route guard - redirect if user doesn't have permission to access Partner Management page
+  useEffect(() => {
+    if (!permissionsLoading && currentUserPermissions?.rolePermissions?.PartnerManagement?.noPermission === true) {
+      setLocation('/admin-home');
+    }
+  }, [currentUserPermissions, permissionsLoading, setLocation]);
 
   const getButtonText = () => {
     if (selectedPartnerType === 'customer') {

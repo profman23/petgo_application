@@ -112,7 +112,9 @@ export const adminSidebarConfig: SidebarSection[] = [
         id: "partner-management",
         i18nKey: { en: "Partner Management", ar: "إدارة الشركاء" },
         route: "/business-partner/partner-management",
-        icon: Users
+        icon: Users,
+        requiresPermission: "PartnerManagement",
+        permissionRedirect: "/admin-home"
       },
     ]
   },
@@ -122,7 +124,9 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "vetsvan-management",
     i18nKey: { en: "VetsVan Management", ar: "إدارة VETS VAN" },
     icon: Car,
-    route: "/admin-dashboard"
+    route: "/admin-dashboard",
+    requiresPermission: "VetsVanManagement",
+    permissionRedirect: "/admin-home"
   },
   
   // Vets Van Shifts
@@ -130,7 +134,9 @@ export const adminSidebarConfig: SidebarSection[] = [
     id: "vets-van-shifts",
     i18nKey: { en: "Vets Van Shifts", ar: "نوبات VETS VAN" },
     icon: Clock,
-    route: "/vets-van-shifts"
+    route: "/vets-van-shifts",
+    requiresPermission: "VetsVanShifts",
+    permissionRedirect: "/admin-home"
   },
   
   // Reports
