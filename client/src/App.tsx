@@ -134,22 +134,12 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
     refetchOnReconnect: 'always',
   });
 
-  // Permission check - redirect users without access
+  // Permission check - redirect users with no permission
   useEffect(() => {
-    if (currentUserPermissions?.rolePermissions?.CreditNote) {
-      const creditNotePerms = currentUserPermissions.rolePermissions.CreditNote;
-      
-      if (creditNotePerms.noPermission === true) {
-        setLocation('/admin-home');
-        return;
-      }
-
-      const hasValidPermission = creditNotePerms.read === true || creditNotePerms.fullControl === true;
-      if (!hasValidPermission) {
-        setLocation('/admin-home');
-      }
+    if (!isLoading && currentUserPermissions?.rolePermissions?.CreditNote?.noPermission === true) {
+      setLocation('/admin-home');
     }
-  }, [currentUserPermissions, setLocation]);
+  }, [currentUserPermissions, isLoading, setLocation]);
 
   // Show loading while fetching permissions
   if (isLoading || !adminToken) {
@@ -168,16 +158,6 @@ function CreditNotePermissionGate({ children }: { children: React.ReactNode }) {
         <div className="text-center text-red-600">Error loading permissions</div>
       </div>
     );
-  }
-
-  // Only render if user has valid permissions
-  const creditNotePerms = currentUserPermissions?.rolePermissions?.CreditNote;
-  const hasValidPermission = creditNotePerms && 
-    (creditNotePerms.read === true || creditNotePerms.fullControl === true) && 
-    creditNotePerms.noPermission !== true;
-
-  if (!hasValidPermission) {
-    return null;
   }
 
   return <>{children}</>;
