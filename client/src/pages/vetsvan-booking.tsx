@@ -975,40 +975,77 @@ export default function VetsVanBooking() {
 
       {/* Booking Confirmation Dialog */}
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent dir={language === 'ar' ? 'rtl' : 'ltr'}>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Booking</AlertDialogTitle>
+            <AlertDialogTitle>
+              {language === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to book this time slot?
+              {language === 'ar' 
+                ? 'هل أنت متأكد من رغبتك في حجز هذا الموعد؟' 
+                : 'Are you sure you want to book this time slot?'}
             </AlertDialogDescription>
             {pendingBooking && (
-              <div className="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
-                <div className="flex items-center gap-2 text-sm text-purple-800">
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium">VetsVan:</span>
-                    <span>{pendingBooking.vetsVanCode}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium">Time:</span>
-                    <span>{pendingBooking.timeSlot}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium">Date:</span>
-                    <span>{selectedDate}</span>
+              <>
+                <div className="mt-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="flex flex-col gap-2 text-sm text-purple-800">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {language === 'ar' ? 'عربة الطبيب:' : 'VetsVan:'}
+                      </span>
+                      <span>{pendingBooking.vetsVanCode}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {language === 'ar' ? 'الوقت:' : 'Time:'}
+                      </span>
+                      <span>{pendingBooking.timeSlot}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {language === 'ar' ? 'التاريخ:' : 'Date:'}
+                      </span>
+                      <span>{selectedDate}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+                
+                {/* Payment Amount Display */}
+                {rideRequestData && rideRequestData.estimatedCost !== undefined && (
+                  <div className="mt-3 p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">
+                        {language === 'ar' ? 'المبلغ المستحق:' : 'Amount to Pay:'}
+                      </span>
+                      <span className="text-2xl font-bold text-green-600">
+                        {rideRequestData.estimatedCost === 0 
+                          ? (language === 'ar' ? 'مجاني' : 'Free')
+                          : `${rideRequestData.estimatedCost} ${language === 'ar' ? 'ريال' : 'SAR'}`
+                        }
+                      </span>
+                    </div>
+                    {rideRequestData.estimatedCost > 0 && rideRequestData.selectedPatients && (
+                      <p className="text-xs text-gray-600 mt-2">
+                        {language === 'ar' 
+                          ? `للخدمة: ${rideRequestData.serviceType} - ${rideRequestData.selectedPatients.length} حيوان أليف`
+                          : `For service: ${rideRequestData.serviceType} - ${rideRequestData.selectedPatients.length} pet(s)`
+                        }
+                      </p>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className={language === 'ar' ? 'flex-row-reverse' : ''}>
             <AlertDialogCancel onClick={handleCancelBooking}>
-              Cancel
+              {language === 'ar' ? 'إلغاء' : 'Cancel'}
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmBooking}
               className="bg-purple-600 hover:bg-purple-700 text-white"
             >
-              Confirm Booking
+              {language === 'ar' ? 'تأكيد الحجز' : 'Confirm Booking'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
