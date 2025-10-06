@@ -409,6 +409,55 @@ export default function Home() {
         {/* Purple Divider Line */}
         <div className="h-1 bg-purple-600 shadow-sm"></div>
 
+        {/* Pending Payment Notification Banner */}
+        {(() => {
+          const pendingPayment = localStorage.getItem('pendingPayment');
+          if (pendingPayment) {
+            try {
+              const paymentData = JSON.parse(pendingPayment);
+              return (
+                <div className="bg-amber-50 border-2 border-amber-400 p-4 m-3 rounded-lg shadow-md animate-pulse" dir={direction}>
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center">
+                        <Bell className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-bold text-amber-800 mb-1" style={{
+                        textAlign,
+                        fontFamily: language === 'ar' ? '"Cairo Play", sans-serif' : '"Comic Relief", cursive'
+                      }}>
+                        {language === 'ar' 
+                          ? '⚠️ انتباه: دفعة معلقة'
+                          : '⚠️ Attention: Pending Payment'}
+                      </h3>
+                      <p className="text-sm text-amber-700 mb-3" style={{ textAlign }}>
+                        {language === 'ar'
+                          ? 'لديك دفعة ناجحة لكن لم يتم تأكيد الحجز في الجدول. يرجى النقر أدناه لإكمال حجزك.'
+                          : 'You have a successful payment but the booking has not been confirmed in the schedule. Please click below to complete your booking.'}
+                      </p>
+                      <Button
+                        onClick={() => setLocation('/vetsvan-booking')}
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all"
+                        data-testid="button-complete-booking"
+                      >
+                        {language === 'ar' 
+                          ? '📅 إكمال الحجز الآن'
+                          : '📅 Complete Booking Now'}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            } catch (error) {
+              console.error('Error parsing pending payment data:', error);
+              return null;
+            }
+          }
+          return null;
+        })()}
+
         {/* Current Location - Hidden but functional */}
         <div className="hidden">
           <div className="flex items-center justify-between mb-1">
