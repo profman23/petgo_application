@@ -821,131 +821,37 @@ export default function RideRequest() {
       return;
     }
 
-    // التحقق من وجود التكلفة التقديرية - تجاوز للخدمات المجانية
+    // Calculate estimated cost
     const { total: estimatedCost } = getEstimatedCost(selectedPatients, patients, serviceType);
     
-    // Special handling for free services
-    if (serviceType === 'free-deworming') {
-      // Skip payment flow and go directly to booking
-      const requestData = {
-        pickupLatitude: currentLocation.latitude,
-        pickupLongitude: currentLocation.longitude,
-        selectedPatients,
-        serviceType,
-        location: form.getValues('pickupLocation'),
-        estimatedCost: 0,
-      };
-      
-      console.log('Free service selected - saving request data and redirecting to booking:', requestData);
-      localStorage.setItem('pendingRequest', JSON.stringify(requestData));
-      
-      toast({
-        title: language === 'ar' ? 'خدمة مجانية!' : 'Free Service!',
-        description: language === 'ar' ? 
-          'يتم توجيهك مباشرة لحجز الموعد' : 
-          'Redirecting directly to appointment booking',
-      });
-      
-      // Reset slide state before redirect
-      setIsSlideComplete(false);
-      setSlidePosition(0);
-      
-      // Redirect to booking page
-      setTimeout(() => {
-        setLocation('/vetsvan-booking');
-      }, 1000);
-      return;
-    }
+    // Prepare request data for booking
+    const requestData = {
+      pickupLatitude: currentLocation.latitude,
+      pickupLongitude: currentLocation.longitude,
+      selectedPatients,
+      serviceType,
+      location: form.getValues('pickupLocation'),
+      estimatedCost: serviceType === 'free-deworming' ? 0 : estimatedCost,
+    };
     
-    if (!estimatedCost || estimatedCost <= 0) {
-      toast({
-        title: language === 'ar' ? 'خطأ في التكلفة' : 'Cost Error',
-        description: language === 'ar' ? 'لا يمكن تحديد تكلفة الخدمة' : 'Cannot determine service cost',
-        variant: 'destructive',
-      });
-      setIsSlideComplete(false);
-      setSlidePosition(0);
-      return;
-    }
-
-    setIsProcessingPayment(true);
+    console.log('Saving request data and redirecting to booking:', requestData);
+    localStorage.setItem('pendingRequest', JSON.stringify(requestData));
     
-    try {
-      // حفظ بيانات الطلب في localStorage للاستخدام بعد الدفع
-      const requestData = {
-        pickupLatitude: currentLocation.latitude,
-        pickupLongitude: currentLocation.longitude,
-        selectedPatients,
-        serviceType,
-        location: form.getValues('pickupLocation'),
-        estimatedCost,
-      };
-      
-      console.log('Saving request data to localStorage:', requestData);
-      localStorage.setItem('pendingRequest', JSON.stringify(requestData));
-      
-      // إنشاء رابط الدفع مع البيانات الحقيقية للمستخدم
-      console.log('Creating authenticated payment link with cost:', estimatedCost);
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        toast({
-          title: language === 'ar' ? 'خطأ في المصادقة' : 'Authentication Error',
-          description: language === 'ar' ? 'يرجى تسجيل الدخول مرة أخرى' : 'Please log in again',
-          variant: 'destructive',
-        });
-        setLocation('/login');
-        return;
-      }
-
-      const response = await fetch('/api/public/payments/test-invoice', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          invoiceNumber: `RIDE-${Date.now()}`,
-          amount: estimatedCost.toString(),
-          description: `VetsVan Service: ${serviceType} for ${selectedPatients.length} pet(s)`,
-          successUrl: `${window.location.origin}/payment-success`,
-          errorUrl: `${window.location.origin}/ride-request?payment=failed`
-        })
-      });
-
-      const responseData = await response.json();
-
-      if (responseData.success && responseData.data?.paymentUrl) {
-        console.log('Payment link created successfully:', responseData.data.paymentUrl);
-        
-        toast({
-          title: language === 'ar' ? 'جاري التوجه للدفع' : 'Redirecting to Payment',
-          description: language === 'ar' ? 
-            `تكلفة الخدمة: ${estimatedCost} ريال` : 
-            `Service cost: ${estimatedCost} SAR`,
-        });
-        
-        // التوجه مباشرة لصفحة الدفع
-        window.location.href = responseData.data.paymentUrl;
-      } else {
-        throw new Error(responseData.message || 'Payment link creation failed');
-      }
-    } catch (error: any) {
-      console.error('Payment creation error:', error);
-      toast({
-        title: language === 'ar' ? 'خطأ في الدفع' : 'Payment Error',
-        description: language === 'ar' ? 
-          `فشل في إنشاء رابط الدفع: ${error.message}` : 
-          `Failed to create payment link: ${error.message}`,
-        variant: 'destructive'
-      });
-      
-      // إعادة تعيين السحب عند الفشل
-      setIsSlideComplete(false);
-      setSlidePosition(0);
-    } finally {
-      setIsProcessingPayment(false);
-    }
+    toast({
+      title: language === 'ar' ? 'جاري التوجه للحجز' : 'Proceeding to Booking',
+      description: language === 'ar' ? 
+        'الرجاء اختيار الموعد المناسب' : 
+        'Please select your preferred appointment time',
+    });
+    
+    // Reset slide state before redirect
+    setIsSlideComplete(false);
+    setSlidePosition(0);
+    
+    // Redirect to booking page
+    setTimeout(() => {
+      setLocation('/vetsvan-booking');
+    }, 500);
   };
 
   const handleSlideComplete = async () => {
