@@ -728,12 +728,40 @@ export default function VetsVanBooking() {
     };
   };
 
+  if (loadingVetsVans || loadingShifts || loadingBookings) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          {paymentSuccess ? (
+            <div className="max-w-md mx-auto px-4">
+              <p className="text-lg font-semibold text-green-600 mb-2">
+                {language === 'ar' 
+                  ? 'تم تأكيد الدفع بنجاح!' 
+                  : 'Payment Confirmed Successfully!'}
+              </p>
+              <p className="text-gray-700 font-medium">
+                {language === 'ar' 
+                  ? 'لإتمام الحجز، يرجى الانتظار — سيتم متابعة الحجز قريباً' 
+                  : 'To complete the booking, please wait — booking will continue shortly'}
+              </p>
+            </div>
+          ) : (
+            <p className="text-gray-600">
+              {language === 'ar' ? 'جاري تحميل بيانات الحجز...' : 'Loading booking data...'}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-gray-50 py-8" dir="ltr">
       <div className="max-w-7xl mx-auto px-4">
         
-        {/* Immediate Payment Success Alert - Shows instantly without delay */}
-        {paymentSuccess && (
+        {/* Payment Success Banner */}
+        {paymentSuccess && paymentReference && paymentId && (
           <div className="mb-6 bg-green-50 border-2 border-green-200 rounded-lg p-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
@@ -742,32 +770,19 @@ export default function VetsVanBooking() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-green-800">
-                  {language === 'ar' ? 'تم تأكيد الدفع بنجاح!' : 'Payment Confirmed Successfully!'}
-                </h3>
-                <p className="text-sm text-green-700 font-medium">
-                  {language === 'ar' 
-                    ? 'لإتمام الحجز، يرجى الانتظار — سيتم متابعة الحجز قريباً' 
-                    : 'To complete the booking, please wait — booking will continue shortly'}
+                <h3 className="text-lg font-semibold text-green-800">Payment Successful!</h3>
+                <p className="text-sm text-green-700">
+                  Payment Reference: <span className="font-mono">{paymentReference}</span> | Payment ID: <span className="font-mono">{paymentId}</span>
                 </p>
-                {paymentReference && paymentId && (
-                  <p className="text-xs text-green-600 mt-1">
-                    {language === 'ar' ? 'مرجع الدفع' : 'Payment Reference'}: <span className="font-mono">{paymentReference}</span>
+                {paymentAmount && paymentAmount > 0 && (
+                  <p className="text-sm text-green-700 mt-1 font-semibold">
+                    💰 Amount Paid: <span className="text-lg">{paymentAmount} {paymentCurrency}</span>
                   </p>
                 )}
+                <p className="text-sm text-green-600 mt-1">
+                  Select your preferred time slot below and click "Confirm Booking" to complete your appointment.
+                </p>
               </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Loading State */}
-        {(loadingVetsVans || loadingShifts || loadingBookings) && (
-          <div className="mb-6 bg-white border border-gray-200 rounded-lg p-8">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">
-                {language === 'ar' ? 'جاري تحميل بيانات الحجز...' : 'Loading booking data...'}
-              </p>
             </div>
           </div>
         )}
