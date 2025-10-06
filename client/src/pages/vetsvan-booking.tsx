@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Stethoscope } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,6 +56,7 @@ export default function VetsVanBooking() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
+  const { language } = useLanguage();
 
   // Confirmation dialog state
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -728,10 +730,27 @@ export default function VetsVanBooking() {
 
   if (loadingVetsVans || loadingShifts || loadingBookings) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center" dir="ltr">
+      <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center" dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading booking data...</p>
+          {paymentSuccess ? (
+            <div className="max-w-md mx-auto px-4">
+              <p className="text-lg font-semibold text-green-600 mb-2">
+                {language === 'ar' 
+                  ? 'تم تأكيد الدفع بنجاح!' 
+                  : 'Payment Confirmed Successfully!'}
+              </p>
+              <p className="text-gray-700 font-medium">
+                {language === 'ar' 
+                  ? 'لإتمام الحجز، يرجى الانتظار — سيتم متابعة الحجز قريباً' 
+                  : 'To complete the booking, please wait — booking will continue shortly'}
+              </p>
+            </div>
+          ) : (
+            <p className="text-gray-600">
+              {language === 'ar' ? 'جاري تحميل بيانات الحجز...' : 'Loading booking data...'}
+            </p>
+          )}
         </div>
       </div>
     );
