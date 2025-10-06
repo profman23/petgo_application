@@ -95,15 +95,6 @@ export default function VetsVanBooking() {
       setPaymentReference(ref);
       setPaymentId(paymentIdParam);
       
-      // Store pending payment data in localStorage for incomplete booking tracking
-      const pendingPaymentData = {
-        paymentReference: ref,
-        paymentId: paymentIdParam,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
-      console.log('💾 Stored pending payment data for incomplete booking tracking:', pendingPaymentData);
-      
       // Fetch actual payment amount immediately
       fetchPaymentDetails(paymentIdParam);
     }
@@ -408,10 +399,6 @@ export default function VetsVanBooking() {
       queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/shifts'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/vetsvan-requests'] });
       
-      // Clear pending payment data since booking is now complete
-      localStorage.removeItem('pendingPayment');
-      console.log('✅ Cleared pending payment data - booking completed successfully');
-      
       toast({
         title: "Booking Successful",
         description: `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
@@ -468,34 +455,11 @@ export default function VetsVanBooking() {
           return; // Exit here - free booking handled
         }
         
-        // CHECK 1: If payment is already successful (from URL params OR localStorage), finalize booking
-        let existingPaymentRef = paymentReference;
-        let existingPaymentId = paymentId;
-        let hasExistingPayment = paymentSuccess && paymentReference && paymentId;
-        
-        // Also check localStorage for pending payment data
-        if (!hasExistingPayment) {
-          const pendingPaymentStr = localStorage.getItem('pendingPayment');
-          if (pendingPaymentStr) {
-            try {
-              const pendingPaymentData = JSON.parse(pendingPaymentStr);
-              existingPaymentRef = pendingPaymentData.paymentReference;
-              existingPaymentId = pendingPaymentData.paymentId;
-              hasExistingPayment = true;
-              console.log('🔍 Found pending payment in localStorage:', {
-                reference: existingPaymentRef,
-                paymentId: existingPaymentId
-              });
-            } catch (error) {
-              console.error('Error parsing pending payment from localStorage:', error);
-            }
-          }
-        }
-        
-        if (hasExistingPayment && existingPaymentRef && existingPaymentId) {
+        // CHECK 1: If payment is already successful (coming from MyFatoorah redirect), finalize booking
+        if (paymentSuccess && paymentReference && paymentId) {
           console.log('✅ Payment already completed, finalizing booking with payment:', {
-            reference: existingPaymentRef,
-            paymentId: existingPaymentId,
+            reference: paymentReference,
+            paymentId: paymentId,
             vetsVanCode: pendingBooking.vetsVanCode,
             timeSlot: pendingBooking.timeSlot
           });
@@ -505,8 +469,8 @@ export default function VetsVanBooking() {
             vetsVanId: pendingBooking.vetsVanId,
             timeSlot: pendingBooking.timeSlot,
             vetsVanCode: pendingBooking.vetsVanCode,
-            paymentReference: existingPaymentRef,
-            paymentId: existingPaymentId
+            paymentReference: paymentReference,
+            paymentId: paymentId
           };
           
           console.log('🎯 Creating booking with payment data:', bookingWithPayment);
