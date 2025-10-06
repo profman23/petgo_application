@@ -533,9 +533,16 @@ export default function VetsVanBooking() {
           vetsVanCode: pendingBooking.vetsVanCode
         });
         
+        // Find the shift for this VetsVan and date to get shiftId
+        const shift = shifts.find(s => s.vetsVanId === pendingBooking.vetsVanId && s.date === selectedDate);
+        if (!shift) {
+          throw new Error('No shift found for selected date and VetsVan');
+        }
+        
         // Store booking details for after payment success
         const bookingDetails = {
           ...pendingBooking,
+          shiftId: shift.id,
           estimatedCost,
           customerName,
           customerEmail,

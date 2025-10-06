@@ -308,19 +308,84 @@ export default function RideRequest() {
             parsedRequestData = JSON.parse(rideRequestData);
           }
           
-          // Create booking with payment information
+          // Validate required booking details
+          if (!bookingDetails.timeSlot || !bookingDetails.shiftId || !bookingDetails.selectedDate) {
+            console.error('❌ Missing required booking details:', bookingDetails);
+            toast({
+              title: language === 'ar' ? 'خطأ في بيانات الحجز' : 'Booking Data Error',
+              description: language === 'ar' 
+                ? 'معلومات الحجز غير مكتملة. يرجى المحاولة مرة أخرى.'
+                : 'Booking information is incomplete. Please try again.',
+              variant: 'destructive',
+            });
+            return;
+          }
+          
+          // Convert time slot to 24-hour format (handles both 12-hour and 24-hour formats)
+          const convertTo24Hour = (timeStr: string): string => {
+            if (!timeStr || typeof timeStr !== 'string') {
+              throw new Error('Invalid time string');
+            }
+            
+            // If already in 24-hour format (no AM/PM), return as-is
+            if (!timeStr.includes('AM') && !timeStr.includes('PM')) {
+              return timeStr;
+            }
+            
+            const [time, period] = timeStr.split(' ');
+            if (!time || !period) {
+              throw new Error('Invalid time format');
+            }
+            
+            const timeParts = time.split(':');
+            if (timeParts.length !== 2) {
+              throw new Error('Invalid time format');
+            }
+            
+            let [hours, minutes] = timeParts.map(Number);
+            
+            if (period === 'PM' && hours !== 12) {
+              hours += 12;
+            } else if (period === 'AM' && hours === 12) {
+              hours = 0;
+            }
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+          };
+          
+          let appointmentTime24: string;
+          try {
+            appointmentTime24 = convertTo24Hour(bookingDetails.timeSlot);
+          } catch (error) {
+            console.error('❌ Time conversion error:', error, 'timeSlot:', bookingDetails.timeSlot);
+            toast({
+              title: language === 'ar' ? 'خطأ في صيغة الوقت' : 'Time Format Error',
+              description: language === 'ar' 
+                ? 'صيغة الوقت غير صحيحة. يرجى المحاولة مرة أخرى.'
+                : 'Invalid time format. Please try again.',
+              variant: 'destructive',
+            });
+            return;
+          }
+          
+          // Create booking with payment information using correct field names
           const bookingData: any = {
+            shiftId: bookingDetails.shiftId,
             vetsVanId: bookingDetails.vetsVanId,
-            date: bookingDetails.selectedDate,
-            timeSlot: bookingDetails.timeSlot,
+            appointmentDate: bookingDetails.selectedDate,
+            appointmentTime: appointmentTime24,
+            customerLocation: {
+              latitude: parsedRequestData.pickupLatitude,
+              longitude: parsedRequestData.pickupLongitude,
+              address: parsedRequestData.location || null
+            },
+            selectedPets: parsedRequestData.selectedPatients || [],
+            serviceType: parsedRequestData.serviceType || 'general_checkup',
             paymentReference: paymentReference,
             paymentId: paymentId,
-            selectedPatients: parsedRequestData.selectedPatients,
-            serviceType: parsedRequestData.serviceType,
-            location: parsedRequestData.location,
-            pickupLatitude: parsedRequestData.pickupLatitude,
-            pickupLongitude: parsedRequestData.pickupLongitude,
           };
+          
+          console.log('📦 Final booking payload:', bookingData);
           
           // Create the booking
           createBookingMutation.mutate(bookingData);
