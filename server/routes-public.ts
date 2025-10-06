@@ -392,17 +392,17 @@ export function addPublicPaymentRoutes(app: any) {
           console.error('❌ Failed to fetch payment details:', fetchError);
         }
 
-        // Store payment success info and redirect to booking page
-        const redirectUrl = `/vetsvan-booking?payment=success&ref=${ref}&paymentId=${actualPaymentId}&source=myfatoorah`;
-        console.log('🔄 Redirecting to booking page with payment info:', redirectUrl);
+        // Store payment success info and redirect to ride-request page
+        const redirectUrl = `/ride-request?payment=success&ref=${ref}&paymentId=${actualPaymentId}&source=myfatoorah`;
+        console.log('🔄 Redirecting to ride-request page with payment info:', redirectUrl);
         return res.redirect(redirectUrl);
       } else {
-        console.log('❌ Missing payment parameters, redirecting to booking page without payment info');
-        return res.redirect('/vetsvan-booking?payment=failed');
+        console.log('❌ Missing payment parameters, redirecting to ride-request page without payment info');
+        return res.redirect('/ride-request?payment=failed');
       }
     } catch (error: any) {
       console.error('❌ MyFatoorah callback error:', error);
-      res.redirect('/vetsvan-booking?payment=error');
+      res.redirect('/ride-request?payment=error');
     }
   });
 

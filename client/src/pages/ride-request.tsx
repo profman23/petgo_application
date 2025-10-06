@@ -301,25 +301,26 @@ export default function RideRequest() {
             bookingDetails
           });
           
+          // Use the saved ride request data for pet information
+          const rideRequestData = localStorage.getItem('pendingRequest');
+          let parsedRequestData: any = {};
+          if (rideRequestData) {
+            parsedRequestData = JSON.parse(rideRequestData);
+          }
+          
           // Create booking with payment information
-          const bookingData = {
+          const bookingData: any = {
             vetsVanId: bookingDetails.vetsVanId,
             date: bookingDetails.selectedDate,
             timeSlot: bookingDetails.timeSlot,
             paymentReference: paymentReference,
             paymentId: paymentId,
+            selectedPatients: parsedRequestData.selectedPatients,
+            serviceType: parsedRequestData.serviceType,
+            location: parsedRequestData.location,
+            pickupLatitude: parsedRequestData.pickupLatitude,
+            pickupLongitude: parsedRequestData.pickupLongitude,
           };
-          
-          // Use the saved ride request data for pet information
-          const rideRequestData = localStorage.getItem('pendingRequest');
-          if (rideRequestData) {
-            const parsedRequestData = JSON.parse(rideRequestData);
-            bookingData.selectedPatients = parsedRequestData.selectedPatients;
-            bookingData.serviceType = parsedRequestData.serviceType;
-            bookingData.location = parsedRequestData.location;
-            bookingData.pickupLatitude = parsedRequestData.pickupLatitude;
-            bookingData.pickupLongitude = parsedRequestData.pickupLongitude;
-          }
           
           // Create the booking
           createBookingMutation.mutate(bookingData);
