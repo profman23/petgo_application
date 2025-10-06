@@ -95,6 +95,15 @@ export default function VetsVanBooking() {
       setPaymentReference(ref);
       setPaymentId(paymentIdParam);
       
+      // Store pending payment data in localStorage for incomplete booking tracking
+      const pendingPaymentData = {
+        paymentReference: ref,
+        paymentId: paymentIdParam,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('pendingPayment', JSON.stringify(pendingPaymentData));
+      console.log('💾 Stored pending payment data for incomplete booking tracking:', pendingPaymentData);
+      
       // Fetch actual payment amount immediately
       fetchPaymentDetails(paymentIdParam);
     }
@@ -398,6 +407,10 @@ export default function VetsVanBooking() {
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/shifts'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/vetsvan-requests'] });
+      
+      // Clear pending payment data since booking is now complete
+      localStorage.removeItem('pendingPayment');
+      console.log('✅ Cleared pending payment data - booking completed successfully');
       
       toast({
         title: "Booking Successful",
