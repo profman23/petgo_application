@@ -228,12 +228,126 @@ export default function RideRequest() {
   const direction = getDirection(language);
   const textAlign = getTextAlign(language);
 
+  // Booking creation mutation
+  const createBookingMutation = useMutation({
+    mutationFn: async (bookingData: any) => {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(bookingData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create booking');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log('✅ Booking created successfully:', data);
+      
+      // Clear localStorage
+      localStorage.removeItem('pendingRequest');
+      localStorage.removeItem('pendingBookingDetails');
+      
+      // Show success message
+      toast({
+        title: language === 'ar' ? 'تم تأكيد الحجز بنجاح!' : 'Booking Successfully Confirmed!',
+        description: language === 'ar' 
+          ? 'تم حجز موعدك بنجاح. سيتم إخطار الطبيب.' 
+          : 'Your appointment has been booked successfully. The doctor will be notified.',
+        duration: 5000,
+      });
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['/api/bookings'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/rides'] });
+    },
+    onError: (error: any) => {
+      console.error('❌ Failed to create booking:', error);
+      toast({
+        title: language === 'ar' ? 'فشل إنشاء الحجز' : 'Booking Failed',
+        description: error.message || (language === 'ar' 
+          ? 'فشل في إنشاء الحجز. يرجى المحاولة مرة أخرى.'
+          : 'Failed to create booking. Please try again.'),
+        variant: 'destructive',
+      });
+    },
+  });
+
   // Check for payment status in URL parameters
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment');
+    const paymentReference = urlParams.get('ref');
+    const paymentId = urlParams.get('paymentId');
     
-    if (paymentStatus === 'failed') {
+    if (paymentStatus === 'success' && paymentReference && paymentId) {
+      console.log('✅ Payment successful! Auto-finalizing booking...');
+      
+      // Load booking details from localStorage
+      const bookingDetailsStr = localStorage.getItem('pendingBookingDetails');
+      
+      if (bookingDetailsStr) {
+        try {
+          const bookingDetails = JSON.parse(bookingDetailsStr);
+          console.log('🎯 Creating booking with payment:', {
+            reference: paymentReference,
+            paymentId: paymentId,
+            bookingDetails
+          });
+          
+          // Create booking with payment information
+          const bookingData = {
+            vetsVanId: bookingDetails.vetsVanId,
+            date: bookingDetails.selectedDate,
+            timeSlot: bookingDetails.timeSlot,
+            paymentReference: paymentReference,
+            paymentId: paymentId,
+          };
+          
+          // Use the saved ride request data for pet information
+          const rideRequestData = localStorage.getItem('pendingRequest');
+          if (rideRequestData) {
+            const parsedRequestData = JSON.parse(rideRequestData);
+            bookingData.selectedPatients = parsedRequestData.selectedPatients;
+            bookingData.serviceType = parsedRequestData.serviceType;
+            bookingData.location = parsedRequestData.location;
+            bookingData.pickupLatitude = parsedRequestData.pickupLatitude;
+            bookingData.pickupLongitude = parsedRequestData.pickupLongitude;
+          }
+          
+          // Create the booking
+          createBookingMutation.mutate(bookingData);
+          
+          // Clear the URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+          
+        } catch (error) {
+          console.error('❌ Failed to parse booking details:', error);
+          toast({
+            title: language === 'ar' ? 'خطأ' : 'Error',
+            description: language === 'ar' 
+              ? 'فشل في استعادة تفاصيل الحجز' 
+              : 'Failed to restore booking details',
+            variant: 'destructive',
+          });
+        }
+      } else {
+        console.warn('⚠️ No booking details found in localStorage');
+        toast({
+          title: language === 'ar' ? 'خطأ' : 'Error',
+          description: language === 'ar' 
+            ? 'لم يتم العثور على تفاصيل الحجز' 
+            : 'Booking details not found',
+          variant: 'destructive',
+        });
+      }
+    } else if (paymentStatus === 'failed') {
       toast({
         title: language === 'ar' ? 'فشل الدفع' : 'Payment Failed',
         description: language === 'ar' ? 

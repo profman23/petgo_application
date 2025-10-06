@@ -178,40 +178,6 @@ export default function VetsVanBooking() {
     }
   }, []);
 
-  // Auto-finalize booking after successful payment
-  useEffect(() => {
-    if (paymentSuccess && paymentReference && paymentId) {
-      const bookingDetailsStr = localStorage.getItem('pendingBookingDetails');
-      
-      if (bookingDetailsStr) {
-        try {
-          const bookingDetails = JSON.parse(bookingDetailsStr);
-          console.log('🎯 Auto-finalizing booking after payment success:', bookingDetails);
-          
-          // Restore pending booking to trigger finalization
-          setPendingBooking({
-            vetsVanId: bookingDetails.vetsVanId,
-            timeSlot: bookingDetails.timeSlot,
-            vetsVanCode: bookingDetails.vetsVanCode
-          });
-          
-          // Set the selected date from booking details
-          if (bookingDetails.selectedDate) {
-            setSelectedDate(bookingDetails.selectedDate);
-          }
-          
-          // Automatically trigger the confirmation
-          setTimeout(() => {
-            handleConfirmBooking();
-          }, 1000);
-          
-        } catch (error) {
-          console.error('❌ Failed to parse booking details:', error);
-        }
-      }
-    }
-  }, [paymentSuccess, paymentReference, paymentId]);
-
   // Fetch all patients for pet name lookup
   const { data: patients = [] } = useQuery<Patient[]>({
     queryKey: ['/api/patients'],
@@ -591,8 +557,8 @@ export default function VetsVanBooking() {
             invoiceNumber: `RIDE-${Date.now()}`,
             amount: estimatedCost.toString(),
             description: `VetsVan Booking: ${serviceType} for ${petCount} pet(s) - ${pendingBooking.vetsVanCode} at ${pendingBooking.timeSlot}`,
-            successUrl: `${window.location.origin}/vetsvan-booking?payment=success`,
-            errorUrl: `${window.location.origin}/vetsvan-booking?payment=failed`
+            successUrl: `${window.location.origin}/ride-request?payment=success`,
+            errorUrl: `${window.location.origin}/ride-request?payment=failed`
           })
         });
 
