@@ -468,11 +468,34 @@ export default function VetsVanBooking() {
           return; // Exit here - free booking handled
         }
         
-        // CHECK 1: If payment is already successful (coming from MyFatoorah redirect), finalize booking
-        if (paymentSuccess && paymentReference && paymentId) {
+        // CHECK 1: If payment is already successful (from URL params OR localStorage), finalize booking
+        let existingPaymentRef = paymentReference;
+        let existingPaymentId = paymentId;
+        let hasExistingPayment = paymentSuccess && paymentReference && paymentId;
+        
+        // Also check localStorage for pending payment data
+        if (!hasExistingPayment) {
+          const pendingPaymentStr = localStorage.getItem('pendingPayment');
+          if (pendingPaymentStr) {
+            try {
+              const pendingPaymentData = JSON.parse(pendingPaymentStr);
+              existingPaymentRef = pendingPaymentData.paymentReference;
+              existingPaymentId = pendingPaymentData.paymentId;
+              hasExistingPayment = true;
+              console.log('🔍 Found pending payment in localStorage:', {
+                reference: existingPaymentRef,
+                paymentId: existingPaymentId
+              });
+            } catch (error) {
+              console.error('Error parsing pending payment from localStorage:', error);
+            }
+          }
+        }
+        
+        if (hasExistingPayment && existingPaymentRef && existingPaymentId) {
           console.log('✅ Payment already completed, finalizing booking with payment:', {
-            reference: paymentReference,
-            paymentId: paymentId,
+            reference: existingPaymentRef,
+            paymentId: existingPaymentId,
             vetsVanCode: pendingBooking.vetsVanCode,
             timeSlot: pendingBooking.timeSlot
           });
@@ -482,8 +505,8 @@ export default function VetsVanBooking() {
             vetsVanId: pendingBooking.vetsVanId,
             timeSlot: pendingBooking.timeSlot,
             vetsVanCode: pendingBooking.vetsVanCode,
-            paymentReference: paymentReference,
-            paymentId: paymentId
+            paymentReference: existingPaymentRef,
+            paymentId: existingPaymentId
           };
           
           console.log('🎯 Creating booking with payment data:', bookingWithPayment);
