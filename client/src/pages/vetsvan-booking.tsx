@@ -47,6 +47,7 @@ interface RideRequestData {
   location: string;
   pickupLatitude: number;
   pickupLongitude: number;
+  estimatedCost?: number;
 }
 
 export default function VetsVanBooking() {
