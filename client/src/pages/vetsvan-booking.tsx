@@ -177,6 +177,40 @@ export default function VetsVanBooking() {
     }
   }, []);
 
+  // Auto-finalize booking after successful payment
+  useEffect(() => {
+    if (paymentSuccess && paymentReference && paymentId) {
+      const bookingDetailsStr = localStorage.getItem('pendingBookingDetails');
+      
+      if (bookingDetailsStr) {
+        try {
+          const bookingDetails = JSON.parse(bookingDetailsStr);
+          console.log('🎯 Auto-finalizing booking after payment success:', bookingDetails);
+          
+          // Restore pending booking to trigger finalization
+          setPendingBooking({
+            vetsVanId: bookingDetails.vetsVanId,
+            timeSlot: bookingDetails.timeSlot,
+            vetsVanCode: bookingDetails.vetsVanCode
+          });
+          
+          // Set the selected date from booking details
+          if (bookingDetails.selectedDate) {
+            setSelectedDate(bookingDetails.selectedDate);
+          }
+          
+          // Automatically trigger the confirmation
+          setTimeout(() => {
+            handleConfirmBooking();
+          }, 1000);
+          
+        } catch (error) {
+          console.error('❌ Failed to parse booking details:', error);
+        }
+      }
+    }
+  }, [paymentSuccess, paymentReference, paymentId]);
+
   // Fetch all patients for pet name lookup
   const { data: patients = [] } = useQuery<Patient[]>({
     queryKey: ['/api/patients'],
@@ -399,20 +433,29 @@ export default function VetsVanBooking() {
       queryClient.invalidateQueries({ queryKey: ['/api/vetsvan/shifts'] });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/vetsvan-requests'] });
       
+      // Clear booking details from localStorage
+      localStorage.removeItem('pendingBookingDetails');
+      
       toast({
-        title: "Booking Successful",
-        description: `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
+        title: language === 'ar' ? 'تم تأكيد الحجز بنجاح!' : 'Booking Successfully Confirmed!',
+        description: language === 'ar' 
+          ? `تم حجز موعدك في ${data.booking.appointmentTime} بتاريخ ${data.booking.appointmentDate}`
+          : `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
       });
 
       console.log('🔔 Booking created successfully:', data);
       
-      // Redirect to customer activity page
-      setLocation('/customer-activity');
+      // Redirect to customer activity page after a short delay
+      setTimeout(() => {
+        setLocation('/customer-activity');
+      }, 2000);
     },
     onError: (error: any) => {
       toast({
-        title: "Booking Failed",
-        description: error.message || "Failed to create booking. Please try again.",
+        title: language === 'ar' ? 'فشل الحجز' : 'Booking Failed',
+        description: error.message || (language === 'ar' 
+          ? 'فشل في إنشاء الحجز. يرجى المحاولة مرة أخرى.'
+          : 'Failed to create booking. Please try again.'),
         variant: "destructive",
       });
     },
@@ -448,8 +491,10 @@ export default function VetsVanBooking() {
           
           // Show success message
           toast({
-            title: "Free Service Booking",
-            description: "Your free deworming appointment is being processed!",
+            title: language === 'ar' ? 'حجز خدمة مجانية' : 'Free Service Booking',
+            description: language === 'ar' 
+              ? 'جاري معالجة موعد التطعيم المجاني الخاص بك!'
+              : 'Your free deworming appointment is being processed!',
           });
           
           return; // Exit here - free booking handled
@@ -487,14 +532,22 @@ export default function VetsVanBooking() {
           return; // Exit here - booking finalization handled by mutation
         }
         
-        // CHECK 2: If no payment yet, create payment first (original flow)
+        // CHECK 2: If no payment yet, create payment first
         const petCount = rideRequestData?.selectedPatients?.length || 1;
         const serviceType = rideRequestData?.serviceType || 'General Check Up';
+        const estimatedCost = rideRequestData?.estimatedCost || 1; // Use saved cost from ride-request
         
-        // Calculate estimated cost (1 SAR per pet for Test Service)
-        let estimatedCost = 1; // Default for Test Service
-        if (serviceType === 'Test Service') {
-          estimatedCost = petCount * 1; // 1 SAR per pet
+        // Get authentication token
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          toast({
+            title: language === 'ar' ? 'خطأ في المصادقة' : 'Authentication Error',
+            description: language === 'ar' ? 'يرجى تسجيل الدخول مرة أخرى' : 'Please log in again',
+            variant: 'destructive',
+          });
+          setLocation('/login');
+          return;
         }
         
         // Get real customer details from user session
@@ -502,13 +555,15 @@ export default function VetsVanBooking() {
         const customerEmail = userSession?.user?.email || 'test@example.com';
         const customerPhone = userSession?.user?.phone || '+966000000000';
         
-        console.log('💳 No payment detected, creating payment with real customer details:', {
+        console.log('💳 Creating payment after time slot selection:', {
           customerName,
           customerEmail,
           customerPhone: customerPhone?.substring(0, 8) + '...',
           amount: estimatedCost,
           serviceType,
-          petCount
+          petCount,
+          timeSlot: pendingBooking.timeSlot,
+          vetsVanCode: pendingBooking.vetsVanCode
         });
         
         // Store booking details for after payment success
@@ -528,17 +583,15 @@ export default function VetsVanBooking() {
         const response = await fetch('/api/public/payments/test-invoice', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            invoiceNumber: `VETSVAN-${Date.now()}`,
+            invoiceNumber: `RIDE-${Date.now()}`,
             amount: estimatedCost.toString(),
-            customerName,
-            customerEmail,
-            customerPhone,
-            description: `VetsVan Booking: ${serviceType} for ${petCount} pet(s) - ${pendingBooking.vetsVanCode}`,
-            successUrl: `${window.location.origin}/payment-success?booking=true`,
-            errorUrl: `${window.location.origin}/payment-error`
+            description: `VetsVan Booking: ${serviceType} for ${petCount} pet(s) - ${pendingBooking.vetsVanCode} at ${pendingBooking.timeSlot}`,
+            successUrl: `${window.location.origin}/vetsvan-booking?payment=success`,
+            errorUrl: `${window.location.origin}/vetsvan-booking?payment=failed`
           })
         });
 
@@ -548,8 +601,10 @@ export default function VetsVanBooking() {
           console.log('Payment link created successfully, redirecting to MyFatoorah...');
           
           toast({
-            title: "Redirecting to Payment",
-            description: "Please complete payment to confirm your booking.",
+            title: language === 'ar' ? 'جاري التوجه للدفع' : 'Redirecting to Payment',
+            description: language === 'ar' 
+              ? `المبلغ: ${estimatedCost} ريال` 
+              : `Amount: ${estimatedCost} SAR`,
           });
           
           // Redirect to MyFatoorah payment page
@@ -561,8 +616,10 @@ export default function VetsVanBooking() {
       } catch (error: any) {
         console.error('Booking confirmation failed:', error);
         toast({
-          title: "Booking Failed",
-          description: error.message || "Failed to process booking. Please try again.",
+          title: language === 'ar' ? 'فشل الحجز' : 'Booking Failed',
+          description: error.message || (language === 'ar' 
+            ? 'فشل في معالجة الحجز. يرجى المحاولة مرة أخرى.'
+            : 'Failed to process booking. Please try again.'),
           variant: "destructive",
         });
       } finally {
