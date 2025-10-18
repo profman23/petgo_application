@@ -8,7 +8,6 @@ import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { DataTable, DataTableColumn } from "@/components/ui/data-table";
-import CustomerModal from "@/components/CustomerModal";
 
 // Customer data type from backend API
 interface CustomerData {
@@ -39,7 +38,6 @@ export default function BusinessPartnerManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
 
   // Fetch current user's permissions
   const {
@@ -262,11 +260,7 @@ export default function BusinessPartnerManagement() {
           <div className="flex items-center gap-4">
             <button
               onClick={isReadOnly ? undefined : () => {
-                if (selectedPartnerType === 'customer') {
-                  setIsCustomerModalOpen(true);
-                } else {
-                  console.log('Create new supplier - not implemented yet');
-                }
+                console.log('Create new partner:', selectedPartnerType);
               }}
               disabled={isReadOnly}
               className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
@@ -402,18 +396,6 @@ export default function BusinessPartnerManagement() {
           />
         )}
       </div>
-
-      {/* Customer Modal */}
-      <CustomerModal 
-        open={isCustomerModalOpen}
-        onClose={() => setIsCustomerModalOpen(false)}
-        onSuccess={() => {
-          // Refetch customer data after successful creation
-          if (selectedPartnerType === 'customer') {
-            window.location.reload();
-          }
-        }}
-      />
     </AdminLayout>
   );
 }

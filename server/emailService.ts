@@ -130,26 +130,6 @@ export class EmailService {
     }
   }
 
-  async sendUserCredentialsEmail(
-    userEmail: string,
-    userName: string,
-    userPassword: string
-  ): Promise<boolean> {
-    try {
-      const template: EmailTemplate = {
-        to: userEmail,
-        subject: 'معلومات حسابك الجديد في VETS VAN - Your New Account Information',
-        html: this.generateUserCredentialsHTML(userName, userEmail, userPassword),
-        text: this.generateUserCredentialsText(userName, userEmail, userPassword)
-      };
-
-      return await this.sendEmail(template);
-    } catch (error) {
-      console.error('Error preparing user credentials email:', error);
-      return false;
-    }
-  }
-
   // Payment confirmation email removed per user request
 
   async sendEmail(template: EmailTemplate): Promise<boolean>;
@@ -947,93 +927,6 @@ VETS VAN - رعاية بيطرية محترفة في منزلك
 
 VETS VAN - نحن في طريقنا إليك
 لأي استفسار عاجل، تواصل معنا عبر التطبيق
-    `;
-  }
-
-  private generateUserCredentialsHTML(userName: string, userEmail: string, userPassword: string): string {
-    return `
-      <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>معلومات حسابك الجديد - Your New Account Information</title>
-      </head>
-      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f4f4;">
-        <div style="background-color: #ffffff; border-radius: 10px; padding: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #852085; margin: 0;">🐾 VETS VAN 🐾</h1>
-            <h2 style="color: #333; margin: 10px 0;">مرحباً بك! Welcome!</h2>
-          </div>
-          
-          <div style="background: linear-gradient(135deg, #852085 0%, #a855f7 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
-            <h3 style="margin: 0;">🎉 تم إنشاء حسابك بنجاح!</h3>
-            <p style="margin: 5px 0;">Your account has been created successfully!</p>
-          </div>
-
-          <div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-            <h3 style="color: #852085; margin-top: 0;">📧 معلومات تسجيل الدخول - Login Information:</h3>
-            
-            <div style="margin: 15px 0;">
-              <strong>👤 الاسم / Name:</strong><br>
-              <span style="color: #555;">${userName}</span>
-            </div>
-            
-            <div style="margin: 15px 0;">
-              <strong>📧 البريد الإلكتروني / Email:</strong><br>
-              <span style="color: #852085; font-size: 16px;">${userEmail}</span>
-            </div>
-            
-            <div style="margin: 15px 0;">
-              <strong>🔑 كلمة المرور / Password:</strong><br>
-              <span style="background: #fff3cd; padding: 5px 10px; border-radius: 4px; font-family: monospace; font-size: 16px;">${userPassword}</span>
-            </div>
-          </div>
-
-          <div style="background-color: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: center;">
-            <p style="margin: 0;"><strong>🔒 ملاحظة أمنية:</strong></p>
-            <p style="margin: 5px 0;">يرجى تغيير كلمة المرور بعد تسجيل الدخول الأول</p>
-            <p style="margin: 5px 0;"><strong>Security Note:</strong> Please change your password after first login</p>
-          </div>
-
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.VITE_API_URL || 'https://vetsvan.com'}/login" style="display: inline-block; background-color: #852085; color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold;">
-              تسجيل الدخول الآن<br>Login Now
-            </a>
-          </div>
-
-          <div class="footer" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-            <p style="color: #852085; font-weight: bold;">🐾 VETS VAN - نعتني بحيواناتك الأليفة 🐾</p>
-            <p style="color: #666;">We Care For Your Pets</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-  }
-
-  private generateUserCredentialsText(userName: string, userEmail: string, userPassword: string): string {
-    return `
-🐾 VETS VAN 🐾
-مرحباً بك! Welcome!
-
-🎉 تم إنشاء حسابك بنجاح!
-Your account has been created successfully!
-
-📧 معلومات تسجيل الدخول - Login Information:
-
-👤 الاسم / Name: ${userName}
-📧 البريد الإلكتروني / Email: ${userEmail}
-🔑 كلمة المرور / Password: ${userPassword}
-
-🔒 ملاحظة أمنية:
-يرجى تغيير كلمة المرور بعد تسجيل الدخول الأول
-Security Note: Please change your password after first login
-
-تسجيل الدخول: ${process.env.VITE_API_URL || 'https://vetsvan.com'}/login
-
-VETS VAN - نعتني بحيواناتك الأليفة
-We Care For Your Pets
     `;
   }
 
