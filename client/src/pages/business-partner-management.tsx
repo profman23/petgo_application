@@ -2,12 +2,14 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
-import { FilePlus } from "lucide-react";
+import { FilePlus, Calendar } from "lucide-react";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { DataTable, DataTableColumn } from "@/components/ui/data-table";
+import { AddAppointmentDialog } from "@/components/booking/AddAppointmentDialog";
+import { Button } from "@/components/ui/button";
 
 // Customer data type from backend API
 interface CustomerData {
@@ -38,6 +40,10 @@ export default function BusinessPartnerManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Add Appointment Dialog state
+  const [appointmentDialogOpen, setAppointmentDialogOpen] = useState(false);
+  const [selectedCustomerForAppointment, setSelectedCustomerForAppointment] = useState<CustomerData | null>(null);
 
   // Fetch current user's permissions
   const {
@@ -145,6 +151,12 @@ export default function BusinessPartnerManagement() {
     setCurrentPage(1);
   }, [customers.length]);
 
+  // Handler for opening Add Appointment dialog
+  const handleAddAppointment = (customer: CustomerData) => {
+    setSelectedCustomerForAppointment(customer);
+    setAppointmentDialogOpen(true);
+  };
+
   // 🎯 DATATABLE CONFIGURATION - Customer columns in exact current order
   const customerColumns: DataTableColumn<CustomerData>[] = [
     {
@@ -185,6 +197,24 @@ export default function BusinessPartnerManagement() {
       label: { ar: 'اسم المريض', en: 'Patient Name' },
       render: (customer) => customer.patientName || (language === 'ar' ? 'لا يوجد' : 'None'),
       className: 'text-gray-500'
+    },
+    {
+      key: 'addAppointment',
+      label: { ar: 'إضافة موعد', en: 'Add Appointment' },
+      render: (customer) => (
+        <Button
+          onClick={() => handleAddAppointment(customer)}
+          variant="outline"
+          size="sm"
+          className="text-purple-600 border-purple-600 hover:bg-purple-50"
+          disabled={isReadOnly}
+          data-testid={`button-add-appointment-${customer.userId}`}
+        >
+          <Calendar className="w-4 h-4 mr-2" />
+          {language === 'ar' ? 'إضافة موعد' : 'Add Appointment'}
+        </Button>
+      ),
+      className: 'text-center'
     }
   ];
 
@@ -393,6 +423,15 @@ export default function BusinessPartnerManagement() {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
+          />
+        )}
+
+        {/* Add Appointment Dialog */}
+        {selectedCustomerForAppointment && (
+          <AddAppointmentDialog
+            open={appointmentDialogOpen}
+            onOpenChange={setAppointmentDialogOpen}
+            customerData={selectedCustomerForAppointment}
           />
         )}
       </div>

@@ -31,6 +31,7 @@ import { DEFAULT_COORDINATES } from '@/lib/constants';
 import { z } from 'zod';
 import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i18n';
 import { LanguageSelector } from '@/components/language-selector';
+import { SERVICE_TYPE_OPTIONS } from '@/lib/service-types';
 
 
 
@@ -1416,59 +1417,17 @@ export default function RideRequest() {
                 } />
               </SelectTrigger>
               <SelectContent className="max-h-[240px] overflow-y-auto">
-
-                <SelectItem value="national-day-vaccination" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Pill className="w-4 h-4 text-blue-600" />
-                    <span>{language === 'ar' ? 'عرض اليوم الوطني 95 تطعيم ومكافحة الديدان' : 'National Day 95 Offer Vaccination & Deworming'}</span>
-                  </div>
-                </SelectItem>
-
-                <SelectItem value="national-day-home-consultation" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Home className="w-4 h-4 text-green-700" />
-                    <span>{language === 'ar' ? 'عرض اليوم الوطني 95 استشارة منزلية' : 'National Day 95 Offer Home Consultation'}</span>
-                  </div>
-                </SelectItem>
-
-
-
-                <SelectItem value="pickup-drop" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Car className="w-4 h-4 text-indigo-600" />
-                    <span>{language === 'ar' ? 'نقل وتوصيل' : 'Pickup & Drop'}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="grooming" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Scissors className="w-4 h-4 text-pink-600" />
-                    <span>{t('grooming')}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="neutering" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Heart className="w-4 h-4 text-red-600" />
-                    <span>{language === 'ar' ? 'خصي/تعقيم' : 'Neutering'}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="surgery" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <ShieldPlus className="w-4 h-4 text-red-600" />
-                    <span>{language === 'ar' ? 'جراحة' : 'Surgery'}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="ct-scan" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Scan className="w-4 h-4 text-green-600" />
-                    <span>{language === 'ar' ? 'أشعة مقطعية' : 'CT-Scan'}</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="test-service" className="select-item-custom">
-                  <div className="flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-purple-600" />
-                    <span>{language === 'ar' ? 'خدمة اختبار' : 'Test Service'}</span>
-                  </div>
-                </SelectItem>
+                {SERVICE_TYPE_OPTIONS.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <SelectItem key={option.value} value={option.value} className="select-item-custom">
+                      <div className="flex items-center gap-2">
+                        <Icon className={`w-4 h-4 ${option.iconColor}`} />
+                        <span>{language === 'ar' ? option.labelAr : option.labelEn}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
             
