@@ -243,17 +243,45 @@ function ServicesPermissionGate({ children }: { children: React.ReactNode }) {
 
 function AuthCheck({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [, setLocation] = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
-    setIsAuthenticated(!!(token && user));
-  }, []);
+    const adminToken = localStorage.getItem('adminToken');
+    
+    // Check if this is an admin booking
+    const pendingRequest = localStorage.getItem('pendingRequest');
+    let isAdminBooking = false;
+    if (pendingRequest) {
+      try {
+        const bookingData = JSON.parse(pendingRequest);
+        isAdminBooking = bookingData.isAdminBooking === true;
+      } catch (e) {
+        // Invalid JSON, ignore
+      }
+    }
+    
+    // Allow access if:
+    // 1. User has customer credentials (normal flow)
+    // 2. Admin is making a booking on behalf of customer (admin booking flow)
+    const hasAccess = (token && user) || (adminToken && isAdminBooking);
+    setIsAuthenticated(!!hasAccess);
+    
+    // Redirect to login if not authenticated and not admin booking
+    if (!hasAccess && isAuthenticated === false) {
+      setLocation('/login');
+    }
+  }, [isAuthenticated, setLocation]);
 
   if (isAuthenticated === null) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">جاري التحميل...</div>
     </div>;
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   return <>{children}</>;

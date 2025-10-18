@@ -72,6 +72,28 @@ export default function VetsVanBooking() {
 
   // Ride request data from localStorage
   const [rideRequestData, setRideRequestData] = useState<RideRequestData | null>(null);
+  
+  // Check if this is an admin booking
+  const [isAdminBooking, setIsAdminBooking] = useState(false);
+  useEffect(() => {
+    const pendingRequest = localStorage.getItem('pendingRequest');
+    if (pendingRequest) {
+      try {
+        const bookingData = JSON.parse(pendingRequest);
+        setIsAdminBooking(bookingData.isAdminBooking === true);
+      } catch (e) {
+        setIsAdminBooking(false);
+      }
+    }
+  }, []);
+  
+  // Get appropriate auth token (admin or customer)
+  const getAuthToken = () => {
+    if (isAdminBooking) {
+      return localStorage.getItem('adminToken');
+    }
+    return localStorage.getItem('token');
+  };
 
   // Check if coming from successful payment
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -178,19 +200,20 @@ export default function VetsVanBooking() {
     }
   }, []);
 
-  // Fetch all patients for pet name lookup
+  // Fetch all patients for pet name lookup (skip for admin bookings)
   const { data: patients = [] } = useQuery<Patient[]>({
     queryKey: ['/api/patients'],
     queryFn: async () => {
-      const customerToken = localStorage.getItem('token');
-      if (!customerToken) throw new Error('Authentication required');
+      const authToken = getAuthToken();
+      if (!authToken) throw new Error('Authentication required');
       
       const response = await fetch('/api/patients', {
-        headers: { 'Authorization': `Bearer ${customerToken}` },
+        headers: { 'Authorization': `Bearer ${authToken}` },
       });
       if (!response.ok) throw new Error('Failed to fetch patients');
       return await response.json();
     },
+    enabled: !isAdminBooking, // Skip for admin bookings
     retry: false,
   });
 
@@ -198,15 +221,15 @@ export default function VetsVanBooking() {
   const { data: vetsVans = [], isLoading: loadingVetsVans } = useQuery<VetsVan[]>({
     queryKey: ['/api/vetsvan/list'],
     queryFn: async () => {
-      const customerToken = localStorage.getItem('token');
+      const authToken = getAuthToken();
       
-      if (!customerToken) {
+      if (!authToken) {
         throw new Error('Authentication required');
       }
       
       const response = await fetch('/api/vetsvan/list', {
         headers: {
-          'Authorization': `Bearer ${customerToken}`,
+          'Authorization': `Bearer ${authToken}`,
         },
       });
       if (!response.ok) throw new Error('Failed to fetch Vets Vans');
@@ -219,15 +242,15 @@ export default function VetsVanBooking() {
   const { data: shifts = [], isLoading: loadingShifts } = useQuery<Shift[]>({
     queryKey: ['/api/vetsvan/shifts', selectedDate],
     queryFn: async () => {
-      const customerToken = localStorage.getItem('token');
+      const authToken = getAuthToken();
       
-      if (!customerToken) {
+      if (!authToken) {
         throw new Error('Authentication required');
       }
       
       const response = await fetch(`/api/vetsvan/shifts?date=${selectedDate}`, {
         headers: {
-          'Authorization': `Bearer ${customerToken}`,
+          'Authorization': `Bearer ${authToken}`,
         },
       });
       if (!response.ok) throw new Error('Failed to fetch shifts');
@@ -240,15 +263,15 @@ export default function VetsVanBooking() {
   const { data: existingBookings = [], isLoading: loadingBookings } = useQuery({
     queryKey: ['/api/bookings/date', selectedDate],
     queryFn: async () => {
-      const customerToken = localStorage.getItem('token');
+      const authToken = getAuthToken();
       
-      if (!customerToken) {
+      if (!authToken) {
         throw new Error('Authentication required');
       }
       
       const response = await fetch(`/api/bookings/by-date?date=${selectedDate}`, {
         headers: {
-          'Authorization': `Bearer ${customerToken}`,
+          'Authorization': `Bearer ${authToken}`,
         },
       });
       if (!response.ok) throw new Error('Failed to fetch bookings');
@@ -336,9 +359,9 @@ export default function VetsVanBooking() {
       paymentReference?: string | null; 
       paymentId?: string | null; 
     }) => {
-      const customerToken = localStorage.getItem('token');
+      const authToken = getAuthToken();
       
-      if (!customerToken) {
+      if (!authToken) {
         throw new Error('Authentication required');
       }
 
@@ -368,7 +391,7 @@ export default function VetsVanBooking() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${customerToken}`,
+          'Authorization': `Bearer ${authToken}`,
         },
         body: JSON.stringify({
           shiftId: shift.id,
@@ -505,7 +528,7 @@ export default function VetsVanBooking() {
         const estimatedCost = rideRequestData?.estimatedCost || 1; // Use saved cost from ride-request
         
         // Get authentication token
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         
         if (!token) {
           toast({
@@ -513,14 +536,23 @@ export default function VetsVanBooking() {
             description: language === 'ar' ? 'يرجى تسجيل الدخول مرة أخرى' : 'Please log in again',
             variant: 'destructive',
           });
-          setLocation('/login');
+          setLocation(isAdminBooking ? '/business-partner/partner-management' : '/login');
           return;
         }
         
-        // Get real customer details from user session
-        const customerName = userSession?.user?.name || userSession?.user?.phone || 'Customer';
-        const customerEmail = userSession?.user?.email || 'test@example.com';
-        const customerPhone = userSession?.user?.phone || '+966000000000';
+        // Get real customer details from user session or admin booking data
+        let customerName, customerEmail, customerPhone;
+        if (isAdminBooking && rideRequestData) {
+          // For admin bookings, use customer data from pendingRequest
+          customerName = (rideRequestData as any).userName || 'Customer';
+          customerEmail = 'admin-booking@example.com'; // Admin bookings don't need customer email
+          customerPhone = (rideRequestData as any).userPhone || '+966000000000';
+        } else {
+          // For customer bookings, use session data
+          customerName = userSession?.user?.name || userSession?.user?.phone || 'Customer';
+          customerEmail = userSession?.user?.email || 'test@example.com';
+          customerPhone = userSession?.user?.phone || '+966000000000';
+        }
         
         console.log('💳 Creating payment after time slot selection:', {
           customerName,
