@@ -817,29 +817,29 @@ export function VetsVanBookingUnified({
             </Card>
           )}
           
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto max-h-[600px] overflow-y-auto">
             <table className="w-full table-auto min-w-max" style={{ direction: 'ltr' }}>
               <colgroup>
-                <col style={{ width: '150px' }} />
+                <col style={{ width: '100px' }} />
                 {availableVetsVans.map((van) => (
-                  <col key={van.id} style={{ width: '200px' }} />
+                  <col key={van.id} style={{ width: '120px' }} />
                 ))}
               </colgroup>
-              <thead>
+              <thead className="sticky top-0 z-10">
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400 sticky left-0 bg-gray-50" style={{ textAlign: 'left' }}>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400 sticky left-0 bg-gray-50" style={{ textAlign: 'left' }}>
                     Time
                   </th>
                   {availableVetsVans.map((van, index) => (
                     <th 
                       key={van.id} 
-                      className={`px-6 py-4 text-center text-sm font-semibold text-gray-900 ${
+                      className={`px-3 py-3 text-center text-sm font-semibold text-gray-900 bg-gray-50 ${
                         index < availableVetsVans.length - 1 ? 'border-r border-gray-300' : ''
                       }`}
                       style={{ textAlign: 'center' }}
                     >
                       <div className="flex flex-col items-center">
-                        <span className="text-purple-600 font-bold">{van.vetsvanCode}</span>
+                        <span className="text-purple-600 font-bold text-xs">{van.vetsvanCode}</span>
                         <span className="text-xs text-gray-500 mt-1">{van.vetsvanName}</span>
                       </div>
                     </th>
@@ -847,9 +847,9 @@ export function VetsVanBookingUnified({
                 </tr>
               </thead>
               <tbody>
-                {timeSlots.map((timeSlot, index) => (
+                {timeSlots.filter(timeSlot => !isTimeSlotInPast(timeSlot, selectedDate)).map((timeSlot, index) => (
                   <tr key={timeSlot} className={`border-b border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                    <td className="px-6 py-4 text-left text-sm text-gray-900 font-medium border-r-2 border-gray-400 sticky left-0 bg-inherit" style={{ textAlign: 'left' }}>
+                    <td className="px-4 py-3 text-left text-xs text-gray-900 font-medium border-r-2 border-gray-400 sticky left-0 bg-inherit" style={{ textAlign: 'left' }}>
                       {timeSlot}
                     </td>
                     {availableVetsVans.map((van, vanIndex) => {
@@ -857,7 +857,7 @@ export function VetsVanBookingUnified({
                       return (
                         <td 
                           key={van.id} 
-                          className={`px-6 py-4 text-center text-sm transition-colors ${
+                          className={`px-3 py-3 text-center text-xs transition-colors ${
                             vanIndex < availableVetsVans.length - 1 ? 'border-r border-gray-300' : ''
                           } ${availability.isClickable ? 'hover:bg-purple-50' : ''}`}
                           style={{ textAlign: 'center' }}
@@ -872,10 +872,10 @@ export function VetsVanBookingUnified({
                             }
                           }}
                         >
-                          <div className={`w-full h-full min-h-[40px] flex items-center justify-center ${availability.className} px-2 py-1 rounded`}>
+                          <div className={`w-full h-full min-h-[32px] flex items-center justify-center ${availability.className} px-2 py-1 rounded text-xs`}>
                             {(isBooking || createBookingMutation.isPending) && availability.isClickable && !availability.isPast ? (
                               <div className="flex items-center gap-1">
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-purple-600"></div>
                                 <span className="text-xs">Booking...</span>
                               </div>
                             ) : (
