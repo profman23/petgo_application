@@ -5710,14 +5710,18 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
       
       console.log('📊 Fetching customer business partners data with search:', search);
       
-      // Get distinct users only to avoid duplicates when user has multiple pets
+      // Get users with all their pets (one row per user-pet combination)
       let query = sql`
-        SELECT DISTINCT
+        SELECT
           u.id as user_id,
           u.name as user_name,
           u.phone as user_phone,
-          u.email as user_email
+          u.email as user_email,
+          p.id as patient_id,
+          p.type as patient_type,
+          p.name as patient_name
         FROM users u
+        LEFT JOIN patients p ON u.id = p.user_id
         WHERE 1=1
       `;
       
@@ -5725,11 +5729,14 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
       if (search && typeof search === 'string' && search.trim()) {
         const searchTerm = `%${search.trim().toLowerCase()}%`;
         query = sql`
-          SELECT DISTINCT
+          SELECT
             u.id as user_id,
             u.name as user_name,
             u.phone as user_phone,
-            u.email as user_email
+            u.email as user_email,
+            p.id as patient_id,
+            p.type as patient_type,
+            p.name as patient_name
           FROM users u
           LEFT JOIN patients p ON u.id = p.user_id
           WHERE (
@@ -5744,17 +5751,20 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
         `;
       }
       
-      query = sql`${query} ORDER BY u.id`;
+      query = sql`${query} ORDER BY u.id, p.id`;
       
       const result = await db.execute(query);
       const customers = result.rows.map((row: any) => ({
         userId: row.user_id,
         userName: row.user_name,
         userPhone: row.user_phone,
-        userEmail: row.user_email || ''
+        userEmail: row.user_email || '',
+        patientId: row.patient_id,
+        patientType: row.patient_type || '',
+        patientName: row.patient_name || ''
       }));
       
-      console.log(`✅ Retrieved ${customers.length} customer records`);
+      console.log(`✅ Retrieved ${customers.length} customer-pet records`);
       
       res.json({
         success: true,
@@ -5766,6 +5776,54 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
       res.status(500).json({
         success: false,
         message: 'Failed to fetch customer business partners',
+        error: error.message
+      });
+    }
+  });
+
+  // Get all pets for a specific customer
+  app.get('/api/admin/customers/:userId/pets', requireAuth, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId, 10);
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid user ID'
+        });
+      }
+      
+      console.log(`📊 Fetching pets for customer userId: ${userId}`);
+      
+      const query = sql`
+        SELECT
+          id,
+          user_id as "userId",
+          name,
+          type,
+          age_year as "ageYear",
+          age_month as "ageMonth",
+          patient_weight as "patientWeight"
+        FROM patients
+        WHERE user_id = ${userId}
+        ORDER BY id
+      `;
+      
+      const result = await db.execute(query);
+      const pets = result.rows;
+      
+      console.log(`✅ Retrieved ${pets.length} pets for customer ${userId}`);
+      
+      res.json({
+        success: true,
+        pets: pets
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Fetch customer pets error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch customer pets',
         error: error.message
       });
     }
