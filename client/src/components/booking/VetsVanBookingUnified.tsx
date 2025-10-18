@@ -91,7 +91,9 @@ export function VetsVanBookingUnified({
 
   const [locallyBookedSlots, setLocallyBookedSlots] = useState<Set<string>>(new Set());
   const [rideRequestData, setRideRequestData] = useState<RideRequestData | null>(null);
-  const [isAdminBooking, setIsAdminBooking] = useState(false);
+  
+  // Check if this is an admin booking - prioritize props, then state
+  const isAdminBooking = propBookingData?.isAdminBooking === true || rideRequestData?.isAdminBooking === true;
 
   // Payment-related state (only for customer bookings)
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -114,7 +116,6 @@ export function VetsVanBookingUnified({
   useEffect(() => {
     if (propBookingData) {
       setRideRequestData(propBookingData);
-      setIsAdminBooking(propBookingData.isAdminBooking || false);
     } else {
       const savedRequestData = localStorage.getItem('pendingRequest');
       if (savedRequestData) {
@@ -122,7 +123,6 @@ export function VetsVanBookingUnified({
           const parsedData = JSON.parse(savedRequestData);
           console.log('Loaded ride request data:', parsedData);
           setRideRequestData(parsedData);
-          setIsAdminBooking(parsedData.isAdminBooking === true);
         } catch (error) {
           console.error('Error parsing ride request data:', error);
         }
@@ -202,7 +202,8 @@ export function VetsVanBookingUnified({
 
   const { data: userSession } = useQuery<{user?: {name?: string, phone?: string, email?: string}}>({
     queryKey: ['/api/auth/session'],
-    enabled: !isAdminBooking,
+    // For admin bookings, check propBookingData first to avoid timing issues
+    enabled: propBookingData?.isAdminBooking !== true && !isAdminBooking && (isModal ? open : true),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
