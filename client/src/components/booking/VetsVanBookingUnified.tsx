@@ -987,11 +987,15 @@ export function VetsVanBookingUnified({
   if (isModal) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Vets Van Booking Schedule</DialogTitle>
-          </DialogHeader>
-          <BookingContent />
+        <DialogContent className="max-w-[95vw] max-h-[90vh] p-0 overflow-hidden flex flex-col">
+          <div className="p-6 pb-2 flex-shrink-0">
+            <DialogHeader>
+              <DialogTitle>Vets Van Booking Schedule</DialogTitle>
+            </DialogHeader>
+          </div>
+          <div className="flex-1 overflow-y-auto px-6 pb-6">
+            <BookingContent />
+          </div>
         </DialogContent>
       </Dialog>
     );
