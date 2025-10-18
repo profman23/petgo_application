@@ -3196,7 +3196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create customer user account (for Business Partner Management)
-  app.post('/api/admin/customers', requireAdminAuth, async (req, res) => {
+  app.post('/api/admin/customers', requireAuth, async (req, res) => {
     try {
       const { firstName, lastName, email, phone, password } = req.body;
       
