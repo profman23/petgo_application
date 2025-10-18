@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SERVICE_TYPE_OPTIONS } from "@/lib/service-types";
-import { BookingTableModal } from "@/components/booking/BookingTableModal";
+import { VetsVanBookingUnified } from "@/components/booking/VetsVanBookingUnified";
 import serviceTypeIcon from "@assets/freepik_assistant_1751437667818_1751437676533.png";
 import selectPetsLogo from "@/assets/select-pets-logo-new.png";
 
@@ -322,7 +322,8 @@ export function AddAppointmentDialog({
       </Dialog>
 
       {/* Booking Table Modal */}
-      <BookingTableModal
+      <VetsVanBookingUnified
+        isModal={true}
         open={showBookingTable}
         onOpenChange={setShowBookingTable}
         bookingData={bookingData}
