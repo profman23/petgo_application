@@ -3195,6 +3195,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Create customer user account (for Business Partner Management)
+  app.post('/api/admin/customers', requireAdminAuth, async (req, res) => {
+    try {
+      const { firstName, lastName, email, phone, password } = req.body;
+      
+      // Validate required fields
+      if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ message: 'First name, last name, email, and password are required' });
+      }
+      
+      // Validate password length (minimum 6 characters)
+      if (password.length < 6) {
+        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+      }
+      
+      // Check if user with this email already exists
+      const existingUser = await db.select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+      
+      if (existingUser.length > 0) {
+        return res.status(400).json({ message: 'A user with this email already exists' });
+      }
+      
+      // Check if user with this phone already exists (if phone is provided)
+      if (phone) {
+        const existingPhoneUser = await db.select()
+          .from(users)
+          .where(eq(users.phone, phone))
+          .limit(1);
+        
+        if (existingPhoneUser.length > 0) {
+          return res.status(400).json({ message: 'A user with this phone number already exists' });
+        }
+      }
+      
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Create the user
+      const fullName = `${firstName} ${lastName}`;
+      const [newUser] = await db.insert(users).values({
+        name: fullName,
+        email: email,
+        phone: phone || null,
+        password: hashedPassword
+      }).returning();
+      
+      // Send credentials email
+      const emailSent = await emailService.sendUserCredentialsEmail(
+        email,
+        fullName,
+        password
+      );
+      
+      if (!emailSent) {
+        console.warn('Failed to send credentials email to:', email);
+      }
+      
+      res.json({ 
+        success: true, 
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+          phone: newUser.phone
+        },
+        emailSent
+      });
+    } catch (error) {
+      console.error('Error creating customer user:', error);
+      res.status(500).json({ message: 'Failed to create customer user' });
+    }
+  });
+
   // Add new driver
   app.post('/api/admin/drivers', requireAdminAuth, async (req, res) => {
     try {

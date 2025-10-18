@@ -70,14 +70,7 @@ export default function CustomerModal({ open, onClose, onSuccess }: CustomerModa
       return false;
     }
 
-    if (!formData.phone.trim()) {
-      toast({
-        title: language === 'ar' ? 'خطأ' : 'Error',
-        description: language === 'ar' ? 'رقم الهاتف مطلوب' : 'Phone number is required',
-        variant: 'destructive',
-      });
-      return false;
-    }
+    // Phone is optional, no validation needed
 
     if (!formData.password || formData.password.length < 6) {
       toast({
@@ -101,20 +94,19 @@ export default function CustomerModal({ open, onClose, onSuccess }: CustomerModa
     setIsSubmitting(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/admin/users/create', {
+      const response = await fetch('/api/admin/customers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify(formData)
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to create user');
+        throw new Error(data.message || 'Failed to create customer');
       }
 
       toast({
@@ -238,7 +230,7 @@ export default function CustomerModal({ open, onClose, onSuccess }: CustomerModa
               className="block text-sm font-medium mb-2" 
               style={{ textAlign, fontFamily: 'Arimo' }}
             >
-              {language === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
+              {language === 'ar' ? 'رقم الهاتف (اختياري)' : 'Phone Number (Optional)'}
             </label>
             <div className="relative">
               <Input
@@ -248,7 +240,6 @@ export default function CustomerModal({ open, onClose, onSuccess }: CustomerModa
                 className={`h-12 pr-4 pl-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                required
                 data-testid="input-phone"
               />
               <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
