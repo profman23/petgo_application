@@ -94,12 +94,18 @@ export default function CustomerModal({ open, onClose, onSuccess }: CustomerModa
     setIsSubmitting(true);
 
     try {
+      const adminToken = localStorage.getItem('adminToken');
+      
+      if (!adminToken) {
+        throw new Error('Admin authentication required');
+      }
+      
       const response = await fetch('/api/admin/customers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`,
         },
-        credentials: 'include',
         body: JSON.stringify(formData)
       });
 
