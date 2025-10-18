@@ -387,6 +387,17 @@ export default function VetsVanBooking() {
 
       const appointmentTime24 = convertTo24Hour(timeSlot);
 
+      // Prepare selected pets data
+      let selectedPetsData;
+      if (isAdminBooking && rideRequestData?.selectedPatients) {
+        // For admin bookings, send patient IDs (backend will fetch patient details)
+        selectedPetsData = rideRequestData.selectedPatients.map(id => ({ id }));
+      } else {
+        // For customer bookings, send full patient objects
+        selectedPetsData = rideRequestData?.selectedPatients ? 
+          patients.filter(p => rideRequestData.selectedPatients.includes(p.id)) : [];
+      }
+
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
@@ -403,11 +414,11 @@ export default function VetsVanBooking() {
             longitude: rideRequestData.pickupLongitude,
             address: rideRequestData.location || null
           } : null,
-          selectedPets: rideRequestData?.selectedPatients ? 
-            patients.filter(p => rideRequestData.selectedPatients.includes(p.id)) : [],
+          selectedPets: selectedPetsData,
           serviceType: rideRequestData?.serviceType || 'general_checkup',
           paymentReference: paymentReference,
-          paymentId: paymentId
+          paymentId: paymentId,
+          isAdminBooking: isAdminBooking
         }),
       });
 
