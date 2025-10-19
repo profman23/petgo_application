@@ -2,24 +2,34 @@ import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { createRegisterSchema } from '@shared/schema';
-import { ArrowLeft, RefreshCw, Mail, Phone, Lock } from 'lucide-react';
-import { useTranslation, getTextAlign } from '@/lib/i18n';
+import { ArrowLeft, RefreshCw, Mail, Phone, Lock, Camera, Cat, Dog, Bird, Calendar } from 'lucide-react';
+import { useTranslation, getTextAlign, getDirection } from '@/lib/i18n';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface CustomerRegistrationFormProps {
   sendOTP?: boolean; // Whether to send OTP email verification
   onSuccess?: (data: any) => void; // Callback after successful registration
   onCancel?: () => void; // Callback for cancel/back button
   showBackButton?: boolean; // Whether to show back button
+  includePetFields?: boolean; // Whether to include pet registration fields
 }
+
+const animalIcons = {
+  Cat: Cat,
+  Dog: Dog,
+  Bird: Bird,
+};
 
 export function CustomerRegistrationForm({
   sendOTP = true,
   onSuccess,
   onCancel,
   showBackButton = true,
+  includePetFields = false,
 }: CustomerRegistrationFormProps) {
   const [captcha, setCaptcha] = useState({ question: '', answer: 0 });
   const [formData, setFormData] = useState({
@@ -30,6 +40,20 @@ export function CustomerRegistrationForm({
     password: '',
     captcha: '',
   });
+  
+  // Pet form state (only used when includePetFields is true)
+  const [petData, setPetData] = useState({
+    name: '',
+    type: '' as 'Cat' | 'Dog' | 'Bird' | '',
+    patientWeight: '',
+    ageYear: '',
+    ageMonth: '',
+    ageDay: '',
+    photo: '',
+    birthdate: '',
+  });
+  
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   
   const { toast } = useToast();
   const { t, language } = useTranslation();
@@ -68,11 +92,19 @@ export function CustomerRegistrationForm({
         throw new Error(language === 'ar' ? 'رمز التحقق غير صحيح' : 'Invalid verification code');
       }
       
-      // Add language and skipOTP flag
+      // If includePetFields is true, validate pet data
+      if (includePetFields) {
+        if (!petData.name || !petData.type || !petData.patientWeight) {
+          throw new Error(language === 'ar' ? 'يرجى ملء جميع حقول الأليف المطلوبة' : 'Please fill all required pet fields');
+        }
+      }
+      
+      // Add language, skipOTP flag, and pet data
       const dataWithLanguage = {
         ...validatedData,
         preferredLanguage: language,
         skipOTP: !sendOTP, // If sendOTP is false, we skip OTP verification
+        ...(includePetFields && { petData }), // Include pet data if flag is set
       };
       
       const response = await apiRequest('/api/auth/register', {
@@ -113,6 +145,22 @@ export function CustomerRegistrationForm({
           password: '',
           captcha: '',
         });
+        
+        // Reset pet data if included
+        if (includePetFields) {
+          setPetData({
+            name: '',
+            type: '',
+            patientWeight: '',
+            ageYear: '',
+            ageMonth: '',
+            ageDay: '',
+            photo: '',
+            birthdate: '',
+          });
+          setSelectedPhoto(null);
+        }
+        
         generateCaptcha();
       }
       
@@ -136,6 +184,33 @@ export function CustomerRegistrationForm({
   const updateFormData = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
+  
+  const updatePetData = (field: string, value: string) => {
+    setPetData(prev => ({ ...prev, [field]: value }));
+  };
+  
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setSelectedPhoto(result);
+        setPetData(prev => ({ ...prev, photo: result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Check if pet fields are valid when includePetFields is true
+  const isPetDataValid = !includePetFields || (
+    petData.name.trim() !== '' &&
+    petData.type !== '' &&
+    petData.patientWeight.trim() !== '' &&
+    parseFloat(petData.patientWeight) > 0
+  );
+  
+  const isRTL = getDirection(language) === 'rtl';
 
   return (
     <form onSubmit={handleRegisterSubmit} className="space-y-6">
@@ -230,6 +305,217 @@ export function CustomerRegistrationForm({
         </div>
       </div>
 
+      {/* Pet Information Section - Only shown when includePetFields is true */}
+      {includePetFields && (
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-xl border-2 border-purple-300 space-y-6">
+          <h3 className="text-center text-lg font-semibold text-purple-800 mb-4" style={{ 
+            textAlign: getTextAlign(language),
+            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+          }}>
+            {language === 'ar' ? 'معلومات الأليف' : 'Pet Information'} *
+          </h3>
+          
+          {/* Pet Name */}
+          <div className="space-y-2">
+            <Label htmlFor="pet-name" className="text-sm font-medium text-gray-700" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'اسم الأليف' : 'Pet Name'} <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="pet-name"
+              value={petData.name}
+              onChange={(e) => updatePetData('name', e.target.value)}
+              className={`border-2 border-purple-600 focus:border-purple-600 rounded-lg ${language === 'ar' ? 'text-right' : 'text-left'}`}
+              placeholder={language === 'ar' ? 'أدخل اسم الأليف' : 'Enter pet name'}
+              data-testid="input-pet-name"
+            />
+          </div>
+
+          {/* Pet Type */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'نوع الأليف' : 'Pet Type'} <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              onValueChange={(value) => updatePetData('type', value)}
+              value={petData.type}
+            >
+              <SelectTrigger className="border-2 border-purple-600 focus:border-purple-600 rounded-lg" data-testid="select-pet-type">
+                <SelectValue placeholder={language === 'ar' ? 'اختر نوع الأليف' : 'Select pet type'} />
+              </SelectTrigger>
+              <SelectContent>
+                {(['Cat', 'Dog', 'Bird'] as const).map((type) => {
+                  const IconComponent = animalIcons[type];
+                  return (
+                    <SelectItem key={type} value={type}>
+                      <div className="flex items-center gap-2">
+                        <IconComponent className="h-5 w-5 text-purple-600" />
+                        <span>{language === 'ar' ? (type === 'Cat' ? 'قطة' : type === 'Dog' ? 'كلب' : 'طير') : type}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Pet Weight */}
+          <div className="space-y-2">
+            <Label htmlFor="pet-weight" className="text-sm font-medium text-gray-700" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'وزن الأليف' : 'Pet Weight'} <span className="text-red-500">*</span>
+            </Label>
+            <div className="relative">
+              <Input
+                id="pet-weight"
+                type="number"
+                step="0.01"
+                min="0"
+                inputMode="decimal"
+                value={petData.patientWeight}
+                onChange={(e) => updatePetData('patientWeight', e.target.value)}
+                className={`border-2 border-purple-600 focus:border-purple-600 rounded-lg pr-12 ${language === 'ar' ? 'text-right' : 'text-left'}`}
+                placeholder={language === 'ar' ? 'أدخل الوزن (مثل: 5.3)' : 'Enter weight (e.g., 5.3)'}
+                data-testid="input-pet-weight"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <span className="text-sm text-gray-500 font-medium">kg</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Pet Age */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'عمر الأليف' : 'Pet Age'} <span className="text-gray-400 text-xs">(Optional)</span>
+            </Label>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label htmlFor="pet-age-year" className="text-xs text-gray-500">
+                  {language === 'ar' ? 'سنة' : 'Year'}
+                </Label>
+                <Input
+                  id="pet-age-year"
+                  type="number"
+                  min="0"
+                  max="50"
+                  value={petData.ageYear}
+                  onChange={(e) => updatePetData('ageYear', e.target.value)}
+                  className="border rounded-lg"
+                  placeholder="0"
+                  data-testid="input-pet-age-year"
+                />
+              </div>
+              <div>
+                <Label htmlFor="pet-age-month" className="text-xs text-gray-500">
+                  {language === 'ar' ? 'شهر' : 'Month'}
+                </Label>
+                <Input
+                  id="pet-age-month"
+                  type="number"
+                  min="0"
+                  max="11"
+                  value={petData.ageMonth}
+                  onChange={(e) => updatePetData('ageMonth', e.target.value)}
+                  className="border rounded-lg"
+                  placeholder="0"
+                  data-testid="input-pet-age-month"
+                />
+              </div>
+              <div>
+                <Label htmlFor="pet-age-day" className="text-xs text-gray-500">
+                  {language === 'ar' ? 'يوم' : 'Day'}
+                </Label>
+                <Input
+                  id="pet-age-day"
+                  type="number"
+                  min="0"
+                  max="30"
+                  value={petData.ageDay}
+                  onChange={(e) => updatePetData('ageDay', e.target.value)}
+                  className="border rounded-lg"
+                  placeholder="0"
+                  data-testid="input-pet-age-day"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Birthdate */}
+          <div className="space-y-2">
+            <Label htmlFor="pet-birthdate" className="text-sm font-medium text-gray-700" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'تاريخ الميلاد' : 'Birthdate'} <span className="text-gray-400 text-xs">(Optional)</span>
+            </Label>
+            <div className="relative">
+              <Calendar className="absolute top-3 w-4 h-4 text-gray-400" style={{ [isRTL ? 'right' : 'left']: '12px' }} />
+              <Input
+                id="pet-birthdate"
+                type="date"
+                value={petData.birthdate}
+                onChange={(e) => updatePetData('birthdate', e.target.value)}
+                className={`border-2 border-purple-600 focus:border-purple-600 rounded-lg ${isRTL ? 'pr-10 text-right' : 'pl-10'}`}
+                data-testid="input-pet-birthdate"
+              />
+            </div>
+          </div>
+
+          {/* Pet Photo */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-gray-700" style={{
+              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+            }}>
+              {language === 'ar' ? 'صورة الأليف' : 'Pet Photo'} <span className="text-gray-400 text-xs">(Optional)</span>
+            </Label>
+            <div className="flex flex-col items-center gap-4">
+              {selectedPhoto ? (
+                <div className="relative">
+                  <img
+                    src={selectedPhoto}
+                    alt="Pet"
+                    className="w-32 h-32 object-cover rounded-full border-2 border-gray-200"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="absolute -bottom-2 -right-2 bg-purple-600 hover:bg-purple-600 rounded-full p-2"
+                    onClick={() => document.getElementById('pet-photo-upload')?.click()}
+                    data-testid="button-change-pet-photo"
+                  >
+                    <Camera className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:border-gray-500 transition-colors"
+                  onClick={() => document.getElementById('pet-photo-upload')?.click()}
+                  data-testid="button-upload-pet-photo"
+                >
+                  <div className="text-center">
+                    <Camera className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                    <p className="text-sm text-purple-600">{language === 'ar' ? 'تحميل صورة' : 'Upload Photo'}</p>
+                  </div>
+                </div>
+              )}
+              <input
+                id="pet-photo-upload"
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-2 border-blue-200">
         <h3 className="text-center text-lg font-semibold text-blue-800 mb-4" style={{ textAlign: getTextAlign(language) }}>
           {language === 'ar' ? 'التحقق الأمني' : 'Security Verification'} *
@@ -277,7 +563,7 @@ export function CustomerRegistrationForm({
       <Button 
         type="submit" 
         className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
-        disabled={registerMutation.isPending}
+        disabled={registerMutation.isPending || !isPetDataValid}
         data-testid="button-submit-registration"
       >
         {registerMutation.isPending ? (
