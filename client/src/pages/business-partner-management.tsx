@@ -447,22 +447,25 @@ export default function BusinessPartnerManagement() {
 
         {/* Customer Registration Dialog */}
         <Dialog open={registrationDialogOpen} onOpenChange={setRegistrationDialogOpen}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden flex flex-col" dir={getDirection(language)}>
             <DialogHeader>
               <DialogTitle style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
                 {language === 'ar' ? 'إنشاء حساب عميل جديد' : 'Create New Customer Account'}
               </DialogTitle>
             </DialogHeader>
-            <CustomerRegistrationForm
-              sendOTP={false}
-              onSuccess={() => {
-                // Close dialog and refresh customer list
-                setRegistrationDialogOpen(false);
-                queryClient.invalidateQueries({ queryKey: ['/api/admin/customers'] });
-              }}
-              onCancel={() => setRegistrationDialogOpen(false)}
-              showBackButton={false}
-            />
+            <div className="overflow-y-auto flex-1 pr-2">
+              <CustomerRegistrationForm
+                sendOTP={false}
+                includePetFields={true}
+                onSuccess={() => {
+                  // Close dialog and refresh customer list
+                  setRegistrationDialogOpen(false);
+                  queryClient.invalidateQueries({ queryKey: ['/api/admin/customers'] });
+                }}
+                onCancel={() => setRegistrationDialogOpen(false)}
+                showBackButton={false}
+              />
+            </div>
           </DialogContent>
         </Dialog>
       </div>
