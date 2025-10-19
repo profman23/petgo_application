@@ -4,12 +4,14 @@ import { useTranslation, getDirection } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { FilePlus, Calendar } from "lucide-react";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { PaginationControls } from "@/components/ui/pagination-controls";
 import { DataTable, DataTableColumn } from "@/components/ui/data-table";
 import { AddAppointmentDialog } from "@/components/booking/AddAppointmentDialog";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { CustomerRegistrationForm } from "@/components/CustomerRegistrationForm";
 
 // Customer data type from backend API
 interface CustomerData {
@@ -34,6 +36,7 @@ declare global {
 export default function BusinessPartnerManagement() {
   const [, setLocation] = useLocation();
   const { language } = useTranslation();
+  const queryClient = useQueryClient();
   const [selectedPartnerType, setSelectedPartnerType] = useState<'customer' | 'supplier'>('customer');
   const [triggerAnimation, setTriggerAnimation] = useState('loop');
   const [searchInput, setSearchInput] = useState('');
@@ -44,6 +47,9 @@ export default function BusinessPartnerManagement() {
   // Add Appointment Dialog state
   const [appointmentDialogOpen, setAppointmentDialogOpen] = useState(false);
   const [selectedCustomerForAppointment, setSelectedCustomerForAppointment] = useState<CustomerData | null>(null);
+  
+  // Customer Registration Dialog state
+  const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
 
   // Fetch current user's permissions
   const {
@@ -290,7 +296,11 @@ export default function BusinessPartnerManagement() {
           <div className="flex items-center gap-4">
             <button
               onClick={isReadOnly ? undefined : () => {
-                console.log('Create new partner:', selectedPartnerType);
+                if (selectedPartnerType === 'customer') {
+                  setRegistrationDialogOpen(true);
+                } else {
+                  console.log('Create new supplier - not yet implemented');
+                }
               }}
               disabled={isReadOnly}
               className={`px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 ${
@@ -434,6 +444,27 @@ export default function BusinessPartnerManagement() {
             customerData={selectedCustomerForAppointment}
           />
         )}
+
+        {/* Customer Registration Dialog */}
+        <Dialog open={registrationDialogOpen} onOpenChange={setRegistrationDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir={getDirection(language)}>
+            <DialogHeader>
+              <DialogTitle style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
+                {language === 'ar' ? 'إنشاء حساب عميل جديد' : 'Create New Customer Account'}
+              </DialogTitle>
+            </DialogHeader>
+            <CustomerRegistrationForm
+              sendOTP={false}
+              onSuccess={() => {
+                // Close dialog and refresh customer list
+                setRegistrationDialogOpen(false);
+                queryClient.invalidateQueries({ queryKey: ['/api/admin/customers'] });
+              }}
+              onCancel={() => setRegistrationDialogOpen(false)}
+              showBackButton={false}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );

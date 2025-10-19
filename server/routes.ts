@@ -421,6 +421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Remove captcha from data
       const { captcha, ...userData } = validatedData;
       const userLanguage = req.body.preferredLanguage || 'ar';
+      const skipOTP = req.body.skipOTP === true;
       
       // Check if phone or email already exists
       const existingUserByPhone = await storage.getUserByPhone(userData.phone);
@@ -435,6 +436,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // If skipOTP is true, create user directly (admin-created accounts)
+      if (skipOTP) {
+        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const newUser = await storage.createUser({
+          ...userData,
+          name: `${userData.firstName} ${userData.lastName}`,
+          password: hashedPassword,
+          membershipType: 'standard',
+        });
+        
+        console.log(`✅ Admin-created user account for ${userData.email} (ID: ${newUser.id})`);
+        
+        return res.json({ 
+          message: userLanguage === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully',
+          userId: newUser.id,
+          email: userData.email
+        });
+      }
+      
+      // Standard registration flow with OTP
       // Generate OTP (6-digit number)
       const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
       
