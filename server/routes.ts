@@ -448,6 +448,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log(`✅ Admin-created user account for ${userData.email} (ID: ${newUser.id})`);
         
+        // Create pet record if petData is provided
+        if (req.body.petData) {
+          const petData = req.body.petData;
+          try {
+            const newPet = await storage.createPatient({
+              userId: newUser.id,
+              name: petData.name,
+              type: petData.type,
+              patientWeight: parseFloat(petData.patientWeight),
+              ageYear: petData.ageYear ? parseInt(petData.ageYear) : undefined,
+              ageMonth: petData.ageMonth ? parseInt(petData.ageMonth) : undefined,
+              ageDay: petData.ageDay ? parseInt(petData.ageDay) : undefined,
+              photo: petData.photo || undefined,
+              birthdate: petData.birthdate || undefined,
+            });
+            console.log(`✅ Pet created for user ${newUser.id}: ${newPet.name} (${newPet.type})`);
+          } catch (petError) {
+            console.error('❌ Failed to create pet record:', petError);
+            // Don't fail the whole registration if pet creation fails
+            // User account is already created
+          }
+        }
+        
         return res.json({ 
           message: userLanguage === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account created successfully',
           userId: newUser.id,
