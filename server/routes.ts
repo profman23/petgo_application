@@ -2061,6 +2061,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to calculate fleas & ticks prevention cost per pet
+  const getFleaTicksCostPerPet = (petType: string, weight: number): { cost: number; tier: string } => {
+    const normalizedType = petType.toLowerCase();
+    
+    if (normalizedType === 'cat') {
+      if (weight >= 0 && weight <= 2.9) {
+        return { cost: 230, tier: '0.0-2.9kg' };
+      } else if (weight >= 3.0 && weight <= 5.9) {
+        return { cost: 250, tier: '3.0-5.9kg' };
+      } else if (weight >= 6.0) {
+        return { cost: 270, tier: '≥6.0kg' };
+      }
+    } else if (normalizedType === 'dog') {
+      if (weight >= 0 && weight <= 10.0) {
+        return { cost: 230, tier: '0.0-10.0kg' };
+      } else if (weight > 10.0) {
+        return { cost: 287, tier: '>10.0kg' };
+      }
+    }
+    
+    return { cost: 0, tier: 'Unknown' };
+  };
+
+  // Helper function to calculate estimated cost based on pets and service type
+  const calculateEstimatedCost = async (
+    selectedPets: Array<{ id: number }>, 
+    serviceType: string,
+    userId: number
+  ): Promise<number> => {
+    const petCount = selectedPets?.length || 0;
+    
+    // Handle zero pets - return service-specific default
+    if (petCount === 0) {
+      if (serviceType === 'free-deworming') return 0;
+      if (serviceType === 'pickup-drop') return 230;
+      return 575; // Default consultation fee for other services
+    }
+
+    // For fleas-ticks-prevention, we need to fetch pet weights
+    if (serviceType === 'fleas-ticks-prevention') {
+      try {
+        const petIds = selectedPets.map(p => p.id);
+        const petsData = await db.execute(sql`
+          SELECT id, type, patient_weight FROM patients 
+          WHERE id = ANY(${petIds}) 
+          AND user_id = ${userId}
+        `);
+        
+        let total = 0;
+        petsData.rows.forEach((pet: any) => {
+          if (pet.patient_weight && pet.patient_weight > 0) {
+            const { cost } = getFleaTicksCostPerPet(pet.type, pet.patient_weight);
+            total += cost;
+          }
+        });
+        
+        // Add flat 575 SAR consultation fee for fleas-ticks-prevention
+        total += 575;
+        return total;
+      } catch (error) {
+        console.error('Error fetching pet weights:', error);
+        return 575; // Fallback to default
+      }
+    }
+
+    // Calculate cost based on service type
+    let total = 0;
+
+    if (serviceType === 'national-day-home-consultation') {
+      if (petCount <= 2) {
+        total = 195;
+      } else if (petCount === 3) {
+        total = 290;
+      } else {
+        total = 290 + ((petCount - 3) * 95);
+      }
+    } else if (serviceType === 'national-day-vaccination') {
+      total = petCount * 95;
+    } else if (['first-visit', 'general-checkup'].includes(serviceType)) {
+      if (petCount <= 2) {
+        total = 575;
+      } else if (petCount <= 4) {
+        total = 575 * 2;
+      } else {
+        total = 575 * 3;
+      }
+    } else if (serviceType === 'test-service') {
+      total = petCount;
+    } else if (serviceType === 'vaccination') {
+      total = (petCount * 172.5) + 575;
+    } else if (serviceType === 'deworming') {
+      total = (petCount * 80.5) + 575;
+    } else if (serviceType === 'free-deworming') {
+      total = 0;
+    } else if (serviceType === 'pickup-drop') {
+      total = 230;
+    } else {
+      // Default pricing for other services
+      if (petCount <= 2) total = 172.5;
+      else if (petCount <= 4) total = 345;
+      else total = 517.5;
+    }
+
+    return total;
+  };
+
   // Book an appointment
   app.post('/api/bookings', requireAuth, async (req: any, res) => {
     try {
@@ -2272,10 +2378,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log('📧 Admin booking - creating payment invoice and sending email');
           
           // Calculate estimated cost from selected pets and service type
-          let estimatedCost = 575; // Default consultation fee
-          
-          // You might want to calculate this more accurately based on service type and pets
-          // For now, using a basic calculation
+          const estimatedCost = await calculateEstimatedCost(selectedPets, serviceType, userId);
+          console.log('💰 Calculated estimated cost:', {
+            serviceType,
+            petCount: selectedPets?.length || 0,
+            estimatedCost
+          });
           
           const myFatoorahService = new MyFatoorahService();
           
