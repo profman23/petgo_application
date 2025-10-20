@@ -716,7 +716,13 @@ export class DatabaseStorage implements IStorage {
       .from(bookings)
       .innerJoin(users, eq(bookings.userId, users.id))
       .innerJoin(drivers, eq(bookings.vetsVanId, drivers.id))
-      .leftJoin(paymentTransactions, eq(paymentTransactions.bookingId, bookings.id));
+      .leftJoin(
+        paymentTransactions, 
+        and(
+          eq(paymentTransactions.bookingId, bookings.id),
+          eq(paymentTransactions.status, 'paid')
+        )
+      );
 
     return bookingData.map(booking => {
       // Extract pet names and types from selectedPets
@@ -740,7 +746,7 @@ export class DatabaseStorage implements IStorage {
         pets: pets,
         serviceType: booking.serviceType || "Unknown",
         createdAt: booking.bookingCreatedAt?.toISOString() || new Date().toISOString(),
-        paidAmount: booking.paymentStatus === 'paid' ? booking.paymentAmount : null
+        paidAmount: booking.paymentAmount || null
       };
     });
   }

@@ -121,6 +121,7 @@ export default function AdminVetsVanRequests() {
         serviceType: string;
         createdAt: string;
         driverId: number;
+        paidAmount?: string | null;
       }>;
       console.log("VetsVan requests data fetched successfully:", data.length, "requests");
       return data;
@@ -516,6 +517,20 @@ export default function AdminVetsVanRequests() {
                               {!['general_checkup', 'grooming'].includes(request.serviceType) && request.serviceType}
                             </span>
                           </div>
+
+                          {/* Paid Amount */}
+                          {request.paidAmount && (
+                            <div className="bg-emerald-50 rounded p-1.5 border border-emerald-200">
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-medium text-emerald-700">
+                                  {language === 'ar' ? 'المبلغ المدفوع' : 'Paid Amount'}
+                                </span>
+                                <span className="text-xs font-bold text-emerald-800">
+                                  {request.paidAmount} {language === 'ar' ? 'ريال' : 'SAR'}
+                                </span>
+                              </div>
+                            </div>
+                          )}
 
                           {/* Pets */}
                           {request.pets && request.pets.length > 0 && (
