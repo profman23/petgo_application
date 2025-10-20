@@ -103,6 +103,7 @@ export interface IStorage {
     pets: Array<{ name: string; type: string; }>;
     serviceType: string;
     createdAt: string;
+    paidAmount?: string | null;
   }>>;
 
   // Pet vitals operations
@@ -691,6 +692,7 @@ export class DatabaseStorage implements IStorage {
     pets: Array<{ name: string; type: string; }>;
     serviceType: string;
     createdAt: string;
+    paidAmount?: string | null;
   }>> {
     const bookingData = await db
       .select({
@@ -707,11 +709,14 @@ export class DatabaseStorage implements IStorage {
         customerEmail: users.email,
         driverId: drivers.id,
         vetsvanCode: drivers.vetsvanCode,
-        vetsvanName: drivers.vetsvanName
+        vetsvanName: drivers.vetsvanName,
+        paymentAmount: paymentTransactions.amount,
+        paymentStatus: paymentTransactions.status
       })
       .from(bookings)
       .innerJoin(users, eq(bookings.userId, users.id))
-      .innerJoin(drivers, eq(bookings.vetsVanId, drivers.id));
+      .innerJoin(drivers, eq(bookings.vetsVanId, drivers.id))
+      .leftJoin(paymentTransactions, eq(paymentTransactions.bookingId, bookings.id));
 
     return bookingData.map(booking => {
       // Extract pet names and types from selectedPets
@@ -734,7 +739,8 @@ export class DatabaseStorage implements IStorage {
         location: booking.customerLocation,
         pets: pets,
         serviceType: booking.serviceType || "Unknown",
-        createdAt: booking.bookingCreatedAt?.toISOString() || new Date().toISOString()
+        createdAt: booking.bookingCreatedAt?.toISOString() || new Date().toISOString(),
+        paidAmount: booking.paymentStatus === 'paid' ? booking.paymentAmount : null
       };
     });
   }
