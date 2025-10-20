@@ -2396,7 +2396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             CustomerMobile: user.phone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code prefix
             InvoiceValue: estimatedCost,
             DisplayCurrencyIso: 'SAR',
-            CallBackUrl: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/api/public/myfatoorah/callback`,
+            CallBackUrl: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/api/public/myfatoorah/callback?ref=BOOKING-${booking.id}`,
             ErrorUrl: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/ride-request?payment=failed`,
             Language: 'En',
             CustomerReference: `BOOKING-${booking.id}`,
