@@ -16,6 +16,7 @@ interface Booking {
   customerName: string;
   customerPhone: string;
   createdAt: string;
+  paidAmount?: string | null;
 }
 
 interface DoctorBookingsTableProps {
@@ -179,6 +180,20 @@ export function DoctorBookingsTable({ vetsVanId, vetsVanName }: DoctorBookingsTa
                     <Clock className="w-4 h-4 text-orange-600" />
                     <span className="text-gray-600">{formatTime(booking.appointmentTime)}</span>
                   </div>
+                  
+                  {/* Paid Amount */}
+                  {booking.paidAmount && (
+                    <div className="mt-2 bg-emerald-50 rounded px-3 py-1.5 border border-emerald-200">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-medium text-emerald-700">
+                          {language === 'ar' ? 'المبلغ المدفوع' : 'Paid Amount'}
+                        </span>
+                        <span className="text-sm font-bold text-emerald-800">
+                          {booking.paidAmount} {language === 'ar' ? 'ريال' : 'SAR'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex flex-col items-end gap-2">
