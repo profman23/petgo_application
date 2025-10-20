@@ -410,17 +410,20 @@ export function addPublicPaymentRoutes(app: any) {
           console.error('❌ Failed to fetch payment details:', fetchError);
         }
 
-        // Store payment success info and redirect to ride-request page
-        const redirectUrl = `/ride-request?payment=success&ref=${ref}&paymentId=${actualPaymentId}&source=myfatoorah`;
+        // Store payment success info and redirect to ride-request page with absolute URL
+        const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
+        const redirectUrl = `${baseUrl}/ride-request?payment=success&ref=${ref}&paymentId=${actualPaymentId}&source=myfatoorah`;
         console.log('🔄 Redirecting to ride-request page with payment info:', redirectUrl);
         return res.redirect(redirectUrl);
       } else {
         console.log('❌ Missing payment parameters, redirecting to ride-request page without payment info');
-        return res.redirect('/ride-request?payment=failed');
+        const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
+        return res.redirect(`${baseUrl}/ride-request?payment=failed`);
       }
     } catch (error: any) {
       console.error('❌ MyFatoorah callback error:', error);
-      res.redirect('/ride-request?payment=error');
+      const baseUrl = process.env.FRONTEND_URL || 'http://localhost:5000';
+      res.redirect(`${baseUrl}/ride-request?payment=error`);
     }
   });
 

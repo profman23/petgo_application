@@ -288,9 +288,25 @@ export default function RideRequest() {
     const paymentId = urlParams.get('paymentId');
     
     if (paymentStatus === 'success' && paymentReference && paymentId) {
-      console.log('✅ Payment successful! Auto-finalizing booking...');
+      console.log('✅ Payment successful!', { paymentReference, paymentId });
       
-      // Load booking details from localStorage
+      // Check if this is an admin-created booking (ref format: BOOKING-{id})
+      if (paymentReference.startsWith('BOOKING-')) {
+        console.log('✅ Admin-created booking payment completed');
+        toast({
+          title: language === 'ar' ? 'تم الدفع بنجاح!' : 'Payment Successful!',
+          description: language === 'ar' 
+            ? 'تم تأكيد دفعتك بنجاح. شكراً لك!'
+            : 'Your payment has been confirmed successfully. Thank you!',
+          duration: 8000,
+        });
+        
+        // Clear the URL parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+      }
+      
+      // For customer-created bookings, load booking details from localStorage
       const bookingDetailsStr = localStorage.getItem('pendingBookingDetails');
       
       if (bookingDetailsStr) {
