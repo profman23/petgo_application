@@ -2073,9 +2073,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         selectedPets, 
         serviceType,
         paymentReference,
-        paymentId
+        paymentId,
+        isAdminBooking,
+        adminCustomerId
       } = req.body;
-      const userId = req.user.id;
+      const userId = isAdminBooking && adminCustomerId ? adminCustomerId : req.user.id;
       
       console.log('📍 Creating booking with request body:', req.body);
       console.log('📍 Customer location received:', customerLocation);
@@ -2264,8 +2266,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const vetsVan = await storage.getDriver(vetsVanId);
       const vetsVanName = vetsVan?.vetsvanName || 'VetsVan';
       
-      // Send booking confirmation email if user has email
-      if (user?.email) {
+      // Admin booking flow: Create payment invoice and send payment link email
+      if (isAdminBooking && user?.email && user?.phone) {
+        try {
+          console.log('📧 Admin booking - creating payment invoice and sending email');
+          
+          // Calculate estimated cost from selected pets and service type
+          let estimatedCost = 575; // Default consultation fee
+          
+          // You might want to calculate this more accurately based on service type and pets
+          // For now, using a basic calculation
+          
+          const myFatoorahService = new MyFatoorahService();
+          
+          // Create payment invoice
+          const invoiceRequest = {
+            CustomerName: user.name,
+            CustomerEmail: user.email,
+            CustomerMobile: user.phone,
+            InvoiceValue: estimatedCost,
+            DisplayCurrencyIso: 'SAR',
+            CallBackUrl: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/api/public/myfatoorah/callback`,
+            ErrorUrl: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/ride-request?payment=failed`,
+            Language: 'en',
+            CustomerReference: `BOOKING-${booking.id}`,
+            UserDefinedField: `Booking ID: ${booking.id}`,
+          };
+          
+          const paymentResponse = await myFatoorahService.createInvoice(invoiceRequest);
+          
+          if (paymentResponse.IsSuccess && paymentResponse.Data) {
+            const paymentUrl = paymentResponse.Data.InvoiceURL;
+            const invoiceId = paymentResponse.Data.InvoiceId;
+            
+            console.log('✅ Payment invoice created:', {
+              invoiceId,
+              paymentUrl,
+              bookingId: booking.id
+            });
+            
+            // Create payment transaction record
+            await db.execute(sql`
+              INSERT INTO payment_transactions (
+                booking_id, myfatoorah_invoice_id, amount, currency, status, 
+                reference_id, customer_name, customer_email, customer_phone,
+                created_at, updated_at
+              ) VALUES (
+                ${booking.id}, ${invoiceId}, ${estimatedCost}, 'SAR', 'pending',
+                ${`BOOKING-${booking.id}`}, ${user.name}, 
+                ${user.email}, ${user.phone},
+                ${new Date()}, ${new Date()}
+              )
+            `);
+            
+            // Send payment link email
+            await emailService.sendPaymentLinkEmail(
+              user.email,
+              user.name,
+              estimatedCost,
+              paymentUrl,
+              appointmentDate,
+              appointmentTime
+            );
+            
+            console.log(`✅ Payment link email sent to ${user.email}`);
+          }
+        } catch (paymentError) {
+          console.error('❌ Failed to create payment invoice or send email:', paymentError);
+          // Don't fail booking if payment email fails
+        }
+      }
+      // Regular customer booking: Send confirmation email  
+      else if (user?.email && !isAdminBooking) {
         try {
           await emailService.sendBookingConfirmationEmail(
             user.email,

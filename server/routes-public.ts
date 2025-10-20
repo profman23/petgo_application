@@ -464,11 +464,30 @@ export function addPublicPaymentRoutes(app: any) {
                   customer_email = ${useCustomerEmail},
                   customer_phone = ${useCustomerPhone},
                   myfatoorah_payment_id = ${PaymentId},
+                  paid_at = ${new Date()},
                   updated_at = ${new Date()}
               WHERE id = ${payment.id}
             `);
             
             console.log('✅ WEBHOOK - Payment transaction updated with preserved customer data');
+            
+            // Update booking status to "Confirmed" if booking_id exists
+            const bookingQuery = await db.execute(sql`
+              SELECT booking_id FROM payment_transactions WHERE id = ${payment.id}
+            `);
+            
+            if (bookingQuery.rows.length > 0 && bookingQuery.rows[0].booking_id) {
+              const bookingId = bookingQuery.rows[0].booking_id;
+              
+              await db.execute(sql`
+                UPDATE bookings 
+                SET status = 'confirmed',
+                    updated_at = ${new Date()}
+                WHERE id = ${bookingId}
+              `);
+              
+              console.log(`✅ WEBHOOK - Booking ${bookingId} status updated to "confirmed" after payment`);
+            }
           } else {
             console.log('⚠️ WEBHOOK - No existing payment transaction found for webhook update');
           }

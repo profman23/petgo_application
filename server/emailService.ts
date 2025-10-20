@@ -613,6 +613,29 @@ VETS VAN - الرعاية البيطرية المنزلية
     return await this.sendEmail(template);
   }
 
+  async sendPaymentLinkEmail(
+    userEmail: string,
+    userName: string,
+    amount: number,
+    paymentLink: string,
+    appointmentDate: string,
+    appointmentTime: string
+  ): Promise<boolean> {
+    if (!userEmail) {
+      console.log('Email not provided, skipping payment link email');
+      return false;
+    }
+
+    const template: EmailTemplate = {
+      to: userEmail,
+      subject: 'Complete Your Payment - أكمل الدفع',
+      html: this.generatePaymentLinkHTML(userName, amount, paymentLink, appointmentDate, appointmentTime),
+      text: this.generatePaymentLinkText(userName, amount, paymentLink, appointmentDate, appointmentTime)
+    };
+
+    return await this.sendEmail(template);
+  }
+
   private generateInvoiceLinkHTML(userName: string, invoiceId: string, invoiceLink: string): string {
     return `
       <!DOCTYPE html>
@@ -695,6 +718,104 @@ ${invoiceLink}
 - في حالة وجود أي استفسارات، تواصل معنا عبر التطبيق
 
 نشكرك مرة أخرى على ثقتك في VETS VAN، ونتطلع لخدمتك مرة أخرى!
+
+VETS VAN - رعاية محترفة في منزلك
+لأي استفسارات، تواصل معنا عبر التطبيق
+    `;
+  }
+
+  private generatePaymentLinkHTML(userName: string, amount: number, paymentLink: string, appointmentDate: string, appointmentTime: string): string {
+    return `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>أكمل الدفع - VETS VAN</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
+          .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+          .header { background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; padding: 30px; text-align: center; }
+          .content { padding: 30px; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; }
+          .payment-card { background-color: #F3F4F6; border: 2px solid #8B2F8B; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center; }
+          h1 { margin: 0; font-size: 28px; }
+          h2 { color: #8B2F8B; margin-top: 0; }
+          .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #8B2F8B, #A855F7); color: white; text-decoration: none; border-radius: 8px; margin: 15px 0; font-size: 16px; font-weight: bold; }
+          .amount { background-color: #8B2F8B; color: white; padding: 12px 20px; border-radius: 20px; display: inline-block; margin: 10px 0; font-weight: bold; font-size: 24px; }
+          .appointment-info { background-color: #EFF6FF; border-radius: 8px; padding: 15px; margin: 20px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>💳 أكمل الدفع</h1>
+            <p>VETS VAN - العيادة البيطرية المتنقلة</p>
+          </div>
+          <div class="content">
+            <h2>مرحباً ${userName}!</h2>
+            <p>تم حجز موعدك بنجاح. لإتمام عملية الحجز، يرجى إكمال الدفع من خلال الرابط أدناه.</p>
+            
+            <div class="payment-card">
+              <h3>💰 المبلغ المطلوب</h3>
+              <div class="amount">${amount} SAR</div>
+              <p style="margin-top: 15px;">يمكنك إكمال الدفع بشكل آمن من خلال النقر على الزر أدناه:</p>
+              
+              <a href="${paymentLink}" class="button">ادفع الآن</a>
+            </div>
+
+            <div class="appointment-info">
+              <h4>📅 تفاصيل الموعد</h4>
+              <p><strong>التاريخ:</strong> ${appointmentDate}</p>
+              <p><strong>الوقت:</strong> ${appointmentTime}</p>
+            </div>
+
+            <div style="margin: 20px 0; padding: 15px; background-color: #FEF3C7; border-radius: 8px;">
+              <h4>⚠️ ملاحظات مهمة:</h4>
+              <ul style="text-align: right;">
+                <li>يرجى إكمال الدفع لتأكيد الموعد</li>
+                <li>الدفع آمن ومشفر 100%</li>
+                <li>بعد إتمام الدفع، سيتم تأكيد موعدك تلقائياً</li>
+                <li>في حالة وجود أي استفسارات، تواصل معنا عبر التطبيق</li>
+              </ul>
+            </div>
+
+            <p>نتطلع لخدمتك قريباً!</p>
+          </div>
+          <div class="footer">
+            <p>🐾 VETS VAN - نحن نأتي إليك 🐾</p>
+            <p>لأي استفسارات، تواصل معنا عبر التطبيق</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+  }
+
+  private generatePaymentLinkText(userName: string, amount: number, paymentLink: string, appointmentDate: string, appointmentTime: string): string {
+    return `
+مرحباً ${userName}!
+
+أكمل الدفع - VETS VAN
+
+تم حجز موعدك بنجاح. لإتمام عملية الحجز، يرجى إكمال الدفع من خلال الرابط أدناه.
+
+💰 المبلغ المطلوب: ${amount} SAR
+
+📅 تفاصيل الموعد:
+التاريخ: ${appointmentDate}
+الوقت: ${appointmentTime}
+
+لإكمال الدفع، يرجى زيارة الرابط التالي:
+${paymentLink}
+
+⚠️ ملاحظات مهمة:
+- يرجى إكمال الدفع لتأكيد الموعد
+- الدفع آمن ومشفر 100%
+- بعد إتمام الدفع، سيتم تأكيد موعدك تلقائياً
+- في حالة وجود أي استفسارات، تواصل معنا عبر التطبيق
+
+نتطلع لخدمتك قريباً!
 
 VETS VAN - رعاية محترفة في منزلك
 لأي استفسارات، تواصل معنا عبر التطبيق
