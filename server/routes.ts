@@ -5873,6 +5873,43 @@ Keep each section concise and clinically relevant. Tailor recommendations to the
     }
   });
 
+  // Admin: Create a new patient for a specific customer
+  app.post('/api/admin/customers/:userId/patients', requireAuth, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId, 10);
+      const { name, type, patientWeight, ageYear, ageMonth, ageDay, photo, birthdate } = req.body;
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: 'Invalid user ID' });
+      }
+      
+      if (!name || !type || !patientWeight) {
+        return res.status(400).json({ message: 'Patient name, type, and weight are required' });
+      }
+      
+      console.log(`📝 Admin creating patient for customer userId: ${userId}`);
+      
+      const patient = await storage.createPatient({
+        userId,
+        name,
+        type,
+        patientWeight,
+        ageYear: ageYear || null,
+        ageMonth: ageMonth || null,
+        ageDay: ageDay || null,
+        photo: photo || null,
+        birthdate: birthdate || null,
+      });
+      
+      console.log(`✅ Patient created successfully:`, patient);
+      
+      res.status(201).json(patient);
+    } catch (error) {
+      console.error("❌ Error creating patient:", error);
+      res.status(500).json({ message: "Failed to create patient" });
+    }
+  });
+
   // Customer Search API - Optimized for PaymentModal component
   app.get('/api/admin/customers/search', requireAuth, async (req, res) => {
     try {
