@@ -34,6 +34,118 @@ interface Patient {
   patientWeight?: number;
 }
 
+// Helper function to calculate fleas & ticks prevention cost per pet
+const getFleaTicksCostPerPet = (petType: string, weight: number): { cost: number; tier: string } => {
+  const normalizedType = petType.toLowerCase();
+  
+  if (normalizedType === 'cat') {
+    if (weight >= 0 && weight <= 2.9) {
+      return { cost: 230, tier: '0.0-2.9kg' };
+    } else if (weight >= 3.0 && weight <= 5.9) {
+      return { cost: 250, tier: '3.0-5.9kg' };
+    } else if (weight >= 6.0) {
+      return { cost: 270, tier: '≥6.0kg' };
+    }
+  } else if (normalizedType === 'dog') {
+    if (weight >= 0 && weight <= 10.0) {
+      return { cost: 230, tier: '0.0-10.0kg' };
+    } else if (weight > 10.0) {
+      return { cost: 287, tier: '>10.0kg' };
+    }
+  }
+  
+  return { cost: 0, tier: 'Unknown' };
+};
+
+// Helper function to calculate estimated cost based on pets and service type
+const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], serviceType: string): { 
+  total: number; 
+  breakdown: Array<{ name: string; type: string; weight: number; tier: string; cost: number; }>; 
+  warnings: string[];
+  consultationFee?: number;
+  serviceCost?: number;
+} => {
+  const selectedPets = selectedPetIds
+    .map(id => patients.find(p => p.id === id))
+    .filter(pet => pet) as Patient[];
+
+  if (serviceType === 'fleas-ticks-prevention') {
+    const breakdown: Array<{ name: string; type: string; weight: number; tier: string; cost: number; }> = [];
+    const warnings: string[] = [];
+    let total = 0;
+
+    selectedPets.forEach(pet => {
+      if (!pet.patientWeight || pet.patientWeight <= 0) {
+        warnings.push(`${pet.name}: Missing weight data`);
+        breakdown.push({
+          name: pet.name,
+          type: pet.type,
+          weight: pet.patientWeight || 0,
+          tier: 'No weight',
+          cost: 0
+        });
+        return;
+      }
+
+      const { cost, tier } = getFleaTicksCostPerPet(pet.type, pet.patientWeight);
+      
+      if (cost === 0) {
+        warnings.push(`${pet.name}: Unknown pet type (${pet.type})`);
+      }
+
+      breakdown.push({
+        name: pet.name,
+        type: pet.type,
+        weight: pet.patientWeight,
+        tier: tier,
+        cost: cost
+      });
+
+      total += cost;
+    });
+
+    return { total, breakdown, warnings };
+  }
+
+  // Services with consultation fees + service cost
+  if (serviceType === 'first-visit' || serviceType === 'general-checkup') {
+    const consultationFee = 200;
+    const serviceCost = serviceType === 'first-visit' ? 100 : 150;
+    return {
+      total: consultationFee + serviceCost,
+      breakdown: [],
+      warnings: [],
+      consultationFee,
+      serviceCost
+    };
+  }
+
+  // Services with only consultation fees (multiple pets supported)
+  if (['national-day-home-consultation', 'national-day-vaccination', 'vaccination', 'deworming', 'test-service', 'pickup-drop'].includes(serviceType)) {
+    const consultationFee = 200;
+    return {
+      total: consultationFee,
+      breakdown: [],
+      warnings: [],
+      consultationFee,
+      serviceCost: 0
+    };
+  }
+
+  // Free service
+  if (serviceType === 'free-deworming') {
+    return {
+      total: 0,
+      breakdown: [],
+      warnings: [],
+      consultationFee: 0,
+      serviceCost: 0
+    };
+  }
+
+  return { total: 0, breakdown: [], warnings: [] };
+};
+
 interface AddAppointmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -306,6 +418,94 @@ export function AddAppointmentDialog({
                 {language === 'ar' ? 'اختياري: أدخل موقع العميل يدويًا' : 'Optional: Enter customer location manually'}
               </p>
             </div>
+
+            {/* Estimated Cost Display */}
+            {selectedPets.length > 0 && serviceType && 
+             ['first-visit', 'general-checkup', 'national-day-home-consultation', 'national-day-vaccination', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
+              <div className="p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                {(() => {
+                  const costData = getEstimatedCost(selectedPets, pets, serviceType);
+                  return (
+                    <>
+                      {/* Show breakdown for services with consultation fee */}
+                      {costData.consultationFee && costData.serviceCost !== undefined ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium text-purple-800" style={{ 
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
+                              {language === 'ar' ? 'رسوم الاستشارة:' : 'Consultation Fees:'}
+                            </span>
+                            <span className="text-sm font-bold text-purple-900" style={{ 
+                              fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                            }}>
+                              {costData.consultationFee.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                            </span>
+                          </div>
+                          
+                          {costData.serviceCost > 0 && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-purple-800" style={{ 
+                                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                              }}>
+                                {language === 'ar' ? 'تكلفة الخدمة:' : 'Service Cost:'}
+                              </span>
+                              <span className="text-sm font-bold text-purple-900" style={{ 
+                                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                              }}>
+                                {costData.serviceCost.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                              </span>
+                            </div>
+                          )}
+                          
+                          <div className="pt-2 border-t border-purple-300">
+                            <div className="flex items-center justify-between">
+                              <span className="text-md font-semibold text-purple-800" style={{ 
+                                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                              }}>
+                                {language === 'ar' ? 'الإجمالي:' : 'Total:'}
+                              </span>
+                              <span className="text-lg font-bold text-purple-900" style={{ 
+                                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                              }}>
+                                {costData.total.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-purple-800" style={{ 
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}>
+                            {language === 'ar' ? 'التكلفة التقديرية:' : 'Estimated Cost:'}
+                          </span>
+                          <span className="text-lg font-bold text-purple-900" style={{ 
+                            fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
+                          }}>
+                            {costData.total.toFixed(2)} {language === 'ar' ? 'ريال' : 'SAR'}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {/* Show warnings if any */}
+                      {costData.warnings && costData.warnings.length > 0 && (
+                        <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                          <p className="text-xs text-yellow-800 font-medium">
+                            {language === 'ar' ? 'تنبيهات:' : 'Warnings:'}
+                          </p>
+                          <ul className="text-xs text-yellow-700 mt-1 space-y-1">
+                            {costData.warnings.map((warning, idx) => (
+                              <li key={idx}>• {warning}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            )}
 
             {/* Confirm Button */}
             <Button
