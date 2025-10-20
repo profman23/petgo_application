@@ -70,9 +70,9 @@ export function AddPatientDialog({ open, onOpenChange, userId, userName }: AddPa
 
   const addPatientMutation = useMutation({
     mutationFn: async (data: PatientFormData) => {
-      return await apiRequest('/api/patients', {
+      return await apiRequest(`/api/admin/customers/${userId}/patients`, {
         method: 'POST',
-        body: JSON.stringify({ ...data, userId }),
+        body: JSON.stringify(data),
       });
     },
     onSuccess: () => {

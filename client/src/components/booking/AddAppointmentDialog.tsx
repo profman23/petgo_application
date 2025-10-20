@@ -104,46 +104,80 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
       total += cost;
     });
 
-    return { total, breakdown, warnings };
+    // Add flat 575 SAR add-on for fleas-ticks-prevention
+    const serviceCost = total;
+    total += 575;
+
+    return { total, breakdown, warnings, consultationFee: 575, serviceCost };
   }
 
-  // Services with consultation fees + service cost
-  if (serviceType === 'first-visit' || serviceType === 'general-checkup') {
-    const consultationFee = 200;
-    const serviceCost = serviceType === 'first-visit' ? 100 : 150;
-    return {
-      total: consultationFee + serviceCost,
-      breakdown: [],
-      warnings: [],
-      consultationFee,
-      serviceCost
-    };
+  // Original pricing for other services
+  const petCount = selectedPets.length;
+  let total = 0;
+
+  // National Day 95 Offer pricing for Home Consultation
+  if (serviceType === 'national-day-home-consultation') {
+    if (petCount <= 2) {
+      total = 195; // 1-2 pets: 195 SAR
+    } else if (petCount === 3) {
+      total = 290; // 3 pets: 290 SAR (195 + 95)
+    } else {
+      total = 290 + ((petCount - 3) * 95); // 4+ pets: 290 + 95 per additional pet
+    }
+  }
+  // National Day 95 Offer pricing for Vaccination & Deworming
+  else if (serviceType === 'national-day-vaccination') {
+    total = petCount * 95; // 95 SAR per pet
+  }
+  // Special pricing for First Visit and General Check-up (unchanged)
+  else if (['first-visit', 'general-checkup'].includes(serviceType)) {
+    if (petCount <= 2) {
+      total = 575; // 1-2 pets: 575 SAR
+    } else if (petCount <= 4) {
+      total = 575 * 2; // 3-4 pets: 1150 SAR
+    } else {
+      total = 575 * 3; // 5+ pets: 1725 SAR (fixed cap)
+    }
+  } else if (serviceType === 'test-service') {
+    total = petCount;
+  } else if (serviceType === 'vaccination') {
+    total = petCount * 172.5;
+  } else if (serviceType === 'deworming') {
+    total = petCount * 80.5;
+  } else if (serviceType === 'free-deworming') {
+    total = 0; // Free service
+  } else if (serviceType === 'pickup-drop') {
+    total = 230;
+  } else {
+    // Original pricing for other services
+    if (petCount <= 2) total = 172.5;
+    else if (petCount <= 4) total = 345;
+    else total = 517.5; // 5+ pets
   }
 
-  // Services with only consultation fees (multiple pets supported)
-  if (['national-day-home-consultation', 'national-day-vaccination', 'vaccination', 'deworming', 'test-service', 'pickup-drop'].includes(serviceType)) {
-    const consultationFee = 200;
-    return {
-      total: consultationFee,
-      breakdown: [],
-      warnings: [],
-      consultationFee,
-      serviceCost: 0
-    };
+  // Add flat 575 SAR to specific services
+  let consultationFee: number | undefined;
+  let serviceCost: number | undefined;
+  
+  if (['vaccination', 'deworming'].includes(serviceType)) {
+    serviceCost = total;
+    consultationFee = 575;
+    total += 575;
   }
 
-  // Free service
-  if (serviceType === 'free-deworming') {
-    return {
-      total: 0,
-      breakdown: [],
-      warnings: [],
-      consultationFee: 0,
-      serviceCost: 0
-    };
-  }
-
-  return { total: 0, breakdown: [], warnings: [] };
+  return { 
+    total, 
+    breakdown: selectedPets.map(pet => ({
+      name: pet.name,
+      type: pet.type,
+      weight: pet.patientWeight || 0,
+      tier: 'Standard',
+      cost: total / selectedPets.length
+    })), 
+    warnings: [],
+    consultationFee,
+    serviceCost
+  };
 };
 
 interface AddAppointmentDialogProps {
