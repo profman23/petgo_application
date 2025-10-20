@@ -2295,6 +2295,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             UserDefinedField: `Booking ID: ${booking.id}`,
           };
           
+          console.log('📤 FULL INVOICE REQUEST:', JSON.stringify(invoiceRequest, null, 2));
+          console.log('📞 User phone before processing:', user.phone);
+          console.log('📞 User phone after processing:', user.phone.replace(/^\+966/, '').replace(/^966/, ''));
+          
           const paymentResponse = await myFatoorahService.createInvoice(invoiceRequest);
           
           if (paymentResponse.IsSuccess && paymentResponse.Data) {
