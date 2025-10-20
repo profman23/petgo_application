@@ -274,24 +274,17 @@ export function AddAppointmentDialog({
     onOpenChange(false);
   };
 
-  // Calculate estimated cost for the booking
-  const costData = selectedPets.length > 0 && serviceType 
-    ? getEstimatedCost(selectedPets, pets, serviceType)
-    : { total: 0, breakdown: [], warnings: [] };
-
   // Prepare booking data for the modal
   const bookingData = {
     userId: customerData.userId,
     userName: customerData.userName,
     userPhone: customerData.userPhone,
-    userEmail: customerData.userEmail,
     selectedPatients: selectedPets,
     serviceType: serviceType,
     location: manualLocation || '',
     pickupLatitude: null,
     pickupLongitude: null,
     isAdminBooking: true,
-    estimatedCost: costData.total,
   };
 
   return (
