@@ -690,7 +690,6 @@ export class DatabaseStorage implements IStorage {
     location: any;
     pets: Array<{ name: string; type: string; }>;
     serviceType: string;
-    paidAmount: number | null;
     createdAt: string;
   }>> {
     const bookingData = await db
@@ -702,7 +701,6 @@ export class DatabaseStorage implements IStorage {
         customerLocation: bookings.customerLocation,
         selectedPets: bookings.selectedPets,
         serviceType: bookings.serviceType,
-        paidAmount: bookings.paidAmount,
         bookingCreatedAt: bookings.createdAt,
         customerName: users.name,
         customerPhone: users.phone,
@@ -736,7 +734,6 @@ export class DatabaseStorage implements IStorage {
         location: booking.customerLocation,
         pets: pets,
         serviceType: booking.serviceType || "Unknown",
-        paidAmount: booking.paidAmount || null,
         createdAt: booking.bookingCreatedAt?.toISOString() || new Date().toISOString()
       };
     });

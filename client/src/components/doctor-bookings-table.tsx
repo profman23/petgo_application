@@ -15,7 +15,6 @@ interface Booking {
   status: string;
   customerName: string;
   customerPhone: string;
-  paidAmount?: number | null;
   createdAt: string;
 }
 
@@ -180,20 +179,6 @@ export function DoctorBookingsTable({ vetsVanId, vetsVanName }: DoctorBookingsTa
                     <Clock className="w-4 h-4 text-orange-600" />
                     <span className="text-gray-600">{formatTime(booking.appointmentTime)}</span>
                   </div>
-                  
-                  {/* Paid Amount - Only show if available */}
-                  {booking.paidAmount && (
-                    <div className="mt-2 bg-green-50 rounded p-2 border border-green-200">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-green-700">
-                          {language === 'ar' ? 'المبلغ المدفوع:' : 'Paid Amount:'}
-                        </span>
-                        <span className="text-sm font-bold text-green-800" data-testid={`paid-amount-${booking.id}`}>
-                          {booking.paidAmount} {language === 'ar' ? 'ر.س' : 'SAR'}
-                        </span>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 
                 <div className="flex flex-col items-end gap-2">

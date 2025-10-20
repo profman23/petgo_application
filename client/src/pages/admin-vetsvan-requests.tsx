@@ -119,7 +119,6 @@ export default function AdminVetsVanRequests() {
           type: string;
         }>;
         serviceType: string;
-        paidAmount: number | null;
         createdAt: string;
         driverId: number;
       }>;
@@ -517,20 +516,6 @@ export default function AdminVetsVanRequests() {
                               {!['general_checkup', 'grooming'].includes(request.serviceType) && request.serviceType}
                             </span>
                           </div>
-
-                          {/* Paid Amount - Only show if booking is confirmed and amount is available */}
-                          {request.status === 'confirmed' && request.paidAmount && (
-                            <div className="bg-green-50 rounded p-2 border border-green-200">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-medium text-green-700">
-                                  {language === 'ar' ? 'المبلغ المدفوع:' : 'Paid Amount:'}
-                                </span>
-                                <span className="text-sm font-bold text-green-800" data-testid={`paid-amount-${request.id}`}>
-                                  {request.paidAmount} {language === 'ar' ? 'ر.س' : 'SAR'}
-                                </span>
-                              </div>
-                            </div>
-                          )}
 
                           {/* Pets */}
                           {request.pets && request.pets.length > 0 && (

@@ -398,12 +398,11 @@ export function addPublicPaymentRoutes(app: any) {
                 await db.execute(sql`
                   UPDATE bookings 
                   SET status = 'confirmed',
-                      paid_amount = ${paymentDetails.amount},
                       updated_at = ${new Date()}
                   WHERE id = ${bookingId}
                 `);
                 
-                console.log(`✅ CALLBACK - Booking ${bookingId} status updated to "confirmed" and paid amount set to ${paymentDetails.amount} SAR after successful payment`);
+                console.log(`✅ CALLBACK - Booking ${bookingId} status updated to "confirmed" after successful payment`);
               }
             }
           }
@@ -501,12 +500,11 @@ export function addPublicPaymentRoutes(app: any) {
               await db.execute(sql`
                 UPDATE bookings 
                 SET status = 'confirmed',
-                    paid_amount = ${InvoiceValue},
                     updated_at = ${new Date()}
                 WHERE id = ${bookingId}
               `);
               
-              console.log(`✅ WEBHOOK - Booking ${bookingId} status updated to "confirmed" and paid amount set to ${InvoiceValue} SAR after payment`);
+              console.log(`✅ WEBHOOK - Booking ${bookingId} status updated to "confirmed" after payment`);
             }
           } else {
             console.log('⚠️ WEBHOOK - No existing payment transaction found for webhook update');
