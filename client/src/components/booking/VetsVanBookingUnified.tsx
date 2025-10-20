@@ -387,7 +387,11 @@ export function VetsVanBookingUnified({
           paymentReference: paymentReference,
           paymentId: paymentId,
           isAdminBooking: isAdminBooking,
-          adminCustomerId: isAdminBooking && rideRequestData ? rideRequestData.userId : undefined
+          adminCustomerId: isAdminBooking && rideRequestData ? rideRequestData.userId : undefined,
+          estimatedCost: rideRequestData?.estimatedCost,
+          customerEmail: rideRequestData?.userEmail,
+          customerPhone: rideRequestData?.userPhone,
+          customerName: rideRequestData?.userName
         }),
       });
 
