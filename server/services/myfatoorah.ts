@@ -97,6 +97,15 @@ export class MyFatoorahService {
         url: error.config?.url,
         requestHeaders: error.config?.headers
       });
+      
+      // Log validation errors in detail
+      if (error.response?.data?.ValidationErrors) {
+        console.error('🔍 MyFatoorah Validation Errors:', JSON.stringify(error.response.data.ValidationErrors, null, 2));
+      }
+      
+      // Log the full request that was sent
+      console.error('📤 Request that failed:', JSON.stringify(request, null, 2));
+      
       throw new Error(`Payment gateway error: ${error.response?.data?.Message || error.message}`);
     }
   }
