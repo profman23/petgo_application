@@ -384,9 +384,27 @@ export function addPublicPaymentRoutes(app: any) {
                     updated_at = ${new Date()}
                 WHERE id = ${payment.id}
               `);
+              
+              console.log('✅ Payment transaction updated with amount AND customer data from callback');
+              
+              // Update booking status to "confirmed" if booking_id exists
+              const bookingQuery = await db.execute(sql`
+                SELECT booking_id FROM payment_transactions WHERE id = ${payment.id}
+              `);
+              
+              if (bookingQuery.rows.length > 0 && bookingQuery.rows[0].booking_id) {
+                const bookingId = bookingQuery.rows[0].booking_id;
+                
+                await db.execute(sql`
+                  UPDATE bookings 
+                  SET status = 'confirmed',
+                      updated_at = ${new Date()}
+                  WHERE id = ${bookingId}
+                `);
+                
+                console.log(`✅ CALLBACK - Booking ${bookingId} status updated to "confirmed" after successful payment`);
+              }
             }
-            
-            console.log('✅ Payment transaction updated with amount AND customer data from callback');
           }
         } catch (fetchError) {
           console.error('❌ Failed to fetch payment details:', fetchError);
