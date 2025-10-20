@@ -2283,7 +2283,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const invoiceRequest = {
             CustomerName: user.name,
             CustomerEmail: user.email,
-            CustomerMobile: user.phone,
+            MobileCountryCode: '966',
+            CustomerMobile: user.phone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code prefix
             InvoiceValue: estimatedCost,
             DisplayCurrencyIso: 'SAR',
             CallBackUrl: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/api/public/myfatoorah/callback`,
