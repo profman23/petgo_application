@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useTranslation, getDirection } from "@/lib/i18n";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
-import { FilePlus, Calendar } from "lucide-react";
+import { FilePlus, Calendar, PawPrint } from "lucide-react";
 import { SearchActionBar } from "@/components/ui/search-action-bar";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -12,6 +12,7 @@ import { AddAppointmentDialog } from "@/components/booking/AddAppointmentDialog"
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CustomerRegistrationForm } from "@/components/CustomerRegistrationForm";
+import { AddPatientDialog } from "@/components/AddPatientDialog";
 
 // Customer data type from backend API
 interface CustomerData {
@@ -50,6 +51,10 @@ export default function BusinessPartnerManagement() {
   
   // Customer Registration Dialog state
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
+  
+  // Add Patient Dialog state
+  const [addPatientDialogOpen, setAddPatientDialogOpen] = useState(false);
+  const [selectedCustomerForPatient, setSelectedCustomerForPatient] = useState<{ userId: number; userName: string } | null>(null);
 
   // Fetch current user's permissions
   const {
@@ -163,6 +168,15 @@ export default function BusinessPartnerManagement() {
     setAppointmentDialogOpen(true);
   };
 
+  // Handler for opening Add Patient dialog
+  const handleAddPatient = (customer: CustomerData) => {
+    setSelectedCustomerForPatient({
+      userId: customer.userId,
+      userName: customer.userName
+    });
+    setAddPatientDialogOpen(true);
+  };
+
   // 🎯 DATATABLE CONFIGURATION - Customer columns in exact current order
   const customerColumns: DataTableColumn<CustomerData>[] = [
     {
@@ -218,6 +232,24 @@ export default function BusinessPartnerManagement() {
         >
           <Calendar className="w-4 h-4 mr-2" />
           {language === 'ar' ? 'إضافة موعد' : 'Add Appointment'}
+        </Button>
+      ),
+      className: 'text-center'
+    },
+    {
+      key: 'addPatient',
+      label: { ar: 'إضافة أليف', en: 'Add Patient' },
+      render: (customer) => (
+        <Button
+          onClick={() => handleAddPatient(customer)}
+          variant="outline"
+          size="sm"
+          className="text-green-600 border-green-600 hover:bg-green-50"
+          disabled={isReadOnly}
+          data-testid={`button-add-patient-${customer.userId}`}
+        >
+          <PawPrint className="w-4 h-4 mr-2" />
+          {language === 'ar' ? 'إضافة أليف' : 'Add Patient'}
         </Button>
       ),
       className: 'text-center'
@@ -468,6 +500,16 @@ export default function BusinessPartnerManagement() {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Add Patient Dialog */}
+        {selectedCustomerForPatient && (
+          <AddPatientDialog
+            open={addPatientDialogOpen}
+            onOpenChange={setAddPatientDialogOpen}
+            userId={selectedCustomerForPatient.userId}
+            userName={selectedCustomerForPatient.userName}
+          />
+        )}
       </div>
     </AdminLayout>
   );
