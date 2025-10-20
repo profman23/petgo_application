@@ -2282,6 +2282,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Create payment invoice
           const invoiceRequest = {
             CustomerName: user.name,
+            NotificationOption: 'EML',
             CustomerEmail: user.email,
             MobileCountryCode: '966',
             CustomerMobile: user.phone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code prefix
@@ -2289,7 +2290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             DisplayCurrencyIso: 'SAR',
             CallBackUrl: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/api/public/myfatoorah/callback`,
             ErrorUrl: `${process.env.FRONTEND_URL || 'http://localhost:5000'}/ride-request?payment=failed`,
-            Language: 'en',
+            Language: 'En',
             CustomerReference: `BOOKING-${booking.id}`,
             UserDefinedField: `Booking ID: ${booking.id}`,
           };
