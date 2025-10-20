@@ -284,6 +284,7 @@ export const bookings = pgTable("bookings", {
     ageDay?: number;
   }>>(),
   serviceType: text("service_type").default("General Check Up"),
+  paidAmount: real("paid_amount"), // Amount paid for the booking
   // Payment fields removed per user request
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
