@@ -145,12 +145,12 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
             </tr>
           </thead>
           <tbody className="bg-white divide-y-2 divide-gray-400">
-            {(invoices || []).map((item) => {
+            {(invoices || []).map((item, index) => {
               if (mode === 'invoice') {
                 const invoice = item as Invoice;
                 return (
                   <tr 
-                    key={invoice.invoiceNumber}
+                    key={invoice.id ? `invoice-${invoice.id}` : `invoice-${invoice.invoiceNumber}-${index}`}
                     className="hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => onSelectInvoice(invoice)}
                     data-testid={`table-invoice-row-${invoice.invoiceNumber}`}
@@ -200,7 +200,7 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
                 const customer = item as Customer;
                 return (
                   <tr 
-                    key={customer.id}
+                    key={`customer-${customer.id}`}
                     className="hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => onSelectInvoice(customer)}
                     data-testid={`table-customer-row-${customer.id}`}
@@ -231,7 +231,7 @@ export function InvoiceDataTable({ invoices, onSelectInvoice, isLoading, mode = 
                 const creditNote = item as CreditNote;
                 return (
                   <tr 
-                    key={creditNote.creditNoteNumber}
+                    key={creditNote.id ? `creditnote-${creditNote.id}` : `creditnote-${creditNote.creditNoteNumber}-${index}`}
                     className="hover:bg-gray-50 cursor-pointer transition-colors"
                     onClick={() => onSelectInvoice(creditNote)}
                     data-testid={`table-credit-note-row-${creditNote.creditNoteNumber}`}
