@@ -724,14 +724,17 @@ export class DatabaseStorage implements IStorage {
         )
       );
 
-    return bookingData.map(booking => {
+    // Deduplicate bookings using Map (in case of multiple payment transactions)
+    const uniqueBookingsMap = new Map();
+    
+    bookingData.forEach(booking => {
       // Extract pet names and types from selectedPets
       const pets = booking.selectedPets?.map((pet: any) => ({
         name: pet.name || "Unknown",
         type: pet.type || "Unknown"
       })) || [];
 
-      return {
+      const bookingRecord = {
         id: booking.bookingId,
         customerName: booking.customerName || "Unknown",
         customerPhone: booking.customerPhone || "Unknown",
@@ -748,7 +751,15 @@ export class DatabaseStorage implements IStorage {
         createdAt: booking.bookingCreatedAt?.toISOString() || new Date().toISOString(),
         paidAmount: booking.paymentAmount || null
       };
+
+      // Only add if not already in map, or if this one has a paid amount and the existing one doesn't
+      if (!uniqueBookingsMap.has(booking.bookingId) || 
+          (booking.paymentAmount && !uniqueBookingsMap.get(booking.bookingId).paidAmount)) {
+        uniqueBookingsMap.set(booking.bookingId, bookingRecord);
+      }
     });
+
+    return Array.from(uniqueBookingsMap.values());
   }
 
   // Pet vitals operations
