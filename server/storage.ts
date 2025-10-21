@@ -727,12 +727,41 @@ export class DatabaseStorage implements IStorage {
     // Deduplicate bookings using Map (in case of multiple payment transactions)
     const uniqueBookingsMap = new Map();
     
-    bookingData.forEach(booking => {
-      // Extract pet names and types from selectedPets
-      const pets = booking.selectedPets?.map((pet: any) => ({
-        name: pet.name || "Unknown",
-        type: pet.type || "Unknown"
-      })) || [];
+    for (const booking of bookingData) {
+      // Fetch actual pet data from patients table based on selectedPets IDs
+      let pets: Array<{ name: string; type: string; }> = [];
+      
+      if (booking.selectedPets && Array.isArray(booking.selectedPets) && booking.selectedPets.length > 0) {
+        try {
+          // Extract pet IDs from selectedPets
+          const petIds = booking.selectedPets
+            .map((pet: any) => pet.id)
+            .filter((id: any) => id !== undefined && id !== null);
+          
+          if (petIds.length > 0) {
+            // Fetch actual patient records from database
+            const patientRecords = await db
+              .select({
+                name: patients.name,
+                type: patients.type
+              })
+              .from(patients)
+              .where(sql`${patients.id} IN (${sql.join(petIds.map((id: number) => sql`${id}`), sql`, `)})`);
+            
+            pets = patientRecords.map(p => ({
+              name: p.name || "Unknown",
+              type: p.type || "Unknown"
+            }));
+          }
+        } catch (petFetchError) {
+          console.error('Error fetching pet data for booking:', booking.bookingId, petFetchError);
+          // Fallback to selectedPets data if available
+          pets = booking.selectedPets?.map((pet: any) => ({
+            name: pet.name || "Unknown",
+            type: pet.type || "Unknown"
+          })) || [];
+        }
+      }
 
       const bookingRecord = {
         id: booking.bookingId,
@@ -757,7 +786,7 @@ export class DatabaseStorage implements IStorage {
           (booking.paymentAmount && !uniqueBookingsMap.get(booking.bookingId).paidAmount)) {
         uniqueBookingsMap.set(booking.bookingId, bookingRecord);
       }
-    });
+    }
 
     return Array.from(uniqueBookingsMap.values());
   }
