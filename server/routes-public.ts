@@ -5,6 +5,34 @@ import { sessionService } from './sessionService';
 import { storage } from './storage';
 import { db } from './db';
 
+// Helper function to get the correct production domain
+function getProductionDomain(): string {
+  const replitDomains = process.env.REPLIT_DOMAINS;
+  
+  // If REPLIT_DOMAINS contains multiple domains (comma-separated)
+  if (replitDomains && replitDomains.includes(',')) {
+    const domains = replitDomains.split(',').map(d => d.trim());
+    
+    // Prefer www.vetsvan.app for production
+    const preferredDomain = domains.find(d => d === 'www.vetsvan.app');
+    if (preferredDomain) {
+      return preferredDomain;
+    }
+    
+    // Fallback to vetsvan.app if www is not found
+    const vetsvanDomain = domains.find(d => d === 'vetsvan.app');
+    if (vetsvanDomain) {
+      return vetsvanDomain;
+    }
+    
+    // Otherwise use the first domain
+    return domains[0];
+  }
+  
+  // Single domain or no REPLIT_DOMAINS
+  return replitDomains || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
+}
+
 export function addPublicPaymentRoutes(app: any) {
   // Simple test endpoint
   app.get('/api/public/test', (req: any, res: any) => {
@@ -222,6 +250,7 @@ export function addPublicPaymentRoutes(app: any) {
       const myfatoorah = new MyFatoorahService();
       
       // Prepare payment request for MyFatoorah API
+      const productionDomain = getProductionDomain();
       const paymentRequest = {
         CustomerName: finalCustomerName,
         NotificationOption: 'EML',
@@ -230,8 +259,8 @@ export function addPublicPaymentRoutes(app: any) {
         MobileCountryCode: '966',
         CustomerMobile: finalCustomerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
         CustomerEmail: finalCustomerEmail,
-        CallBackUrl: `${req.protocol}://${req.get('host')}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
-        ErrorUrl: `${req.protocol}://${req.get('host')}/ride-request?payment=failed&ref=${invoiceNumber}&source=myfatoorah`,
+        CallBackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
+        ErrorUrl: `https://www.vetsvan.app/login`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
       };
