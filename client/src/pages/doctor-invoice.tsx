@@ -28,7 +28,7 @@ interface InvoiceItem {
   quantity: number;
   unitPrice: number;
   discount: number;
-  discountType: 'none' | '10%' | '100%';
+  discountType: 'none' | '10%' | '15%' | '100%';
   vatRate: number;
   vatAmount: number;
   totalBeforeVat: number;
@@ -582,6 +582,8 @@ export default function DoctorInvoice() {
     const itemSubtotal = item.unitPrice * item.quantity;
     if (item.discountType === '10%') {
       return sum + (itemSubtotal * 0.10);
+    } else if (item.discountType === '15%') {
+      return sum + (itemSubtotal * 0.15);
     } else if (item.discountType === '100%') {
       return sum + itemSubtotal;
     }
@@ -599,6 +601,8 @@ export default function DoctorInvoice() {
     
     if (item.discountType === '10%') {
       discountAmount = subtotal * 0.10; // 10% discount
+    } else if (item.discountType === '15%') {
+      discountAmount = subtotal * 0.15; // 15% discount (F.Pets)
     } else if (item.discountType === '100%') {
       discountAmount = subtotal; // 100% discount (free)
     } else {
@@ -1555,7 +1559,9 @@ export default function DoctorInvoice() {
                                 ? (language === 'ar' ? 'بدون خصم' : 'No Discount')
                                 : item.discountType === '10%' 
                                   ? (language === 'ar' ? 'خصم 10%' : '10% Discount')
-                                  : (language === 'ar' ? 'خصم 100%' : '100% Discount')
+                                  : item.discountType === '15%'
+                                    ? (language === 'ar' ? 'F.Pets خصم 15%' : 'F.Pets 15%')
+                                    : (language === 'ar' ? 'خصم 100%' : '100% Discount')
                               }
                             </div>
                           ) : (
@@ -1569,6 +1575,7 @@ export default function DoctorInvoice() {
                               <SelectContent>
                                 <SelectItem value="none">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</SelectItem>
                                 <SelectItem value="10%">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</SelectItem>
+                                <SelectItem value="15%">{language === 'ar' ? 'F.Pets خصم 15%' : 'F.Pets 15%'}</SelectItem>
                                 <SelectItem value="100%">{language === 'ar' ? 'خصم 100%' : '100% Discount'}</SelectItem>
                               </SelectContent>
                             </Select>
@@ -1629,8 +1636,17 @@ export default function DoctorInvoice() {
                                         setTimeout(() => setDropdownOpen(''), 200);
                                       }}
                                       placeholder={language === 'ar' ? 'ابحث أو اكتب اسم المنتج/الخدمة...' : 'Search or type product/service name...'}
-                                      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                      className={`w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                                        [...products, ...services].some((ps: any) => ps.name === item.description)
+                                          ? 'bg-gray-100 cursor-not-allowed'
+                                          : ''
+                                      }`}
                                       dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                      readOnly={
+                                        [...products, ...services].some(
+                                          (ps: any) => ps.name === item.description
+                                        )
+                                      }
                                     />
                                     {(item.description || searchQuery) && (
                                       <button
@@ -1808,8 +1824,17 @@ export default function DoctorInvoice() {
                                         setTimeout(() => setDropdownOpen(''), 200);
                                       }}
                                       placeholder={language === 'ar' ? 'ابحث أو اكتب اسم المنتج/الخدمة...' : 'Search or type product/service name...'}
-                                      className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                      className={`w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                                        [...products, ...services].some((ps: any) => ps.name === item.description)
+                                          ? 'bg-gray-100 cursor-not-allowed'
+                                          : ''
+                                      }`}
                                       dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                      readOnly={
+                                        [...products, ...services].some(
+                                          (ps: any) => ps.name === item.description
+                                        )
+                                      }
                                     />
                                     {(item.description || searchQuery) && (
                                       <button
@@ -1986,7 +2011,9 @@ export default function DoctorInvoice() {
                                 ? (language === 'ar' ? 'بدون خصم' : 'No Discount')
                                 : item.discountType === '10%' 
                                   ? (language === 'ar' ? 'خصم 10%' : '10% Discount')
-                                  : (language === 'ar' ? 'خصم 100%' : '100% Discount')
+                                  : item.discountType === '15%'
+                                    ? (language === 'ar' ? 'F.Pets خصم 15%' : 'F.Pets 15%')
+                                    : (language === 'ar' ? 'خصم 100%' : '100% Discount')
                               }
                             </div>
                           ) : (
@@ -2000,6 +2027,7 @@ export default function DoctorInvoice() {
                               <SelectContent>
                                 <SelectItem value="none">{language === 'ar' ? 'بدون خصم' : 'No Discount'}</SelectItem>
                                 <SelectItem value="10%">{language === 'ar' ? 'خصم 10%' : '10% Discount'}</SelectItem>
+                                <SelectItem value="15%">{language === 'ar' ? 'F.Pets خصم 15%' : 'F.Pets 15%'}</SelectItem>
                                 <SelectItem value="100%">{language === 'ar' ? 'خصم 100%' : '100% Discount'}</SelectItem>
                               </SelectContent>
                             </Select>
