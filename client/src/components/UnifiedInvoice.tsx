@@ -97,7 +97,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
       const quantity = parseFloat(item.quantity || '1');
       const unitPrice = parseFloat(item.unitPrice || '0');
       const subtotal = quantity * unitPrice;
-      const discountPercent = item.discountType === '10%' ? 10 : item.discountType === '100%' ? 100 : 0;
+      const discountPercent = item.discountType === '10%' ? 10 : item.discountType === '15%' ? 15 : item.discountType === '100%' ? 100 : 0;
       const discountAmount = (subtotal * discountPercent) / 100;
       const beforeVat = subtotal - discountAmount;
       const vatAmount = beforeVat * 0.15;
@@ -356,11 +356,18 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
             const quantity = parseFloat(item.quantity || '1');
             const unitPrice = parseFloat(item.unitPrice || '0');
             const subtotal = quantity * unitPrice;
-            const discountPercent = item.discountType === '10%' ? 10 : item.discountType === '100%' ? 100 : 0;
+            const discountPercent = item.discountType === '10%' ? 10 : item.discountType === '15%' ? 15 : item.discountType === '100%' ? 100 : 0;
             const discountAmount = (subtotal * discountPercent) / 100;
             const totalBeforeVat = subtotal - discountAmount;
             const vatAmount = totalBeforeVat * 0.15; // 15% VAT
             const totalAfterVat = totalBeforeVat + vatAmount;
+            
+            // Get discount label
+            const discountLabel = item.discountType === 'none' ? 'No Discount' 
+              : item.discountType === '10%' ? 'Discount 10%'
+              : item.discountType === '15%' ? 'F.Pets 15%'
+              : item.discountType === '100%' ? 'Discount 100%'
+              : 'No Discount';
 
             return (
               <div key={index} className="grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 py-1 border-b border-gray-100">
@@ -385,7 +392,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
                 {/* Discount */}
                 <div className="text-center">
                   <span className="text-gray-600 text-sm">
-                    {discountPercent > 0 ? `Discount ${discountPercent}%` : 'No Discount'}
+                    {discountLabel}
                   </span>
                 </div>
                 
