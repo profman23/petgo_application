@@ -15,6 +15,7 @@ import { useTranslation, getDirection, getTextAlign } from "@/lib/i18n";
 import { playBookingNotification } from "@/utils/audio";
 import { AdminLayout } from "@/components/admin-layout/AdminLayout";
 import { PaginationControls } from "@/components/ui/pagination-controls";
+import { BookingCard } from "@/components/BookingCard";
 
 export default function AdminVetsVanRequests() {
   const [, setLocation] = useLocation();
@@ -448,141 +449,37 @@ export default function AdminVetsVanRequests() {
                 ) : vetsVanRequests && vetsVanRequests.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {vetsVanRequests.map((request) => (
-                      <Card key={request.id} className="h-fit border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                        <CardHeader className="pb-2 px-3 pt-3">
-                          <div className="flex items-start justify-between">
-                            <div className="space-y-1 flex-1 min-w-0">
-                              <CardTitle className="text-sm font-medium text-gray-900 truncate">
-                                {request.customerName}
-                              </CardTitle>
-                              <div className="flex items-center gap-1">
-                                <Phone className="h-3 w-3 text-gray-400" />
-                                <span className="text-xs text-gray-600 truncate">{request.customerPhone}</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Mail className="h-3 w-3 text-gray-400" />
-                                <span className="text-xs text-gray-600 truncate">{request.customerEmail}</span>
-                              </div>
-                            </div>
-                            <Badge
-                              className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${
-                                request.status === 'confirmed' 
-                                  ? 'bg-green-100 text-green-700 border border-green-300' 
-                                  : request.status === 'pending_review'
-                                  ? 'bg-yellow-100 text-yellow-700 border border-yellow-300'
-                                  : request.status === 'cancelled'
-                                  ? 'bg-red-100 text-red-700 border border-red-300'
-                                  : 'bg-blue-100 text-blue-700 border border-blue-300'
-                              }`}
-                            >
-                              {request.status === 'confirmed' && (language === 'ar' ? 'مؤكد' : 'Confirmed')}
-                              {request.status === 'pending_review' && (language === 'ar' ? 'قيد المراجعة' : 'Pending')}
-                              {request.status === 'cancelled' && (language === 'ar' ? 'ملغي' : 'Cancelled')}
-                              {!['confirmed', 'pending_review', 'cancelled'].includes(request.status) && request.status}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        
-                        <CardContent className="space-y-2 px-3 pb-3">
-                          {/* VetsVan Info */}
-                          <div className="bg-purple-50 rounded p-1">
-                            <div className="flex items-center gap-1">
-                              <div className="w-1 h-1 bg-purple-600 rounded-full"></div>
-                              <span className="text-xs font-medium text-purple-700">
-                                {request.vetsvanCode}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Appointment Details */}
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3 text-blue-600" />
-                              <span className="text-xs text-gray-600 truncate">
-                                {new Date(request.appointmentDate).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3 text-blue-600" />
-                              <span className="text-xs text-gray-600">{request.appointmentTime}</span>
-                            </div>
-                          </div>
-
-                          {/* Service Type */}
-                          <div className="bg-blue-50 rounded p-1">
-                            <span className="text-xs text-blue-700">
-                              {request.serviceType === 'general_checkup' && (language === 'ar' ? 'كشف' : 'Check')}
-                              {request.serviceType === 'grooming' && (language === 'ar' ? 'تنظيف' : 'Groom')}
-                              {!['general_checkup', 'grooming'].includes(request.serviceType) && request.serviceType}
-                            </span>
-                          </div>
-
-                          {/* Paid Amount */}
-                          {request.paidAmount && (
-                            <div className="bg-emerald-50 rounded p-1.5 border border-emerald-200">
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-medium text-emerald-700">
-                                  {language === 'ar' ? 'المبلغ المدفوع' : 'Paid Amount'}
-                                </span>
-                                <span className="text-xs font-bold text-emerald-800">
-                                  {request.paidAmount} {language === 'ar' ? 'ريال' : 'SAR'}
-                                </span>
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Pets */}
-                          {request.pets && request.pets.length > 0 && (
-                            <div className="bg-green-50 rounded p-1">
-                              <div className="flex flex-wrap gap-1">
-                                {request.pets.map((pet, index) => (
-                                  <span key={index} className="text-xs text-green-700 bg-green-100 px-1 rounded">
-                                    {pet.name}
-                                    {pet.type === 'cat' && ' 🐱'}
-                                    {pet.type === 'dog' && ' 🐶'}
-                                    {pet.type === 'bird' && ' 🐦'}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Status Update */}
-                          <div className="bg-gray-50 rounded p-1">
-                            <select
-                              value={request.status}
-                              onChange={(e) => {
-                                const newStatus = e.target.value;
-                                updateBookingStatusMutation.mutate({ 
-                                  bookingId: request.id, 
-                                  status: newStatus 
-                                });
-                              }}
-                              disabled={updateBookingStatusMutation.isPending}
-                              className="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-600 bg-white"
-                              style={{ textAlign: getTextAlign(language) }}
-                            >
-                              <option value="pending_review">
-                                {language === 'ar' ? 'قيد المراجعة' : 'Pending Review'}
-                              </option>
-                              <option value="confirmed">
-                                {language === 'ar' ? 'مؤكد' : 'Confirmed'}
-                              </option>
-                              <option value="cancelled">
-                                {language === 'ar' ? 'ملغي' : 'Cancelled'}
-                              </option>
-                            </select>
-                          </div>
-
-                          {/* Created Date */}
-                          <div className="border-t pt-1 mt-1">
-                            <div className="text-xs text-gray-400 text-center">
-                              {new Date(request.createdAt).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <BookingCard
+                        key={request.id}
+                        booking={request}
+                        language={language}
+                        statusSelector={
+                          <select
+                            value={request.status}
+                            onChange={(e) => {
+                              const newStatus = e.target.value;
+                              updateBookingStatusMutation.mutate({ 
+                                bookingId: request.id, 
+                                status: newStatus 
+                              });
+                            }}
+                            disabled={updateBookingStatusMutation.isPending}
+                            className="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-600 bg-white"
+                            style={{ textAlign: getTextAlign(language) }}
+                            data-testid={`status-select-${request.id}`}
+                          >
+                            <option value="pending_review">
+                              {language === 'ar' ? 'قيد المراجعة' : 'Pending Review'}
+                            </option>
+                            <option value="confirmed">
+                              {language === 'ar' ? 'مؤكد' : 'Confirmed'}
+                            </option>
+                            <option value="cancelled">
+                              {language === 'ar' ? 'ملغي' : 'Cancelled'}
+                            </option>
+                          </select>
+                        }
+                      />
                     ))}
                   </div>
                 ) : (

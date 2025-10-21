@@ -14,6 +14,7 @@ import { useTranslation, useLanguage, getDirection, getTextAlign } from '@/lib/i
 import { playBookingNotification, testAudioNotification, audioNotification } from '@/utils/audio';
 import { useToast } from '@/hooks/use-toast';
 import logoImage from "@assets/IMG-20250415-WA0047_1750708739645.jpg";
+import { BookingCard } from '@/components/BookingCard';
 
 interface Booking {
   id: number;
@@ -624,147 +625,121 @@ export default function DoctorActivity() {
             </CardHeader>
             <CardContent className="space-y-3">
               {dateBookings.map((booking) => (
-                <div 
-                  key={booking.id} 
-                  className="bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200 hover:shadow-md transition-shadow cursor-pointer hover:bg-blue-50 w-full overflow-hidden"
-                  onClick={() => handleBookingClick(booking)}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-purple-600" />
-                      <span className="font-semibold text-purple-600">
-                        {formatTime(booking.appointmentTime)}
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      {getStatusBadge(booking.status)}
-                      {(booking.paymentAmount || booking.paymentAmount === 0) && (
-                        <div className="text-sm font-medium text-green-600" style={{ textAlign }}>
-                          {language === 'ar' ? 'المبلغ:' : 'Payment:'} {booking.paymentAmount} {booking.paymentCurrency || 'SAR'}
-                        </div>
-                      )}
-
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm text-gray-700" style={{ textAlign }}>
-                        {booking.customerName}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm text-gray-700" style={{ textAlign }}>
-                        {booking.customerPhone}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-gray-500" />
-                      <span className="text-xs text-gray-500" style={{ textAlign }}>
-                        {language === 'ar' ? 'تم الحجز في:' : 'Booked at:'} {new Date(booking.createdAt).toLocaleString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Status Update Control */}
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-sm font-medium text-gray-700" style={{ textAlign }}>
-                        {language === 'ar' ? 'حالة الحجز:' : 'Booking Status:'}
-                      </span>
-                      <Select
-                        value={booking.status}
-                        onValueChange={(newStatus) => {
-                          updateStatusMutation.mutate({ 
-                            bookingId: booking.id, 
-                            status: newStatus 
-                          });
-                        }}
-                        disabled={updateStatusMutation.isPending}
-                      >
-                        <SelectTrigger className="w-48">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {getStatusOptions().map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {updateStatusMutation.isPending && (
-                        <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
-                          <span className="text-xs text-gray-500">
-                            {language === 'ar' ? 'جاري التحديث...' : 'Updating...'}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action Buttons - Mobile Responsive */}
-                    <div className="flex flex-wrap justify-end gap-2 w-full">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-green-100 border-green-300 text-green-700 hover:bg-green-200 hover:border-green-400 flex-shrink-0 min-w-0 text-xs sm:text-sm"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent card click event
-                          if (booking.customerLocation) {
-                            setSelectedBooking(booking);
-                            setShowMap(true);
-                          } else {
-                            toast({
-                              title: language === 'ar' ? 'موقع غير متوفر' : 'Location Not Available',
-                              description: language === 'ar' ? 'لا يتوفر موقع لهذا العميل' : 'No location available for this customer',
-                              variant: 'destructive',
+                <div key={booking.id} className="space-y-2">
+                  <BookingCard
+                    booking={{
+                      id: booking.id,
+                      customerName: booking.customerName,
+                      customerPhone: booking.customerPhone,
+                      customerEmail: '-',
+                      vetsvanCode: user.vetsvanCode || user.username || 'VetsVan',
+                      vetsvanName: user.vetsvanName || user.name,
+                      appointmentDate: booking.appointmentDate,
+                      appointmentTime: booking.appointmentTime,
+                      status: booking.status,
+                      serviceType: '-',
+                      paidAmount: booking.paymentAmount ? String(booking.paymentAmount) : null,
+                      createdAt: booking.createdAt
+                    }}
+                    language={language}
+                    onClick={() => handleBookingClick(booking)}
+                    statusSelector={
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-gray-700" style={{ textAlign }}>
+                          {language === 'ar' ? 'حالة الحجز:' : 'Booking Status:'}
+                        </span>
+                        <Select
+                          value={booking.status}
+                          onValueChange={(newStatus) => {
+                            updateStatusMutation.mutate({ 
+                              bookingId: booking.id, 
+                              status: newStatus 
                             });
-                          }
-                        }}
-                      >
-                        <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">{language === 'ar' ? 'موقع العميل' : 'Customer Location'}</span>
-                        <span className="sm:hidden">{language === 'ar' ? 'موقع' : 'Location'}</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200 hover:border-blue-400 flex-shrink-0 min-w-0 text-xs sm:text-sm"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent card click event
-                          sendTrackingMutation.mutate(booking.id);
-                        }}
-                        disabled={sendTrackingMutation.isPending}
-                      >
-                        {sendTrackingMutation.isPending ? (
-                          <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-blue-600"></div>
-                        ) : (
-                          <Truck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          }}
+                          disabled={updateStatusMutation.isPending}
+                        >
+                          <SelectTrigger className="w-48">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getStatusOptions().map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {updateStatusMutation.isPending && (
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                            <span className="text-xs text-gray-500">
+                              {language === 'ar' ? 'جاري التحديث...' : 'Updating...'}
+                            </span>
+                          </div>
                         )}
-                        <span className="hidden sm:inline">{language === 'ar' ? 'إرسال التتبع' : 'Send Tracking'}</span>
-                        <span className="sm:hidden">{language === 'ar' ? 'تتبع' : 'Track'}</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700 flex-shrink-0 min-w-0 text-xs sm:text-sm"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent card click event
-                          setLocation(`/doctor-invoice/${booking.id}`);
-                        }}
-                      >
-                        <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                        <span className="hidden sm:inline">{language === 'ar' ? 'فتح السجل' : 'Open Record'}</span>
-                        <span className="sm:hidden">{language === 'ar' ? 'سجل' : 'Record'}</span>
-                      </Button>
-                    </div>
-                  </div>
-
+                      </div>
+                    }
+                    additionalActions={
+                      <div className="flex flex-wrap justify-end gap-2 w-full pt-2 border-t border-gray-200">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-green-100 border-green-300 text-green-700 hover:bg-green-200 hover:border-green-400 flex-shrink-0 min-w-0 text-xs sm:text-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (booking.customerLocation) {
+                              setSelectedBooking(booking);
+                              setShowMap(true);
+                            } else {
+                              toast({
+                                title: language === 'ar' ? 'موقع غير متوفر' : 'Location Not Available',
+                                description: language === 'ar' ? 'لا يتوفر موقع لهذا العميل' : 'No location available for this customer',
+                                variant: 'destructive',
+                              });
+                            }
+                          }}
+                          data-testid={`button-customer-location-${booking.id}`}
+                        >
+                          <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          <span className="hidden sm:inline">{language === 'ar' ? 'موقع العميل' : 'Customer Location'}</span>
+                          <span className="sm:hidden">{language === 'ar' ? 'موقع' : 'Location'}</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-blue-100 border-blue-300 text-blue-700 hover:bg-blue-200 hover:border-blue-400 flex-shrink-0 min-w-0 text-xs sm:text-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            sendTrackingMutation.mutate(booking.id);
+                          }}
+                          disabled={sendTrackingMutation.isPending}
+                          data-testid={`button-send-tracking-${booking.id}`}
+                        >
+                          {sendTrackingMutation.isPending ? (
+                            <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-b-2 border-blue-600"></div>
+                          ) : (
+                            <Truck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          )}
+                          <span className="hidden sm:inline">{language === 'ar' ? 'إرسال التتبع' : 'Send Tracking'}</span>
+                          <span className="sm:hidden">{language === 'ar' ? 'تتبع' : 'Track'}</span>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-purple-600 border-purple-600 text-white hover:bg-purple-700 hover:border-purple-700 flex-shrink-0 min-w-0 text-xs sm:text-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setLocation(`/doctor-invoice/${booking.id}`);
+                          }}
+                          data-testid={`button-open-record-${booking.id}`}
+                        >
+                          <User className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                          <span className="hidden sm:inline">{language === 'ar' ? 'فتح السجل' : 'Open Record'}</span>
+                          <span className="sm:hidden">{language === 'ar' ? 'سجل' : 'Record'}</span>
+                        </Button>
+                      </div>
+                    }
+                  />
                 </div>
               ))}
             </CardContent>
