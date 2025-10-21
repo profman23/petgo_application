@@ -18,23 +18,24 @@ import { BookingCard } from '@/components/BookingCard';
 
 interface Booking {
   id: number;
-  userId: number;
-  shiftId: number;
-  vetsVanId: number;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  driverId: number;
+  vetsvanCode: string;
+  vetsvanName: string;
   appointmentDate: string;
   appointmentTime: string;
   status: string;
-  customerName: string;
-  customerPhone: string;
-  createdAt: string;
-  paymentAmount?: string | null;
-  paymentCurrency?: string;
-  paymentStatus?: string | null;
-  customerLocation?: {
+  location?: {
     latitude: number;
     longitude: number;
     address: string;
   };
+  pets: Array<{ name: string; type: string; }>;
+  serviceType: string;
+  createdAt: string;
+  paidAmount?: string | null;
 }
 
 export default function DoctorActivity() {
@@ -314,8 +315,8 @@ export default function DoctorActivity() {
 
   // Open Google Maps with customer location
   const openGoogleMaps = () => {
-    if (selectedBooking?.customerLocation) {
-      const { latitude, longitude } = selectedBooking.customerLocation;
+    if (selectedBooking?.location) {
+      const { latitude, longitude } = selectedBooking.location;
       const googleMapsUrl = `https://www.google.com/maps?q=${latitude},${longitude}`;
       
       // Try to open in new window/tab
@@ -631,14 +632,15 @@ export default function DoctorActivity() {
                       id: booking.id,
                       customerName: booking.customerName,
                       customerPhone: booking.customerPhone,
-                      customerEmail: '-',
-                      vetsvanCode: user.vetsvanCode || user.username || 'VetsVan',
-                      vetsvanName: user.vetsvanName || user.name,
+                      customerEmail: booking.customerEmail,
+                      vetsvanCode: booking.vetsvanCode,
+                      vetsvanName: booking.vetsvanName,
                       appointmentDate: booking.appointmentDate,
                       appointmentTime: booking.appointmentTime,
                       status: booking.status,
-                      serviceType: '-',
-                      paidAmount: booking.paymentAmount ? String(booking.paymentAmount) : null,
+                      serviceType: booking.serviceType,
+                      paidAmount: booking.paidAmount,
+                      pets: booking.pets,
                       createdAt: booking.createdAt
                     }}
                     language={language}
@@ -687,7 +689,7 @@ export default function DoctorActivity() {
                           className="bg-green-100 border-green-300 text-green-700 hover:bg-green-200 hover:border-green-400 flex-shrink-0 min-w-0 text-xs sm:text-sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (booking.customerLocation) {
+                            if (booking.location) {
                               setSelectedBooking(booking);
                               setShowMap(true);
                             } else {
@@ -761,7 +763,7 @@ export default function DoctorActivity() {
             </DialogTitle>
           </DialogHeader>
           
-          {selectedBooking && selectedBooking.customerLocation ? (
+          {selectedBooking && selectedBooking.location ? (
             <div className="space-y-4">
               {/* Address Display */}
               <div className="bg-gray-50 p-4 rounded-lg">
@@ -772,8 +774,8 @@ export default function DoctorActivity() {
                   </span>
                 </div>
                 <p className="text-gray-700" style={{ textAlign }}>
-                  {selectedBooking.customerLocation.address || 
-                    `${selectedBooking.customerLocation.latitude}, ${selectedBooking.customerLocation.longitude}`
+                  {selectedBooking.location.address || 
+                    `${selectedBooking.location.latitude}, ${selectedBooking.location.longitude}`
                   }
                 </p>
               </div>
@@ -794,7 +796,7 @@ export default function DoctorActivity() {
                       </span>
                       <br />
                       <span className="font-mono text-blue-600 text-lg">
-                        {selectedBooking.customerLocation.latitude.toFixed(6)}
+                        {selectedBooking.location.latitude.toFixed(6)}
                       </span>
                     </div>
                     <div className="bg-gray-50 p-3 rounded-lg">
@@ -803,7 +805,7 @@ export default function DoctorActivity() {
                       </span>
                       <br />
                       <span className="font-mono text-blue-600 text-lg">
-                        {selectedBooking.customerLocation.longitude.toFixed(6)}
+                        {selectedBooking.location.longitude.toFixed(6)}
                       </span>
                     </div>
                   </div>
@@ -823,7 +825,7 @@ export default function DoctorActivity() {
                       variant="outline"
                       size="sm"
                       onClick={() => {
-                        const { latitude, longitude } = selectedBooking.customerLocation!;
+                        const { latitude, longitude } = selectedBooking.location!;
                         navigator.clipboard.writeText(`${latitude}, ${longitude}`);
                         toast({
                           title: language === 'ar' ? 'تم النسخ' : 'Copied',

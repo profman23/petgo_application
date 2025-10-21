@@ -2795,40 +2795,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: 'VetsVan ID not found' });
       }
       
-      const allBookings = await storage.getAllBookings();
+      // Get all bookings with complete details using the same method as admin
+      const allBookingsWithDetails = await storage.getAllVetsVanRequestsWithDetails();
       
-      // Filter bookings for this specific VetsVan - show ALL bookings regardless of status
-      const vetsVanBookings = allBookings.filter(booking => 
-        booking.vetsVanId === vetsVanId
+      // Filter bookings for this specific VetsVan
+      const vetsVanBookings = allBookingsWithDetails.filter(booking => 
+        booking.driverId === vetsVanId
       );
       
-      // Sort bookings by creation date (newest first)
+      // Sort by creation date (newest first)
       const sortedBookings = vetsVanBookings.sort((a, b) => 
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      
-      // Get user details and payment information for each booking
-      const bookingsWithUserDetails = await Promise.all(
-        sortedBookings.map(async (booking) => {
-          const customer = await storage.getUser(booking.userId);
-          
-          // Get payment information from MyFatoorah transactions
-          const paymentTransaction = await storage.getPaymentTransactionByBooking(booking.id);
-          
-          return {
-            ...booking,
-            customerName: customer?.name || 'غير معروف',
-            customerPhone: customer?.phone || 'غير محدد',
-            customerLocation: booking.customerLocation ? {
-              latitude: booking.customerLocation.latitude,
-              longitude: booking.customerLocation.longitude,
-              address: booking.customerLocation.address || null
-            } : null,
-            paidAmount: paymentTransaction?.status === 'paid' ? paymentTransaction?.amount : null,
-            paymentCurrency: paymentTransaction?.currency || 'SAR',
-            paymentStatus: paymentTransaction?.status || null
-          };
-        })
       );
       
       // Add cache-busting headers to ensure fresh data
@@ -2838,7 +2815,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'Expires': '0'
       });
       
-      res.json(bookingsWithUserDetails);
+      res.json(sortedBookings);
     } catch (error) {
       console.error('Error fetching doctor bookings:', error);
       res.status(500).json({ message: 'Failed to fetch doctor bookings' });
