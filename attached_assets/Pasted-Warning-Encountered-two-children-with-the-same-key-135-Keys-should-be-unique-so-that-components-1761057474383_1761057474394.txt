@@ -1,0 +1,112 @@
+Warning: Encountered two children with the same key, `135`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at tbody
+    at table
+    at div
+    at div
+    at InvoiceDataTable (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/InvoiceDataTable.tsx:20:36)
+    at div
+    at div
+    at div
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=4cc0d9fd:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XX3JVV2H.js?v=4cc0d9fd:59:7
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=4cc0d9fd:79:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=4cc0d9fd:56:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=4cc0d9fd:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RRN33AHF.js?v=4cc0d9fd:42:5
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:231:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:154:58
+    at Presence (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-Y35DGYDY.js?v=4cc0d9fd:24:11)
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:145:64
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=4cc0d9fd:79:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=4cc0d9fd:56:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=4cc0d9fd:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XX3JVV2H.js?v=4cc0d9fd:258:22
+    at Presence (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-Y35DGYDY.js?v=4cc0d9fd:24:11)
+    at Provider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BJXGM5RH.js?v=4cc0d9fd:38:15)
+    at DialogPortal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:107:11)
+    at _c3 (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/ui/dialog.tsx:52:12)
+    at Provider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BJXGM5RH.js?v=4cc0d9fd:38:15)
+    at Dialog (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:48:5)
+    at InvoiceSelectionModal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/InvoiceSelectionModal.tsx:26:3)
+    at CreditNoteModal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/CreditNoteModal.tsx:26:35)
+    at div
+    at div
+    at div
+    at AdminLayoutContent (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/AdminLayout.tsx:29:31)
+    at SidebarStateProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/sidebar-state.tsx:23:40)
+    at AdminLayout (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/AdminLayout.tsx:285:31)
+    at FinancialCreditNotes (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/financial-credit-notes.tsx:30:27)
+    at CreditNotePermissionGate (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=yhL9jOW2NLz_xaKWJTI93:108:37)
+    at component
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=4cc0d9fd:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=4cc0d9fd:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=yhL9jOW2NLz_xaKWJTI93:302:22)
+    at PermissionsProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/hooks/usePermissionsStore.tsx:90:39)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=4cc0d9fd:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=yhL9jOW2NLz_xaKWJTI93:659:39)
+printWarning @ chunk-276SZO74.js?v=4cc0d9fd:521
+error @ chunk-276SZO74.js?v=4cc0d9fd:505
+warnOnInvalidKey @ chunk-276SZO74.js?v=4cc0d9fd:10219
+reconcileChildrenArray @ chunk-276SZO74.js?v=4cc0d9fd:10235
+reconcileChildFibers2 @ chunk-276SZO74.js?v=4cc0d9fd:10559
+reconcileChildren @ chunk-276SZO74.js?v=4cc0d9fd:14290
+updateHostComponent @ chunk-276SZO74.js?v=4cc0d9fd:14807
+beginWork @ chunk-276SZO74.js?v=4cc0d9fd:15935
+beginWork$1 @ chunk-276SZO74.js?v=4cc0d9fd:19753
+performUnitOfWork @ chunk-276SZO74.js?v=4cc0d9fd:19198
+workLoopSync @ chunk-276SZO74.js?v=4cc0d9fd:19137
+renderRootSync @ chunk-276SZO74.js?v=4cc0d9fd:19116
+performConcurrentWorkOnRoot @ chunk-276SZO74.js?v=4cc0d9fd:18678
+workLoop @ chunk-276SZO74.js?v=4cc0d9fd:197
+flushWork @ chunk-276SZO74.js?v=4cc0d9fd:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=4cc0d9fd:384Understand this error
+4chunk-276SZO74.js?v=4cc0d9fd:521 Warning: Encountered two children with the same key, `137`. Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is unsupported and could change in a future version.
+    at tbody
+    at table
+    at div
+    at div
+    at InvoiceDataTable (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/InvoiceDataTable.tsx:20:36)
+    at div
+    at div
+    at div
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=4cc0d9fd:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XX3JVV2H.js?v=4cc0d9fd:59:7
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=4cc0d9fd:79:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=4cc0d9fd:56:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=4cc0d9fd:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-RRN33AHF.js?v=4cc0d9fd:42:5
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:231:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:154:58
+    at Presence (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-Y35DGYDY.js?v=4cc0d9fd:24:11)
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:145:64
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=4cc0d9fd:79:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-GR3B7I3S.js?v=4cc0d9fd:56:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-DVHSTOKX.js?v=4cc0d9fd:42:13
+    at https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XX3JVV2H.js?v=4cc0d9fd:258:22
+    at Presence (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-Y35DGYDY.js?v=4cc0d9fd:24:11)
+    at Provider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BJXGM5RH.js?v=4cc0d9fd:38:15)
+    at DialogPortal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:107:11)
+    at _c3 (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/ui/dialog.tsx:52:12)
+    at Provider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BJXGM5RH.js?v=4cc0d9fd:38:15)
+    at Dialog (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6EIZVOSP.js?v=4cc0d9fd:48:5)
+    at InvoiceSelectionModal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/InvoiceSelectionModal.tsx:26:3)
+    at CreditNoteModal (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/CreditNoteModal.tsx:26:35)
+    at div
+    at div
+    at div
+    at AdminLayoutContent (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/AdminLayout.tsx:29:31)
+    at SidebarStateProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/sidebar-state.tsx:23:40)
+    at AdminLayout (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/admin-layout/AdminLayout.tsx:285:31)
+    at FinancialCreditNotes (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/pages/financial-credit-notes.tsx:30:27)
+    at CreditNotePermissionGate (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=yhL9jOW2NLz_xaKWJTI93:108:37)
+    at component
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=4cc0d9fd:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=4cc0d9fd:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=yhL9jOW2NLz_xaKWJTI93:302:22)
+    at PermissionsProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/hooks/usePermissionsStore.tsx:90:39)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=4cc0d9fd:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=yhL9jOW2NLz_xaKWJTI93:659:39)
