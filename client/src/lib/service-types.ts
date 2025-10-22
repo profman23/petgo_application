@@ -19,16 +19,9 @@ export interface ServiceTypeOption {
 
 export const SERVICE_TYPE_OPTIONS: ServiceTypeOption[] = [
   {
-    value: 'national-day-vaccination',
-    labelEn: 'National Day 95 Offer Vaccination & Deworming',
-    labelAr: 'عرض اليوم الوطني 95 تطعيم ومكافحة الديدان',
-    icon: Pill,
-    iconColor: 'text-blue-600'
-  },
-  {
-    value: 'national-day-home-consultation',
-    labelEn: 'National Day 95 Offer Home Consultation',
-    labelAr: 'عرض اليوم الوطني 95 استشارة منزلية',
+    value: 'home-consultation',
+    labelEn: 'Home Consultation',
+    labelAr: 'استشارة منزلية',
     icon: Home,
     iconColor: 'text-green-700'
   },
