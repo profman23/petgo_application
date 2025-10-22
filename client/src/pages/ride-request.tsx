@@ -136,19 +136,13 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   const petCount = selectedPets.length;
   let total = 0;
 
-  // National Day 95 Offer pricing for Home Consultation
-  if (serviceType === 'national-day-home-consultation') {
+  // Home Consultation pricing
+  if (serviceType === 'home-consultation') {
     if (petCount <= 2) {
-      total = 195; // 1-2 pets: 195 SAR
-    } else if (petCount === 3) {
-      total = 290; // 3 pets: 290 SAR (195 + 95)
+      total = 399; // 1-2 pets: 399 SAR
     } else {
-      total = 290 + ((petCount - 3) * 95); // 4+ pets: 290 + 95 per additional pet
+      total = 798; // 3+ pets: 798 SAR
     }
-  }
-  // National Day 95 Offer pricing for Vaccination & Deworming
-  else if (serviceType === 'national-day-vaccination') {
-    total = petCount * 95; // 95 SAR per pet
   }
   // Special pricing for First Visit and General Check-up (unchanged)
   else if (['first-visit', 'general-checkup'].includes(serviceType)) {
