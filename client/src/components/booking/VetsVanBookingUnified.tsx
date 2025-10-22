@@ -132,14 +132,23 @@ export function VetsVanBookingUnified({
 
   // Parse URL parameters for payment success (customer mode only)
   useEffect(() => {
+    console.log('🔍 Payment URL check:', {
+      isModal,
+      isAdminBooking,
+      url: window.location.search,
+      hasPaymentParams: window.location.search.includes('payment=success')
+    });
+    
     if (!isModal && !isAdminBooking) {
       const urlParams = new URLSearchParams(window.location.search);
       const payment = urlParams.get('payment');
       const ref = urlParams.get('ref');
       const paymentIdParam = urlParams.get('paymentId') || urlParams.get('Id');
       
+      console.log('🔍 URL Parameters:', { payment, ref, paymentIdParam });
+      
       if (payment === 'success' && ref && paymentIdParam) {
-        console.log('🎉 Payment successful! Ready to finalize booking:', {
+        console.log('🎉 Payment successful! Setting payment state:', {
           reference: ref,
           paymentId: paymentIdParam
         });
@@ -147,6 +156,8 @@ export function VetsVanBookingUnified({
         setPaymentReference(ref);
         setPaymentId(paymentIdParam);
         fetchPaymentDetails(paymentIdParam);
+      } else {
+        console.log('⚠️ Payment parameters missing or invalid');
       }
     }
   }, [isModal, isAdminBooking]);
@@ -449,8 +460,20 @@ export function VetsVanBookingUnified({
 
   // Auto-trigger booking creation after payment success
   useEffect(() => {
+    console.log('🔍 Auto-booking check:', {
+      paymentSuccess,
+      paymentReference,
+      paymentId,
+      isBooking,
+      isModal,
+      isAdminBooking,
+      hasPendingBookingDetails: !!localStorage.getItem('pendingBookingDetails')
+    });
+    
     if (paymentSuccess && paymentReference && paymentId && !isBooking && !isModal && !isAdminBooking) {
       const savedBookingDetails = localStorage.getItem('pendingBookingDetails');
+      
+      console.log('✅ All conditions met for auto-booking. Checking localStorage...');
       
       if (savedBookingDetails) {
         try {
@@ -488,7 +511,10 @@ export function VetsVanBookingUnified({
         }
       } else {
         console.log('⚠️ No pending booking details found in localStorage after payment');
+        console.log('📦 localStorage contents:', Object.keys(localStorage));
       }
+    } else {
+      console.log('❌ Auto-booking conditions NOT met');
     }
   }, [paymentSuccess, paymentReference, paymentId, isBooking, isModal, isAdminBooking]);
 
