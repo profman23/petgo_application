@@ -259,7 +259,7 @@ export function addPublicPaymentRoutes(app: any) {
         MobileCountryCode: '966',
         CustomerMobile: finalCustomerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
         CustomerEmail: finalCustomerEmail,
-        CallBackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}&successUrl=${encodeURIComponent('https://' + productionDomain + '/vetsvan-booking?payment=success')}`,
+        CallBackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
         ErrorUrl: `https://${productionDomain}/vetsvan-booking?payment=failed`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
@@ -439,19 +439,13 @@ export function addPublicPaymentRoutes(app: any) {
           console.error('❌ Failed to fetch payment details:', fetchError);
         }
 
-        // Redirect to success URL from query parameter or default to booking page
+        // Redirect to booking page with payment success
         const productionDomain = getProductionDomain();
-        const defaultSuccessUrl = `https://${productionDomain}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
-        const successUrl = req.query.successUrl ? decodeURIComponent(req.query.successUrl as string) : defaultSuccessUrl;
+        const successUrl = `https://${productionDomain}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
         
-        // Add payment details to success URL if not already present
-        const finalRedirectUrl = successUrl.includes('?') 
-          ? `${successUrl}&paymentId=${actualPaymentId}&ref=${ref}`
-          : `${successUrl}?paymentId=${actualPaymentId}&ref=${ref}`;
-        
-        console.log('🔄 Redirecting to success page after payment:', finalRedirectUrl);
+        console.log('🔄 Redirecting to booking page after successful payment:', successUrl);
         console.log('✅ Payment processed successfully:', { ref, paymentId: actualPaymentId });
-        return res.redirect(finalRedirectUrl);
+        return res.redirect(successUrl);
       } else {
         console.log('❌ Missing payment parameters, redirecting to booking page');
         const productionDomain = getProductionDomain();
