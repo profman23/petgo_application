@@ -1,0 +1,49 @@
+conditions met for auto-booking. Checking localStorage...
+VetsVanBookingUnified.tsx:525 🔄 Auto-creating booking after payment success: {paymentId: '0808595533505802161282', paymentReference: 'RIDE-1761155339881', bookingDetails: {…}}
+VetsVanBookingUnified.tsx:507 🔍 Auto-booking check: {paymentSuccess: false, paymentReference: null, paymentId: null, isBooking: true, isModal: false, …}
+VetsVanBookingUnified.tsx:561 ❌ Auto-booking conditions NOT met
+VetsVanBookingUnified.tsx:485 ❌ Booking mutation failed: Error: No shift found for selected date and VetsVan
+    at Object.mutationFn (VetsVanBookingUnified.tsx:391:25)
+    at Object.fn (@tanstack_react-query.js?v=4cc0d9fd:1189:29)
+    at run (@tanstack_react-query.js?v=4cc0d9fd:494:49)
+    at Object.start (@tanstack_react-query.js?v=4cc0d9fd:536:9)
+    at _a6.execute (@tanstack_react-query.js?v=4cc0d9fd:1225:56)
+onError @ VetsVanBookingUnified.tsx:485
+execute @ @tanstack_react-query.js?v=4cc0d9fd:1254
+await in execute
+mutate @ @tanstack_react-query.js?v=4cc0d9fd:2630
+(anonymous) @ @tanstack_react-query.js?v=4cc0d9fd:3295
+(anonymous) @ VetsVanBookingUnified.tsx:540
+commitHookEffectListMount @ chunk-276SZO74.js?v=4cc0d9fd:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=4cc0d9fd:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=4cc0d9fd:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=4cc0d9fd:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=4cc0d9fd:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=4cc0d9fd:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=4cc0d9fd:19447
+(anonymous) @ chunk-276SZO74.js?v=4cc0d9fd:19328
+workLoop @ chunk-276SZO74.js?v=4cc0d9fd:197
+flushWork @ chunk-276SZO74.js?v=4cc0d9fd:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=4cc0d9fd:384Understand this error
+VetsVanBookingUnified.tsx:486 ❌ Error details: {message: 'No shift found for selected date and VetsVan', stack: 'Error: No shift found for selected date and VetsVa…deps/@tanstack_react-query.js?v=4cc0d9fd:1225:56)', fullError: Error: No shift found for selected date and VetsVan
+    at Object.mutationFn (https://587a84d0-b094…}
+onError @ VetsVanBookingUnified.tsx:486
+execute @ @tanstack_react-query.js?v=4cc0d9fd:1254
+await in execute
+mutate @ @tanstack_react-query.js?v=4cc0d9fd:2630
+(anonymous) @ @tanstack_react-query.js?v=4cc0d9fd:3295
+(anonymous) @ VetsVanBookingUnified.tsx:540
+commitHookEffectListMount @ chunk-276SZO74.js?v=4cc0d9fd:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=4cc0d9fd:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=4cc0d9fd:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=4cc0d9fd:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=4cc0d9fd:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=4cc0d9fd:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=4cc0d9fd:19447
+(anonymous) @ chunk-276SZO74.js?v=4cc0d9fd:19328
+workLoop @ chunk-276SZO74.js?v=4cc0d9fd:197
+flushWork @ chunk-276SZO74.js?v=4cc0d9fd:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=4cc0d9fd:384Understand this error
+VetsVanBookingUnified.tsx:507 🔍 Auto-booking check: {paymentSuccess: false, paymentReference: null, paymentId: null, isBooking: false, isModal: false, …}
+VetsVanBookingUnified.tsx:561 ❌ Auto-booking conditions NOT met
+VetsVanBookingUnified.tsx:219 💰 Payment details received: {paymentId: '0808595533505802161282', invoiceId: 59553350, amount: 1, currency: 'SR', status: 'paid', …}

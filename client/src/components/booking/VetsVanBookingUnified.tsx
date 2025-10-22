@@ -379,16 +379,27 @@ export function VetsVanBookingUnified({
       timeSlot, 
       vetsVanCode, 
       paymentReference = null, 
-      paymentId = null 
+      paymentId = null,
+      shiftId = null,
+      appointmentDate = null
     }: { 
       vetsVanId: number; 
       timeSlot: string; 
       vetsVanCode: string;
       paymentReference?: string | null; 
-      paymentId?: string | null; 
+      paymentId?: string | null;
+      shiftId?: number | null;
+      appointmentDate?: string | null;
     }) => {
-      const shift = shifts.find(s => s.vetsVanId === vetsVanId && s.date === selectedDate);
-      if (!shift) throw new Error('No shift found for selected date and VetsVan');
+      // Use provided shiftId or find it from current state
+      let finalShiftId = shiftId;
+      let finalAppointmentDate = appointmentDate || selectedDate;
+      
+      if (!finalShiftId) {
+        const shift = shifts.find(s => s.vetsVanId === vetsVanId && s.date === selectedDate);
+        if (!shift) throw new Error('No shift found for selected date and VetsVan');
+        finalShiftId = shift.id;
+      }
 
       const convertTo24Hour = (time12: string): string => {
         const [time, period] = time12.split(' ');
@@ -421,9 +432,9 @@ export function VetsVanBookingUnified({
         },
         credentials: 'include',
         body: JSON.stringify({
-          shiftId: shift.id,
+          shiftId: finalShiftId,
           vetsVanId: vetsVanId,
-          appointmentDate: selectedDate,
+          appointmentDate: finalAppointmentDate,
           appointmentTime: appointmentTime24,
           customerLocation: rideRequestData ? {
             latitude: rideRequestData.pickupLatitude,
@@ -542,7 +553,9 @@ export function VetsVanBookingUnified({
             timeSlot: bookingDetails.timeSlot,
             vetsVanCode: bookingDetails.vetsVanCode,
             paymentReference: paymentReference,
-            paymentId: paymentId
+            paymentId: paymentId,
+            shiftId: bookingDetails.shiftId,
+            appointmentDate: bookingDetails.selectedDate
           });
           
           // Clean up URL parameters
