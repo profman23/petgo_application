@@ -130,34 +130,37 @@ export function VetsVanBookingUnified({
     }
   }, [propBookingData]);
 
-  // Parse URL parameters for payment success (customer mode only)
+  // Check for payment success from sessionStorage (set by callback page)
   useEffect(() => {
-    console.log('🔍 Payment URL check:', {
-      isModal,
-      isAdminBooking,
-      url: window.location.search,
-      hasPaymentParams: window.location.search.includes('payment=success')
-    });
-    
     if (!isModal && !isAdminBooking) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const payment = urlParams.get('payment');
-      const ref = urlParams.get('ref');
-      const paymentIdParam = urlParams.get('paymentId') || urlParams.get('Id');
+      // Check sessionStorage for payment success (more reliable than URL params)
+      const paymentSuccessFlag = sessionStorage.getItem('paymentSuccess');
+      const paymentIdParam = sessionStorage.getItem('paymentId');
+      const ref = sessionStorage.getItem('paymentReference');
       
-      console.log('🔍 URL Parameters:', { payment, ref, paymentIdParam });
+      console.log('🔍 Payment check:', {
+        isModal,
+        isAdminBooking,
+        sessionStorage: { paymentSuccessFlag, paymentIdParam, ref }
+      });
       
-      if (payment === 'success' && ref && paymentIdParam) {
+      if (paymentSuccessFlag === 'true' && ref && paymentIdParam) {
         console.log('🎉 Payment successful! Setting payment state:', {
           reference: ref,
           paymentId: paymentIdParam
         });
+        
+        // Clear sessionStorage to prevent re-processing
+        sessionStorage.removeItem('paymentSuccess');
+        sessionStorage.removeItem('paymentId');
+        sessionStorage.removeItem('paymentReference');
+        
         setPaymentSuccess(true);
         setPaymentReference(ref);
         setPaymentId(paymentIdParam);
         fetchPaymentDetails(paymentIdParam);
       } else {
-        console.log('⚠️ Payment parameters missing or invalid');
+        console.log('⚠️ No payment success in sessionStorage');
       }
     }
   }, [isModal, isAdminBooking]);

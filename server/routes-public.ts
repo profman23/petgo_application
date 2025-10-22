@@ -439,13 +439,31 @@ export function addPublicPaymentRoutes(app: any) {
           console.error('❌ Failed to fetch payment details:', fetchError);
         }
 
-        // Redirect to booking page with payment success
+        // Return HTML page that sets sessionStorage and redirects
         const productionDomain = getProductionDomain();
-        const successUrl = `https://${productionDomain}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
+        const redirectUrl = `https://${productionDomain}/vetsvan-booking`;
         
-        console.log('🔄 Redirecting to booking page after successful payment:', successUrl);
+        console.log('🔄 Redirecting to booking page after successful payment with sessionStorage');
         console.log('✅ Payment processed successfully:', { ref, paymentId: actualPaymentId });
-        return res.redirect(successUrl);
+        
+        // Return HTML that sets sessionStorage and redirects
+        return res.send(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Payment Successful</title>
+          </head>
+          <body>
+            <p>Payment successful! Redirecting...</p>
+            <script>
+              sessionStorage.setItem('paymentSuccess', 'true');
+              sessionStorage.setItem('paymentId', '${actualPaymentId}');
+              sessionStorage.setItem('paymentReference', '${ref}');
+              window.location.href = '${redirectUrl}';
+            </script>
+          </body>
+          </html>
+        `);
       } else {
         console.log('❌ Missing payment parameters, redirecting to booking page');
         const productionDomain = getProductionDomain();
