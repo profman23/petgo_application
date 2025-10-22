@@ -1452,7 +1452,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'national-day-home-consultation', 'national-day-vaccination', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 {(() => {
                   const costData = getEstimatedCost(selectedPatients, patients, serviceType);
@@ -1480,8 +1480,7 @@ export default function RideRequest() {
                               {serviceType === 'vaccination' && (language === 'ar' ? 'التطعيم:' : 'Vaccination:')}
                               {serviceType === 'deworming' && (language === 'ar' ? 'مكافحة الديدان:' : 'Deworming:')}
                               {serviceType === 'fleas-ticks-prevention' && (language === 'ar' ? 'مكافحة البراغيث والقراد:' : 'Fleas & Ticks Prevention:')}
-                              {serviceType === 'national-day-vaccination' && (language === 'ar' ? 'عرض اليوم الوطني 95 تطعيم ومكافحة الديدان:' : 'National Day 95 Offer Vaccination & Deworming:')}
-                              {serviceType === 'national-day-home-consultation' && (language === 'ar' ? 'عرض اليوم الوطني 95 استشارة منزلية:' : 'National Day 95 Offer Home Consultation:')}
+                              {serviceType === 'home-consultation' && (language === 'ar' ? 'استشارة منزلية:' : 'Home Consultation:')}
                             </span>
                             <span className="text-sm font-bold text-purple-900" style={{ 
                               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
