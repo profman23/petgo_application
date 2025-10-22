@@ -104,6 +104,7 @@ export interface IStorage {
     serviceType: string;
     createdAt: string;
     paidAmount?: string | null;
+    paymentStatus?: string | null;
   }>>;
 
   // Pet vitals operations
@@ -778,7 +779,8 @@ export class DatabaseStorage implements IStorage {
         pets: pets,
         serviceType: booking.serviceType || "Unknown",
         createdAt: booking.bookingCreatedAt?.toISOString() || new Date().toISOString(),
-        paidAmount: booking.paymentAmount || null
+        paidAmount: booking.paymentAmount || null,
+        paymentStatus: booking.paymentStatus || null
       };
 
       // Only add if not already in map, or if this one has a paid amount and the existing one doesn't

@@ -21,6 +21,7 @@ interface BookingCardProps {
     pets?: Pet[];
     serviceType: string;
     paidAmount?: string | null;
+    paymentStatus?: string | null;
     createdAt: string;
   };
   language: 'ar' | 'en';
@@ -114,13 +115,20 @@ export function BookingCard({ booking, language, statusSelector, additionalActio
           </span>
         </div>
 
-        {/* Paid Amount */}
+        {/* Payment Status & Amount */}
         {booking.paidAmount && (
           <div className="bg-emerald-50 rounded p-1.5 border border-emerald-200" data-testid="paid-amount">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-emerald-700">
-                {language === 'ar' ? 'المبلغ المدفوع' : 'Paid Amount'}
-              </span>
+              <div className="flex items-center gap-1">
+                <span className="text-xs font-medium text-emerald-700">
+                  {language === 'ar' ? 'المبلغ المدفوع' : 'Paid Amount'}
+                </span>
+                {booking.paymentStatus === 'paid' && (
+                  <Badge className="bg-emerald-600 text-white text-[10px] px-1.5 py-0" data-testid="payment-status-badge">
+                    {language === 'ar' ? 'مدفوع' : 'Paid'}
+                  </Badge>
+                )}
+              </div>
               <span className="text-xs font-bold text-emerald-800">
                 {booking.paidAmount} {language === 'ar' ? 'ريال' : 'SAR'}
               </span>
