@@ -439,10 +439,9 @@ export function addPublicPaymentRoutes(app: any) {
           console.error('❌ Failed to fetch payment details:', fetchError);
         }
 
-        // Redirect to ride-request page with payment success parameters
-        const productionDomain = getProductionDomain();
-        const redirectUrl = `https://${productionDomain}/ride-request?payment=success&ref=${ref}&paymentId=${actualPaymentId}`;
-        console.log('🔄 Redirecting to ride-request page after successful payment:', redirectUrl);
+        // Redirect to login page after successful payment (production domain)
+        const redirectUrl = `https://www.vetsvan.app/login`;
+        console.log('🔄 Redirecting to login page after successful payment:', redirectUrl);
         console.log('✅ Payment processed successfully:', { ref, paymentId: actualPaymentId });
         return res.redirect(redirectUrl);
       } else {

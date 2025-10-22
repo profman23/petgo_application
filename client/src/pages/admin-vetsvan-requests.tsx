@@ -27,12 +27,6 @@ export default function AdminVetsVanRequests() {
   const lastRequestCountRef = useRef(0);
   const [currentRequestCount, setCurrentRequestCount] = useState(0);
 
-  // State for tracking seen requests (for green flashing border)
-  const [seenRequestIds, setSeenRequestIds] = useState<Set<number>>(() => {
-    const stored = localStorage.getItem('admin-seen-requests');
-    return stored ? new Set(JSON.parse(stored)) : new Set();
-  });
-
   // State for VetsVan Requests Filters - exact copy from admin dashboard
   const [requestSearchTerm, setRequestSearchTerm] = useState('');
   const [requestFilterDateFrom, setRequestFilterDateFrom] = useState<Date | undefined>(undefined);
@@ -50,21 +44,6 @@ export default function AdminVetsVanRequests() {
     setRequestFilterDateTo(undefined);
     setSelectedVetsVanIds([]);
     setRequestCurrentPage(1); // Reset to first page when clearing filters
-  };
-
-  // Toggle seen status for a request
-  const toggleSeenStatus = (requestId: number) => {
-    setSeenRequestIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(requestId)) {
-        newSet.delete(requestId);
-      } else {
-        newSet.add(requestId);
-      }
-      // Persist to localStorage
-      localStorage.setItem('admin-seen-requests', JSON.stringify(Array.from(newSet)));
-      return newSet;
-    });
   };
 
   // Admin token for API calls
@@ -170,8 +149,7 @@ export default function AdminVetsVanRequests() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Filter VetsVan requests based on search term, date, and selected VetsVan vehicles
-  // Then sort by createdAt descending (newest first)
+  // Filter VetsVan requests based on search term, date, and selected VetsVan vehicles - exact copy from admin dashboard
   const filteredVetsVanRequests = allVetsVanRequests?.filter(request => {
     // Search filter - check name, phone, email, pets, vetsvan
     const searchMatch = !requestSearchTerm || 
@@ -203,11 +181,6 @@ export default function AdminVetsVanRequests() {
       selectedVetsVanIds.includes(request.driverId);
 
     return searchMatch && dateMatch && vetsVanMatch;
-  }).sort((a, b) => {
-    // Sort by createdAt descending (newest first)
-    const dateA = new Date(a.createdAt).getTime();
-    const dateB = new Date(b.createdAt).getTime();
-    return dateB - dateA;
   });
 
   // Pagination calculations for VetsVan requests - exact copy from admin dashboard
@@ -313,23 +286,6 @@ export default function AdminVetsVanRequests() {
 
   return (
     <AdminLayout>
-      <style>{`
-        @keyframes greenFlash {
-          0%, 100% {
-            border-color: #22c55e;
-            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
-          }
-          50% {
-            border-color: #16a34a;
-            box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
-          }
-        }
-        .green-flash-border {
-          border: 3px solid #22c55e !important;
-          animation: greenFlash 2s ease-in-out infinite;
-          border-radius: 0.5rem;
-        }
-      `}</style>
       <div 
         className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8" 
         dir={getDirection(language)} 
@@ -492,60 +448,39 @@ export default function AdminVetsVanRequests() {
                   </div>
                 ) : vetsVanRequests && vetsVanRequests.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {vetsVanRequests.map((request) => {
-                      const isUnseen = !seenRequestIds.has(request.id);
-                      return (
-                        <div 
-                          key={request.id}
-                          className={`relative ${isUnseen ? 'green-flash-border' : ''}`}
-                        >
-                          {/* Show checkbox below status badge */}
-                          <div className="absolute top-10 right-2 z-10 flex items-center gap-1 bg-white px-2 py-1 rounded shadow-sm border border-gray-200">
-                            <input
-                              type="checkbox"
-                              checked={seenRequestIds.has(request.id)}
-                              onChange={() => toggleSeenStatus(request.id)}
-                              className="rounded border-gray-300 text-green-600 focus:ring-green-600 cursor-pointer"
-                              data-testid={`seen-checkbox-${request.id}`}
-                            />
-                            <label className="text-xs text-gray-700 cursor-pointer select-none" onClick={() => toggleSeenStatus(request.id)}>
-                              {language === 'ar' ? 'شاهدت' : 'Seen'}
-                            </label>
-                          </div>
-                          
-                          <BookingCard
-                            booking={request}
-                            language={language}
-                            statusSelector={
-                              <select
-                                value={request.status}
-                                onChange={(e) => {
-                                  const newStatus = e.target.value;
-                                  updateBookingStatusMutation.mutate({ 
-                                    bookingId: request.id, 
-                                    status: newStatus 
-                                  });
-                                }}
-                                disabled={updateBookingStatusMutation.isPending}
-                                className="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-600 bg-white"
-                                style={{ textAlign: getTextAlign(language) }}
-                                data-testid={`status-select-${request.id}`}
-                              >
-                                <option value="pending_review">
-                                  {language === 'ar' ? 'قيد المراجعة' : 'Pending Review'}
-                                </option>
-                                <option value="confirmed">
-                                  {language === 'ar' ? 'مؤكد' : 'Confirmed'}
-                                </option>
-                                <option value="cancelled">
-                                  {language === 'ar' ? 'ملغي' : 'Cancelled'}
-                                </option>
-                              </select>
-                            }
-                          />
-                        </div>
-                      );
-                    })}
+                    {vetsVanRequests.map((request) => (
+                      <BookingCard
+                        key={request.id}
+                        booking={request}
+                        language={language}
+                        statusSelector={
+                          <select
+                            value={request.status}
+                            onChange={(e) => {
+                              const newStatus = e.target.value;
+                              updateBookingStatusMutation.mutate({ 
+                                bookingId: request.id, 
+                                status: newStatus 
+                              });
+                            }}
+                            disabled={updateBookingStatusMutation.isPending}
+                            className="w-full text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-600 bg-white"
+                            style={{ textAlign: getTextAlign(language) }}
+                            data-testid={`status-select-${request.id}`}
+                          >
+                            <option value="pending_review">
+                              {language === 'ar' ? 'قيد المراجعة' : 'Pending Review'}
+                            </option>
+                            <option value="confirmed">
+                              {language === 'ar' ? 'مؤكد' : 'Confirmed'}
+                            </option>
+                            <option value="cancelled">
+                              {language === 'ar' ? 'ملغي' : 'Cancelled'}
+                            </option>
+                          </select>
+                        }
+                      />
+                    ))}
                   </div>
                 ) : (
                   <div className="text-center py-12">
