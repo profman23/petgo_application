@@ -259,8 +259,8 @@ export function addPublicPaymentRoutes(app: any) {
         MobileCountryCode: '966',
         CustomerMobile: finalCustomerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
         CustomerEmail: finalCustomerEmail,
-        CallBackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
-        ErrorUrl: `https://www.vetsvan.app/login`,
+        CallBackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}&successUrl=${encodeURIComponent('https://' + productionDomain + '/vetsvan-booking?payment=success')}`,
+        ErrorUrl: `https://${productionDomain}/vetsvan-booking?payment=failed`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
       };
@@ -439,18 +439,28 @@ export function addPublicPaymentRoutes(app: any) {
           console.error('❌ Failed to fetch payment details:', fetchError);
         }
 
-        // Redirect to login page after successful payment (production domain)
-        const redirectUrl = `https://www.vetsvan.app/login`;
-        console.log('🔄 Redirecting to login page after successful payment:', redirectUrl);
+        // Redirect to success URL from query parameter or default to booking page
+        const productionDomain = getProductionDomain();
+        const defaultSuccessUrl = `https://${productionDomain}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
+        const successUrl = req.query.successUrl ? decodeURIComponent(req.query.successUrl as string) : defaultSuccessUrl;
+        
+        // Add payment details to success URL if not already present
+        const finalRedirectUrl = successUrl.includes('?') 
+          ? `${successUrl}&paymentId=${actualPaymentId}&ref=${ref}`
+          : `${successUrl}?paymentId=${actualPaymentId}&ref=${ref}`;
+        
+        console.log('🔄 Redirecting to success page after payment:', finalRedirectUrl);
         console.log('✅ Payment processed successfully:', { ref, paymentId: actualPaymentId });
-        return res.redirect(redirectUrl);
+        return res.redirect(finalRedirectUrl);
       } else {
-        console.log('❌ Missing payment parameters, redirecting to login page');
-        return res.redirect(`https://www.vetsvan.app/login`);
+        console.log('❌ Missing payment parameters, redirecting to booking page');
+        const productionDomain = getProductionDomain();
+        return res.redirect(`https://${productionDomain}/vetsvan-booking?payment=failed`);
       }
     } catch (error: any) {
       console.error('❌ MyFatoorah callback error:', error);
-      res.redirect(`https://www.vetsvan.app/login`);
+      const productionDomain = getProductionDomain();
+      res.redirect(`https://${productionDomain}/vetsvan-booking?payment=failed`);
     }
   });
 
