@@ -1431,7 +1431,7 @@ export default function RideRequest() {
                   .filter(option => {
                     // Only show Test Service for specific user
                     if (option.value === 'test-service') {
-                      return userSession?.user?.email === 'Profman23@gmail.com';
+                      return userSession?.user?.email?.toLowerCase() === 'profman23@gmail.com';
                     }
                     return true;
                   })
