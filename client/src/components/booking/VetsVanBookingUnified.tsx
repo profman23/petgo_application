@@ -482,6 +482,13 @@ export function VetsVanBookingUnified({
       }
     },
     onError: (error: any) => {
+      console.error('❌ Booking mutation failed:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack,
+        fullError: error
+      });
+      
       toast({
         title: language === 'ar' ? 'فشل الحجز' : 'Booking Failed',
         description: error.message || (language === 'ar' 

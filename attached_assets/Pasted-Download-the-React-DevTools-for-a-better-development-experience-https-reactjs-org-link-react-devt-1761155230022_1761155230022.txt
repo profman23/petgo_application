@@ -1,0 +1,16 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+main.tsx:11 SW registered:  ServiceWorkerRegistration {installing: null, waiting: null, active: ServiceWorker, navigationPreload: NavigationPreloadManager, scope: 'https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/', …}
+VetsVanBookingUnified.tsx:124 Loaded ride request data: {pickupLatitude: 24.833609000000003, pickupLongitude: 46.735071500000004, selectedPatients: Array(1), serviceType: 'test-service', location: 'Al Thumama, Al Rimal District, Qurtubah, Municipal…h governorate, Riyadh Region, 11263, Saudi Arabia', …}
+VetsVanBookingUnified.tsx:159 🔍 Payment check (all sources): {isModal: false, isAdminBooking: false, sessionStorage: {…}, localStorage: {…}, urlParams: '', …}
+VetsVanBookingUnified.tsx:177 🎉 Payment successful! Setting payment state: {reference: 'RIDE-1761155125126', paymentId: '0808595531735802146984', source: 'sessionStorage'}
+VetsVanBookingUnified.tsx:204 🔍 Fetching payment details for: 0808595531735802146984
+VetsVanBookingUnified.tsx:500 🔍 Auto-booking check: {paymentSuccess: false, paymentReference: null, paymentId: null, isBooking: false, isModal: false, …}
+VetsVanBookingUnified.tsx:554 ❌ Auto-booking conditions NOT met
+VetsVanBookingUnified.tsx:500 🔍 Auto-booking check: {paymentSuccess: true, paymentReference: 'RIDE-1761155125126', paymentId: '0808595531735802146984', isBooking: false, isModal: false, …}
+VetsVanBookingUnified.tsx:513 ✅ All conditions met for auto-booking. Checking localStorage...
+VetsVanBookingUnified.tsx:518 🔄 Auto-creating booking after payment success: {paymentId: '0808595531735802146984', paymentReference: 'RIDE-1761155125126', bookingDetails: {…}}
+VetsVanBookingUnified.tsx:500 🔍 Auto-booking check: {paymentSuccess: false, paymentReference: null, paymentId: null, isBooking: true, isModal: false, …}
+VetsVanBookingUnified.tsx:554 ❌ Auto-booking conditions NOT met
+VetsVanBookingUnified.tsx:500 🔍 Auto-booking check: {paymentSuccess: false, paymentReference: null, paymentId: null, isBooking: false, isModal: false, …}
+VetsVanBookingUnified.tsx:554 ❌ Auto-booking conditions NOT met
+VetsVanBookingUnified.tsx:219 💰 Payment details received: {paymentId: '0808595531735802146984', invoiceId: 59553173, amount: 1, currency: 'SR', status: 'paid', …}
