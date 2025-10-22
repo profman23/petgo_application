@@ -20,9 +20,9 @@ The application is a full-stack solution. The frontend is built with React 18 an
 - **Database**: PostgreSQL with Drizzle ORM for persistence (users, Vets Vans, bookings, pets, invoices, payments, products, services, sessions).
 - **Authentication**: Phone number and password-based authentication with session-based authorization. OTP email verification for account creation.
 - **Core Features**:
-    - **Booking Management**: Real-time status updates via polling, location-based matching, distance and cost estimation, real-time GPS tracking.
-    - **Enhanced Payment-Booking Linking**: Multi-tiered linking system using phone numbers as primary identifiers, with fuzzy name matching fallbacks, extended time windows (2-48 hours), and automated background jobs running every 15 minutes.
-    - **Notification System**: Real-time browser and audio notifications for new requests (doctors/admins), and email notifications for booking confirmations and pre-appointment alerts.
+    - **Booking Management**: Real-time status updates via polling, location-based matching, distance and cost estimation, real-time GPS tracking. Automatic booking creation after successful payment with immediate redirect to Activity page.
+    - **Enhanced Payment-Booking Linking**: Multi-tiered linking system using phone numbers as primary identifiers, with fuzzy name matching fallbacks, extended time windows (2-48 hours), and automated background jobs running every 15 minutes. Optimized MyFatoorah CallBackUrl to comply with 254 character limit.
+    - **Notification System**: Real-time browser and audio notifications for new bookings (doctors/admins via polling every 2-3 seconds), and email notifications for booking confirmations and pre-appointment alerts. Includes playBookingNotification() sound alerts.
     - **Data Persistence**: Robust PostgreSQL-based storage with comprehensive CRUD operations and multi-layered data protection.
     - **Invoice & Payment System**: Generation of professional, bilingual invoices with tax and discount calculations, pet vitals tracking, and email delivery of invoice links.
     - **Patient Weight Management**: Comprehensive patient weight tracking with decimal precision support (patient_weight column, REAL type) integrated in both Create and Edit patient forms with bilingual UI.
