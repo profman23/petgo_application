@@ -254,7 +254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'رقم الهاتف أو الإيميل أو كلمة المرور غير صحيحة' });
       }
       
-      const userData = { id: user.id, phone: user.phone, name: user.name, email: user.email, membershipType: user.membershipType };
+      const userData = { id: user.id, phone: user.phone, name: user.name, membershipType: user.membershipType };
       const sessionId = await sessionService.createSession(user.id, 'customer', userData, 24);
       
       res.json({ 

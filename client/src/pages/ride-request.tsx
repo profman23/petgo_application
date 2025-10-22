@@ -136,13 +136,19 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   const petCount = selectedPets.length;
   let total = 0;
 
-  // Home Consultation pricing
-  if (serviceType === 'home-consultation') {
+  // National Day 95 Offer pricing for Home Consultation
+  if (serviceType === 'national-day-home-consultation') {
     if (petCount <= 2) {
-      total = 399; // 1-2 pets: 399 SAR
+      total = 195; // 1-2 pets: 195 SAR
+    } else if (petCount === 3) {
+      total = 290; // 3 pets: 290 SAR (195 + 95)
     } else {
-      total = 798; // 3+ pets: 798 SAR
+      total = 290 + ((petCount - 3) * 95); // 4+ pets: 290 + 95 per additional pet
     }
+  }
+  // National Day 95 Offer pricing for Vaccination & Deworming
+  else if (serviceType === 'national-day-vaccination') {
+    total = petCount * 95; // 95 SAR per pet
   }
   // Special pricing for First Visit and General Check-up (unchanged)
   else if (['first-visit', 'general-checkup'].includes(serviceType)) {
@@ -656,13 +662,10 @@ export default function RideRequest() {
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
-        console.log('User Session Loaded - Email:', userData.email);
         setUserSession({ user: userData });
       } catch (error) {
         console.error('Error parsing stored user data:', error);
       }
-    } else {
-      console.log('No user data in localStorage');
     }
   }, []);
   
@@ -1430,35 +1433,23 @@ export default function RideRequest() {
                 } />
               </SelectTrigger>
               <SelectContent className="max-h-[240px] overflow-y-auto">
-                {SERVICE_TYPE_OPTIONS
-                  .filter(option => {
-                    // Only show Test Service for specific user
-                    if (option.value === 'test-service') {
-                      const userEmail = userSession?.user?.email?.toLowerCase();
-                      console.log('Test Service Filter - User Email:', userEmail);
-                      console.log('Test Service Filter - Comparison:', userEmail === 'profman23@gmail.com');
-                      return userEmail === 'profman23@gmail.com';
-                    }
-                    return true;
-                  })
-                  .map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <SelectItem key={option.value} value={option.value} className="select-item-custom">
-                        <div className="flex items-center gap-2">
-                          <Icon className={`w-4 h-4 ${option.iconColor}`} />
-                          <span>{language === 'ar' ? option.labelAr : option.labelEn}</span>
-                        </div>
-                      </SelectItem>
-                    );
-                  })
-                }
+                {SERVICE_TYPE_OPTIONS.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <SelectItem key={option.value} value={option.value} className="select-item-custom">
+                      <div className="flex items-center gap-2">
+                        <Icon className={`w-4 h-4 ${option.iconColor}`} />
+                        <span>{language === 'ar' ? option.labelAr : option.labelEn}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'home-consultation', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
+             ['first-visit', 'general-checkup', 'national-day-home-consultation', 'national-day-vaccination', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 {(() => {
                   const costData = getEstimatedCost(selectedPatients, patients, serviceType);
@@ -1486,7 +1477,8 @@ export default function RideRequest() {
                               {serviceType === 'vaccination' && (language === 'ar' ? 'التطعيم:' : 'Vaccination:')}
                               {serviceType === 'deworming' && (language === 'ar' ? 'مكافحة الديدان:' : 'Deworming:')}
                               {serviceType === 'fleas-ticks-prevention' && (language === 'ar' ? 'مكافحة البراغيث والقراد:' : 'Fleas & Ticks Prevention:')}
-                              {serviceType === 'home-consultation' && (language === 'ar' ? 'استشارة منزلية:' : 'Home Consultation:')}
+                              {serviceType === 'national-day-vaccination' && (language === 'ar' ? 'عرض اليوم الوطني 95 تطعيم ومكافحة الديدان:' : 'National Day 95 Offer Vaccination & Deworming:')}
+                              {serviceType === 'national-day-home-consultation' && (language === 'ar' ? 'عرض اليوم الوطني 95 استشارة منزلية:' : 'National Day 95 Offer Home Consultation:')}
                             </span>
                             <span className="text-sm font-bold text-purple-900" style={{ 
                               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
