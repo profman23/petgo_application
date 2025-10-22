@@ -381,7 +381,8 @@ export function VetsVanBookingUnified({
       paymentReference = null, 
       paymentId = null,
       shiftId = null,
-      appointmentDate = null
+      appointmentDate = null,
+      savedRideRequestData = null
     }: { 
       vetsVanId: number; 
       timeSlot: string; 
@@ -390,6 +391,7 @@ export function VetsVanBookingUnified({
       paymentId?: string | null;
       shiftId?: number | null;
       appointmentDate?: string | null;
+      savedRideRequestData?: any | null;
     }) => {
       // Use provided shiftId or find it from current state
       let finalShiftId = shiftId;
@@ -416,12 +418,15 @@ export function VetsVanBookingUnified({
 
       const appointmentTime24 = convertTo24Hour(timeSlot);
 
+      // Use saved ride request data if provided (after payment redirect), otherwise use component state
+      const activeRideRequestData = savedRideRequestData || rideRequestData;
+
       let selectedPetsData;
-      if (isAdminBooking && rideRequestData?.selectedPatients) {
-        selectedPetsData = rideRequestData.selectedPatients.map(id => ({ id }));
+      if (isAdminBooking && activeRideRequestData?.selectedPatients) {
+        selectedPetsData = activeRideRequestData.selectedPatients.map((id: number) => ({ id }));
       } else {
-        selectedPetsData = rideRequestData?.selectedPatients ? 
-          patients.filter(p => rideRequestData.selectedPatients.includes(p.id)) : [];
+        selectedPetsData = activeRideRequestData?.selectedPatients ? 
+          patients.filter(p => activeRideRequestData.selectedPatients.includes(p.id)) : [];
       }
 
       const response = await fetch('/api/bookings', {
@@ -555,7 +560,8 @@ export function VetsVanBookingUnified({
             paymentReference: paymentReference,
             paymentId: paymentId,
             shiftId: bookingDetails.shiftId,
-            appointmentDate: bookingDetails.selectedDate
+            appointmentDate: bookingDetails.selectedDate,
+            savedRideRequestData: bookingDetails.rideRequestData
           });
           
           // Clean up URL parameters

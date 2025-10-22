@@ -2235,13 +2235,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create booking with customer location
+      // Set status to 'confirmed' if payment is present, otherwise 'pending_review'
+      const bookingStatus = (paymentReference && paymentId) ? 'confirmed' : 'pending_review';
+      console.log(`📋 Creating booking with status: ${bookingStatus} (hasPayment: ${!!(paymentReference && paymentId)})`);
+      
       const booking = await storage.createBooking({
         userId,
         shiftId,
         vetsVanId,
         appointmentDate,
         appointmentTime,
-        status: 'pending_review',
+        status: bookingStatus,
         customerLocation: customerLocation || null,
         selectedPets: selectedPets || [],
         serviceType: serviceType || 'General Check Up'

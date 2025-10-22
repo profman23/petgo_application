@@ -489,7 +489,7 @@ export type InsertInvoicePayment = z.infer<typeof insertInvoicePaymentSchema>;
 export const paymentTransactions = pgTable("payment_transactions", {
   id: serial("id").primaryKey(),
   bookingId: integer("booking_id").references(() => bookings.id).notNull(),
-  paymentId: text("payment_id"), // MyFatoorah Payment ID
+  myfatoorahPaymentId: text("myfatoorah_payment_id"), // MyFatoorah Payment ID
   invoiceReference: text("invoice_reference"), // MyFatoorah Invoice Reference
   paymentReference: text("payment_reference"), // MyFatoorah Payment Reference
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
@@ -499,6 +499,9 @@ export const paymentTransactions = pgTable("payment_transactions", {
   gatewayResponse: jsonb("gateway_response"), // Full response from MyFatoorah
   paymentUrl: text("payment_url"), // Payment link from MyFatoorah
   customerReference: text("customer_reference"), // Customer reference for tracking
+  customerName: text("customer_name"), // Customer name from payment
+  customerEmail: text("customer_email"), // Customer email from payment
+  customerPhone: text("customer_phone"), // Customer phone from payment
   errorMessage: text("error_message"), // Error details if payment fails
   paidAt: timestamp("paid_at"), // When payment was completed
   createdAt: timestamp("created_at").defaultNow(),

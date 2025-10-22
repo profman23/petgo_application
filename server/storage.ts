@@ -1297,7 +1297,7 @@ export class DatabaseStorage implements IStorage {
 
   async getPaymentTransactionByPaymentId(paymentId: string): Promise<SelectPaymentTransaction | undefined> {
     const [transaction] = await db.select().from(paymentTransactions)
-      .where(eq(paymentTransactions.paymentId, paymentId));
+      .where(eq(paymentTransactions.myfatoorahPaymentId, paymentId));
     return transaction;
   }
 
