@@ -1427,17 +1427,26 @@ export default function RideRequest() {
                 } />
               </SelectTrigger>
               <SelectContent className="max-h-[240px] overflow-y-auto">
-                {SERVICE_TYPE_OPTIONS.map((option) => {
-                  const Icon = option.icon;
-                  return (
-                    <SelectItem key={option.value} value={option.value} className="select-item-custom">
-                      <div className="flex items-center gap-2">
-                        <Icon className={`w-4 h-4 ${option.iconColor}`} />
-                        <span>{language === 'ar' ? option.labelAr : option.labelEn}</span>
-                      </div>
-                    </SelectItem>
-                  );
-                })}
+                {SERVICE_TYPE_OPTIONS
+                  .filter(option => {
+                    // Only show Test Service for specific user
+                    if (option.value === 'test-service') {
+                      return userSession?.user?.email === 'Profman23@gmail.com';
+                    }
+                    return true;
+                  })
+                  .map((option) => {
+                    const Icon = option.icon;
+                    return (
+                      <SelectItem key={option.value} value={option.value} className="select-item-custom">
+                        <div className="flex items-center gap-2">
+                          <Icon className={`w-4 h-4 ${option.iconColor}`} />
+                          <span>{language === 'ar' ? option.labelAr : option.labelEn}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })
+                }
               </SelectContent>
             </Select>
             
