@@ -130,37 +130,71 @@ export function VetsVanBookingUnified({
     }
   }, [propBookingData]);
 
-  // Check for payment success from sessionStorage (set by callback page)
+  // Check for payment success from multiple sources (sessionStorage, localStorage, URL params)
   useEffect(() => {
     if (!isModal && !isAdminBooking) {
-      // Check sessionStorage for payment success (more reliable than URL params)
-      const paymentSuccessFlag = sessionStorage.getItem('paymentSuccess');
-      const paymentIdParam = sessionStorage.getItem('paymentId');
-      const ref = sessionStorage.getItem('paymentReference');
+      // Check all three sources for maximum reliability
       
-      console.log('🔍 Payment check:', {
+      // 1. Check sessionStorage first
+      let paymentSuccessFlag = sessionStorage.getItem('paymentSuccess');
+      let paymentIdParam = sessionStorage.getItem('paymentId');
+      let ref = sessionStorage.getItem('paymentReference');
+      
+      // 2. Fall back to localStorage if sessionStorage is empty
+      if (!paymentSuccessFlag) {
+        paymentSuccessFlag = localStorage.getItem('paymentSuccess');
+        paymentIdParam = localStorage.getItem('paymentId');
+        ref = localStorage.getItem('paymentReference');
+      }
+      
+      // 3. Fall back to URL parameters if both storage methods are empty
+      if (!paymentSuccessFlag) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const payment = urlParams.get('payment');
+        paymentIdParam = urlParams.get('paymentId') || urlParams.get('Id');
+        ref = urlParams.get('ref');
+        paymentSuccessFlag = payment === 'success' ? 'true' : null;
+      }
+      
+      console.log('🔍 Payment check (all sources):', {
         isModal,
         isAdminBooking,
-        sessionStorage: { paymentSuccessFlag, paymentIdParam, ref }
+        sessionStorage: {
+          paymentSuccess: sessionStorage.getItem('paymentSuccess'),
+          paymentId: sessionStorage.getItem('paymentId'),
+          ref: sessionStorage.getItem('paymentReference')
+        },
+        localStorage: {
+          paymentSuccess: localStorage.getItem('paymentSuccess'),
+          paymentId: localStorage.getItem('paymentId'),
+          ref: localStorage.getItem('paymentReference')
+        },
+        urlParams: window.location.search,
+        finalValues: { paymentSuccessFlag, paymentIdParam, ref }
       });
       
       if (paymentSuccessFlag === 'true' && ref && paymentIdParam) {
         console.log('🎉 Payment successful! Setting payment state:', {
           reference: ref,
-          paymentId: paymentIdParam
+          paymentId: paymentIdParam,
+          source: sessionStorage.getItem('paymentSuccess') ? 'sessionStorage' : 
+                  localStorage.getItem('paymentSuccess') ? 'localStorage' : 'URL params'
         });
         
-        // Clear sessionStorage to prevent re-processing
+        // Clear all storage to prevent re-processing
         sessionStorage.removeItem('paymentSuccess');
         sessionStorage.removeItem('paymentId');
         sessionStorage.removeItem('paymentReference');
+        localStorage.removeItem('paymentSuccess');
+        localStorage.removeItem('paymentId');
+        localStorage.removeItem('paymentReference');
         
         setPaymentSuccess(true);
         setPaymentReference(ref);
         setPaymentId(paymentIdParam);
         fetchPaymentDetails(paymentIdParam);
       } else {
-        console.log('⚠️ No payment success in sessionStorage');
+        console.log('⚠️ No payment success found in any source');
       }
     }
   }, [isModal, isAdminBooking]);

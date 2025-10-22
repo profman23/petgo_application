@@ -441,25 +441,59 @@ export function addPublicPaymentRoutes(app: any) {
 
         // Return HTML page that sets sessionStorage and redirects
         const productionDomain = getProductionDomain();
-        const redirectUrl = `https://${productionDomain}/vetsvan-booking`;
+        const redirectUrl = `https://${productionDomain}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
         
-        console.log('🔄 Redirecting to booking page after successful payment with sessionStorage');
+        console.log('🔄 Redirecting to booking page after successful payment');
         console.log('✅ Payment processed successfully:', { ref, paymentId: actualPaymentId });
         
-        // Return HTML that sets sessionStorage and redirects
+        // Return HTML that sets sessionStorage, localStorage, AND URL params for maximum reliability
         return res.send(`
           <!DOCTYPE html>
           <html>
           <head>
             <title>Payment Successful</title>
+            <style>
+              body { font-family: Arial; text-align: center; padding: 50px; }
+              .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #8B2F8B; 
+                         border-radius: 50%; width: 40px; height: 40px; 
+                         animation: spin 1s linear infinite; margin: 20px auto; }
+              @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+            </style>
           </head>
           <body>
-            <p>Payment successful! Redirecting...</p>
+            <h2>✅ Payment Successful!</h2>
+            <p>Finalizing your booking...</p>
+            <div class="spinner"></div>
             <script>
+              console.log('🔄 Payment callback page - Setting storage and redirecting...');
+              
+              // Set in both sessionStorage AND localStorage for maximum reliability
               sessionStorage.setItem('paymentSuccess', 'true');
               sessionStorage.setItem('paymentId', '${actualPaymentId}');
               sessionStorage.setItem('paymentReference', '${ref}');
-              window.location.href = '${redirectUrl}';
+              
+              localStorage.setItem('paymentSuccess', 'true');
+              localStorage.setItem('paymentId', '${actualPaymentId}');
+              localStorage.setItem('paymentReference', '${ref}');
+              
+              console.log('✅ Storage set:', {
+                sessionStorage: {
+                  paymentSuccess: sessionStorage.getItem('paymentSuccess'),
+                  paymentId: sessionStorage.getItem('paymentId'),
+                  paymentReference: sessionStorage.getItem('paymentReference')
+                },
+                localStorage: {
+                  paymentSuccess: localStorage.getItem('paymentSuccess'),
+                  paymentId: localStorage.getItem('paymentId'),
+                  paymentReference: localStorage.getItem('paymentReference')
+                }
+              });
+              
+              // Small delay to ensure storage is set, then redirect with URL params as backup
+              setTimeout(function() {
+                console.log('🔄 Redirecting to:', '${redirectUrl}');
+                window.location.href = '${redirectUrl}';
+              }, 500);
             </script>
           </body>
           </html>
