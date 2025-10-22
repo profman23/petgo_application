@@ -656,10 +656,13 @@ export default function RideRequest() {
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
+        console.log('User Session Loaded - Email:', userData.email);
         setUserSession({ user: userData });
       } catch (error) {
         console.error('Error parsing stored user data:', error);
       }
+    } else {
+      console.log('No user data in localStorage');
     }
   }, []);
   
@@ -1431,7 +1434,10 @@ export default function RideRequest() {
                   .filter(option => {
                     // Only show Test Service for specific user
                     if (option.value === 'test-service') {
-                      return userSession?.user?.email?.toLowerCase() === 'profman23@gmail.com';
+                      const userEmail = userSession?.user?.email?.toLowerCase();
+                      console.log('Test Service Filter - User Email:', userEmail);
+                      console.log('Test Service Filter - Comparison:', userEmail === 'profman23@gmail.com');
+                      return userEmail === 'profman23@gmail.com';
                     }
                     return true;
                   })
