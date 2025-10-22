@@ -499,8 +499,8 @@ export default function AdminVetsVanRequests() {
                           key={request.id}
                           className={`relative ${isUnseen ? 'green-flash-border' : ''}`}
                         >
-                          {/* Show checkbox at top-right corner */}
-                          <div className="absolute top-2 right-2 z-10 flex items-center gap-1 bg-white px-2 py-1 rounded shadow-sm border border-gray-200">
+                          {/* Show checkbox below status badge */}
+                          <div className="absolute top-10 right-2 z-10 flex items-center gap-1 bg-white px-2 py-1 rounded shadow-sm border border-gray-200">
                             <input
                               type="checkbox"
                               checked={seenRequestIds.has(request.id)}
