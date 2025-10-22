@@ -1,0 +1,26 @@
+VetsVanBookingUnified.tsx:197 Uncaught ReferenceError: Cannot access 'createBookingMutation' before initialization
+    at VetsVanBookingUnified (VetsVanBookingUnified.tsx:197:63)
+
+VetsVanBookingUnified.tsx:197 Uncaught ReferenceError: Cannot access 'createBookingMutation' before initialization
+    at VetsVanBookingUnified (VetsVanBookingUnified.tsx:197:63)
+chunk-276SZO74.js?v=4cc0d9fd:14032 The above error occurred in the <VetsVanBookingUnified> component:
+
+    at VetsVanBookingUnified (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/components/booking/VetsVanBookingUnified.tsx:42:3)
+    at VetsVanBooking
+    at AuthCheck (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=fbs6UhPQlZ8-BNov9dgXh:253:22)
+    at component
+    at Route (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=4cc0d9fd:323:16)
+    at Switch (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=4cc0d9fd:379:17)
+    at div
+    at div
+    at Router (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=fbs6UhPQlZ8-BNov9dgXh:302:22)
+    at PermissionsProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/hooks/usePermissionsStore.tsx:90:39)
+    at QueryClientProvider (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.d…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=4cc0d9fd:2805:3)
+    at App (https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/src/App.tsx?v=fbs6UhPQlZ8-BNov9dgXh:659:39)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+chunk-276SZO74.js?v=4cc0d9fd:19413 Uncaught ReferenceError: Cannot access 'createBookingMutation' before initialization
+    at VetsVanBookingUnified (VetsVanBookingUnified.tsx:197:63)
+
+﻿

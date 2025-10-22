@@ -151,51 +151,6 @@ export function VetsVanBookingUnified({
     }
   }, [isModal, isAdminBooking]);
 
-  // Auto-trigger booking creation after payment success
-  useEffect(() => {
-    if (paymentSuccess && paymentReference && paymentId && !isBooking) {
-      const savedBookingDetails = localStorage.getItem('pendingBookingDetails');
-      
-      if (savedBookingDetails) {
-        try {
-          const bookingDetails = JSON.parse(savedBookingDetails);
-          console.log('🔄 Auto-creating booking after payment success:', {
-            paymentId,
-            paymentReference,
-            bookingDetails
-          });
-          
-          // Auto-trigger booking creation
-          setPendingBooking({
-            vetsVanId: bookingDetails.vetsVanId,
-            timeSlot: bookingDetails.timeSlot,
-            vetsVanCode: bookingDetails.vetsVanCode
-          });
-          
-          setIsBooking(true);
-          
-          createBookingMutation.mutate({
-            vetsVanId: bookingDetails.vetsVanId,
-            timeSlot: bookingDetails.timeSlot,
-            vetsVanCode: bookingDetails.vetsVanCode,
-            paymentReference: paymentReference,
-            paymentId: paymentId
-          });
-          
-          // Clean up URL parameters
-          window.history.replaceState({}, document.title, window.location.pathname);
-          setPaymentSuccess(false);
-          setPaymentReference(null);
-          setPaymentId(null);
-        } catch (error) {
-          console.error('❌ Failed to parse pending booking details:', error);
-        }
-      } else {
-        console.log('⚠️ No pending booking details found in localStorage after payment');
-      }
-    }
-  }, [paymentSuccess, paymentReference, paymentId, isBooking, createBookingMutation]);
-
   const fetchPaymentDetails = async (paymentId: string) => {
     try {
       console.log('🔍 Fetching payment details for:', paymentId);
@@ -491,6 +446,51 @@ export function VetsVanBookingUnified({
       setIsBooking(false);
     }
   });
+
+  // Auto-trigger booking creation after payment success
+  useEffect(() => {
+    if (paymentSuccess && paymentReference && paymentId && !isBooking && !isModal && !isAdminBooking) {
+      const savedBookingDetails = localStorage.getItem('pendingBookingDetails');
+      
+      if (savedBookingDetails) {
+        try {
+          const bookingDetails = JSON.parse(savedBookingDetails);
+          console.log('🔄 Auto-creating booking after payment success:', {
+            paymentId,
+            paymentReference,
+            bookingDetails
+          });
+          
+          // Auto-trigger booking creation
+          setPendingBooking({
+            vetsVanId: bookingDetails.vetsVanId,
+            timeSlot: bookingDetails.timeSlot,
+            vetsVanCode: bookingDetails.vetsVanCode
+          });
+          
+          setIsBooking(true);
+          
+          createBookingMutation.mutate({
+            vetsVanId: bookingDetails.vetsVanId,
+            timeSlot: bookingDetails.timeSlot,
+            vetsVanCode: bookingDetails.vetsVanCode,
+            paymentReference: paymentReference,
+            paymentId: paymentId
+          });
+          
+          // Clean up URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+          setPaymentSuccess(false);
+          setPaymentReference(null);
+          setPaymentId(null);
+        } catch (error) {
+          console.error('❌ Failed to parse pending booking details:', error);
+        }
+      } else {
+        console.log('⚠️ No pending booking details found in localStorage after payment');
+      }
+    }
+  }, [paymentSuccess, paymentReference, paymentId, isBooking, isModal, isAdminBooking]);
 
   const handleConfirmBooking = async () => {
     if (pendingBooking) {
