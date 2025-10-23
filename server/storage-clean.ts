@@ -1,4 +1,4 @@
-import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification } from "@shared/schema";
+import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, paymentTransactions, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, not, inArray, desc, lt } from "drizzle-orm";
 
@@ -713,21 +713,32 @@ export class DatabaseStorage implements IStorage {
     location: any;
     pets: Array<{ name: string; type: string; }>;
     serviceType: string;
+    paidAmount?: string | null;
+    paymentStatus?: string | null;
     createdAt: string;
   }>> {
     const allBookings = await db.select().from(bookings);
     const allUsers = await db.select().from(users);
     const allDrivers = await db.select().from(drivers);
+    const allPayments = await db.select().from(paymentTransactions);
 
     return allBookings.map(booking => {
       const user = allUsers.find(u => u.id === booking.userId);
       const driver = allDrivers.find(d => d.id === booking.vetsVanId);
+      
+      // Find payment for this booking WHERE status = 'paid'
+      const payment = allPayments.find(p => 
+        p.bookingId === booking.id && p.status === 'paid'
+      );
 
       // Extract pet names and types from selectedPets
       const pets = booking.selectedPets?.map((pet: any) => ({
         name: pet.name || "Unknown",
         type: pet.type || "Unknown"
       })) || [];
+
+      // CRITICAL: Change status to "confirmed" ONLY when payment is paid
+      const bookingStatus = payment ? 'confirmed' : booking.status;
 
       return {
         id: booking.id,
@@ -738,10 +749,12 @@ export class DatabaseStorage implements IStorage {
         vetsvanName: driver?.vetsvanName || "Unknown",
         appointmentDate: booking.appointmentDate,
         appointmentTime: booking.appointmentTime,
-        status: booking.status,
+        status: bookingStatus,
         location: booking.customerLocation,
         pets: pets,
         serviceType: booking.serviceType || "Unknown",
+        paidAmount: payment ? `${payment.amount} ${payment.currency}` : null,
+        paymentStatus: payment ? 'paid' : null,
         createdAt: booking.createdAt?.toISOString() || new Date().toISOString()
       };
     });
