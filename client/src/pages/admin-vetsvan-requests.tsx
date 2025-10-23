@@ -123,6 +123,7 @@ export default function AdminVetsVanRequests() {
         createdAt: string;
         driverId: number;
         paidAmount?: string | null;
+        paymentStatus?: string | null;
       }>;
       console.log("VetsVan requests data fetched successfully:", data.length, "requests");
       return data;

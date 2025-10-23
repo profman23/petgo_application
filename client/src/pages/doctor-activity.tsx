@@ -36,6 +36,7 @@ interface Booking {
   serviceType: string;
   createdAt: string;
   paidAmount?: string | null;
+  paymentStatus?: string | null;
 }
 
 export default function DoctorActivity() {
@@ -212,6 +213,13 @@ export default function DoctorActivity() {
   // Audio notification system
   useEffect(() => {
     const currentBookingCount = (bookings as Booking[]).length;
+    
+    console.log('🔔 Doctor Notification Check:', {
+      currentBookingCount,
+      previousCount: previousBookingCount.current,
+      willNotify: previousBookingCount.current > 0 && currentBookingCount > previousBookingCount.current,
+      bookings: bookings
+    });
     
     // Play notification sound when new booking is added
     if (previousBookingCount.current > 0 && currentBookingCount > previousBookingCount.current) {

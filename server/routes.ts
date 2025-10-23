@@ -2795,6 +2795,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get doctor's VetsVan ID from user data (direct mapping from doctors table)
       const vetsVanId = user.vetsVanId || user.id;
       
+      console.log('🩺 Doctor bookings request:', {
+        doctorId: user.id,
+        vetsVanId: vetsVanId,
+        username: user.username || user.name
+      });
+      
       if (!vetsVanId) {
         return res.status(404).json({ message: 'VetsVan ID not found' });
       }
@@ -2802,10 +2808,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get all bookings with complete details using the same method as admin
       const allBookingsWithDetails = await storage.getAllVetsVanRequestsWithDetails();
       
+      console.log('📊 All bookings retrieved:', {
+        totalBookings: allBookingsWithDetails.length,
+        bookingDriverIds: allBookingsWithDetails.map(b => ({ id: b.id, driverId: b.driverId, vetsvanCode: b.vetsvanCode }))
+      });
+      
       // Filter bookings for this specific VetsVan
       const vetsVanBookings = allBookingsWithDetails.filter(booking => 
         booking.driverId === vetsVanId
       );
+      
+      console.log('✅ Filtered bookings for doctor:', {
+        vetsVanId: vetsVanId,
+        filteredCount: vetsVanBookings.length,
+        bookingIds: vetsVanBookings.map(b => b.id)
+      });
       
       // Sort by creation date (newest first)
       const sortedBookings = vetsVanBookings.sort((a, b) => 
