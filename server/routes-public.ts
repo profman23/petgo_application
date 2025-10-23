@@ -39,6 +39,80 @@ export function addPublicPaymentRoutes(app: any) {
     res.json({ status: 'Public routes working', timestamp: new Date() });
   });
 
+  // Verify payment status by payment ID (for when callback doesn't work)
+  app.get('/api/public/verify-payment/:paymentId', async (req: any, res: any) => {
+    try {
+      const { paymentId } = req.params;
+      const { ref } = req.query;
+      
+      console.log('🔍 VERIFY PAYMENT REQUEST:', { paymentId, ref });
+      
+      if (!paymentId) {
+        return res.status(400).json({ success: false, error: 'Missing paymentId' });
+      }
+
+      const myFatoorahService = new MyFatoorahService();
+      const paymentDetails = await myFatoorahService.getPaymentDetailsFromCallback(paymentId);
+      
+      console.log('✅ Payment verification result:', paymentDetails);
+
+      // Update payment transaction in database
+      if (paymentDetails.amount > 0 && paymentDetails.status === 'paid') {
+        const existingPayment = await db.execute(sql`
+          SELECT id, customer_name, customer_email, customer_phone, 
+                 original_customer_name, original_customer_email, original_customer_phone
+          FROM payment_transactions 
+          WHERE myfatoorah_invoice_id = ${paymentDetails.invoiceId}
+          OR myfatoorah_payment_id = ${paymentId}
+          OR reference_id = ${ref || ''}
+          LIMIT 1
+        `);
+
+        if (existingPayment.rows.length > 0) {
+          const payment = existingPayment.rows[0];
+          
+          const useCustomerName = payment.original_customer_name || payment.customer_name;
+          const useCustomerEmail = payment.original_customer_email || payment.customer_email;
+          const useCustomerPhone = payment.original_customer_phone || payment.customer_phone;
+
+          await db.execute(sql`
+            UPDATE payment_transactions 
+            SET amount = ${paymentDetails.amount}, 
+                currency = ${paymentDetails.currency},
+                status = ${paymentDetails.status},
+                paid_at = ${paymentDetails.paidAt},
+                customer_name = ${useCustomerName},
+                customer_email = ${useCustomerEmail},
+                customer_phone = ${useCustomerPhone},
+                myfatoorah_payment_id = ${paymentId},
+                updated_at = ${new Date()}
+            WHERE id = ${payment.id}
+          `);
+          
+          console.log('✅ Payment transaction updated from verification');
+        }
+      }
+
+      res.json({
+        success: true,
+        payment: {
+          status: paymentDetails.status,
+          amount: paymentDetails.amount,
+          currency: paymentDetails.currency,
+          invoiceId: paymentDetails.invoiceId,
+          paidAt: paymentDetails.paidAt,
+          isVerified: paymentDetails.status === 'paid'
+        }
+      });
+    } catch (error: any) {
+      console.error('❌ Payment verification error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message || 'Failed to verify payment' 
+      });
+    }
+  });
+
   // Backfill payment amounts from MyFatoorah for existing transactions
   app.post('/api/public/payments/backfill-amounts', async (req: any, res: any) => {
     try {
@@ -357,6 +431,9 @@ export function addPublicPaymentRoutes(app: any) {
   });
 
   // MyFatoorah payment callback handler
+  // IMPORTANT: MyFatoorah needs to reach this endpoint after payment
+  // In development, they redirect to ErrorUrl if callback is unreachable
+  // So we handle payment completion on the frontend with paymentId from URL
   app.get('/api/public/myfatoorah/callback', async (req: any, res: any) => {
     console.log('📞 CALLBACK ENDPOINT HIT!', {
       url: req.url,

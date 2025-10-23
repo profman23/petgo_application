@@ -131,6 +131,8 @@ export function VetsVanBookingUnified({
   }, [propBookingData]);
 
   // Check for payment success from multiple sources (sessionStorage, localStorage, URL params)
+  // IMPORTANT: In development, MyFatoorah can't reach callback, so they redirect with payment=failed
+  // But they still include paymentId! So we verify the payment status directly.
   useEffect(() => {
     if (!isModal && !isAdminBooking) {
       // Check all three sources for maximum reliability
@@ -148,11 +150,53 @@ export function VetsVanBookingUnified({
       }
       
       // 3. Fall back to URL parameters if both storage methods are empty
-      if (!paymentSuccessFlag) {
+      if (!paymentSuccessFlag || !paymentIdParam) {
         const urlParams = new URLSearchParams(window.location.search);
         const payment = urlParams.get('payment');
         paymentIdParam = urlParams.get('paymentId') || urlParams.get('Id');
         ref = urlParams.get('ref');
+        
+        // CRITICAL: Even if payment=failed, verify if we have a paymentId
+        if (paymentIdParam) {
+          console.log('🔍 Found paymentId in URL, verifying payment status...', {
+            paymentId: paymentIdParam,
+            urlPaymentParam: payment
+          });
+          
+          // Verify payment with backend
+          fetch(`/api/public/verify-payment/${paymentIdParam}?ref=${ref || ''}`)
+            .then(response => response.json())
+            .then(data => {
+              console.log('✅ Payment verification response:', data);
+              
+              if (data.success && data.payment.isVerified) {
+                console.log('🎉 Payment verified as successful!', data.payment);
+                
+                // Clear storage
+                sessionStorage.removeItem('paymentSuccess');
+                sessionStorage.removeItem('paymentId');
+                sessionStorage.removeItem('paymentReference');
+                localStorage.removeItem('paymentSuccess');
+                localStorage.removeItem('paymentId');
+                localStorage.removeItem('paymentReference');
+                
+                // Set payment success state
+                setPaymentSuccess(true);
+                setPaymentReference(ref || '');
+                setPaymentId(paymentIdParam);
+                setPaymentAmount(data.payment.amount);
+                setPaymentCurrency(data.payment.currency);
+              } else {
+                console.log('❌ Payment verification failed or payment not completed');
+              }
+            })
+            .catch(error => {
+              console.error('❌ Payment verification error:', error);
+            });
+          
+          return; // Exit early, let the verification complete
+        }
+        
         paymentSuccessFlag = payment === 'success' ? 'true' : null;
       }
       
