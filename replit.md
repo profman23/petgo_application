@@ -22,6 +22,7 @@ The application is a full-stack solution. The frontend is built with React 18 an
 - **Core Features**:
     - **Booking Management**: Real-time status updates via polling, location-based matching, distance and cost estimation, real-time GPS tracking. Automatic booking creation after successful payment with immediate redirect to Activity page.
     - **Enhanced Payment-Booking Linking**: Multi-tiered linking system using phone numbers as primary identifiers, with fuzzy name matching fallbacks, extended time windows (2-48 hours), and automated background jobs running every 15 minutes. Optimized MyFatoorah CallBackUrl to comply with 254 character limit.
+    - **Payment Verification**: Development uses client-side detection (URL parameters + localStorage verification). Production uses MyFatoorah callback (primary) with client-side detection as fallback. Multi-factor verification ensures security (paymentId + pendingBookingDetails + backend validation).
     - **Notification System**: Real-time browser and audio notifications for new bookings (doctors/admins via polling every 2-3 seconds), and email notifications for booking confirmations and pre-appointment alerts. Includes playBookingNotification() sound alerts.
     - **Data Persistence**: Robust PostgreSQL-based storage with comprehensive CRUD operations and multi-layered data protection.
     - **Invoice & Payment System**: Generation of professional, bilingual invoices with tax and discount calculations, pet vitals tracking, and email delivery of invoice links.
