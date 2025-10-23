@@ -2222,6 +2222,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🏥 Service type received:', serviceType);
       console.log('💳 Payment info received:', { paymentReference, paymentId });
 
+      // Check for orphaned payment BEFORE checking time slot availability
+      // This allows users who already paid to rebook if their original slot was taken
+      let orphanedPayment = null;
+      let usingOrphanedPayment = false;
+      
+      if (!paymentReference && !paymentId && !isAdminBooking) {
+        // Get user to check for orphaned payments
+        const user = await storage.getUser(userId);
+        if (user && user.phone) {
+          orphanedPayment = await storage.findOrphanedPayment(user.phone, 120); // 2 hour window
+          
+          if (orphanedPayment) {
+            console.log('🔄 Found orphaned payment for user:', {
+              userId,
+              userPhone: user.phone,
+              paymentId: orphanedPayment.myfatoorahPaymentId,
+              amount: orphanedPayment.amount,
+              paidAt: orphanedPayment.paidAt
+            });
+            usingOrphanedPayment = true;
+          }
+        }
+      }
+
       // Check if this specific time slot is already booked
       const existingBookings = await storage.getShiftBookings(shiftId);
       const timeSlotBooked = existingBookings.some(booking => 
@@ -2235,9 +2259,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create booking with customer location
-      // Set status to 'confirmed' if payment is present, otherwise 'pending_review'
-      const bookingStatus = (paymentReference && paymentId) ? 'confirmed' : 'pending_review';
-      console.log(`📋 Creating booking with status: ${bookingStatus} (hasPayment: ${!!(paymentReference && paymentId)})`);
+      // Set status to 'confirmed' if payment is present OR orphaned payment exists
+      const hasPayment = (paymentReference && paymentId) || orphanedPayment;
+      const bookingStatus = hasPayment ? 'confirmed' : 'pending_review';
+      console.log(`📋 Creating booking with status: ${bookingStatus} (hasPayment: ${!!hasPayment}, usingOrphaned: ${usingOrphanedPayment})`);
       
       const booking = await storage.createBooking({
         userId,
@@ -2252,8 +2277,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Link existing payment transaction to booking
-      // First check if payment information is explicitly provided
-      if (paymentReference && paymentId && booking) {
+      // Handle orphaned payment OR explicit payment provided
+      if (orphanedPayment && booking) {
+        try {
+          console.log('🔗 Attempting to link orphaned payment to new booking:', {
+            bookingId: booking.id,
+            paymentId: orphanedPayment.myfatoorahPaymentId,
+            amount: orphanedPayment.amount
+          });
+          
+          // Guard against race condition: only update if booking_id is still NULL
+          const updateResult = await db.execute(sql`
+            UPDATE payment_transactions 
+            SET booking_id = ${booking.id},
+                updated_at = ${new Date()}
+            WHERE id = ${orphanedPayment.id}
+              AND booking_id IS NULL
+          `);
+          
+          // Check if the update actually modified a row
+          const rowsAffected = updateResult.rowCount || 0;
+          
+          if (rowsAffected === 0) {
+            // Race condition: payment was already claimed by another booking
+            console.warn('⚠️ Orphaned payment was already claimed by another booking');
+            usingOrphanedPayment = false;
+            orphanedPayment = null;
+            
+            // Update booking status back to pending_review since we don't have payment
+            await db.execute(sql`
+              UPDATE bookings 
+              SET status = 'pending_review'
+              WHERE id = ${booking.id}
+            `);
+          } else {
+            console.log('✅ Orphaned payment successfully linked to new booking');
+          }
+        } catch (error) {
+          console.error('❌ Failed to link orphaned payment:', error);
+          usingOrphanedPayment = false;
+          orphanedPayment = null;
+          
+          // Ensure booking status is pending_review on error
+          try {
+            await db.execute(sql`
+              UPDATE bookings 
+              SET status = 'pending_review'
+              WHERE id = ${booking.id}
+            `);
+          } catch (statusError) {
+            console.error('❌ Failed to update booking status:', statusError);
+          }
+        }
+      } else if (paymentReference && paymentId && booking) {
         try {
           console.log('💳 Linking existing payment transaction to booking:', booking.id);
           
@@ -2517,6 +2593,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         success: true, 
         booking,
+        usedOrphanedPayment: usingOrphanedPayment,
+        orphanedPaymentAmount: orphanedPayment?.amount || null,
         notification: {
           message: `New booking from ${customerName}`,
           vetsVanId,

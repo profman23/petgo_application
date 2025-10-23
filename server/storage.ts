@@ -187,6 +187,7 @@ export interface IStorage {
   updatePaymentTransaction(id: number, data: Partial<SelectPaymentTransaction>): Promise<SelectPaymentTransaction | undefined>;
   updatePaymentTransactionStatus(id: number, status: string, paidAt?: Date): Promise<void>;
   getAllPaymentTransactions(): Promise<SelectPaymentTransaction[]>;
+  findOrphanedPayment(userPhone: string, timeWindowMinutes?: number): Promise<SelectPaymentTransaction | undefined>;
 
   // Credit Note operations
   createCreditNote(creditNote: InsertCreditNote): Promise<CreditNote>;
@@ -1329,6 +1330,26 @@ export class DatabaseStorage implements IStorage {
   async getAllPaymentTransactions(): Promise<SelectPaymentTransaction[]> {
     return await db.select().from(paymentTransactions)
       .orderBy(desc(paymentTransactions.createdAt));
+  }
+
+  async findOrphanedPayment(userPhone: string, timeWindowMinutes: number = 120): Promise<SelectPaymentTransaction | undefined> {
+    // Find paid transactions without bookings for this user within the time window
+    const timeAgo = new Date(Date.now() - timeWindowMinutes * 60 * 1000);
+    
+    const [orphanedPayment] = await db.select()
+      .from(paymentTransactions)
+      .where(
+        and(
+          eq(paymentTransactions.status, 'paid'),
+          isNull(paymentTransactions.bookingId),
+          eq(paymentTransactions.customerPhone, userPhone),
+          sql`${paymentTransactions.createdAt} > ${timeAgo}`
+        )
+      )
+      .orderBy(desc(paymentTransactions.createdAt))
+      .limit(1);
+    
+    return orphanedPayment;
   }
 
   // Credit Note operations

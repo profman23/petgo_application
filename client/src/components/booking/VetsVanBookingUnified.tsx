@@ -469,12 +469,23 @@ export function VetsVanBookingUnified({
       
       localStorage.removeItem('pendingBookingDetails');
       
-      toast({
-        title: language === 'ar' ? 'تم تأكيد الحجز بنجاح!' : 'Booking Successfully Confirmed!',
-        description: language === 'ar' 
-          ? `تم حجز موعدك في ${data.booking.appointmentTime} بتاريخ ${data.booking.appointmentDate}`
-          : `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
-      });
+      // Show different message if orphaned payment was used
+      if (data.usedOrphanedPayment) {
+        toast({
+          title: language === 'ar' ? '✅ تم تأكيد الحجز بنجاح!' : '✅ Booking Successfully Confirmed!',
+          description: language === 'ar' 
+            ? `تم استخدام دفعتك السابقة (${data.orphanedPaymentAmount} ريال) لهذا الحجز الجديد في ${data.booking.appointmentTime} بتاريخ ${data.booking.appointmentDate}`
+            : `Your previous payment (${data.orphanedPaymentAmount} SAR) has been used for this new booking at ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
+          duration: 8000,
+        });
+      } else {
+        toast({
+          title: language === 'ar' ? 'تم تأكيد الحجز بنجاح!' : 'Booking Successfully Confirmed!',
+          description: language === 'ar' 
+            ? `تم حجز موعدك في ${data.booking.appointmentTime} بتاريخ ${data.booking.appointmentDate}`
+            : `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
+        });
+      }
 
       console.log('🔔 Booking created successfully:', data);
       
