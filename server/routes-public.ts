@@ -251,6 +251,15 @@ export function addPublicPaymentRoutes(app: any) {
       
       // Prepare payment request for MyFatoorah API
       const productionDomain = getProductionDomain();
+      
+      console.log('🌐 Domain detection:', {
+        REPLIT_DOMAINS: process.env.REPLIT_DOMAINS,
+        REPLIT_DEV_DOMAIN: process.env.REPLIT_DEV_DOMAIN,
+        selectedDomain: productionDomain,
+        callbackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
+        errorUrl: `https://${productionDomain}/vetsvan-booking?payment=failed`
+      });
+      
       const paymentRequest = {
         CustomerName: finalCustomerName,
         NotificationOption: 'EML',
@@ -349,6 +358,13 @@ export function addPublicPaymentRoutes(app: any) {
 
   // MyFatoorah payment callback handler
   app.get('/api/public/myfatoorah/callback', async (req: any, res: any) => {
+    console.log('📞 CALLBACK ENDPOINT HIT!', {
+      url: req.url,
+      query: req.query,
+      headers: req.headers,
+      timestamp: new Date().toISOString()
+    });
+    
     try {
       const { paymentId, Id, ref } = req.query;
       const actualPaymentId = paymentId || Id;
