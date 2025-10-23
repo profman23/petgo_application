@@ -469,23 +469,12 @@ export function VetsVanBookingUnified({
       
       localStorage.removeItem('pendingBookingDetails');
       
-      // Show different message if orphaned payment was used
-      if (data.usedOrphanedPayment) {
-        toast({
-          title: language === 'ar' ? '✅ تم تأكيد الحجز بنجاح!' : '✅ Booking Successfully Confirmed!',
-          description: language === 'ar' 
-            ? `تم استخدام دفعتك السابقة (${data.orphanedPaymentAmount} ريال) لهذا الحجز الجديد في ${data.booking.appointmentTime} بتاريخ ${data.booking.appointmentDate}`
-            : `Your previous payment (${data.orphanedPaymentAmount} SAR) has been used for this new booking at ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
-          duration: 8000,
-        });
-      } else {
-        toast({
-          title: language === 'ar' ? 'تم تأكيد الحجز بنجاح!' : 'Booking Successfully Confirmed!',
-          description: language === 'ar' 
-            ? `تم حجز موعدك في ${data.booking.appointmentTime} بتاريخ ${data.booking.appointmentDate}`
-            : `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
-        });
-      }
+      toast({
+        title: language === 'ar' ? 'تم تأكيد الحجز بنجاح!' : 'Booking Successfully Confirmed!',
+        description: language === 'ar' 
+          ? `تم حجز موعدك في ${data.booking.appointmentTime} بتاريخ ${data.booking.appointmentDate}`
+          : `Your appointment has been booked for ${data.booking.appointmentTime} on ${data.booking.appointmentDate}`,
+      });
 
       console.log('🔔 Booking created successfully:', data);
       
@@ -647,47 +636,6 @@ export function VetsVanBookingUnified({
           setPaymentReference(null);
           setPaymentId(null);
           return;
-        }
-        
-        // 🔍 URGENT FIX: Check for orphaned payment BEFORE creating new payment
-        // This prevents double payment when customer books after failed first attempt
-        try {
-          console.log('🔍 Checking for orphaned payment before creating new payment...');
-          const orphanedCheckResponse = await fetch('/api/bookings/check-orphaned-payment', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              ...getAuthHeaders(),
-            },
-            credentials: 'include',
-          });
-          
-          if (orphanedCheckResponse.ok) {
-            const orphanedData = await orphanedCheckResponse.json();
-            
-            if (orphanedData.hasOrphanedPayment && orphanedData.payment) {
-              console.log('✅ Found orphaned payment! Creating booking directly without new payment:', {
-                amount: orphanedData.payment.amount,
-                paymentId: orphanedData.payment.myfatoorahPaymentId
-              });
-              
-              // Create booking directly using orphaned payment
-              createBookingMutation.mutate({
-                vetsVanId: pendingBooking.vetsVanId,
-                timeSlot: pendingBooking.timeSlot,
-                vetsVanCode: pendingBooking.vetsVanCode,
-                paymentReference: orphanedData.payment.referenceId,
-                paymentId: orphanedData.payment.myfatoorahPaymentId
-              });
-              
-              return; // Skip payment creation!
-            } else {
-              console.log('ℹ️ No orphaned payment found, proceeding with normal payment flow');
-            }
-          }
-        } catch (orphanedCheckError) {
-          console.error('⚠️ Failed to check for orphaned payment, proceeding with normal flow:', orphanedCheckError);
-          // Continue with normal payment flow if check fails
         }
         
         // Create payment for customer bookings
