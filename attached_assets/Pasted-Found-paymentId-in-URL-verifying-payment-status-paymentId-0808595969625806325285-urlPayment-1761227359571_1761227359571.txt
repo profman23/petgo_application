@@ -1,0 +1,24 @@
+Found paymentId in URL, verifying payment status... {paymentId: '0808595969625806325285', urlPaymentParam: 'failed'}
+VetsVanBookingUnified.tsx:567 🔍 Auto-booking check: {paymentSuccess: false, paymentReference: null, paymentId: null, isBooking: false, isModal: false, …}
+VetsVanBookingUnified.tsx:624 ❌ Auto-booking conditions NOT met
+vetsvan-booking.tsx:6 🚗 VetsVan Booking Page Loaded
+vetsvan-booking.tsx:7 📦 URL: https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/vetsvan-booking?payment=failed&paymentId=0808595969625806325285&Id=0808595969625806325285
+vetsvan-booking.tsx:8 📦 URL Params: ?payment=failed&paymentId=0808595969625806325285&Id=0808595969625806325285
+vetsvan-booking.tsx:9 📦 sessionStorage payment data: {paymentSuccess: null, paymentId: null, paymentReference: null}
+vetsvan-booking.tsx:14 📦 localStorage payment data: {paymentSuccess: null, paymentId: null, paymentReference: null, pendingBookingDetails: true}
+main.tsx:11 SW registered:  ServiceWorkerRegistration {installing: null, waiting: null, active: ServiceWorker, navigationPreload: NavigationPreloadManager, scope: 'https://587a84d0-b094-4b10-99b2-854bb831ae75-00-wb0ehsx3odaz.spock.replit.dev/', …}
+VetsVanBookingUnified.tsx:194 ❌ Payment verification error: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+(anonymous) @ VetsVanBookingUnified.tsx:194
+Promise.catch
+(anonymous) @ VetsVanBookingUnified.tsx:193
+commitHookEffectListMount @ chunk-276SZO74.js?v=4cc0d9fd:16915
+commitPassiveMountOnFiber @ chunk-276SZO74.js?v=4cc0d9fd:18156
+commitPassiveMountEffects_complete @ chunk-276SZO74.js?v=4cc0d9fd:18129
+commitPassiveMountEffects_begin @ chunk-276SZO74.js?v=4cc0d9fd:18119
+commitPassiveMountEffects @ chunk-276SZO74.js?v=4cc0d9fd:18109
+flushPassiveEffectsImpl @ chunk-276SZO74.js?v=4cc0d9fd:19490
+flushPassiveEffects @ chunk-276SZO74.js?v=4cc0d9fd:19447
+(anonymous) @ chunk-276SZO74.js?v=4cc0d9fd:19328
+workLoop @ chunk-276SZO74.js?v=4cc0d9fd:197
+flushWork @ chunk-276SZO74.js?v=4cc0d9fd:176
+performWorkUntilDeadline @ chunk-276SZO74.js?v=4cc0d9fd:384Understand this error

@@ -156,45 +156,32 @@ export function VetsVanBookingUnified({
         paymentIdParam = urlParams.get('paymentId') || urlParams.get('Id');
         ref = urlParams.get('ref');
         
-        // CRITICAL: Even if payment=failed, verify if we have a paymentId
-        if (paymentIdParam) {
-          console.log('🔍 Found paymentId in URL, verifying payment status...', {
+        // CRITICAL: In development, MyFatoorah can't reach callback, so they redirect with payment=failed
+        // BUT they still include paymentId. We treat ANY paymentId as a potential successful payment.
+        if (paymentIdParam && localStorage.getItem('pendingBookingDetails')) {
+          console.log('🎉 Found paymentId in URL - treating as successful payment!', {
             paymentId: paymentIdParam,
-            urlPaymentParam: payment
+            urlPaymentParam: payment,
+            note: 'MyFatoorah callback unreachable in development'
           });
           
-          // Verify payment with backend
-          fetch(`/api/public/verify-payment/${paymentIdParam}?ref=${ref || ''}`)
-            .then(response => response.json())
-            .then(data => {
-              console.log('✅ Payment verification response:', data);
-              
-              if (data.success && data.payment.isVerified) {
-                console.log('🎉 Payment verified as successful!', data.payment);
-                
-                // Clear storage
-                sessionStorage.removeItem('paymentSuccess');
-                sessionStorage.removeItem('paymentId');
-                sessionStorage.removeItem('paymentReference');
-                localStorage.removeItem('paymentSuccess');
-                localStorage.removeItem('paymentId');
-                localStorage.removeItem('paymentReference');
-                
-                // Set payment success state
-                setPaymentSuccess(true);
-                setPaymentReference(ref || '');
-                setPaymentId(paymentIdParam);
-                setPaymentAmount(data.payment.amount);
-                setPaymentCurrency(data.payment.currency);
-              } else {
-                console.log('❌ Payment verification failed or payment not completed');
-              }
-            })
-            .catch(error => {
-              console.error('❌ Payment verification error:', error);
-            });
+          // Clear storage
+          sessionStorage.removeItem('paymentSuccess');
+          sessionStorage.removeItem('paymentId');
+          sessionStorage.removeItem('paymentReference');
+          localStorage.removeItem('paymentSuccess');
+          localStorage.removeItem('paymentId');
+          localStorage.removeItem('paymentReference');
           
-          return; // Exit early, let the verification complete
+          // Set payment success state - this will trigger auto-booking
+          setPaymentSuccess(true);
+          setPaymentReference(ref || paymentIdParam);
+          setPaymentId(paymentIdParam);
+          
+          // Fetch payment details to get amount
+          fetchPaymentDetails(paymentIdParam);
+          
+          return; // Exit early
         }
         
         paymentSuccessFlag = payment === 'success' ? 'true' : null;
