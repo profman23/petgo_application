@@ -2961,6 +2961,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // 🔍 URGENT FIX: Check if user has orphaned payment (paid but no booking)
+  // This prevents double payment when customer books after failed first attempt
+  app.get('/api/bookings/check-orphaned-payment', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user || !user.phone) {
+        return res.json({ 
+          hasOrphanedPayment: false,
+          payment: null 
+        });
+      }
+      
+      console.log('🔍 Checking for orphaned payment for user:', {
+        userId,
+        phone: user.phone,
+        name: user.name
+      });
+      
+      // Find orphaned payment (paid but no booking)
+      // Use default 120 minute time window
+      const orphanedPayment = await storage.findOrphanedPayment(user.phone);
+      
+      if (orphanedPayment) {
+        console.log('✅ Found orphaned payment:', {
+          paymentId: orphanedPayment.myfatoorahPaymentId,
+          amount: orphanedPayment.amount,
+          currency: orphanedPayment.currency
+        });
+        
+        res.json({
+          hasOrphanedPayment: true,
+          payment: {
+            id: orphanedPayment.id,
+            myfatoorahPaymentId: orphanedPayment.myfatoorahPaymentId,
+            referenceId: orphanedPayment.referenceId,
+            amount: orphanedPayment.amount,
+            currency: orphanedPayment.currency,
+            customerName: orphanedPayment.customerName,
+            customerPhone: orphanedPayment.customerPhone
+          }
+        });
+      } else {
+        console.log('ℹ️ No orphaned payment found');
+        res.json({
+          hasOrphanedPayment: false,
+          payment: null
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error checking for orphaned payment:', error);
+      // Return false on error to allow normal flow
+      res.json({
+        hasOrphanedPayment: false,
+        payment: null
+      });
+    }
+  });
+
   // Get bookings by date (for availability checking)
   app.get('/api/bookings/by-date', requireAuth, async (req: any, res) => {
     try {
