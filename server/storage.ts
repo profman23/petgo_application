@@ -1,6 +1,6 @@
 import { users, drivers, rides, patients, admins, adminUsers, shifts, bookings, reviews, petVitals, petAttachments, invoiceItems, invoiceStatus, products, services, importHistory, otpVerifications, generatedInvoices, invoicePayments, userSessions, paymentTransactions, creditNotes, outgoingPayments, incomePayments, authorizationRoles, type User, type Driver, type Ride, type InsertUser, type RideRequest, type Patient, type InsertPatient, type Admin, type InsertDriver, type Shift, type InsertShift, type Booking, type InsertBooking, type Review, type InsertReview, type PetVital, type InsertPetVital, type PetAttachment, type InsertPetAttachment, type InvoiceItem, type InsertInvoiceItem, type InvoiceStatus, type InsertInvoiceStatus, type Product, type InsertProduct, type Service, type InsertService, type ImportHistory, type InsertImportHistory, type OtpVerification, type InsertOtpVerification, type GeneratedInvoice, type InsertGeneratedInvoice, type InvoicePayment, type InsertInvoicePayment, type UserSession, type InsertUserSession, type SelectPaymentTransaction, type InsertPaymentTransaction, type CreditNote, type InsertCreditNote, type OutgoingPayment, type InsertOutgoingPayment, type IncomePayment, type InsertIncomePayment, type AuthorizationRole, type InsertAuthorizationRole } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, not, inArray, desc, lt, sql } from "drizzle-orm";
+import { eq, and, not, inArray, desc, lt, sql, isNull } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
