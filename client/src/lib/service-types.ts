@@ -19,6 +19,13 @@ export interface ServiceTypeOption {
 
 export const SERVICE_TYPE_OPTIONS: ServiceTypeOption[] = [
   {
+    value: 'home-consultation',
+    labelEn: 'Home Consultation',
+    labelAr: 'استشارة منزلية',
+    icon: Home,
+    iconColor: 'text-purple-600'
+  },
+  {
     value: 'national-day-vaccination',
     labelEn: 'National Day 95 Offer Vaccination & Deworming',
     labelAr: 'عرض اليوم الوطني 95 تطعيم ومكافحة الديدان',

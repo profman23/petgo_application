@@ -136,8 +136,16 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   const petCount = selectedPets.length;
   let total = 0;
 
+  // Home Consultation pricing (regular service)
+  if (serviceType === 'home-consultation') {
+    if (petCount <= 2) {
+      total = 399; // 1-2 pets: 399 SAR
+    } else {
+      total = 798; // 3+ pets: 798 SAR (capped)
+    }
+  }
   // National Day 95 Offer pricing for Home Consultation
-  if (serviceType === 'national-day-home-consultation') {
+  else if (serviceType === 'national-day-home-consultation') {
     if (petCount <= 2) {
       total = 195; // 1-2 pets: 195 SAR
     } else if (petCount === 3) {
@@ -1449,7 +1457,7 @@ export default function RideRequest() {
             
             {/* Estimated Cost Display */}
             {selectedPatients.length > 0 && 
-             ['first-visit', 'general-checkup', 'national-day-home-consultation', 'national-day-vaccination', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
+             ['home-consultation', 'first-visit', 'general-checkup', 'national-day-home-consultation', 'national-day-vaccination', 'vaccination', 'deworming', 'free-deworming', 'test-service', 'fleas-ticks-prevention', 'pickup-drop'].includes(serviceType) && (
               <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
                 {(() => {
                   const costData = getEstimatedCost(selectedPatients, patients, serviceType);
