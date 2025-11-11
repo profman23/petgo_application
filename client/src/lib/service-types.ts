@@ -26,20 +26,6 @@ export const SERVICE_TYPE_OPTIONS: ServiceTypeOption[] = [
     iconColor: 'text-purple-600'
   },
   {
-    value: 'national-day-vaccination',
-    labelEn: 'National Day 95 Offer Vaccination & Deworming',
-    labelAr: 'عرض اليوم الوطني 95 تطعيم ومكافحة الديدان',
-    icon: Pill,
-    iconColor: 'text-blue-600'
-  },
-  {
-    value: 'national-day-home-consultation',
-    labelEn: 'National Day 95 Offer Home Consultation',
-    labelAr: 'عرض اليوم الوطني 95 استشارة منزلية',
-    icon: Home,
-    iconColor: 'text-green-700'
-  },
-  {
     value: 'pickup-drop',
     labelEn: 'Pickup & Drop',
     labelAr: 'نقل وتوصيل',
