@@ -139,7 +139,7 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
   // Home Consultation pricing (regular service)
   if (serviceType === 'home-consultation') {
     if (petCount <= 2) {
-      total = 399; // 1-2 pets: 399 SAR
+      total = 300; // 1-2 pets: 300 SAR
     } else {
       total = 798; // 3+ pets: 798 SAR (capped)
     }
