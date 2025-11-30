@@ -141,7 +141,7 @@ const getEstimatedCost = (selectedPetIds: number[], patients: Patient[], service
     if (petCount <= 2) {
       total = 300; // 1-2 pets: 300 SAR
     } else {
-      total = 798; // 3+ pets: 798 SAR (capped)
+      total = 600; // 3+ pets: 600 SAR (capped)
     }
   }
   // National Day 95 Offer pricing for Home Consultation
