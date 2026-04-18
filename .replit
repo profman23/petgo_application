@@ -97,4 +97,4 @@ localPort = 46587
 externalPort = 8099
 
 [agent]
-integrations = ["javascript_database==1.0.0"]
+integrations = ["javascript_database:1.0.0"]
