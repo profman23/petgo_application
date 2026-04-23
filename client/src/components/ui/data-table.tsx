@@ -26,34 +26,39 @@ export interface DataTableProps<T = any> {
   // Data
   data: T[];
   keyField?: string; // Field to use as React key (defaults to 'id')
-  
+
   // Columns configuration
   columns: DataTableColumn<T>[];
-  
+
   // Actions configuration (optional)
   actions?: DataTableAction<T>[];
   actionsLabel?: { ar: string; en: string };
-  
+
   // Loading and empty states
   isLoading?: boolean;
   loadingText?: { ar: string; en: string };
   emptyStateText?: { ar: string; en: string };
   emptySearchText?: { ar: string; en: string };
   showEmptySearch?: boolean;
-  
+
   // Styling customization
   className?: string;
   tableClassName?: string;
   headerClassName?: string;
   rowClassName?: string | ((item: T, index: number) => string);
-  
+
   // Table features
   hover?: boolean;
   striped?: boolean;
   bordered?: boolean;
   responsive?: boolean;
   verticalSeparators?: boolean;
-  
+
+  // Mobile responsiveness (NEW — backwards compatible)
+  // When provided, below `mobileBreakpoint` the table is replaced with cards.
+  mobileCardRender?: (item: T, index: number) => React.ReactNode;
+  mobileBreakpoint?: 'sm' | 'md'; // sm => hidden at <640, md => hidden at <768. Default: 'md'
+
   // Optional features
   onRowClick?: (item: T) => void;
   rowTestId?: string;
@@ -79,6 +84,8 @@ export function DataTable<T = any>({
   bordered = false,
   responsive = true,
   verticalSeparators = false,
+  mobileCardRender,
+  mobileBreakpoint = 'md',
   onRowClick,
   rowTestId = 'table-row'
 }: DataTableProps<T>) {
@@ -219,15 +226,35 @@ export function DataTable<T = any>({
   // Show actions column if actions are provided
   const showActions = actions && actions.length > 0;
 
+  // Classes for hide/show based on mobileBreakpoint.
+  // 'md' means: cards on <768, table on >=768.
+  // 'sm' means: cards on <640, table on >=640.
+  const cardsVisibilityClass = mobileBreakpoint === 'sm' ? 'sm:hidden' : 'md:hidden';
+  const tableVisibilityClass = mobileBreakpoint === 'sm' ? 'hidden sm:block' : 'hidden md:block';
+
   return (
     <div className={className}>
-      {responsive ? (
-        <div className="overflow-x-auto">
-          <TableContent />
+      {/* Mobile: cards (only when mobileCardRender is provided) */}
+      {mobileCardRender && (
+        <div className={`${cardsVisibilityClass} space-y-3 p-3`}>
+          {sortedData.map((item, index) => (
+            <div key={(item as any)[keyField] || index} data-testid={`${rowTestId}-mobile-${index}`}>
+              {mobileCardRender(item, index)}
+            </div>
+          ))}
         </div>
-      ) : (
-        <TableContent />
       )}
+
+      {/* Desktop: table (hidden below breakpoint when mobileCardRender is provided) */}
+      <div className={mobileCardRender ? tableVisibilityClass : ''}>
+        {responsive ? (
+          <div className="overflow-x-auto">
+            <TableContent />
+          </div>
+        ) : (
+          <TableContent />
+        )}
+      </div>
     </div>
   );
 

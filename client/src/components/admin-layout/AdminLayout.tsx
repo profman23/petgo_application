@@ -68,27 +68,40 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
     setLocation("/admin-login");
   };
 
+  const isRTL = language === 'ar';
+
   return (
     <div className="min-h-screen bg-gray-50" dir={getDirection(language)}>
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            {/* Logo and Mobile Menu */}
-            <div className="flex items-center">
-              {/* Mobile Menu Trigger */}
+        <div className="max-w-full mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-2 sm:py-3 md:py-4 gap-2">
+            {/* Logo + Mobile Menu */}
+            <div className="flex items-center gap-2 min-w-0">
+              {/* Mobile Menu Trigger (hidden on desktop) */}
               <Sheet open={isMobileSidebarOpen} onOpenChange={setIsMobileSidebarOpen}>
                 <SheetTrigger asChild>
-                  <button className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 mr-2">
+                  <button
+                    className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0"
+                    aria-label="Menu"
+                  >
                     <Menu className="h-6 w-6" />
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-64 p-0">
-                  <div className="flex flex-col h-full bg-white">
+                <SheetContent
+                  side={isRTL ? 'right' : 'left'}
+                  className="w-72 sm:w-80 p-0"
+                  dir={getDirection(language)}
+                >
+                  <div className="flex flex-col h-full bg-white" dir={getDirection(language)}>
                     <div className="p-4 border-b">
                       <div className="flex items-center gap-2">
-                        <img src={vetsVanLogo} alt="PetGo Logo" className="h-12 w-auto object-contain" />
-                        <span className="text-lg font-semibold text-purple-800">PetGo</span>
+                        <img
+                          src={vetsVanLogo}
+                          alt="PetGo Logo"
+                          className="h-10 w-auto object-contain"
+                        />
+                        <span className="text-lg font-semibold text-blue-800">PetGo</span>
                       </div>
                     </div>
                     <MobileSidebar />
@@ -96,26 +109,27 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 </SheetContent>
               </Sheet>
 
-              {/* Logo */}
-              <div className="flex items-center">
-                <img
-                  src={vetsVanLogo}
-                  alt="PetGo"
-                  className="h-20 md:h-24 w-auto object-contain"
-                />
-              </div>
+              {/* Logo — responsive */}
+              <img
+                src={vetsVanLogo}
+                alt="PetGo"
+                className="h-10 sm:h-14 md:h-16 lg:h-20 w-auto object-contain"
+              />
             </div>
 
             {/* Header Controls */}
-            <div className="flex items-center space-x-4">
-              {/* Language Selector */}
-              <LanguageSelector />
+            <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+              {/* Language Selector — hidden on smallest screen to save space */}
+              <div className="hidden sm:block">
+                <LanguageSelector />
+              </div>
 
               {/* Audio Toggle */}
               <button
                 onClick={() => setAudioEnabled(!audioEnabled)}
                 className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                title={audioEnabled ? "Disable Audio Notifications" : "Enable Audio Notifications"}
+                title={audioEnabled ? 'Disable Audio Notifications' : 'Enable Audio Notifications'}
+                aria-label="Toggle audio notifications"
               >
                 {audioEnabled ? (
                   <Volume2 className="h-5 w-5" />
@@ -128,6 +142,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
               <button
                 onClick={() => setLocation('/admin-vetsvan-requests')}
                 className="relative p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                aria-label="Notifications"
               >
                 <Bell className="h-5 w-5" />
                 {currentRequestCount > 0 && (
@@ -142,6 +157,7 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                 onClick={handleLogout}
                 className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                 title={language === 'ar' ? 'تسجيل الخروج' : 'Logout'}
+                aria-label="Logout"
               >
                 <LogOut className="h-5 w-5" />
               </button>
@@ -153,12 +169,12 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
       {/* Main Content with Sidebar */}
       <div className="flex">
         {/* Desktop Sidebar */}
-        <div className="hidden md:block w-64 bg-white shadow-lg min-h-screen">
+        <div className="hidden md:block md:w-56 lg:w-64 bg-white shadow-lg min-h-screen shrink-0">
           <Sidebar />
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 min-h-screen">
+        <div className="flex-1 min-h-screen min-w-0 overflow-x-hidden">
           {children}
         </div>
       </div>
