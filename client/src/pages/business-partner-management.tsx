@@ -268,7 +268,7 @@ export default function BusinessPartnerManagement() {
               src="https://cdn.lordicon.com/rcuovkuy.json"
               trigger={triggerAnimation}
               delay="1500"
-              colors="primary:#852085,secondary:#545454"
+              colors="primary:#1E50C8,secondary:#545454"
               style={{width:'80px',height:'80px'}}
             />
             
@@ -342,7 +342,7 @@ export default function BusinessPartnerManagement() {
               }`}
               data-testid="button-create-partner"
             >
-              <FilePlus className="h-4 w-4" style={{ color: isReadOnly ? '#9ca3af' : '#852085' }} />
+              <FilePlus className="h-4 w-4" style={{ color: isReadOnly ? '#9ca3af' : '#1E50C8' }} />
               <span style={{ fontFamily: 'Arimo' }}>
                 {getButtonText()}
               </span>

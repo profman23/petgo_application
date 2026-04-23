@@ -4,3 +4,40 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Environment files — NEVER commit these. All contain secrets.
+.env
+.env.*
+!.env.example
+
+# Local logs and cookies
+*.log
+cookies.txt
+admin_cookies.txt
+admin_session.txt
+customer_cookies.txt
+customer_test_cookies.txt
+doctor_session_cookies.txt
+fresh_customer_session.txt
+new_admin_cookies.txt
+new_customer_cookies.txt
+
+# IDE / OS
+.vscode/settings.json
+.idea
+Thumbs.db
+
+# Temp / backup files
+*.backup
+*.bak
+*-backup.*
+*-old.*
+temp_*
+client/temp_*
+
+# Claude / Replit internal (not part of app)
+.claude/
+.local/
+.config/
+.agents/
+.replit

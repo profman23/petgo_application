@@ -634,7 +634,7 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
             <div className="flex-shrink-0">
               <div 
                 dangerouslySetInnerHTML={{
-                  __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                  __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="hover" colors="primary:#1E50C8,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
                 }}
               />
             </div>
@@ -857,13 +857,13 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                       onClick={handleAddItem}
                       className="px-4 border-2 font-medium rounded-md transition-colors duration-200 flex items-center gap-2 bg-white hover:bg-purple-50"
                       style={{ 
-                        borderColor: '#852085', 
-                        color: '#852085',
+                        borderColor: '#1E50C8', 
+                        color: '#1E50C8',
                         height: '25px'
                       }}
                       data-testid="button-add-item"
                     >
-                      <Plus className="w-4 h-4" style={{ color: '#852085' }} />
+                      <Plus className="w-4 h-4" style={{ color: '#1E50C8' }} />
                       {language === 'ar' ? 'إضافة عنصر' : 'Add Item'}
                     </button>
                   )}
@@ -1105,12 +1105,12 @@ export function CreditNoteModal({ isOpen, onOpenChange, onCreditNoteCreated, vie
                       : 'bg-gray-100 cursor-not-allowed'
                   }`}
                   style={{ 
-                    borderColor: selectedCustomer ? '#852085' : '#9CA3AF',
-                    color: selectedCustomer ? '#852085' : '#9CA3AF'
+                    borderColor: selectedCustomer ? '#1E50C8' : '#9CA3AF',
+                    color: selectedCustomer ? '#1E50C8' : '#9CA3AF'
                   }}
                   data-testid="button-save"
                 >
-                  <FilePlus className="h-4 w-4" style={{ color: selectedCustomer ? '#852085' : '#9CA3AF' }} />
+                  <FilePlus className="h-4 w-4" style={{ color: selectedCustomer ? '#1E50C8' : '#9CA3AF' }} />
                   {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
                 </button>
               )}

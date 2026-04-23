@@ -191,7 +191,7 @@ export default function Account() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br #85208550 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br #1E50C850 to-white flex items-center justify-center">
         <div className="text-purple-600">{t('loading')}</div>
       </div>
     );
@@ -206,7 +206,7 @@ export default function Account() {
             <div className="flex items-center">
               <img 
                 src={logoPath} 
-                alt="VETS VAN Logo" 
+                alt="PetGo Logo" 
                 className="h-8 w-auto object-contain logo-clean"
                 style={{ 
                   maxWidth: '60px',
@@ -254,7 +254,7 @@ export default function Account() {
             <CircleUserRound 
               size={80} 
               style={{ 
-                color: '#852085',
+                color: '#1E50C8',
                 strokeWidth: '1px'
               }}
             />
@@ -337,7 +337,7 @@ export default function Account() {
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#1E50C8 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('firstNamePlaceholder')}
               />
             </div>
@@ -357,7 +357,7 @@ export default function Account() {
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#1E50C8 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={t('lastNamePlaceholder')}
               />
             </div>
@@ -379,7 +379,7 @@ export default function Account() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#1E50C8 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                 placeholder={language === 'ar' ? 'أدخل الإيميل' : 'Enter Email'}
               />
             </div>
@@ -419,7 +419,7 @@ export default function Account() {
                 type="date"
                 value={birthdate}
                 onChange={(e) => setBirthdate(e.target.value)}
-                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#1E50C8 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
               />
             </div>
           </div>
@@ -470,7 +470,7 @@ export default function Account() {
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#1E50C8 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('currentPassword')}
                 />
               </div>
@@ -490,7 +490,7 @@ export default function Account() {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#1E50C8 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('newPassword')}
                 />
               </div>
@@ -510,7 +510,7 @@ export default function Account() {
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#852085 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
+                  className={`w-full h-10 rounded-md border border-purple-600 bg-white px-3 py-2 text-sm focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-#1E50C8 ${direction === 'rtl' ? 'pr-10 text-right' : 'pl-10'}`}
                   placeholder={t('confirmNewPassword')}
                 />
               </div>

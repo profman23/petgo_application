@@ -30,7 +30,7 @@ export default function UserTypeSelection() {
           <div className="w-20 h-20 flex items-center justify-center mx-auto mb-4">
             <img 
               src={logoImage} 
-              alt="Vets Van" 
+              alt="PetGo" 
               className="w-full h-full object-contain rounded-full border-2" 
               style={{ borderColor: 'var(--purple-primary)' }}
             />

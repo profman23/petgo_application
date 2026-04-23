@@ -126,7 +126,7 @@ export default function DoctorLogin() {
               <div className="bg-white rounded-2xl p-3 shadow-md transition-all duration-300 hover:scale-105">
                 <img 
                   src={logoImage} 
-                  alt="Vets Van" 
+                  alt="PetGo" 
                   className="h-16 w-auto max-w-[200px] object-contain mx-auto"
                   style={{ 
                     filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1)) contrast(1.05)',

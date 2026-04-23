@@ -55,11 +55,11 @@ const InvoiceView = () => {
     if (booking) {
       // Set doctor info based on booking
       const doctorData = {
-        name: booking.vetsVan?.name || 'VETS VAN Doctor',
+        name: booking.vetsVan?.name || 'PetGo Doctor',
         license: 'VET-2024-001',
         specialty: language === 'ar' ? 'طب بيطري عام' : 'General Veterinary Medicine',
-        phone: '+966 50 123 4567',
-        email: 'doctor@vetsvan.com'
+        phone: '+9660000000',
+        email: 'profman23@gmail.com'
       };
       setDoctorInfo(doctorData);
     }

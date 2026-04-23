@@ -233,7 +233,7 @@ export default function FinancialOutgoingPayment() {
                 src="https://cdn.lordicon.com/uemybdyy.json" 
                 trigger={triggerAnimation}
                 delay="1500"
-                colors="primary:#852085,secondary:#848484" 
+                colors="primary:#1E50C8,secondary:#848484" 
                 style={{ width: '80px', height: '80px' }}
               />
             </div>
@@ -255,7 +255,7 @@ export default function FinancialOutgoingPayment() {
             }`}
             data-testid="button-create-outgoing-payment"
           >
-            <FilePlus className="h-4 w-4" style={{ color: isReadOnly ? '#9ca3af' : '#852085' }} />
+            <FilePlus className="h-4 w-4" style={{ color: isReadOnly ? '#9ca3af' : '#1E50C8' }} />
             {language === 'ar' ? 'إنشاء دفع صادر' : 'Create Outgoing Payment'}
           </button>
         </div>

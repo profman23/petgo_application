@@ -180,7 +180,7 @@ export function InvoiceMapModal({
                 src="https://cdn.lordicon.com/wsvtrygf.json"
                 trigger="loop"
                 delay="1500"
-                colors="primary:#852085,secondary:#545454"
+                colors="primary:#1E50C8,secondary:#545454"
                 style={{ width: '80px', height: '80px' }}
               ></lord-icon>
               <h2 className="text-xl font-bold text-gray-800">
@@ -226,7 +226,7 @@ export function InvoiceMapModal({
                           y1={invoicePos.y + 85}  // Invoice box center + half height
                           x2={creditNotePos.x}    // Credit note box left edge
                           y2={creditNotePos.y + 80} // Credit note box center + half height
-                          stroke="#8B2F8B"
+                          stroke="#1E50C8"
                           strokeWidth="2"
                           strokeDasharray="none"
                         />
@@ -272,7 +272,7 @@ export function InvoiceMapModal({
                           y1={paymentPos.y + 80}  // Payment box center + half height
                           x2={creditNotePos.x + 250}    // Credit note box right edge
                           y2={creditNotePos.y + 80} // Credit note box center + half height
-                          stroke="#8B2F8B"
+                          stroke="#1E50C8"
                           strokeWidth="2"
                           strokeDasharray="none"
                         />
@@ -314,7 +314,7 @@ export function InvoiceMapModal({
                 style={{
                   left: boxPositions[`invoice-${invoice.invoiceNumber}`].x,
                   top: boxPositions[`invoice-${invoice.invoiceNumber}`].y,
-                  borderColor: '#8B2F8B',
+                  borderColor: '#1E50C8',
                   width: '300px',
                   height: '170px'
                 }}
@@ -366,7 +366,7 @@ export function InvoiceMapModal({
                   style={{
                     left: position.x,
                     top: position.y,
-                    borderColor: '#8B2F8B',
+                    borderColor: '#1E50C8',
                     width: '250px',
                     height: '160px'
                   }}

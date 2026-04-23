@@ -7,21 +7,31 @@ interface EmailTemplate {
   text?: string;
 }
 
+const EMAIL_ENABLED = process.env.EMAIL_ENABLED === 'true';
+
 export class EmailService {
   private fromEmail: string;
-  private transporter: nodemailer.Transporter;
+  private transporter: nodemailer.Transporter | null = null;
 
   constructor() {
-    this.fromEmail = process.env.FROM_EMAIL || 'info@vetsvan.com';
-    
-    // Create transporter for Outlook SMTP
+    this.fromEmail = process.env.FROM_EMAIL || 'profman23@gmail.com';
+
+    if (!EMAIL_ENABLED) {
+      console.log('📧 EmailService: DISABLED (EMAIL_ENABLED=false). Emails will be logged to console.');
+      return;
+    }
+
+    if (!process.env.EMAIL_PASSWORD) {
+      throw new Error('EMAIL_PASSWORD environment variable is required when EMAIL_ENABLED=true');
+    }
+
     this.transporter = nodemailer.createTransport({
       host: 'smtp-mail.outlook.com',
       port: 587,
-      secure: false, // true for 465, false for other ports
+      secure: false,
       auth: {
         user: this.fromEmail,
-        pass: process.env.EMAIL_PASSWORD || 'defaultpassword'
+        pass: process.env.EMAIL_PASSWORD
       },
       tls: {
         ciphers: 'SSLv3'
@@ -37,7 +47,7 @@ export class EmailService {
 
     const template: EmailTemplate = {
       to: userEmail,
-      subject: 'تأكيد إنشاء الحساب - Account Verification - VETS VAN',
+      subject: 'تأكيد إنشاء الحساب - Account Verification - PetGo',
       html: this.generateOtpVerificationHTML(userName, otpCode),
       text: this.generateOtpVerificationText(userName, otpCode)
     };
@@ -49,7 +59,7 @@ export class EmailService {
     try {
       const template: EmailTemplate = {
         to: userEmail,
-        subject: 'مرحباً بك في خدمة VETS VAN',
+        subject: 'مرحباً بك في خدمة PetGo',
         html: this.generateWelcomeEmailHTML(userName, petName),
         text: this.generateWelcomeEmailText(userName, petName)
       };
@@ -76,7 +86,7 @@ export class EmailService {
 
       const template: EmailTemplate = {
         to: userEmail,
-        subject: 'تأكيد موعد خدمة VETS VAN',
+        subject: 'تأكيد موعد خدمة PetGo',
         html: this.generateBookingConfirmationHTML(userName, appointmentDate, appointmentTime, vetsVanName, isToday),
         text: this.generateBookingConfirmationText(userName, appointmentDate, appointmentTime, vetsVanName, isToday)
       };
@@ -97,7 +107,7 @@ export class EmailService {
     try {
       const template: EmailTemplate = {
         to: userEmail,
-        subject: 'VETS VAN في الطريق إليك الآن',
+        subject: 'PetGo في الطريق إليك الآن',
         html: this.generatePreAppointmentHTML(userName, appointmentTime, vetsVanName),
         text: this.generatePreAppointmentText(userName, appointmentTime, vetsVanName)
       };
@@ -118,7 +128,7 @@ export class EmailService {
     try {
       const template: EmailTemplate = {
         to: userEmail,
-        subject: 'تم إكمال خدمة VETS VAN - يرجى تقييم الخدمة',
+        subject: 'تم إكمال خدمة PetGo - يرجى تقييم الخدمة',
         html: this.generateServiceCompletionHTML(userName, appointmentDate, appointmentTime),
         text: this.generateServiceCompletionText(userName, appointmentDate, appointmentTime)
       };
@@ -153,8 +163,15 @@ export class EmailService {
   }
 
   private async sendEmailInternal(template: EmailTemplate): Promise<boolean> {
+    if (!this.transporter) {
+      console.log('📧 [EMAIL DISABLED] Would send:');
+      console.log(`   To: ${template.to}`);
+      console.log(`   Subject: ${template.subject}`);
+      if (template.text) console.log(`   Text: ${template.text.substring(0, 200)}`);
+      return true;
+    }
+
     try {
-      // Try to send email via SMTP
       const mailOptions = {
         from: this.fromEmail,
         to: template.to,
@@ -191,7 +208,7 @@ export class EmailService {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>مرحباً بك في VETS VAN</title>
+        <title>مرحباً بك في PetGo</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -206,12 +223,12 @@ export class EmailService {
       <body>
         <div class="container">
           <div class="header">
-            <h1>🚐 VETS VAN</h1>
+            <h1>🚐 PetGo</h1>
             <p>عيادة بيطرية متنقلة</p>
           </div>
           <div class="content">
             <h2>مرحباً ${userName}!</h2>
-            <p>نحن سعداء جداً لانضمامك إلى عائلة VETS VAN. تم تسجيل حسابك بنجاح ونحن جاهزون لخدمة حيوانك الأليف الجميل <strong>${petName}</strong>.</p>
+            <p>نحن سعداء جداً لانضمامك إلى عائلة PetGo. تم تسجيل حسابك بنجاح ونحن جاهزون لخدمة حيوانك الأليف الجميل <strong>${petName}</strong>.</p>
             
             <h3>ما الذي يمكنك توقعه:</h3>
             <ul>
@@ -229,7 +246,7 @@ export class EmailService {
             </div>
           </div>
           <div class="footer">
-            <p>🐾 VETS VAN - نحن نأتي إليك 🐾</p>
+            <p>🐾 PetGo - نحن نأتي إليك 🐾</p>
             <p>لأي استفسارات، تواصل معنا عبر التطبيق</p>
           </div>
         </div>
@@ -242,7 +259,7 @@ export class EmailService {
     return `
 مرحباً ${userName}!
 
-نحن سعداء جداً لانضمامك إلى عائلة VETS VAN. تم تسجيل حسابك بنجاح ونحن جاهزون لخدمة حيوانك الأليف الجميل ${petName}.
+نحن سعداء جداً لانضمامك إلى عائلة PetGo. تم تسجيل حسابك بنجاح ونحن جاهزون لخدمة حيوانك الأليف الجميل ${petName}.
 
 ما الذي يمكنك توقعه:
 - خدمة بيطرية عالية الجودة في منزلك
@@ -253,7 +270,7 @@ export class EmailService {
 
 يمكنك الآن بدء استخدام خدماتنا وحجز أول موعد لـ ${petName}.
 
-VETS VAN - نحن نأتي إليك
+PetGo - نحن نأتي إليك
 لأي استفسارات، تواصل معنا عبر التطبيق
     `;
   }
@@ -271,7 +288,7 @@ VETS VAN - نحن نأتي إليك
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>تأكيد موعد VETS VAN</title>
+        <title>تأكيد موعد PetGo</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -287,7 +304,7 @@ VETS VAN - نحن نأتي إليك
         <div class="container">
           <div class="header">
             <h1>✅ تم تأكيد موعدك</h1>
-            <p>${isToday ? 'VETS VAN في طريقه إليك' : 'موعدك محجوز بنجاح'}</p>
+            <p>${isToday ? 'PetGo في طريقه إليك' : 'موعدك محجوز بنجاح'}</p>
           </div>
           <div class="content">
             <h2>عزيزي ${userName},</h2>
@@ -311,7 +328,7 @@ VETS VAN - نحن نأتي إليك
             <p><strong>ملاحظة:</strong> سيصلك إشعار قبل وصول الطبيب البيطري بـ 15 دقيقة.</p>
           </div>
           <div class="footer">
-            <p>🐾 VETS VAN - رعاية محترفة في منزلك 🐾</p>
+            <p>🐾 PetGo - رعاية محترفة في منزلك 🐾</p>
             <p>لأي تعديل أو إلغاء، تواصل معنا عبر التطبيق</p>
           </div>
         </div>
@@ -328,8 +345,8 @@ VETS VAN - نحن نأتي إليك
     isToday: boolean = false
   ): string {
     return `
-✅ تم تأكيد موعدك - VETS VAN
-${isToday ? 'VETS VAN في طريقه إليك' : 'موعدك محجوز بنجاح'}
+✅ تم تأكيد موعدك - PetGo
+${isToday ? 'PetGo في طريقه إليك' : 'موعدك محجوز بنجاح'}
 
 عزيزي ${userName},
 
@@ -348,7 +365,7 @@ ${isToday ? 'VETS VAN في طريقه إليك' : 'موعدك محجوز بنج�
 
 ملاحظة: سيصلك إشعار قبل وصول الطبيب البيطري بـ 15 دقيقة.
 
-VETS VAN - رعاية محترفة في منزلك
+PetGo - رعاية محترفة في منزلك
 لأي تعديل أو إلغاء، تواصل معنا عبر التطبيق
     `;
   }
@@ -364,7 +381,7 @@ VETS VAN - رعاية محترفة في منزلك
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>VETS VAN في الطريق إليك</title>
+        <title>PetGo في الطريق إليك</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -380,7 +397,7 @@ VETS VAN - رعاية محترفة في منزلك
       <body>
         <div class="container">
           <div class="header">
-            <h1>🚐 VETS VAN في الطريق إليك الآن!</h1>
+            <h1>🚐 PetGo في الطريق إليك الآن!</h1>
             <p>الطبيب البيطري قادم إليك</p>
           </div>
           <div class="content">
@@ -405,7 +422,7 @@ VETS VAN - رعاية محترفة في منزلك
             <p><strong>ملاحظة مهمة:</strong> سيتصل بك الطبيب البيطري قبل الوصول مباشرة للتأكيد.</p>
           </div>
           <div class="footer">
-            <p>🐾 VETS VAN - نحن في طريقنا إليك 🐾</p>
+            <p>🐾 PetGo - نحن في طريقنا إليك 🐾</p>
             <p>لأي استفسار عاجل، تواصل معنا عبر التطبيق</p>
           </div>
         </div>
@@ -420,7 +437,7 @@ VETS VAN - رعاية محترفة في منزلك
     vetsVanName: string
   ): string {
     return `
-🚐 VETS VAN في الطريق إليك الآن!
+🚐 PetGo في الطريق إليك الآن!
 
 عزيزي ${userName},
 
@@ -440,7 +457,7 @@ VETS VAN - رعاية محترفة في منزلك
 
 ملاحظة مهمة: سيتصل بك الطبيب البيطري قبل الوصول مباشرة للتأكيد.
 
-VETS VAN - نحن في طريقنا إليك
+PetGo - نحن في طريقنا إليك
 لأي استفسار عاجل، تواصل معنا عبر التطبيق
     `;
   }
@@ -456,7 +473,7 @@ VETS VAN - نحن في طريقنا إليك
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>تم إكمال خدمة VETS VAN</title>
+      <title>تم إكمال خدمة PetGo</title>
       <style>
         body { font-family: 'Arial', sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
@@ -477,8 +494,8 @@ VETS VAN - نحن في طريقنا إليك
         </div>
         
         <div class="content">
-          <h2>🎉 خدمة VETS VAN مكتملة</h2>
-          <p>نشكرك لاستخدام خدمة VETS VAN المنزلية. لقد تم إكمال موعدك البيطري بنجاح:</p>
+          <h2>🎉 خدمة PetGo مكتملة</h2>
+          <p>نشكرك لاستخدام خدمة PetGo المنزلية. لقد تم إكمال موعدك البيطري بنجاح:</p>
           
           <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <p><strong>📅 التاريخ:</strong> ${appointmentDate}</p>
@@ -490,7 +507,7 @@ VETS VAN - نحن في طريقنا إليك
             <h3>⭐ قيّم تجربتك</h3>
             <p>نحن نقدر رأيك! يرجى تقييم الخدمة المقدمة لمساعدتنا في التحسين.</p>
             <div class="stars">⭐⭐⭐⭐⭐</div>
-            <p><strong>انتقل إلى تطبيق VETS VAN لترك تقييمك</strong></p>
+            <p><strong>انتقل إلى تطبيق PetGo لترك تقييمك</strong></p>
           </div>
 
           <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; margin: 20px 0;">
@@ -505,7 +522,7 @@ VETS VAN - نحن في طريقنا إليك
         </div>
         
         <div class="footer">
-          <p>VETS VAN - الرعاية البيطرية المنزلية</p>
+          <p>PetGo - الرعاية البيطرية المنزلية</p>
           <p>نتطلع لخدمتك مرة أخرى قريباً!</p>
         </div>
       </div>
@@ -520,18 +537,18 @@ VETS VAN - نحن في طريقنا إليك
     appointmentTime: string
   ): string {
     return `
-تم إكمال خدمة VETS VAN بنجاح!
+تم إكمال خدمة PetGo بنجاح!
 
 عزيزي ${userName}،
 
-نشكرك لاستخدام خدمة VETS VAN المنزلية. لقد تم إكمال موعدك البيطري بنجاح:
+نشكرك لاستخدام خدمة PetGo المنزلية. لقد تم إكمال موعدك البيطري بنجاح:
 
 📅 التاريخ: ${appointmentDate}
 ⏰ الوقت: ${appointmentTime}
 ✅ الحالة: مكتملة
 
 ⭐ قيّم تجربتك:
-نحن نقدر رأيك! يرجى فتح تطبيق VETS VAN وتقييم الخدمة المقدمة لمساعدتنا في التحسين.
+نحن نقدر رأيك! يرجى فتح تطبيق PetGo وتقييم الخدمة المقدمة لمساعدتنا في التحسين.
 
 💡 تذكير مهم:
 - اتبع إرشادات الطبيب البيطري
@@ -539,7 +556,7 @@ VETS VAN - نحن في طريقنا إليك
 - راقب حالة حيوانك الأليف
 - لا تتردد في التواصل معنا عند الحاجة
 
-VETS VAN - الرعاية البيطرية المنزلية
+PetGo - الرعاية البيطرية المنزلية
 نتطلع لخدمتك مرة أخرى قريباً!
     `;
   }
@@ -643,7 +660,7 @@ VETS VAN - الرعاية البيطرية المنزلية
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>فاتورتك جاهزة - VETS VAN</title>
+        <title>فاتورتك جاهزة - PetGo</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -661,11 +678,11 @@ VETS VAN - الرعاية البيطرية المنزلية
         <div class="container">
           <div class="header">
             <h1>🧾 فاتورتك جاهزة</h1>
-            <p>VETS VAN - العيادة البيطرية المتنقلة</p>
+            <p>PetGo - العيادة البيطرية المتنقلة</p>
           </div>
           <div class="content">
             <h2>مرحباً ${userName}!</h2>
-            <p>نشكرك على استخدام خدمات VETS VAN. تم إنشاء فاتورتك بنجاح ومتاحة للعرض والتحميل.</p>
+            <p>نشكرك على استخدام خدمات PetGo. تم إنشاء فاتورتك بنجاح ومتاحة للعرض والتحميل.</p>
             
             <div class="invoice-card">
               <h3>📋 تفاصيل الفاتورة</h3>
@@ -685,10 +702,10 @@ VETS VAN - الرعاية البيطرية المنزلية
               </ul>
             </div>
 
-            <p>نشكرك مرة أخرى على ثقتك في VETS VAN، ونتطلع لخدمتك مرة أخرى!</p>
+            <p>نشكرك مرة أخرى على ثقتك في PetGo، ونتطلع لخدمتك مرة أخرى!</p>
           </div>
           <div class="footer">
-            <p>🐾 VETS VAN - نحن نأتي إليك 🐾</p>
+            <p>🐾 PetGo - نحن نأتي إليك 🐾</p>
             <p>لأي استفسارات، تواصل معنا عبر التطبيق</p>
           </div>
         </div>
@@ -701,9 +718,9 @@ VETS VAN - الرعاية البيطرية المنزلية
     return `
 مرحباً ${userName}!
 
-فاتورتك جاهزة - VETS VAN
+فاتورتك جاهزة - PetGo
 
-نشكرك على استخدام خدمات VETS VAN. تم إنشاء فاتورتك بنجاح ومتاحة للعرض والتحميل.
+نشكرك على استخدام خدمات PetGo. تم إنشاء فاتورتك بنجاح ومتاحة للعرض والتحميل.
 
 📋 تفاصيل الفاتورة:
 رقم الفاتورة: ${invoiceId}
@@ -717,9 +734,9 @@ ${invoiceLink}
 - احتفظ بهذا الرابط للرجوع إليه لاحقاً
 - في حالة وجود أي استفسارات، تواصل معنا عبر التطبيق
 
-نشكرك مرة أخرى على ثقتك في VETS VAN، ونتطلع لخدمتك مرة أخرى!
+نشكرك مرة أخرى على ثقتك في PetGo، ونتطلع لخدمتك مرة أخرى!
 
-VETS VAN - رعاية محترفة في منزلك
+PetGo - رعاية محترفة في منزلك
 لأي استفسارات، تواصل معنا عبر التطبيق
     `;
   }
@@ -731,7 +748,7 @@ VETS VAN - رعاية محترفة في منزلك
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>أكمل الدفع - VETS VAN</title>
+        <title>أكمل الدفع - PetGo</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -750,7 +767,7 @@ VETS VAN - رعاية محترفة في منزلك
         <div class="container">
           <div class="header">
             <h1>💳 أكمل الدفع</h1>
-            <p>VETS VAN - العيادة البيطرية المتنقلة</p>
+            <p>PetGo - العيادة البيطرية المتنقلة</p>
           </div>
           <div class="content">
             <h2>مرحباً ${userName}!</h2>
@@ -783,7 +800,7 @@ VETS VAN - رعاية محترفة في منزلك
             <p>نتطلع لخدمتك قريباً!</p>
           </div>
           <div class="footer">
-            <p>🐾 VETS VAN - نحن نأتي إليك 🐾</p>
+            <p>🐾 PetGo - نحن نأتي إليك 🐾</p>
             <p>لأي استفسارات، تواصل معنا عبر التطبيق</p>
           </div>
         </div>
@@ -796,7 +813,7 @@ VETS VAN - رعاية محترفة في منزلك
     return `
 مرحباً ${userName}!
 
-أكمل الدفع - VETS VAN
+أكمل الدفع - PetGo
 
 تم حجز موعدك بنجاح. لإتمام عملية الحجز، يرجى إكمال الدفع من خلال الرابط أدناه.
 
@@ -817,7 +834,7 @@ ${paymentLink}
 
 نتطلع لخدمتك قريباً!
 
-VETS VAN - رعاية محترفة في منزلك
+PetGo - رعاية محترفة في منزلك
 لأي استفسارات، تواصل معنا عبر التطبيق
     `;
   }
@@ -829,7 +846,7 @@ VETS VAN - رعاية محترفة في منزلك
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>تأكيد إنشاء الحساب - VETS VAN</title>
+        <title>تأكيد إنشاء الحساب - PetGo</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -847,11 +864,11 @@ VETS VAN - رعاية محترفة في منزلك
         <div class="container">
           <div class="header">
             <h1>🔐 تأكيد إنشاء الحساب</h1>
-            <p>أهلاً بك في VETS VAN</p>
+            <p>أهلاً بك في PetGo</p>
           </div>
           <div class="content">
             <h2>عزيزي ${userName},</h2>
-            <p>مرحباً بك في منصة VETS VAN للعناية البيطرية المتنقلة! لإكمال إنشاء حسابك، يرجى استخدام رمز التحقق التالي:</p>
+            <p>مرحباً بك في منصة PetGo للعناية البيطرية المتنقلة! لإكمال إنشاء حسابك، يرجى استخدام رمز التحقق التالي:</p>
             
             <div class="otp-card">
               <h3>🔢 رمز التحقق:</h3>
@@ -878,7 +895,7 @@ VETS VAN - رعاية محترفة في منزلك
             </ul>
           </div>
           <div class="footer">
-            <p>🐾 VETS VAN - رعاية بيطرية محترفة في منزلك 🐾</p>
+            <p>🐾 PetGo - رعاية بيطرية محترفة في منزلك 🐾</p>
             <p>إذا لم تطلب إنشاء هذا الحساب، يرجى تجاهل هذا البريد</p>
           </div>
         </div>
@@ -889,12 +906,12 @@ VETS VAN - رعاية محترفة في منزلك
 
   private generateOtpVerificationText(userName: string, otpCode: string): string {
     return `
-🔐 تأكيد إنشاء الحساب - VETS VAN
-أهلاً بك في VETS VAN
+🔐 تأكيد إنشاء الحساب - PetGo
+أهلاً بك في PetGo
 
 عزيزي ${userName},
 
-مرحباً بك في منصة VETS VAN للعناية البيطرية المتنقلة! لإكمال إنشاء حسابك، يرجى استخدام رمز التحقق التالي:
+مرحباً بك في منصة PetGo للعناية البيطرية المتنقلة! لإكمال إنشاء حسابك، يرجى استخدام رمز التحقق التالي:
 
 🔢 رمز التحقق: ${otpCode}
 
@@ -910,7 +927,7 @@ VETS VAN - رعاية محترفة في منزلك
 - حجز مواعيد مع أطباء بيطريين محترفين
 - متابعة تاريخ الرعاية الصحية لحيواناتك
 
-VETS VAN - رعاية بيطرية محترفة في منزلك
+PetGo - رعاية بيطرية محترفة في منزلك
 إذا لم تطلب إنشاء هذا الحساب، يرجى تجاهل هذا البريد
     `;
   }
@@ -930,7 +947,7 @@ VETS VAN - رعاية بيطرية محترفة في منزلك
 
     const template: EmailTemplate = {
       to: userEmail,
-      subject: '🚚 VETS VAN في الطريق إليك الآن! - On the way to you!',
+      subject: '🚚 PetGo في الطريق إليك الآن! - On the way to you!',
       html: this.generateTrackingNotificationHTML(userName, vetsVanCode, estimatedMinutes, appointmentDate, appointmentTime),
       text: this.generateTrackingNotificationText(userName, vetsVanCode, estimatedMinutes, appointmentDate, appointmentTime)
     };
@@ -951,7 +968,7 @@ VETS VAN - رعاية بيطرية محترفة في منزلك
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>VETS VAN في الطريق إليك</title>
+        <title>PetGo في الطريق إليك</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f5f5f5; }
           .container { max-width: 600px; margin: 0 auto; background-color: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -970,7 +987,7 @@ VETS VAN - رعاية بيطرية محترفة في منزلك
         <div class="container">
           <div class="header">
             <h1>🚚 في الطريق إليك!</h1>
-            <p>VETS VAN - العيادة البيطرية المتنقلة</p>
+            <p>PetGo - العيادة البيطرية المتنقلة</p>
           </div>
           <div class="content">
             <h2>عزيزي ${userName},</h2>
@@ -1006,7 +1023,7 @@ VETS VAN - رعاية بيطرية محترفة في منزلك
             </div>
           </div>
           <div class="footer">
-            <p>🐾 VETS VAN - نحن في طريقنا إليك 🐾</p>
+            <p>🐾 PetGo - نحن في طريقنا إليك 🐾</p>
             <p>لأي استفسار عاجل، تواصل معنا عبر التطبيق</p>
           </div>
         </div>
@@ -1023,7 +1040,7 @@ VETS VAN - رعاية بيطرية محترفة في منزلك
     appointmentTime: string
   ): string {
     return `
-🚚 VETS VAN في الطريق إليك الآن!
+🚚 PetGo في الطريق إليك الآن!
 
 عزيزي ${userName},
 
@@ -1046,7 +1063,7 @@ VETS VAN - رعاية بيطرية محترفة في منزلك
 📞 ملاحظة مهمة:
 سيتصل بك الطبيب البيطري قبل الوصول مباشرة للتأكيد والتنسيق
 
-VETS VAN - نحن في طريقنا إليك
+PetGo - نحن في طريقنا إليك
 لأي استفسار عاجل، تواصل معنا عبر التطبيق
     `;
   }

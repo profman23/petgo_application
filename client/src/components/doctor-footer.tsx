@@ -14,8 +14,8 @@ export function DoctorFooter() {
       id: 'home',
       path: '/doctor-dashboard',
       label: language === 'ar' ? 'الرئيسية' : 'Home',
-      bgColor: 'bg-gradient-to-br from-purple-600 via-#852085 to-purple-600',
-      hoverColor: 'hover:from-purple-600 hover:via-#852085 hover:#852085950',
+      bgColor: 'bg-gradient-to-br from-purple-600 via-#1E50C8 to-purple-600',
+      hoverColor: 'hover:from-purple-600 hover:via-#1E50C8 hover:#1E50C8950',
       icon: '🏠'
     },
     {
@@ -30,8 +30,8 @@ export function DoctorFooter() {
       id: 'account',
       path: '/doctor-account',
       label: language === 'ar' ? 'الحساب' : 'Account',
-      bgColor: 'bg-gradient-to-br from-purple-600 via-#852085 to-purple-600',
-      hoverColor: 'hover:from-purple-600 hover:via-#852085 hover:#852085950',
+      bgColor: 'bg-gradient-to-br from-purple-600 via-#1E50C8 to-purple-600',
+      hoverColor: 'hover:from-purple-600 hover:via-#1E50C8 hover:#1E50C8950',
       icon: '🐱'
     }
   ];

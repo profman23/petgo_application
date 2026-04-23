@@ -434,7 +434,7 @@ export default function AdminDashboard() {
         // Show browser notification if permission granted
         if (Notification.permission === 'granted') {
           new Notification(
-            language === 'ar' ? 'VETS VAN - طلب جديد' : 'VETS VAN - New Request',
+            language === 'ar' ? 'PetGo - طلب جديد' : 'PetGo - New Request',
             {
               body: language === 'ar' 
                 ? `${newRequestsCount} طلب جديد من العملاء` 
@@ -806,7 +806,7 @@ export default function AdminDashboard() {
               }`}
             >
               <Car className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'إدارة VETS VAN' : 'Vets Van Management'}
+              {language === 'ar' ? 'إدارة PetGo' : 'PetGo Management'}
             </button>
             <button
               onClick={(e) => {
@@ -826,7 +826,7 @@ export default function AdminDashboard() {
               }`}
             >
               <Clock className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}
+              {language === 'ar' ? 'مناوبات PetGo' : 'PetGo Shifts'}
             </button>
             <button
               onClick={() => setActiveTab('reports')}
@@ -848,7 +848,7 @@ export default function AdminDashboard() {
               }`}
             >
               <FileText className="ml-3 h-6 w-6" />
-              {language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}
+              {language === 'ar' ? 'طلبات PetGo' : 'PetGo Requests'}
             </button>
             <button
               onClick={() => setActiveTab('import')}
@@ -892,7 +892,7 @@ export default function AdminDashboard() {
                               type="text"
                               value={newDriver.vetsvanCode}
                               onChange={(e) => setNewDriver({ ...newDriver, vetsvanCode: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                               placeholder="V001"
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -903,8 +903,8 @@ export default function AdminDashboard() {
                               type="text"
                               value={newDriver.vetsvanName}
                               onChange={(e) => setNewDriver({ ...newDriver, vetsvanName: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
-                              placeholder="VETS VAN 1"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
+                              placeholder="PetGo 1"
                               style={{ textAlign: getTextAlign(language) }}
                             />
                           </div>
@@ -914,7 +914,7 @@ export default function AdminDashboard() {
                               type="tel"
                               value={newDriver.phone}
                               onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                               placeholder="05xxxxxxxx"
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -925,7 +925,7 @@ export default function AdminDashboard() {
                               type="text"
                               value={newDriver.username}
                               onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                               placeholder={t('username')}
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -936,7 +936,7 @@ export default function AdminDashboard() {
                               type="password"
                               value={newDriver.password}
                               onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
-                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                               placeholder={t('password')}
                               style={{ textAlign: getTextAlign(language) }}
                             />
@@ -1106,7 +1106,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center">
                                 <div className="flex-1">
                                   <h4 className="text-sm font-medium opacity-90">
-                                    {language === 'ar' ? 'إجمالي VETS VAN' : 'Total Vets Vans'}
+                                    {language === 'ar' ? 'إجمالي PetGo' : 'Total PetGos'}
                                   </h4>
                                   <p className="text-2xl font-bold">{reportsStats?.totalVetsVans || 0}</p>
                                 </div>
@@ -1118,7 +1118,7 @@ export default function AdminDashboard() {
                               <div className="flex items-center">
                                 <div className="flex-1">
                                   <h4 className="text-sm font-medium opacity-90">
-                                    {language === 'ar' ? 'VETS VAN متاحة' : 'Available Vets Vans'}
+                                    {language === 'ar' ? 'PetGo متاحة' : 'Available PetGos'}
                                   </h4>
                                   <p className="text-2xl font-bold">{reportsStats?.availableVetsVans || 0}</p>
                                 </div>
@@ -1209,7 +1209,7 @@ export default function AdminDashboard() {
                             
                             <div>
                               <h5 className="text-sm font-medium text-gray-700 mb-2">
-                                {language === 'ar' ? 'معدل توفر VETS VAN' : 'Vets Van Availability'}
+                                {language === 'ar' ? 'معدل توفر PetGo' : 'PetGo Availability'}
                               </h5>
                               <div className="bg-gray-200 rounded-full h-3">
                                 <div 
@@ -1263,7 +1263,7 @@ export default function AdminDashboard() {
                                           {language === 'ar' ? 'الطبيب' : 'Doctor'}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                          {language === 'ar' ? 'VetsVan' : 'VetsVan'}
+                                          {language === 'ar' ? 'PetGo' : 'PetGo'}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                           {language === 'ar' ? 'الإجمالي' : 'Total'}
@@ -1347,10 +1347,10 @@ export default function AdminDashboard() {
                 <div className="space-y-6" dir={getDirection(language)}>
                   <div className="text-center">
                     <h2 className="text-2xl font-bold text-gray-900 mb-2" style={{ textAlign: getTextAlign(language) }}>
-                      {language === 'ar' ? 'جميع طلبات VETS VAN' : 'All VetsVan Requests'}
+                      {language === 'ar' ? 'جميع طلبات PetGo' : 'All VetsVan Requests'}
                     </h2>
                     <p className="text-gray-600" style={{ textAlign: getTextAlign(language) }}>
-                      {language === 'ar' ? 'عرض جميع طلبات العملاء لكل سيارات VETS VAN' : 'View all customer requests for all VetsVan vehicles'}
+                      {language === 'ar' ? 'عرض جميع طلبات العملاء لكل سيارات PetGo' : 'View all customer requests for all VetsVan vehicles'}
                     </p>
                   </div>
 
@@ -1399,7 +1399,7 @@ export default function AdminDashboard() {
                           
                           <CardContent className="space-y-4">
                             {/* VetsVan Info */}
-                            <div className="#85208550 rounded-lg p-3">
+                            <div className="#1E50C850 rounded-lg p-3">
                               <div className="flex items-center gap-2 mb-2">
                                 <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
                                 <span className="font-medium text-purple-600">
@@ -1488,7 +1488,7 @@ export default function AdminDashboard() {
                                   });
                                 }}
                                 disabled={updateBookingStatusMutation.isPending}
-                                className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085 bg-white"
+                                className="w-full text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#1E50C8 bg-white"
                                 style={{ textAlign: getTextAlign(language) }}
                               >
                                 <option value="pending_review">
@@ -1521,7 +1521,7 @@ export default function AdminDashboard() {
                         {language === 'ar' ? 'لا توجد طلبات حتى الآن' : 'No requests found'}
                       </h3>
                       <p className="mt-1 text-sm text-gray-500">
-                        {language === 'ar' ? 'لم يتم تقديم أي طلبات VETS VAN بعد' : 'No VetsVan requests have been made yet'}
+                        {language === 'ar' ? 'لم يتم تقديم أي طلبات PetGo بعد' : 'No VetsVan requests have been made yet'}
                       </p>
                     </div>
                   )}
@@ -1543,7 +1543,7 @@ export default function AdminDashboard() {
                           onClick={() => setImportSubTab('products')}
                           className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                             importSubTab === 'products'
-                              ? 'border-purple-600 text-purple-600 #85208550'
+                              ? 'border-purple-600 text-purple-600 #1E50C850'
                               : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                           }`}
                         >
@@ -1553,7 +1553,7 @@ export default function AdminDashboard() {
                           onClick={() => setImportSubTab('services')}
                           className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                             importSubTab === 'services'
-                              ? 'border-purple-600 text-purple-600 #85208550'
+                              ? 'border-purple-600 text-purple-600 #1E50C850'
                               : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                           }`}
                         >
@@ -1753,7 +1753,7 @@ export default function AdminDashboard() {
                   step="any"
                   value={newLocation.latitude}
                   onChange={(e) => setNewLocation({ ...newLocation, latitude: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#1E50C8"
                   placeholder="24.7136"
                   required
                   style={{ textAlign: getTextAlign(language) }}
@@ -1769,7 +1769,7 @@ export default function AdminDashboard() {
                   step="any"
                   value={newLocation.longitude}
                   onChange={(e) => setNewLocation({ ...newLocation, longitude: e.target.value })}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#852085"
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-#1E50C8"
                   placeholder="46.6753"
                   required
                   style={{ textAlign: getTextAlign(language) }}
@@ -1806,7 +1806,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-medium text-gray-900">
-                {language === 'ar' ? 'تعديل بيانات VETS VAN' : 'Edit VETS VAN Data'}
+                {language === 'ar' ? 'تعديل بيانات PetGo' : 'Edit PetGo Data'}
               </h3>
               <button
                 onClick={() => setShowEditDialog(false)}
@@ -1819,7 +1819,7 @@ export default function AdminDashboard() {
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ar' ? 'كود VETS VAN' : 'VETS VAN Code'}
+                  {language === 'ar' ? 'كود PetGo' : 'PetGo Code'}
                 </label>
                 <input
                   type="text"
@@ -1833,7 +1833,7 @@ export default function AdminDashboard() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {language === 'ar' ? 'اسم VETS VAN' : 'VETS VAN Name'}
+                  {language === 'ar' ? 'اسم PetGo' : 'PetGo Name'}
                 </label>
                 <input
                   type="text"

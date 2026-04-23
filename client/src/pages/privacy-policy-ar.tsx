@@ -19,7 +19,7 @@ export default function PrivacyPolicyAr() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center" style={{ fontFamily: 'Cairo, Tajawal, Noto Sans Arabic, system-ui, sans-serif' }}>
-            سياسة الخصوصية – VetsVan
+            سياسة الخصوصية – PetGo
           </h1>
           
           <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed arabic-text" style={{ fontFamily: 'Cairo, Tajawal, Noto Sans Arabic, system-ui, sans-serif' }}>
@@ -49,7 +49,7 @@ export default function PrivacyPolicyAr() {
             
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-3">التواصل:</h2>
-              <p>للاستفسارات يمكنكم التواصل عبر <a href="mailto:support@vetsvan.com" className="underline">support@vetsvan.com</a>.</p>
+              <p>للاستفسارات يمكنكم التواصل عبر <a href="mailto:profman23@gmail.com" className="underline">profman23@gmail.com</a>.</p>
             </div>
             
             <div className="mt-8 pt-6 border-t border-gray-200">

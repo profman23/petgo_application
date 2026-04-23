@@ -288,7 +288,7 @@ const MonthlyReportPage = ({ language, generatedInvoices }: { language: string; 
 
 // VetsVan Report Page
 const VetsVanReportPage = ({ language, generatedInvoices }: { language: string; generatedInvoices: any[] }) => {
-  // Group invoices by VetsVan
+  // Group invoices by PetGo
   const vetsVanSales = generatedInvoices?.reduce((acc, invoice) => {
     const vetsVanCode = invoice.vetsvanCode || 'Unknown';
     if (!acc[vetsVanCode]) {
@@ -312,10 +312,10 @@ const VetsVanReportPage = ({ language, generatedInvoices }: { language: string; 
     <div>
       <div className="mb-6">
         <h4 className="text-lg font-medium text-gray-900 mb-2">
-          {language === 'ar' ? 'تقرير حسب VETS VAN' : 'VetsVan Report'}
+          {language === 'ar' ? 'تقرير حسب PetGo' : 'VetsVan Report'}
         </h4>
         <p className="text-sm text-gray-600">
-          {language === 'ar' ? 'مبيعات كل سيارة VETS VAN' : 'Sales report by each VetsVan vehicle'}
+          {language === 'ar' ? 'مبيعات كل سيارة PetGo' : 'Sales report by each VetsVan vehicle'}
         </p>
       </div>
 
@@ -365,7 +365,7 @@ const VetsVanReportPage = ({ language, generatedInvoices }: { language: string; 
             {language === 'ar' ? 'لا توجد بيانات' : 'No Data Available'}
           </h3>
           <p className="text-gray-500">
-            {language === 'ar' ? 'لا توجد مبيعات لأي VETS VAN' : 'No sales data for any VetsVan'}
+            {language === 'ar' ? 'لا توجد مبيعات لأي PetGo' : 'No sales data for any VetsVan'}
           </p>
         </div>
       )}
@@ -547,7 +547,7 @@ export const SalesReportPages = ({
     { id: 'all', nameAr: 'جميع الفواتير', nameEn: 'All Invoices', icon: FileText },
     { id: 'daily', nameAr: 'التقرير اليومي', nameEn: 'Daily Report', icon: Calendar },
     { id: 'monthly', nameAr: 'التقرير الشهري', nameEn: 'Monthly Report', icon: BarChart3 },
-    { id: 'vetsvan', nameAr: 'تقرير VETS VAN', nameEn: 'VetsVan Report', icon: Car },
+    { id: 'vetsvan', nameAr: 'تقرير PetGo', nameEn: 'VetsVan Report', icon: Car },
     { id: 'service', nameAr: 'تقرير الخدمات', nameEn: 'Service Report', icon: Stethoscope }
   ];
 

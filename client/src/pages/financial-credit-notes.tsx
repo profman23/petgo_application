@@ -258,7 +258,7 @@ export default function FinancialCreditNotes() {
             <div className="flex-shrink-0">
               <div 
                 dangerouslySetInnerHTML={{
-                  __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="loop" delay="1500" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                  __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="loop" delay="1500" colors="primary:#1E50C8,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
                 }}
               />
             </div>
@@ -279,12 +279,12 @@ export default function FinancialCreditNotes() {
                 : 'bg-white hover:bg-purple-50'
             }`}
             style={isReadOnly ? {} : { 
-              borderColor: '#852085', 
-              color: '#852085'
+              borderColor: '#1E50C8', 
+              color: '#1E50C8'
             }}
             data-testid="button-create-credit-note"
           >
-            <FilePlus className="h-4 w-4" style={isReadOnly ? { color: '#9ca3af' } : { color: '#852085' }} />
+            <FilePlus className="h-4 w-4" style={isReadOnly ? { color: '#9ca3af' } : { color: '#1E50C8' }} />
             {language === 'ar' ? 'إنشاء إشعار دائن' : 'Create Credit Note'}
           </button>
         </div>

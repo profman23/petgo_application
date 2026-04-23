@@ -384,7 +384,7 @@ export default function DoctorInvoice() {
 
   const translations = {
     ar: {
-      invoiceTitle: 'فاتورة خدمة VETS VAN',
+      invoiceTitle: 'فاتورة خدمة PetGo',
       customerInfo: 'بيانات العميل',
       petInfo: 'بيانات الأليف',
       serviceDetails: 'تفاصيل الخدمة',
@@ -467,7 +467,7 @@ export default function DoctorInvoice() {
       clearFilters: 'مسح الفلاتر',
     },
     en: {
-      invoiceTitle: 'VETS VAN Service Invoice',
+      invoiceTitle: 'PetGo Service Invoice',
       customerInfo: 'Customer Information',
       petInfo: 'Pet Information',
       serviceDetails: 'Service Details',

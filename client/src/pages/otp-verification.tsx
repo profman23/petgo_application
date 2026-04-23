@@ -274,7 +274,7 @@ export default function OtpVerification() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br #85208550 to-white dark:#852085950 dark:to-gray-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br #1E50C850 to-white dark:#1E50C8950 dark:to-gray-900 flex items-center justify-center p-4">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       
@@ -284,7 +284,7 @@ export default function OtpVerification() {
           <div className="relative w-20 h-20 rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-purple-600 dark:border-purple-600 hover:border-purple-600 dark:hover:border-purple-600 group">
             <img
               src={logoPath}
-              alt="VetsVan Logo"
+              alt="PetGo Logo"
               className="w-full h-full object-contain rounded-lg group-hover:scale-105 transition-transform duration-300"
             />
           </div>

@@ -211,14 +211,14 @@ export default function Activity() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br #85208550 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br #1E50C850 to-white flex items-center justify-center">
         <div className="text-purple-600">{t('loading')}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br #85208550 to-white" dir={direction}>
+    <div className="min-h-screen bg-gradient-to-br #1E50C850 to-white" dir={direction}>
       {/* Header with Enhanced Logo and Back Button */}
       <div className="bg-white shadow-lg border-b border-purple-600 p-4">
         <div className="flex items-center justify-between max-w-md mx-auto">
@@ -232,10 +232,10 @@ export default function Activity() {
           
           <div className="flex items-center gap-2">
             <LanguageSelector />
-            <div className="w-12 h-12 flex items-center justify-center #85208550 rounded-xl border-2 border-purple-600 shadow-sm">
+            <div className="w-12 h-12 flex items-center justify-center #1E50C850 rounded-xl border-2 border-purple-600 shadow-sm">
               <img 
                 src={logoPath} 
-                alt="VETS VAN Logo" 
+                alt="PetGo Logo" 
                 className="h-10 w-auto object-contain"
               />
             </div>

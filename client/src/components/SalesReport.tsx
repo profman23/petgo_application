@@ -174,7 +174,7 @@ export const SalesReport = ({ language }: SalesReportProps) => {
                   {language === 'ar' ? 'الطبيب' : 'Doctor'}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  {language === 'ar' ? 'VetsVan' : 'VetsVan'}
+                  {language === 'ar' ? 'PetGo' : 'PetGo'}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   {language === 'ar' ? 'الإجمالي' : 'Total'}

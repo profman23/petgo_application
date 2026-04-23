@@ -156,37 +156,37 @@ export default function Login() {
       <div className="w-full max-w-lg">
         <Card className="border-0">
           {/* Header with back button and improved logo design */}
-          <div className="bg-white px-6 py-6 text-center relative rounded-t-lg">
-            
-            {/* Logo Container - VETS VAN في الأعلى */}
-            <div className="mb-16 flex justify-center">
-              <img 
-                src={logoImage} 
-                alt="VETS VAN - Mobile Veterinary Clinic" 
-                className="h-20 w-auto max-w-[320px] object-contain mx-auto transition-all duration-300 hover:scale-105"
-                style={{ 
+          <div className="bg-white px-6 pt-4 pb-2 text-center relative rounded-t-lg">
+
+            {/* Logo Container - PetGo في الأعلى */}
+            <div className="mb-4 flex justify-center">
+              <img
+                src={logoImage}
+                alt="PetGo - Mobile Veterinary Clinic"
+                className="h-48 md:h-56 w-auto max-w-[640px] object-contain mx-auto transition-all duration-300 hover:scale-105"
+                style={{
                   filter: 'brightness(1.02) contrast(1.1)',
                 }}
               />
             </div>
 
             {/* Hand Logo في المنتصف */}
-            <div className="mb-6 flex justify-center">
-              <img 
-                src={welcomeHandImage} 
-                alt="Welcome Hand" 
+            <div className="mb-2 flex justify-center">
+              <img
+                src={welcomeHandImage}
+                alt="Welcome Hand"
                 className="w-20 h-20 object-contain mx-auto transition-all duration-300 hover:scale-110"
               />
             </div>
 
             {/* Welcome Message في الأسفل */}
-            <div className="mb-4 text-center">
-              <h2 className="text-xl font-bold text-purple-600 mb-2" style={{ 
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-purple-600 mb-1" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
                 {language === 'ar' ? 'أهلاً وسهلاً بك' : 'Welcome'}
               </h2>
-              <p className="text-sm text-gray-600" style={{ 
+              <p className="text-sm text-gray-600" style={{
                 fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
               }}>
                 {language === 'ar' ? 'سعداء بوجودك معنا' : 'Happy to have you with us'}
@@ -195,7 +195,7 @@ export default function Login() {
 
           </div>
 
-        <CardContent className="p-8 bg-white/95 backdrop-blur-sm">
+        <CardContent className="px-8 pt-2 pb-8 bg-white/95 backdrop-blur-sm">
 
           {!isRegistering ? (
             <Form {...loginForm}>
@@ -264,7 +264,7 @@ export default function Login() {
                   type="submit" 
                   className="w-full text-white py-3 rounded-xl font-semibold text-lg shadow-lg transition-all duration-300 
                     hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed
-                    bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:#852085950" 
+                    bg-gradient-to-r from-purple-600 to-purple-600 hover:from-purple-600 hover:#1E50C8950" 
                   disabled={loginMutation.isPending}
                   style={{ 
                     background: loginMutation.isPending ? '#6B21A8' : undefined,

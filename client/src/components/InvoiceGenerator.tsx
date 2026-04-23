@@ -101,7 +101,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
           width: 120,
           margin: 2,
           color: {
-            dark: '#8B2F8B',
+            dark: '#1E50C8',
             light: '#FFFFFF'
           }
         });
@@ -143,7 +143,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
               overflow: hidden;
             }
             .header { 
-              background: linear-gradient(135deg, #8B2F8B, #9333EA); 
+              background: linear-gradient(135deg, #1E50C8, #9333EA); 
               color: white; 
               padding: 20px; 
               text-align: center;
@@ -158,7 +158,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
               align-items: center; 
               justify-content: center;
               font-weight: bold;
-              color: #8B2F8B;
+              color: #1E50C8;
             }
             .content { padding: 20px; }
             .section { margin-bottom: 20px; }
@@ -237,7 +237,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
               overflow: hidden;
             }
             .header { 
-              background: linear-gradient(135deg, #8B2F8B, #9333EA); 
+              background: linear-gradient(135deg, #1E50C8, #9333EA); 
               color: white; 
               padding: 20px; 
               text-align: center;
@@ -252,7 +252,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
               align-items: center; 
               justify-content: center;
               font-weight: bold;
-              color: #8B2F8B;
+              color: #1E50C8;
             }
             .content { padding: 20px; }
             .section { margin-bottom: 20px; }
@@ -317,7 +317,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
         {/* Action Buttons */}
         <div className="flex justify-between items-center p-4 border-b bg-gray-50 no-print">
           <h3 className="text-lg font-semibold">
-            {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
+            {language === 'ar' ? 'فاتورة PetGo' : 'PetGo Invoice'}
           </h3>
           <div className="flex gap-2">
             <Button onClick={printInvoice} variant="outline" size="sm">
@@ -342,7 +342,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
               VETS
             </div>
             <h1 className="text-2xl font-bold mb-2">
-              {language === 'ar' ? 'VETS VAN - العيادة البيطرية المتنقلة' : 'VETS VAN - Mobile Veterinary Clinic'}
+              {language === 'ar' ? 'PetGo - العيادة البيطرية المتنقلة' : 'PetGo - Mobile Veterinary Clinic'}
             </h1>
             <p className="text-sm opacity-90">
               {language === 'ar' ? 'خدمات بيطرية متميزة في منزلك' : 'Premium Veterinary Services at Your Home'}
@@ -496,7 +496,7 @@ export default function InvoiceGenerator({ invoiceData, onClose }: InvoiceGenera
             <div className="section border-t pt-4 mt-6">
               <div className="text-center text-sm text-gray-500">
                 <p className="mb-2">
-                  {language === 'ar' ? 'شكراً لاختيارك VETS VAN - العيادة البيطرية المتنقلة' : 'Thank you for choosing VETS VAN - Mobile Veterinary Clinic'}
+                  {language === 'ar' ? 'شكراً لاختيارك PetGo - العيادة البيطرية المتنقلة' : 'Thank you for choosing PetGo - Mobile Veterinary Clinic'}
                 </p>
                 <p>
                   {language === 'ar' ? 'الطبيب البيطري:' : 'Veterinarian:'} {invoiceData.doctorName}

@@ -66,10 +66,10 @@ export function LocationPermissionModal({ isOpen, onClose, onAllow }: LocationPe
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" dir={getDirection(language)}>
-      <Card className="w-full max-w-md mx-auto shadow-2xl border-2" style={{ borderColor: '#852085' }}>
+      <Card className="w-full max-w-md mx-auto shadow-2xl border-2" style={{ borderColor: '#1E50C8' }}>
         <CardContent className="p-0">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6 rounded-t-lg relative" style={{ background: 'linear-gradient(135deg, #852085 0%, #a855f7 100%)' }}>
+          <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6 rounded-t-lg relative" style={{ background: 'linear-gradient(135deg, #1E50C8 0%, #a855f7 100%)' }}>
             <button
               onClick={onClose}
               className="absolute top-4 right-4 p-1 hover:bg-white/20 rounded-full transition-colors"
@@ -129,7 +129,7 @@ export function LocationPermissionModal({ isOpen, onClose, onAllow }: LocationPe
                 onClick={handleAllow}
                 className="w-full py-3 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                 style={{ 
-                  background: 'linear-gradient(135deg, #852085 0%, #a855f7 100%)',
+                  background: 'linear-gradient(135deg, #1E50C8 0%, #a855f7 100%)',
                   boxShadow: '0 8px 25px rgba(133, 32, 133, 0.3)'
                 }}
               >
@@ -143,7 +143,7 @@ export function LocationPermissionModal({ isOpen, onClose, onAllow }: LocationPe
                 onClick={onClose}
                 variant="outline"
                 className="w-full py-3 font-semibold rounded-xl border-2 transition-all duration-300 hover:bg-gray-50"
-                style={{ borderColor: '#852085', color: '#852085' }}
+                style={{ borderColor: '#1E50C8', color: '#1E50C8' }}
               >
                 {text.skipButton}
               </Button>

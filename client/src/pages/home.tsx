@@ -367,15 +367,15 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="bg-white text-gray-800 px-2 py-3 h-12 shadow-sm">
+        <div className="bg-white text-gray-800 px-2 py-3 h-20 shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center">
-              <img 
-                src={logoImage} 
-                alt="VETS VAN Logo" 
-                className="h-8 w-auto object-contain logo-clean"
-                style={{ 
-                  maxWidth: '60px',
+              <img
+                src={logoImage}
+                alt="PetGo Logo"
+                className="h-20 w-auto object-contain logo-clean"
+                style={{
+                  maxWidth: '200px',
                   border: 'none !important',
                   outline: 'none !important',
                   boxShadow: 'none !important',
@@ -624,7 +624,7 @@ export default function Home() {
                               isActive 
                                 ? 'bg-purple-600 border-purple-600 text-white' 
                                 : isCurrent
-                                ? 'bg-white border-purple-600 text-purple-600 ring-2 ring-#852085'
+                                ? 'bg-white border-purple-600 text-purple-600 ring-2 ring-#1E50C8'
                                 : 'bg-white border-gray-300 text-gray-300'
                             }`}>
                               <IconComponent className="w-4 h-4" />
@@ -780,7 +780,7 @@ export default function Home() {
           <button
             className="w-full font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer"
             style={{ 
-              background: 'linear-gradient(to right, #852085, #6d1a6d)',
+              background: 'linear-gradient(to right, #1E50C8, #6d1a6d)',
               color: 'white',
               border: 'none',
               outline: 'none'
@@ -845,14 +845,14 @@ export default function Home() {
                   borderBottomLeftRadius: '30px',
                   borderTopRightRadius: '0px',
                   borderBottomRightRadius: '0px',
-                  borderLeft: '4px solid #852085',
+                  borderLeft: '4px solid #1E50C8',
                   transition: 'all 0.5s ease-in-out'
                 }}
               >
                 <div className="flex items-center justify-center gap-4">
                   {/* WhatsApp */}
                   <a 
-                    href="https://wa.me/966535152250" 
+                    href="https://wa.me/9660000000" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-green-50 transition-colors"
@@ -918,7 +918,7 @@ export default function Home() {
               {/* Weekly Tips Header */}
               <div className="flex items-center justify-start mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg" style={{ color: '#852085' }}>📍</span>
+                  <span className="text-lg" style={{ color: '#1E50C8' }}>📍</span>
                   <span 
                     className="text-sm font-bold"
                     style={{
@@ -946,7 +946,7 @@ export default function Home() {
                 style={{ 
                   textAlign,
                   fontFamily: '"Delius", cursive',
-                  color: '#852085'
+                  color: '#1E50C8'
                 }}
               >
                 {language === 'ar' 

@@ -232,7 +232,7 @@ export default function AdminVetsVanRequests() {
         // Show browser notification if permission granted
         if (Notification.permission === 'granted') {
           new Notification(
-            language === 'ar' ? 'VETS VAN - طلب جديد' : 'VETS VAN - New Request',
+            language === 'ar' ? 'PetGo - طلب جديد' : 'PetGo - New Request',
             {
               body: language === 'ar' 
                 ? `${newRequestsCount} طلب جديد من العملاء` 
@@ -300,20 +300,20 @@ export default function AdminVetsVanRequests() {
                 src="https://cdn.lordicon.com/nwwurnnq.json"
                 trigger="loop"
                 delay="2000"
-                colors="primary:#852085,secondary:#848484"
+                colors="primary:#1E50C8,secondary:#848484"
                 style={{width: '80px', height: '80px'}}
               />
               <h2 className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>
-                {language === 'ar' ? 'جميع طلبات VETS VAN' : 'All VetsVan Requests'}
+                {language === 'ar' ? 'جميع طلبات PetGo' : 'All VetsVan Requests'}
               </h2>
             </div>
             <p className="text-gray-600" style={{ textAlign: getTextAlign(language) }}>
-              {language === 'ar' ? 'عرض جميع طلبات العملاء لكل سيارات VETS VAN' : 'View all customer requests for all VetsVan vehicles'}
+              {language === 'ar' ? 'عرض جميع طلبات العملاء لكل سيارات PetGo' : 'View all customer requests for all VetsVan vehicles'}
             </p>
           </div>
 
                 {/* Filters Section - exact copy from admin dashboard */}
-                <div className="bg-white p-4 rounded-lg border-2 shadow-sm" style={{ borderColor: '#852085' }}>
+                <div className="bg-white p-4 rounded-lg border-2 shadow-sm" style={{ borderColor: '#1E50C8' }}>
                   <h3 className="text-lg font-medium text-gray-900 mb-3" style={{ textAlign: getTextAlign(language) }}>
                     {language === 'ar' ? 'فلاتر البحث' : 'Search Filters'}
                   </h3>
@@ -405,7 +405,7 @@ export default function AdminVetsVanRequests() {
                     {/* VetsVan Selection Filter */}
                     <div className="space-y-1">
                       <label className="text-sm font-medium text-gray-700" style={{ textAlign: getTextAlign(language) }}>
-                        {language === 'ar' ? 'فلتر بسيارات VETS VAN' : 'Filter by VetsVan Vehicles'}
+                        {language === 'ar' ? 'فلتر بسيارات PetGo' : 'Filter by VetsVan Vehicles'}
                       </label>
                       <div className="flex flex-wrap gap-2">
                         {allDrivers?.map((driver: any) => (
@@ -490,7 +490,7 @@ export default function AdminVetsVanRequests() {
                       {language === 'ar' ? 'لا توجد طلبات حتى الآن' : 'No requests found'}
                     </h3>
                     <p className="mt-1 text-sm text-gray-500">
-                      {language === 'ar' ? 'لم يتم تقديم أي طلبات VETS VAN بعد' : 'No VetsVan requests have been made yet'}
+                      {language === 'ar' ? 'لم يتم تقديم أي طلبات PetGo بعد' : 'No VetsVan requests have been made yet'}
                     </p>
                   </div>
                 )}

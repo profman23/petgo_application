@@ -332,7 +332,7 @@ export function InvoiceSelectionModal({
           <DialogTitle className="flex items-center gap-3 text-xl font-bold text-gray-700">
             <div 
               dangerouslySetInnerHTML={{
-                __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:60px;height:60px"></lord-icon>'
+                __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#1E50C8,secondary:#848484" style="width:60px;height:60px"></lord-icon>'
               }}
             />
             <span style={{ textAlign: getTextAlign() }}>

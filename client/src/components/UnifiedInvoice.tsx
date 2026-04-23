@@ -180,7 +180,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
           <div className="company-logo">
             <img 
               src={logoImage} 
-              alt="VETS VAN Logo" 
+              alt="PetGo Logo" 
               className="h-20 w-auto object-contain"
               style={{ maxHeight: '80px' }}
             />
@@ -207,7 +207,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         {/* خط فاصل بعرض الفاتورة - نفس لون الموف في اللوجو */}
         <div 
           className="w-full h-0.5 my-2"
-          style={{ backgroundColor: '#8B2F8B' }}
+          style={{ backgroundColor: '#1E50C8' }}
         ></div>
       </div>
 
@@ -242,7 +242,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         {/* خط فاصل ثاني أسفل معلومات العميل */}
         <div 
           className="w-full h-0.5 mt-2"
-          style={{ backgroundColor: '#8B2F8B' }}
+          style={{ backgroundColor: '#1E50C8' }}
         ></div>
         
         {/* Pet Information Section - ثنائي اللغة */}
@@ -299,7 +299,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         {/* خط فاصل ثالث أسفل معلومات الأليف */}
         <div 
           className="w-full h-0.5 mt-2"
-          style={{ backgroundColor: '#8B2F8B' }}
+          style={{ backgroundColor: '#1E50C8' }}
         ></div>
       </div>
 
@@ -431,7 +431,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         {/* خط فاصل قبل المجاميع */}
         <div 
           className="w-full h-0.5 mt-6 mb-4"
-          style={{ backgroundColor: '#8B2F8B' }}
+          style={{ backgroundColor: '#1E50C8' }}
         ></div>
         
         {/* Invoice Totals Section - ثنائي اللغة */}
@@ -621,7 +621,7 @@ export const UnifiedInvoice: React.FC<UnifiedInvoiceProps> = ({
         {/* خط فاصل رابع أسفل المجاميع */}
         <div 
           className="w-full h-0.5 mt-4"
-          style={{ backgroundColor: '#8B2F8B' }}
+          style={{ backgroundColor: '#1E50C8' }}
         ></div>
       </div>
     </div>

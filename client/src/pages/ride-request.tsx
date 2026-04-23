@@ -846,7 +846,7 @@ export default function RideRequest() {
       return;
     }
 
-    // حفظ بيانات الطلب في localStorage للانتقال إلى صفحة حجز VetsVan
+    // حفظ بيانات الطلب في localStorage للانتقال إلى صفحة حجز PetGo
     const requestData = {
       ...data,
       pickupLatitude: currentLocation.latitude,
@@ -861,7 +861,7 @@ export default function RideRequest() {
     console.log('Saving request data for VetsVan booking:', requestData);
     localStorage.setItem('pendingRequest', JSON.stringify(requestData));
     
-    // التوجه إلى صفحة حجز VetsVan
+    // التوجه إلى صفحة حجز PetGo
     setLocation('/vetsvan-booking');
   };
 
@@ -1210,15 +1210,15 @@ export default function RideRequest() {
     <div className="min-h-screen bg-gray-50" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header - Exact copy from home.tsx */}
-        <div className="bg-white text-gray-800 px-2 py-3 h-12 shadow-sm">
+        <div className="bg-white text-gray-800 px-2 py-3 h-20 shadow-sm">
           <div className="flex items-center justify-between h-full">
             <div className="flex items-center">
-              <img 
-                src={logoImage} 
-                alt="VETS VAN Logo" 
-                className="h-8 w-auto object-contain"
-                style={{ 
-                  maxWidth: '60px',
+              <img
+                src={logoImage}
+                alt="PetGo Logo"
+                className="h-20 w-auto object-contain"
+                style={{
+                  maxWidth: '200px',
                   border: 'none !important',
                   outline: 'none !important',
                   boxShadow: 'none !important',
@@ -1750,28 +1750,28 @@ export default function RideRequest() {
           <div className="space-y-4 p-4">
             {/* Partners Logos */}
             <div className="flex justify-center items-start gap-8 mb-6">
-              {/* Show Dr. Paws only for non-CT-Scan services */}
+              {/* Show Fluff N Woof only for non-CT-Scan services */}
               {!eliteOnlyServices.includes(serviceType) && (
                 <div className="flex flex-col items-center">
                   <img 
                     src={drPawsLogo} 
-                    alt="Dr. Paws Logo" 
+                    alt="Fluff N Woof Logo" 
                     className="w-16 h-16 object-contain mb-2"
                   />
                   <div className="flex gap-2">
                     {/* Phone Icon */}
                     <button
-                      onClick={() => window.open('tel:+966920003045', '_self')}
+                      onClick={() => window.open('tel:+966534429329', '_self')}
                       className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
-                      title="Call Dr. Paws"
+                      title="Call Fluff N Woof"
                     >
                       <Phone className="w-4 h-4 text-green-600" />
                     </button>
                     {/* WhatsApp Icon */}
                     <button
-                      onClick={() => window.open('https://wa.me/966920003045', '_blank')}
+                      onClick={() => window.open('https://wa.me/966534429329', '_blank')}
                       className="p-2 bg-green-100 hover:bg-green-200 rounded-full transition-colors"
-                      title="WhatsApp Dr. Paws"
+                      title="WhatsApp Fluff N Woof"
                     >
                       <MessageCircle className="w-4 h-4 text-green-600" />
                     </button>
@@ -1779,27 +1779,27 @@ export default function RideRequest() {
                 </div>
               )}
 
-              {/* Elite Vet - Always show */}
+              {/* Fluff N Woof - Always show */}
               <div className="flex flex-col items-center">
                 <img 
                   src={eliteVetLogo} 
-                  alt="Elite Vet Logo" 
+                  alt="Fluff N Woof Logo" 
                   className="w-16 h-16 object-contain mb-2"
                 />
                 <div className="flex gap-2">
                   {/* Phone Icon */}
                   <button
-                    onClick={() => window.open('tel:+966920011626', '_self')}
+                    onClick={() => window.open('tel:+966534429329', '_self')}
                     className="p-2 bg-purple-100 hover:bg-purple-200 rounded-full transition-colors"
-                    title="Call Elite Vet"
+                    title="Call Fluff N Woof"
                   >
                     <Phone className="w-4 h-4 text-purple-600" />
                   </button>
                   {/* WhatsApp Icon */}
                   <button
-                    onClick={() => window.open('https://wa.me/966920011626', '_blank')}
+                    onClick={() => window.open('https://wa.me/966534429329', '_blank')}
                     className="p-2 bg-purple-100 hover:bg-purple-200 rounded-full transition-colors"
-                    title="WhatsApp Elite Vet"
+                    title="WhatsApp Fluff N Woof"
                   >
                     <MessageCircle className="w-4 h-4 text-purple-600" />
                   </button>

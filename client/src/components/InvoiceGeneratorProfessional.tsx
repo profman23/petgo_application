@@ -157,7 +157,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
       <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
         <head>
           <meta charset="utf-8">
-          <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
+          <title>PetGo Invoice #${invoiceData.bookingId}</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body { 
@@ -179,7 +179,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               align-items: flex-start; 
               margin-bottom: 15px; 
               padding-bottom: 15px; 
-              border-bottom: 3px solid #8B2F8B;
+              border-bottom: 3px solid #1E50C8;
             }
             .logo-header {
               text-align: center;
@@ -195,7 +195,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             .company-name { 
               font-size: 32px; 
               font-weight: 900; 
-              color: #8B2F8B; 
+              color: #1E50C8; 
               margin-bottom: 8px;
               text-shadow: 1px 1px 2px rgba(139, 47, 139, 0.1);
             }
@@ -218,7 +218,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             .invoice-number { 
               font-size: 24px; 
               font-weight: bold; 
-              color: #8B2F8B; 
+              color: #1E50C8; 
               margin-bottom: 10px;
             }
             .invoice-date { 
@@ -241,12 +241,12 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               padding: 20px; 
               background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); 
               border-radius: 10px; 
-              border-left: 5px solid #8B2F8B;
+              border-left: 5px solid #1E50C8;
             }
             .section-title { 
               font-size: 18px; 
               font-weight: bold; 
-              color: #8B2F8B; 
+              color: #1E50C8; 
               margin-bottom: 15px; 
               border-bottom: 1px solid #e9ecef; 
               padding-bottom: 8px;
@@ -282,7 +282,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             .pet-name { 
               font-size: 16px; 
               font-weight: bold; 
-              color: #8B2F8B; 
+              color: #1E50C8; 
               margin-bottom: 8px;
             }
             .pet-details { 
@@ -299,7 +299,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             }
             .services-table th { 
-              background: linear-gradient(135deg, #8B2F8B 0%, #a855f7 100%); 
+              background: linear-gradient(135deg, #1E50C8 0%, #a855f7 100%); 
               color: white; 
               padding: 12px 8px; 
               text-align: center; 
@@ -319,7 +319,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
               padding: 25px; 
               border-radius: 12px; 
-              border: 3px solid #8B2F8B; 
+              border: 3px solid #1E50C8; 
               margin-top: 20px;
             }
             .total-row { 
@@ -335,8 +335,8 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             .final-total { 
               font-size: 20px; 
               font-weight: bold; 
-              color: #8B2F8B; 
-              border-top: 2px solid #8B2F8B; 
+              color: #1E50C8; 
+              border-top: 2px solid #1E50C8; 
               padding-top: 15px; 
               margin-top: 10px; 
               background: white; 
@@ -354,7 +354,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             .footer { 
               margin-top: 40px; 
               padding-top: 20px; 
-              border-top: 2px solid #8B2F8B; 
+              border-top: 2px solid #1E50C8; 
               text-align: center; 
               font-size: 12px; 
               color: #666;
@@ -362,7 +362,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             .thank-you { 
               font-size: 18px; 
               font-weight: bold; 
-              color: #8B2F8B; 
+              color: #1E50C8; 
               margin-bottom: 10px;
             }
             .logo-header img {
@@ -493,7 +493,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
         <html dir="${language === 'ar' ? 'rtl' : 'ltr'}">
           <head>
             <meta charset="utf-8">
-            <title>VETS VAN Invoice #${invoiceData.bookingId}</title>
+            <title>PetGo Invoice #${invoiceData.bookingId}</title>
             <style>
               /* Include all the print styles here */
               * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -539,7 +539,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
         <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-purple-600 to-purple-700 no-print rounded-t-2xl">
           <h3 className="text-2xl font-bold text-white flex items-center">
             <FileText className="h-7 w-7 mr-3 text-white" />
-            {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
+            {language === 'ar' ? 'فاتورة PetGo' : 'PetGo Invoice'}
           </h3>
           <div className="flex gap-3">
             <Button onClick={printInvoice} variant="outline" size="sm" className="text-white border-white hover:bg-white hover:text-purple-600">
@@ -562,7 +562,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           <div className="logo-header">
             <img 
               src={logoImage}
-              alt="Vets Van Logo"
+              alt="PetGo Logo"
               className="mx-auto h-20 object-contain"
             />
           </div>
@@ -572,7 +572,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
             <div className="logo-section">
               <div className="mb-3">
                 <div className="company-name text-3xl font-black text-purple-600">
-                  VETS VAN
+                  PetGo
                 </div>
                 <div className="company-tagline text-gray-600 font-medium">
                   {language === 'ar' ? 'خدمات بيطرية متنقلة في منزلك' : 'Mobile Veterinary Services at Your Home'}
@@ -581,11 +581,11 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
               <div className="contact-info text-sm text-gray-600 space-y-1">
                 <div className="flex items-center">
                   <Phone className="h-4 w-4 mr-2 text-purple-600" />
-                  <span>+966 50 123 4567</span>
+                  <span>+9660000000</span>
                 </div>
                 <div className="flex items-center">
                   <Mail className="h-4 w-4 mr-2 text-purple-600" />
-                  <span>info@vetsvan.com</span>
+                  <span>profman23@gmail.com</span>
                 </div>
                 <div>
                   <span>{language === 'ar' ? 'الرياض، المملكة العربية السعودية' : 'Riyadh, Saudi Arabia'}</span>
@@ -634,7 +634,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#1E50C8 to-purple-600 my-6"></div>
 
           {/* Customer Information */}
           <div className="section border-2 border-purple-600 shadow-lg">
@@ -669,7 +669,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#1E50C8 to-purple-600 my-6"></div>
 
           {/* Pets Information */}
           <div className="section border-2 border-purple-600 shadow-lg">
@@ -691,7 +691,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#1E50C8 to-purple-600 my-6"></div>
 
           {/* Service Items */}
           <div className="section border-2 border-purple-600 shadow-lg">
@@ -786,7 +786,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#1E50C8 to-purple-600 my-6"></div>
 
           {/* Enhanced Invoice Summary */}
           <div className="total-section border-4 border-purple-600 shadow-xl bg-gradient-to-br from-purple-50 to-white rounded-lg">
@@ -831,7 +831,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           </div>
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#1E50C8 to-purple-600 my-6"></div>
 
           {/* Payment Methods */}
           {invoiceData.paymentMethods && invoiceData.paymentMethods.length > 0 && (
@@ -878,7 +878,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           )}
 
           {/* Separator Line */}
-          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#852085 to-purple-600 my-6"></div>
+          <div className="w-full h-px bg-gradient-to-r from-purple-600 via-#1E50C8 to-purple-600 my-6"></div>
 
           {/* Notes */}
           {invoiceData.notes && (
@@ -893,7 +893,7 @@ export default function InvoiceGeneratorProfessional({ invoiceData, onClose }: I
           {/* Footer */}
           <div className="footer">
             <div className="thank-you">
-              {language === 'ar' ? 'شكراً لاختياركم VETS VAN' : 'Thank you for choosing VETS VAN'}
+              {language === 'ar' ? 'شكراً لاختياركم PetGo' : 'Thank you for choosing PetGo'}
             </div>
             <p>
               {language === 'ar' 

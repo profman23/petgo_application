@@ -198,7 +198,7 @@ export function AuthorizationModal({
           onChange={() => handlePermissionToggle(screenId, permissionType)}
           className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500 checked:border-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            accentColor: isDisabled ? '#d1d5db' : '#852085'
+            accentColor: isDisabled ? '#d1d5db' : '#1E50C8'
           }}
           data-testid={`checkbox-${screenId}-${permissionType}`}
         />
@@ -218,7 +218,7 @@ export function AuthorizationModal({
             {/* Lord Icon */}
             <div 
               dangerouslySetInnerHTML={{
-                __html: '<lord-icon src="https://cdn.lordicon.com/gjlzobte.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                __html: '<lord-icon src="https://cdn.lordicon.com/gjlzobte.json" trigger="hover" colors="primary:#1E50C8,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
               }}
             />
             
@@ -263,7 +263,7 @@ export function AuthorizationModal({
               <button
                 onClick={() => onSave(authorizationName || '', permissions)}
                 className="px-4 py-2 text-sm font-medium text-white bg-purple-600 border border-transparent rounded-md hover:bg-purple-700"
-                style={{ backgroundColor: '#852085' }}
+                style={{ backgroundColor: '#1E50C8' }}
                 data-testid="button-save-authorization"
               >
                 {language === 'ar' ? 'حفظ' : 'Save'}

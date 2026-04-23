@@ -309,7 +309,7 @@ export function VetsVanBookingUnified({
         headers: getAuthHeaders(),
         credentials: 'include',
       });
-      if (!response.ok) throw new Error('Failed to fetch Vets Vans');
+      if (!response.ok) throw new Error('Failed to fetch PetGos');
       return await response.json();
     },
     enabled: isModal ? open : true,
@@ -895,11 +895,11 @@ export function VetsVanBookingUnified({
           )}
           
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Vets Van Booking Schedule</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">PetGo Booking Schedule</h1>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600">
-                  Available Vets Vans: {availableVetsVans.length}
+                  Available PetGos: {availableVetsVans.length}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
                   Shifts loaded: {shifts.length} for {selectedDate}
@@ -1058,10 +1058,10 @@ export function VetsVanBookingUnified({
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">🚐</div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No Available Vets Vans
+                No Available PetGos
               </h3>
               <p className="text-gray-600">
-                No Vets Vans with active shifts found for this date.
+                No PetGos with active shifts found for this date.
               </p>
             </div>
           )}
@@ -1153,7 +1153,7 @@ export function VetsVanBookingUnified({
         <DialogContent className="max-w-[95vw] max-h-[90vh] p-0 overflow-hidden flex flex-col">
           <div className="p-6 pb-2 flex-shrink-0">
             <DialogHeader>
-              <DialogTitle>Vets Van Booking Schedule</DialogTitle>
+              <DialogTitle>PetGo Booking Schedule</DialogTitle>
             </DialogHeader>
           </div>
           <div className="flex-1 overflow-y-auto px-6 pb-6">

@@ -57,7 +57,7 @@ export default function AdminHome() {
               <lord-icon
                 src="https://cdn.lordicon.com/hfadyleu.json"
                 trigger={triggerAnimation}
-                colors="primary:#852085,secondary:#848484"
+                colors="primary:#1E50C8,secondary:#848484"
                 style={{ width: '80px', height: '80px' }}
               />
             </div>

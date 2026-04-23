@@ -122,17 +122,17 @@ export const adminSidebarConfig: SidebarSection[] = [
   // VetsVan Management
   {
     id: "vetsvan-management",
-    i18nKey: { en: "VetsVan Management", ar: "إدارة VETS VAN" },
+    i18nKey: { en: "VetsVan Management", ar: "إدارة PetGo" },
     icon: Car,
     route: "/admin-dashboard",
     requiresPermission: "VetsVanManagement",
     permissionRedirect: "/admin-home"
   },
   
-  // Vets Van Shifts
+  // PetGo Shifts
   {
     id: "vets-van-shifts",
-    i18nKey: { en: "Vets Van Shifts", ar: "نوبات VETS VAN" },
+    i18nKey: { en: "PetGo Shifts", ar: "نوبات PetGo" },
     icon: Clock,
     route: "/vets-van-shifts",
     requiresPermission: "VetsVanShifts",
@@ -162,10 +162,10 @@ export const adminSidebarConfig: SidebarSection[] = [
     ]
   },
   
-  // Vets Van Requests
+  // PetGo Requests
   {
     id: "vets-van-requests",
-    i18nKey: { en: "Vets Van Requests", ar: "طلبات VETS VAN" },
+    i18nKey: { en: "PetGo Requests", ar: "طلبات PetGo" },
     icon: FileText,
     route: "/admin-vetsvan-requests",
     requiresPermission: "VetsVanRequests",

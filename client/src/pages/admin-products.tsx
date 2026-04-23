@@ -366,7 +366,7 @@ const ProductsManagementTable = ({ language, isReadOnly }: { language: 'ar' | 'e
             src="https://cdn.lordicon.com/nppnalch.json"
             trigger="loop"
             delay="2000"
-            colors="primary:#852085,secondary:#848484"
+            colors="primary:#1E50C8,secondary:#848484"
             style={{width: '90px', height: '90px'}}
           />
           {language === 'ar' ? 'إدارة المنتجات' : 'Products Management'}

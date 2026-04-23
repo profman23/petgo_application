@@ -37,24 +37,28 @@ export interface PaymentStatus {
   InvoiceError: string;
 }
 
+const MYFATOORAH_ENABLED = process.env.MYFATOORAH_ENABLED === 'true';
+
 export class MyFatoorahService {
   private baseURL: string;
   private apiKey: string;
+  private enabled: boolean;
 
   constructor() {
-    // Try Saudi Arabia production environment
     this.baseURL = 'https://api-sa.myfatoorah.com';
     this.apiKey = process.env.MYFATOORAH_API_KEY || '';
-    
-    if (!this.apiKey) {
-      throw new Error('MYFATOORAH_API_KEY environment variable is required');
+    this.enabled = MYFATOORAH_ENABLED;
+
+    if (!this.enabled) {
+      console.log('💳 MyFatoorah: DISABLED (MYFATOORAH_ENABLED=false). Payment calls return mock success.');
+      return;
     }
-    
-    console.log('🔧 MyFatoorah Service initialized for Saudi Arabia:', {
-      baseURL: this.baseURL,
-      hasApiKey: !!this.apiKey,
-      apiKeyLength: this.apiKey.length
-    });
+
+    if (!this.apiKey) {
+      throw new Error('MYFATOORAH_API_KEY environment variable is required when MYFATOORAH_ENABLED=true');
+    }
+
+    console.log('🔧 MyFatoorah Service initialized for Saudi Arabia');
   }
 
   private getHeaders() {
@@ -66,6 +70,22 @@ export class MyFatoorahService {
   }
 
   async createInvoice(request: CreateInvoiceRequest): Promise<CreateInvoiceResponse> {
+    if (!this.enabled) {
+      const mockInvoiceId = Math.floor(Math.random() * 1000000);
+      console.log('💳 [MYFATOORAH DISABLED] Mock invoice created:', { amount: request.InvoiceValue, customer: request.CustomerName, reference: request.CustomerReference });
+      return {
+        IsSuccess: true,
+        Message: 'Mock invoice (MyFatoorah disabled in dev)',
+        Data: {
+          InvoiceId: mockInvoiceId,
+          InvoiceURL: `${request.CallBackUrl}?paymentId=mock_${mockInvoiceId}&Id=${mockInvoiceId}`,
+          PaymentURL: `${request.CallBackUrl}?paymentId=mock_${mockInvoiceId}&Id=${mockInvoiceId}`,
+          CustomerReference: request.CustomerReference,
+          InvoiceReference: `MOCK-${mockInvoiceId}`
+        }
+      };
+    }
+
     try {
       console.log('🏦 Creating MyFatoorah invoice:', {
         amount: request.InvoiceValue,
@@ -73,12 +93,7 @@ export class MyFatoorahService {
         reference: request.CustomerReference
       });
 
-      console.log('🔐 API Details:', {
-        baseURL: this.baseURL,
-        apiKeyLength: this.apiKey.length,
-        apiKeyPrefix: this.apiKey.substring(0, 20) + '...',
-        headers: this.getHeaders()
-      });
+      console.log('🔐 MyFatoorah request to:', this.baseURL);
 
       const response = await axios.post(
         `${this.baseURL}/v2/SendPayment`,
@@ -89,13 +104,11 @@ export class MyFatoorahService {
       console.log('✅ MyFatoorah invoice created successfully:', response.data);
       return response.data;
     } catch (error: any) {
-      console.error('❌ MyFatoorah detailed error:', {
+      console.error('❌ MyFatoorah error:', {
         status: error.response?.status,
         statusText: error.response?.statusText,
         data: error.response?.data,
-        headers: error.response?.headers,
-        url: error.config?.url,
-        requestHeaders: error.config?.headers
+        url: error.config?.url
       });
       
       // Log validation errors in detail
@@ -111,6 +124,17 @@ export class MyFatoorahService {
   }
 
   async getPaymentStatus(invoiceId: number): Promise<PaymentStatus> {
+    if (!this.enabled) {
+      console.log('💳 [MYFATOORAH DISABLED] Mock payment status for invoice:', invoiceId);
+      return {
+        InvoiceId: invoiceId,
+        InvoiceStatus: 'Paid',
+        InvoiceValue: 0,
+        PaidValue: 0,
+        PaymentMethod: 'MockPayment',
+        InvoiceError: ''
+      };
+    }
     try {
       console.log('🔍 Checking payment status for invoice:', invoiceId);
 
@@ -149,6 +173,21 @@ export class MyFatoorahService {
   }
 
   async getPaymentDetailsFromCallback(paymentId: string): Promise<any> {
+    if (!this.enabled) {
+      console.log('💳 [MYFATOORAH DISABLED] Mock payment details for:', paymentId);
+      return {
+        paymentId,
+        invoiceId: 0,
+        amount: 0,
+        currency: 'SAR',
+        status: 'paid',
+        customerReference: paymentId,
+        paidAt: new Date(),
+        customerName: 'Mock Customer',
+        customerEmail: 'mock@dev.local',
+        customerMobile: '500000000'
+      };
+    }
     try {
       console.log('🔍 Fetching payment details from MyFatoorah for payment ID:', paymentId);
 
@@ -188,6 +227,10 @@ export class MyFatoorahService {
   }
 
   async getInvoiceDetails(invoiceId: number): Promise<any> {
+    if (!this.enabled) {
+      console.log('💳 [MYFATOORAH DISABLED] Mock invoice details for:', invoiceId);
+      return { Data: { InvoiceId: invoiceId, InvoiceStatus: 'Paid', InvoiceValue: 0 } };
+    }
     try {
       console.log('🔍 Fetching invoice details from MyFatoorah for invoice ID:', invoiceId);
 

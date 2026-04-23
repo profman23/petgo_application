@@ -191,7 +191,7 @@ export default function FinancialARBalance() {
               src="https://cdn.lordicon.com/mrniyolg.json"
               trigger="loop"
               delay="1500"
-              colors="primary:#852085,secondary:#848484"
+              colors="primary:#1E50C8,secondary:#848484"
               style={{width:'80px',height:'80px'}}
             />
             

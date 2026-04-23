@@ -72,7 +72,7 @@ export default function DoctorActivity() {
     queryClient.invalidateQueries({ queryKey: ['/api/doctor/bookings'] });
   }, [queryClient]);
 
-  // Fetch bookings for the current doctor's VetsVan
+  // Fetch bookings for the current doctor's PetGo
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['/api/doctor/bookings'],
     queryFn: () => apiRequest('/api/doctor/bookings'),
@@ -440,7 +440,7 @@ export default function DoctorActivity() {
           <div className="flex items-center gap-3">
             <img 
               src={logoImage} 
-              alt="Vets Van" 
+              alt="PetGo" 
               className="h-8 object-contain"
             />
             <h1 className="text-lg font-semibold" style={{ textAlign }}>
@@ -509,7 +509,7 @@ export default function DoctorActivity() {
 
       <div className="p-4">
         {/* Doctor Info Card */}
-        <Card className="mb-6 bg-gradient-to-r #85208550 to-purple-600 border-purple-600">
+        <Card className="mb-6 bg-gradient-to-r #1E50C850 to-purple-600 border-purple-600">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">

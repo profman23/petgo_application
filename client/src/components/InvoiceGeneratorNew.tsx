@@ -101,7 +101,7 @@ export default function InvoiceGeneratorNew({ invoiceData, onClose }: InvoiceGen
           width: 120,
           margin: 2,
           color: {
-            dark: '#8B2F8B',
+            dark: '#1E50C8',
             light: '#FFFFFF'
           }
         });
@@ -150,7 +150,7 @@ export default function InvoiceGeneratorNew({ invoiceData, onClose }: InvoiceGen
               background: white;
             }
             .header {
-              background: linear-gradient(135deg, #8B2F8B 0%, #A855F7 50%, #6B46C1 100%);
+              background: linear-gradient(135deg, #1E50C8 0%, #A855F7 50%, #6B46C1 100%);
               color: white;
               padding: 40px;
               text-align: center;
@@ -190,7 +190,7 @@ export default function InvoiceGeneratorNew({ invoiceData, onClose }: InvoiceGen
               overflow: hidden;
             }
             .table th {
-              background: linear-gradient(135deg, #8B2F8B, #A855F7);
+              background: linear-gradient(135deg, #1E50C8, #A855F7);
               color: white;
               padding: 15px;
               text-align: ${language === 'ar' ? 'right' : 'left'};
@@ -274,9 +274,9 @@ export default function InvoiceGeneratorNew({ invoiceData, onClose }: InvoiceGen
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-y-auto">
         {/* Action Buttons */}
-        <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r #85208550 to-purple-600 no-print sticky top-0 z-10">
+        <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r #1E50C850 to-purple-600 no-print sticky top-0 z-10">
           <h3 className="text-xl font-bold text-purple-600">
-            {language === 'ar' ? 'فاتورة VETS VAN' : 'VETS VAN Invoice'}
+            {language === 'ar' ? 'فاتورة PetGo' : 'PetGo Invoice'}
           </h3>
           <div className="flex gap-3">
             <Button onClick={printInvoice} variant="outline" size="sm" className="text-purple-600 border-purple-600 hover:bg-purple-100">
@@ -299,7 +299,7 @@ export default function InvoiceGeneratorNew({ invoiceData, onClose }: InvoiceGen
           <div className="header">
             <div className="logo">VV</div>
             <h1 className="text-3xl font-bold mb-2">
-              VETS VAN
+              PetGo
             </h1>
             <p className="text-lg opacity-90 mb-1">
               {language === 'ar' ? 'العيادة البيطرية المتنقلة' : 'Mobile Veterinary Clinic'}
@@ -452,7 +452,7 @@ export default function InvoiceGeneratorNew({ invoiceData, onClose }: InvoiceGen
             {/* Footer */}
             <div className="text-center mt-8 pt-6 border-t border-gray-200">
               <p className="text-gray-600 text-sm">
-                {language === 'ar' ? 'شكراً لاختيارك VETS VAN' : 'Thank you for choosing VETS VAN'}
+                {language === 'ar' ? 'شكراً لاختيارك PetGo' : 'Thank you for choosing PetGo'}
               </p>
               <p className="text-gray-500 text-xs mt-1">
                 {language === 'ar' ? 'خدمة بيطرية متميزة' : 'Premium Veterinary Service'}

@@ -87,8 +87,8 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
                   <div className="flex flex-col h-full bg-white">
                     <div className="p-4 border-b">
                       <div className="flex items-center gap-2">
-                        <img src={vetsVanLogo} alt="VetsVan Logo" className="h-8 w-8" />
-                        <span className="text-lg font-semibold text-purple-800">VetsVan</span>
+                        <img src={vetsVanLogo} alt="PetGo Logo" className="h-12 w-auto object-contain" />
+                        <span className="text-lg font-semibold text-purple-800">PetGo</span>
                       </div>
                     </div>
                     <MobileSidebar />
@@ -98,10 +98,10 @@ function AdminLayoutContent({ children }: AdminLayoutProps) {
 
               {/* Logo */}
               <div className="flex items-center">
-                <img 
-                  src={vetsVanLogo} 
-                  alt="VETS VAN" 
-                  className="h-12 w-auto object-contain"
+                <img
+                  src={vetsVanLogo}
+                  alt="PetGo"
+                  className="h-20 md:h-24 w-auto object-contain"
                 />
               </div>
             </div>

@@ -259,7 +259,7 @@ export default function AdminDashboard() {
                       type="text"
                       value={newDriver.vetsvanCode}
                       onChange={(e) => setNewDriver({ ...newDriver, vetsvanCode: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                       placeholder="V001"
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -270,7 +270,7 @@ export default function AdminDashboard() {
                       type="text"
                       value={newDriver.vetsvanName}
                       onChange={(e) => setNewDriver({ ...newDriver, vetsvanName: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                       placeholder="VETS VAN 1"
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -281,7 +281,7 @@ export default function AdminDashboard() {
                       type="tel"
                       value={newDriver.phone}
                       onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                       placeholder="05xxxxxxxx"
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -292,7 +292,7 @@ export default function AdminDashboard() {
                       type="text"
                       value={newDriver.username}
                       onChange={(e) => setNewDriver({ ...newDriver, username: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                       placeholder={t('username')}
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
                       type="password"
                       value={newDriver.password}
                       onChange={(e) => setNewDriver({ ...newDriver, password: e.target.value })}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                       placeholder={t('password')}
                       style={{ textAlign: getTextAlign(language) }}
                     />

@@ -122,7 +122,7 @@ export default function AdminLogin() {
                     strokeDashoffset="75.36"
                     className="text-purple-600 transition-all duration-1000 ease-in-out"
                     style={{ 
-                      color: '#852085',
+                      color: '#1E50C8',
                       animation: 'dash 3s ease-in-out infinite alternate'
                     }}
                   />
@@ -158,7 +158,7 @@ export default function AdminLogin() {
                     strokeDashoffset="50.24"
                     className="text-purple-600 transition-all duration-1000 ease-in-out"
                     style={{ 
-                      color: '#852085',
+                      color: '#1E50C8',
                       animation: 'dash2 2.5s ease-in-out infinite alternate'
                     }}
                   />
@@ -194,7 +194,7 @@ export default function AdminLogin() {
                     strokeDashoffset="125.6"
                     className="text-purple-600 transition-all duration-1000 ease-in-out"
                     style={{ 
-                      color: '#852085',
+                      color: '#1E50C8',
                       animation: 'dash3 4s ease-in-out infinite alternate'
                     }}
                   />
@@ -230,7 +230,7 @@ export default function AdminLogin() {
                     strokeDashoffset="25.12"
                     className="text-purple-600 transition-all duration-1000 ease-in-out"
                     style={{ 
-                      color: '#852085',
+                      color: '#1E50C8',
                       animation: 'dash4 3.5s ease-in-out infinite alternate'
                     }}
                   />
@@ -251,7 +251,7 @@ export default function AdminLogin() {
                 <PhoneCall 
                   className="w-7 h-7"
                   style={{ 
-                    color: '#852085',
+                    color: '#1E50C8',
                     animation: 'bounce 1.5s ease-in-out infinite'
                   }}
                 />
@@ -262,7 +262,7 @@ export default function AdminLogin() {
                 <Mail 
                   className="w-8 h-8"
                   style={{ 
-                    color: '#852085',
+                    color: '#1E50C8',
                     animation: 'swing 2s ease-in-out infinite'
                   }}
                 />
@@ -273,7 +273,7 @@ export default function AdminLogin() {
                 <Brain 
                   className="w-7 h-7"
                   style={{ 
-                    color: '#852085',
+                    color: '#1E50C8',
                     animation: 'brainPulse 2.5s ease-in-out infinite'
                   }}
                 />
@@ -294,7 +294,7 @@ export default function AdminLogin() {
                   <div 
                     className="h-2 rounded-full transition-all duration-2000 ease-in-out"
                     style={{ 
-                      backgroundColor: '#852085',
+                      backgroundColor: '#1E50C8',
                       animation: 'bar1 3s ease-in-out infinite alternate',
                       width: '78%'
                     }}
@@ -312,7 +312,7 @@ export default function AdminLogin() {
                   <div 
                     className="h-2 rounded-full transition-all duration-2000 ease-in-out"
                     style={{ 
-                      backgroundColor: '#852085',
+                      backgroundColor: '#1E50C8',
                       animation: 'bar2 2.5s ease-in-out infinite alternate',
                       width: '60%'
                     }}
@@ -330,7 +330,7 @@ export default function AdminLogin() {
                   <div 
                     className="h-2 rounded-full transition-all duration-2000 ease-in-out"
                     style={{ 
-                      backgroundColor: '#852085',
+                      backgroundColor: '#1E50C8',
                       animation: 'bar3 4s ease-in-out infinite alternate',
                       width: '90%'
                     }}
@@ -348,7 +348,7 @@ export default function AdminLogin() {
                   <div 
                     className="h-2 rounded-full transition-all duration-2000 ease-in-out"
                     style={{ 
-                      backgroundColor: '#852085',
+                      backgroundColor: '#1E50C8',
                       animation: 'bar4 3.5s ease-in-out infinite alternate',
                       width: '45%'
                     }}
@@ -440,7 +440,7 @@ export default function AdminLogin() {
                       required
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                       placeholder={t('username')}
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -460,7 +460,7 @@ export default function AdminLogin() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-#852085 focus:border-purple-600 sm:text-sm"
+                      className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-#1E50C8 focus:border-purple-600 sm:text-sm"
                       placeholder={t('password')}
                       style={{ textAlign: getTextAlign(language) }}
                     />
@@ -471,7 +471,7 @@ export default function AdminLogin() {
                   <button
                     type="submit"
                     disabled={loginMutation.isPending}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-#852085 disabled:opacity-50"
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-#1E50C8 disabled:opacity-50"
                   >
                     {loginMutation.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

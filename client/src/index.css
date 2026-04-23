@@ -11,11 +11,11 @@
     transition: border-color 0.2s ease;
   }
   .input-compact-20:hover {
-    border-color: #852085;
+    border-color: #1E50C8;
   }
   .input-compact-20:focus {
-    border-color: #852085;
-    ring-color: #852085;
+    border-color: #1E50C8;
+    ring-color: #1E50C8;
   }
   .description-field {
     @apply w-[200px] h-[50px] px-2 py-1 text-[12px] leading-[14px] rounded-sm focus:outline-none focus:ring-1 resize-none;
@@ -23,11 +23,11 @@
     transition: border-color 0.2s ease;
   }
   .description-field:hover {
-    border-color: #852085;
+    border-color: #1E50C8;
   }
   .description-field:focus {
-    border-color: #852085;
-    ring-color: #852085;
+    border-color: #1E50C8;
+    ring-color: #1E50C8;
   }
   .select-reset {
     @apply appearance-none min-h-0;
@@ -38,11 +38,11 @@
     transition: border-color 0.2s ease;
   }
   .credit-note-input:hover:not(:disabled) {
-    border-color: #852085;
+    border-color: #1E50C8;
   }
   .credit-note-input:focus {
-    border-color: #852085;
-    box-shadow: 0 0 0 1px #852085;
+    border-color: #1E50C8;
+    box-shadow: 0 0 0 1px #1E50C8;
   }
 }
 
@@ -106,22 +106,22 @@
 
 /* Custom button override to remove shadcn/ui styling */
 .custom-purple-button {
-  background: linear-gradient(to right, #852085, #732073) !important;
-  background-color: #852085 !important;
+  background: linear-gradient(to right, #1E50C8, #0D3AA8) !important;
+  background-color: #1E50C8 !important;
   color: white !important;
   border: none !important;
   outline: none !important;
 }
 
 .custom-purple-button:hover {
-  background: linear-gradient(to right, #732073, #611961) !important;
-  background-color: #732073 !important;
+  background: linear-gradient(to right, #0D3AA8, #0A2E87) !important;
+  background-color: #0D3AA8 !important;
   color: white !important;
 }
 
 .custom-purple-button:focus {
-  background: linear-gradient(to right, #852085, #732073) !important;
-  background-color: #852085 !important;
+  background: linear-gradient(to right, #1E50C8, #0D3AA8) !important;
+  background-color: #1E50C8 !important;
   color: white !important;
   box-shadow: none !important;
 }
@@ -155,7 +155,7 @@
     opacity: 1;
   }
   50% {
-    border-color: #852085;
+    border-color: #1E50C8;
     opacity: 0.8;
   }
 }
@@ -171,7 +171,7 @@
     opacity: 1;
   }
   50% {
-    color: #852085;
+    color: #1E50C8;
     opacity: 0.8;
   }
 }
@@ -315,21 +315,34 @@
   animation: bounce-right-to-left 6s ease-in-out infinite;
 }
 
-/* Custom purple theme with new color #852085 */
+/* PetGo brand theme — blue primary #1E50C8, green accent #4CB847 */
 :root {
-  --purple-primary: #852085;
-  --purple-dark: #732073;
-  --purple-light: #972097;
-  --purple-accent: #A940A9;
-  --purple-100: #F3E8F3;
-  --purple-200: #E1CCE1;
-  --purple-300: #CEB0CE;
-  --purple-400: #B594B5;
-  --purple-500: #9C789C;
-  --purple-600: #852085;
-  --purple-700: #732073;
-  --purple-800: #611961;
-  --purple-900: #4F134F;
+  /* Brand tokens */
+  --brand-blue: #1E50C8;
+  --brand-blue-dark: #0D3AA8;
+  --brand-blue-light: #3A6FD8;
+  --brand-blue-50: #EEF4FF;
+  --brand-blue-100: #D9E5FD;
+  --brand-green: #4CB847;
+  --brand-green-dark: #3A9E36;
+  --brand-green-light: #6DD165;
+  --brand-green-50: #EEFBEE;
+  --brand-green-100: #D4F5D2;
+
+  /* Legacy purple aliases → mapped to brand blue for backwards compatibility */
+  --purple-primary: #1E50C8;
+  --purple-dark: #0D3AA8;
+  --purple-light: #3A6FD8;
+  --purple-accent: #3A6FD8;
+  --purple-100: #EEF4FF;
+  --purple-200: #D9E5FD;
+  --purple-300: #B3CBFA;
+  --purple-400: #7EA4E8;
+  --purple-500: #4A7BD9;
+  --purple-600: #1E50C8;
+  --purple-700: #0D3AA8;
+  --purple-800: #0A2E87;
+  --purple-900: #082568;
 }
 
 :root {
@@ -343,19 +356,19 @@
   --card-foreground: hsl(20, 14.3%, 4.1%);
   --border: hsl(20, 5.9%, 90%);
   --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(210, 100%, 4%);
+  --primary: hsl(222, 76%, 45%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(142, 71%, 45%);
+  --secondary: hsl(117, 46%, 50%);
   --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(207, 90%, 54%);
+  --accent: hsl(222, 76%, 45%);
   --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --warning: hsl(38, 92%, 50%);
   --warning-foreground: hsl(0, 0%, 100%);
-  --success: hsl(168, 76%, 36%);
+  --success: hsl(117, 46%, 50%);
   --success-foreground: hsl(0, 0%, 100%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  --ring: hsl(222, 76%, 45%);
   --radius: 0.5rem;
 }
 
@@ -370,11 +383,11 @@
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 3.7%, 15.9%);
   --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(210, 100%, 4%);
+  --primary: hsl(222, 76%, 55%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(142, 71%, 45%);
+  --secondary: hsl(117, 46%, 55%);
   --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(207, 90%, 54%);
+  --accent: hsl(222, 76%, 55%);
   --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(0, 0%, 98%);
@@ -467,7 +480,7 @@
     right: -1.5rem !important;
   }
 
-  /* Global purple color override using the new #852085 color */
+  /* Global purple color override using the new #1E50C8 color */
   .text-purple-100 { color: var(--purple-100) !important; }
   .text-purple-200 { color: var(--purple-200) !important; }
   .text-purple-300 { color: var(--purple-300) !important; }

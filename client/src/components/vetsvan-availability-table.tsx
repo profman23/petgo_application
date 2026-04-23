@@ -535,7 +535,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
       return 'past_time';
     }
     
-    // First check if user has a booking at this time and VetsVan
+    // First check if user has a booking at this time and PetGo
     const userBooking = userBookings.find((booking: any) => 
       booking.appointmentTime === time && 
       booking.appointmentDate === selectedDate &&
@@ -690,7 +690,7 @@ export function VetsVanAvailabilityTable({ onSelectTimeSlot, enableDirectBooking
             </span>
           </button>
           
-          <div className="flex items-center gap-2 px-4 py-2 #85208550 border border-purple-600 rounded-lg">
+          <div className="flex items-center gap-2 px-4 py-2 #1E50C850 border border-purple-600 rounded-lg">
             <Calendar className="w-4 h-4 text-purple-600" />
             <span className="text-sm font-semibold text-purple-600" style={{
               fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'

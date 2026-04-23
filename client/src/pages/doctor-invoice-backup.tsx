@@ -260,7 +260,7 @@ export default function DoctorInvoice() {
 
   const translations = {
     ar: {
-      invoiceTitle: 'فاتورة خدمة VETS VAN',
+      invoiceTitle: 'فاتورة خدمة PetGo',
       customerInfo: 'بيانات العميل',
       petInfo: 'بيانات الأليف',
       serviceDetails: 'تفاصيل الخدمة',
@@ -326,7 +326,7 @@ export default function DoctorInvoice() {
       clearFilters: 'مسح الفلاتر',
     },
     en: {
-      invoiceTitle: 'VETS VAN Service Invoice',
+      invoiceTitle: 'PetGo Service Invoice',
       customerInfo: 'Customer Information',
       petInfo: 'Pet Information',
       serviceDetails: 'Service Details',
@@ -1844,7 +1844,7 @@ export default function DoctorInvoice() {
             tax: taxAmount,
             total: finalTotal,
             notes: notes,
-            doctorName: doctorInfo.name || 'Dr. VETS VAN',
+            doctorName: doctorInfo.name || 'Dr. PetGo',
             vetsVanCode: doctorInfo.vetsvanCode || 'VETS001'
           }}
           onClose={() => setShowInvoiceGenerator(false)}

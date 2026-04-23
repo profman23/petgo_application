@@ -1,0 +1,71 @@
+# Render blueprint — deploy PetGo staging + production.
+# After importing this repo in Render, it will prompt for secret env vars.
+# See SECURITY.md for how to set env vars securely.
+services:
+  - type: web
+    name: petgo-staging
+    env: node
+    region: frankfurt
+    plan: free
+    branch: staging
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: APP_ENV
+        value: staging
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: EMAIL_ENABLED
+        value: "false"
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: FROM_EMAIL
+        value: profman23@gmail.com
+      - key: MYFATOORAH_ENABLED
+        value: "false"
+      - key: MYFATOORAH_API_KEY
+        sync: false
+      - key: TAQNYAT_ENABLED
+        value: "false"
+      - key: TAQNYAT_API_KEY
+        sync: false
+      - key: PERPLEXITY_ENABLED
+        value: "false"
+      - key: PERPLEXITY_API_KEY
+        sync: false
+
+  - type: web
+    name: petgo-production
+    env: node
+    region: frankfurt
+    plan: free
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: EMAIL_ENABLED
+        value: "false"
+      - key: EMAIL_PASSWORD
+        sync: false
+      - key: FROM_EMAIL
+        value: profman23@gmail.com
+      - key: MYFATOORAH_ENABLED
+        value: "false"
+      - key: MYFATOORAH_API_KEY
+        sync: false
+      - key: TAQNYAT_ENABLED
+        value: "false"
+      - key: TAQNYAT_API_KEY
+        sync: false
+      - key: PERPLEXITY_ENABLED
+        value: "false"
+      - key: PERPLEXITY_API_KEY
+        sync: false

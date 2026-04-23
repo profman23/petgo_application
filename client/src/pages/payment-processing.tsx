@@ -27,7 +27,7 @@ export default function PaymentProcessing() {
 
   return (
     <div 
-      className={`min-h-screen bg-gradient-to-br #85208550 to-white flex flex-col ${direction === 'rtl' ? 'font-arabic' : ''}`}
+      className={`min-h-screen bg-gradient-to-br #1E50C850 to-white flex flex-col ${direction === 'rtl' ? 'font-arabic' : ''}`}
       dir={direction}
     >
       {/* Header */}
@@ -37,7 +37,7 @@ export default function PaymentProcessing() {
             <div className="w-12 h-12 bg-white border-2 border-purple-600 rounded-xl p-1 shadow-md hover:shadow-lg transition-all duration-200">
               <img 
                 src={logoImage} 
-                alt="VetsVan Logo" 
+                alt="PetGo Logo" 
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
@@ -77,7 +77,7 @@ export default function PaymentProcessing() {
                 }
               </p>
 
-              <div className="#85208550 rounded-lg p-4 mt-6">
+              <div className="#1E50C850 rounded-lg p-4 mt-6">
                 <p className="text-sm text-purple-600">
                   {language === 'ar'
                     ? '• سيتم التواصل معك خلال 15 دقيقة\n• يمكنك متابعة حالة طلبك في صفحة الأنشطة\n• تأكد من تشغيل الإشعارات'

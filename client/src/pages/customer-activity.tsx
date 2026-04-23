@@ -313,7 +313,7 @@ export default function CustomerActivity() {
             <div className="flex items-center">
               <img 
                 src={logoImage} 
-                alt="VETS VAN Logo" 
+                alt="PetGo Logo" 
                 className="h-8 w-auto object-contain logo-clean"
                 style={{ 
                   maxWidth: '60px',
@@ -396,7 +396,7 @@ export default function CustomerActivity() {
                   
                   <div className="space-y-3">
                     {groupedBookings[date].map((booking) => (
-                      <Card key={booking.id} className="border-l-4 border-l-#852085 hover:shadow-md transition-shadow">
+                      <Card key={booking.id} className="border-l-4 border-l-#1E50C8 hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
                           <div className="space-y-3">
                             {/* Header with status and time */}
@@ -664,7 +664,7 @@ function TrackingModal({ booking, trackingData: initialTrackingData, language, o
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
         {/* Header */}
-        <div style={{ backgroundColor: '#852085' }} className="text-white p-6 relative">
+        <div style={{ backgroundColor: '#1E50C8' }} className="text-white p-6 relative">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-white/80 hover:text-white"
@@ -681,7 +681,7 @@ function TrackingModal({ booking, trackingData: initialTrackingData, language, o
                 {language === 'ar' ? 'تتبع الوصول' : 'Track Arrival'}
               </h2>
               <p className="text-white/80">
-                {language === 'ar' ? 'VETS VAN في الطريق إليك' : 'VETS VAN is on the way'}
+                {language === 'ar' ? 'PetGo في الطريق إليك' : 'PetGo is on the way'}
               </p>
             </div>
           </div>
@@ -702,7 +702,7 @@ function TrackingModal({ booking, trackingData: initialTrackingData, language, o
                 <circle
                   cx="64" cy="64" r="56"
                   fill="none"
-                  stroke="#852085"
+                  stroke="#1E50C8"
                   strokeWidth="8"
                   strokeLinecap="round"
                   strokeDasharray={`${2 * Math.PI * 56}`}
@@ -713,7 +713,7 @@ function TrackingModal({ booking, trackingData: initialTrackingData, language, o
               
               {/* Countdown Text */}
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="text-2xl font-bold" style={{ color: '#852085' }}>
+                <div className="text-2xl font-bold" style={{ color: '#1E50C8' }}>
                   {formatCountdown()}
                 </div>
                 <div className="text-xs text-gray-600 mt-1">

@@ -108,7 +108,7 @@ export default function Patients() {
             <div className="flex items-center">
               <img 
                 src={logoImage} 
-                alt="VETS VAN Logo" 
+                alt="PetGo Logo" 
                 className="h-8 w-auto object-contain logo-clean"
                 style={{ 
                   maxWidth: '60px',

@@ -93,7 +93,7 @@ export function SearchActionBar({
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onKeyPress={handleSearchKeyPress}
-          className="w-full focus:border-[#852085] focus-visible:ring-2 focus-visible:ring-[#852085] focus-visible:ring-offset-2"
+          className="w-full focus:border-[#1E50C8] focus-visible:ring-2 focus-visible:ring-[#1E50C8] focus-visible:ring-offset-2"
           data-testid={inputTestId}
           dir={getDirection(language)}
         />
@@ -117,8 +117,8 @@ export function SearchActionBar({
             onClick={handleExportAction}
             className="flex-1 px-4 py-2 border-2 font-medium rounded-md transition-colors duration-200 bg-white hover:bg-purple-50"
             style={{ 
-              borderColor: '#852085', 
-              color: '#852085'
+              borderColor: '#1E50C8', 
+              color: '#1E50C8'
             }}
             data-testid={exportButtonTestId}
             disabled={exportDisabled}

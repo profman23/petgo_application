@@ -310,7 +310,7 @@ export default function VetsVanShifts() {
                     src="https://cdn.lordicon.com/warimioc.json"
                     trigger="loop"
                     stroke="bold"
-                    colors="primary:#852085,secondary:#b4b4b4"
+                    colors="primary:#1E50C8,secondary:#b4b4b4"
                     style={{width: '80px', height: '80px'}}
                   />
                   <span className="text-2xl font-bold text-gray-600" style={{ fontFamily: 'Arimo' }}>{t('shiftsSchedule')}</span>

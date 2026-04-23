@@ -196,7 +196,7 @@ export default function DoctorRideTracking() {
           <div className="flex items-center gap-3">
             <img 
               src={logoImage} 
-              alt="Vets Van" 
+              alt="PetGo" 
               className="h-8 object-contain"
             />
             <h1 className="text-lg font-semibold" style={{ textAlign }}>

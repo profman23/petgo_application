@@ -817,7 +817,7 @@ export default function FinancialCreditNote() {
           <div className="flex-shrink-0 -ml-6">
             <img 
               src={vetsVanLogo} 
-              alt="VETS VAN" 
+              alt="PetGo" 
               className="h-14 w-auto object-contain"
             />
           </div>
@@ -874,8 +874,8 @@ export default function FinancialCreditNote() {
                 <div className="flex flex-col h-full bg-white">
                   <div className="p-4 border-b">
                     <div className="flex items-center gap-2">
-                      <img src={vetsVanLogo} alt="VetsVan Logo" className="h-8 w-8" />
-                      <span className="text-lg font-semibold text-purple-800">VetsVan</span>
+                      <img src={vetsVanLogo} alt="PetGo Logo" className="h-8 w-8" />
+                      <span className="text-lg font-semibold text-purple-800">PetGo</span>
                     </div>
                   </div>
                   <nav className="flex-1 px-2 py-4 space-y-1">
@@ -1020,10 +1020,10 @@ export default function FinancialCreditNote() {
                       className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     >
                       <Car className="h-6 w-6 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'Vets Van Management'}</span>
+                      <span>{language === 'ar' ? 'إدارة الPetGo' : 'PetGo Management'}</span>
                     </button>
 
-                    {/* Vets Van Shifts */}
+                    {/* PetGo Shifts */}
                     <button
                       onClick={() => {
                         setLocation('/vets-van-shifts');
@@ -1032,7 +1032,7 @@ export default function FinancialCreditNote() {
                       className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     >
                       <Clock className="h-6 w-6 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
+                      <span>{language === 'ar' ? 'مناوبات PetGo' : 'PetGo Shifts'}</span>
                     </button>
 
                     {/* Reports */}
@@ -1090,7 +1090,7 @@ export default function FinancialCreditNote() {
                       className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 relative"
                     >
                       <FileText className="h-6 w-6 flex-shrink-0" />
-                      <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+                      <span>{language === 'ar' ? 'طلبات PetGo' : 'PetGo Requests'}</span>
                     </button>
 
                     {/* Import */}
@@ -1347,10 +1347,10 @@ export default function FinancialCreditNote() {
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Car className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'إدارة الفيتس فان' : 'Vets Van Management'}</span>
+              <span>{language === 'ar' ? 'إدارة الPetGo' : 'PetGo Management'}</span>
             </button>
 
-            {/* Vets Van Shifts */}
+            {/* PetGo Shifts */}
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -1360,7 +1360,7 @@ export default function FinancialCreditNote() {
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               <Clock className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'مناوبات VETS VAN' : 'Vets Van Shifts'}</span>
+              <span>{language === 'ar' ? 'مناوبات PetGo' : 'PetGo Shifts'}</span>
             </button>
             
             {/* Reports */}
@@ -1417,7 +1417,7 @@ export default function FinancialCreditNote() {
               className="group flex items-center gap-3 px-2 py-2 text-base font-medium rounded-md w-full mb-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 relative"
             >
               <FileText className="h-6 w-6 flex-shrink-0" />
-              <span>{language === 'ar' ? 'طلبات VETS VAN' : 'Vets Van Requests'}</span>
+              <span>{language === 'ar' ? 'طلبات PetGo' : 'PetGo Requests'}</span>
             </button>
             
             {/* Import */}
@@ -1470,7 +1470,7 @@ export default function FinancialCreditNote() {
               <div className="flex-shrink-0">
                 <div 
                   dangerouslySetInnerHTML={{
-                    __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="loop" delay="1500" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                    __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="loop" delay="1500" colors="primary:#1E50C8,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
                   }}
                 />
               </div>
@@ -1497,7 +1497,7 @@ export default function FinancialCreditNote() {
               }`}
               title={isReadOnlyMode ? (language === 'ar' ? 'غير مسموح - صلاحية القراءة فقط' : 'Not allowed - Read-only permission') : ''}
             >
-              <FilePlus className="h-4 w-4" style={{ color: isReadOnlyMode ? '#9CA3AF' : '#852085' }} />
+              <FilePlus className="h-4 w-4" style={{ color: isReadOnlyMode ? '#9CA3AF' : '#1E50C8' }} />
               {language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}
             </button>
           </div>
@@ -1561,7 +1561,7 @@ export default function FinancialCreditNote() {
               <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
                 <div 
                   dangerouslySetInnerHTML={{
-                    __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                    __html: '<lord-icon src="https://cdn.lordicon.com/wlkedhqk.json" trigger="hover" colors="primary:#1E50C8,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
                   }}
                 />
                 <span>{language === 'ar' ? 'إنشاء مذكرة ائتمان جديدة' : 'Create New Credit Note'}</span>
@@ -2006,7 +2006,7 @@ export default function FinancialCreditNote() {
               <div className="flex items-center gap-3" style={{textAlign: getTextAlign(language)}}>
                 <div 
                   dangerouslySetInnerHTML={{
-                    __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="hover" colors="primary:#852085,secondary:#848484" style="width:60px;height:60px"></lord-icon>'
+                    __html: '<lord-icon src="https://cdn.lordicon.com/lbrbofig.json" trigger="hover" colors="primary:#1E50C8,secondary:#848484" style="width:60px;height:60px"></lord-icon>'
                   }}
                 />
                 <span>{language === 'ar' ? 'تفاصيل مذكرة الائتمان' : 'Credit Note Details'}</span>

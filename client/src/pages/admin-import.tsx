@@ -249,7 +249,7 @@ export default function AdminImport() {
                     src="https://cdn.lordicon.com/qkyvpnmr.json"
                     trigger="loop"
                     delay="2000"
-                    colors="primary:#852085,secondary:#848484"
+                    colors="primary:#1E50C8,secondary:#848484"
                     style={{width: '90px', height: '90px'}}
                   />
                   {language === 'ar' ? 'استيراد البيانات' : 'Import Data'}
@@ -262,7 +262,7 @@ export default function AdminImport() {
                     onClick={() => setImportSubTab('products')}
                     className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                       importSubTab === 'products'
-                        ? 'border-purple-600 text-purple-600 #85208550'
+                        ? 'border-purple-600 text-purple-600 #1E50C850'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     }`}
                   >
@@ -273,7 +273,7 @@ export default function AdminImport() {
                     onClick={() => setImportSubTab('services')}
                     className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                       importSubTab === 'services'
-                        ? 'border-purple-600 text-purple-600 #85208550'
+                        ? 'border-purple-600 text-purple-600 #1E50C850'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     }`}
                   >

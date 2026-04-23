@@ -204,7 +204,7 @@ export default function AdministrationAuthorization() {
             <div className="flex-shrink-0">
               <div 
                 dangerouslySetInnerHTML={{
-                  __html: '<lord-icon src="https://cdn.lordicon.com/gjlzobte.json" trigger="loop" delay="1500" colors="primary:#852085,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
+                  __html: '<lord-icon src="https://cdn.lordicon.com/gjlzobte.json" trigger="loop" delay="1500" colors="primary:#1E50C8,secondary:#848484" style="width:80px;height:80px"></lord-icon>'
                 }}
               />
             </div>
@@ -225,12 +225,12 @@ export default function AdministrationAuthorization() {
                 : 'bg-white hover:bg-purple-50'
             }`}
             style={isReadOnly ? {} : { 
-              borderColor: '#852085', 
-              color: '#852085'
+              borderColor: '#1E50C8', 
+              color: '#1E50C8'
             }}
             data-testid="button-create-authorization"
           >
-            <FilePlus className="h-4 w-4" style={isReadOnly ? { color: '#9ca3af' } : { color: '#852085' }} />
+            <FilePlus className="h-4 w-4" style={isReadOnly ? { color: '#9ca3af' } : { color: '#1E50C8' }} />
             {language === 'ar' ? 'إنشاء صلاحية' : 'Create Authorization'}
           </button>
         </div>
@@ -278,7 +278,7 @@ export default function AdministrationAuthorization() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-purple-100 rounded-lg">
-                      <Shield className="h-5 w-5" style={{ color: '#852085' }} />
+                      <Shield className="h-5 w-5" style={{ color: '#1E50C8' }} />
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900" dir={getDirection(language)}>
@@ -300,7 +300,7 @@ export default function AdministrationAuthorization() {
                     data-testid={`button-edit-authorization-${role.id}`}
                     title={language === 'ar' ? 'تعديل' : 'Edit'}
                   >
-                    <Pencil className="h-5 w-5" style={{ color: isReadOnly ? '#9ca3af' : '#852085' }} />
+                    <Pencil className="h-5 w-5" style={{ color: isReadOnly ? '#9ca3af' : '#1E50C8' }} />
                   </button>
                 </div>
               </div>

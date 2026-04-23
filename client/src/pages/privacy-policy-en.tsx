@@ -10,7 +10,7 @@ export default function PrivacyPolicyEn() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Privacy Policy – VetsVan
+            Privacy Policy – PetGo
           </h1>
           
           <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed">
@@ -40,7 +40,7 @@ export default function PrivacyPolicyEn() {
             
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-3">Contact:</h2>
-              <p>For any inquiries, contact us at <a href="mailto:support@vetsvan.com" className="text-purple-600 hover:text-purple-800 underline">support@vetsvan.com</a>.</p>
+              <p>For any inquiries, contact us at <a href="mailto:profman23@gmail.com" className="text-purple-600 hover:text-purple-800 underline">profman23@gmail.com</a>.</p>
             </div>
             
             <div className="mt-8 pt-6 border-t border-gray-200">

@@ -287,7 +287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Generate OTP for password reset
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otp = (process.env.NODE_ENV !== 'production' ? '000000' : Math.floor(100000 + Math.random() * 900000).toString());
       
       // Store OTP with reset type - use code field, not otp
       await storage.createOtpVerification({
@@ -508,7 +508,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Standard registration flow with OTP
       // Generate OTP (6-digit number)
-      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpCode = (process.env.NODE_ENV !== 'production' ? '000000' : Math.floor(100000 + Math.random() * 900000).toString());
       
       // Create OTP verification record with expiration time (10 minutes from now)
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
@@ -742,7 +742,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Generate 6-digit OTP
-      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpCode = (process.env.NODE_ENV !== 'production' ? '000000' : Math.floor(100000 + Math.random() * 900000).toString());
       
       // Clean up any existing OTPs for this email
       await storage.deleteOtpVerification(email);
@@ -3987,10 +3987,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'Message and phone number are required' });
       }
 
-      // Taqnyat API configuration  
+      if (process.env.TAQNYAT_ENABLED !== 'true') {
+        console.log(`📱 [SMS DISABLED] Would send to ${phoneNumber}: ${message.substring(0, 100)}`);
+        return res.json({ success: true, message: 'SMS logged (Taqnyat disabled in dev)', data: { mock: true } });
+      }
+
       const taqnyatApiUrl = 'https://api.taqnyat.sa/v1/messages';
       const bearerToken = process.env.TAQNYAT_API_KEY;
-      
+
       if (!bearerToken) {
         console.error('TAQNYAT_API_KEY is not configured');
         return res.status(500).json({ message: 'SMS service not configured' });
@@ -5832,6 +5836,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         : screenContent;
 
       console.log('🧠 AI Doctor Analysis requested, content length:', truncatedContent.length);
+
+      if (process.env.PERPLEXITY_ENABLED !== 'true') {
+        console.log('🧠 [PERPLEXITY DISABLED] Returning mock analysis');
+        return res.json({
+          success: true,
+          analysis: '## ENGLISH ANALYSIS\n\n**Key Findings:**\n- AI analysis is disabled in development mode.\n\n## التحليل العربي\n\n**النتائج الرئيسية:**\n- تحليل الذكاء الاصطناعي معطل في وضع التطوير.',
+          mock: true
+        });
+      }
 
       const perplexityApiKey = process.env.PERPLEXITY_API_KEY;
       if (!perplexityApiKey) {
