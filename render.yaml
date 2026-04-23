@@ -6,7 +6,7 @@ services:
     name: petgo-staging
     env: node
     region: frankfurt
-    plan: free
+    plan: starter
     branch: staging
     buildCommand: npm install && npm run build
     startCommand: npm run start
@@ -40,7 +40,7 @@ services:
     name: petgo-production
     env: node
     region: frankfurt
-    plan: free
+    plan: starter
     branch: main
     buildCommand: npm install && npm run build
     startCommand: npm run start
