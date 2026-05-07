@@ -25,16 +25,20 @@ export class EmailService {
       throw new Error('EMAIL_PASSWORD environment variable is required when EMAIL_ENABLED=true');
     }
 
+    // SMTP transport — defaults to Resend (smtp.resend.com:465 TLS).
+    // Override with SMTP_HOST/SMTP_PORT/SMTP_USER env vars for other providers.
+    const smtpHost = process.env.SMTP_HOST || 'smtp.resend.com';
+    const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
+    const smtpUser = process.env.SMTP_USER || 'resend';
+    const smtpSecure = smtpPort === 465; // 465 = implicit TLS, others use STARTTLS
+
     this.transporter = nodemailer.createTransport({
-      host: 'smtp-mail.outlook.com',
-      port: 587,
-      secure: false,
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
       auth: {
-        user: this.fromEmail,
+        user: smtpUser,
         pass: process.env.EMAIL_PASSWORD
-      },
-      tls: {
-        ciphers: 'SSLv3'
       }
     });
   }
