@@ -176,12 +176,26 @@ export class EmailService {
     }
 
     try {
+      // Build a friendly From with a display name (helps Gmail trust + branding)
+      const fromHeader = this.fromEmail.includes('<')
+        ? this.fromEmail
+        : `PetGo <${this.fromEmail}>`;
+      const replyTo = process.env.REPLY_TO_EMAIL || this.fromEmail;
+      const unsubscribeMailto = process.env.UNSUBSCRIBE_EMAIL || this.fromEmail;
+
       const mailOptions = {
-        from: this.fromEmail,
+        from: fromHeader,
         to: template.to,
+        replyTo,
         subject: template.subject,
         text: template.text,
-        html: template.html
+        html: template.html,
+        headers: {
+          // Deliverability: Gmail/Outlook expect these for transactional emails
+          'List-Unsubscribe': `<mailto:${unsubscribeMailto}?subject=unsubscribe>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+          'X-Entity-Ref-ID': `petgo-${Date.now()}`,
+        },
       };
 
       const result = await this.transporter.sendMail(mailOptions);
