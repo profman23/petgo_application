@@ -156,34 +156,69 @@ export function VetsVanBookingUnified({
         paymentIdParam = urlParams.get('paymentId') || urlParams.get('Id');
         ref = urlParams.get('ref');
         
-        // CRITICAL: In development, MyFatoorah can't reach callback, so they redirect with payment=failed
-        // BUT they still include paymentId. We treat ANY paymentId as a potential successful payment.
+        // SECURITY: Always verify payment status with MyFatoorah server-side before
+        // treating as success. URL parameters alone CANNOT be trusted — MyFatoorah
+        // includes paymentId even in failed transactions, and a malicious user
+        // could forge them in the address bar.
         if (paymentIdParam && localStorage.getItem('pendingBookingDetails')) {
-          console.log('🎉 Found paymentId in URL - treating as successful payment!', {
+          console.log('🔍 Found paymentId in URL — verifying server-side before treating as success', {
             paymentId: paymentIdParam,
             urlPaymentParam: payment,
-            note: 'MyFatoorah callback unreachable in development'
           });
-          
-          // Clear storage
+
+          // Clear stale flags so we don't double-process if verification fails
           sessionStorage.removeItem('paymentSuccess');
           sessionStorage.removeItem('paymentId');
           sessionStorage.removeItem('paymentReference');
           localStorage.removeItem('paymentSuccess');
           localStorage.removeItem('paymentId');
           localStorage.removeItem('paymentReference');
-          
-          // Set payment success state - this will trigger auto-booking
-          setPaymentSuccess(true);
-          setPaymentReference(ref || paymentIdParam);
-          setPaymentId(paymentIdParam);
-          
-          // Fetch payment details to get amount
-          fetchPaymentDetails(paymentIdParam);
-          
-          return; // Exit early
+
+          // Async server-side verification
+          const verifyRef = ref || '';
+          fetch(`/api/public/verify-payment/${paymentIdParam}?ref=${encodeURIComponent(verifyRef)}`)
+            .then((r) => r.json())
+            .then((result) => {
+              if (result?.success && result?.payment?.status === 'paid') {
+                console.log('✅ Payment verified as paid by MyFatoorah', result.payment);
+                setPaymentSuccess(true);
+                setPaymentReference(ref || paymentIdParam);
+                setPaymentId(paymentIdParam);
+                fetchPaymentDetails(paymentIdParam);
+              } else {
+                console.warn('❌ Payment NOT paid — refusing to create booking:', result);
+                toast({
+                  title: language === 'ar' ? 'لم يتم تأكيد الدفع' : 'Payment Not Completed',
+                  description:
+                    language === 'ar'
+                      ? 'لم يتم تأكيد عملية الدفع لدى مقدم الخدمة. لم يتم إنشاء الحجز. يمكنك المحاولة مجدداً.'
+                      : 'Payment was not confirmed by the provider. No booking was created. You may try again.',
+                  variant: 'destructive',
+                });
+                // Clear pending booking details so we don't retry on next render
+                localStorage.removeItem('pendingBookingDetails');
+                // Strip query params from URL to prevent re-trigger on refresh
+                if (typeof window !== 'undefined' && window.history?.replaceState) {
+                  window.history.replaceState({}, '', window.location.pathname);
+                }
+              }
+            })
+            .catch((err) => {
+              console.error('❌ Payment verification request failed:', err);
+              toast({
+                title: language === 'ar' ? 'خطأ في التحقق من الدفع' : 'Payment Verification Error',
+                description:
+                  language === 'ar'
+                    ? 'تعذّر التحقق من حالة الدفع. الحجز لم يُنشأ. حاول مرة أخرى أو تواصل مع الدعم.'
+                    : 'Could not verify payment status. Booking was not created. Try again or contact support.',
+                variant: 'destructive',
+              });
+              localStorage.removeItem('pendingBookingDetails');
+            });
+
+          return; // Exit early — verification is async, will set state on success
         }
-        
+
         paymentSuccessFlag = payment === 'success' ? 'true' : null;
       }
       
