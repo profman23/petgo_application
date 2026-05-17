@@ -1,9 +1,39 @@
 // Public payment test endpoint without authentication
 import { sql } from 'drizzle-orm';
+import crypto from 'crypto';
 import { MyFatoorahService } from './services/myfatoorah';
 import { sessionService } from './sessionService';
 import { storage } from './storage';
 import { db } from './db';
+
+/**
+ * Verify MyFatoorah webhook signature using HMAC-SHA256.
+ * Returns true if valid, false otherwise. If the secret is not configured,
+ * returns true with a console warning (dev fallback).
+ *
+ * MyFatoorah Signing v2 sends HMAC-SHA256 of the raw JSON body in the
+ * `MyFatoorah-Signature` header (typically base64-encoded). We try both
+ * base64 and hex encodings to be tolerant of the provider's format.
+ */
+function verifyMyFatoorahSignature(rawBody: any, signatureHeader: unknown): boolean {
+  const secret = process.env.MYFATOORAH_WEBHOOK_SECRET;
+  if (!secret) {
+    console.warn('⚠️ MYFATOORAH_WEBHOOK_SECRET not set — accepting unsigned webhook (DEV ONLY, NOT FOR PRODUCTION)');
+    return true;
+  }
+  if (!signatureHeader || typeof signatureHeader !== 'string') {
+    return false;
+  }
+  const body = typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody);
+  const expectedBase64 = crypto.createHmac('sha256', secret).update(body).digest('base64');
+  const expectedHex = crypto.createHmac('sha256', secret).update(body).digest('hex');
+  const provided = signatureHeader.trim();
+  const safeEq = (a: string, b: string) => {
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  };
+  return safeEq(expectedBase64, provided) || safeEq(expectedHex, provided);
+}
 
 // Helper function to get the correct production domain
 function getProductionDomain(): string {
@@ -607,7 +637,20 @@ export function addPublicPaymentRoutes(app: any) {
   app.post('/api/public/myfatoorah/webhook', async (req: any, res: any) => {
     try {
       console.log('🔔 MyFatoorah webhook received:', req.body);
-      
+
+      // ⛔ SECURITY: Verify HMAC signature before trusting payload
+      const signatureHeader =
+        req.headers['myfatoorah-signature'] ||
+        req.headers['x-myfatoorah-signature'] ||
+        req.headers['signature'];
+      const isValidSignature = verifyMyFatoorahSignature(req.body, signatureHeader);
+      if (!isValidSignature) {
+        console.warn('🚨 Webhook signature INVALID — rejecting payload');
+        console.warn('   Header present:', signatureHeader ? 'yes' : 'no');
+        return res.status(401).json({ error: 'Invalid or missing signature' });
+      }
+      console.log('✅ Webhook signature verified');
+
       const { InvoiceId, PaymentId, InvoiceValue, InvoiceStatus, CustomerReference } = req.body;
       
       if (InvoiceStatus === 'Paid' && PaymentId && InvoiceValue && CustomerReference) {
