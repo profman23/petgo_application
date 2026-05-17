@@ -157,7 +157,65 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
               </div>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Mobile: cards view */}
+            <div className="md:hidden space-y-3 p-3">
+              {paginatedProducts.map((product: any) => (
+                <div key={product.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+                  <div className="font-medium text-gray-900 mb-2 break-words">{product.name}</div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="text-xs text-gray-500">
+                      {language === 'ar' ? 'السعر' : 'Price'}
+                    </span>
+                    {editingProduct?.id === product.id ? (
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editedProducts[product.id] || product.price}
+                        onChange={(e) => handlePriceChange(product.id, e.target.value)}
+                        className="w-24 px-2 py-1.5 border border-gray-300 rounded-md focus:ring-blue-600 focus:border-blue-600 text-sm"
+                        style={{ textAlign: getTextAlign(language) }}
+                      />
+                    ) : (
+                      <span className="text-sm font-semibold text-gray-900">
+                        {product.price} {language === 'ar' ? 'ريال' : 'SAR'}
+                      </span>
+                    )}
+                  </div>
+                  {editingProduct?.id === product.id ? (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleSave}
+                        disabled={updateProductMutation.isPending}
+                        className="flex-1 min-h-[40px] px-3 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md disabled:opacity-50 flex items-center justify-center gap-1"
+                      >
+                        {updateProductMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          language === 'ar' ? 'حفظ' : 'Save'
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setEditingProduct(null)}
+                        className="flex-1 min-h-[40px] px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                      >
+                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handlePriceEdit(product.id, product.price)}
+                      className="w-full min-h-[40px] px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-md inline-flex items-center justify-center gap-1"
+                    >
+                      <Edit className="w-4 h-4" />
+                      {language === 'ar' ? 'تعديل' : 'Edit'}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop/Tablet: table view */}
+            <div className="hidden md:block overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
@@ -185,7 +243,7 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
                           step="0.01"
                           value={editedProducts[product.id] || product.price}
                           onChange={(e) => handlePriceChange(product.id, e.target.value)}
-                          className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:ring-purple-600 focus:border-purple-600"
+                          className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:ring-blue-600 focus:border-blue-600"
                           style={{ textAlign: getTextAlign(language) }}
                         />
                       ) : (
@@ -216,7 +274,7 @@ const ProductsManagementTable = ({ language }: { language: string }) => {
                       ) : (
                         <button
                           onClick={() => handlePriceEdit(product.id, product.price)}
-                          className="text-purple-600 hover:text-purple-900 inline-flex items-center gap-1"
+                          className="text-blue-600 hover:text-blue-900 inline-flex items-center gap-1"
                         >
                           <Edit className="w-4 h-4" />
                           {language === 'ar' ? 'تعديل' : 'Edit'}
@@ -375,7 +433,7 @@ function InvoiceCard({ invoice, language }: { invoice: GeneratedInvoice; languag
       {/* Invoice Header - Always Visible */}
       <div className="p-4 border-b">
         <div className="flex items-center justify-between">
-          <div className="flex-1 grid grid-cols-7 gap-4 text-sm">
+          <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4 text-sm">
             <div>
               <span className="text-gray-500 block">{language === 'ar' ? 'رقم الفاتورة' : 'Invoice #'}</span>
               <span className="font-medium">{invoice.invoiceNumber}</span>
@@ -1823,8 +1881,8 @@ export default function AdminDashboard() {
     <AdminLayout>
       {/* Main Content Area */}
         <div className="flex-1 overflow-auto">
-          <div className="max-w-7xl mx-auto py-3 pl-1 pr-6 lg:pr-8">
-            <div className="px-1 py-3 sm:px-0">
+          <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6 lg:p-8">
+            <div className="py-3 sm:px-0">
               {activeTab === 'management' && (
                 <div>
                   {/* Add Driver Section */}
@@ -1940,22 +1998,22 @@ export default function AdminDashboard() {
                     <ul className="divide-y divide-gray-200">
                       {drivers?.map((driver) => (
                         <li key={driver.id} className="px-4 py-4 sm:px-6">
-                          <div className="flex items-center justify-between">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                             <div className="flex items-center">
                               <div className="flex-shrink-0">
-                                <div className="h-10 w-10 rounded-full bg-purple-600 flex items-center justify-center">
-                                  <span className="text-sm font-medium text-purple-600">
+                                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
+                                  <span className="text-sm font-medium text-white">
                                     {driver.name?.charAt(0) || 'V'}
                                   </span>
                                 </div>
                               </div>
-                              <div className="ml-4">
-                                <div className="text-sm font-medium text-gray-900">{(driver as any).vetsvanName || driver.name}</div>
-                                <div className="text-sm text-gray-500">{driver.phone}</div>
-                                <div className="text-sm text-gray-500">@{(driver as any).vetsvanCode || driver.username}</div>
+                              <div className="ml-4 min-w-0">
+                                <div className="text-sm font-medium text-gray-900 truncate">{(driver as any).vetsvanName || driver.name}</div>
+                                <div className="text-sm text-gray-500 truncate">{driver.phone}</div>
+                                <div className="text-sm text-gray-500 truncate">@{(driver as any).vetsvanCode || driver.username}</div>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex flex-wrap items-center gap-2 md:gap-3">
                               <span
                                 className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                   driver.isAvailable

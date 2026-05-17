@@ -41,24 +41,17 @@ export function useDoctorLocation() {
     }
   }, [accuracy]);
 
-  // تحديث موقع الطبيب عند تغيير الإحداثيات
+  // تحديث موقع الطبيب عند تغيير الإحداثيات (geo-restriction removed)
   useEffect(() => {
     if (latitude && longitude) {
-      // فحص ما إذا كان الموقع داخل المملكة العربية السعودية
-      const isInSaudiArabia = latitude >= 16 && latitude <= 32 && longitude >= 34 && longitude <= 56;
-      
-      if (isInSaudiArabia) {
-        updateDoctorLocation(latitude, longitude);
-        
-        // إشعار بدقة الموقع
-        if (accuracy && accuracy < 50) {
-          toast({
-            title: 'موقع الطبيب محدث',
-            description: `دقة الموقع: ${Math.round(accuracy)} متر`,
-          });
-        }
-      } else {
-        console.warn('Doctor location outside Saudi Arabia:', { latitude, longitude });
+      updateDoctorLocation(latitude, longitude);
+
+      // إشعار بدقة الموقع
+      if (accuracy && accuracy < 50) {
+        toast({
+          title: 'موقع الطبيب محدث',
+          description: `دقة الموقع: ${Math.round(accuracy)} متر`,
+        });
       }
     }
   }, [latitude, longitude, accuracy, updateDoctorLocation, toast]);

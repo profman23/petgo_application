@@ -8,13 +8,15 @@ services:
     region: frankfurt
     plan: starter
     branch: staging
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm run start
     envVars:
       - key: APP_ENV
         value: staging
       - key: NODE_ENV
         value: production
+      - key: PUBLIC_BASE_URL
+        value: https://petgo-staging.onrender.com
       - key: DATABASE_URL
         sync: false
       - key: EMAIL_ENABLED
@@ -42,13 +44,15 @@ services:
     region: frankfurt
     plan: starter
     branch: main
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm run start
     envVars:
       - key: APP_ENV
         value: production
       - key: NODE_ENV
         value: production
+      - key: PUBLIC_BASE_URL
+        value: https://petgo-production.onrender.com
       - key: DATABASE_URL
         sync: false
       - key: EMAIL_ENABLED

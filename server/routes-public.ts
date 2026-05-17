@@ -1,37 +1,43 @@
 // Public payment test endpoint without authentication
 import { sql } from 'drizzle-orm';
+import crypto from 'crypto';
 import { MyFatoorahService } from './services/myfatoorah';
 import { sessionService } from './sessionService';
 import { storage } from './storage';
 import { db } from './db';
+import { getPublicBaseUrl } from './lib/publicBaseUrl';
 
-// Helper function to get the correct production domain
-function getProductionDomain(): string {
-  const replitDomains = process.env.REPLIT_DOMAINS;
-  
-  // If REPLIT_DOMAINS contains multiple domains (comma-separated)
-  if (replitDomains && replitDomains.includes(',')) {
-    const domains = replitDomains.split(',').map(d => d.trim());
-    
-    // Prefer www.vetsvan.app for production
-    const preferredDomain = domains.find(d => d === 'www.vetsvan.app');
-    if (preferredDomain) {
-      return preferredDomain;
-    }
-    
-    // Fallback to vetsvan.app if www is not found
-    const vetsvanDomain = domains.find(d => d === 'vetsvan.app');
-    if (vetsvanDomain) {
-      return vetsvanDomain;
-    }
-    
-    // Otherwise use the first domain
-    return domains[0];
+/**
+ * Verify MyFatoorah webhook signature using HMAC-SHA256.
+ * Returns true if valid, false otherwise. If the secret is not configured,
+ * returns true with a console warning (dev fallback).
+ *
+ * MyFatoorah Signing v2 sends HMAC-SHA256 of the raw JSON body in the
+ * `MyFatoorah-Signature` header (typically base64-encoded). We try both
+ * base64 and hex encodings to be tolerant of the provider's format.
+ */
+function verifyMyFatoorahSignature(rawBody: any, signatureHeader: unknown): boolean {
+  const secret = process.env.MYFATOORAH_WEBHOOK_SECRET;
+  if (!secret) {
+    console.warn('⚠️ MYFATOORAH_WEBHOOK_SECRET not set — accepting unsigned webhook (DEV ONLY, NOT FOR PRODUCTION)');
+    return true;
   }
-  
-  // Single domain or no REPLIT_DOMAINS
-  return replitDomains || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
+  if (!signatureHeader || typeof signatureHeader !== 'string') {
+    return false;
+  }
+  const body = typeof rawBody === 'string' ? rawBody : JSON.stringify(rawBody);
+  const expectedBase64 = crypto.createHmac('sha256', secret).update(body).digest('base64');
+  const expectedHex = crypto.createHmac('sha256', secret).update(body).digest('hex');
+  const provided = signatureHeader.trim();
+  const safeEq = (a: string, b: string) => {
+    if (a.length !== b.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
+  };
+  return safeEq(expectedBase64, provided) || safeEq(expectedHex, provided);
 }
+
+// Domain resolution is now centralized in lib/publicBaseUrl.ts
+// Use getPublicBaseUrl(req) directly for callback/redirect URLs.
 
 export function addPublicPaymentRoutes(app: any) {
   // Simple test endpoint
@@ -113,75 +119,6 @@ export function addPublicPaymentRoutes(app: any) {
     }
   });
 
-  // Backfill payment amounts from MyFatoorah for existing transactions
-  app.post('/api/public/payments/backfill-amounts', async (req: any, res: any) => {
-    try {
-      console.log('🔧 Starting payment amount backfill process...');
-      
-      // Get all payment transactions with payment IDs but potentially incorrect amounts
-      const result = await db.execute(sql`
-        SELECT id, myfatoorah_payment_id, amount, status, created_at 
-        FROM payment_transactions 
-        WHERE myfatoorah_payment_id IS NOT NULL 
-        AND status = 'paid'
-        ORDER BY created_at DESC 
-        LIMIT 20
-      `);
-      
-      const transactions = result.rows;
-      console.log(`📊 Found ${transactions.length} transactions to process`);
-      
-      const myFatoorahService = new MyFatoorahService();
-      let successCount = 0;
-      let errorCount = 0;
-      
-      for (const transaction of transactions) {
-        try {
-          console.log(`🔍 Processing payment ID: ${transaction.myfatoorah_payment_id}`);
-          
-          const paymentDetails = await myFatoorahService.getPaymentDetailsFromCallback(
-            transaction.myfatoorah_payment_id
-          );
-          
-          if (paymentDetails.amount > 0 && paymentDetails.amount !== transaction.amount) {
-            await db.execute(sql`
-              UPDATE payment_transactions 
-              SET amount = ${paymentDetails.amount}, 
-                  currency = ${paymentDetails.currency || 'SAR'},
-                  updated_at = ${new Date()}
-              WHERE id = ${transaction.id}
-            `);
-            
-            console.log(`✅ Updated transaction ${transaction.id}: ${transaction.amount} → ${paymentDetails.amount} SAR`);
-            successCount++;
-          } else {
-            console.log(`⏭️ Skipping transaction ${transaction.id}: amount already correct or unavailable`);
-          }
-          
-          // Small delay to avoid overwhelming the API
-          await new Promise(resolve => setTimeout(resolve, 500));
-        } catch (error) {
-          console.error(`❌ Failed to update transaction ${transaction.id}:`, error);
-          errorCount++;
-        }
-      }
-      
-      res.json({
-        success: true,
-        message: `Backfill completed: ${successCount} updated, ${errorCount} errors`,
-        processed: transactions.length,
-        updated: successCount,
-        errors: errorCount
-      });
-      
-    } catch (error: any) {
-      console.error('❌ Payment backfill error:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message 
-      });
-    }
-  });
 
   // Public test payment creation (no auth required)
   app.post('/api/public/payments/test-invoice', async (req: any, res: any) => {
@@ -322,18 +259,20 @@ export function addPublicPaymentRoutes(app: any) {
       });
 
       const myfatoorah = new MyFatoorahService();
-      
+
       // Prepare payment request for MyFatoorah API
-      const productionDomain = getProductionDomain();
-      
+      const baseUrl = getPublicBaseUrl(req);
+
+
       console.log('🌐 Domain detection:', {
+        PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL,
         REPLIT_DOMAINS: process.env.REPLIT_DOMAINS,
         REPLIT_DEV_DOMAIN: process.env.REPLIT_DEV_DOMAIN,
-        selectedDomain: productionDomain,
-        callbackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
-        errorUrl: `https://${productionDomain}/vetsvan-booking?payment=failed`
+        resolvedBaseUrl: baseUrl,
+        callbackUrl: `${baseUrl}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
+        errorUrl: `${baseUrl}/vetsvan-booking?payment=failed`
       });
-      
+
       const paymentRequest = {
         CustomerName: finalCustomerName,
         NotificationOption: 'EML',
@@ -342,8 +281,8 @@ export function addPublicPaymentRoutes(app: any) {
         MobileCountryCode: '966',
         CustomerMobile: finalCustomerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
         CustomerEmail: finalCustomerEmail,
-        CallBackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
-        ErrorUrl: `https://${productionDomain}/vetsvan-booking?payment=failed`,
+        CallBackUrl: `${baseUrl}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
+        ErrorUrl: `${baseUrl}/vetsvan-booking?payment=failed`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
       };
@@ -533,8 +472,8 @@ export function addPublicPaymentRoutes(app: any) {
         }
 
         // Return HTML page that sets sessionStorage and redirects
-        const productionDomain = getProductionDomain();
-        const redirectUrl = `https://${productionDomain}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
+        const baseUrl = getPublicBaseUrl(req);
+        const redirectUrl = `${baseUrl}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
         
         console.log('🔄 Redirecting to booking page after successful payment');
         console.log('✅ Payment processed successfully:', { ref, paymentId: actualPaymentId });
@@ -593,13 +532,13 @@ export function addPublicPaymentRoutes(app: any) {
         `);
       } else {
         console.log('❌ Missing payment parameters, redirecting to booking page');
-        const productionDomain = getProductionDomain();
-        return res.redirect(`https://${productionDomain}/vetsvan-booking?payment=failed`);
+        const baseUrl = getPublicBaseUrl(req);
+        return res.redirect(`${baseUrl}/vetsvan-booking?payment=failed`);
       }
     } catch (error: any) {
       console.error('❌ MyFatoorah callback error:', error);
-      const productionDomain = getProductionDomain();
-      res.redirect(`https://${productionDomain}/vetsvan-booking?payment=failed`);
+      const baseUrl = getPublicBaseUrl(req);
+      res.redirect(`${baseUrl}/vetsvan-booking?payment=failed`);
     }
   });
 
@@ -607,7 +546,20 @@ export function addPublicPaymentRoutes(app: any) {
   app.post('/api/public/myfatoorah/webhook', async (req: any, res: any) => {
     try {
       console.log('🔔 MyFatoorah webhook received:', req.body);
-      
+
+      // ⛔ SECURITY: Verify HMAC signature before trusting payload
+      const signatureHeader =
+        req.headers['myfatoorah-signature'] ||
+        req.headers['x-myfatoorah-signature'] ||
+        req.headers['signature'];
+      const isValidSignature = verifyMyFatoorahSignature(req.body, signatureHeader);
+      if (!isValidSignature) {
+        console.warn('🚨 Webhook signature INVALID — rejecting payload');
+        console.warn('   Header present:', signatureHeader ? 'yes' : 'no');
+        return res.status(401).json({ error: 'Invalid or missing signature' });
+      }
+      console.log('✅ Webhook signature verified');
+
       const { InvoiceId, PaymentId, InvoiceValue, InvoiceStatus, CustomerReference } = req.body;
       
       if (InvoiceStatus === 'Paid' && PaymentId && InvoiceValue && CustomerReference) {
@@ -629,9 +581,10 @@ export function addPublicPaymentRoutes(app: any) {
 
           // First check if we have original customer data stored
           const existingPayment = await db.execute(sql`
-            SELECT id, customer_name, customer_email, customer_phone, 
+            SELECT id, status, myfatoorah_payment_id,
+                   customer_name, customer_email, customer_phone,
                    original_customer_name, original_customer_email, original_customer_phone
-            FROM payment_transactions 
+            FROM payment_transactions
             WHERE myfatoorah_invoice_id = ${InvoiceId}
             OR myfatoorah_payment_id = ${PaymentId}
             OR reference_id = ${CustomerReference}
@@ -640,7 +593,17 @@ export function addPublicPaymentRoutes(app: any) {
 
           if (existingPayment.rows.length > 0) {
             const payment = existingPayment.rows[0];
-            
+
+            // IDEMPOTENCY: skip if already marked paid with same paymentId.
+            // MyFatoorah may retry on network failure or be replayed manually.
+            if (payment.status === 'paid' && payment.myfatoorah_payment_id === PaymentId) {
+              console.log('⏭️ Webhook duplicate — payment already processed, skipping UPDATE:', {
+                paymentTransactionId: payment.id,
+                paymentId: PaymentId,
+              });
+              return res.status(200).json({ success: true, idempotent: true });
+            }
+
             // Use original customer data if available, otherwise keep current data
             const useCustomerName = payment.original_customer_name || payment.customer_name;
             const useCustomerEmail = payment.original_customer_email || payment.customer_email;
@@ -702,159 +665,7 @@ export function addPublicPaymentRoutes(app: any) {
     }
   });
 
-  // Comprehensive backfill endpoint for placeholder payment transactions
-  app.post('/api/public/backfill-payment-customer-data', async (req: any, res: any) => {
-    try {
-      console.log('🔧 Starting comprehensive payment customer data backfill...');
-      
-      // Get all payment transactions with placeholder data
-      const placeholderTransactions = await db.execute(sql`
-        SELECT 
-          pt.id,
-          pt.myfatoorah_payment_id,
-          pt.customer_name,
-          pt.customer_phone,
-          pt.customer_email,
-          pt.booking_id
-        FROM payment_transactions pt
-        WHERE 
-          pt.customer_name IN ('Payment Verified', 'Customer', 'Test Customer') OR
-          pt.customer_email IN ('verified@payment.com', 'test@example.com', 'customer@vetsvan.app') OR
-          pt.customer_phone IN ('+966000000000', '0000000000')
-        ORDER BY pt.created_at DESC
-      `);
-      
-      console.log(`📊 Found ${placeholderTransactions.rows.length} payment transactions with placeholder data`);
-      
-      let successCount = 0;
-      let errorCount = 0;
-      const myFatoorahService = new MyFatoorahService();
-      
-      for (const transaction of placeholderTransactions.rows as any[]) {
-        try {
-          console.log(`🔍 Processing payment transaction ${transaction.id} - Payment ID: ${transaction.myfatoorah_payment_id}`);
-          
-          // Get real customer data from MyFatoorah
-          const paymentDetails = await myFatoorahService.getPaymentDetailsFromCallback(
-            transaction.myfatoorah_payment_id
-          );
-          
-          console.log(`🔍 Payment details for transaction ${transaction.id}:`, paymentDetails);
-          
-          if (paymentDetails && paymentDetails.customerName) {
-            const mfCustomerName = paymentDetails.customerName || 'MyFatoorah Customer';
-            const mfCustomerEmail = paymentDetails.customerEmail || 'customer@myfatoorah.com';
-            const mfCustomerPhone = paymentDetails.customerMobile ? 
-              '+966' + paymentDetails.customerMobile.replace(/^966/, '') : '+966000000000';
-            
-            await db.execute(sql`
-              UPDATE payment_transactions 
-              SET customer_name = ${mfCustomerName},
-                  customer_email = ${mfCustomerEmail},
-                  customer_phone = ${mfCustomerPhone},
-                  updated_at = ${new Date()}
-              WHERE id = ${transaction.id}
-            `);
-            
-            console.log(`✅ Updated transaction ${transaction.id} with MyFatoorah customer data:`, {
-              name: mfCustomerName,
-              email: mfCustomerEmail?.substring(0, 15) + '...',
-              phone: mfCustomerPhone?.substring(0, 8) + '...'
-            });
-            successCount++;
-          } else {
-            console.log(`⚠️ No MyFatoorah customer data found for transaction ${transaction.id}, skipping`);
-          }
-          
-          // Small delay to avoid overwhelming the API
-          await new Promise(resolve => setTimeout(resolve, 300));
-        } catch (error) {
-          console.error(`❌ Failed to backfill transaction ${transaction.id}:`, error);
-          errorCount++;
-        }
-      }
-      
-      res.json({
-        success: true,
-        message: `Payment customer data backfill completed: ${successCount} updated, ${errorCount} errors`,
-        processed: placeholderTransactions.rows.length,
-        updated: successCount,
-        errors: errorCount
-      });
-      
-    } catch (error: any) {
-      console.error('❌ Payment backfill error:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message 
-      });
-    }
-  });
 
-  // Manual payment linking endpoint for testing (admin only)
-  app.post('/api/public/link-payment-to-booking', async (req: any, res: any) => {
-    try {
-      const { bookingId, amount, paymentId, reference } = req.body;
-      
-      if (!bookingId || !amount) {
-        return res.status(400).json({
-          success: false,
-          message: 'Missing required fields: bookingId, amount'
-        });
-      }
-
-      console.log('🔗 Manually linking payment to booking:', {
-        bookingId,
-        amount,
-        paymentId,
-        reference
-      });
-
-      // Get booking details
-      const allBookings = await storage.getAllBookings();
-      const booking = allBookings.find(b => b.id === parseInt(bookingId));
-      if (!booking) {
-        return res.status(404).json({
-          success: false,
-          message: 'Booking not found'
-        });
-      }
-
-      // Get user details
-      const user = await storage.getUser(booking.userId);
-
-      // Create payment transaction record using raw SQL (to match existing database structure)
-      await db.execute(sql`
-        INSERT INTO payment_transactions (
-          booking_id, myfatoorah_payment_id, amount, currency, status, 
-          reference_id, customer_name, customer_email, customer_phone,
-          paid_at, created_at, updated_at
-        ) VALUES (
-          ${booking.id}, ${paymentId || `MANUAL-${Date.now()}`}, ${parseFloat(amount)}, 'SAR', 'paid',
-          ${reference || `REF-${bookingId}`}, ${user?.name || 'Customer'}, 
-          ${user?.email || 'customer@vetsvan.app'}, ${user?.phone || '+966000000000'},
-          ${new Date()}, ${new Date()}, ${new Date()}
-        )
-      `);
-
-      console.log('✅ Payment successfully linked to booking:', bookingId);
-
-      res.json({
-        success: true,
-        message: 'Payment linked successfully',
-        bookingId,
-        amount
-      });
-
-    } catch (error: any) {
-      console.error('❌ Payment linking error:', error);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to link payment',
-        error: error.message
-      });
-    }
-  });
 
   // Fetch payment details endpoint for immediate payment verification
   app.get('/api/public/payment-details/:paymentId', async (req: any, res: any) => {

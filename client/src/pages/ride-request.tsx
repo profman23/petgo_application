@@ -869,38 +869,26 @@ export default function RideRequest() {
   useEffect(() => {
     if (latitude && longitude && accuracy) {
       console.log('useGeolocation hook update:', latitude, longitude, accuracy);
-      
-      // فحص ما إذا كان الموقع داخل المملكة العربية السعودية
-      const isInSaudiArabia = latitude >= 15 && latitude <= 33 && longitude >= 34 && longitude <= 56;
-      
-      if (isInSaudiArabia) {
-        setCurrentLocation({ latitude, longitude });
-        form.setValue('pickupLatitude', latitude);
-        form.setValue('pickupLongitude', longitude);
-        
-        // تحديد اسم المنطقة حسب الإحداثيات - عرض مبسط
-        let locationName = 'موقعك الحالي';
-        
-        if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
-          locationName = 'الرياض - موقعك الحالي';
-        } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
-          locationName = 'جدة - موقعك الحالي';
-        } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
-          locationName = 'الدمام - موقعك الحالي';
-        } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
-          locationName = 'المدينة المنورة - موقعك الحالي';
-        }
-        
-        form.setValue('pickupLocation', locationName);
-        
-        // Location updated with high accuracy - no notification needed
-      } else {
-        toast({
-          title: 'موقع خارج المملكة',
-          description: `تم اكتشاف موقع خارج المملكة العربية السعودية`,
-          variant: 'destructive',
-        });
+
+      // Accept any valid coordinates (geo-restriction removed)
+      setCurrentLocation({ latitude, longitude });
+      form.setValue('pickupLatitude', latitude);
+      form.setValue('pickupLongitude', longitude);
+
+      // تحديد اسم المنطقة حسب الإحداثيات - عرض مبسط
+      let locationName = 'موقعك الحالي';
+
+      if (latitude >= 24.0 && latitude <= 25.5 && longitude >= 46.0 && longitude <= 47.5) {
+        locationName = 'الرياض - موقعك الحالي';
+      } else if (latitude >= 21.0 && latitude <= 22.0 && longitude >= 39.0 && longitude <= 39.8) {
+        locationName = 'جدة - موقعك الحالي';
+      } else if (latitude >= 26.0 && latitude <= 27.0 && longitude >= 49.5 && longitude <= 50.5) {
+        locationName = 'الدمام - موقعك الحالي';
+      } else if (latitude >= 24.0 && latitude <= 25.0 && longitude >= 39.0 && longitude <= 40.5) {
+        locationName = 'المدينة المنورة - موقعك الحالي';
       }
+
+      form.setValue('pickupLocation', locationName);
     }
   }, [latitude, longitude, accuracy, form, toast]);
 
