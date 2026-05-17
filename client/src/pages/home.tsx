@@ -10,9 +10,6 @@ import logoImage from "@assets/Screenshot 2025-07-21 115341_1753088187495.png";
 import vetsVanImage from "@assets/image_1751292329902.png";
 import truckIcon from "@assets/10773561_1751295833176.png";
 import snapchatIcon from "@assets/freepik__a-simple-and-clean-cartoonstyle-logo-inspired-by-s__62952_1753187857021.png";
-import xIcon from "@assets/f065fd7d-6dd1-4688-a3d8-2fc13e5b0cde_1753187919935.png";
-import snapchatLogo from "@assets/freepik__a-simple-and-clean-cartoonstyle-logo-inspired-by-s__62952_1753187857021.png";
-import xLogo from "@assets/f065fd7d-6dd1-4688-a3d8-2fc13e5b0cde_1753187919935.png";
 import petsImage from "@assets/freepik_assistant_1751361910420_1751361937178.png";
 import newVetVanImage from "@assets/freepik__background__70346_1751363211262.png";
 import newHouseImage from "@assets/freepik_assistant_1751363501296_1751363531753.jpeg";
@@ -822,15 +819,15 @@ export default function Home() {
                   transition: 'all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1.0)'
                 }}
               >
-                <div 
+                <div
                   className="writing-vertical-rl text-gray-500 font-semibold text-sm h-full flex items-center justify-center animate-pulse-text"
-                  style={{ 
-                    fontFamily: '"Comic Relief", cursive',
+                  style={{
+                    fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive',
                     writingMode: 'vertical-rl',
                     textOrientation: 'mixed'
                   }}
                 >
-                  Contact Us
+                  {language === 'ar' ? 'تواصل معنا' : 'Contact Us'}
                 </div>
               </div>
             ) : (
@@ -851,60 +848,26 @@ export default function Home() {
               >
                 <div className="flex items-center justify-center gap-4">
                   {/* WhatsApp */}
-                  <a 
-                    href="https://wa.me/9660000000" 
-                    target="_blank" 
+                  <a
+                    href="https://wa.me/966552222564"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-green-50 transition-colors"
                   >
                     <MessageCircle className="w-6 h-6 text-green-600" />
-                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
-                      WhatsApp
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
+                      {language === 'ar' ? 'واتساب' : 'WhatsApp'}
                     </span>
                   </a>
-                  
+
                   {/* Phone Call */}
-                  <a 
-                    href="tel:920011626"
+                  <a
+                    href="tel:+966552222564"
                     className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-blue-50 transition-colors"
                   >
                     <Phone className="w-6 h-6 text-blue-600" />
-                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
-                      Call
-                    </span>
-                  </a>
-                  
-                  {/* Snapchat */}
-                  <a 
-                    href="https://www.snapchat.com/@vetsvan?share_id=60cdgfm7ZO0" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-yellow-50 transition-colors"
-                  >
-                    <img 
-                      src={snapchatLogo} 
-                      alt="Snapchat" 
-                      className="w-7 h-7 object-contain"
-                    />
-                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
-                      Snapchat
-                    </span>
-                  </a>
-                  
-                  {/* X (Twitter) */}
-                  <a 
-                    href="https://x.com/vetvan276742" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-1 p-2 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    <img 
-                      src={xLogo} 
-                      alt="X" 
-                      className="w-7 h-7 object-contain"
-                    />
-                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: '"Comic Relief", cursive' }}>
-                      X
+                    <span className="text-xs font-medium text-gray-700" style={{ fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive' }}>
+                      {language === 'ar' ? 'اتصال' : 'Call'}
                     </span>
                   </a>
                 </div>
