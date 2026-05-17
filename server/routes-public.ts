@@ -5,6 +5,7 @@ import { MyFatoorahService } from './services/myfatoorah';
 import { sessionService } from './sessionService';
 import { storage } from './storage';
 import { db } from './db';
+import { getPublicBaseUrl } from './lib/publicBaseUrl';
 
 /**
  * Verify MyFatoorah webhook signature using HMAC-SHA256.
@@ -35,33 +36,8 @@ function verifyMyFatoorahSignature(rawBody: any, signatureHeader: unknown): bool
   return safeEq(expectedBase64, provided) || safeEq(expectedHex, provided);
 }
 
-// Helper function to get the correct production domain
-function getProductionDomain(): string {
-  const replitDomains = process.env.REPLIT_DOMAINS;
-  
-  // If REPLIT_DOMAINS contains multiple domains (comma-separated)
-  if (replitDomains && replitDomains.includes(',')) {
-    const domains = replitDomains.split(',').map(d => d.trim());
-    
-    // Prefer www.vetsvan.app for production
-    const preferredDomain = domains.find(d => d === 'www.vetsvan.app');
-    if (preferredDomain) {
-      return preferredDomain;
-    }
-    
-    // Fallback to vetsvan.app if www is not found
-    const vetsvanDomain = domains.find(d => d === 'vetsvan.app');
-    if (vetsvanDomain) {
-      return vetsvanDomain;
-    }
-    
-    // Otherwise use the first domain
-    return domains[0];
-  }
-  
-  // Single domain or no REPLIT_DOMAINS
-  return replitDomains || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
-}
+// Domain resolution is now centralized in lib/publicBaseUrl.ts
+// Use getPublicBaseUrl(req) directly for callback/redirect URLs.
 
 export function addPublicPaymentRoutes(app: any) {
   // Simple test endpoint
@@ -352,18 +328,20 @@ export function addPublicPaymentRoutes(app: any) {
       });
 
       const myfatoorah = new MyFatoorahService();
-      
+
       // Prepare payment request for MyFatoorah API
-      const productionDomain = getProductionDomain();
-      
+      const baseUrl = getPublicBaseUrl(req);
+
+
       console.log('🌐 Domain detection:', {
+        PUBLIC_BASE_URL: process.env.PUBLIC_BASE_URL,
         REPLIT_DOMAINS: process.env.REPLIT_DOMAINS,
         REPLIT_DEV_DOMAIN: process.env.REPLIT_DEV_DOMAIN,
-        selectedDomain: productionDomain,
-        callbackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
-        errorUrl: `https://${productionDomain}/vetsvan-booking?payment=failed`
+        resolvedBaseUrl: baseUrl,
+        callbackUrl: `${baseUrl}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
+        errorUrl: `${baseUrl}/vetsvan-booking?payment=failed`
       });
-      
+
       const paymentRequest = {
         CustomerName: finalCustomerName,
         NotificationOption: 'EML',
@@ -372,8 +350,8 @@ export function addPublicPaymentRoutes(app: any) {
         MobileCountryCode: '966',
         CustomerMobile: finalCustomerPhone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code
         CustomerEmail: finalCustomerEmail,
-        CallBackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
-        ErrorUrl: `https://${productionDomain}/vetsvan-booking?payment=failed`,
+        CallBackUrl: `${baseUrl}/api/public/myfatoorah/callback?ref=${invoiceNumber}`,
+        ErrorUrl: `${baseUrl}/vetsvan-booking?payment=failed`,
         Language: 'En' as const,
         CustomerReference: invoiceNumber
       };
@@ -563,8 +541,8 @@ export function addPublicPaymentRoutes(app: any) {
         }
 
         // Return HTML page that sets sessionStorage and redirects
-        const productionDomain = getProductionDomain();
-        const redirectUrl = `https://${productionDomain}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
+        const baseUrl = getPublicBaseUrl(req);
+        const redirectUrl = `${baseUrl}/vetsvan-booking?payment=success&paymentId=${actualPaymentId}&ref=${ref}`;
         
         console.log('🔄 Redirecting to booking page after successful payment');
         console.log('✅ Payment processed successfully:', { ref, paymentId: actualPaymentId });
@@ -623,13 +601,13 @@ export function addPublicPaymentRoutes(app: any) {
         `);
       } else {
         console.log('❌ Missing payment parameters, redirecting to booking page');
-        const productionDomain = getProductionDomain();
-        return res.redirect(`https://${productionDomain}/vetsvan-booking?payment=failed`);
+        const baseUrl = getPublicBaseUrl(req);
+        return res.redirect(`${baseUrl}/vetsvan-booking?payment=failed`);
       }
     } catch (error: any) {
       console.error('❌ MyFatoorah callback error:', error);
-      const productionDomain = getProductionDomain();
-      res.redirect(`https://${productionDomain}/vetsvan-booking?payment=failed`);
+      const baseUrl = getPublicBaseUrl(req);
+      res.redirect(`${baseUrl}/vetsvan-booking?payment=failed`);
     }
   });
 

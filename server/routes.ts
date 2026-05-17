@@ -15,35 +15,8 @@ import bcrypt from 'bcrypt';
 import { addPublicPaymentRoutes } from "./routes-public";
 import { db } from "./db";
 import { sql, eq } from "drizzle-orm";
+import { getPublicBaseUrl } from "./lib/publicBaseUrl";
 // Payment service removed per user request
-
-// Helper function to get the correct production domain
-function getProductionDomain(): string {
-  const replitDomains = process.env.REPLIT_DOMAINS;
-  
-  // If REPLIT_DOMAINS contains multiple domains (comma-separated)
-  if (replitDomains && replitDomains.includes(',')) {
-    const domains = replitDomains.split(',').map(d => d.trim());
-    
-    // Prefer www.vetsvan.app for production
-    const preferredDomain = domains.find(d => d === 'www.vetsvan.app');
-    if (preferredDomain) {
-      return preferredDomain;
-    }
-    
-    // Fallback to vetsvan.app if www is not found
-    const vetsvanDomain = domains.find(d => d === 'vetsvan.app');
-    if (vetsvanDomain) {
-      return vetsvanDomain;
-    }
-    
-    // Otherwise use the first domain
-    return domains[0];
-  }
-  
-  // Single domain or no REPLIT_DOMAINS
-  return replitDomains || process.env.REPLIT_DEV_DOMAIN || 'localhost:5000';
-}
 
 async function requireAuth(req: any, res: any, next: any) {
   try {
@@ -2418,9 +2391,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           const myFatoorahService = new MyFatoorahService();
-          
+
           // Create payment invoice
-          const productionDomain = getProductionDomain();
+          const baseUrl = getPublicBaseUrl(req);
           const invoiceRequest = {
             CustomerName: user.name,
             NotificationOption: 'EML',
@@ -2429,8 +2402,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             CustomerMobile: user.phone.replace(/^\+966/, '').replace(/^966/, ''), // Remove country code prefix
             InvoiceValue: estimatedCost,
             DisplayCurrencyIso: 'SAR',
-            CallBackUrl: `https://${productionDomain}/api/public/myfatoorah/callback?ref=BOOKING-${booking.id}`,
-            ErrorUrl: `https://www.vetsvan.app/login`,
+            CallBackUrl: `${baseUrl}/api/public/myfatoorah/callback?ref=BOOKING-${booking.id}`,
+            ErrorUrl: `${baseUrl}/login`,
             Language: 'En',
             CustomerReference: `BOOKING-${booking.id}`,
             UserDefinedField: `Booking ID: ${booking.id}`,
