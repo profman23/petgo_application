@@ -1,43 +1,17 @@
-# Render blueprint — deploy PetGo staging + production.
-# After importing this repo in Render, it will prompt for secret env vars.
-# See SECURITY.md for how to set env vars securely.
+# Render Blueprint — manages petgo-production only.
+#
+# petgo-staging was created manually in the Render dashboard before this
+# Blueprint existed, and is intentionally NOT redeclared here so that
+# `render blueprint launch` does not try to create a duplicate. Its
+# configuration lives in the Render dashboard for that service.
+#
+# To re-introduce petgo-staging under Blueprint management later, add a
+# matching `- type: web` block above petgo-production.
+#
+# After importing this repo as a Blueprint, Render will prompt for the
+# `sync: false` secrets (DATABASE_URL, EMAIL_PASSWORD, MYFATOORAH_API_KEY,
+# TAQNYAT_API_KEY, PERPLEXITY_API_KEY). See SECURITY.md.
 services:
-  - type: web
-    name: petgo-staging
-    env: node
-    region: frankfurt
-    plan: starter
-    branch: staging
-    buildCommand: npm install --include=dev && npm run build
-    startCommand: npm run start
-    envVars:
-      - key: APP_ENV
-        value: staging
-      - key: NODE_ENV
-        value: production
-      - key: PUBLIC_BASE_URL
-        value: https://petgo-staging.onrender.com
-      - key: DATABASE_URL
-        sync: false
-      - key: EMAIL_ENABLED
-        value: "false"
-      - key: EMAIL_PASSWORD
-        sync: false
-      - key: FROM_EMAIL
-        value: profman23@gmail.com
-      - key: MYFATOORAH_ENABLED
-        value: "false"
-      - key: MYFATOORAH_API_KEY
-        sync: false
-      - key: TAQNYAT_ENABLED
-        value: "false"
-      - key: TAQNYAT_API_KEY
-        sync: false
-      - key: PERPLEXITY_ENABLED
-        value: "false"
-      - key: PERPLEXITY_API_KEY
-        sync: false
-
   - type: web
     name: petgo-production
     env: node
@@ -56,14 +30,22 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: EMAIL_ENABLED
-        value: "false"
+        value: "false"   # Flip to "true" in dashboard after EMAIL_PASSWORD is set
       - key: EMAIL_PASSWORD
         sync: false
       - key: FROM_EMAIL
-        value: profman23@gmail.com
+        value: info@petgo.me
+      - key: SMTP_HOST
+        value: smtp.resend.com
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_USER
+        value: resend
       - key: MYFATOORAH_ENABLED
-        value: "false"
+        value: "false"   # Flip to "true" in dashboard after MYFATOORAH_API_KEY is set
       - key: MYFATOORAH_API_KEY
+        sync: false
+      - key: MYFATOORAH_WEBHOOK_SECRET
         sync: false
       - key: TAQNYAT_ENABLED
         value: "false"
