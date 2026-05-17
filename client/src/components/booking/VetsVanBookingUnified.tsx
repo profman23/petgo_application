@@ -903,7 +903,7 @@ export function VetsVanBookingUnified({
     }
 
     return (
-      <div className={`${isModal ? '' : 'min-h-screen'} bg-gray-50 py-8`} dir="ltr">
+      <div className={`${isModal ? '' : 'min-h-screen'} bg-gray-50 py-8`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className={`${isModal ? '' : 'max-w-7xl mx-auto px-4'}`}>
           
           {!isModal && paymentSuccess && paymentReference && paymentId && (
@@ -915,13 +915,15 @@ export function VetsVanBookingUnified({
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-green-800">Payment Successful!</h3>
+                  <h3 className="text-lg font-semibold text-green-800">
+                    {language === 'ar' ? 'تمت عملية الدفع بنجاح!' : 'Payment Successful!'}
+                  </h3>
                   <p className="text-sm text-green-700">
-                    Payment Reference: <span className="font-mono">{paymentReference}</span>
+                    {language === 'ar' ? 'مرجع الدفع:' : 'Payment Reference:'} <span className="font-mono">{paymentReference}</span>
                   </p>
                   {paymentAmount && paymentAmount > 0 && (
                     <p className="text-sm text-green-700 mt-1 font-semibold">
-                      💰 Amount Paid: <span className="text-lg">{paymentAmount} {paymentCurrency}</span>
+                      💰 {language === 'ar' ? 'المبلغ المدفوع:' : 'Amount Paid:'} <span className="text-lg">{paymentAmount} {paymentCurrency}</span>
                     </p>
                   )}
                 </div>
@@ -1036,7 +1038,7 @@ export function VetsVanBookingUnified({
               <thead className="sticky top-0 z-10">
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400 sticky left-0 bg-gray-50" style={{ textAlign: 'left' }}>
-                    Time
+                    {language === 'ar' ? 'الوقت' : 'Time'}
                   </th>
                   {availableVetsVans.map((van, index) => (
                     <th 
@@ -1084,7 +1086,7 @@ export function VetsVanBookingUnified({
                             {(isBooking || createBookingMutation.isPending) && availability.isClickable && !availability.isPast ? (
                               <div className="flex items-center gap-1">
                                 <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-purple-600"></div>
-                                <span className="text-xs">Booking...</span>
+                                <span className="text-xs">{language === 'ar' ? 'جاري الحجز...' : 'Booking...'}</span>
                               </div>
                             ) : (
                               availability.display
