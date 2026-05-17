@@ -903,7 +903,7 @@ export function VetsVanBookingUnified({
     }
 
     return (
-      <div className={`${isModal ? '' : 'min-h-screen'} bg-gray-50 py-8`} dir="ltr">
+      <div className={`${isModal ? '' : 'min-h-screen'} bg-gray-50 py-8`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
         <div className={`${isModal ? '' : 'max-w-7xl mx-auto px-4'}`}>
           
           {!isModal && paymentSuccess && paymentReference && paymentId && (
@@ -915,13 +915,15 @@ export function VetsVanBookingUnified({
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-green-800">Payment Successful!</h3>
+                  <h3 className="text-lg font-semibold text-green-800">
+                    {language === 'ar' ? 'تمت عملية الدفع بنجاح!' : 'Payment Successful!'}
+                  </h3>
                   <p className="text-sm text-green-700">
-                    Payment Reference: <span className="font-mono">{paymentReference}</span>
+                    {language === 'ar' ? 'مرجع الدفع:' : 'Payment Reference:'} <span className="font-mono">{paymentReference}</span>
                   </p>
                   {paymentAmount && paymentAmount > 0 && (
                     <p className="text-sm text-green-700 mt-1 font-semibold">
-                      💰 Amount Paid: <span className="text-lg">{paymentAmount} {paymentCurrency}</span>
+                      💰 {language === 'ar' ? 'المبلغ المدفوع:' : 'Amount Paid:'} <span className="text-lg">{paymentAmount} {paymentCurrency}</span>
                     </p>
                   )}
                 </div>
@@ -930,19 +932,25 @@ export function VetsVanBookingUnified({
           )}
           
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">PetGo Booking Schedule</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              {language === 'ar' ? 'جدول حجز PetGo' : 'PetGo Booking Schedule'}
+            </h1>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-600">
-                  Available PetGos: {availableVetsVans.length}
+                  {language === 'ar'
+                    ? `سيارات PetGo المتاحة: ${availableVetsVans.length}`
+                    : `Available PetGos: ${availableVetsVans.length}`}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Shifts loaded: {shifts.length} for {selectedDate}
+                  {language === 'ar'
+                    ? `المناوبات المتاحة: ${shifts.length} ليوم ${selectedDate}`
+                    : `Shifts loaded: ${shifts.length} for ${selectedDate}`}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <label htmlFor="booking-date" className="text-sm font-medium text-gray-700">
-                  Select Date:
+                  {language === 'ar' ? 'اختر التاريخ:' : 'Select Date:'}
                 </label>
                 <input
                   id="booking-date"
@@ -963,13 +971,15 @@ export function VetsVanBookingUnified({
                   <div className="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
                     <Stethoscope className="w-4 h-4 text-white" />
                   </div>
-                  <h2 className="text-lg font-semibold text-purple-800">Request Summary</h2>
+                  <h2 className="text-lg font-semibold text-purple-800">
+                    {language === 'ar' ? 'ملخص الطلب' : 'Request Summary'}
+                  </h2>
                 </div>
                 
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 text-sm font-medium text-gray-700 min-w-[100px]">
-                      Selected Pets:
+                      {language === 'ar' ? 'الحيوانات المختارة:' : 'Selected Pets:'}
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {selectedPets.map((pet) => (
@@ -984,7 +994,7 @@ export function VetsVanBookingUnified({
                   {rideRequestData.serviceType && (
                     <div className="flex items-center gap-3">
                       <div className="flex-shrink-0 text-sm font-medium text-gray-700 min-w-[100px]">
-                        Service Type:
+                        {language === 'ar' ? 'نوع الخدمة:' : 'Service Type:'}
                       </div>
                       <span className="inline-flex items-center gap-1 bg-white px-3 py-1 rounded-full text-sm font-medium text-purple-700 border border-purple-300">
                         <Stethoscope className="w-3 h-3" />
@@ -996,7 +1006,7 @@ export function VetsVanBookingUnified({
                   {rideRequestData.location && (
                     <div className="flex items-center gap-3">
                       <div className="flex-shrink-0 text-sm font-medium text-gray-700 min-w-[100px]">
-                        Service Location:
+                        {language === 'ar' ? 'موقع الخدمة:' : 'Service Location:'}
                       </div>
                       <span className="inline-flex items-center gap-1 bg-white px-3 py-1 rounded-full text-sm font-medium text-purple-700 border border-purple-300">
                         <MapPin className="w-3 h-3" />
@@ -1008,7 +1018,9 @@ export function VetsVanBookingUnified({
 
                 <div className="mt-4 pt-4 border-t border-purple-200">
                   <p className="text-sm text-purple-600 font-medium">
-                    Please select your preferred appointment time from the schedule below.
+                    {language === 'ar'
+                      ? 'يرجى اختيار الوقت المناسب من الجدول أدناه.'
+                      : 'Please select your preferred appointment time from the schedule below.'}
                   </p>
                 </div>
               </CardContent>
@@ -1026,7 +1038,7 @@ export function VetsVanBookingUnified({
               <thead className="sticky top-0 z-10">
                 <tr className="bg-gray-50 border-b border-gray-200">
                   <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 border-r-2 border-gray-400 sticky left-0 bg-gray-50" style={{ textAlign: 'left' }}>
-                    Time
+                    {language === 'ar' ? 'الوقت' : 'Time'}
                   </th>
                   {availableVetsVans.map((van, index) => (
                     <th 
@@ -1074,7 +1086,7 @@ export function VetsVanBookingUnified({
                             {(isBooking || createBookingMutation.isPending) && availability.isClickable && !availability.isPast ? (
                               <div className="flex items-center gap-1">
                                 <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-purple-600"></div>
-                                <span className="text-xs">Booking...</span>
+                                <span className="text-xs">{language === 'ar' ? 'جاري الحجز...' : 'Booking...'}</span>
                               </div>
                             ) : (
                               availability.display
@@ -1093,10 +1105,12 @@ export function VetsVanBookingUnified({
             <div className="text-center py-12">
               <div className="text-gray-400 text-6xl mb-4">🚐</div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No Available PetGos
+                {language === 'ar' ? 'لا توجد سيارات PetGo متاحة' : 'No Available PetGos'}
               </h3>
               <p className="text-gray-600">
-                No PetGos with active shifts found for this date.
+                {language === 'ar'
+                  ? 'لا توجد سيارات PetGo بمناوبات نشطة لهذا التاريخ.'
+                  : 'No PetGos with active shifts found for this date.'}
               </p>
             </div>
           )}
@@ -1188,7 +1202,7 @@ export function VetsVanBookingUnified({
         <DialogContent className="max-w-[95vw] max-h-[90vh] p-0 overflow-hidden flex flex-col">
           <div className="p-6 pb-2 flex-shrink-0">
             <DialogHeader>
-              <DialogTitle>PetGo Booking Schedule</DialogTitle>
+              <DialogTitle>{language === 'ar' ? 'جدول حجز PetGo' : 'PetGo Booking Schedule'}</DialogTitle>
             </DialogHeader>
           </div>
           <div className="flex-1 overflow-y-auto px-6 pb-6">
