@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { createRegisterSchema } from '@shared/schema';
-import { ArrowLeft, RefreshCw, Mail, Phone, Lock, Camera, Cat, Dog, Bird, Calendar } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Lock, Camera, Cat, Dog, Bird, Calendar } from 'lucide-react';
 import { useTranslation, getTextAlign, getDirection } from '@/lib/i18n';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -31,14 +31,12 @@ export function CustomerRegistrationForm({
   showBackButton = true,
   includePetFields = false,
 }: CustomerRegistrationFormProps) {
-  const [captcha, setCaptcha] = useState({ question: '', answer: 0 });
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
     password: '',
-    captcha: '',
   });
   
   // Pet form state (only used when includePetFields is true)
@@ -58,40 +56,12 @@ export function CustomerRegistrationForm({
   const { toast } = useToast();
   const { t, language } = useTranslation();
 
-  const generateCaptcha = () => {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    const operation = Math.random() > 0.5 ? '+' : '-';
-    
-    let question, answer;
-    if (operation === '+') {
-      question = `${num1} + ${num2} = ؟`;
-      answer = num1 + num2;
-    } else {
-      const larger = Math.max(num1, num2);
-      const smaller = Math.min(num1, num2);
-      question = `${larger} - ${smaller} = ؟`;
-      answer = larger - smaller;
-    }
-    
-    setCaptcha({ question, answer });
-  };
-
-  useEffect(() => {
-    generateCaptcha();
-  }, []);
-
   const registerMutation = useMutation({
     mutationFn: async (data: any) => {
       // Validate with dynamic schema
       const registerSchema = createRegisterSchema(language);
       const validatedData = registerSchema.parse(data);
-      
-      // Validate captcha first
-      if (parseInt(validatedData.captcha) !== captcha.answer) {
-        throw new Error(language === 'ar' ? 'رمز التحقق غير صحيح' : 'Invalid verification code');
-      }
-      
+
       // If includePetFields is true, validate pet data
       if (includePetFields) {
         if (!petData.name || !petData.type || !petData.patientWeight) {
@@ -143,7 +113,6 @@ export function CustomerRegistrationForm({
           email: '',
           phone: '',
           password: '',
-          captcha: '',
         });
         
         // Reset pet data if included
@@ -160,8 +129,6 @@ export function CustomerRegistrationForm({
           });
           setSelectedPhoto(null);
         }
-        
-        generateCaptcha();
       }
       
       // Call onSuccess callback
@@ -516,51 +483,7 @@ export function CustomerRegistrationForm({
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-2 border-blue-200">
-        <h3 className="text-center text-lg font-semibold text-blue-800 mb-4" style={{ textAlign: getTextAlign(language) }}>
-          {language === 'ar' ? 'التحقق الأمني' : 'Security Verification'} *
-        </h3>
-        <div className="flex justify-center mb-4">
-          <div 
-            id="captcha-question" 
-            className="inline-block bg-white border-3 border-blue-300 px-6 py-3 rounded-xl text-2xl font-bold text-blue-900 shadow-lg"
-            role="img"
-            aria-label={language === 'ar' ? `سؤال الحماية: ${captcha.question}` : `Security question: ${captcha.question}`}
-          >
-            {captcha.question}
-          </div>
-        </div>
-        <label htmlFor="captcha-input" className="block text-sm font-medium text-gray-700 mb-2 text-center" style={{ textAlign: getTextAlign(language) }}>
-          {language === 'ar' ? 'الإجابة' : 'Answer'}
-        </label>
-        <Input
-          id="captcha-input"
-          type="number"
-          placeholder={language === 'ar' ? 'أدخل الإجابة' : 'Enter your answer'}
-          className="text-center text-xl mb-4 h-12 border-2 border-blue-300"
-          value={formData.captcha}
-          onChange={(e) => updateFormData('captcha', e.target.value)}
-          required
-          aria-label={language === 'ar' ? 'إجابة السؤال الأمني' : 'Security question answer'}
-          aria-describedby="captcha-question"
-          data-testid="input-captcha"
-        />
-        <div className="flex justify-center">
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="lg" 
-            onClick={generateCaptcha}
-            className="flex items-center gap-3 border-2 border-blue-300 hover:bg-blue-100"
-            data-testid="button-refresh-captcha"
-          >
-            <RefreshCw className="w-5 h-5" />
-            {language === 'ar' ? 'تجديد السؤال' : 'Refresh Question'}
-          </Button>
-        </div>
-      </div>
-
-      <Button 
+      <Button
         type="submit" 
         className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300" 
         disabled={registerMutation.isPending || !isPetDataValid}

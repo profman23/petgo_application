@@ -418,9 +418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/auth/register', async (req, res) => {
     try {
       const validatedData = registerSchema.parse(req.body);
-      
-      // Remove captcha from data
-      const { captcha, ...userData } = validatedData;
+      const userData = validatedData;
       const userLanguage = req.body.preferredLanguage || 'ar';
       const skipOTP = req.body.skipOTP === true;
       
