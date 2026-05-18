@@ -18,6 +18,7 @@ import { useTranslation, getDirection, getTextAlign } from '@/lib/i18n';
 import { YouTubeTutorialModal } from '@/components/YouTubeTutorialModal';
 import { shouldShowTutorialVideo } from '@/lib/deviceDetection';
 import { CustomerRegistrationForm } from '@/components/CustomerRegistrationForm';
+import { LanguageSelector } from '@/components/language-selector';
 
 interface LoginFormData {
   identifier: string;
@@ -154,6 +155,9 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4" dir={getDirection(language)}>
       <div className="w-full max-w-lg">
+        <div className="flex justify-end mb-3">
+          <LanguageSelector />
+        </div>
         <Card className="border-0">
           {/* Header with back button and improved logo design */}
           <div className="bg-white px-6 pt-4 pb-2 text-center relative rounded-t-lg">
