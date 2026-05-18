@@ -294,9 +294,9 @@ export default function Login() {
                   >
                     <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
                       <UserPlus className="w-5 h-5" />
-                      <span style={{ 
+                      <span style={{
                         fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                      }}>Create New Account</span>
+                      }}>{language === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'}</span>
                     </div>
                   </Button>
                   
@@ -380,15 +380,10 @@ export default function Login() {
                     </div>
                   )}
 
-                  <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
-                    <p className="text-sm text-gray-500 font-medium tracking-wide" style={{ 
-                      fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                    }}>
-                      Powered By DotVets Software
-                    </p>
+                  <div className="mt-6 pt-4 border-t border-gray-200">
                     <div className="text-center">
                       <Link href="/en/privacy-policy">
-                        <span className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer underline" style={{ 
+                        <span className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer underline" style={{
                           fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                         }}>
                           Privacy & Policy
@@ -408,15 +403,10 @@ export default function Login() {
                 showBackButton={true}
               />
               
-              <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
-                <p className="text-sm text-gray-500 font-medium tracking-wide text-center" style={{ 
-                  fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-                }}>
-                  Powered By DotVets Software
-                </p>
+              <div className="mt-6 pt-4 border-t border-gray-200">
                 <div className="text-center">
                   <Link href="/en/privacy-policy">
-                    <span className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer underline" style={{ 
+                    <span className="text-sm text-purple-600 hover:text-purple-700 cursor-pointer underline" style={{
                       fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
                     }}>
                       Privacy & Policy
