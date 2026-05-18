@@ -135,16 +135,14 @@ export const createRegisterSchema = (language: string = 'en') => {
       lastNameRequired: "الاسم الثاني مطلوب (حد أدنى حرفين)", 
       emailInvalid: "البريد الإلكتروني غير صحيح",
       phoneInvalid: "رقم الهاتف يجب أن يبدأ بـ 05 ويحتوي على 10 أرقام",
-      passwordTooShort: "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
-      captchaRequired: "يرجى إدخال رمز التحقق"
+      passwordTooShort: "كلمة المرور يجب أن تكون 6 أحرف على الأقل"
     },
     en: {
       firstNameRequired: "First name is required (minimum 2 characters)",
       lastNameRequired: "Last name is required (minimum 2 characters)",
-      emailInvalid: "Invalid email address", 
+      emailInvalid: "Invalid email address",
       phoneInvalid: "Phone number must start with 05 and contain 10 digits",
-      passwordTooShort: "Password must be at least 6 characters long",
-      captchaRequired: "Please enter verification code"
+      passwordTooShort: "Password must be at least 6 characters long"
     }
   };
   
@@ -156,7 +154,6 @@ export const createRegisterSchema = (language: string = 'en') => {
     email: z.string().email(msg.emailInvalid),
     phone: z.string().regex(/^05\d{8}$/, msg.phoneInvalid).optional().or(z.literal('')),
     password: z.string().min(6, msg.passwordTooShort),
-    captcha: z.string().min(1, msg.captchaRequired),
   });
 };
 
