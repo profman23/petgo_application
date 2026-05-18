@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -93,10 +93,47 @@ const getSimplifiedProgressPercentage = (status: string): number => {
   return progressMap[mappedStatus] || 0;
 };
 
+const EDUCATIONAL_TIPS = [
+  {
+    titleAr: 'التطعيمات الدورية: درعك الواقي ضد الأمراض المعدية',
+    titleEn: "Annual Vaccinations: Your Pet's Shield Against Disease",
+    bodyAr: 'التطعيمات السنوية تحمي حيوانك الأليف من أمراض خطيرة مثل السعار، البارفو، والسُّعال. الكلاب والقطط الصغيرة تحتاج جدول تطعيمات مكثف خلال أول 16 أسبوع، يليه booster سنوي. تأخير التطعيم قد يُعرّض حيوانك لأمراض قاتلة وقابلة للوقاية.',
+    bodyEn: 'Annual vaccinations protect your pet from serious diseases like rabies, parvovirus, and kennel cough. Puppies and kittens need an intensive vaccination schedule during their first 16 weeks, followed by yearly boosters. Skipping vaccines exposes your pet to preventable, often fatal illnesses.',
+  },
+  {
+    titleAr: 'علامات تحذيرية تستدعي زيارة الطبيب البيطري فوراً',
+    titleEn: "Warning Signs That Demand an Immediate Vet Visit",
+    bodyAr: 'فقدان الشهية لأكثر من 24 ساعة، القيء المتكرر، الخمول الشديد، صعوبة التنفس، أو تغيّر مفاجئ في السلوك — كلها إشارات لا يجب تجاهلها. حيوانك لا يستطيع إخبارك بما يشعر به، فمراقبة عاداته اليومية هي أول خط دفاع. التدخل المبكر يُحسّن فرص الشفاء بشكل كبير.',
+    bodyEn: "Loss of appetite for more than 24 hours, repeated vomiting, extreme lethargy, breathing difficulties, or sudden behavior changes — none should be ignored. Your pet can't tell you how it feels, so observing daily habits is your first line of defense. Early intervention dramatically improves recovery outcomes.",
+  },
+  {
+    titleAr: 'التغذية المتوازنة: أساس صحة حيوانك الأليف',
+    titleEn: "Balanced Nutrition: The Foundation of Your Pet's Health",
+    bodyAr: 'طعام عالي الجودة مخصص لعُمر ووزن وفصيلة حيوانك يدعم مناعته، فروه، وصحة مفاصله. تجنّب إطعامه بقايا طعام البشر، خاصة الشوكولاتة، البصل، والعنب — فهي سامة للقطط والكلاب. استشر طبيبك البيطري لاختيار النظام الغذائي الأنسب.',
+    bodyEn: "High-quality food tailored to your pet's age, weight, and breed supports its immunity, coat, and joint health. Avoid table scraps — especially chocolate, onions, and grapes, which are toxic to cats and dogs. Consult your vet to choose the most suitable diet.",
+  },
+  {
+    titleAr: 'العناية بأسنان حيوانك: لماذا هي أهم مما تظن؟',
+    titleEn: "Dental Care for Pets: More Important Than You Think",
+    bodyAr: 'أمراض اللثة تصيب أكثر من 80% من الكلاب والقطط فوق سن 3 سنوات، وقد تؤدي لمشاكل في القلب والكلى. تنظيف أسنان حيوانك بفرشاة مخصصة 2-3 مرات أسبوعياً، واستخدام طعام جاف مع زيارات تنظيف دورية، يطيل عمره ويُجنّبه آلاماً مزمنة.',
+    bodyEn: "Periodontal disease affects over 80% of dogs and cats over age 3, and can lead to heart and kidney problems. Brushing your pet's teeth 2–3 times weekly with a pet-safe brush, alongside dry food and regular dental cleanings, extends its life and prevents chronic pain.",
+  },
+  {
+    titleAr: 'الفحوصات الدورية: الكشف المبكر يحفظ حياة حيوانك',
+    titleEn: "Regular Check-ups: Early Detection Saves Lives",
+    bodyAr: 'الحيوانات الأليفة تُخفي الألم بطبيعتها كآلية بقاء. زيارة بيطرية شاملة كل 6-12 شهراً تكشف الأمراض في مراحلها المبكرة — حين يكون العلاج أسهل، أقل تكلفة، وأكثر فاعلية. للحيوانات فوق سن 7 سنوات، يُنصح بفحوصات أكثر تكراراً.',
+    bodyEn: "Pets instinctively hide pain as a survival mechanism. A comprehensive vet exam every 6–12 months catches diseases early — when treatment is easier, cheaper, and more effective. For pets over 7 years old, more frequent check-ups are recommended.",
+  },
+];
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
+  const educationalTip = useMemo(
+    () => EDUCATIONAL_TIPS[Math.floor(Math.random() * EDUCATIONAL_TIPS.length)],
+    []
+  );
   const { language } = useLanguage();
   const t = useTranslation();
   const textAlign = getTextAlign(language);
@@ -792,13 +829,6 @@ export default function Home() {
               }}>
                 {language === 'ar' ? 'اضغط هنا للطلب' : 'Click Here to Request'}
               </span>
-              <span className="text-sm opacity-90 !text-white" style={{ 
-                textAlign, 
-                color: 'white',
-                fontFamily: language === 'ar' ? '"Delius", cursive' : '"Comic Relief", cursive'
-              }}>
-                Vetsvan
-              </span>
             </div>
           </button>
 
@@ -911,10 +941,7 @@ export default function Home() {
                   color: '#1E50C8'
                 }}
               >
-                {language === 'ar' 
-                  ? 'العلاج المنتظم للوقاية من البراغيث' 
-                  : 'Regular anti-flea treatment is important'
-                }
+                {language === 'ar' ? educationalTip.titleAr : educationalTip.titleEn}
               </h2>
               
               {/* Educational Content */}
@@ -927,10 +954,7 @@ export default function Home() {
                   lineHeight: '1.6'
                 }}
               >
-                {language === 'ar' 
-                  ? 'العلاج المنتظم للوقاية من البراغيث أمر مهم. الوقاية أفضل من العلاج، لأن البراغيث يمكن أن تنقل طفيليات الدم، وتعمل كناقل لبعض الأمراض، وقد تكون أيضًا مصدرًا للطفيليات الداخلية مثل الديدان الشريطية.'
-                  : 'Regular anti-flea treatment is important. Prophylaxis is better than treatment, as fleas can transmit blood parasites, act as vectors for certain diseases, and may also be a source of internal parasites like tapeworms.'
-                }
+                {language === 'ar' ? educationalTip.bodyAr : educationalTip.bodyEn}
               </p>
             </div>
           </div>
