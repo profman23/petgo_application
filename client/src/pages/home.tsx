@@ -397,7 +397,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir={direction}>
+    <div className="min-h-screen bg-gray-50 pb-32" dir={direction}>
       <div className="max-w-md mx-auto bg-white shadow-sm overflow-hidden">
         {/* Header */}
         <div className="bg-white text-gray-800 px-2 py-3 h-20 shadow-sm">
@@ -905,7 +905,7 @@ export default function Home() {
           </div>
 
           {/* Educational Section - Anti-Flea Prevention */}
-          <div className="mt-6 mb-4 px-4">
+          <div className="mt-4 mb-4 px-4">
             <div className="text-center">
               {/* Weekly Tips Header */}
               <div className="flex items-center justify-start mb-3">
@@ -924,17 +924,17 @@ export default function Home() {
               </div>
               
               {/* Dog & Cat Logo */}
-              <div className="flex justify-center mb-4">
-                <img 
+              <div className="flex justify-center mb-2">
+                <img
                   src={dogCatLogo}
-                  alt="Dog and Cat Logo" 
+                  alt="Dog and Cat Logo"
                   className="w-24 h-24 object-contain"
                 />
               </div>
-              
+
               {/* Title */}
-              <h2 
-                className="text-xl font-bold mb-3"
+              <h2
+                className="text-xl font-bold mb-2"
                 style={{ 
                   textAlign,
                   fontFamily: '"Delius", cursive',
